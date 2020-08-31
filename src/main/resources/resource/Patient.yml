@@ -1,0 +1,21 @@
+# Represents data that needs to be extracted for a Patient Resource in FHIR
+# reference: https://www.hl7.org/fhir/patient.html
+---
+resourceType: Patient
+id:
+  evaluate: 'UUID.randomUUID()'
+identifier:
+    type: Array
+    reference: datatype/Identifier
+    hl7spec: PID.3  
+name: 
+    type: Array
+    reference: datatype/HumanName
+    hl7spec: PID.5  
+gender: 
+     type: ADMINISTRATIVE_GENDER
+     hl7spec: PID.8
+
+birthDate:
+     type: LOCAL_DATE
+     hl7spec: PID.7

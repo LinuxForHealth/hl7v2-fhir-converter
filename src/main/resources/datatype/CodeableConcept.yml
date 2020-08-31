@@ -1,0 +1,11 @@
+# Represents codeable concept that can be derived from CE/CNE/CWE 
+---
+
+ coding : 
+    type: Single
+    reference: datatype/Coding
+    
+ text :  
+     type: STRING
+     hl7spec: CX
+  
