@@ -1,0 +1,9 @@
+---
+reference:
+ fetch:  '$ref-type:id'
+type:
+ fetch: '$ref-type:resourceType'
+identifier:
+ fetch: '$ref-type:identifier'
+display:
+ value: $ref-display

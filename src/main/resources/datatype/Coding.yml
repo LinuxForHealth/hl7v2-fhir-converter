@@ -1,0 +1,19 @@
+hl7prefix:
+system: 
+     type: STRING
+     hl7prefix:
+     hl7spec: '::::3'
+version:
+     type: STRING
+     hl7prefix:
+     hl7spec: '::::7'
+code: 
+     type: STRING
+     hl7prefix:
+     hl7spec: '::::1'
+display: 
+     type: STRING
+     hl7prefix:
+     hl7spec: '::::2'
+userSelected: 
+     default: ""
