@@ -1,4 +1,4 @@
-# HL7v2-FHIR
+# HL7v2-FHIR Converter
 
 FHIR converter is a Java based library that enables converting [Hl7v2](https://www.hl7.org/implement/standards/product_section.cfm?section=13) messages to [FHIR](https://hl7.org/FHIR/) resources.<br>
 FHIR converter utilized the open source  [HAPI Library](https://hapifhir.github.io/hapi-hl7v2/) for parsing Hl7 messages and it also utilizes the [HAPI library for FHIR](https://hapifhir.io/) resources to validate the generated FHIR resources.
@@ -56,7 +56,33 @@ resources:
 ```
 
 ### Structure of a resource template
+Resource template represents a [FHIR resource](https://hl7.org/FHIR/resourcelist.html). In order to generate a resource, a resource template for that resource should exist in this location: master/src/main/resources/resource. The resource template defines list of fields and a way to extract values for each of these fields.
+The extraction logic for each field can be defined by using expressions. This component supports 4 different type of expressions.
 
+Sample resource template:
+```yml
+# Represents data that needs to be extracted for a Patient Resource in FHIR
+# reference: https://www.hl7.org/fhir/patient.html
+---
+resourceType: Patient
+id:
+  evaluate: 'UUID.randomUUID()'
+identifier:
+    type: Array
+    reference: datatype/IdentifierCX
+    hl7spec: PID.3  
+name: 
+    type: Array
+    reference: datatype/HumanName
+    hl7spec: PID.5  
+gender: 
+     type: ADMINISTRATIVE_GENDER
+     hl7spec: PID.8
+
+birthDate:
+     type: LOCAL_DATE
+     hl7spec: PID.7
+```
 
 
 ### Different expressions types 
