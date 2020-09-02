@@ -15,7 +15,7 @@ For each resource in a template following attributes needs to be defined:
       resourceName: [REQUIRED]
       segment: [REQUIRED]
       resourcePath: [REQUIRED] 
-      order:[DEFAULT 0] 
+      order: [DEFAULT 0] 
       repeates:  [DEFAULT false]       
       additionalSegments: [DEFAULT empty] 
 ```
@@ -26,13 +26,47 @@ Attribute description:
 * order: Order of resource generation, example -- generate Patient resource followed by Encounter and so on.
 * repeates:  HL7 have certain segments that repeat and so the convertor needs to generate multiple resources from those segments. Example OBX segment. If this field is set to false then only the first occurance of that segment will be used for resource generation. If this is set to true then multiple resources will be generated from each of the occurrences of that segment.  
 * additionalSegments: Any additional segments the resource needs.
+Example:
+```yml
+# FHIR Resources to extract from ADT_A01 message
+---
+resources:
+    - resourceName: Patient
+      segment: PID
+      resourcePath: resource/Patient
+      order: 1
+      repeates: false
+      additionalSegments:
+      
+    - resourceName: Encounter
+      segment: PV1
+      resourcePath: resource/Encounter
+      order: 2
+      repeates: false
+      additionalSegments:
+             - PV2
+             - EVN
+    - resourceName: Observation
+      segment: OBX
+      resourcePath: resource/Observation
+      order: 3
+      repeates: true
+      additionalSegments:
+
+```
+
+### Structure of a resource template
 
 
 
+### Different expressions types 
+
+
+### Conversion steps 
 In order to convert the message the converter executes following steps:
 * Detect the HL7 message type
 * Based on the message type select the HL7 message template
-* 
+
 
 
 ## Installation
