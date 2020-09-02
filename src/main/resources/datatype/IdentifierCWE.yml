@@ -1,0 +1,24 @@
+---
+type: 
+   type: Single
+   reference: datatype/CodeableConcept
+   var:
+     code: CWE.5
+
+system: 
+     type: STRING
+     hl7spec: CWE.4
+    
+value: 
+     type: STRING
+     hl7spec: CWE.1
+     required: true
+
+period: 
+     evaluate: 'GeneralUtils.generatePeriod(start,end)'
+     var: 
+       start: LOCAL_DATE_TIME CWE.7
+       end: LOCAL_DATE_TIME CWE.8
+  
+
+

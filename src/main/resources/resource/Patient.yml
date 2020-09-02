@@ -6,7 +6,7 @@ id:
   evaluate: 'UUID.randomUUID()'
 identifier:
     type: Array
-    reference: datatype/Identifier
+    reference: datatype/IdentifierCX
     hl7spec: PID.3  
 name: 
     type: Array

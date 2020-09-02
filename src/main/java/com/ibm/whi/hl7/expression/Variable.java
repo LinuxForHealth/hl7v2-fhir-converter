@@ -3,13 +3,14 @@ package com.ibm.whi.hl7.expression;
 import java.util.List;
 
 public class Variable {
+  public static final String OBJECT_TYPE = "Object";
   private String name;
   private String type;
   private List<String> spec;
 
 
   public Variable(String name, List<String> spec) {
-    this(name, spec, "Object");
+    this(name, spec, OBJECT_TYPE);
   }
 
   public Variable(String name, List<String> spec, String type) {

@@ -1,0 +1,11 @@
+---
+low:
+   value: $low
+high:
+   value: $high
+type:
+  value: $type
+appliesTo:
+  value: $appliesto
+text:
+  value: $text

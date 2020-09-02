@@ -1,4 +1,4 @@
-package com.ibm.whi.hl7.expression;
+package com.ibm.whi.hl7.expression.model;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -10,7 +10,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.ibm.whi.hl7.expression.eval.WHIAJexlEngine;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class ValueReplacementExpression extends AbstractExpression {
+public class JELXExpression extends AbstractExpression {
   private static final WHIAJexlEngine JEXL = new WHIAJexlEngine();
   private String evaluate;
 
@@ -18,7 +18,7 @@ public class ValueReplacementExpression extends AbstractExpression {
 
 
   @JsonCreator
-  public ValueReplacementExpression(@JsonProperty("type") String type,
+  public JELXExpression(@JsonProperty("type") String type,
       @JsonProperty("default") Object defaultValue, @JsonProperty("required") boolean required,
       @JsonProperty("hl7spec") String hl7spec, @JsonProperty("evaluate") String evaluate,
       @JsonProperty("var") Map<String, String> variables) {
@@ -32,7 +32,7 @@ public class ValueReplacementExpression extends AbstractExpression {
   }
 
 
-  public ValueReplacementExpression(String evaluate, Map<String, String> variables) {
+  public JELXExpression(String evaluate, Map<String, String> variables) {
     this("String", null, false, null, evaluate, variables);
 
 

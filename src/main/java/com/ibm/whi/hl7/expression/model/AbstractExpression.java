@@ -1,4 +1,4 @@
-package com.ibm.whi.hl7.expression;
+package com.ibm.whi.hl7.expression.model;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,6 +15,9 @@ import org.slf4j.LoggerFactory;
 import com.ibm.whi.hl7.data.DataEvaluator;
 import com.ibm.whi.hl7.data.SimpleDataTypeMapper;
 import com.ibm.whi.hl7.exception.DataExtractionException;
+import com.ibm.whi.hl7.expression.Expression;
+import com.ibm.whi.hl7.expression.Hl7SpecResult;
+import com.ibm.whi.hl7.expression.Variable;
 import com.ibm.whi.hl7.parsing.Hl7DataExtractor;
 import ca.uhn.hl7v2.model.Segment;
 import ca.uhn.hl7v2.model.Structure;
@@ -101,7 +104,7 @@ public abstract class AbstractExpression implements Expression {
       try {
       Object value = getValueVariable(var.getSpec(), context);
         Object resolvedValue = value;
-        if (value != null & !var.getType().equalsIgnoreCase("Object")) {
+        if (value != null && !var.getType().equalsIgnoreCase(Variable.OBJECT_TYPE)) {
 
           DataEvaluator<Object, ?> resolver = SimpleDataTypeMapper.getValueResolver(var.getType());
           if (resolver != null) {
@@ -136,16 +139,16 @@ public abstract class AbstractExpression implements Expression {
 
 
 
-  static List<Visitable> getValuesFromSpecs(List<String> hl7specs, Map<String, Object> context) {
+  static Hl7SpecResult getValuesFromSpecs(List<String> hl7specs, Map<String, Object> context) {
     if (hl7specs.isEmpty()) {
-      return new ArrayList<>();
+      return null;
     }
-    List<Visitable> fetchedValue = null;
+    Hl7SpecResult fetchedValue = null;
     for (String hl7specValue : hl7specs) {
 
       fetchedValue = valuesFromHl7Message(hl7specValue, context);
       // break the loop and return
-      if (!fetchedValue.isEmpty()) {
+      if (fetchedValue != null && fetchedValue.isNotEmpty()) {
         return fetchedValue;
       }
     }
@@ -154,11 +157,11 @@ public abstract class AbstractExpression implements Expression {
 
   }
 
-  static Visitable getValueFromSpecs(List<String> hl7specs, Map<String, Object> context) {
+  static Object getValueFromSpecs(List<String> hl7specs, Map<String, Object> context) {
     if (hl7specs.isEmpty()) {
       return null;
     }
-    Visitable fetchedValue = null;
+    Object fetchedValue = null;
     for (String hl7specValue : hl7specs) {
 
       fetchedValue = valueFromHl7Message(hl7specValue, context);
@@ -199,36 +202,55 @@ public abstract class AbstractExpression implements Expression {
 
 
 
-  static List<Visitable> valuesFromHl7Message(String hl7specs, Map<String, Object> context) {
-    List<Visitable> fetchedValues = new ArrayList<>();
+  static Hl7SpecResult valuesFromHl7Message(String hl7specs, Map<String, Object> context) {
+    Hl7SpecResult res = null;
+
     String[] tokens = StringUtils.split(hl7specs, HL7_SPEC_SPLITTER.pattern());
     Object obj = context.get(tokens[0]);
     Hl7DataExtractor hde = (Hl7DataExtractor) context.get("hde");
+
+
     try {
     if (obj instanceof Segment) {
       int field = NumberUtils.toInt(tokens[1]);
+        List<Visitable> fetchedValues = new ArrayList<>();
       fetchedValues.addAll((List<Visitable>) hde.getTypes((Segment) obj, field));
+        res = new Hl7SpecResult(fetchedValues);
+
     } else if (obj instanceof Type) {
+        List<Visitable> fetchedValues = new ArrayList<>();
       int component = NumberUtils.toInt(tokens[1]);
       fetchedValues.add(hde.getComponent((Type) obj, component));
-    } else {
+        res = new Hl7SpecResult(fetchedValues);
+      } else if (tokens.length == 2) {
+        String fetchedValue = hde.get(tokens[0], tokens[1]);
+        res = new Hl7SpecResult(fetchedValue);
+
+      } else {
+        List<Visitable> fetchedValues = new ArrayList<>();
       fetchedValues.addAll(hde.getAllStructures(tokens[0]));
+        res = new Hl7SpecResult(fetchedValues);
       }
     } catch (DataExtractionException e) {
       LOGGER.error("cannot extract value for variable {} ", hl7specs, e);
     }
 
-    return fetchedValues;
+    return res;
 
   }
 
 
-  static Visitable valueFromHl7Message(String hl7specs, Map<String, Object> context) {
-    List<Visitable> vals = valuesFromHl7Message(hl7specs, context);
-    if (vals.isEmpty()) {
+  static Object valueFromHl7Message(String hl7specs, Map<String, Object> context) {
+    Hl7SpecResult vals = valuesFromHl7Message(hl7specs, context);
+    if (vals == null || vals.isEmpty()) {
       return null;
     } else {
-      return vals.get(0);
+      if (!vals.getHl7DatatypeValue().isEmpty()) {
+        return vals.getHl7DatatypeValue().get(0);
+      } else {
+        return vals.getTextValue();
+      }
+
     }
 
   }

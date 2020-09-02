@@ -1,22 +1,45 @@
 ---
 preAdmissionIdentifier:
-     hl7spec: PV1-5	
+    type: Array
+    reference: datatype/IdentifierCX
+    hl7spec:  PV1.5	
 admitSource: 
-     hl7spec: PV1-14	
+   type: Single
+   reference: datatype/CodeableConcept
+   var:
+     code: PV1.14
 
 reAdmission:
-     hl7spec: PV1-13
+   type: Single
+   reference: datatype/CodeableConcept
+   var:
+     code: PV1.13
+
 
 dietPreference:
-     hl7spec: PV1-38	
+   type: Single
+   reference: datatype/CodeableConcept
+   var:
+     code: PV1.38
+   
 
 specialCourtesy:
-     hl7spec: PV1-16
+   type: Single
+   reference: datatype/CodeableConcept
+   var:
+     code: PV1.16
+
 
 specialArrangement: 
-     hl7spec: PV1-15 | OBR-30 | OBR-43
+   type: Single
+   reference: datatype/CodeableConcept
+   var:
+     code: PV1.15 | OBR.30 | OBR.43
 
-destination: 
-    hl7spec: PV1-37
+
 dischargeDisposition:
-    hl7spec: PV1-36
+   type: Single
+   reference: datatype/CodeableConcept
+   var:
+     code: PV1.36
+

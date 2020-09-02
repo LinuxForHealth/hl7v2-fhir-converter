@@ -15,8 +15,8 @@ import org.hl7.fhir.r4.model.Enumerations.AdministrativeGender;
 import org.hl7.fhir.r4.model.Observation.ObservationStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ca.uhn.hl7v2.model.v26.datatype.DT;
-import ca.uhn.hl7v2.model.v26.datatype.DTM;
+import ca.uhn.hl7v2.model.primitive.DT;
+import ca.uhn.hl7v2.model.primitive.TSComponentOne;
 
 public class SimpleDataValueResolver {
   private static final Logger LOGGER = LoggerFactory.getLogger(SimpleDataValueResolver.class);
@@ -24,11 +24,14 @@ public class SimpleDataValueResolver {
 
   public static final DataEvaluator<Object, LocalDate> LOCAL_DATE = (Object value) -> {
     LOGGER.info("parsing value to Localdate {}  ", value);
+    if (value != null) {
+      LOGGER.info("parsing value to Localdate {} type {} ", value, value.getClass());
+    }
     LocalDate date = null;
-    if(value instanceof DT) {
-      date = Hl7DataHandlerUtil.toLocalDate((DT) value);
-    } else if (value instanceof DTM) {
-      date = Hl7DataHandlerUtil.toLocalDate((DTM) value);
+    if (value instanceof ca.uhn.hl7v2.model.primitive.DT) {
+      date = Hl7DataHandlerUtil.toLocalDate((ca.uhn.hl7v2.model.primitive.DT) value);
+    } else if (value instanceof TSComponentOne) {
+      date = Hl7DataHandlerUtil.toLocalDate((TSComponentOne) value);
     } else if (value instanceof String) {
       date = LocalDate.parse((String) value, DateTimeFormatter.BASIC_ISO_DATE);
     }
@@ -40,8 +43,8 @@ public class SimpleDataValueResolver {
     LocalDateTime date = null;
     if (value instanceof DT) {
       date = Hl7DataHandlerUtil.toLocalDateTime((DT) value);
-    } else if (value instanceof DTM) {
-      date = Hl7DataHandlerUtil.toLocalDateTime((DTM) value);
+    } else if (value instanceof TSComponentOne) {
+      date = Hl7DataHandlerUtil.toLocalDateTime((TSComponentOne) value);
     } else if (value instanceof String) {
       date = LocalDateTime.parse((String) value, DateTimeFormatter.ISO_INSTANT);
     }
@@ -175,8 +178,8 @@ public class SimpleDataValueResolver {
     LocalDateTime date = null;
     if (value instanceof DT) {
       date = Hl7DataHandlerUtil.toLocalDateTime((DT) value);
-    } else if (value instanceof DTM) {
-      date = Hl7DataHandlerUtil.toLocalDateTime((DTM) value);
+    } else if (value instanceof TSComponentOne) {
+      date = Hl7DataHandlerUtil.toLocalDateTime((TSComponentOne) value);
     } else if (value instanceof String) {
       date = LocalDateTime.parse((String) value, DateTimeFormatter.ISO_INSTANT);
     }

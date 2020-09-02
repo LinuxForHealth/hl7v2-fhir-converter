@@ -63,4 +63,44 @@ public class GeneralUtils {
   }
 
 
+  public static Object getObservationValue(Object observation, Object observationType,
+      Object units) {
+    LOGGER.info("Generating onservation value from observation {}, observationType {}, units  {}",
+        observation, observationType, units);
+
+      if (observation != null && observationType != null) {
+        Object observationResult = null;
+        String valueType = Hl7DataHandlerUtil.getStringValue(observationType);
+        if ("NM".equalsIgnoreCase(valueType)) {
+          observationResult = Hl7DataHandlerUtil.getStringValue(observation);
+        } else if ("SN".equalsIgnoreCase(valueType)) {
+
+
+              observationResult = Hl7DataHandlerUtil.getStringValue(observation);
+        } else if ("TX".equalsIgnoreCase(valueType)) {
+          observationResult = Hl7DataHandlerUtil.getStringValue(observation);
+        } else if ("CWE".equalsIgnoreCase(valueType)) {
+          observationResult = Hl7DataHandlerUtil.getStringValue(observation);
+        } else if ("CX".equalsIgnoreCase(valueType)) {
+          observationResult = Hl7DataHandlerUtil.getStringValue(observation);
+        } else if ("DTM".equalsIgnoreCase(valueType)) {
+          observationResult = Hl7DataHandlerUtil.getStringValue(observation);
+        } else if ("DM".equalsIgnoreCase(valueType)) {
+          observationResult = Hl7DataHandlerUtil.getStringValue(observation);
+        }
+
+        return observationResult;
+
+      }
+
+
+
+    return null;
+  }
+
+
+  public static Object getPerformer(Object practitioner, Object device, Object organization) {
+    return null;
+  }
+
 }

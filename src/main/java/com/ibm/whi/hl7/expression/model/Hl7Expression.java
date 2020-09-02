@@ -1,4 +1,4 @@
-package com.ibm.whi.hl7.expression;
+package com.ibm.whi.hl7.expression.model;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -9,7 +9,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.ibm.whi.hl7.data.DataEvaluator;
 import com.ibm.whi.hl7.data.SimpleDataTypeMapper;
-import ca.uhn.hl7v2.model.Visitable;
 
 
 /**
@@ -41,7 +40,7 @@ public class Hl7Expression extends AbstractExpression {
   public Object execute(Map<String, Object> context) {
     LOGGER.info("Evaluating expression type {} , hl7spec {}", this.getType(), this.getHl7specs());
   
-    Visitable hl7Value = getValueFromSpecs(this.getHl7specs(), context);
+    Object hl7Value = getValueFromSpecs(this.getHl7specs(), context);
     LOGGER.info("Evaluating expression type {} , hl7spec {} returned hl7 value {} ", this.getType(),
         this.getHl7specs(), hl7Value);
     Object resolvedValue = null;

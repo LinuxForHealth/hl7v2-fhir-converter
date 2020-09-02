@@ -1,0 +1,81 @@
+#Observation resource
+---
+resourceType: Observation
+identifier:
+    type: Array
+    reference: datatype/IdentifierCWE
+    hl7spec: OBX.3 |  OBX.21 
+
+status:
+   type: OBSERVATION_STATUS
+   hl7spec: OBX.11
+
+code:
+   type: Single
+   reference: datatype/CodeableConcept
+   var:
+     code: OBX.3
+     
+subject:
+    type: Single
+    reference: datatype/Reference
+    var: 
+      ref-type: $Patient
+
+encounter:
+    type: Single
+    reference: datatype/Reference
+    var: 
+      ref-type: $Encounter
+
+
+effective:
+     type: LOCAL_DATE
+     hl7spec: OBX.14 | OBX.19
+
+
+issued:
+     type: LOCAL_DATE
+     hl7spec: OBR.22 | MSH.7| OBX.19
+
+performer:
+   type: Single
+   evaluate: 'GeneralUtils.getPerformer(practitioner,device,organization)'
+   var:
+     practitioner: OBX.15 | OBX.16
+     device: OBX.18
+     organization: OBX.23
+     
+valueString:
+     evaluate: 'GeneralUtils.getObservationValue(observation,observationType,units )'
+     var:
+       observation: OBX.5
+       observationType: OBX.2
+       units: OBX.6
+
+interpretation: 
+   type: Single
+   reference: datatype/CodeableConcept
+   var:
+     code: OBX.8
+
+bodySite:
+   type: Single
+   reference: datatype/CodeableConcept
+   var:
+     code: OBX.20
+
+method:
+   type: Single
+   reference: datatype/CodeableConcept
+   var:
+     code: OBX.17
+referenceRange: 
+   type: Array
+   reference: secondary/ReferenceRange
+   var:
+     low: OBX.7
+     high: OBX.7
+     appliesto: OBX.10
+     text: OBX.7
+     type: OBX.10

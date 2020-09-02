@@ -2,10 +2,12 @@
 ---
 
  coding : 
-    type: Single
+    type: Array
     reference: datatype/Coding
+    vars:
+       code: $code
     
  text :  
      type: STRING
-     hl7spec: CX
+     value: $code
   

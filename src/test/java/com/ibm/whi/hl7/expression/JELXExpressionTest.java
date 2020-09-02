@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import org.junit.Test;
+import com.ibm.whi.hl7.expression.model.JELXExpression;
 import com.ibm.whi.hl7.parsing.HL7HapiParser;
 import com.ibm.whi.hl7.parsing.Hl7DataExtractor;
 import ca.uhn.hl7v2.HL7Exception;
@@ -12,7 +13,7 @@ import ca.uhn.hl7v2.model.Message;
 import ca.uhn.hl7v2.model.Unmodifiable;
 import ca.uhn.hl7v2.model.v26.datatype.CX;
 
-public class ValueReplacementExpressionTest {
+public class JELXExpressionTest {
 
   private static final String SOME_VALUE = "SOME_VALUE";
   private static final String SOME_VALUE_1 = "SOME_VALUE_1";
@@ -21,7 +22,8 @@ public class ValueReplacementExpressionTest {
 
   @Test
   public void test_simple() {
-    ValueReplacementExpression exp = new ValueReplacementExpression(
+    JELXExpression exp =
+        new JELXExpression(
         "String.join(\" \",  var1,var2, var3)", new HashMap<>());
     Map<String, Object> context = new HashMap<>();
     context.put("var1", SOME_VALUE_1);
@@ -62,8 +64,7 @@ public class ValueReplacementExpressionTest {
       cx.getCx2_IdentifierCheckDigit().setValue("value2");
 
 
-      ValueReplacementExpression exp =
-          new ValueReplacementExpression("String.join(\" \",  var1,var2, var3)", var);
+      JELXExpression exp = new JELXExpression("String.join(\" \",  var1,var2, var3)", var);
 
     Map<String, Object> context = new HashMap<>();
     context.put("CX", cx);

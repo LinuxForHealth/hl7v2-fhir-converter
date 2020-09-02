@@ -252,83 +252,28 @@ public class Hl7DataExtractor {
     }
   }
 
-  //
-  // /**
-  // * Extracts the value of the specified input from the message and returns an object - which
-  // could
-  // * either be Structure (Segment/Group) or Type or a String value
-  // *
-  // * @param obj - if obj is null then uses the terser to extract the String specified by the spec
-  // * @param spec - this field can be either represent Segment name or field type or spec for
-  // * extracting value from Terser.
-  // * @param rep -- validates that rep is non negative
-  // * @return
-  // */
-  // public Object get(Structure obj, int field, int rep, String type) {
-  //
-  // Preconditions.checkArgument(rep >= 0, REP_CANNOT_BE_NEGATIVE);
-  // Object returnObject = null;
-  // try {
-  // if (obj != null && obj instanceof Segment) {
-  // List<Type> objects = this.getField((Segment) obj, NumberUtils.toInt(spec), rep);
-  // if (!objects.isEmpty()) {
-  // returnObject = objects.get(0);
-  // }
-  // } else if (obj != null && obj instanceof Type) {
-  // returnObject = this.getComponent((Type) obj, NumberUtils.toInt(spec));
-  // } else {
-  // returnObject = getTerser().get(spec);
-  // }
-  //
-  // return returnObject;
-  // } catch (HL7Exception | IllegalArgumentException e) {
-  // if (e.getMessage().contains(CAN_T_GET_REPETITION)
-  // || e.getMessage().contains(CANNOT_ADD_REPETITION_WITH_INDEX)) {
-  // throw new NoMoreRepititionException(
-  // CANNOT_EXTRACT_VALUE_FROM_OF_TAG_FROM_TERSER_STRING + spec, e);
-  // } else {
-  // throw new DataExtractionException(CANNOT_EXTRACT_VALUE_FROM_OF_TAG_FROM_TERSER, e);
-  // }
-  //
-  // } catch (ArrayIndexOutOfBoundsException are) {
-  // LOGGER.error(HL7_STRING, spec, are);
-  // return null;
-  // // throw new DataExtractionException("Cannot extract value from of tag from Terser", are);
-  // }
-  // }
-  //
-  // /**
-  // *
-  // * @param obj
-  // * @param spec
-  // * @return
-  // */
-  // public List<?> getAllRepetitions(Object obj, String spec) {
-  //
-  // try {
-  // if (obj instanceof Segment) {
-  // return this.getField((Segment) obj, NumberUtils.toInt(spec), -1);
-  // } else {
-  // return this.getSegments(spec, -1);
-  // }
-  //
-  //
-  // } catch (IllegalArgumentException e) {
-  // if (e.getMessage().contains(CAN_T_GET_REPETITION)
-  // || e.getMessage().contains(CANNOT_ADD_REPETITION_WITH_INDEX)) {
-  // throw new NoMoreRepititionException(
-  // CANNOT_EXTRACT_VALUE_FROM_OF_TAG_FROM_TERSER_STRING + spec, e);
-  // } else {
-  // throw new DataExtractionException(CANNOT_EXTRACT_VALUE_FROM_OF_TAG_FROM_TERSER, e);
-  // }
-  //
-  // } catch (ArrayIndexOutOfBoundsException are) {
-  // LOGGER.error(HL7_STRING, spec, are);
-  // return null;
-  // // throw new DataExtractionException("Cannot extract value from of tag from Terser", are);
-  // }
-  // }
-  //
+
+
+  /**
+   * 
+   * @param segment
+   * @param field
+   * @return
+   */
+   public String get(String segment, String field) {
+  
+   Preconditions.checkArgument(StringUtils.isNotBlank(segment), "segment cannot be blank");
+   Preconditions.checkArgument(StringUtils.isNotBlank(field), "field cannot be blank");
+
+   try {
+      return getTerser().get("/" + segment + "-" + field);
+
+    } catch (HL7Exception | IllegalArgumentException | ArrayIndexOutOfBoundsException e) {
+      LOGGER.error(HL7_STRING, segment + "-" + field);
+      return null;
+
+    }
+  }
 
 
 }

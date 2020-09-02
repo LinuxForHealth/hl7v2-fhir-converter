@@ -7,29 +7,35 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.ibm.whi.hl7.expression.DefaultExpression;
 import com.ibm.whi.hl7.expression.Expression;
-import com.ibm.whi.hl7.expression.Hl7Expression;
-import com.ibm.whi.hl7.expression.ReferenceExpression;
-import com.ibm.whi.hl7.expression.ResourceReferenceExpression;
-import com.ibm.whi.hl7.expression.ValueReplacementExpression;
+import com.ibm.whi.hl7.expression.model.DefaultExpression;
+import com.ibm.whi.hl7.expression.model.Hl7Expression;
+import com.ibm.whi.hl7.expression.model.JELXExpression;
+import com.ibm.whi.hl7.expression.model.ReferenceExpression;
+import com.ibm.whi.hl7.expression.model.ValueExtractionGeneralExpression;
 
 
 @JsonDeserialize(using = ResourceDeserializer.class)
 public class ResourceModel {
+  private static final Logger LOGGER = LoggerFactory.getLogger(ResourceModel.class);
+
   private static final File RESOURCES = new File("src/main/resources");
   private Map<String, Expression> expressions;
   private String hl7spec;
   private int order;
+  private String name;
 
-  public ResourceModel(Map<String, Expression> expressions, String hl7spec) {
-    this(expressions, hl7spec, 0);
+  public ResourceModel(String name, Map<String, Expression> expressions, String hl7spec) {
+    this(name, expressions, hl7spec, 0);
 
 
   }
 
-  public ResourceModel(Map<String, Expression> expressions, String hl7spec, int order) {
+  public ResourceModel(String name, Map<String, Expression> expressions, String hl7spec,
+      int order) {
     this.expressions = new HashMap<>();
     this.expressions.putAll(expressions);
     this.hl7spec = hl7spec;
@@ -39,8 +45,8 @@ public class ResourceModel {
 
 
 
-  public ResourceModel(Map<String, Expression> expressions) {
-    this(expressions, null);
+  public ResourceModel(String name, Map<String, Expression> expressions) {
+    this(name, expressions, null);
   }
 
   public Map<String, Expression> getExpressions() {
@@ -50,6 +56,8 @@ public class ResourceModel {
 
 
   public Object evaluate(Map<String, Object> context) {
+
+    LOGGER.info("Started Evaluating resource {}", this.name);
     Map<String, Object> localContext = new HashMap<>(context);
     Map<String, Object> resolveValues = new HashMap<>();
     Map<String, Expression> expressionMap = this.getExpressions();
@@ -70,12 +78,12 @@ public class ResourceModel {
             .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
     Map<String, Expression> resourceRef = expressionMap.entrySet().stream()
-        .filter(e -> (e.getValue() instanceof ResourceReferenceExpression))
+        .filter(e -> (e.getValue() instanceof ValueExtractionGeneralExpression))
         .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
 
     Map<String, Expression> valueref = expressionMap.entrySet().stream()
-        .filter(e -> (e.getValue() instanceof ValueReplacementExpression))
+        .filter(e -> (e.getValue() instanceof JELXExpression))
         .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
 
@@ -83,11 +91,14 @@ public class ResourceModel {
     for (Entry<String, Expression> entry : refExp.entrySet()) {
 
       ReferenceExpression exp = (ReferenceExpression) entry.getValue();
-      exp.getReferencesResources().forEach(ref -> localContext.put(ref, resolveValues.get(ref)));
-
+      LOGGER.info("----Evaluating {} {}", exp.getType(), entry.getKey());
+      LOGGER.info("----Extracted reference resource  {} {} reference {}", exp.getType(),
+          entry.getKey(), exp.getReference());
       if (exp.getData() != null) {
 
         Object obj = exp.execute(localContext);
+        LOGGER.info("----Extracted object from reference resource  {} {} reference {}  value {}",
+            exp.getType(), entry.getKey(), exp.getReference(), obj);
         if (obj != null) {
 
           resolveValues.put(entry.getKey(), obj);
@@ -116,9 +127,9 @@ public class ResourceModel {
       Map<String, Object> resolveValues, Map<String, Expression> hl7Exps) {
     for (Entry<String, Expression> entry : hl7Exps.entrySet()) {
       Expression exp = entry.getValue();
-
+      LOGGER.info("Evaluating {} {}", entry.getKey(), entry.getValue());
       Object obj = exp.execute(localContext);
-
+      LOGGER.info("Evaluated {} {} value returned {} ", entry.getKey(), entry.getValue(), obj);
 
       if (obj != null) {
 
@@ -144,8 +155,10 @@ public class ResourceModel {
 
     if (templateFile.exists()) {
       try {
-        return ObjectMapperUtil.getInstance().readValue(templateFile, ResourceModel.class);
-
+        ResourceModel rm =
+            ObjectMapperUtil.getInstance().readValue(templateFile, ResourceModel.class);
+        rm.setName(templateFile.getName());
+        return rm;
       } catch (IOException e) {
         throw new IllegalArgumentException(
             "Error encountered in processing the template" + templateFile, e);
@@ -156,6 +169,13 @@ public class ResourceModel {
 
   }
 
+  private void setName(String name) {
+    this.name = name;
+  }
+
+  public String getName() {
+    return name;
+  }
 
 
 

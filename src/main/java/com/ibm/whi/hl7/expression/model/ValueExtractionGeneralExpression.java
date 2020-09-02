@@ -1,4 +1,4 @@
-package com.ibm.whi.hl7.expression;
+package com.ibm.whi.hl7.expression.model;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -16,9 +16,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * @author {user}
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class ResourceReferenceExpression extends AbstractExpression {
+public class ValueExtractionGeneralExpression extends AbstractExpression {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(ResourceReferenceExpression.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(ValueExtractionGeneralExpression.class);
 
 
   private String fetch;
@@ -35,7 +35,7 @@ public class ResourceReferenceExpression extends AbstractExpression {
    * @param variables
    */
   @JsonCreator
-  public ResourceReferenceExpression(@JsonProperty("type") String type,
+  public ValueExtractionGeneralExpression(@JsonProperty("type") String type,
       @JsonProperty("fetch") String fetch, @JsonProperty("hl7spec") String hl7spec,
       @JsonProperty("default") Object defaultValue, @JsonProperty("required") boolean required,
       @JsonProperty("var") Map<String, String> variables) {
@@ -49,8 +49,8 @@ public class ResourceReferenceExpression extends AbstractExpression {
   }
 
 
-  public ResourceReferenceExpression(String type, String reference, String hl7spec) {
-    this(type, reference, hl7spec, null, false, null);
+  public ValueExtractionGeneralExpression(String type, String fetch, String hl7spec) {
+    this(type, fetch, hl7spec, null, false, null);
   }
 
 
