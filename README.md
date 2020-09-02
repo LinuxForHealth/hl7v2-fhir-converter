@@ -12,15 +12,20 @@ HL7v2-FHIR converter converts a given HL7 message to FHIR bundle resource using 
 A message template file consists of list of resources that can be generated from that message type.
 For each resource in a template following attributes needs to be defined:
 ```yml
-      resourceName: [REQUIRED] Name of the resource example: Patient
-      segment: [REQUIRED] Primary segment that this resource depends on. Example patient resource depends on PID segment
-      resourcePath: [REQUIRED] path for resource file example: [Patient resource](src/main/resources/resource/Patient.yml) 
-      order:[DEFAULT 0] Order of resource generation, example -- generate Patient resource followed by Encounter and so on.
-      repeates: false [DEFAULT false]
-      additionalSegments: [DEFAULT empty]
+      resourceName: [REQUIRED]
+      segment: [REQUIRED]
+      resourcePath: [REQUIRED] 
+      order:[DEFAULT 0] 
+      repeates:  [DEFAULT false]       
+      additionalSegments: [DEFAULT empty] 
 ```
-
-
+Attribute description: 
+* resourceName:  Name of the resource example: Patient
+* segment: Primary segment that this resource depends on. Example patient resource depends on PID segment
+* resourcePath: Path for resource file example: Patient resource :src/main/resources/resource/Patient.yml
+* order: Order of resource generation, example -- generate Patient resource followed by Encounter and so on.
+* repeates:  HL7 have certain segments that repeat and so the convertor needs to generate multiple resources from those segments. Example OBX segment. If this field is set to false then only the first occurance of that segment will be used for resource generation. If this is set to true then multiple resources will be generated from each of the occurrences of that segment.  
+* additionalSegments: Any additional segments the resource needs.
 
 
 
