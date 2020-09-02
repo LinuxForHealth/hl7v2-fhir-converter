@@ -11,8 +11,8 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Lists;
-import com.ibm.whi.hl7.expression.Hl7SpecResult;
+import com.google.common.collect.ImmutableMap;
+import com.ibm.whi.hl7.expression.GenericResult;
 import com.ibm.whi.hl7.expression.Variable;
 import com.ibm.whi.hl7.resource.ResourceModel;
 
@@ -83,30 +83,38 @@ public class ReferenceExpression extends AbstractExpression {
 
 
   @Override
-  public Object execute(Map<String, Object> context) {
+  public GenericResult execute(ImmutableMap<String, ?> executables,
+      ImmutableMap<String, GenericResult> variables) {
 
     if ("ARRAY".equalsIgnoreCase(this.getType())) {
 
-      List<Object> dataValues = (List<Object>) getRepts(context);
+      List<?> dataValues = getRepts(executables, variables);
       List<Object> resolvedvalues = new ArrayList<>();
       for (Object o : dataValues) {
-        Map<String, Object> localContext =
-            getLocalContext(o, this.getVariables(), context);
+        Map<String, GenericResult> localContext =
+            getLocalVariables(o, this.getVariables(), executables, variables);
 
-        resolvedvalues.add(this.data.evaluate(localContext));
+        resolvedvalues.add(this.data.evaluate(executables, ImmutableMap.copyOf(localContext)));
       }
       resolvedvalues.removeIf(Objects::isNull);
       if (resolvedvalues.isEmpty()) {
         return null;
       } else {
-        return resolvedvalues;
+        return new GenericResult(resolvedvalues);
       }
 
 
 
     } else {
-      Object hl7Value = getValueFromSpecs(this.getHl7specs(), context);
-      return this.data.evaluate(getLocalContext(hl7Value, this.getVariables(), context));
+      GenericResult hl7Value = getValueFromSpecs(this.getHl7specs(), executables, variables);
+      Object val = null;
+      if (hl7Value != null) {
+        val = hl7Value.getValue();
+      }
+      Map<String, GenericResult> localContext =
+          getLocalVariables(val, this.getVariables(), executables, variables);
+      return new GenericResult(
+          this.data.evaluate(executables, ImmutableMap.copyOf(localContext)));
 
     }
 
@@ -115,33 +123,32 @@ public class ReferenceExpression extends AbstractExpression {
   }
 
 
-  private List<?> getRepts(Map<String, Object> context) {
-    Hl7SpecResult result = getValuesFromSpecs(this.getHl7specs(), context);
-    if (result != null && result.isNotEmpty()) {
-      if (!result.getHl7DatatypeValue().isEmpty()) {
-        return result.getHl7DatatypeValue();
-      } else {
-        return Lists.newArrayList(result.getTextValue());
-      }
+  private List<?> getRepts(ImmutableMap<String, ?> executables,
+      ImmutableMap<String, GenericResult> variables) {
+    GenericResult result = getValuesFromSpecs(this.getHl7specs(), executables, variables);
+    if (result != null && result.getValue() instanceof List) {
+      return (List) result.getValue();
     }
     return new ArrayList<>();
   }
 
 
-  private static Map<String, Object> getLocalContext(Object hl7Value,
-      List<Variable> vars, Map<String, Object> context) {
-    Map<String, Object> localContext = new HashMap<>(context);
+  private static Map<String, GenericResult> getLocalVariables(Object hl7Value,
+      List<Variable> variableNames,
+      ImmutableMap<String, ?> executables, ImmutableMap<String, GenericResult> variables) {
+    Map<String, GenericResult> localVariables = new HashMap<>(variables);
 
     if (hl7Value != null) {
       String type = getDataType(hl7Value);
 
       LOGGER.info(type);
-      localContext.put(type, hl7Value);
+      localVariables.put(type, new GenericResult(hl7Value));
     }
 
-    localContext.putAll(resolveVariables(vars, localContext));
+    localVariables
+        .putAll(resolveVariables(variableNames, executables, ImmutableMap.copyOf(localVariables)));
 
-    return localContext;
+    return ImmutableMap.copyOf(localVariables);
   }
 
 

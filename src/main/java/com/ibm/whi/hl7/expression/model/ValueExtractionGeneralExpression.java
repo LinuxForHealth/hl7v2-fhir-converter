@@ -8,6 +8,8 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.common.collect.ImmutableMap;
+import com.ibm.whi.hl7.expression.GenericResult;
 
 /**
  * Represent a expression that represents resolving a json template
@@ -63,24 +65,26 @@ public class ValueExtractionGeneralExpression extends AbstractExpression {
    * 
    * @see com.ibm.whi.hl7.expression.Expression#execute(java.util.Map)
    */
+
   @Override
-  public Object execute(Map<String, Object> context) {
-    Map<String, Object> localContext = new HashMap<>(context);
-    localContext.putAll(resolveVariables(this.getVariables(), localContext));
+  public GenericResult execute(ImmutableMap<String, ?> executables,
+      ImmutableMap<String, GenericResult> variables) {
+
+    Map<String, GenericResult> resolvedVariables = new HashMap<>(variables);
+    resolvedVariables.putAll(resolveVariables(this.getVariables(), executables, variables));
+    Map<String, Object> localContext = new HashMap<>();
+    resolvedVariables
+        .forEach((key, value) -> localContext.put(key, value.getValue()));
     String[] token = fetch.split(":");
     if (token.length == 2) {
       Object resource = localContext.get(token[0].replace("$", ""));
     if (resource instanceof Map) {
       Map<String, Object> resourceMap = (Map<String, Object>) resource;
-      return resourceMap.get(token[1]);
+        return new GenericResult(resourceMap.get(token[1]));
       }
     }
     return null;
-
-
   }
-
-
 
 
 

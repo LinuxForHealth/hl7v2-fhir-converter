@@ -18,7 +18,7 @@ public class DeserializationTest {
     JsonNode jnode = objMapper.readTree("\"test\"");
     DefaultExpression exp = objMapper.convertValue(jnode, DefaultExpression.class);
     
-    assertThat(exp.getValue()).isEqualTo("");
+    assertThat(exp.getValue()).isEqualTo("test");
   }
 
 }

@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import org.junit.Test;
+import com.google.common.collect.ImmutableMap;
 import com.ibm.whi.hl7.expression.model.JELXExpression;
 import com.ibm.whi.hl7.parsing.HL7HapiParser;
 import com.ibm.whi.hl7.parsing.Hl7DataExtractor;
@@ -25,13 +26,18 @@ public class JELXExpressionTest {
     JELXExpression exp =
         new JELXExpression(
         "String.join(\" \",  var1,var2, var3)", new HashMap<>());
-    Map<String, Object> context = new HashMap<>();
-    context.put("var1", SOME_VALUE_1);
-    context.put("var2", SOME_VALUE_2);
-    context.put("var3", SOME_VALUE_3);
 
-    Object value = exp.execute(context);
-    assertThat(value).isEqualTo(SOME_VALUE_1 + " " + SOME_VALUE_2 + " " + SOME_VALUE_3);
+
+
+    Map<String, GenericResult> context = new HashMap<>();
+    context.put("var1", new GenericResult(SOME_VALUE_1));
+    context.put("var2", new GenericResult(SOME_VALUE_2));
+    context.put("var3", new GenericResult(SOME_VALUE_3));
+    Map<String, Object> executable = new HashMap<>();
+    GenericResult value =
+        exp.execute(ImmutableMap.copyOf(executable), ImmutableMap.copyOf(context));
+
+    assertThat(value.getValue()).isEqualTo(SOME_VALUE_1 + " " + SOME_VALUE_2 + " " + SOME_VALUE_3);
   }
 
 
@@ -52,26 +58,32 @@ public class JELXExpressionTest {
 
       Hl7DataExtractor hl7DTE = new Hl7DataExtractor(hl7message);
 
+      CX cx = new CX(hl7message);
+      cx.getCx1_IDNumber().setValue(SOME_VALUE_1);
+      cx.getCx2_IdentifierCheckDigit().setValue(SOME_VALUE_2);
+
+
+      Map<String, GenericResult> context = new HashMap<>();
+      context.put("CX", new GenericResult(cx));
+
+      Map<String, Object> executable = new HashMap<>();
+      executable.put("hde", hl7DTE);
+      executable.put("String", String.class);
 
 
     Map<String, String> var = new HashMap<>();
-    var.put("var1", "CX.1");
-    var.put("var2", "CX.2");
-      var.put("var3", "CX.2");
-
-      CX cx = new CX(hl7message);
-    cx.getCx1_IDNumber().setValue("value1");
-      cx.getCx2_IdentifierCheckDigit().setValue("value2");
-
+      var.put("var1", "String CX.1");
+      var.put("var2", "String CX.2");
+      var.put("var3", "String CX.2");
 
       JELXExpression exp = new JELXExpression("String.join(\" \",  var1,var2, var3)", var);
 
-    Map<String, Object> context = new HashMap<>();
-    context.put("CX", cx);
-      context.put("hde", hl7DTE);
-      context.put("String", String.class);
-    Object value = exp.execute(context);
-    assertThat(value).isEqualTo(SOME_VALUE_1 + " " + SOME_VALUE_2 + " " + SOME_VALUE_3);
+
+      GenericResult value =
+          exp.execute(ImmutableMap.copyOf(executable), ImmutableMap.copyOf(context));
+
+      assertThat(value.getValue())
+          .isEqualTo(SOME_VALUE_1 + " " + SOME_VALUE_2 + " " + SOME_VALUE_2);
 
 
     } finally {

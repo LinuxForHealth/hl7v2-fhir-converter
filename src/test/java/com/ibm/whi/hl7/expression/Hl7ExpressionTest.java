@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import org.junit.Test;
+import com.google.common.collect.ImmutableMap;
 import com.ibm.whi.hl7.expression.model.Hl7Expression;
 import com.ibm.whi.hl7.parsing.HL7HapiParser;
 import com.ibm.whi.hl7.parsing.Hl7DataExtractor;
@@ -33,16 +34,22 @@ public class Hl7ExpressionTest {
 
       Hl7DataExtractor hl7DTE = new Hl7DataExtractor(hl7message);
 
-      Map<String, Object> context = new HashMap<>();
-      context.put("hde", hl7DTE);
-      Structure s = hl7DTE.getStructure("PID", 0);
-      context.put("PID", s);
+
+      Structure s = hl7DTE.getStructure("PID", 0).getValue();
+
       Hl7Expression exp = new Hl7Expression("String", "PID.3");
 
 
 
-      Object value = exp.execute(context);
-      assertThat(value).isEqualTo("000010016");
+      Map<String, GenericResult> context = new HashMap<>();
+      context.put("PID", new GenericResult(s));
+
+      Map<String, Object> executable = new HashMap<>();
+      executable.put("hde", hl7DTE);
+
+      GenericResult value =
+          exp.execute(ImmutableMap.copyOf(executable), ImmutableMap.copyOf(context));
+      assertThat(value.getValue()).isEqualTo("000010016");
 
 
     } finally {
@@ -73,19 +80,27 @@ public class Hl7ExpressionTest {
 
       Hl7DataExtractor hl7DTE = new Hl7DataExtractor(hl7message);
 
-      Map<String, Object> context = new HashMap<>();
-      context.put("hde", hl7DTE);
-      Structure s = hl7DTE.getStructure("PID", 0);
-      context.put("PID", s);
-      Type type = hl7DTE.getType((Segment) s, 3, 0);
 
-      context.put(type.getName(), type);
+      Structure s = hl7DTE.getStructure("PID", 0).getValue();
+
+      Type type = hl7DTE.getType((Segment) s, 3, 0).getValue();
+
+
       Hl7Expression exp = new Hl7Expression("String", "CX.1");
 
 
 
-      Object value = exp.execute(context);
-      assertThat(value).isEqualTo("000010016");
+      Map<String, GenericResult> context = new HashMap<>();
+      context.put("PID", new GenericResult(s));
+      context.put(type.getName(), new GenericResult(type));
+      Map<String, Object> executable = new HashMap<>();
+      executable.put("hde", hl7DTE);
+
+      GenericResult value =
+          exp.execute(ImmutableMap.copyOf(executable), ImmutableMap.copyOf(context));
+
+
+      assertThat(value.getValue()).isEqualTo("000010016");
 
 
     } finally {
@@ -116,17 +131,20 @@ public class Hl7ExpressionTest {
 
       Hl7DataExtractor hl7DTE = new Hl7DataExtractor(hl7message);
 
-      Map<String, Object> context = new HashMap<>();
-      context.put("hde", hl7DTE);
-      Structure s = hl7DTE.getStructure("PV1", 0);
-      context.put("PV1", s);
-
+      Structure s = hl7DTE.getStructure("PV1", 0).getValue();
       Hl7Expression exp = new Hl7Expression("String", "PV1.3 | PV1.4 |PV1.59");
 
+      Map<String, GenericResult> context = new HashMap<>();
+      context.put("PV1", new GenericResult(s));
+      Map<String, Object> executable = new HashMap<>();
+      executable.put("hde", hl7DTE);
+
+      GenericResult value =
+          exp.execute(ImmutableMap.copyOf(executable), ImmutableMap.copyOf(context));
 
 
-      Object value = exp.execute(context);
-      assertThat(value).isEqualTo("Location");
+
+      assertThat(value.getValue()).isEqualTo("Location");
 
 
     } finally {

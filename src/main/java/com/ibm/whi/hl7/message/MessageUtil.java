@@ -5,13 +5,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.hl7.fhir.r4.model.Bundle;
-import org.python.google.common.collect.ImmutableMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.ImmutableMap;
 import com.ibm.whi.fhir.FHIRContext;
 import com.ibm.whi.fhir.FHIRResourceMapper;
+import com.ibm.whi.hl7.expression.GenericResult;
 import com.ibm.whi.hl7.parsing.Hl7DataExtractor;
 import com.ibm.whi.hl7.resource.ResourceModel;
 import ca.uhn.hl7v2.model.Structure;
@@ -33,7 +34,8 @@ public class MessageUtil {
    */
   public static Bundle convertMessageToFHIRResource(Hl7DataExtractor hl7DTE,
       Iterable<FHIRResource> resources,
-      Map<String, Object> context) throws IOException {
+      Map<String, ?> executables, Map<String, GenericResult> variables)
+      throws IOException {
 
     Bundle bundle = new Bundle();
     bundle.setType(Bundle.BundleType.COLLECTION);
@@ -41,10 +43,10 @@ public class MessageUtil {
     for (FHIRResource res : resources) {
 
       ResourceModel rs = res.getResource();
-      List<Structure> segments = hl7DTE.getAllStructures(res.getSegment());
+      List<Structure> segments = hl7DTE.getAllStructures(res.getSegment()).getValues();
       if (!segments.isEmpty()) {
 
-        generateFhirResources(res, rs, segments, ImmutableMap.copyOf(context), bundle);
+        generateFhirResources(res, rs, segments, executables, variables, bundle);
 
       }
 
@@ -60,14 +62,16 @@ public class MessageUtil {
 
 
   private static void generateFhirResources(FHIRResource res, ResourceModel rs, List<Structure> segments,
-      Map<String, Object> context, Bundle bundle) throws JsonProcessingException {
+      Map<String, ?> executables, Map<String, GenericResult> variables,
+      Bundle bundle) throws JsonProcessingException {
 
     if (res.isRepeates()) {
 
       for (Structure str : segments) {
-        Map<String, Object> localcontext = new HashMap<>(context);
-        localcontext.put(res.getSegment(), str);
-        Object obj = rs.evaluate(localcontext);
+        Map<String, GenericResult> localVariables = new HashMap<>(variables);
+        localVariables.put(res.getSegment(), new GenericResult(str));
+        Object obj =
+            rs.evaluate(ImmutableMap.copyOf(executables), ImmutableMap.copyOf(localVariables));
         if (obj != null) {
 
             String json = OBJ_MAPPER.writeValueAsString(obj);
@@ -79,14 +83,16 @@ public class MessageUtil {
     } else {
 
 
-      Map<String, Object> localcontext = new HashMap<>(context);
-      localcontext.put(res.getSegment(), segments.get(0));
-      Object evaluatedValue = rs.evaluate(localcontext);
+      Map<String, GenericResult> localVariables = new HashMap<>(variables);
+      localVariables.put(res.getSegment(), new GenericResult(segments.get(0)));
+
+      Object evaluatedValue =
+          rs.evaluate(ImmutableMap.copyOf(executables), ImmutableMap.copyOf(localVariables));
 
       if (evaluatedValue != null) {
         String json = OBJ_MAPPER.writeValueAsString(evaluatedValue);
         addEntry(res.getResourceName(), json, bundle);
-        context.put(res.getResourceName(), evaluatedValue);
+        variables.put(res.getResourceName(), new GenericResult(evaluatedValue));
       }
 
     }

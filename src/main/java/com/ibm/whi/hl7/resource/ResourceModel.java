@@ -10,7 +10,9 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.google.common.collect.ImmutableMap;
 import com.ibm.whi.hl7.expression.Expression;
+import com.ibm.whi.hl7.expression.GenericResult;
 import com.ibm.whi.hl7.expression.model.DefaultExpression;
 import com.ibm.whi.hl7.expression.model.Hl7Expression;
 import com.ibm.whi.hl7.expression.model.JELXExpression;
@@ -40,6 +42,7 @@ public class ResourceModel {
     this.expressions.putAll(expressions);
     this.hl7spec = hl7spec;
     this.order = order;
+    this.name = name;
 
   }
 
@@ -55,10 +58,11 @@ public class ResourceModel {
 
 
 
-  public Object evaluate(Map<String, Object> context) {
+  public Object evaluate(ImmutableMap<String, ?> executable,
+      ImmutableMap<String, GenericResult> variables) {
 
     LOGGER.info("Started Evaluating resource {}", this.name);
-    Map<String, Object> localContext = new HashMap<>(context);
+    Map<String, GenericResult> localContext = new HashMap<>(variables);
     Map<String, Object> resolveValues = new HashMap<>();
     Map<String, Expression> expressionMap = this.getExpressions();
 
@@ -96,22 +100,22 @@ public class ResourceModel {
           entry.getKey(), exp.getReference());
       if (exp.getData() != null) {
 
-        Object obj = exp.execute(localContext);
+        GenericResult obj = exp.execute(executable, ImmutableMap.copyOf(localContext));
         LOGGER.info("----Extracted object from reference resource  {} {} reference {}  value {}",
             exp.getType(), entry.getKey(), exp.getReference(), obj);
         if (obj != null) {
 
-          resolveValues.put(entry.getKey(), obj);
+          resolveValues.put(entry.getKey(), obj.getValue());
         }
       }
     }
 
-    executeExpression(localContext, resolveValues, hl7Exps);
-    executeExpression(localContext, resolveValues, resourceRef);
+    executeExpression(executable, ImmutableMap.copyOf(localContext), resolveValues, hl7Exps);
+    executeExpression(executable, ImmutableMap.copyOf(localContext), resolveValues, resourceRef);
 
-    executeExpression(localContext, resolveValues, defaultExp);
+    executeExpression(executable, ImmutableMap.copyOf(localContext), resolveValues, defaultExp);
 
-    executeExpression(localContext, resolveValues, valueref);
+    executeExpression(executable, ImmutableMap.copyOf(localContext), resolveValues, valueref);
 
 
     resolveValues.values().removeIf(Objects::isNull);
@@ -123,17 +127,18 @@ public class ResourceModel {
 
   }
 
-  private static void executeExpression(Map<String, Object> localContext,
+  private static void executeExpression(ImmutableMap<String, ?> executable,
+      ImmutableMap<String, GenericResult> localContext,
       Map<String, Object> resolveValues, Map<String, Expression> hl7Exps) {
     for (Entry<String, Expression> entry : hl7Exps.entrySet()) {
       Expression exp = entry.getValue();
       LOGGER.info("Evaluating {} {}", entry.getKey(), entry.getValue());
-      Object obj = exp.execute(localContext);
+      GenericResult obj = exp.execute(executable, localContext);
       LOGGER.info("Evaluated {} {} value returned {} ", entry.getKey(), entry.getValue(), obj);
 
       if (obj != null) {
 
-        resolveValues.put(entry.getKey(), obj);
+        resolveValues.put(entry.getKey(), obj.getValue());
       } else if (exp.getDefaultValue() != null) {
         resolveValues.put(entry.getKey(), exp.getDefaultValue());
       }
