@@ -9,6 +9,10 @@ import org.slf4j.LoggerFactory;
 import com.google.common.collect.Lists;
 import com.ibm.whi.hl7.exception.DataExtractionException;
 import com.ibm.whi.hl7.exception.NoMoreRepititionException;
+import com.ibm.whi.hl7.parsing.result.Hl7ParsingStringResult;
+import com.ibm.whi.hl7.parsing.result.Hl7ParsingStructureResult;
+import com.ibm.whi.hl7.parsing.result.Hl7ParsingTypeResult;
+import com.ibm.whi.hl7.parsing.result.ParsingResult;
 import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Composite;
 import ca.uhn.hl7v2.model.DataTypeException;
@@ -16,7 +20,6 @@ import ca.uhn.hl7v2.model.Message;
 import ca.uhn.hl7v2.model.Segment;
 import ca.uhn.hl7v2.model.Structure;
 import ca.uhn.hl7v2.model.Type;
-import ca.uhn.hl7v2.model.Visitable;
 import ca.uhn.hl7v2.util.Terser;
 
 public class Hl7DataExtractor {
@@ -75,7 +78,7 @@ public class Hl7DataExtractor {
   }
 
 
-  public Structure getStructure(String spec, int rep) {
+  public ParsingResult<Structure> getStructure(String spec, int rep) {
     try {
 
       Preconditions.checkArgument(StringUtils.isNotBlank(spec),
@@ -83,7 +86,7 @@ public class Hl7DataExtractor {
       Preconditions.checkArgument(rep >= 0, REP_CANNOT_BE_NEGATIVE);
       LOGGER.info("fetching values for spec {} rep {}", spec, rep);
 
-      return message.get(spec, rep);
+      return new Hl7ParsingStructureResult(message.get(spec, rep));
 
     } catch (HL7Exception | IllegalArgumentException e) {
       if (e.getMessage().contains(CAN_T_GET_REPETITION)
@@ -103,7 +106,7 @@ public class Hl7DataExtractor {
 
 
 
-  public List<Structure> getAllStructures(String spec) {
+  public ParsingResult<Structure> getAllStructures(String spec) {
     try {
 
       Preconditions.checkArgument(StringUtils.isNotBlank(spec),
@@ -113,7 +116,7 @@ public class Hl7DataExtractor {
       Structure[] strs = message.getAll(spec);
 
       segments.addAll(Lists.newArrayList(strs));
-      return segments;
+      return new Hl7ParsingStructureResult(segments);
 
     } catch (HL7Exception | IllegalArgumentException e) {
       if (e.getMessage().contains(CAN_T_GET_REPETITION)
@@ -126,21 +129,21 @@ public class Hl7DataExtractor {
 
     } catch (ArrayIndexOutOfBoundsException are) {
       LOGGER.error(HL7_STRING, spec, are);
-      return new ArrayList<>();
+      return new Hl7ParsingStructureResult(new ArrayList<>());
 
     }
   }
 
 
 
-  public Type getType(Segment segment, int field, int rep) {
+  public ParsingResult<Type> getType(Segment segment, int field, int rep) {
     try {
       Preconditions.checkArgument(segment != null, "segment cannot be null");
       Preconditions.checkArgument(field >= 1, "field cannot be negative");
       Preconditions.checkArgument(rep >= 0, REP_CANNOT_BE_NEGATIVE);
       LOGGER.info("fetching values for Segment {} field {} rep {}, ", segment, field, rep);
 
-      return segment.getField(field, rep);
+      return new Hl7ParsingTypeResult(segment.getField(field, rep));
 
     } catch (HL7Exception | IllegalArgumentException e) {
       if (e.getMessage().contains(CAN_T_GET_REPETITION)
@@ -158,19 +161,19 @@ public class Hl7DataExtractor {
     }
   }
 
-  public List<Visitable> getTypes(Segment segment, int field) {
+  public ParsingResult<Type> getTypes(Segment segment, int field) {
     try {
       Preconditions.checkArgument(segment != null, "segment cannot be null");
       Preconditions.checkArgument(field >= 1, "field cannot be negative");
 
       LOGGER.info("fetching values for Segment {} field {}  ", segment, field);
 
-      List<Visitable> types = new ArrayList<>();
+      List<Type> types = new ArrayList<>();
 
       Type[] fields = segment.getField(field);
       types.addAll(Lists.newArrayList(fields));
 
-      return types;
+      return new Hl7ParsingTypeResult(types);
 
     } catch (HL7Exception | IllegalArgumentException e) {
       if (e.getMessage().contains(CAN_T_GET_REPETITION)
@@ -183,21 +186,21 @@ public class Hl7DataExtractor {
 
     } catch (ArrayIndexOutOfBoundsException are) {
       LOGGER.error(HL7_STRING, segment, are);
-      return new ArrayList<>();
+      return new Hl7ParsingTypeResult(new ArrayList<>());
 
     }
   }
 
 
 
-  public Type getComponent(Type type, int component) {
+  public ParsingResult<Type> getComponent(Type type, int component) {
     try {
       Preconditions.checkArgument(type != null, "type!=null");
       if (type instanceof Composite) {
-        return ((Composite) type).getComponent(component - 1);
+        return new Hl7ParsingTypeResult(((Composite) type).getComponent(component - 1));
       }
 
-      return Terser.getPrimitive(type, component - 1, 1);
+      return new Hl7ParsingTypeResult(Terser.getPrimitive(type, component - 1, 1));
 
 
     } catch (IllegalArgumentException | DataTypeException e) {
@@ -216,10 +219,10 @@ public class Hl7DataExtractor {
     }
   }
 
-  public Type getComponent(Type type, int component, int subComponent) {
+  public ParsingResult<Type> getComponent(Type type, int component, int subComponent) {
     try {
       Preconditions.checkArgument(type != null, "type!=null");
-      return Terser.getPrimitive(type, component, subComponent);
+      return new Hl7ParsingTypeResult(Terser.getPrimitive(type, component, subComponent));
 
 
     } catch (IllegalArgumentException e) {
@@ -240,95 +243,39 @@ public class Hl7DataExtractor {
 
 
 
-  public Terser getTerser() {
+  private Terser getTerser() {
     return new Terser(message);
   }
 
-  public String getMessageType() {
-    try {
-      return new Terser(message).get("/MSH-9");
-    } catch (HL7Exception e) {
-      throw new IllegalArgumentException("cannot determine message type in message", e);
-    }
+  public static String getMessageType(Message message) {
+
+    return message.getName();
+
   }
 
-  //
-  // /**
-  // * Extracts the value of the specified input from the message and returns an object - which
-  // could
-  // * either be Structure (Segment/Group) or Type or a String value
-  // *
-  // * @param obj - if obj is null then uses the terser to extract the String specified by the spec
-  // * @param spec - this field can be either represent Segment name or field type or spec for
-  // * extracting value from Terser.
-  // * @param rep -- validates that rep is non negative
-  // * @return
-  // */
-  // public Object get(Structure obj, int field, int rep, String type) {
-  //
-  // Preconditions.checkArgument(rep >= 0, REP_CANNOT_BE_NEGATIVE);
-  // Object returnObject = null;
-  // try {
-  // if (obj != null && obj instanceof Segment) {
-  // List<Type> objects = this.getField((Segment) obj, NumberUtils.toInt(spec), rep);
-  // if (!objects.isEmpty()) {
-  // returnObject = objects.get(0);
-  // }
-  // } else if (obj != null && obj instanceof Type) {
-  // returnObject = this.getComponent((Type) obj, NumberUtils.toInt(spec));
-  // } else {
-  // returnObject = getTerser().get(spec);
-  // }
-  //
-  // return returnObject;
-  // } catch (HL7Exception | IllegalArgumentException e) {
-  // if (e.getMessage().contains(CAN_T_GET_REPETITION)
-  // || e.getMessage().contains(CANNOT_ADD_REPETITION_WITH_INDEX)) {
-  // throw new NoMoreRepititionException(
-  // CANNOT_EXTRACT_VALUE_FROM_OF_TAG_FROM_TERSER_STRING + spec, e);
-  // } else {
-  // throw new DataExtractionException(CANNOT_EXTRACT_VALUE_FROM_OF_TAG_FROM_TERSER, e);
-  // }
-  //
-  // } catch (ArrayIndexOutOfBoundsException are) {
-  // LOGGER.error(HL7_STRING, spec, are);
-  // return null;
-  // // throw new DataExtractionException("Cannot extract value from of tag from Terser", are);
-  // }
-  // }
-  //
-  // /**
-  // *
-  // * @param obj
-  // * @param spec
-  // * @return
-  // */
-  // public List<?> getAllRepetitions(Object obj, String spec) {
-  //
-  // try {
-  // if (obj instanceof Segment) {
-  // return this.getField((Segment) obj, NumberUtils.toInt(spec), -1);
-  // } else {
-  // return this.getSegments(spec, -1);
-  // }
-  //
-  //
-  // } catch (IllegalArgumentException e) {
-  // if (e.getMessage().contains(CAN_T_GET_REPETITION)
-  // || e.getMessage().contains(CANNOT_ADD_REPETITION_WITH_INDEX)) {
-  // throw new NoMoreRepititionException(
-  // CANNOT_EXTRACT_VALUE_FROM_OF_TAG_FROM_TERSER_STRING + spec, e);
-  // } else {
-  // throw new DataExtractionException(CANNOT_EXTRACT_VALUE_FROM_OF_TAG_FROM_TERSER, e);
-  // }
-  //
-  // } catch (ArrayIndexOutOfBoundsException are) {
-  // LOGGER.error(HL7_STRING, spec, are);
-  // return null;
-  // // throw new DataExtractionException("Cannot extract value from of tag from Terser", are);
-  // }
-  // }
-  //
+
+
+  /**
+   * 
+   * @param segment
+   * @param field
+   * @return
+   */
+  public ParsingResult<String> get(String segment, String field) {
+  
+   Preconditions.checkArgument(StringUtils.isNotBlank(segment), "segment cannot be blank");
+   Preconditions.checkArgument(StringUtils.isNotBlank(field), "field cannot be blank");
+
+   try {
+      return new Hl7ParsingStringResult(getTerser().get("/" + segment + "-" + field));
+
+    } catch (HL7Exception | IllegalArgumentException | ArrayIndexOutOfBoundsException e) {
+      LOGGER.error(HL7_STRING, segment + "-" + field + e.getMessage());
+      LOGGER.debug(HL7_STRING, segment + "-" + field, e);
+      return null;
+
+    }
+  }
 
 
 }

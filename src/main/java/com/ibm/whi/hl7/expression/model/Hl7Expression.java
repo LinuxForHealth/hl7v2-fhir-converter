@@ -1,15 +1,15 @@
-package com.ibm.whi.hl7.expression;
+package com.ibm.whi.hl7.expression.model;
 
 import java.util.HashMap;
-import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.common.collect.ImmutableMap;
 import com.ibm.whi.hl7.data.DataEvaluator;
 import com.ibm.whi.hl7.data.SimpleDataTypeMapper;
-import ca.uhn.hl7v2.model.Visitable;
+import com.ibm.whi.hl7.expression.GenericResult;
 
 
 /**
@@ -38,18 +38,19 @@ public class Hl7Expression extends AbstractExpression {
   }
 
   @Override
-  public Object execute(Map<String, Object> context) {
+  public GenericResult execute(ImmutableMap<String, ?> executables,
+      ImmutableMap<String, GenericResult> variables) {
     LOGGER.info("Evaluating expression type {} , hl7spec {}", this.getType(), this.getHl7specs());
   
-    Visitable hl7Value = getValueFromSpecs(this.getHl7specs(), context);
+    GenericResult hl7Value = getValueFromSpecs(this.getHl7specs(), executables, variables);
     LOGGER.info("Evaluating expression type {} , hl7spec {} returned hl7 value {} ", this.getType(),
         this.getHl7specs(), hl7Value);
     Object resolvedValue = null;
 
     DataEvaluator<Object, ?> resolver =
         SimpleDataTypeMapper.getValueResolver(this.getType());
-    if (resolver != null) {
-      resolvedValue = resolver.apply(hl7Value);
+    if (resolver != null && hl7Value != null) {
+      resolvedValue = resolver.apply(hl7Value.getValue());
       LOGGER.info("Evaluating expression type {} , hl7spec {} resolved value {} ", this.getType(),
           this.getHl7specs(), resolvedValue);
     }
@@ -57,9 +58,9 @@ public class Hl7Expression extends AbstractExpression {
 
 
     if (resolvedValue != null) {
-      return resolvedValue;
+      return new GenericResult(resolvedValue);
     } else {
-      return this.getDefaultValue();
+      return new GenericResult(this.getDefaultValue());
     }
   }
 

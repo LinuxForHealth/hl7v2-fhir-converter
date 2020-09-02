@@ -1,3 +1,27 @@
-# FHIR Resources to extract from ADT message
+# FHIR Resources to extract from ADT_A01 message
 ---
-message:ADT_A01
+resources:
+    - resourceName: Patient
+      segment: PID
+      resourcePath: resource/Patient
+      order: 1
+      repeates: false
+      additionalSegments:
+      
+    - resourceName: Encounter
+      segment: PV1
+      resourcePath: resource/Encounter
+      order: 2
+      repeates: false
+      additionalSegments:
+             - PV2
+             - EVN
+    - resourceName: Observation
+      segment: OBX
+      resourcePath: resource/Observation
+      order: 3
+      repeates: true
+      additionalSegments:
+
+      
+  

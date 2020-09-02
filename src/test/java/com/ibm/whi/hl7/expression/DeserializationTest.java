@@ -6,6 +6,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ibm.whi.hl7.expression.model.DefaultExpression;
 import com.ibm.whi.hl7.resource.ObjectMapperUtil;
 
 
@@ -17,7 +18,7 @@ public class DeserializationTest {
     JsonNode jnode = objMapper.readTree("\"test\"");
     DefaultExpression exp = objMapper.convertValue(jnode, DefaultExpression.class);
     
-    assertThat(exp.getValue()).isEqualTo("");
+    assertThat(exp.getValue()).isEqualTo("test");
   }
 
 }

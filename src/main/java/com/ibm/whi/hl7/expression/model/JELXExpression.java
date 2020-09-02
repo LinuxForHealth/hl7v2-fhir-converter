@@ -1,4 +1,4 @@
-package com.ibm.whi.hl7.expression;
+package com.ibm.whi.hl7.expression.model;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -7,10 +7,12 @@ import org.python.google.common.base.Preconditions;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.common.collect.ImmutableMap;
+import com.ibm.whi.hl7.expression.GenericResult;
 import com.ibm.whi.hl7.expression.eval.WHIAJexlEngine;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class ValueReplacementExpression extends AbstractExpression {
+public class JELXExpression extends AbstractExpression {
   private static final WHIAJexlEngine JEXL = new WHIAJexlEngine();
   private String evaluate;
 
@@ -18,7 +20,7 @@ public class ValueReplacementExpression extends AbstractExpression {
 
 
   @JsonCreator
-  public ValueReplacementExpression(@JsonProperty("type") String type,
+  public JELXExpression(@JsonProperty("type") String type,
       @JsonProperty("default") Object defaultValue, @JsonProperty("required") boolean required,
       @JsonProperty("hl7spec") String hl7spec, @JsonProperty("evaluate") String evaluate,
       @JsonProperty("var") Map<String, String> variables) {
@@ -32,7 +34,7 @@ public class ValueReplacementExpression extends AbstractExpression {
   }
 
 
-  public ValueReplacementExpression(String evaluate, Map<String, String> variables) {
+  public JELXExpression(String evaluate, Map<String, String> variables) {
     this("String", null, false, null, evaluate, variables);
 
 
@@ -40,15 +42,19 @@ public class ValueReplacementExpression extends AbstractExpression {
 
 
   @Override
-  public Object execute(Map<String, Object> context) {
-    Map<String, Object> localContext = new HashMap<>(context);
-    localContext.putAll(resolveVariables(this.getVariables(), localContext));
+  public GenericResult execute(ImmutableMap<String, ?> executables,
+      ImmutableMap<String, GenericResult> variables) {
+    Map<String, Object> localContext = new HashMap<>(executables);
 
+    Map<String, GenericResult> resolvedVariables = new HashMap<>(variables);
+    resolvedVariables.putAll(resolveVariables(this.getVariables(), executables, variables));
+    resolvedVariables
+        .forEach((key, value) -> localContext.put(key, value.getValue()));
     Object obj = JEXL.evaluate(this.evaluate, localContext);
     if (obj != null) {
-      return obj;
+      return new GenericResult(obj);
     } else {
-      return this.getDefaultValue();
+      return new GenericResult(this.getDefaultValue());
     }
   }
 

@@ -12,12 +12,12 @@ import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ibm.whi.hl7.expression.DefaultExpression;
 import com.ibm.whi.hl7.expression.Expression;
-import com.ibm.whi.hl7.expression.Hl7Expression;
-import com.ibm.whi.hl7.expression.ReferenceExpression;
-import com.ibm.whi.hl7.expression.ResourceReferenceExpression;
-import com.ibm.whi.hl7.expression.ValueReplacementExpression;
+import com.ibm.whi.hl7.expression.model.DefaultExpression;
+import com.ibm.whi.hl7.expression.model.Hl7Expression;
+import com.ibm.whi.hl7.expression.model.JELXExpression;
+import com.ibm.whi.hl7.expression.model.ReferenceExpression;
+import com.ibm.whi.hl7.expression.model.ValueExtractionGeneralExpression;
 
 
 
@@ -40,6 +40,7 @@ public class ResourceDeserializer extends JsonDeserializer<ResourceModel> {
     Map<String, Expression> expressions = new HashMap<>();
     
     Iterator<Entry<String, JsonNode>> iter= node.fields();
+
     while(iter.hasNext()) {
       Entry<String, JsonNode> entry=iter.next();
 
@@ -49,9 +50,9 @@ public class ResourceDeserializer extends JsonDeserializer<ResourceModel> {
 
         e = MAPPER.convertValue(entry.getValue(), ReferenceExpression.class);
       } else if (entry.getValue() != null && entry.getValue().has(TemplateFieldNames.FETCH)) {
-        e = MAPPER.convertValue(entry.getValue(), ResourceReferenceExpression.class);
+        e = MAPPER.convertValue(entry.getValue(), ValueExtractionGeneralExpression.class);
       } else if (entry.getValue() != null && entry.getValue().has(TemplateFieldNames.EVALUATE)) {
-        e = MAPPER.convertValue(entry.getValue(), ValueReplacementExpression.class);
+        e = MAPPER.convertValue(entry.getValue(), JELXExpression.class);
 
       } else if (entry.getValue() != null && entry.getValue().has(TemplateFieldNames.HL7_SPEC)) {
         e = MAPPER.convertValue(entry.getValue(), Hl7Expression.class);
@@ -65,7 +66,12 @@ public class ResourceDeserializer extends JsonDeserializer<ResourceModel> {
       LOGGER.info("deserealized {} expression type {}", entry, e.getClass());
       
     }
-    return new ResourceModel(expressions, hl7Prefix);
+    JsonNode namenode = node.get("resourceType");
+    String name = "unknown";
+    if (namenode != null) {
+      name = namenode.textValue();
+    }
+    return new ResourceModel(name, expressions, hl7Prefix);
     }
 
 }

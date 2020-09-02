@@ -1,9 +1,9 @@
 package com.ibm.whi.hl7.expression;
 
 import java.util.List;
-import java.util.Map;
+import com.google.common.collect.ImmutableMap;
 
-// @JsonDeserialize(using = ExpressionlDeserializer.class)
+
 
 public interface Expression {
   String getType();
@@ -11,7 +11,8 @@ public interface Expression {
 
   List<String> getHl7specs();
 
-  Object execute(Map<String, Object> context);
+  GenericResult execute(ImmutableMap<String, ?> executables,
+      ImmutableMap<String, GenericResult> varables);
 
 
 }

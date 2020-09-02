@@ -1,19 +1,17 @@
-hl7prefix:
+# represents coding system.
+---
 system: 
      type: STRING
-     hl7prefix:
-     hl7spec: '::::3'
+     value: $system
 version:
      type: STRING
-     hl7prefix:
-     hl7spec: '::::7'
+     value: $version
 code: 
      type: STRING
-     hl7prefix:
-     hl7spec: '::::1'
+     value: $code
 display: 
      type: STRING
-     hl7prefix:
-     hl7spec: '::::2'
+     value: $display
+    
 userSelected: 
      default: ""
