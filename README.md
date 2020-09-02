@@ -93,6 +93,16 @@ The extraction logic for each field can be defined by using expressions. This co
 * required : [DEFAULT - false] If a field is required and cannot be extracted then the resource generation will fail even if other fields were extracted.
 * variables: [DEFAULT - EMPTY] List of variables and there value can be provided which can be used during the extraction process.
 
+
+```yml
+      type: String
+      hl7spec: CX.1
+      defaultValue: 'abc'
+      required: true 
+      variables:
+        var1: 'abcd'
+        var2: 'xyz'
+ ```     
  Different types of expressions
 * ReferenceExpression : This type of expression is used when a field is a data type defined in one of the [data type templates](master/src/main/resources/datatype). These data type templates define different [FHIR data types](https://hl7.org/FHIR/datatypes.html). 
   Example:
@@ -102,10 +112,34 @@ The extraction logic for each field can be defined by using expressions. This co
     reference: datatype/IdentifierCX
     hl7spec: PID.3 
   ```
-* JELXExpression
-* ValueExtractionGeneralExpression
-* Hl7Expression
-* DefaultExpression
+* JELXExpression: This type of expression is used when a field value needs to be extracted by executing a Java method.
+```yml
+ type: STRING
+    hl7prefix:
+    evaluate: 'GeneralUtils.generateName( prefix, given,family, suffix)'
+    var:
+      prefix: STRING XPN.4
+      given: STRING XPN.2
+      family: STRING XPN.1
+      suffix: STRING XPN.5
+```
+
+* ValueExtractionGeneralExpression : This type of expression is used when a field value can be extracted from a field of another resource or variable.
+```yml
+identifier:
+ fetch: '$ref-type:identifier'
+```
+* Hl7Expression : This type of expression is used when a field value has to be extracted directly from the HL7 segment/field/component
+```yml
+given: 
+     type: STRING
+     hl7spec: XPN.2
+```
+* DefaultExpression : If the field value is constant and no extraction or conversion is required then this expression is used.
+```yml
+code: 'ABX'
+
+```
 
 
 ### Conversion steps 
