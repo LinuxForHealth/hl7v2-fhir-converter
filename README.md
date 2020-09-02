@@ -57,7 +57,7 @@ resources:
 
 ### Structure of a resource template
 Resource template represents a [FHIR resource](https://hl7.org/FHIR/resourcelist.html). In order to generate a resource, a resource template for that resource should exist in this location: master/src/main/resources/resource. The resource template defines list of fields and a way to extract values for each of these fields.
-The extraction logic for each field can be defined by using expressions. This component supports 4 different type of expressions.
+
 
 Sample resource template:
 ```yml
@@ -86,6 +86,26 @@ birthDate:
 
 
 ### Different expressions types 
+The extraction logic for each field can be defined by using expressions. This component supports 4 different type of expressions. All expressions have following attributes:
+* type: [DEFAULT -String] Class type of the field .
+* hl7spec:[DEFAULT - NONE] The value that needs to be extracted usiing the HL7 spec.
+* defaultValue: [DEFAULT - NULL]if extraction of the value fails, then the default value can be used.
+* required : [DEFAULT - false] If a field is required and cannot be extracted then the resource generation will fail even if other fields were extracted.
+* variables:[DEFAULT - EMPTY] List of variables and there value can be provided which can be used during the extraction process.
+
+ Different types of expressions
+* ReferenceExpression : This type of expression is used when a field is a data type defined in one of the [data type templates](master/src/main/resources/datatype). These data type templates define different [FHIR data types](https://hl7.org/FHIR/datatypes.html). 
+  Example:
+  ```yml
+  identifier:
+    type: Array
+    reference: datatype/IdentifierCX
+    hl7spec: PID.3 
+  ```
+* JELXExpression
+* ValueExtractionGeneralExpression
+* Hl7Expression
+* DefaultExpression
 
 
 ### Conversion steps 
