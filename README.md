@@ -140,16 +140,10 @@ given:
 code: 'ABX'
 
 ```
+## Usage
 
 
-### Conversion steps 
-In order to convert the message the converter executes following steps:
-* Detect the HL7 message type
-* Based on the message type select the HL7 message template
-
-
-
-## Installation
+### Installation
 
 What you’ll need
 * JDK 8 or later
@@ -163,6 +157,84 @@ cd hl7v2-FHIR
 gradle build
 ```
 
+### Converting HL7v2 message to FHIR resources
+
+In order to convert a Hl7 message to FHIR resource, create a new instance of the class FHIRConverter and invoke the function  convert and pass the hl7message data (file contents).
+```
+    FHIRConverter ftv = new FHIRConverter();
+    String output= ftv.convert(hl7message); // generated a FHIR output
+```
+Sample output:
+```json
+"resourceType": "Bundle",
+  "meta": {
+    "tag": [ {
+      "system": "http://terminology.hl7.org/CodeSystem/v3-ObservationValue",
+      "code": "SUBSETTED",
+      "display": "Resource encoded in summary mode"
+    } ]
+  },
+  "type": "collection",
+  "entry": [ {
+    "resource": {
+      "resourceType": "Patient",
+      "id": "553232e4-61f3-4227-9d02-74c8320f9dab",
+      "meta": {
+        "tag": [ {
+          "system": "http://terminology.hl7.org/CodeSystem/v3-ObservationValue",
+          "code": "SUBSETTED",
+          "display": "Resource encoded in summary mode"
+        } ]
+      },
+      "identifier": [ {
+        "system": "1231",
+        "value": "ADTNew"
+      } ],
+      "name": [ {
+        "text": "null null ADT01New null",
+        "family": "ADT01New"
+      } ],
+      "gender": "female"
+    }
+  }, {
+    "resource": {
+      "resourceType": "Encounter",
+      "id": "88359b91-6565-4c2d-a076-382b0c9716ec",
+      "meta": {
+        "tag": [ {
+          "system": "http://terminology.hl7.org/CodeSystem/v3-ObservationValue",
+          "code": "SUBSETTED",
+          "display": "Resource encoded in summary mode"
+        } ]
+      },
+      "identifier": [ {
+        "value": "48390"
+      } ],
+      "status": "finished",
+      "serviceType": {
+        "text": "MED"
+      },
+      "subject": {
+        "reference": "553232e4-61f3-4227-9d02-74c8320f9dab",
+        "type": "Patient",
+        "identifier": {
+          "system": "1231",
+          "value": "ADTNew"
+        }
+      },
+      "hospitalization": {
+        "specialCourtesy": [ {
+          "text": "E"
+        } ],
+        "specialArrangement": [ {
+          "text": "B6"
+        } ]
+      }
+    }
+  } ]
+}
+
+```
 
 
 
