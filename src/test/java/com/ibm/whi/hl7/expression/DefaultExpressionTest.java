@@ -5,7 +5,8 @@ import java.util.HashMap;
 import java.util.Map;
 import org.junit.Test;
 import com.google.common.collect.ImmutableMap;
-import com.ibm.whi.hl7.expression.model.DefaultExpression;
+import com.ibm.whi.core.expression.GenericResult;
+import com.ibm.whi.hl7.expression.DefaultExpression;
 
 public class DefaultExpressionTest {
 
@@ -17,8 +18,9 @@ public class DefaultExpressionTest {
 
     DefaultExpression exp = new DefaultExpression(SOME_VALUE);
     Map<String, GenericResult> context = new HashMap<>();
-    Map<String, ?> executable = new HashMap<>();
-    GenericResult value = exp.execute(ImmutableMap.copyOf(executable), ImmutableMap.copyOf(context));
+
+    GenericResult value =
+        exp.evaluate(null, ImmutableMap.copyOf(context));
     assertThat(value.getValue()).isEqualTo(SOME_VALUE);
   }
 
@@ -28,10 +30,11 @@ public class DefaultExpressionTest {
 
     DefaultExpression exp = new DefaultExpression("$var1");
     Map<String, GenericResult> context = new HashMap<>();
-    Map<String, ?> executable = new HashMap<>();
+
     context.put("var1", new GenericResult(SOME_VALUE));
 
-    GenericResult  value = exp.execute(ImmutableMap.copyOf(executable), ImmutableMap.copyOf(context));
+    GenericResult value =
+        exp.evaluate(null, ImmutableMap.copyOf(context));
     assertThat(value.getValue()).isEqualTo(SOME_VALUE);
   }
 
@@ -42,10 +45,11 @@ public class DefaultExpressionTest {
     DefaultExpression exp = new DefaultExpression("$");
 
     Map<String, GenericResult> context = new HashMap<>();
-    Map<String, ?> executable = new HashMap<>();
+
     context.put("", new GenericResult(SOME_VALUE));
 
-    GenericResult  value = exp.execute(ImmutableMap.copyOf(executable), ImmutableMap.copyOf(context));
+    GenericResult value =
+        exp.evaluate(null, ImmutableMap.copyOf(context));
     assertThat(value.getValue()).isEqualTo("$");
   }
 
@@ -55,10 +59,11 @@ public class DefaultExpressionTest {
 
     DefaultExpression exp = new DefaultExpression("$var1");
     Map<String, GenericResult> context = new HashMap<>();
-    Map<String, ?> executable = new HashMap<>();
 
 
-    GenericResult  value = exp.execute(ImmutableMap.copyOf(executable), ImmutableMap.copyOf(context));
+
+    GenericResult value =
+        exp.evaluate(null, ImmutableMap.copyOf(context));
     assertThat(value).isNull();
   }
 
@@ -67,10 +72,10 @@ public class DefaultExpressionTest {
 
     DefaultExpression exp = new DefaultExpression("");
     Map<String, GenericResult> context = new HashMap<>();
-    Map<String, ?> executable = new HashMap<>();
 
 
-    GenericResult value = exp.execute(ImmutableMap.copyOf(executable), ImmutableMap.copyOf(context));
+    GenericResult value =
+        exp.evaluate(null, ImmutableMap.copyOf(context));
     assertThat(value.getValue()).isEqualTo("");
   }
 

@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.HashMap;
 import java.util.Map;
 import org.junit.Test;
+import com.ibm.whi.core.expression.eval.WHIAJexlEngine;
 
 
 public class WHIAJexlEngineTest {

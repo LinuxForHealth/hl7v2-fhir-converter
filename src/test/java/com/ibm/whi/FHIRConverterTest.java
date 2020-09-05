@@ -2,6 +2,7 @@ package com.ibm.whi;
 
 import java.io.IOException;
 import org.junit.Test;
+import com.ibm.whi.hl7.HL7ToFHIRConverter;
 import ca.uhn.hl7v2.HL7Exception;
 
 
@@ -16,7 +17,7 @@ public class FHIRConverterTest {
         + "PV1|1|ff|yyy|EL|||200^ATTEND_DOC_FAMILY_TEST^ATTEND_DOC_GIVEN_TEST|201^REFER_DOC_FAMILY_TEST^REFER_DOC_GIVEN_TEST|202^CONSULTING_DOC_FAMILY_TEST^CONSULTING_DOC_GIVEN_TEST|MED|||||B6|E|272^ADMITTING_DOC_FAMILY_TEST^ADMITTING_DOC_GIVEN_TEST||48390|||||||||||||||||||||||||201409122200|20000206031726\r"
         + "AL1|0001|DA|98798^problem|SV|sneeze|20120808\r";
 
-    FHIRConverter ftv = new FHIRConverter();
+    HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
     System.out.println(ftv.convert(hl7message));
   }
 

@@ -2,7 +2,8 @@ package com.ibm.whi.hl7.parsing.result;
 
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
-import org.python.google.common.collect.Lists;
+import com.google.common.collect.Lists;
+
 
 /**
  * Represents the String value of result of parsing HL7 message.
