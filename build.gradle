@@ -20,8 +20,7 @@ dependencies {
  compile group: 'commons-io', name: 'commons-io', version: '2.6'
     // Use JUnit test framework
     testImplementation 'junit:junit:4.12'
-    // https://mvnrepository.com/artifact/com.vmware.jsonteng/jsonteng
-     compile group: 'com.vmware.jsonteng', name: 'jsonteng', version: '1.0.4'
+  
      implementation 'ca.uhn.hapi:hapi-base:2.3'
     implementation 'ca.uhn.hapi:hapi-structures-v26:2.3'
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.10.1'
@@ -36,16 +35,16 @@ compile group: 'org.apache.commons', name: 'commons-text', version: '1.8'
 // https://mvnrepository.com/artifact/ca.uhn.hapi.fhir/hapi-fhir-structures-r4
 compile group: 'ca.uhn.hapi.fhir', name: 'hapi-fhir-structures-r4', version: '5.1.0'
     
-    // https://mvnrepository.com/artifact/org.codehaus.groovy/groovy-templates
-compile group: 'org.codehaus.groovy', name: 'groovy-templates', version: '2.0.0'
-    // https://mvnrepository.com/artifact/com.cedarsoftware/json-io
-compile group: 'com.cedarsoftware', name: 'json-io', version: '2.2.30'
 
 // https://mvnrepository.com/artifact/org.apache.commons/commons-jexl3
 compile group: 'org.apache.commons', name: 'commons-jexl3', version: '3.1'
 // https://mvnrepository.com/artifact/org.slf4j/slf4j-api
 
 testCompile group: 'ch.qos.logback', name: 'logback-classic', version: '0.9.26'
+// https://mvnrepository.com/artifact/org.apache.commons/commons-configuration2
+compile group: 'org.apache.commons', name: 'commons-configuration2', version: '2.7'
+// https://mvnrepository.com/artifact/commons-beanutils/commons-beanutils
+compile group: 'commons-beanutils', name: 'commons-beanutils', version: '1.9.4'
 
 
 }

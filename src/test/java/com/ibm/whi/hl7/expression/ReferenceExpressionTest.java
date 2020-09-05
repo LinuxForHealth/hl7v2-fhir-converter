@@ -7,9 +7,11 @@ import java.util.List;
 import java.util.Map;
 import org.junit.Test;
 import com.google.common.collect.ImmutableMap;
-import com.ibm.whi.hl7.expression.model.ReferenceExpression;
+import com.ibm.whi.core.expression.GenericResult;
+import com.ibm.whi.hl7.expression.ReferenceExpression;
+import com.ibm.whi.hl7.message.HL7MessageData;
+import com.ibm.whi.hl7.parsing.HL7DataExtractor;
 import com.ibm.whi.hl7.parsing.HL7HapiParser;
-import com.ibm.whi.hl7.parsing.Hl7DataExtractor;
 import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Message;
 import ca.uhn.hl7v2.model.Segment;
@@ -32,7 +34,7 @@ public class ReferenceExpressionTest {
 
       Message hl7message = Unmodifiable.unmodifiableMessage(hparser.getParser().parse(message));
 
-      Hl7DataExtractor hl7DTE = new Hl7DataExtractor(hl7message);
+      HL7DataExtractor hl7DTE = new HL7DataExtractor(hl7message);
 
       Structure s = hl7DTE.getStructure("PID", 0).getValue();
 
@@ -43,12 +45,10 @@ public class ReferenceExpressionTest {
       Map<String, GenericResult> context = new HashMap<>();
       context.put("PID", new GenericResult(s));
 
-      Map<String, Object> executable = new HashMap<>();
-      executable.put("hde", hl7DTE);
-
-
       GenericResult value =
-          exp.execute(ImmutableMap.copyOf(executable), ImmutableMap.copyOf(context));
+          exp.evaluate(new HL7MessageData(hl7DTE),
+              ImmutableMap.copyOf(context));
+
       Map<String, Object> result = (Map<String, Object>) value.getValue();
       assertThat(result.get("use")).isEqualTo(null);
       assertThat(result.get("value")).isEqualTo("000010016");
@@ -81,7 +81,7 @@ public class ReferenceExpressionTest {
 
       Message hl7message = Unmodifiable.unmodifiableMessage(hparser.getParser().parse(message));
 
-      Hl7DataExtractor hl7DTE = new Hl7DataExtractor(hl7message);
+      HL7DataExtractor hl7DTE = new HL7DataExtractor(hl7message);
 
 
       Structure s = hl7DTE.getStructure("PID", 0).getValue();
@@ -93,12 +93,11 @@ public class ReferenceExpressionTest {
       Map<String, GenericResult> context = new HashMap<>();
       context.put("PID", new GenericResult(s));
       context.put("code", new GenericResult(hl7DTE.getTypes((Segment) s, 3)));
-      Map<String, Object> executable = new HashMap<>();
-      executable.put("hde", hl7DTE);
 
 
       GenericResult value =
-          exp.execute(ImmutableMap.copyOf(executable), ImmutableMap.copyOf(context));
+          exp.evaluate(new HL7MessageData(hl7DTE),
+              ImmutableMap.copyOf(context));
 
       List<Object> results = (List<Object>) value.getValue();
       assertThat(results).hasSize(3);
@@ -135,7 +134,7 @@ public class ReferenceExpressionTest {
 
       Message hl7message = Unmodifiable.unmodifiableMessage(hparser.getParser().parse(message));
 
-      Hl7DataExtractor hl7DTE = new Hl7DataExtractor(hl7message);
+      HL7DataExtractor hl7DTE = new HL7DataExtractor(hl7message);
 
 
       Structure s = hl7DTE.getStructure("OBX", 0).getValue();
@@ -148,12 +147,10 @@ public class ReferenceExpressionTest {
       Map<String, GenericResult> context = new HashMap<>();
       context.put("OBX", new GenericResult(s));
 
-      Map<String, Object> executable = new HashMap<>();
-      executable.put("hde", hl7DTE);
-
 
       GenericResult value =
-          exp.execute(ImmutableMap.copyOf(executable), ImmutableMap.copyOf(context));
+          exp.evaluate(new HL7MessageData(hl7DTE), 
+              ImmutableMap.copyOf(context));
       Map<String, Object> result = (Map<String, Object>) value.getValue();
       assertThat(result.get("use")).isEqualTo(null);
       assertThat(result.get("value")).isEqualTo("1234");
@@ -185,7 +182,7 @@ public class ReferenceExpressionTest {
 
       Message hl7message = Unmodifiable.unmodifiableMessage(hparser.getParser().parse(message));
 
-      Hl7DataExtractor hl7DTE = new Hl7DataExtractor(hl7message);
+      HL7DataExtractor hl7DTE = new HL7DataExtractor(hl7message);
 
 
       Structure s = hl7DTE.getStructure("OBX", 0).getValue();
@@ -197,12 +194,11 @@ public class ReferenceExpressionTest {
       Map<String, GenericResult> context = new HashMap<>();
       context.put("OBX", new GenericResult(s));
       context.put("code", new GenericResult(hl7DTE.getTypes((Segment) s, 3).getValue()));
-      Map<String, Object> executable = new HashMap<>();
-      executable.put("hde", hl7DTE);
 
 
       GenericResult value =
-          exp.execute(ImmutableMap.copyOf(executable), ImmutableMap.copyOf(context));
+          exp.evaluate(new HL7MessageData(hl7DTE), 
+              ImmutableMap.copyOf(context));
 
       List<Map<String, Object>> result = (List<Map<String, Object>>) value.getValue();
       assertThat(result.get(0).get("text")).isEqualTo("1234");

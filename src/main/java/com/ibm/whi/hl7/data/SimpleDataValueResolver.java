@@ -22,7 +22,7 @@ public class SimpleDataValueResolver {
   private static final Logger LOGGER = LoggerFactory.getLogger(SimpleDataValueResolver.class);
 
 
-  public static final DataEvaluator<Object, LocalDate> LOCAL_DATE = (Object value) -> {
+  public static final ValueExtractor<Object, LocalDate> LOCAL_DATE = (Object value) -> {
     LOGGER.info("parsing value to Localdate {}  ", value);
     if (value != null) {
       LOGGER.info("parsing value to Localdate {} type {} ", value, value.getClass());
@@ -38,7 +38,7 @@ public class SimpleDataValueResolver {
     return date;
   };
 
-  public static final DataEvaluator<Object, LocalDateTime> LOCAL_DATE_TIME = (Object value) -> {
+  public static final ValueExtractor<Object, LocalDateTime> LOCAL_DATE_TIME = (Object value) -> {
 
     LocalDateTime date = null;
     if (value instanceof DT) {
@@ -53,14 +53,14 @@ public class SimpleDataValueResolver {
     return date;
   };
 
-  public static final DataEvaluator<Object, String> STRING = (Object value) -> {
+  public static final ValueExtractor<Object, String> STRING = (Object value) -> {
     return Hl7DataHandlerUtil.getStringValue(value);
 
 
   };
 
 
-  public static final DataEvaluator<Object, URI> URI_VAL = (Object value) -> {
+  public static final ValueExtractor<Object, URI> URI_VAL = (Object value) -> {
 
     try {
       String val = Hl7DataHandlerUtil.getStringValue(value);
@@ -76,7 +76,7 @@ public class SimpleDataValueResolver {
 
   };
 
-  public static final DataEvaluator<Object, String> ADMINISTRATIVE_GENDER = (Object value) -> {
+  public static final ValueExtractor<Object, String> ADMINISTRATIVE_GENDER = (Object value) -> {
 
     String val = Hl7DataHandlerUtil.getStringValue(value);
     if (null == val) {
@@ -97,7 +97,7 @@ public class SimpleDataValueResolver {
 
   };
   
-  public static final DataEvaluator<Object, String> OBSERVATION_STATUS = (Object value) -> {
+  public static final ValueExtractor<Object, String> OBSERVATION_STATUS = (Object value) -> {
     String val = Hl7DataHandlerUtil.getStringValue(value);
     if (null == val) {
           return ObservationStatus.UNKNOWN.toCode();
@@ -136,7 +136,7 @@ public class SimpleDataValueResolver {
 
   
 
-  public static final DataEvaluator<Object, Boolean> BOOLEAN = (Object value) -> {
+  public static final ValueExtractor<Object, Boolean> BOOLEAN = (Object value) -> {
     String val = Hl7DataHandlerUtil.getStringValue(value);
     if (null == val) {
       return false;
@@ -145,7 +145,7 @@ public class SimpleDataValueResolver {
 
   };
 
-  public static final DataEvaluator<Object, Integer> INTEGER = (Object value) -> {
+  public static final ValueExtractor<Object, Integer> INTEGER = (Object value) -> {
     String val = Hl7DataHandlerUtil.getStringValue(value);
     if (null == val) {
       return null;
@@ -159,7 +159,7 @@ public class SimpleDataValueResolver {
     
   };
 
-  public static final DataEvaluator<Object, Float> FLOAT = (Object value) -> {
+  public static final ValueExtractor<Object, Float> FLOAT = (Object value) -> {
     String val = Hl7DataHandlerUtil.getStringValue(value);
     if (null == val) {
       return null;
@@ -174,7 +174,7 @@ public class SimpleDataValueResolver {
   };
 
 
-  public static final DataEvaluator<Object, Instant> INSTANT = (Object value) -> {
+  public static final ValueExtractor<Object, Instant> INSTANT = (Object value) -> {
     LocalDateTime date = null;
     if (value instanceof DT) {
       date = Hl7DataHandlerUtil.toLocalDateTime((DT) value);

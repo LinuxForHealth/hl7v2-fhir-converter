@@ -1,0 +1,17 @@
+# represents coding system.
+---
+system: 
+     type: STRING
+     value: $system
+version:
+     type: STRING
+     value: $version
+code: 
+     type: STRING
+     value: $code
+display: 
+     type: STRING
+     value: $display
+    
+userSelected: 
+     default: ''
