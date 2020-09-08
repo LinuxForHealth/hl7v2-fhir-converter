@@ -1,10 +1,10 @@
 package com.ibm.whi.hl7.expression;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -13,7 +13,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import com.ibm.whi.core.expression.GenericResult;
-import com.ibm.whi.core.expression.Variable;
 import com.ibm.whi.core.message.InputData;
 import com.ibm.whi.hl7.resource.HL7DataBasedResourceModel;
 import com.ibm.whi.hl7.resource.ResourceModelReader;
@@ -34,10 +33,6 @@ public class ReferenceExpression extends AbstractExpression {
   private String reference;
 
 
-  private List<String> referencesResources;
-
-
-
 
   /**
    * 
@@ -54,20 +49,19 @@ public class ReferenceExpression extends AbstractExpression {
       @JsonProperty("reference") String reference, @JsonProperty("hl7spec") String hl7spec,
       @JsonProperty("default") Object defaultValue, @JsonProperty("required") boolean required,
       @JsonProperty("var") Map<String, String> variables,
-      @JsonProperty("reference-resources") String referencesResources) {
-    super(type, defaultValue, required, hl7spec, variables);
+      @JsonProperty("condition") String condition) {
+    super(type, defaultValue, required, hl7spec, variables, condition);
 
-
-
-    this.reference = reference;
-    this.data =
-        (HL7DataBasedResourceModel) ResourceModelReader.getInstance()
-            .generateResourceModel(this.reference);
-    Preconditions.checkState(this.data != null, "Resource reference model cannot be null");
-    this.referencesResources = new ArrayList<>();
-    if (referencesResources != null) {
-      this.referencesResources.add(referencesResources);
+    Preconditions.checkArgument(StringUtils.isNotBlank(reference), "reference cannot be blank");
+    if (reference.endsWith("*")) {
+      this.setMultiple(true);
+      reference = StringUtils.removeEnd(reference, "*");
     }
+    this.reference = StringUtils.strip(reference);
+    this.data = (HL7DataBasedResourceModel) ResourceModelReader.getInstance()
+        .generateResourceModel(this.reference);
+    Preconditions.checkState(this.data != null, "Resource reference model cannot be null");
+
 
   }
 
@@ -85,47 +79,37 @@ public class ReferenceExpression extends AbstractExpression {
 
 
 
-
   @Override
-  public GenericResult evaluate(InputData dataSource, Map<String, GenericResult> contextValues) {
+  public GenericResult evaluateExpression(InputData dataSource,
+      Map<String, GenericResult> contextValues, GenericResult hl7SpecValues) {
     Preconditions.checkArgument(dataSource != null, "dataSource cannot be null");
     Preconditions.checkArgument(contextValues != null, "contextValues cannot be null");
+    LOGGER.info("Evaluating expression {}", this.reference);
+    if (this.isMultiple() && hl7SpecValues != null) {
+      List<?> dataValues = (List<?>) hl7SpecValues.getValue();
+      List<GenericResult> baseValues = new ArrayList<>();
 
-    if ("ARRAY".equalsIgnoreCase(this.getType())) {
-
-      List<?> dataValues =
-          getRepts(dataSource, ImmutableMap.copyOf(contextValues));
-      List<Object> resolvedvalues = new ArrayList<>();
-      for (Object o : dataValues) {
-        Map<String, GenericResult> localContext =
-            getLocalVariables(dataSource, o, this.getVariables(),
-                ImmutableMap.copyOf(contextValues));
-
-        resolvedvalues.add(this.data.evaluate(dataSource,
-            ImmutableMap.copyOf(localContext)));
-      }
-      resolvedvalues.removeIf(Objects::isNull);
-      if (resolvedvalues.isEmpty()) {
+      dataValues.removeIf(Objects::isNull);
+      dataValues.forEach(d -> baseValues.add(new GenericResult(d)));
+      List<?> resolvedvalues = this.data.evaluateMultiple(dataSource,
+          ImmutableMap.copyOf(contextValues), baseValues, this.getVariables());
+      LOGGER.info("Evaluated expression {}, returning {} ", this.reference, resolvedvalues);
+      if (resolvedvalues == null || resolvedvalues.isEmpty()) {
         return null;
       } else {
         return new GenericResult(resolvedvalues);
       }
-
-
-
     } else {
-      GenericResult hl7Value =
-          dataSource.extractSingleValueForSpec(this.getspecs(),
-              ImmutableMap.copyOf(contextValues));
-      Object val = null;
-      if (hl7Value != null) {
-        val = hl7Value.getValue();
+      GenericResult baseValue = new GenericResult(getSingleValue(hl7SpecValues));
+
+      Object obj =
+          this.data.evaluateSingle(dataSource, ImmutableMap.copyOf(contextValues), baseValue);
+      LOGGER.info("Evaluated expression {}, returning {} ", this.reference, obj);
+      if (obj != null) {
+        return new GenericResult(obj);
+      } else {
+        return null;
       }
-      Map<String, GenericResult> localContext =
-          getLocalVariables(dataSource, val, this.getVariables(),
-              ImmutableMap.copyOf(contextValues));
-      return new GenericResult(
-          this.data.evaluate(dataSource, ImmutableMap.copyOf(localContext)));
 
     }
 
@@ -145,31 +129,11 @@ public class ReferenceExpression extends AbstractExpression {
   }
 
 
-  private static Map<String, GenericResult> getLocalVariables(InputData dataExtractor,
-      Object hl7Value,
-      List<Variable> variableNames,
-      ImmutableMap<String, GenericResult> contextValues) {
-    Map<String, GenericResult> localVariables = new HashMap<>(contextValues);
-
-    if (hl7Value != null) {
-      String type = getDataType(hl7Value);
-
-      LOGGER.info(type);
-      localVariables.put(type, new GenericResult(hl7Value));
-    }
-
-    localVariables
-        .putAll(dataExtractor.resolveVariables(variableNames, ImmutableMap.copyOf(localVariables)));
-
-    return ImmutableMap.copyOf(localVariables);
-  }
-
-
-
 
   public String getReference() {
     return reference;
   }
+
 
 
 }

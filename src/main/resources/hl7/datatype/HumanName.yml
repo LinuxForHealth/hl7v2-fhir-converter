@@ -1,7 +1,6 @@
 #Human name derived from component XPN
 ---
 
-use: ""
 text: 
     type: STRING
     hl7prefix:
@@ -20,13 +19,13 @@ given:
 prefix:
      type: STRING
      hl7spec: XPN.4
-     default: ""
+     default: ''
 suffix: 
      type: STRING
      hl7spec: XPN.5
-period: 
-      evaluate: 'GeneralUtils.generatePeriod(start,end)'
-      var: 
-       start: LOCAL_DATE_TIME XPN.13
-       end: LOCAL_DATE_TIME XPN.14
+period:
+    reference: datatype/Period
+    var:
+       start: XPN.12
+       end: XPN.13
      

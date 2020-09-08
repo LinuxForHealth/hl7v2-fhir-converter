@@ -1,6 +1,8 @@
 package com.ibm.whi.hl7.resource;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
@@ -11,18 +13,23 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.common.collect.ImmutableMap;
 import com.ibm.whi.core.expression.Expression;
 import com.ibm.whi.core.expression.GenericResult;
+import com.ibm.whi.core.expression.Variable;
+import com.ibm.whi.core.expression.util.GeneralUtil;
 import com.ibm.whi.core.message.InputData;
 import com.ibm.whi.core.resource.ResourceModel;
-import com.ibm.whi.hl7.expression.DefaultExpression;
+import com.ibm.whi.hl7.exception.RequiredConstraintFailureException;
 import com.ibm.whi.hl7.expression.Hl7Expression;
 import com.ibm.whi.hl7.expression.JELXExpression;
 import com.ibm.whi.hl7.expression.ReferenceExpression;
+import com.ibm.whi.hl7.expression.SimpleExpression;
 import com.ibm.whi.hl7.expression.ValueExtractionGeneralExpression;
 import com.ibm.whi.hl7.resource.deserializer.HL7DataBasedResourceDeserializer;
 
 
 @JsonDeserialize(using = HL7DataBasedResourceDeserializer.class)
 public class HL7DataBasedResourceModel implements ResourceModel {
+
+  // public static final String BASE_VALUE_NAME = "baseValue";
   private static final Logger LOGGER = LoggerFactory.getLogger(HL7DataBasedResourceModel.class);
 
 
@@ -58,18 +65,41 @@ public class HL7DataBasedResourceModel implements ResourceModel {
     return expressions;
   }
 
+  @Override
+  public List<?> evaluateMultiple(InputData dataSource, Map<String, GenericResult> contextValues,
+      List<GenericResult> baseVariables, List<Variable> variables) {
 
+    List<Object> resolvedvalues = new ArrayList<>();
+    for (GenericResult baseVar : baseVariables) {
+      Map<String, GenericResult> localContext =
+          resolveLocalVariables(dataSource, baseVar, variables, ImmutableMap.copyOf(contextValues));
+      Object obj = evaluateSingle(dataSource, localContext, baseVar);
+      if (obj != null) {
+        resolvedvalues.add(obj);
+      }
+    }
+    if (resolvedvalues.isEmpty()) {
+      return null;
+    }
+    return resolvedvalues;
 
-  public Object evaluate(InputData dataSource, Map<String, GenericResult> variables) {
+  }
 
+  @Override
+  public Object evaluateSingle(InputData dataSource, Map<String, GenericResult> variables,
+      GenericResult baseVariable) {
+    try {
     LOGGER.info("Started Evaluating resource {}", this.name);
     Map<String, GenericResult> localContext = new HashMap<>(variables);
+    if (baseVariable != null && !baseVariable.isEmpty()) {
+      localContext.put(baseVariable.getKlassName(), baseVariable);
+    }
     Map<String, Object> resolveValues = new HashMap<>();
     Map<String, Expression> expressionMap = this.getExpressions();
 
 
     Map<String, Expression> defaultExp =
-        expressionMap.entrySet().stream().filter(e -> (e.getValue() instanceof DefaultExpression))
+        expressionMap.entrySet().stream().filter(e -> (e.getValue() instanceof SimpleExpression))
             .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
 
@@ -87,9 +117,9 @@ public class HL7DataBasedResourceModel implements ResourceModel {
         .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
 
-    Map<String, Expression> valueref = expressionMap.entrySet().stream()
-        .filter(e -> (e.getValue() instanceof JELXExpression))
-        .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+    Map<String, Expression> valueref =
+        expressionMap.entrySet().stream().filter(e -> (e.getValue() instanceof JELXExpression))
+            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
 
 
@@ -101,8 +131,7 @@ public class HL7DataBasedResourceModel implements ResourceModel {
           entry.getKey(), exp.getReference());
       if (exp.getData() != null) {
 
-        GenericResult obj =
-            exp.evaluate(dataSource, ImmutableMap.copyOf(localContext));
+        GenericResult obj = exp.evaluate(dataSource, ImmutableMap.copyOf(localContext));
         LOGGER.info("----Extracted object from reference resource  {} {} reference {}  value {}",
             exp.getType(), entry.getKey(), exp.getReference(), obj);
         if (obj != null) {
@@ -126,12 +155,16 @@ public class HL7DataBasedResourceModel implements ResourceModel {
     } else {
       return resolveValues;
     }
-
+    } catch (RequiredConstraintFailureException e) {
+      LOGGER.error("RequiredConstraintFailureException during  resource {} evaluation", this.name,
+          e);
+      return null;
+    }
   }
 
   private static void executeExpression(InputData dataSource,
-      Map<String, GenericResult> localContext,
-      Map<String, Object> resolveValues, Map<String, Expression> hl7Exps) {
+      Map<String, GenericResult> localContext, Map<String, Object> resolveValues,
+      Map<String, Expression> hl7Exps) {
     for (Entry<String, Expression> entry : hl7Exps.entrySet()) {
       Expression exp = entry.getValue();
       LOGGER.info("Evaluating {} {}", entry.getKey(), entry.getValue());
@@ -165,26 +198,24 @@ public class HL7DataBasedResourceModel implements ResourceModel {
     return this.name;
   }
 
+  private static Map<String, GenericResult> resolveLocalVariables(InputData dataExtractor,
+      Object hl7Value, List<Variable> variableNames,
+      ImmutableMap<String, GenericResult> contextValues) {
+    Map<String, GenericResult> localVariables = new HashMap<>(contextValues);
 
-  // public static ResourceModel generateResourceModel(String path) {
-  //
-  // File templateFile = new File(Constants.DEFAULT_HL7_RESOURCES, path + ".yml");
-  //
-  // if (templateFile.exists()) {
-  // try {
-  // HL7DataBasedResourceModel rm =
-  // ObjectMapperUtil.getInstance().readValue(templateFile, HL7DataBasedResourceModel.class);
-  // rm.setName(templateFile.getName());
-  // return rm;
-  // } catch (IOException e) {
-  // throw new IllegalArgumentException(
-  // "Error encountered in processing the template" + templateFile, e);
-  // }
-  // } else {
-  // throw new IllegalArgumentException("File not present:" + templateFile);
-  // }
-  //
-  // }
+    if (hl7Value != null) {
+      String type = GeneralUtil.getDataType(hl7Value);
+
+      LOGGER.info(type);
+      localVariables.put(type, new GenericResult(hl7Value));
+    }
+
+    localVariables
+        .putAll(dataExtractor.resolveVariables(variableNames, ImmutableMap.copyOf(localVariables)));
+
+    return ImmutableMap.copyOf(localVariables);
+  }
+
 
 
 }

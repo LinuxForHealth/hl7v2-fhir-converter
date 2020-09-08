@@ -1,0 +1,10 @@
+---
+value: 
+    evaluate: 'GeneralUtils.diffDateMin(var1,var2)'
+    var: 
+      var1: $time1
+      var2: $time2
+      
+unit:
+   type: String
+   value:  "Minutes"

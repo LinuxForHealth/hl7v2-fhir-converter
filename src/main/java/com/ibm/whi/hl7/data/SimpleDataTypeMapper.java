@@ -1,43 +1,40 @@
 package com.ibm.whi.hl7.data;
 
-import java.lang.reflect.Type;
 import org.apache.commons.lang3.EnumUtils;
 
 
 public enum SimpleDataTypeMapper {
   
-  BOOLEAN(SimpleDataValueResolver.BOOLEAN, Boolean.class), //
-  INTEGER(SimpleDataValueResolver.INTEGER, Integer.class), //
-  STRING(SimpleDataValueResolver.STRING, String.class), //
-  FLOAT(SimpleDataValueResolver.FLOAT, Float.class), //
+  BOOLEAN(SimpleDataValueResolver.BOOLEAN), //
+  INTEGER(SimpleDataValueResolver.INTEGER), //
+  STRING(SimpleDataValueResolver.STRING), //
+  FLOAT(SimpleDataValueResolver.FLOAT), //
   
-  URI(SimpleDataValueResolver.URI_VAL, java.net.URI.class), //
-  URL(SimpleDataValueResolver.STRING, String.class), //
-  // BASE64BINARY(SimpleDataValueResolver.STRING),
-  INSTANT(SimpleDataValueResolver.INSTANT, java.time.Instant.class), //
-  DATE(SimpleDataValueResolver.LOCAL_DATE, java.time.LocalDate.class), //
-  DATETIME(SimpleDataValueResolver.LOCAL_DATE_TIME, java.time.LocalDateTime.class), //
-  // TIME(SimpleDataValueResolver.STRING),
-  ID(SimpleDataValueResolver.STRING, String.class), //
+  URI(SimpleDataValueResolver.URI_VAL), //
+  URL(SimpleDataValueResolver.STRING), //
+  // INSTANT(SimpleDataValueResolver.INSTANT), //
+
+  DATE(SimpleDataValueResolver.DATE), //
+
+  DATE_TIME(SimpleDataValueResolver.DATE_TIME), //
+  // TIME(SimpleDataValueResolver.TIME_TYPE),
+  ID(SimpleDataValueResolver.STRING), //
   // MARKDOWN(SimpleDataValueResolver.STRING),
-  UNSIGNEDINT(SimpleDataValueResolver.INTEGER, Integer.class), //
-  POSITIVEINT(SimpleDataValueResolver.INTEGER, Integer.class), //
-  // UUID(SimpleDataValueResolver.UUID_VAL),
+  UNSIGNEDINT(SimpleDataValueResolver.INTEGER), //
+  POSITIVEINT(SimpleDataValueResolver.INTEGER), //
+  UUID(SimpleDataValueResolver.UUID_VAL),
+  OBJECT(SimpleDataValueResolver.OBJECT),
 
-
-
-  LOCAL_DATE(SimpleDataValueResolver.LOCAL_DATE, java.time.LocalDate.class), //
-  LOCAL_DATE_TIME(SimpleDataValueResolver.LOCAL_DATE_TIME, java.time.LocalDateTime.class), //
-  ADMINISTRATIVE_GENDER(SimpleDataValueResolver.ADMINISTRATIVE_GENDER, String.class), //
-  OBSERVATION_STATUS(SimpleDataValueResolver.OBSERVATION_STATUS, String.class);
+  ADMINISTRATIVE_GENDER(SimpleDataValueResolver.ADMINISTRATIVE_GENDER_FHIR), //
+  OBSERVATION_STATUS(SimpleDataValueResolver.OBSERVATION_STATUS_FHIR);
  
 
 
   private ValueExtractor<Object, ?> valueResolver;
-  private Type type;
-  SimpleDataTypeMapper(ValueExtractor<Object, ?> valueResolver, Type t) {
+
+  SimpleDataTypeMapper(ValueExtractor<Object, ?> valueResolver) {
     this.valueResolver = valueResolver;
-    this.type = t;
+
   }
 
   public static ValueExtractor<Object, ?> getValueResolver(String enumName) {
@@ -52,9 +49,6 @@ public enum SimpleDataTypeMapper {
 
   }
 
-  public Type getType() {
-    return type;
-  }
 
 
 }

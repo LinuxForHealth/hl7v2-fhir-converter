@@ -1,0 +1,143 @@
+package com.ibm.whi.hl7.data.date;
+
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.time.temporal.Temporal;
+import java.util.Map.Entry;
+import java.util.regex.Pattern;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+
+public class DateUtil {
+  private static final Logger LOGGER = LoggerFactory.getLogger(DateUtil.class);
+
+  private DateUtil() {}
+
+
+
+  public static String formatToDate(String input) {
+    DateTimeFormatter format = null;
+
+    for (Entry<Pattern, DateTimeFormatter> pattern : DateFormats.getDatePatternsInstance()
+        .entrySet()) {
+      if (pattern.getKey().matcher(input).matches()) {
+        format = pattern.getValue();
+        break;
+      }
+
+    }
+
+    LocalDate ldt = LocalDate.parse(input, DateFormats.getFormatterInstance());
+    return ldt.format(format);
+
+  }
+
+
+  public static String formatToDateTime(String input) {
+
+
+    String returnValue = getLocalDate(input);
+    if (returnValue == null) {
+      returnValue = getZonedDate(input);
+    }
+
+    if (returnValue == null) {
+      DateTimeFormatter format = null;
+
+      for (Entry<Pattern, DateTimeFormatter> pattern : DateFormats.getDateTimePatternsInstance()
+          .entrySet()) {
+        if (pattern.getKey().matcher(input).matches()) {
+          format = pattern.getValue();
+          break;
+        }
+
+      }
+
+      LocalDateTime ldt = LocalDateTime.parse(input, DateFormats.getFormatterInstance());
+      returnValue = ldt.format(format);
+
+    }
+
+    return returnValue;
+  }
+
+
+
+  private static String getLocalDate(String input) {
+    DateTimeFormatter format = null;
+    for (Entry<Pattern, DateTimeFormatter> pattern : DateFormats
+        .getDatePatternsWithoutTimeInstance().entrySet()) {
+      if (pattern.getKey().matcher(input).matches()) {
+        format = pattern.getValue();
+        break;
+      }
+
+    }
+    if (format != null) {
+      LocalDate ldt = LocalDate.parse(input, DateFormats.getFormatterInstance());
+      return ldt.atStartOfDay().format(format);
+    }
+    return null;
+  }
+
+
+  private static String getZonedDate(String input) {
+    DateTimeFormatter format = null;
+    for (Entry<Pattern, DateTimeFormatter> pattern : DateFormats.getDatePatternsWithZoneInstance()
+        .entrySet()) {
+      if (pattern.getKey().matcher(input).matches()) {
+        format = pattern.getValue();
+        break;
+      }
+
+    }
+    if (format != null) {
+      ZonedDateTime zdt = ZonedDateTime.parse(input, DateFormats.getFormatterInstance());
+      return zdt.format(format);
+    }
+    return null;
+  }
+
+
+
+  public static Temporal getTemporal(String dateString) {
+    Temporal temporal = null;
+
+    try {
+      temporal = Instant.parse(dateString);
+    } catch (DateTimeParseException e) {
+      LOGGER.error("Date parsing error for instant {}", dateString);
+    }
+    if (temporal == null) {
+    try {
+      temporal = ZonedDateTime.parse(dateString, DateTimeFormatter.ISO_ZONED_DATE_TIME);
+    } catch (DateTimeParseException e) {
+      LOGGER.error("Date parsing error for ZonedDateTime {}", dateString);
+    }
+
+    }
+    if (temporal == null) {
+    try {
+      temporal = LocalDateTime.parse(dateString, DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+    } catch (DateTimeParseException e) {
+      LOGGER.error("Date parsing error for LocalDateTime {}", dateString);
+    }
+    }
+    if (temporal == null) {
+
+    try {
+      temporal = LocalDate.parse(dateString, DateTimeFormatter.ISO_LOCAL_DATE);
+    } catch (DateTimeParseException e) {
+      LOGGER.error("Date parsing error for LocalDate {}", dateString);
+    }
+    }
+    return temporal;
+
+  }
+}
+

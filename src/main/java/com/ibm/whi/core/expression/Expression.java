@@ -44,12 +44,8 @@ public interface Expression {
    */
   GenericResult evaluate(InputData dataSource, Map<String, GenericResult> contextValues);
 
-  /**
-   * Data Extractor defines how to resolve variable and extract values for the spec
-   * 
-   * @return
-   */
 
+  boolean isConditionSatisfied(Map<String, GenericResult> contextValues);
 
 
 

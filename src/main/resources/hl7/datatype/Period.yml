@@ -1,8 +1,8 @@
 ---
 start: 
-     type: LOCAL_DATE
+     type: DATE_TIME
      value: $start
       
 end:
-   type: LOCAL_DATE
-   value:   $end
+   type: DATE_TIME
+   value: $end

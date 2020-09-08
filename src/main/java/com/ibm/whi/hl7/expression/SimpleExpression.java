@@ -2,6 +2,7 @@ package com.ibm.whi.hl7.expression;
 
 import java.util.HashMap;
 import java.util.Map;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -16,21 +17,22 @@ import com.ibm.whi.hl7.data.ValueExtractor;
 
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class DefaultExpression extends AbstractExpression {
-  private static final Logger LOGGER = LoggerFactory.getLogger(DefaultExpression.class);
+public class SimpleExpression extends AbstractExpression {
+  private static final Logger LOGGER = LoggerFactory.getLogger(SimpleExpression.class);
 
   private String value;
 
 
   @JsonCreator
-  public DefaultExpression(String var) {
-    this("String", var);
+  public SimpleExpression(String var) {
+    this("String", var, null);
 
   }
 
   @JsonCreator
-  public DefaultExpression(@JsonProperty("type") String type, @JsonProperty("value") String var) {
-    super(type, null, false, "", new HashMap<>());
+  public SimpleExpression(@JsonProperty("type") String type, @JsonProperty("value") String var,
+      @JsonProperty("condition") String condition) {
+    super(type, null, false, "", new HashMap<>(), condition);
     this.value = var;
   }
 
@@ -41,17 +43,18 @@ public class DefaultExpression extends AbstractExpression {
 
 
   @Override
-  public GenericResult evaluate(InputData dataSource, Map<String, GenericResult> contextValues) {
+  public GenericResult evaluateExpression(InputData dataSource,
+      Map<String, GenericResult> contextValues, GenericResult hl7SpecValues) {
 
-    return convert(contextValues);
-  }
-
-  private GenericResult convert(Map<String, GenericResult> contextValues) {
     Preconditions.checkArgument(contextValues != null, "contextValues cannot be null");
+    Map<String, GenericResult> localContextValues = new HashMap<>(contextValues);
+    if (hl7SpecValues != null && !hl7SpecValues.isEmpty()) {
+      localContextValues.put(hl7SpecValues.getKlassName(), hl7SpecValues);
+    }
     LOGGER.info("Evaluating {}", this.value);
     if (isVar(value)) {
       GenericResult obj =
-          getVariableValueFromVariableContextMap(value, ImmutableMap.copyOf(contextValues));
+          getVariableValueFromVariableContextMap(value, ImmutableMap.copyOf(localContextValues));
       LOGGER.info("Evaluated value {} to {} ", this.value, obj);
       if (obj != null) {
         LOGGER.info("Evaluated value {} to {} type {} ", this.value, obj, obj.getClass());
@@ -66,6 +69,16 @@ public class DefaultExpression extends AbstractExpression {
     }
   }
 
+  private static GenericResult getVariableValueFromVariableContextMap(String varName,
+      ImmutableMap<String, GenericResult> varables) {
+    if (StringUtils.isNotBlank(varName)) {
+      GenericResult fetchedValue;
+      fetchedValue = varables.get(varName.replace("$", ""));
+      return fetchedValue;
+    } else {
+      return null;
+    }
+  }
 
 
 
