@@ -61,6 +61,47 @@ public class ReferenceExpressionTest {
     }
 
 
+  }
+
+
+
+  @Test
+  public void test1_segment_required_missing() throws IOException, HL7Exception {
+    String message = "MSH|^~\\&|hl7Integration|hl7Integration|||||ADT^A01|||2.3|\r"
+        + "EVN|A01|20130617154644\r"
+        + "PID|1|465 306 5961|^^^MR^SSS^^20091020^20200101~000010017^^^MR~000010018^^^MR|407623|Wood^Patrick^^^MR||19700101|female|||High Street^^Oxford^^Ox1 4DP~George St^^Oxford^^Ox1 5AP|||||||\r"
+        + "NK1|1|Wood^John^^^MR|Father||999-9999\r" + "NK1|2|Jones^Georgie^^^MSS|MOTHER||999-9999\r"
+        + "PV1|1||Location||||||||||||||||261938_6_201306171546|||||||||||||||||||||||||20130617134644|||||||||";
+
+    HL7HapiParser hparser = null;
+    try {
+      hparser = new HL7HapiParser();
+
+      Message hl7message = Unmodifiable.unmodifiableMessage(hparser.getParser().parse(message));
+
+      HL7DataExtractor hl7DTE = new HL7DataExtractor(hl7message);
+
+      Structure s = hl7DTE.getStructure("PID", 0).getValue();
+
+      ReferenceExpression exp = new ReferenceExpression("Single", "datatype/IdentifierCX", "PID.3");
+      assertThat(exp.getData()).isNotNull();
+
+
+      Map<String, GenericResult> context = new HashMap<>();
+      context.put("PID", new GenericResult(s));
+
+      GenericResult value = exp.evaluate(new HL7MessageData(hl7DTE), ImmutableMap.copyOf(context));
+
+      assertThat(value).isEqualTo(null);
+
+
+    } finally {
+      if (hparser != null) {
+        hparser.getContext().close();
+      }
+    }
+
+
 
   }
 

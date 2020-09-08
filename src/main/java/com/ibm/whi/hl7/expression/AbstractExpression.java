@@ -17,6 +17,7 @@ import com.ibm.whi.core.expression.Expression;
 import com.ibm.whi.core.expression.GenericResult;
 import com.ibm.whi.core.expression.Variable;
 import com.ibm.whi.core.message.InputData;
+import com.ibm.whi.hl7.exception.RequiredConstraintFailureException;
 import ca.uhn.hl7v2.model.Structure;
 import ca.uhn.hl7v2.model.Type;
 
@@ -135,11 +136,15 @@ public abstract class AbstractExpression implements Expression {
           dataSource.resolveVariables(this.getVariables(), ImmutableMap.copyOf(contextValues)));
     }
     if (this.isConditionSatisfied(resolvedVariables)) {
-      return evaluateExpression(dataSource, resolvedVariables, hl7Values);
-    } else {
-      return null;
-    }
-
+      GenericResult gen=  evaluateExpression(dataSource, resolvedVariables, hl7Values);
+      if(this.isRequired() && (gen==null || gen.isEmpty())) {
+        throw new RequiredConstraintFailureException(
+            "Failure in Evaluating expression  hl7spec :" + this.getspecs());
+      }else {
+        return gen;
+      }
+    } 
+return null;
   }
 
 

@@ -17,6 +17,7 @@ import com.ibm.whi.core.expression.Variable;
 import com.ibm.whi.core.expression.util.GeneralUtil;
 import com.ibm.whi.core.message.InputData;
 import com.ibm.whi.core.resource.ResourceModel;
+import com.ibm.whi.hl7.exception.RequiredConstraintFailureException;
 import com.ibm.whi.hl7.expression.Hl7Expression;
 import com.ibm.whi.hl7.expression.JELXExpression;
 import com.ibm.whi.hl7.expression.ReferenceExpression;
@@ -87,7 +88,7 @@ public class HL7DataBasedResourceModel implements ResourceModel {
   @Override
   public Object evaluateSingle(InputData dataSource, Map<String, GenericResult> variables,
       GenericResult baseVariable) {
-
+    try {
     LOGGER.info("Started Evaluating resource {}", this.name);
     Map<String, GenericResult> localContext = new HashMap<>(variables);
     if (baseVariable != null && !baseVariable.isEmpty()) {
@@ -154,7 +155,11 @@ public class HL7DataBasedResourceModel implements ResourceModel {
     } else {
       return resolveValues;
     }
-
+    } catch (RequiredConstraintFailureException e) {
+      LOGGER.error("RequiredConstraintFailureException during  resource {} evaluation", this.name,
+          e);
+      return null;
+    }
   }
 
   private static void executeExpression(InputData dataSource,
