@@ -1,11 +1,11 @@
-# HL7v2-FHIR Converter
+# FHIR Converter
 
 FHIR converter is a Java based library that enables converting [Hl7v2](https://www.hl7.org/implement/standards/product_section.cfm?section=13) messages to [FHIR](https://hl7.org/FHIR/) resources.<br>
 FHIR converter utilized the open source  [HAPI Library](https://hapifhir.github.io/hapi-hl7v2/) for parsing Hl7 messages and it also utilizes the [HAPI library for FHIR](https://hapifhir.io/) resources to validate the generated FHIR resources.
 
 
 
-## Features and Concepts
+## Features and Concepts of Hl7 -> FHIR conversion
 HL7v2-FHIR converter converts a given HL7 message to FHIR bundle resource using the message templates. These templates are [yaml](https://yaml.org/) files. Each message template defines what all FHIR resources needs to be generated from a particular message. <br>
 
 ### Structure of a message template
@@ -67,13 +67,11 @@ Sample resource template:
 resourceType: Patient
 id:
   evaluate: 'UUID.randomUUID()'
-identifier:
-    type: Array
-    reference: datatype/IdentifierCX
+identifier: 
+    reference: datatype/IdentifierCX *
     hl7spec: PID.3  
 name: 
-    type: Array
-    reference: datatype/HumanName
+    reference: datatype/HumanName *
     hl7spec: PID.5  
 gender: 
      type: ADMINISTRATIVE_GENDER
@@ -87,11 +85,12 @@ birthDate:
 
 ### Different expressions types 
 The extraction logic for each field can be defined by using expressions. This component supports 4 different type of expressions. All expressions have following attributes:
-* type: [DEFAULT -String] Class type of the field .
+* type: [DEFAULT - Object] Class type of the field .
 * hl7spec: [DEFAULT - NONE] The value that needs to be extracted usiing the HL7 spec.
 * defaultValue: [DEFAULT - NULL]if extraction of the value fails, then the default value can be used.
 * required : [DEFAULT - false] If a field is required and cannot be extracted then the resource generation will fail even if other fields were extracted.
 * variables: [DEFAULT - EMPTY] List of variables and there value can be provided which can be used during the extraction process.
+* condition: [DEFAULT - true] if a condition is provided then the expression will be resolved only if condition evaluates to true. Condition is simple string of this format Var1 Operator Var2 (Currently supported operators are: == != > < >= <=)
 
 
 ```yml
@@ -99,9 +98,10 @@ The extraction logic for each field can be defined by using expressions. This co
       hl7spec: CX.1
       defaultValue: 'abc'
       required: true 
+      condition: var1 != null
       variables:
-        var1: 'abcd'
-        var2: 'xyz'
+        var1: CX.1
+        var2: CX.2
  ```     
  Different types of expressions
 * ReferenceExpression : This type of expression is used when a field is a data type defined in one of the [data type templates](master/src/main/resources/datatype). These data type templates define different [FHIR data types](https://hl7.org/FHIR/datatypes.html). 
