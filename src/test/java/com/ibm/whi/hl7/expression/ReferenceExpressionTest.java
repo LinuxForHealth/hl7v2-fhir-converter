@@ -8,7 +8,6 @@ import java.util.Map;
 import org.junit.Test;
 import com.google.common.collect.ImmutableMap;
 import com.ibm.whi.core.expression.GenericResult;
-import com.ibm.whi.hl7.expression.ReferenceExpression;
 import com.ibm.whi.hl7.message.HL7MessageData;
 import com.ibm.whi.hl7.parsing.HL7DataExtractor;
 import com.ibm.whi.hl7.parsing.HL7HapiParser;
@@ -24,7 +23,7 @@ public class ReferenceExpressionTest {
   public void test1_segment() throws IOException, HL7Exception {
     String message = "MSH|^~\\&|hl7Integration|hl7Integration|||||ADT^A01|||2.3|\r"
         + "EVN|A01|20130617154644\r"
-        + "PID|1|465 306 5961|000010016^^^MR~000010017^^^MR~000010018^^^MR|407623|Wood^Patrick^^^MR||19700101|female|||High Street^^Oxford^^Ox1 4DP~George St^^Oxford^^Ox1 5AP|||||||\r"
+        + "PID|1|465 306 5961|000010016^^^MR^SSS^^20091020^20200101~000010017^^^MR~000010018^^^MR|407623|Wood^Patrick^^^MR||19700101|female|||High Street^^Oxford^^Ox1 4DP~George St^^Oxford^^Ox1 5AP|||||||\r"
         + "NK1|1|Wood^John^^^MR|Father||999-9999\r" + "NK1|2|Jones^Georgie^^^MSS|MOTHER||999-9999\r"
         + "PV1|1||Location||||||||||||||||261938_6_201306171546|||||||||||||||||||||||||20130617134644|||||||||";
 
@@ -86,7 +85,8 @@ public class ReferenceExpressionTest {
 
       Structure s = hl7DTE.getStructure("PID", 0).getValue();
 
-      ReferenceExpression exp = new ReferenceExpression("Array", "datatype/IdentifierCX", "PID.3");
+      ReferenceExpression exp =
+          new ReferenceExpression("Array", "datatype/IdentifierCX *", "PID.3");
       assertThat(exp.getData()).isNotNull();
 
 
@@ -188,7 +188,7 @@ public class ReferenceExpressionTest {
       Structure s = hl7DTE.getStructure("OBX", 0).getValue();
 
       ReferenceExpression exp =
-          new ReferenceExpression("Array", "datatype/CodeableConcept", "OBX.3");
+          new ReferenceExpression("Array", "datatype/CodeableConcept *", "OBX.3");
       assertThat(exp.getData()).isNotNull();
 
       Map<String, GenericResult> context = new HashMap<>();

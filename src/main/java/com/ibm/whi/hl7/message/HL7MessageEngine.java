@@ -1,9 +1,11 @@
 package com.ibm.whi.hl7.message;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import org.hl7.fhir.r4.model.Bundle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,11 +20,12 @@ import com.ibm.whi.core.message.MessageEngine;
 import com.ibm.whi.core.resource.ResourceModel;
 import com.ibm.whi.fhir.FHIRContext;
 import com.ibm.whi.fhir.FHIRResourceMapper;
+import com.ibm.whi.hl7.resource.ObjectMapperUtil;
 import ca.uhn.hl7v2.model.Structure;
 
 public class HL7MessageEngine implements MessageEngine {
   private static final Logger LOGGER = LoggerFactory.getLogger(HL7MessageEngine.class);
-  private static final ObjectMapper OBJ_MAPPER = new ObjectMapper();
+  private static final ObjectMapper OBJ_MAPPER = ObjectMapperUtil.getJSONInstance();
 
 
 
@@ -50,9 +53,6 @@ public class HL7MessageEngine implements MessageEngine {
     for (AbstractFHIRResource res : resources) {
       HL7FHIRResource hres = (HL7FHIRResource) res;
       ResourceModel rs = res.getResource();
-
-
-
       List<Structure> segments =
           hl7DataInput.getHL7DataParser().getAllStructures(hres.getSegment()).getValues();
       if (!segments.isEmpty()) {
@@ -74,24 +74,25 @@ public class HL7MessageEngine implements MessageEngine {
 
   private static void generateFHIRResources(InputData dataExtractor, HL7FHIRResource res,
       ResourceModel rs, List<Structure> segments, Map<String, GenericResult> variables,
-      Bundle bundle) throws JsonProcessingException {
+      Bundle bundle) {
 
     if (res.isRepeates()) {
+      List<GenericResult> baseValues = new ArrayList<>();
+      segments.removeIf(Objects::isNull);
+      segments.forEach(d -> baseValues.add(new GenericResult(d)));
 
-      for (Structure str : segments) {
         Map<String, GenericResult> localVariables = new HashMap<>(variables);
-        localVariables.put(res.getSegment(), new GenericResult(str));
-        Object obj =
-            rs.evaluate(dataExtractor, 
-                ImmutableMap.copyOf(localVariables));
-        if (obj != null) {
 
-            String json = OBJ_MAPPER.writeValueAsString(obj);
-            addEntry(res.getResourceName(), json, bundle);
+      List<?> objects = rs.evaluateMultiple(dataExtractor, ImmutableMap.copyOf(localVariables),
+          baseValues, new ArrayList<>());
+      if (objects != null && !objects.isEmpty()) {
+        objects.forEach(obj -> {
+          addEntry(res.getResourceName(), obj, bundle);
+        });
 
         }
 
-      }
+
     } else {
 
 
@@ -99,12 +100,12 @@ public class HL7MessageEngine implements MessageEngine {
       localVariables.put(res.getSegment(), new GenericResult(segments.get(0)));
 
       Object evaluatedValue =
-          rs.evaluate(dataExtractor, 
-              ImmutableMap.copyOf(localVariables));
+          rs.evaluateSingle(dataExtractor, ImmutableMap.copyOf(localVariables),
+              new GenericResult(segments.get(0)));
 
       if (evaluatedValue != null) {
-        String json = OBJ_MAPPER.writeValueAsString(evaluatedValue);
-        addEntry(res.getResourceName(), json, bundle);
+
+        addEntry(res.getResourceName(), evaluatedValue, bundle);
         variables.put(res.getResourceName(), new GenericResult(evaluatedValue));
       }
 
@@ -113,13 +114,21 @@ public class HL7MessageEngine implements MessageEngine {
   }
 
 
-  private static void addEntry(String resourceName, String json, Bundle bundle) {
-    LOGGER.info("Converting resourceName {} to FHIR {}", resourceName, json);
-    if (json != null) {
-      org.hl7.fhir.r4.model.Resource parsed = FHIRContext.getIParserInstance()
-          .parseResource(FHIRResourceMapper.getResourceClass(resourceName), json);
-      bundle.addEntry().setResource(parsed);
+  private static void addEntry(String resourceName, Object obj, Bundle bundle) {
+    LOGGER.info("Converting resourceName {} to FHIR {}", resourceName, obj);
+    try {
+      if (obj != null) {
+        String json = OBJ_MAPPER.writeValueAsString(obj);
+        if (json != null) {
+          org.hl7.fhir.r4.model.Resource parsed = FHIRContext.getIParserInstance()
+              .parseResource(FHIRResourceMapper.getResourceClass(resourceName), json);
+          bundle.addEntry().setResource(parsed);
+        }
+      }
+    } catch (JsonProcessingException e) {
+      LOGGER.error("Processing exception when Serialization", e);
     }
+
 
   }
 

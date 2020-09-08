@@ -1,44 +1,37 @@
 ---
 preAdmissionIdentifier:
-    type: Array
-    reference: datatype/IdentifierCX
+    reference: datatype/IdentifierCX *
     hl7spec:  PV1.5	
 admitSource: 
-   type: Single
    reference: datatype/CodeableConcept
    var:
      code: PV1.14
 
 reAdmission:
-   type: Single
    reference: datatype/CodeableConcept
    var:
      code: PV1.13
 
 
 dietPreference:
-   type: Single
    reference: datatype/CodeableConcept
    var:
      code: PV1.38
    
 
 specialCourtesy:
-   type: Single
-   reference: datatype/CodeableConcept
+   reference: datatype/CodeableConcept *
    var:
      code: PV1.16
 
 
 specialArrangement: 
-   type: Single
-   reference: datatype/CodeableConcept
+   reference: datatype/CodeableConcept *
    var:
      code: PV1.15 | OBR.30 | OBR.43
 
 
 dischargeDisposition:
-   type: Single
    reference: datatype/CodeableConcept
    var:
      code: PV1.36

@@ -1,9 +1,11 @@
 ---
 reference:
- fetch:  '$ref-type:id'
+    type: STRING
+    fetch:  '$ref-type:id'
 type:
- fetch: '$ref-type:resourceType'
-identifier:
- fetch: '$ref-type:identifier'
+    type: STRING
+    fetch: '$ref-type:resourceType'
+
 display:
- value: $ref-display
+   type: STRING
+   value: $ref-display

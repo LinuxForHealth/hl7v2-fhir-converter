@@ -13,7 +13,7 @@ import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ibm.whi.core.expression.Expression;
-import com.ibm.whi.hl7.expression.DefaultExpression;
+import com.ibm.whi.hl7.expression.SimpleExpression;
 import com.ibm.whi.hl7.expression.Hl7Expression;
 import com.ibm.whi.hl7.expression.JELXExpression;
 import com.ibm.whi.hl7.expression.ReferenceExpression;
@@ -26,7 +26,7 @@ import com.ibm.whi.hl7.resource.ObjectMapperUtil;
 
 public class HL7DataBasedResourceDeserializer extends JsonDeserializer<HL7DataBasedResourceModel> {
 
-  private static final ObjectMapper MAPPER = ObjectMapperUtil.getInstance();
+  private static final ObjectMapper MAPPER = ObjectMapperUtil.getYAMLInstance();
 
   private static final Logger LOGGER = LoggerFactory.getLogger(HL7DataBasedResourceDeserializer.class);
  
@@ -61,7 +61,7 @@ public class HL7DataBasedResourceDeserializer extends JsonDeserializer<HL7DataBa
       } else if (entry.getValue() != null && entry.getValue().has(TemplateFieldNames.HL7_SPEC)) {
         e = MAPPER.convertValue(entry.getValue(), Hl7Expression.class);
       } else {
-        e = MAPPER.convertValue(entry.getValue(), DefaultExpression.class);
+        e = MAPPER.convertValue(entry.getValue(), SimpleExpression.class);
       }
       if (e != null) {
         expressions.put(entry.getKey(), e);

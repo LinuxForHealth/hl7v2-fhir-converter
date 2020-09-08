@@ -1,70 +1,67 @@
 ---
 resourceType: Encounter
 id:
+  type: STRING
   evaluate: 'UUID.randomUUID()'
 identifier:
-    type: Array
-    reference: datatype/IdentifierCX
+    reference: datatype/IdentifierCX *
     hl7spec: PV1.19
 
 status:
+    type: STRING
     evaluate: 'GeneralUtils.getEncounterStatus(var1,var2,var3)'
     var: 
       var1: String PV1.45
       var2: String PV1.44
       var3: String PV2.16
+      
 class:
-    type: Single
     reference: datatype/Coding
     vars:
        code: PV1.2
 
-type: 
-   type: Array
-   reference: datatype/CodeableConcept
+type:
+   reference: datatype/CodeableConcept *
    var:
      code: PV1.4 | PV1.18
 
 serviceType:
-   type: Single
    reference: datatype/CodeableConcept
    var:
      code: PV1.10
  
 priority:
-   type: Single
    reference: datatype/CodeableConcept
    var:
      code: PV2.25
 
 
 episodeOfCare:
+   type: STRING
    hl7spec: PV1.54 | PV1.53
+
 period: 
-     evaluate: 'GeneralUtils.generatePeriod(start,end)'
-     var: 
-       start: LOCAL_DATE_TIME PV1.44
-       end: LOCAL_DATE_TIME PV1.45
+    reference: datatype/Period
+    var: 
+       start: PV1.44
+       end: PV1.45
 
 length:
-    evaluate: 'GeneralUtils.diffDateMin(var1,var2)'
+    reference: datatype/Duration
     var: 
-      var1: LOCAL_DATE_TIME PV1.45
-      var2: LOCAL_DATE_TIME PV1.44
+      time1: DATE_TIME PV1.44
+      time2: DATE_TIME PV1.45
 
 reasonCode:
-    type: Array
-    reference: datatype/CodeableConcept
+    reference: datatype/CodeableConcept *
     var:
       code: EVN.4 | PV2.3
 
 
 hospitalization:
-    type: Single
     reference: secondary/Hospitalization
 
 subject:
-    type: Single
     reference: datatype/Reference
     var: 
       ref-type: $Patient

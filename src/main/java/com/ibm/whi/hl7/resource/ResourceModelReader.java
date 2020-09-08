@@ -43,7 +43,8 @@ public class ResourceModelReader {
     if (templateFile.exists()) {
       try {
         HL7DataBasedResourceModel rm =
-            ObjectMapperUtil.getInstance().readValue(templateFile, HL7DataBasedResourceModel.class);
+            ObjectMapperUtil.getYAMLInstance().readValue(templateFile,
+                HL7DataBasedResourceModel.class);
         rm.setName(templateFile.getName());
         return rm;
       } catch (IOException e) {

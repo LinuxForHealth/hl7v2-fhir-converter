@@ -3,19 +3,19 @@
 ---
 resourceType: Patient
 id:
+  type: STRING
   evaluate: 'UUID.randomUUID()'
+  
 identifier:
-    type: Array
-    reference: datatype/IdentifierCX
+    reference: datatype/IdentifierCX *
     hl7spec: PID.3  
 name: 
-    type: Array
-    reference: datatype/HumanName
+    reference: datatype/HumanName *
     hl7spec: PID.5  
 gender: 
      type: ADMINISTRATIVE_GENDER
      hl7spec: PID.8
 
 birthDate:
-     type: LOCAL_DATE
+     type: DATE
      hl7spec: PID.7

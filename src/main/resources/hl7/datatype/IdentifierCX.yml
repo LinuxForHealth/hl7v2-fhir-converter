@@ -1,6 +1,5 @@
 ---
 type: 
-   type: Single
    reference: datatype/CodeableConcept
    var:
      code: CX.5
@@ -14,11 +13,11 @@ value:
      hl7spec: CX.1
      required: true
 
-period: 
-     evaluate: 'GeneralUtils.generatePeriod(start,end)'
-     var: 
-       start: LOCAL_DATE_TIME CX.7
-       end: LOCAL_DATE_TIME CX.8
+period:  
+    reference: datatype/Period   
+    var: 
+       start: CX.7
+       end: CX.8
   
 
 

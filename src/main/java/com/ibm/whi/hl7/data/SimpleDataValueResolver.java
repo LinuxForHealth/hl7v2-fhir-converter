@@ -1,11 +1,7 @@
 package com.ibm.whi.hl7.data;
 
 import java.net.URI;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
-import java.time.format.DateTimeFormatter;
+import java.net.URISyntaxException;
 import java.util.Locale;
 import java.util.UUID;
 import org.apache.commons.lang3.BooleanUtils;
@@ -15,42 +11,28 @@ import org.hl7.fhir.r4.model.Enumerations.AdministrativeGender;
 import org.hl7.fhir.r4.model.Observation.ObservationStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ca.uhn.hl7v2.model.primitive.DT;
-import ca.uhn.hl7v2.model.primitive.TSComponentOne;
+import com.ibm.whi.hl7.data.date.DateUtil;
 
 public class SimpleDataValueResolver {
   private static final Logger LOGGER = LoggerFactory.getLogger(SimpleDataValueResolver.class);
 
 
-  public static final ValueExtractor<Object, LocalDate> LOCAL_DATE = (Object value) -> {
-    LOGGER.info("parsing value to Localdate {}  ", value);
-    if (value != null) {
-      LOGGER.info("parsing value to Localdate {} type {} ", value, value.getClass());
+  public static final ValueExtractor<Object, String> DATE = (Object value) -> {
+
+      String val = Hl7DataHandlerUtil.getStringValue(value);
+    if (val != null) {
+      return DateUtil.formatToDate(val);
     }
-    LocalDate date = null;
-    if (value instanceof ca.uhn.hl7v2.model.primitive.DT) {
-      date = Hl7DataHandlerUtil.toLocalDate((ca.uhn.hl7v2.model.primitive.DT) value);
-    } else if (value instanceof TSComponentOne) {
-      date = Hl7DataHandlerUtil.toLocalDate((TSComponentOne) value);
-    } else if (value instanceof String) {
-      date = LocalDate.parse((String) value, DateTimeFormatter.BASIC_ISO_DATE);
-    }
-    return date;
+    return null;
   };
 
-  public static final ValueExtractor<Object, LocalDateTime> LOCAL_DATE_TIME = (Object value) -> {
+  public static final ValueExtractor<Object, String> DATE_TIME = (Object value) -> {
 
-    LocalDateTime date = null;
-    if (value instanceof DT) {
-      date = Hl7DataHandlerUtil.toLocalDateTime((DT) value);
-    } else if (value instanceof TSComponentOne) {
-      date = Hl7DataHandlerUtil.toLocalDateTime((TSComponentOne) value);
-    } else if (value instanceof String) {
-      date = LocalDateTime.parse((String) value, DateTimeFormatter.ISO_INSTANT);
+    String val = Hl7DataHandlerUtil.getStringValue(value);
+    if (val != null) {
+      return DateUtil.formatToDateTime(val);
     }
-
-
-    return date;
+    return null;
   };
 
   public static final ValueExtractor<Object, String> STRING = (Object value) -> {
@@ -65,18 +47,19 @@ public class SimpleDataValueResolver {
     try {
       String val = Hl7DataHandlerUtil.getStringValue(value);
       if (val != null) {
-        return URI.create(val);
+        return new URI("urn", "uuid", val);
       } else {
         return null;
       }
-    } catch (IllegalArgumentException e) {
+    } catch (IllegalArgumentException | URISyntaxException e) {
       LOGGER.warn("Value not valid URI, value: {}", value, e);
       return null;
     }
 
   };
 
-  public static final ValueExtractor<Object, String> ADMINISTRATIVE_GENDER = (Object value) -> {
+  public static final ValueExtractor<Object, String> ADMINISTRATIVE_GENDER_FHIR =
+      (Object value) -> {
 
     String val = Hl7DataHandlerUtil.getStringValue(value);
     if (null == val) {
@@ -97,43 +80,18 @@ public class SimpleDataValueResolver {
 
   };
   
-  public static final ValueExtractor<Object, String> OBSERVATION_STATUS = (Object value) -> {
+  public static final ValueExtractor<Object, String> OBSERVATION_STATUS_FHIR = (Object value) -> {
     String val = Hl7DataHandlerUtil.getStringValue(value);
     if (null == val) {
           return ObservationStatus.UNKNOWN.toCode();
         }
-        ObservationStatus status;
-    switch (StringUtils.upperCase(val, Locale.ENGLISH)) {
-          case "C":
-            status = ObservationStatus.CORRECTED;
-            break;
-          case "D":
-            status = ObservationStatus.CANCELLED;
-            break;
-          case "F":
-            status = ObservationStatus.FINAL;
-            break;
-          case "I":
-            status = ObservationStatus.REGISTERED;
-            break;
-          case "P":
-            status = ObservationStatus.PRELIMINARY;
-            break;
-          case "W":
-            status = ObservationStatus.ENTEREDINERROR;
-            break;
-          default:
-            status = ObservationStatus.UNKNOWN;
-
-        }
+        ObservationStatus status = getObservationStatus(val);
 
         return status.toCode();
 
   };
+
   
-
-
-
   
 
   public static final ValueExtractor<Object, Boolean> BOOLEAN = (Object value) -> {
@@ -174,28 +132,25 @@ public class SimpleDataValueResolver {
   };
 
 
-  public static final ValueExtractor<Object, Instant> INSTANT = (Object value) -> {
-    LocalDateTime date = null;
-    if (value instanceof DT) {
-      date = Hl7DataHandlerUtil.toLocalDateTime((DT) value);
-    } else if (value instanceof TSComponentOne) {
-      date = Hl7DataHandlerUtil.toLocalDateTime((TSComponentOne) value);
-    } else if (value instanceof String) {
-      date = LocalDateTime.parse((String) value, DateTimeFormatter.ISO_INSTANT);
-    }
-    if (date != null) {
-      return date.toInstant(ZoneOffset.UTC);
-    } else {
-      return null;
-    }
+
+
+
+
+
+  public static final ValueExtractor<Object, UUID> UUID_VAL = (Object value) -> {
+    String val = Hl7DataHandlerUtil.getStringValue(value);
+    return getUUID(val);
 
   };
 
-  private SimpleDataValueResolver() {}
+  public static final ValueExtractor<Object, Object> OBJECT = (Object value) -> {
+    return value;
+
+  };
 
 
 
-  private static Object getUUID(String value) {
+  private static UUID getUUID(String value) {
     if (value != null) {
       try {
         return UUID.fromString(value);
@@ -208,6 +163,37 @@ public class SimpleDataValueResolver {
       return null;
     }
   }
+
+  private static ObservationStatus getObservationStatus(String val) {
+    ObservationStatus status;
+    switch (StringUtils.upperCase(val, Locale.ENGLISH)) {
+      case "C":
+        status = ObservationStatus.CORRECTED;
+        break;
+      case "D":
+        status = ObservationStatus.CANCELLED;
+        break;
+      case "F":
+        status = ObservationStatus.FINAL;
+        break;
+      case "I":
+        status = ObservationStatus.REGISTERED;
+        break;
+      case "P":
+        status = ObservationStatus.PRELIMINARY;
+        break;
+      case "W":
+        status = ObservationStatus.ENTEREDINERROR;
+        break;
+      default:
+        status = ObservationStatus.UNKNOWN;
+
+    }
+    return status;
+  }
+
+
+
 
 
 

@@ -2,8 +2,7 @@
 ---
 
  coding : 
-    type: Array
-    reference: datatype/Coding
+    reference: datatype/Coding *
     vars:
        code: $code
     

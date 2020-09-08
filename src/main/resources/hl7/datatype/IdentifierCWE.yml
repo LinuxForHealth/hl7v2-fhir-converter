@@ -1,6 +1,5 @@
 ---
-type: 
-   type: Single
+type:
    reference: datatype/CodeableConcept
    var:
      code: CWE.5
@@ -15,10 +14,10 @@ value:
      required: true
 
 period: 
-     evaluate: 'GeneralUtils.generatePeriod(start,end)'
-     var: 
-       start: LOCAL_DATE_TIME CWE.7
-       end: LOCAL_DATE_TIME CWE.8
+    reference: datatype/Period
+    var: 
+       start: CWE.7
+       end: CWE.8
   
 
 

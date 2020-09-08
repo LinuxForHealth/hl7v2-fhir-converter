@@ -72,7 +72,8 @@ public class HL7ToFHIRConverter {
     if (templateFile.exists()) {
       try {
 
-        HL7MessageModel rm = ObjectMapperUtil.getInstance().readValue(templateFile, HL7MessageModel.class);
+        HL7MessageModel rm =
+            ObjectMapperUtil.getYAMLInstance().readValue(templateFile, HL7MessageModel.class);
         rm.setMessageName(templateFile.getName());
         messagetemplates.put(com.google.common.io.Files.getNameWithoutExtension(path.toString()),
             rm);

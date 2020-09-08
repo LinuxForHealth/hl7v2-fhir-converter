@@ -6,17 +6,16 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ibm.whi.hl7.expression.DefaultExpression;
 import com.ibm.whi.hl7.resource.ObjectMapperUtil;
 
 
 
 public class DeserializationTest {
-  private static final ObjectMapper objMapper = ObjectMapperUtil.getInstance();
+  private static final ObjectMapper objMapper = ObjectMapperUtil.getYAMLInstance();
   @Test
   public void test() throws JsonMappingException, JsonProcessingException {
     JsonNode jnode = objMapper.readTree("\"test\"");
-    DefaultExpression exp = objMapper.convertValue(jnode, DefaultExpression.class);
+    SimpleExpression exp = objMapper.convertValue(jnode, SimpleExpression.class);
     
     assertThat(exp.getValue()).isEqualTo("test");
   }

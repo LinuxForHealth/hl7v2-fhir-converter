@@ -1,14 +1,12 @@
 package com.ibm.whi.hl7.data;
 
 
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
-import java.util.Date;
-import org.hl7.fhir.r4.model.Period;
+import java.time.temporal.Temporal;
 import org.hl7.fhir.r4.model.codesystems.EncounterStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.ibm.whi.hl7.data.date.DateUtil;
 import ca.uhn.hl7v2.model.Type;
 import ca.uhn.hl7v2.model.Variable;
 
@@ -32,40 +30,35 @@ public class HL7GeneralUtils {
 
 
 
-  public static long diffDateMin(LocalDateTime time1, LocalDateTime time2) {
+
+  public static long diffDateMin(Object time1, Object time2) {
     LOGGER.info("Generating time diff in min  from var1{}, var2 {}", time1, time2);
-    if (time1 != null && time2 != null) {
-      return ChronoUnit.MINUTES.between(time1, time2);
+    Temporal date1 = DateUtil.getTemporal(Hl7DataHandlerUtil.getStringValue(time1));
+    Temporal date2 = DateUtil.getTemporal(Hl7DataHandlerUtil.getStringValue(time2));
+
+
+    if (date1 != null && date2 != null) {
+
+      return ChronoUnit.MINUTES.between(date2, date1);
+
     } else {
       return 0;
     }
   }
 
 
-  public static Period generatePeriod(LocalDateTime start, LocalDateTime end) {
-    LOGGER.info("Generating period datatype  from start{}, end {}", start, end);
-    if (start != null && end != null) {
-      Period p = new Period();
-      Date d = Date.from(start.toInstant(ZoneOffset.UTC));
-      p.setStart(d);
-      Date e = Date.from(end.toInstant(ZoneOffset.UTC));
-      p.setStart(e);
-      return p;
 
 
-    } else {
-      return null;
-    }
-  }
 
   public static String generateName(String prefix, String given, String family, String suffix) {
     LOGGER.info("Generating name from  from prefix {}, given {}, family {} ,suffix {}", prefix,
         given, family, suffix);
+
     return String.join(" ", prefix, given, family, suffix);
   }
 
 
-  public static Object getObservationValue(Object observation, Object observationType,
+  public static String getObservationValue(Object observation, Object observationType,
       Object units) {
     LOGGER.info("Generating onservation value from observation {}, observationType {}, units  {}",
         observation, observationType, units);
@@ -82,9 +75,5 @@ public class HL7GeneralUtils {
 
   }
 
-
-  public static Object getPerformer(Object practitioner, Object device, Object organization) {
-    return null;
-  }
 
 }

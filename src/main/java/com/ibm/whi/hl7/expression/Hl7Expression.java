@@ -8,7 +8,6 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableMap;
 import com.ibm.whi.core.expression.GenericResult;
 import com.ibm.whi.core.message.InputData;
 import com.ibm.whi.hl7.data.SimpleDataTypeMapper;
@@ -31,46 +30,43 @@ public class Hl7Expression extends AbstractExpression {
 
 
   public Hl7Expression(@JsonProperty("type") String type, @JsonProperty("hl7spec") String hl7spec) {
-    this(type, hl7spec, null, false);
+    this(type, hl7spec, null, false, null);
   }
 
   @JsonCreator
   public Hl7Expression(@JsonProperty("type") String type, @JsonProperty("hl7spec") String hl7spec,
-      @JsonProperty("default") Object defaultValue, @JsonProperty("required") boolean required) {
-    super(type, defaultValue, required, hl7spec, new HashMap<>());
+      @JsonProperty("default") Object defaultValue, @JsonProperty("required") boolean required,
+      @JsonProperty("condition") String condition) {
+    super(type, defaultValue, required, hl7spec, new HashMap<>(), condition);
 
   }
 
   @Override
-  public GenericResult evaluate(InputData dataSource, Map<String, GenericResult> contextValues) {
+  public GenericResult evaluateExpression(InputData dataSource,
+      Map<String, GenericResult> contextValues, GenericResult hl7SpecValues) {
     Preconditions.checkArgument(dataSource != null, "dataSource cannot be null");
     Preconditions.checkArgument(contextValues != null, "contextValues cannot be null");
 
-    LOGGER.info("Evaluating expression type {} , hl7spec {}", this.getType(), this.getspecs());
-  
-    GenericResult hl7Value =
-        dataSource.extractSingleValueForSpec(this.getspecs(),
-            ImmutableMap.copyOf(contextValues));
+
+    Object hl7Value = getSingleValue(hl7SpecValues);
     LOGGER.info("Evaluating expression type {} , hl7spec {} returned hl7 value {} ", this.getType(),
         this.getspecs(), hl7Value);
     Object resolvedValue = null;
 
-    ValueExtractor<Object, ?> resolver =
-        SimpleDataTypeMapper.getValueResolver(this.getType());
+    ValueExtractor<Object, ?> resolver = SimpleDataTypeMapper.getValueResolver(this.getType());
     if (resolver != null && hl7Value != null) {
-      resolvedValue = resolver.apply(hl7Value.getValue());
+      resolvedValue = resolver.apply(hl7Value);
       LOGGER.info("Evaluating expression type {} , hl7spec {} resolved value {} ", this.getType(),
           this.getspecs(), resolvedValue);
     }
-
-
-
     if (resolvedValue != null) {
       return new GenericResult(resolvedValue);
     } else {
       return new GenericResult(this.getDefaultValue());
     }
   }
+
+
 
 
 
