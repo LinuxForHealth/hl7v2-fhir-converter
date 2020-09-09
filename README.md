@@ -104,18 +104,23 @@ The extraction logic for each field can be defined by using expressions. This co
         var2: CX.2
  ```     
  Different types of expressions
-* ReferenceExpression : This type of expression is used when a field is a data type defined in one of the [data type templates](master/src/main/resources/datatype). These data type templates define different [FHIR data types](https://hl7.org/FHIR/datatypes.html). 
-  Example:
+* ReferenceExpression : This type of expression is used when a field is a data type defined in one of the [data type templates](master/src/main/resources/datatype). These data type templates define different [FHIR data types](https://hl7.org/FHIR/datatypes.html). If the path of the reference has * then multiple elements will be generated.
+  Example 1: Generating multiple values, this expression will return a array of elements
   ```yml
   identifier:
-    type: Array
-    reference: datatype/IdentifierCX
-    hl7spec: PID.3 
+     reference: datatype/IdentifierCX *
+     hl7spec: PID.3 
+  ```
+  
+   Example 2: Generating single value, this expression will return a single element.
+  ```yml
+  identifier:
+     reference: datatype/IdentifierCX 
+     hl7spec: PID.3 
   ```
 * JELXExpression: This type of expression is used when a field value needs to be extracted by executing a Java method.
 ```yml
- type: STRING
-    hl7prefix:
+    type: STRING
     evaluate: 'GeneralUtils.generateName( prefix, given,family, suffix)'
     var:
       prefix: STRING XPN.4
@@ -135,9 +140,15 @@ given:
      type: STRING
      hl7spec: XPN.2
 ```
-* DefaultExpression : If the field value is constant and no extraction or conversion is required then this expression is used.
+* SimpleExpression : If the field value is constant and no extraction or conversion is required then this expression is used.
+Example 1: Constant value
 ```yml
 code: 'ABX'
+
+```
+Example 2: Value needs to be extracted from a variable. 
+```yml
+code: $var
 
 ```
 ## Usage
