@@ -1,11 +1,11 @@
-# HL7v2-FHIR Converter
+# FHIR Converter
 
 FHIR converter is a Java based library that enables converting [Hl7v2](https://www.hl7.org/implement/standards/product_section.cfm?section=13) messages to [FHIR](https://hl7.org/FHIR/) resources.<br>
 FHIR converter utilized the open source  [HAPI Library](https://hapifhir.github.io/hapi-hl7v2/) for parsing Hl7 messages and it also utilizes the [HAPI library for FHIR](https://hapifhir.io/) resources to validate the generated FHIR resources.
 
 
 
-## Features and Concepts
+## Features and Concepts of Hl7 -> FHIR conversion
 HL7v2-FHIR converter converts a given HL7 message to FHIR bundle resource using the message templates. These templates are [yaml](https://yaml.org/) files. Each message template defines what all FHIR resources needs to be generated from a particular message. <br>
 
 ### Structure of a message template
@@ -70,13 +70,11 @@ Sample resource template:
 resourceType: Patient
 id:
   evaluate: 'UUID.randomUUID()'
-identifier:
-    type: Array
-    reference: datatype/IdentifierCX
+identifier: 
+    reference: datatype/IdentifierCX *
     hl7spec: PID.3  
 name: 
-    type: Array
-    reference: datatype/HumanName
+    reference: datatype/HumanName *
     hl7spec: PID.5  
 gender: 
      type: ADMINISTRATIVE_GENDER
@@ -90,7 +88,7 @@ birthDate:
 
 ### Different expressions types 
 The extraction logic for each field can be defined by using expressions. This component supports 4 different type of expressions. All expressions have following attributes:
-* type: [DEFAULT -String] Class type of the field .
+* type: [DEFAULT - Object] Class type of the field .
 * hl7spec: [DEFAULT - NONE] The value that needs to be extracted usiing the HL7 spec.
 * defaultValue: [DEFAULT - NULL]if extraction of the value fails, then the default value can be used.
 * required : [DEFAULT - false] If a field is required and cannot be extracted then the resource generation will fail even if other fields were extracted.
@@ -107,6 +105,7 @@ The extraction logic for each field can be defined by using expressions. This co
       variables:
         var1: CX.1
         var2: CX.2
+
  ```
  
 
@@ -130,11 +129,11 @@ Example:
    hl7spec: OBX.16
 
 ```
+
 * JELXExpression: This type of expression is used when a field value needs to be extracted by executing a Java method.
 
 ```yml
- type: STRING
-    hl7prefix:
+    type: STRING
     evaluate: 'GeneralUtils.generateName( prefix, given,family, suffix)'
     var:
       prefix: STRING XPN.4
@@ -156,10 +155,17 @@ given:
      type: STRING
      hl7spec: XPN.2
 ```
-* DefaultExpression : If the field value is constant and no extraction or conversion is required then this expression is used.
+
+* SimpleExpression : If the field value is constant and no extraction or conversion is required then this expression is used.
+Example 1: Constant value
 
 ```yml
 code: 'ABX'
+
+```
+Example 2: Value needs to be extracted from a variable. 
+```yml
+code: $var
 
 ```
 ## Usage
