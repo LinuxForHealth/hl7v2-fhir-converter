@@ -6,26 +6,26 @@ text:
     hl7prefix:
     evaluate: 'GeneralUtils.generateName( prefix, given,family, suffix)'
     var:
-      prefix: STRING XPN.4
-      given: STRING XPN.2
-      family: STRING XPN.1
-      suffix: STRING XPN.5
+      prefix: STRING XCN.5
+      given: STRING XCN.3
+      family: STRING XCN.2
+      suffix: STRING XCN.6
 family:
      type: STRING
-     hl7spec: XPN.1
+     hl7spec: XCN.2
 given: 
      type: STRING
-     hl7spec: XPN.2
+     hl7spec: XCN.3
 prefix:
      type: STRING
-     hl7spec: XPN.4
+     hl7spec: XCN.5
      default: ''
 suffix: 
      type: STRING
-     hl7spec: XPN.5
+     hl7spec: XCN.6
 period:
-    reference: datatype/Period
+    resource: datatype/Period
     var:
-       start: XPN.12
-       end: XPN.13
+       start: XCN.19
+       end: XCN.20
      

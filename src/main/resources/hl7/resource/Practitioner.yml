@@ -1,0 +1,16 @@
+resourceType: Practitioner
+id:
+  type: STRING
+  evaluate: 'UUID.randomUUID()'
+  
+identifier:
+    resource: datatype/IdentifierGen
+    var:
+      system: XCN.9
+      id: XCN.1 
+      start: XCN.19 
+      end: XCN.20
+name: 
+    resource: datatype/HumanName_XCN *
+
+  

@@ -1,13 +1,15 @@
 package com.ibm.whi.hl7.message;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Map;
 import org.junit.Test;
 import com.google.common.collect.Lists;
 import com.ibm.whi.core.resource.ResourceModel;
+import com.ibm.whi.hl7.resource.ObjectMapperUtil;
 import com.ibm.whi.hl7.resource.ResourceModelReader;
 import ca.uhn.hl7v2.HL7Exception;
-
 
 public class Hl7MessageTest {
   private static HL7MessageEngine engine = new HL7MessageEngine();
@@ -22,7 +24,10 @@ public class Hl7MessageTest {
         + "PID|1|465 306 5961|000010016^^^MR~000010017^^^MR~000010018^^^MR|407623|Wood^Patrick^^Sr^MR||19700101|female|||High Street^^Oxford^^Ox1 4DP~George St^^Oxford^^Ox1 5AP|||||||\r"
         + "NK1|1|Wood^John^^^MR|Father||999-9999\r" + "NK1|2|Jones^Georgie^^^MSS|MOTHER||999-9999\r"
         + "PV1|1||Location||||||||||||||||261938_6_201306171546|||||||||||||||||||||||||20130617134644|||||||||";
-    System.out.println(message.convert(hl7message, engine));
+    String json = message.convert(hl7message, engine);
+    assertThat(json).isNotBlank();
+    Map<String, Object> values = ObjectMapperUtil.getJSONInstance().readValue(json, Map.class);
+    System.out.println(json);
   }
 
 
@@ -81,9 +86,9 @@ public class Hl7MessageTest {
         + "PID|1|465 306 5961|000010016^^^MR~000010017^^^MR~000010018^^^MR|407623|Wood^Patrick^^Sr^MR||19700101|female|||High Street^^Oxford^^Ox1 4DP~George St^^Oxford^^Ox1 5AP|||||||\r"
         + "NK1|1|Wood^John^^^MR|Father||999-9999\r" + "NK1|2|Jones^Georgie^^^MSS|MOTHER||999-9999\r"
         + "PV1|1||Location||||||||||||||||261938_6_201306171546|||||||||||||||||||||||||20130617134644|||||||||\r"
-        + "OBX|1|TX|1234||First line: ECHOCARDIOGRAPHIC REPORT||||||F||\r"
+        + "OBX|1|TX|1234||First line: ECHOCARDIOGRAPHIC REPORT||||||F|||||2740^Tsadok^Janetary~2913^Merrit^Darren^F~3065^Mahoney^Paul^J~4723^Loh^Robert^L~9052^Winter^Oscar^|\r"
         + "OBX|2|TX|||Second Line: NORMAL LV CHAMBER SIZE WITH MILD CONCENTRIC LVH\\.br\\Third Line in the same field, after the escape character for line break.||||||F||\r"
-        + "OBX|3|TX|||Fourth Line: HYPERDYNAMIC LV SYSTOLIC FUNCTION, VISUAL EF 80%~Fifth line, as part of a repeated field||||||F||";
+        + "OBX|3|TX|||Fourth Line: HYPERDYNAMIC LV SYSTOLIC FUNCTION, VISUAL EF 80%~Fifth line, as part of a repeated field||||||F||||Alex||";
     System.out.println(message.convert(hl7message, engine));
   }
 

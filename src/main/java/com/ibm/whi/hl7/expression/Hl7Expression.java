@@ -1,6 +1,5 @@
 package com.ibm.whi.hl7.expression;
 
-import java.util.HashMap;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,14 +29,15 @@ public class Hl7Expression extends AbstractExpression {
 
 
   public Hl7Expression(@JsonProperty("type") String type, @JsonProperty("hl7spec") String hl7spec) {
-    this(type, hl7spec, null, false, null);
+    this(type, hl7spec, null, false, null, null);
   }
 
   @JsonCreator
   public Hl7Expression(@JsonProperty("type") String type, @JsonProperty("hl7spec") String hl7spec,
       @JsonProperty("default") Object defaultValue, @JsonProperty("required") boolean required,
+      @JsonProperty("var") Map<String, String> variables,
       @JsonProperty("condition") String condition) {
-    super(type, defaultValue, required, hl7spec, new HashMap<>(), condition);
+    super(type, defaultValue, required, hl7spec, variables, condition);
 
   }
 

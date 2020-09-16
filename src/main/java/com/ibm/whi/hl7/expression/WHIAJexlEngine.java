@@ -77,7 +77,7 @@ public final class WHIAJexlEngine {
 
 
 
-  boolean evaluateCondition(String jexlExp, Map<String, Object> context) {
+  public boolean evaluateCondition(String jexlExp, Map<String, Object> context) {
     Preconditions.checkArgument(StringUtils.isNotBlank(jexlExp), "jexlExp cannot be blank");
     Preconditions.checkArgument(context != null, "context cannot be null");
     String trimedJexlExp = StringUtils.trim(jexlExp);

@@ -2,7 +2,7 @@
 ---
 
  coding : 
-    reference: datatype/Coding *
+    resource: datatype/Coding *
     vars:
        code: $code
     

@@ -10,7 +10,7 @@ public abstract class AbstractFHIRResource {
 
   private String resourceName;
   private int order;
-  private boolean repeates;
+  private boolean repeats;
   private String resourcePath;
 
 
@@ -18,11 +18,11 @@ public abstract class AbstractFHIRResource {
   @JsonCreator
   public AbstractFHIRResource(@JsonProperty("resourceName") String resourceName,
       @JsonProperty("resourcePath") String resourcePath, @JsonProperty("order") int order,
-      @JsonProperty("repeates") boolean repeates) {
+      @JsonProperty("repeats") boolean repeats) {
     this.resourceName = resourceName;
     this.resourcePath = resourcePath;
     this.order = order;
-    this.repeates = repeates;
+    this.repeats = repeats;
   }
 
 
@@ -45,8 +45,8 @@ public abstract class AbstractFHIRResource {
   }
 
 
-  public boolean isRepeates() {
-    return repeates;
+  public boolean isRepeats() {
+    return repeats;
   }
 
 

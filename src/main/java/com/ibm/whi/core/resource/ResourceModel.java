@@ -10,10 +10,10 @@ import com.ibm.whi.core.message.InputData;
 
 public interface ResourceModel {
 
-  Object evaluateSingle(InputData dataExtractor, Map<String, GenericResult> contextValues,
+  ResourceResult evaluateSingle(InputData dataExtractor, Map<String, GenericResult> contextValues,
       GenericResult baseValue);
 
-  List<?> evaluateMultiple(InputData dataExtractor, Map<String, GenericResult> contextValues,
+  ResourceResult evaluateMultiple(InputData dataExtractor, Map<String, GenericResult> contextValues,
       List<GenericResult> baseValues, List<Variable> variables);
 
   Map<String, Expression> getExpressions();

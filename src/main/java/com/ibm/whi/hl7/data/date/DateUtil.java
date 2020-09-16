@@ -47,22 +47,30 @@ public class DateUtil {
     }
 
     if (returnValue == null) {
-      DateTimeFormatter format = null;
-
-      for (Entry<Pattern, DateTimeFormatter> pattern : DateFormats.getDateTimePatternsInstance()
-          .entrySet()) {
-        if (pattern.getKey().matcher(input).matches()) {
-          format = pattern.getValue();
-          break;
-        }
-
-      }
-
-      LocalDateTime ldt = LocalDateTime.parse(input, DateFormats.getFormatterInstance());
-      returnValue = ldt.format(format);
+      returnValue = getLocalDateTime(input);
 
     }
 
+    return returnValue;
+  }
+
+
+
+  private static String getLocalDateTime(String input) {
+    String returnValue;
+    DateTimeFormatter format = null;
+
+    for (Entry<Pattern, DateTimeFormatter> pattern : DateFormats.getDateTimePatternsInstance()
+        .entrySet()) {
+      if (pattern.getKey().matcher(input).matches()) {
+        format = pattern.getValue();
+        break;
+      }
+
+    }
+
+    LocalDateTime ldt = LocalDateTime.parse(input, DateFormats.getFormatterInstance());
+    returnValue = ldt.format(format);
     return returnValue;
   }
 
@@ -138,6 +146,17 @@ public class DateUtil {
     }
     return temporal;
 
+  }
+
+
+
+  public static String formatToZonedDateTime(String input) {
+    String zoned = getZonedDate(input);
+    if (zoned == null) {
+      zoned = getLocalDateTime(input);
+
+    }
+    return zoned;
   }
 }
 

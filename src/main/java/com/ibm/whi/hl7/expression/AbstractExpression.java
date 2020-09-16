@@ -16,6 +16,8 @@ import com.google.common.collect.ImmutableMap;
 import com.ibm.whi.core.expression.Expression;
 import com.ibm.whi.core.expression.GenericResult;
 import com.ibm.whi.core.expression.Variable;
+import com.ibm.whi.core.expression.condition.Condition;
+import com.ibm.whi.core.expression.condition.ConditionUtil;
 import com.ibm.whi.core.message.InputData;
 import com.ibm.whi.hl7.exception.RequiredConstraintFailureException;
 import ca.uhn.hl7v2.model.Structure;
@@ -49,7 +51,7 @@ public abstract class AbstractExpression implements Expression {
     this.required = required;
     this.hl7specs = getTokens(hl7spec);
     if (StringUtils.isNotBlank(condition)) {
-      this.condition = new Condition(condition);
+      this.condition = ConditionUtil.createCondition(condition);
     }
 
     initVariables(rawvariables);
@@ -174,7 +176,7 @@ return null;
   @Override
   public boolean isConditionSatisfied(Map<String, GenericResult> contextValues) {
     if (this.condition != null) {
-      return this.condition.evaluateCondition(contextValues);
+      return this.condition.test(contextValues);
     } else {
       return true;
     }
@@ -184,8 +186,8 @@ return null;
     return isMultiple;
   }
 
-  public void setMultiple(boolean isMultiple) {
-    this.isMultiple = isMultiple;
+  public void setMultiple() {
+    this.isMultiple = true;
   }
 
   static Object getSingleValue(GenericResult hl7SpecValues) {

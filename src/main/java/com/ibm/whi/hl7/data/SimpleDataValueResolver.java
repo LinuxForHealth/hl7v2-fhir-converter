@@ -41,6 +41,17 @@ public class SimpleDataValueResolver {
 
   };
 
+  public static final ValueExtractor<Object, String> INSTANT = (Object value) -> {
+
+    String val = Hl7DataHandlerUtil.getStringValue(value);
+    if (val != null) {
+      return DateUtil.formatToZonedDateTime(val);
+    }
+    return null;
+  };
+
+
+
 
   public static final ValueExtractor<Object, URI> URI_VAL = (Object value) -> {
 
