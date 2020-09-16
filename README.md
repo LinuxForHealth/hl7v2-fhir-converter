@@ -192,8 +192,8 @@ gradle build
 In order to convert a Hl7 message to FHIR resource, create a new instance of the class FHIRConverter and invoke the function  convert and pass the hl7message data (file contents).
 
 ```
-    FHIRConverter fhirconverter = new FHIRConverter();
-    String output= fhirconverter.convert(hl7message); // generated a FHIR output
+    HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
+    String output= ftv.convert(hl7message); // generated a FHIR output
 ```
 Sample output:
 
