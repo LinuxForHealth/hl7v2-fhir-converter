@@ -18,6 +18,8 @@ import com.ibm.whi.core.message.AbstractFHIRResource;
 import com.ibm.whi.core.message.InputData;
 import com.ibm.whi.core.message.MessageEngine;
 import com.ibm.whi.core.resource.ResourceModel;
+import com.ibm.whi.core.resource.ResourceResult;
+import com.ibm.whi.core.resource.ResourceValue;
 import com.ibm.whi.fhir.FHIRContext;
 import com.ibm.whi.fhir.FHIRResourceMapper;
 import com.ibm.whi.hl7.resource.ObjectMapperUtil;
@@ -76,22 +78,21 @@ public class HL7MessageEngine implements MessageEngine {
       ResourceModel rs, List<Structure> segments, Map<String, GenericResult> variables,
       Bundle bundle) {
 
-    if (res.isRepeates()) {
+    if (res.isRepeats()) {
       List<GenericResult> baseValues = new ArrayList<>();
       segments.removeIf(Objects::isNull);
       segments.forEach(d -> baseValues.add(new GenericResult(d)));
 
         Map<String, GenericResult> localVariables = new HashMap<>(variables);
+        ResourceResult result=rs.evaluateMultiple(dataExtractor, ImmutableMap.copyOf(localVariables),
+            baseValues, new ArrayList<>());
 
-      List<?> objects = rs.evaluateMultiple(dataExtractor, ImmutableMap.copyOf(localVariables),
-          baseValues, new ArrayList<>());
-      if (objects != null && !objects.isEmpty()) {
-        objects.forEach(obj -> {
-          addEntry(res.getResourceName(), obj, bundle);
-        });
-
-        }
-
+      if (result != null && result.getResources() != null && !result.getResources().isEmpty()) {
+      List<ResourceValue> resourceObjects = result.getResources();
+      addValues(bundle, resourceObjects);
+      List<ResourceValue> additionalResourceObjects = result.getAdditionalResources();
+      addValues(bundle, additionalResourceObjects);
+      }
 
     } else {
 
@@ -99,29 +100,45 @@ public class HL7MessageEngine implements MessageEngine {
       Map<String, GenericResult> localVariables = new HashMap<>(variables);
       localVariables.put(res.getSegment(), new GenericResult(segments.get(0)));
 
-      Object evaluatedValue =
+      ResourceResult evaluatedValue =
           rs.evaluateSingle(dataExtractor, ImmutableMap.copyOf(localVariables),
               new GenericResult(segments.get(0)));
 
-      if (evaluatedValue != null) {
+      if (evaluatedValue != null && evaluatedValue.getResources() != null
+          && !evaluatedValue.getResources().isEmpty()) {
 
-        addEntry(res.getResourceName(), evaluatedValue, bundle);
+        addEntry(res.getResourceName(), evaluatedValue.getResources().get(0), bundle);
         variables.put(res.getResourceName(), new GenericResult(evaluatedValue));
+        List<ResourceValue> additionalResourceObjects = evaluatedValue.getAdditionalResources();
+        addValues(bundle, additionalResourceObjects);
       }
 
-    }
 
+    }
   }
 
 
-  private static void addEntry(String resourceName, Object obj, Bundle bundle) {
-    LOGGER.info("Converting resourceName {} to FHIR {}", resourceName, obj);
+  private static void addValues(Bundle bundle, List<ResourceValue> objects) {
+    if (objects != null && !objects.isEmpty()) {
+      objects.forEach(obj -> {
+        addEntry(obj.getResourceClass(), obj, bundle);
+      });
+
+    }
+  }
+
+
+
+  private static void addEntry(String resourceClass, ResourceValue obj, Bundle bundle) {
+    LOGGER.info("Converting resourceName {} to FHIR {}", resourceClass, obj);
+
     try {
       if (obj != null) {
-        String json = OBJ_MAPPER.writeValueAsString(obj);
+        LOGGER.info("Converting resourceName {} to FHIR {}", resourceClass, obj.getResource());
+        String json = OBJ_MAPPER.writeValueAsString(obj.getResource());
         if (json != null) {
           org.hl7.fhir.r4.model.Resource parsed = FHIRContext.getIParserInstance()
-              .parseResource(FHIRResourceMapper.getResourceClass(resourceName), json);
+              .parseResource(FHIRResourceMapper.getResourceClass(resourceClass), json);
           bundle.addEntry().setResource(parsed);
         }
       }

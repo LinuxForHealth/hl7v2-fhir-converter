@@ -45,7 +45,8 @@ public class ResourceModelReader {
         HL7DataBasedResourceModel rm =
             ObjectMapperUtil.getYAMLInstance().readValue(templateFile,
                 HL7DataBasedResourceModel.class);
-        rm.setName(templateFile.getName());
+        // if(StringUtils.isBlank(rm.getName())){
+        // rm.setName(FilenameUtils.templateFile.getName());}
         return rm;
       } catch (IOException e) {
         throw new IllegalArgumentException(

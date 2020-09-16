@@ -9,22 +9,21 @@ import ca.uhn.hl7v2.model.DataTypeException;
 import ca.uhn.hl7v2.model.Primitive;
 import ca.uhn.hl7v2.model.Structure;
 import ca.uhn.hl7v2.model.Type;
+import ca.uhn.hl7v2.model.Variable;
 
 
 public class Hl7DataHandlerUtil {
 
-  private static final String ERROR_PARSING_VALUE = "Error parsing value {}";
   private static final Logger LOGGER = LoggerFactory.getLogger(Hl7DataHandlerUtil.class);
 
   private Hl7DataHandlerUtil() {}
 
 
   public static String getStringValue(Object obj) {
-
     if (obj == null) {
       return null;
     }
-
+    LOGGER.info("Extracting string value for {} type {}", obj, obj.getClass());
 
     Object local = obj;
     if (local instanceof Collection) {
@@ -36,7 +35,11 @@ public class Hl7DataHandlerUtil {
       }
     }
     String returnvalue;
-    if (local instanceof Composite) {
+
+
+    if (local instanceof Variable) {
+      returnvalue = convertVariesDataTypeToString(local);
+    } else if (local instanceof Composite) {
       Composite com = (Composite) local;
 
       try {
@@ -54,6 +57,15 @@ public class Hl7DataHandlerUtil {
 
     return returnvalue;
 
+  }
+
+
+  private static String convertVariesDataTypeToString(Object obj) {
+    if (obj instanceof Variable) {
+      Variable v = (Variable) obj;
+      return getStringValue(v.getData());
+    }
+    return obj.toString();
   }
 
 

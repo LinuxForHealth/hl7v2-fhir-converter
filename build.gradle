@@ -22,6 +22,7 @@ dependencies {
     testImplementation 'junit:junit:4.12'
   
      implementation 'ca.uhn.hapi:hapi-base:2.3'
+
     implementation 'ca.uhn.hapi:hapi-structures-v26:2.3'
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.10.1'
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.10.1'
@@ -46,6 +47,8 @@ compile group: 'org.apache.commons', name: 'commons-configuration2', version: '2
 // https://mvnrepository.com/artifact/commons-beanutils/commons-beanutils
 compile group: 'commons-beanutils', name: 'commons-beanutils', version: '1.9.4'
 
+// https://mvnrepository.com/artifact/org.apache.commons/commons-collections4
+compile group: 'org.apache.commons', name: 'commons-collections4', version: '4.4'
 
 }
 

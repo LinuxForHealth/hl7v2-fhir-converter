@@ -1,5 +1,6 @@
 package com.ibm.whi.core.expression.util;
 
+import org.apache.commons.lang3.StringUtils;
 import ca.uhn.hl7v2.model.Structure;
 import ca.uhn.hl7v2.model.Type;
 
@@ -15,8 +16,19 @@ public class GeneralUtil {
     } else if (data instanceof Type) {
       return ((Type) data).getName();
     } else {
-      return data.getClass().getCanonicalName();
+      return data.getClass().getSimpleName();
     }
+  }
+
+  public static boolean isVar(String name) {
+    return StringUtils.isNotBlank(name) && name.startsWith("$") && name.length() > 1;
+  }
+
+  public static String getVarName(String name) {
+    if (isVar(name)) {
+      return StringUtils.removeStart(name, "$");
+    }
+    return name;
   }
 
 }

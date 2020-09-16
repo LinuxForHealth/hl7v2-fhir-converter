@@ -147,9 +147,18 @@ public class HL7MessageData implements InputData {
 
   private ParsingResult<?> valuesFromHl7Message(String hl7specs,
       ImmutableMap<String, GenericResult> varables) {
+    if(StringUtils.isBlank(hl7specs)) {
+      return null;
+    }
     ParsingResult<?> res = null;
 
     String[] tokens = StringUtils.split(hl7specs, HL7_SPEC_SPLITTER.pattern());
+    int subcomponent = -1;
+    if (tokens.length == 3) {
+      subcomponent = NumberUtils.toInt(tokens[2]);
+    }
+    
+    
     GenericResult valuefromVariables = varables.get(tokens[0]);
 
 
@@ -167,7 +176,11 @@ public class HL7MessageData implements InputData {
       } else if (obj instanceof Type) {
 
         int component = NumberUtils.toInt(tokens[1]);
-        res = hde.getComponent((Type) obj, component);
+        if (subcomponent != -1) {
+        res = hde.getComponent((Type) obj, component, subcomponent);
+        } else {
+          res = hde.getComponent((Type) obj, component);
+        }
 
       } else if (tokens.length == 2) {
         res = hde.get(tokens[0], tokens[1]);

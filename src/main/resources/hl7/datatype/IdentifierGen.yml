@@ -1,0 +1,19 @@
+---
+
+system: 
+     type: STRING
+     value: $system
+    
+value: 
+     type: STRING
+     value: $id
+     required: true
+
+period:  
+    resource: datatype/Period
+    var: 
+       start: $start
+       end: $end
+  
+
+

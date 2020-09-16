@@ -17,8 +17,8 @@ public class HL7FHIRResource extends AbstractFHIRResource {
   private ResourceModel resource;
 
   public HL7FHIRResource(String resourceName, String segment, ResourceModel resource, int order,
-      boolean repeates, List<String> additionalSegments) {
-    super(resourceName, "", order, repeates);
+      boolean repeats, List<String> additionalSegments) {
+    super(resourceName, "", order, repeats);
     this.additionalSegments = new ArrayList<>();
     if (additionalSegments != null) {
       this.additionalSegments.addAll(additionalSegments);
@@ -28,16 +28,16 @@ public class HL7FHIRResource extends AbstractFHIRResource {
   }
 
   public HL7FHIRResource(String resourceName, String segment, ResourceModel resource, int order,
-      boolean repeates) {
-    this(resourceName, segment, resource, order, repeates, new ArrayList<>());
+      boolean repeats) {
+    this(resourceName, segment, resource, order, repeats, new ArrayList<>());
   }
 
   @JsonCreator
   public HL7FHIRResource(@JsonProperty("resourceName") String resourceName,
       @JsonProperty("segment") String segment, @JsonProperty("resourcePath") String resourcePath,
-      @JsonProperty("order") int order, @JsonProperty("repeates") boolean repeates,
+      @JsonProperty("order") int order, @JsonProperty("repeats") boolean repeats,
       @JsonProperty("additionalSegments") List<String> additionalSegments) {
-    super(resourceName, resourcePath, order, repeates);
+    super(resourceName, resourcePath, order, repeats);
 
     this.additionalSegments = new ArrayList<>();
     if (additionalSegments != null) {

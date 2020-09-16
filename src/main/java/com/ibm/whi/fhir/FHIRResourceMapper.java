@@ -7,7 +7,8 @@ public enum FHIRResourceMapper {
 
   PATIENT(org.hl7.fhir.r4.model.Patient.class), //
   ENCOUNTER(org.hl7.fhir.r4.model.Encounter.class), //
-  OBSERVATION(org.hl7.fhir.r4.model.Observation.class);
+  OBSERVATION(org.hl7.fhir.r4.model.Observation.class), //
+  PRACTITIONER(org.hl7.fhir.r4.model.Practitioner.class);
 
   private Class<? extends Resource> klass;
 
@@ -24,6 +25,10 @@ public enum FHIRResourceMapper {
 
   public static Class<? extends Resource> getResourceClass(String name) {
     FHIRResourceMapper fm = EnumUtils.getEnumIgnoreCase(FHIRResourceMapper.class, name);
+    if (fm == null) {
+      throw new IllegalStateException(
+          "Resource type not mapped in FHIRResourceMapper , resource name" + name);
+    }
     return fm.klass;
   }
 

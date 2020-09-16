@@ -3,8 +3,9 @@ resourceType: Encounter
 id:
   type: STRING
   evaluate: 'UUID.randomUUID()'
+
 identifier:
-    reference: datatype/IdentifierCX *
+    resource: datatype/Identifier_CX *
     hl7spec: PV1.19
 
 status:
@@ -14,55 +15,54 @@ status:
       var1: String PV1.45
       var2: String PV1.44
       var3: String PV2.16
-      
+
 class:
-    reference: datatype/Coding
+    resource: datatype/Coding
     vars:
        code: PV1.2
 
 type:
-   reference: datatype/CodeableConcept *
+   resource: datatype/CodeableConcept *
    var:
      code: PV1.4 | PV1.18
 
 serviceType:
-   reference: datatype/CodeableConcept
+   resource: datatype/CodeableConcept
    var:
      code: PV1.10
- 
+
 priority:
-   reference: datatype/CodeableConcept
+   resource: datatype/CodeableConcept
    var:
      code: PV2.25
-
 
 episodeOfCare:
    type: STRING
    hl7spec: PV1.54 | PV1.53
 
 period: 
-    reference: datatype/Period
+    resource: datatype/Period
     var: 
        start: PV1.44
        end: PV1.45
 
 length:
-    reference: datatype/Duration
+    resource: datatype/Duration
     var: 
       time1: DATE_TIME PV1.44
       time2: DATE_TIME PV1.45
 
 reasonCode:
-    reference: datatype/CodeableConcept *
+    resource: datatype/CodeableConcept *
     var:
       code: EVN.4 | PV2.3
 
 
 hospitalization:
-    reference: secondary/Hospitalization
+    resource: secondary/Hospitalization
 
 subject:
-    reference: datatype/Reference
+    resource: datatype/Reference
     var: 
       ref-type: $Patient
 

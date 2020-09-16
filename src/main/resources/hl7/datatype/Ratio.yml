@@ -1,0 +1,11 @@
+
+numerator:
+    resource: datatype/Quantity
+    var: 
+      value: $numerator
+
+denominator:
+   resource: datatype/Quantity
+   var: 
+      value: $denominator
+  

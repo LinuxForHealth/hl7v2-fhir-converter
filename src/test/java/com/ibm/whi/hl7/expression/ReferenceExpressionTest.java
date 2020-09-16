@@ -37,7 +37,7 @@ public class ReferenceExpressionTest {
 
       Structure s = hl7DTE.getStructure("PID", 0).getValue();
 
-      ReferenceExpression exp = new ReferenceExpression("Single", "datatype/IdentifierCX", "PID.3");
+      ResourceExpression exp = new ResourceExpression("Single", "datatype/IdentifierCX", "PID.3");
       assertThat(exp.getData()).isNotNull();
 
 
@@ -83,7 +83,7 @@ public class ReferenceExpressionTest {
 
       Structure s = hl7DTE.getStructure("PID", 0).getValue();
 
-      ReferenceExpression exp = new ReferenceExpression("Single", "datatype/IdentifierCX", "PID.3");
+      ResourceExpression exp = new ResourceExpression("Single", "datatype/IdentifierCX", "PID.3");
       assertThat(exp.getData()).isNotNull();
 
 
@@ -126,8 +126,8 @@ public class ReferenceExpressionTest {
 
       Structure s = hl7DTE.getStructure("PID", 0).getValue();
 
-      ReferenceExpression exp =
-          new ReferenceExpression("Array", "datatype/IdentifierCX *", "PID.3");
+      ResourceExpression exp =
+          new ResourceExpression("Array", "datatype/IdentifierCX *", "PID.3");
       assertThat(exp.getData()).isNotNull();
 
 
@@ -180,8 +180,8 @@ public class ReferenceExpressionTest {
 
       Structure s = hl7DTE.getStructure("OBX", 0).getValue();
 
-      ReferenceExpression exp =
-          new ReferenceExpression("Single", "datatype/IdentifierCWE", "OBX.3");
+      ResourceExpression exp =
+          new ResourceExpression("Single", "datatype/IdentifierCWE", "OBX.3");
       assertThat(exp.getData()).isNotNull();
 
 
@@ -228,8 +228,8 @@ public class ReferenceExpressionTest {
 
       Structure s = hl7DTE.getStructure("OBX", 0).getValue();
 
-      ReferenceExpression exp =
-          new ReferenceExpression("Array", "datatype/CodeableConcept *", "OBX.3");
+      ResourceExpression exp =
+          new ResourceExpression("Array", "datatype/CodeableConcept *", "OBX.3");
       assertThat(exp.getData()).isNotNull();
 
       Map<String, GenericResult> context = new HashMap<>();

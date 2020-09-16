@@ -1,0 +1,16 @@
+
+value : 
+   type: DECIMAL
+   value: $value
+comparator : 
+   type: String
+   value: $comparator
+unit : 
+   type: String
+   value: $unit
+system : 
+   type: URI
+   value: $system
+code : 
+   type: String
+   value: $code

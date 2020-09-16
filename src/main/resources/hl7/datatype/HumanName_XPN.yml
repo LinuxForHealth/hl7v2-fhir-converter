@@ -1,0 +1,31 @@
+#Human name derived from component XPN
+---
+
+text: 
+    type: STRING
+    hl7prefix:
+    evaluate: 'GeneralUtils.generateName( prefix, given,family, suffix)'
+    var:
+      prefix: STRING XPN.4
+      given: STRING XPN.2
+      family: STRING XPN.1
+      suffix: STRING XPN.5
+family:
+     type: STRING
+     hl7spec: XPN.1
+given: 
+     type: STRING
+     hl7spec: XPN.2
+prefix:
+     type: STRING
+     hl7spec: XPN.4
+     default: ''
+suffix: 
+     type: STRING
+     hl7spec: XPN.5
+period:
+    resource: datatype/Period
+    var:
+       start: XPN.12
+       end: XPN.13
+     

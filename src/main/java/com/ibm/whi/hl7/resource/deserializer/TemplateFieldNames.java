@@ -12,6 +12,7 @@ public class TemplateFieldNames {
   public static final String REQUIRED = "required";
   public static final String EVALUATE = "evaluate";
   public static final String REFERENCE = "reference";
+  public static final String RESOURCE = "resource";
   public static final String REFERENCE_RESOURCES = "reference-resources";
   public static final String FETCH = "fetch";
 

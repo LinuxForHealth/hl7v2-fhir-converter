@@ -5,14 +5,15 @@ resources:
       segment: PID
       resourcePath: resource/Patient
       order: 1
-      repeates: false
+      repeats: false
       additionalSegments:
+
       
     - resourceName: Encounter
       segment: PV1
       resourcePath: resource/Encounter
       order: 2
-      repeates: false
+      repeats: false
       additionalSegments:
              - PV2
              - EVN
@@ -20,7 +21,7 @@ resources:
       segment: OBX
       resourcePath: resource/Observation
       order: 3
-      repeates: true
+      repeats: true
       additionalSegments:
 
       

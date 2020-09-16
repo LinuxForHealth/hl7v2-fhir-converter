@@ -25,15 +25,16 @@ public class SimpleExpression extends AbstractExpression {
 
   @JsonCreator
   public SimpleExpression(String var) {
-    this("String", var, null);
+    this("String", var, new HashMap<>(), null);
 
   }
 
   @JsonCreator
-  public SimpleExpression(@JsonProperty("type") String type, @JsonProperty("value") String var,
+  public SimpleExpression(@JsonProperty("type") String type, @JsonProperty("value") String value,
+      @JsonProperty("var") Map<String, String> variables,
       @JsonProperty("condition") String condition) {
-    super(type, null, false, "", new HashMap<>(), condition);
-    this.value = var;
+    super(type, null, false, "", variables, condition);
+    this.value = value;
   }
 
 

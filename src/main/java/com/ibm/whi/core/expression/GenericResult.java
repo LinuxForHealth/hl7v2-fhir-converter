@@ -1,6 +1,9 @@
 package com.ibm.whi.core.expression;
 
+import java.util.ArrayList;
+import java.util.List;
 import com.ibm.whi.core.expression.util.GeneralUtil;
+import com.ibm.whi.core.resource.ResourceValue;
 
 /**
  * Represents value returned after the expression is evaluated.
@@ -14,16 +17,24 @@ public class GenericResult {
   private Object value;
   private Class<?> klass;
   private String klassName;
+  private List<ResourceValue> additionalResources;
+
 
   public GenericResult(Object value) {
+    this(value, new ArrayList<>());
+  }
+
+
+
+  public GenericResult(Object value, List<ResourceValue> additionalResources) {
 
     this.value = value;
     if (value != null) {
-    this.klass = value.getClass();
-    this.klassName = GeneralUtil.getDataType(value);
+      this.klass = value.getClass();
+      this.klassName = GeneralUtil.getDataType(value);
     }
+    this.additionalResources = additionalResources;
   }
-
 
   public Object getValue() {
     return value;
@@ -57,6 +68,14 @@ public class GenericResult {
     }
     return false;
   }
+
+
+
+
+  public List<ResourceValue> getAdditionalResources() {
+    return additionalResources;
+  }
+
 
 
 }

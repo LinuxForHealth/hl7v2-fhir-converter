@@ -12,7 +12,7 @@ public enum SimpleDataTypeMapper {
   
   URI(SimpleDataValueResolver.URI_VAL), //
   URL(SimpleDataValueResolver.STRING), //
-  // INSTANT(SimpleDataValueResolver.INSTANT), //
+  INSTANT(SimpleDataValueResolver.INSTANT), //
 
   DATE(SimpleDataValueResolver.DATE), //
 

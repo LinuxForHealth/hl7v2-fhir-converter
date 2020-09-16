@@ -1,9 +1,9 @@
 package com.ibm.whi.hl7.expression;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,11 +14,14 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import com.ibm.whi.core.expression.GenericResult;
 import com.ibm.whi.core.message.InputData;
+import com.ibm.whi.core.resource.ResourceResult;
+import com.ibm.whi.core.resource.ResourceValue;
 import com.ibm.whi.hl7.resource.HL7DataBasedResourceModel;
 import com.ibm.whi.hl7.resource.ResourceModelReader;
 
 /**
- * Represent a expression that represents resolving a json template
+ * Represent a expression that represents resolving a json template and creating a reference data
+ * type.
  * 
  *
  * @author {user}
@@ -27,9 +30,12 @@ import com.ibm.whi.hl7.resource.ResourceModelReader;
 public class ReferenceExpression extends AbstractExpression {
 
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(ReferenceExpression.class);
+  private static final Logger LOGGER =
+      LoggerFactory.getLogger(ReferenceExpression.class);
 
   private HL7DataBasedResourceModel data;
+  private HL7DataBasedResourceModel referenceModel = (HL7DataBasedResourceModel) ResourceModelReader
+      .getInstance().generateResourceModel("datatype/Reference");
   private String reference;
 
 
@@ -54,7 +60,7 @@ public class ReferenceExpression extends AbstractExpression {
 
     Preconditions.checkArgument(StringUtils.isNotBlank(reference), "reference cannot be blank");
     if (reference.endsWith("*")) {
-      this.setMultiple(true);
+      this.setMultiple();
       reference = StringUtils.removeEnd(reference, "*");
     }
     this.reference = StringUtils.strip(reference);
@@ -85,49 +91,59 @@ public class ReferenceExpression extends AbstractExpression {
     Preconditions.checkArgument(dataSource != null, "dataSource cannot be null");
     Preconditions.checkArgument(contextValues != null, "contextValues cannot be null");
     LOGGER.info("Evaluating expression {}", this.reference);
-    if (this.isMultiple() && hl7SpecValues != null) {
-      List<?> dataValues = (List<?>) hl7SpecValues.getValue();
-      List<GenericResult> baseValues = new ArrayList<>();
+    GenericResult resourceReferenceResult = null;
+    // Evaluate the resource first and add it to the list of additional resources generated
+    ResourceResult primaryResourceResult =
+        evaluateResource(dataSource, contextValues, hl7SpecValues);
+    // If the primary resource is generated then create the reference
+    if (primaryResourceResult != null && primaryResourceResult.getResources() != null
+        && !primaryResourceResult.getResources().isEmpty()) {
+      List<ResourceValue> additionalResources = new ArrayList<>();
+      additionalResources.addAll(primaryResourceResult.getAdditionalResources());
+      additionalResources.add(primaryResourceResult.getResources().get(0));
 
-      dataValues.removeIf(Objects::isNull);
-      dataValues.forEach(d -> baseValues.add(new GenericResult(d)));
-      List<?> resolvedvalues = this.data.evaluateMultiple(dataSource,
-          ImmutableMap.copyOf(contextValues), baseValues, this.getVariables());
-      LOGGER.info("Evaluated expression {}, returning {} ", this.reference, resolvedvalues);
-      if (resolvedvalues == null || resolvedvalues.isEmpty()) {
-        return null;
-      } else {
-        return new GenericResult(resolvedvalues);
-      }
-    } else {
+      Map<String, GenericResult> localContextValues = new HashMap<>(contextValues);
+      localContextValues.put("ref-type",
+          new GenericResult(primaryResourceResult.getResources().get(0).getResource()));
       GenericResult baseValue = new GenericResult(getSingleValue(hl7SpecValues));
 
-      Object obj =
-          this.data.evaluateSingle(dataSource, ImmutableMap.copyOf(contextValues), baseValue);
-      LOGGER.info("Evaluated expression {}, returning {} ", this.reference, obj);
-      if (obj != null) {
-        return new GenericResult(obj);
-      } else {
-        return null;
+      ResourceResult result =
+          this.referenceModel.evaluateSingle(dataSource, ImmutableMap.copyOf(localContextValues),
+              baseValue);
+      if (result != null && result.getResources() != null && !result.getResources().isEmpty()) {
+        List<ResourceValue> resolvedvalues = result.getResources();
+
+      LOGGER.info("Evaluated expression {}, returning {} ", this.reference, resolvedvalues);
+      if (resolvedvalues != null && !resolvedvalues.isEmpty()) {
+          resourceReferenceResult =
+              new GenericResult(resolvedvalues.get(0).getResource(), additionalResources);
       }
-
+      }
     }
 
-
+    return resourceReferenceResult;
 
   }
 
 
-  private List<?> getRepts(InputData dataExtractor,
-      ImmutableMap<String, GenericResult> contextValues) {
-    GenericResult result =
-        dataExtractor.extractMultipleValuesForSpec(this.getspecs(), contextValues);
-    if (result != null && result.getValue() instanceof List) {
-      return (List) result.getValue();
-    }
-    return new ArrayList<>();
-  }
 
+  private ResourceResult evaluateResource(InputData dataSource,
+      Map<String, GenericResult> contextValues, GenericResult hl7SpecValues) {
+    // first evaluate the main resource and then evaluate the referenceResource
+    GenericResult baseValue = new GenericResult(getSingleValue(hl7SpecValues));
+
+    ResourceResult result =
+        this.data.evaluateSingle(dataSource, ImmutableMap.copyOf(contextValues), baseValue);
+    List<?> resolvedvalues = result.getResources();
+
+    LOGGER.info("Evaluated expression {}, returning {} ", this.reference, resolvedvalues);
+    if (resolvedvalues != null && !resolvedvalues.isEmpty()) {
+      return result;
+
+    }
+    return null;
+
+  }
 
 
   public String getReference() {

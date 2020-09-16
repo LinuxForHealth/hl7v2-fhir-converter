@@ -1,6 +1,6 @@
 ---
 type:
-   reference: datatype/CodeableConcept
+   resource: datatype/CodeableConcept
    var:
      code: CWE.5
 
@@ -14,7 +14,7 @@ value:
      required: true
 
 period: 
-    reference: datatype/Period
+    resource: datatype/Period
     var: 
        start: CWE.7
        end: CWE.8
