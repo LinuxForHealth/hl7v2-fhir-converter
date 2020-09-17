@@ -1,3 +1,8 @@
+/*
+ * (C) Copyright IBM Corp. 2020
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
 package com.ibm.whi.hl7.expression;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -7,7 +12,6 @@ import java.util.Map;
 import org.junit.Test;
 import com.google.common.collect.ImmutableMap;
 import com.ibm.whi.core.expression.GenericResult;
-import com.ibm.whi.hl7.expression.JELXExpression;
 import com.ibm.whi.hl7.message.HL7MessageData;
 import com.ibm.whi.hl7.parsing.HL7DataExtractor;
 import com.ibm.whi.hl7.parsing.HL7HapiParser;

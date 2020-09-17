@@ -1,3 +1,8 @@
+/*
+ * (C) Copyright IBM Corp. 2020
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
 package com.ibm.whi.core.expression.condition;
 
 import java.util.ArrayList;
@@ -6,8 +11,13 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringTokenizer;
 import com.google.common.base.Preconditions;
 
+/**
+ * Utility class to create different conditions from string value.
+ * 
+ *
+ */
 public class ConditionUtil {
-
+  private ConditionUtil() {}
 
 
   public static Condition createCondition(String conditionString) {

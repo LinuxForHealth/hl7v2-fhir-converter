@@ -1,3 +1,8 @@
+/*
+ * (C) Copyright IBM Corp. 2020
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
 package com.ibm.whi.hl7.data;
 
 import java.net.URI;
@@ -16,7 +21,7 @@ import com.ibm.whi.hl7.data.date.DateUtil;
 public class SimpleDataValueResolver {
   private static final Logger LOGGER = LoggerFactory.getLogger(SimpleDataValueResolver.class);
 
-
+  private SimpleDataValueResolver() {}
   public static final ValueExtractor<Object, String> DATE = (Object value) -> {
 
       String val = Hl7DataHandlerUtil.getStringValue(value);

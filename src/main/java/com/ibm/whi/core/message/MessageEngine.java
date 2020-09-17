@@ -1,3 +1,8 @@
+/*
+ * (C) Copyright IBM Corp. 2020
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
 package com.ibm.whi.core.message;
 
 import java.io.IOException;
@@ -8,11 +13,10 @@ import com.ibm.whi.core.expression.GenericResult;
 /**
  * Implement this interface for each Data type that needs to be transformed into FHIR resource
  * 
- *
- * @author {user}
+ * 
  */
 
-
+@FunctionalInterface
 public interface MessageEngine {
 
 
