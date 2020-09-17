@@ -181,8 +181,8 @@ What you’ll need
 Steps:
 
 ```
-git clone https://github.ibm.com/pbhallam/hl7v2-FHIR
-cd hl7v2-FHIR
+git clone git@github.ibm.com:pbhallam/WHI-FHIR-Converter.git
+cd WHI-FHIR-Converter
 gradle build
 
 ```
