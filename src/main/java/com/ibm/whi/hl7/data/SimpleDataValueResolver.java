@@ -57,11 +57,12 @@ public class SimpleDataValueResolver {
 
     try {
       String val = Hl7DataHandlerUtil.getStringValue(value);
-      if (val != null) {
+      if (val != null && isValidUUID(val)) {
         return new URI("urn", "uuid", val);
       } else {
         return null;
       }
+
     } catch (IllegalArgumentException | URISyntaxException e) {
       LOGGER.warn("Value not valid URI, value: {}", value, e);
       return null;
@@ -173,6 +174,17 @@ public class SimpleDataValueResolver {
       LOGGER.info("Value for  UUID is null, value: {}", value);
       return null;
     }
+  }
+
+  private static boolean isValidUUID(String val) {
+    try {
+      UUID.fromString(val);
+      return true;
+    } catch (IllegalArgumentException e) {
+      LOGGER.warn("Not a valid UUID ", e);
+      return false;
+    }
+
   }
 
   private static ObservationStatus getObservationStatus(String val) {
