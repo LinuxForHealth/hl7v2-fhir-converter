@@ -114,18 +114,21 @@ public class DateUtil {
 
 
   public static Temporal getTemporal(String dateString) {
-    Temporal temporal = null;
 
+    if (dateString == null) {
+      return null;
+    }
+    Temporal temporal = null;
     try {
       temporal = Instant.parse(dateString);
     } catch (DateTimeParseException e) {
-      LOGGER.error("Date parsing error for instant {}", dateString);
+      LOGGER.error("Date parsing error for instant {}", dateString, e);
     }
     if (temporal == null) {
     try {
       temporal = ZonedDateTime.parse(dateString, DateTimeFormatter.ISO_ZONED_DATE_TIME);
     } catch (DateTimeParseException e) {
-      LOGGER.error("Date parsing error for ZonedDateTime {}", dateString);
+        LOGGER.error("Date parsing error for ZonedDateTime {}", dateString, e);
     }
 
     }
@@ -133,7 +136,7 @@ public class DateUtil {
     try {
       temporal = LocalDateTime.parse(dateString, DateTimeFormatter.ISO_LOCAL_DATE_TIME);
     } catch (DateTimeParseException e) {
-      LOGGER.error("Date parsing error for LocalDateTime {}", dateString);
+        LOGGER.error("Date parsing error for LocalDateTime {}", dateString, e);
     }
     }
     if (temporal == null) {
@@ -141,7 +144,7 @@ public class DateUtil {
     try {
       temporal = LocalDate.parse(dateString, DateTimeFormatter.ISO_LOCAL_DATE);
     } catch (DateTimeParseException e) {
-      LOGGER.error("Date parsing error for LocalDate {}", dateString);
+        LOGGER.error("Date parsing error for LocalDate {}", dateString, e);
     }
     }
     return temporal;

@@ -70,14 +70,17 @@ public class Hl7DataHandlerUtil {
 
 
   public static String getDataType(Object data) {
-
+    String dataType = null;
     if (data instanceof Structure) {
-      return ((Structure) data).getName();
+      dataType = ((Structure) data).getName();
     } else if (data instanceof Type) {
-      return ((Type) data).getName();
+      dataType = ((Type) data).getName();
+    } else if (data != null) {
+      dataType = data.getClass().getSimpleName();
     } else {
-      return data.getClass().getCanonicalName();
+      dataType = null;
     }
+    return dataType;
   }
 
 }

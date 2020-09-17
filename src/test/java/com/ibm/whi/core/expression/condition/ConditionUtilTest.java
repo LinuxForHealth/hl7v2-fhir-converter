@@ -40,9 +40,17 @@ public class ConditionUtilTest {
         (CompountORCondition) ConditionUtil.createCondition(condition);
     assertThat(simplecondition).isNotNull();
     assertThat(simplecondition.getConditions()).hasSize(2);
-    // assertThat(simplecondition.getVar1()).isEqualTo("$var1");
-    // assertThat(simplecondition.getVar2()).isEqualTo("4");
-    // assertThat(simplecondition.getConditionOperator()).isEqualTo("GREATER_THAN");
+
+  }
+
+  @Test
+  public void multiple_and_condition() {
+    String condition = "$var1 EQUALS abc && $var1 EQUALS xyz";
+    CompountAndCondition simplecondition =
+        (CompountAndCondition) ConditionUtil.createCondition(condition);
+    assertThat(simplecondition).isNotNull();
+    assertThat(simplecondition.getConditions()).hasSize(2);
+
   }
 
 

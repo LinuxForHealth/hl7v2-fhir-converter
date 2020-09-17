@@ -13,10 +13,10 @@ import org.apache.commons.jexl3.MapContext;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.text.StringTokenizer;
-import org.assertj.core.util.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
 import com.ibm.whi.hl7.data.HL7GeneralUtils;
 import com.ibm.whi.hl7.exception.NoMoreRepititionException;
 

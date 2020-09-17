@@ -134,10 +134,11 @@ public class ReferenceExpression extends AbstractExpression {
 
     ResourceResult result =
         this.data.evaluateSingle(dataSource, ImmutableMap.copyOf(contextValues), baseValue);
+    if (result != null && result.getResources() != null && !result.getResources().isEmpty()) {
     List<?> resolvedvalues = result.getResources();
 
     LOGGER.info("Evaluated expression {}, returning {} ", this.reference, resolvedvalues);
-    if (resolvedvalues != null && !resolvedvalues.isEmpty()) {
+
       return result;
 
     }

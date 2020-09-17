@@ -37,7 +37,7 @@ public class ReferenceExpressionTest {
 
       Structure s = hl7DTE.getStructure("PID", 0).getValue();
 
-      ResourceExpression exp = new ResourceExpression("Single", "datatype/IdentifierCX", "PID.3");
+      ResourceExpression exp = new ResourceExpression("Single", "datatype/Identifier_CX", "PID.3");
       assertThat(exp.getData()).isNotNull();
 
 
@@ -83,7 +83,7 @@ public class ReferenceExpressionTest {
 
       Structure s = hl7DTE.getStructure("PID", 0).getValue();
 
-      ResourceExpression exp = new ResourceExpression("Single", "datatype/IdentifierCX", "PID.3");
+      ResourceExpression exp = new ResourceExpression("Single", "datatype/Identifier_CX", "PID.3");
       assertThat(exp.getData()).isNotNull();
 
 
@@ -127,7 +127,7 @@ public class ReferenceExpressionTest {
       Structure s = hl7DTE.getStructure("PID", 0).getValue();
 
       ResourceExpression exp =
-          new ResourceExpression("Array", "datatype/IdentifierCX *", "PID.3");
+          new ResourceExpression("Array", "datatype/Identifier_CX *", "PID.3");
       assertThat(exp.getData()).isNotNull();
 
 
@@ -181,7 +181,7 @@ public class ReferenceExpressionTest {
       Structure s = hl7DTE.getStructure("OBX", 0).getValue();
 
       ResourceExpression exp =
-          new ResourceExpression("Single", "datatype/IdentifierCWE", "OBX.3");
+          new ResourceExpression("Single", "datatype/Identifier_CWE", "OBX.3");
       assertThat(exp.getData()).isNotNull();
 
 
