@@ -223,11 +223,11 @@ Sample output:
         "value": "ADTNew"
       } ],
       "name": [ {
-        "text": "null null ADT01New null",
-        "family": "ADT01New"
+        "text": "familyname",
+        "family": "familyname"
       } ],
       "gender": "female",
-      "birthDate": "1980-02-02"
+      "birthDate": "1983-02-02"
     }
   }, {
     "resource": {
@@ -307,9 +307,9 @@ Sample output:
         "value": "2740"
       } ],
       "name": [ {
-        "text": "null Janetary Tsadok null",
-        "family": "Tsadok",
-        "given": [ "Janetary" ]
+        "text": "Jane FamilyName",
+        "family": "FamilyName",
+        "given": [ "Jane" ]
       } ]
     }
   } ]
