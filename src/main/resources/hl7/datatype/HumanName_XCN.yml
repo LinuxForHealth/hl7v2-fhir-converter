@@ -3,7 +3,6 @@
 
 text: 
     type: STRING
-    hl7prefix:
     evaluate: 'GeneralUtils.generateName( prefix, given,family, suffix)'
     var:
       prefix: STRING XCN.5
@@ -19,7 +18,7 @@ given:
 prefix:
      type: STRING
      hl7spec: XCN.5
-     default: ''
+
 suffix: 
      type: STRING
      hl7spec: XCN.6

@@ -1,15 +1,22 @@
 package com.ibm.whi;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import java.io.IOException;
+import java.util.List;
+import java.util.stream.Collectors;
+import org.hl7.fhir.instance.model.api.IBaseResource;
+import org.hl7.fhir.r4.model.Bundle;
+import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
+import org.hl7.fhir.r4.model.Resource;
+import org.hl7.fhir.r4.model.ResourceType;
 import org.junit.Test;
+import com.ibm.whi.fhir.FHIRContext;
 import com.ibm.whi.hl7.HL7ToFHIRConverter;
-import ca.uhn.hl7v2.HL7Exception;
-
 
 public class FHIRConverterTest {
 
   @Test
-  public void test_patient_encounter() throws HL7Exception, IOException {
+  public void test_patient_encounter() throws IOException {
 
     String hl7message = "MSH|^~\\&|SE050|050|PACS|050|20120912011230||ADT^A01|102|T|2.7|||AL|NE\r"
         + "EVN||201209122222\r"
@@ -19,7 +26,30 @@ public class FHIRConverterTest {
         + "AL1|0001|DA|98798^problem|SV|sneeze|20120808\r";
 
     HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
-    System.out.println(ftv.convert(hl7message));
+    String json = ftv.convert(hl7message);
+    IBaseResource bundleResource = FHIRContext.getIParserInstance().parseResource(json);
+    assertThat(bundleResource).isNotNull();
+    Bundle b = (Bundle) bundleResource;
+    List<BundleEntryComponent> e = b.getEntry();
+    List<Resource> patientResource =
+        e.stream().filter(v -> ResourceType.Patient == v.getResource().getResourceType())
+            .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+    assertThat(patientResource).hasSize(1);
+
+    List<Resource> encounterResource =
+        e.stream().filter(v -> ResourceType.Encounter == v.getResource().getResourceType())
+            .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+    assertThat(encounterResource).hasSize(1);
+    List<Resource> obsResource =
+        e.stream().filter(v -> ResourceType.Observation == v.getResource().getResourceType())
+            .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+    assertThat(obsResource).hasSize(1);
+    List<Resource> pracResource =
+        e.stream().filter(v -> ResourceType.Practitioner == v.getResource().getResourceType())
+            .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+    assertThat(pracResource).hasSize(1);
+
+    System.out.println(json);
   }
 
 

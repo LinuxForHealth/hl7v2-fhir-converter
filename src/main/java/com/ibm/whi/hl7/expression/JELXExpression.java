@@ -61,7 +61,7 @@ public class JELXExpression extends AbstractExpression {
     if (obj != null) {
       return new GenericResult(obj);
     } else {
-      return new GenericResult(this.getDefaultValue());
+      return null;
     }
   }
 

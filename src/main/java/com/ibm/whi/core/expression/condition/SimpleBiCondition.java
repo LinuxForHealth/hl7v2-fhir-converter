@@ -8,22 +8,6 @@ public class SimpleBiCondition implements Condition {
 
   private String var1;
 
-  public String getVar1() {
-    return var1;
-  }
-
-
-
-  public Object getVar2() {
-    return var2;
-  }
-
-
-
-  public String getConditionOperator() {
-    return conditionOperator;
-  }
-
 
 
   private Object var2;
@@ -82,6 +66,21 @@ public class SimpleBiCondition implements Condition {
   }
 
 
+  public String getVar1() {
+    return var1;
+  }
+
+
+
+  public Object getVar2() {
+    return var2;
+  }
+
+
+
+  public String getConditionOperator() {
+    return conditionOperator;
+  }
 
 
 

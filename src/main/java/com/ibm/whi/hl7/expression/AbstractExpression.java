@@ -139,10 +139,16 @@ public abstract class AbstractExpression implements Expression {
     }
     if (this.isConditionSatisfied(resolvedVariables)) {
       GenericResult gen=  evaluateExpression(dataSource, resolvedVariables, hl7Values);
+      // Use the default value if the generated value is null and provided default value is not
+      // null
+      if (gen == null && this.getDefaultValue() != null && !this.getDefaultValue().isEmpty()) {
+        gen = new GenericResult(this.getDefaultValue().getValue());
+      }
+
       if(this.isRequired() && (gen==null || gen.isEmpty())) {
         throw new RequiredConstraintFailureException(
             "Failure in Evaluating expression  hl7spec :" + this.getspecs());
-      }else {
+      } else {
         return gen;
       }
     } 

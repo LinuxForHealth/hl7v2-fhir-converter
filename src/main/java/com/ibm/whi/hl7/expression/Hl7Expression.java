@@ -62,7 +62,7 @@ public class Hl7Expression extends AbstractExpression {
     if (resolvedValue != null) {
       return new GenericResult(resolvedValue);
     } else {
-      return new GenericResult(this.getDefaultValue());
+      return null;
     }
   }
 

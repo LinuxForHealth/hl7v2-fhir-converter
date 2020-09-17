@@ -4,13 +4,15 @@ id:
   evaluate: 'UUID.randomUUID()'
   
 identifier:
-    resource: datatype/IdentifierGen
+    resource: datatype/IdentifierGen *
+
     var:
       system: XCN.9
       id: XCN.1 
       start: XCN.19 
       end: XCN.20
 name: 
+    required: true
     resource: datatype/HumanName_XCN *
 
   
