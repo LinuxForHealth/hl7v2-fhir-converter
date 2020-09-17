@@ -1,16 +1,8 @@
-/*******************************************************************************
- * Watson Health Imaging Analytics
+/*
+ * (C) Copyright IBM Corp. 2020
  *
- * IBM Confidential
- *
- * OCO Source Materials
- *
- * (C) Copyright IBM Corp. 2019
- *
- * The source code for this program is not published or otherwise
- * divested of its trade secrets, irrespective of what has been
- * deposited with the U.S. Copyright Office.
- *******************************************************************************/
+ * SPDX-License-Identifier: Apache-2.0
+ */
 package com.ibm.whi.core.expression.condition;
 
 import java.util.function.BiPredicate;

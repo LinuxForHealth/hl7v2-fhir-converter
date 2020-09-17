@@ -1,3 +1,8 @@
+/*
+ * (C) Copyright IBM Corp. 2020
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
 package com.ibm.whi.hl7.expression;
 
 import static org.assertj.core.api.Assertions.assertThat;
