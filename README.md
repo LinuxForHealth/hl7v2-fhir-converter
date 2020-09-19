@@ -5,7 +5,7 @@ FHIR converter utilized the open source  [HAPI Library](https://hapifhir.github.
 
 
 
-## Features and Concepts of Hl7 -> FHIR conversion
+## Features and Concepts of Hl7 to FHIR conversion
 HL7v2-FHIR converter converts a given HL7 message to FHIR bundle resource using the message templates. These templates are [yaml](https://yaml.org/) files. Each message template defines what all FHIR resources needs to be generated from a particular message. <br>
 
 ### Structure of a message template
@@ -181,8 +181,8 @@ What you’ll need
 Steps:
 
 ```
-git clone git@github.ibm.com:pbhallam/WHI-FHIR-Converter.git
-cd WHI-FHIR-Converter
+git clone git@github.com:LinuxForHealth/hl7v2-fhir-converter.git
+cd hl7v2-fhir-converter
 gradle build
 
 ```
