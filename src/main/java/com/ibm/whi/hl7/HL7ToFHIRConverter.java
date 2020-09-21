@@ -41,7 +41,7 @@ public class HL7ToFHIRConverter {
   private void initTemplates() throws IOException {
     try (Stream<Path> paths =
         Files.walk(Paths.get(Constants.DEAFULT_HL7_MESSAGE_FOLDER.getAbsolutePath()))) {
-      paths.filter(Files::isRegularFile).forEach(f -> addMessageModel(f));
+      paths.filter(p -> p.toFile().isFile()).forEach(this::addMessageModel);
     }
   }
 
