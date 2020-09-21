@@ -3,6 +3,7 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  */
+
 package com.ibm.whi.hl7.expression;
 
 import java.util.Map;
@@ -24,7 +25,7 @@ import com.ibm.whi.hl7.data.ValueExtractor;
  * evaluate. Supports the following structure <br>
  * 
  *
- * @author pbhallam@us.ibm.com
+ * @author pbhallam
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Hl7Expression extends AbstractExpression {

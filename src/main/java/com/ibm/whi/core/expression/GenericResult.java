@@ -38,7 +38,13 @@ public class GenericResult {
       this.klass = value.getClass();
       this.klassName = DataTypeUtil.getDataType(value);
     }
-    this.additionalResources = additionalResources;
+    this.additionalResources = new ArrayList<>();
+    if (additionalResources != null) {
+      this.additionalResources.addAll(additionalResources);
+    }
+
+
+
   }
 
   public Object getValue() {
@@ -78,7 +84,7 @@ public class GenericResult {
 
 
   public List<ResourceValue> getAdditionalResources() {
-    return additionalResources;
+    return new ArrayList<>(additionalResources);
   }
 
 

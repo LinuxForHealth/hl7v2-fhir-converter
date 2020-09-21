@@ -237,24 +237,5 @@ public class HL7DataBasedResourceModel implements ResourceModel {
     return this.name;
   }
 
-  // private static Map<String, GenericResult> resolveLocalVariables(InputData dataExtractor,
-  // Object hl7Value, List<Variable> variableNames,
-  // ImmutableMap<String, GenericResult> contextValues) {
-  // Map<String, GenericResult> localVariables = new HashMap<>(contextValues);
-  //
-  // if (hl7Value != null) {
-  // String type = GeneralUtil.getDataType(hl7Value);
-  //
-  // LOGGER.info(type);
-  // localVariables.put(type, new GenericResult(hl7Value));
-  // }
-  //
-  // localVariables
-  // .putAll(dataExtractor.resolveVariables(variableNames, ImmutableMap.copyOf(localVariables)));
-  //
-  // return ImmutableMap.copyOf(localVariables);
-  // }
-
-
 
 }

@@ -14,7 +14,7 @@ import com.ibm.whi.core.message.InputData;
  * Represents FHIR resource that needs to be generated based on the provided expressions
  * 
  *
- * @author {user}
+ * @author pbhallam
  */
 public interface ResourceModel {
 

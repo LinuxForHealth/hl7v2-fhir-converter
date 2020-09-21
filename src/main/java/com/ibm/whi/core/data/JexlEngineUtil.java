@@ -24,7 +24,6 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.ibm.whi.hl7.exception.NoMoreRepititionException;
 
-
 public final class JexlEngineUtil {
   private static final Logger LOGGER = LoggerFactory.getLogger(JexlEngineUtil.class);
   private static final List<String> OPERATORS =

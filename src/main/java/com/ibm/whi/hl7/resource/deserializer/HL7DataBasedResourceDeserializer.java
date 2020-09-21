@@ -76,7 +76,7 @@ public class HL7DataBasedResourceDeserializer extends JsonDeserializer<HL7DataBa
         expressions.put(entry.getKey(), e);
       }
 
-      LOGGER.info("deserealized {} expression type {}", entry, e.getClass());
+      LOGGER.info("deserealized {} expression type {}", entry, e);
       
     }
     JsonNode namenode = node.get("resourceType");
