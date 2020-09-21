@@ -11,7 +11,7 @@ id:
   
 identifier:
     resource: datatype/IdentifierGen *
-
+    hl7spec: XCN.1
     var:
       system: XCN.9
       id: XCN.1 
@@ -19,6 +19,7 @@ identifier:
       end: XCN.20
 name: 
     required: true
+    hl7spec: XCN.2 | XCN.3
     resource: datatype/HumanName_XCN *
 
   

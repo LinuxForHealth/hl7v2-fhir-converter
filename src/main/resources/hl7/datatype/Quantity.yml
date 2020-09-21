@@ -6,7 +6,7 @@
 ---
 
 value : 
-   type: DECIMAL
+   type: FLOAT
    value: $value
 comparator : 
    type: String

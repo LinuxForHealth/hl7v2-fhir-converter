@@ -10,6 +10,7 @@ import java.io.IOException;
 import org.apache.commons.configuration2.PropertiesConfiguration;
 import org.apache.commons.configuration2.builder.fluent.Configurations;
 import org.apache.commons.configuration2.ex.ConfigurationException;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import com.ibm.whi.core.Constants;
 import com.ibm.whi.core.resource.ResourceModel;
@@ -50,8 +51,9 @@ public class ResourceModelReader {
         HL7DataBasedResourceModel rm =
             ObjectMapperUtil.getYAMLInstance().readValue(templateFile,
                 HL7DataBasedResourceModel.class);
-        // if(StringUtils.isBlank(rm.getName())){
-        // rm.setName(FilenameUtils.templateFile.getName());}
+        if (StringUtils.isBlank(rm.getName())) {
+          rm.setName(FilenameUtils.removeExtension(templateFile.getName()));
+        }
         return rm;
       } catch (IOException e) {
         throw new IllegalArgumentException(

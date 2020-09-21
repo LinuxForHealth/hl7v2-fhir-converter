@@ -5,12 +5,21 @@
 #
 ---
 low:
-   value: $low
+   resource: datatype/Quantity
+   var:
+     value: $low
+     unit: $unit
 high:
-   value: $high
+   resource: datatype/Quantity
+   var:
+     value: $high
+     unit: $unit
 type:
+  type: STRING
   value: $type
 appliesTo:
+  type: STRING
   value: $appliesto
 text:
+  type: STRING
   value: $text

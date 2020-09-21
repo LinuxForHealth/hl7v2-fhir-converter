@@ -12,21 +12,25 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.apache.commons.text.StringTokenizer;
 import org.apache.commons.text.matcher.StringMatcherFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
+import com.ibm.whi.core.data.DataTypeUtil;
 import com.ibm.whi.core.expression.Expression;
 import com.ibm.whi.core.expression.GenericResult;
 import com.ibm.whi.core.expression.Variable;
+import com.ibm.whi.core.expression.VariableUtils;
 import com.ibm.whi.core.expression.condition.Condition;
 import com.ibm.whi.core.expression.condition.ConditionUtil;
 import com.ibm.whi.core.message.InputData;
+import com.ibm.whi.core.resource.ResourceValue;
+import com.ibm.whi.hl7.exception.DataExtractionException;
 import com.ibm.whi.hl7.exception.RequiredConstraintFailureException;
-import ca.uhn.hl7v2.model.Structure;
-import ca.uhn.hl7v2.model.Type;
+import com.ibm.whi.hl7.expression.variable.VariableGenerator;
 
 public abstract class AbstractExpression implements Expression {
   private static final Logger LOGGER = LoggerFactory.getLogger(AbstractExpression.class);
@@ -67,18 +71,10 @@ public abstract class AbstractExpression implements Expression {
     this.variables = new ArrayList<>();
     if (rawvariables != null) {
       for (Entry<String, String> e : rawvariables.entrySet()) {
-        StringTokenizer stk = new StringTokenizer(e.getValue(), " ").setIgnoreEmptyTokens(true);
-        if (stk.getTokenList().size() == 2) {
-          String vartype = stk.nextToken();
 
-          String specs = stk.nextToken();
-
-          this.variables.add(new Variable(e.getKey(), getTokens(specs), vartype));
-        } else {
+        this.variables.add(VariableGenerator.parse(e.getKey(), e.getValue()));
 
 
-          this.variables.add(new Variable(e.getKey(), getTokens(e.getValue())));
-        }
       }
 
     }
@@ -108,58 +104,133 @@ public abstract class AbstractExpression implements Expression {
   }
 
 
-  private static List<String> getTokens(String value) {
-    if (StringUtils.isNotBlank(value)) {
-      StringTokenizer st = new StringTokenizer(value, "|").setIgnoreEmptyTokens(true)
-          .setTrimmerMatcher(StringMatcherFactory.INSTANCE.spaceMatcher());
-      return st.getTokenList();
-    }
 
-    return new ArrayList<>();
-  }
 
-  /**
-   * Evaluates Hl7spec value and resolves variables
-   * 
-   * @see com.ibm.whi.core.expression.Expression#evaluate(com.ibm.whi.core.message.InputData,
-   *      java.util.Map)
-   */
-  @Override
+
   public GenericResult evaluate(InputData dataSource, Map<String, GenericResult> contextValues) {
     Preconditions.checkArgument(dataSource != null, "dataSource cannot be null");
     Preconditions.checkArgument(contextValues != null, "contextValues cannot be null");
+    if (this.isMultiple) {
+      return evaluateMultiple(dataSource, contextValues);
+    } else {
+      return evaluateSingle(dataSource, contextValues);
+    }
+  }
 
+
+
+  private GenericResult evaluateSingle(InputData dataSource,
+      Map<String, GenericResult> contextValues) {
+    String stringRep = this.toString();
     // resolve hl7spec
-    LOGGER.info("Evaluating expression type {} , hl7spec {}", this.getType(), this.getspecs());
+    LOGGER.info("Evaluating expression {}", stringRep);
+    GenericResult hl7Value = dataSource.extractSingleValueForSpec(this.getspecs(),
+        ImmutableMap.copyOf(contextValues));
+    LOGGER.info("Evaluating expression {} returned hl7 value {} ", stringRep, hl7Value);
+    GenericResult gen = generateValue(dataSource, contextValues, hl7Value);
+      if (this.isRequired() && (gen == null || gen.isEmpty())) {
+        throw new RequiredConstraintFailureException(
+          "Failure in Evaluating expression   :" + stringRep);
+      } else {
+        return gen;
+      }
+
+  }
+
+  private GenericResult evaluateMultiple(InputData dataSource,
+      Map<String, GenericResult> contextValues) {
+    String stringRep = this.toString();
+    // resolve hl7spec
+    LOGGER.info("Evaluating multiple values for expression {} ", stringRep);
     GenericResult hl7Values = dataSource.extractMultipleValuesForSpec(this.getspecs(),
         ImmutableMap.copyOf(contextValues));
-    LOGGER.info("Evaluating expression type {} , hl7spec {} returned hl7 value {} ", this.getType(),
-        this.getspecs(), hl7Values);
-    // resolve variables
-    Map<String, GenericResult> resolvedVariables = new HashMap<>(contextValues);
-
-    if (!this.isMultiple) {
-    resolvedVariables.putAll(
-          dataSource.resolveVariables(this.getVariables(), ImmutableMap.copyOf(contextValues)));
+    if (hl7Values == null || hl7Values.getValue() == null
+        || !(hl7Values.getValue() instanceof List)) {
+      return null;
     }
-    if (this.isConditionSatisfied(resolvedVariables)) {
-      GenericResult gen=  evaluateExpression(dataSource, resolvedVariables, hl7Values);
+
+
+    List<Object> result = new ArrayList<>();
+    List<ResourceValue> additionalresourcesresult = new ArrayList<>();
+    List<Object> baseHl7Specvalues = (List<Object>) hl7Values.getValue();
+    for (Object o : baseHl7Specvalues) {
+      GenericResult gen = generateValue(dataSource, contextValues, new GenericResult(o));
+      if (gen != null && gen.getValue() != null && !gen.isEmpty()) {
+        result.add(gen.getValue());
+        if (gen.getAdditionalResources() != null && !gen.getAdditionalResources().isEmpty()) {
+          additionalresourcesresult.addAll(gen.getAdditionalResources());
+        }
+      }
+    }
+
+
+    if (!result.isEmpty()) {
+    return new GenericResult(result, additionalresourcesresult);
+    } else {
+      return null;
+    }
+
+
+  }
+
+  private GenericResult generateValue(InputData dataSource,
+      Map<String, GenericResult> contextValues, GenericResult obj) {
+    String stringRep = this.toString();
+    LOGGER.info("Evaluating expression {} for spec value {}  ", stringRep, obj);
+    // resolve variables
+    Map<String, GenericResult> localContextValues = new HashMap<>(contextValues);
+    if (obj != null && obj.getValue() != null) {
+      localContextValues.put(DataTypeUtil.getDataType(obj.getValue()), obj);
+    }
+    localContextValues.putAll(
+        resolveVariables(this.getVariables(), ImmutableMap.copyOf(localContextValues), dataSource));
+
+    if (this.isConditionSatisfied(localContextValues)) {
+      GenericResult gen = evaluateExpression(dataSource, ImmutableMap.copyOf(localContextValues),
+          obj);
       // Use the default value if the generated value is null and provided default value is not
       // null
       if (gen == null && this.getDefaultValue() != null && !this.getDefaultValue().isEmpty()) {
         gen = new GenericResult(this.getDefaultValue().getValue());
       }
 
-      if(this.isRequired() && (gen==null || gen.isEmpty())) {
-        throw new RequiredConstraintFailureException(
-            "Failure in Evaluating expression  hl7spec :" + this.getspecs());
+      if (this.isRequired() && (gen == null || gen.isEmpty())) {
+        LOGGER.warn("Failure in Evaluating expression {} for hl7spec obj {} value generated {}",
+            stringRep, obj, gen);
+        return null;
       } else {
         return gen;
       }
-    } 
-return null;
+    }
+    return null;
   }
 
+
+
+  private static Map<String, GenericResult> resolveVariables(List<Variable> variables,
+      Map<String, GenericResult> contextValues, InputData dataSource) {
+
+    Map<String, GenericResult> localVariables = new HashMap<>();
+
+    for (Variable var : variables) {
+      try {
+        GenericResult value =
+            var.extractVariableValue(ImmutableMap.copyOf(contextValues), dataSource);
+        if (value != null) {
+
+          localVariables.put(VariableUtils.getVarName(var.getVariableName()),
+              new GenericResult(value.getValue()));
+        } else {
+          // enclose null in GenericParsingResult
+          localVariables.put(VariableUtils.getVarName(var.getVariableName()),
+              new GenericResult(null));
+        }
+      } catch (DataExtractionException e) {
+        LOGGER.error("cannot extract value for variable {} ", var.getVariableName(), e);
+      }
+    }
+    return localVariables;
+  }
 
 
   protected abstract GenericResult evaluateExpression(InputData dataSource,
@@ -167,22 +238,10 @@ return null;
 
 
 
-
-
   protected static boolean isVar(String spec) {
     return StringUtils.isNotBlank(spec) && spec.startsWith("$") && spec.length() > 1;
   }
 
-  protected static String getDataType(Object data) {
-
-    if (data instanceof Structure) {
-      return ((Structure) data).getName();
-    } else if (data instanceof Type) {
-      return ((Type) data).getName();
-    } else {
-      return data.getClass().getCanonicalName();
-    }
-  }
 
   @Override
   public boolean isConditionSatisfied(Map<String, GenericResult> contextValues) {
@@ -212,6 +271,23 @@ return null;
       }
     }
     return hl7Value;
+  }
+
+
+  private static List<String> getTokens(String value) {
+    if (StringUtils.isNotBlank(value)) {
+      StringTokenizer st = new StringTokenizer(value, "|").setIgnoreEmptyTokens(true)
+          .setTrimmerMatcher(StringMatcherFactory.INSTANCE.spaceMatcher());
+      return st.getTokenList();
+    }
+
+    return new ArrayList<>();
+  }
+
+
+
+  public String toString() {
+    return ReflectionToStringBuilder.toString(this);
   }
 
 }

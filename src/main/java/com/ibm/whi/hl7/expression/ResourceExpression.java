@@ -5,10 +5,7 @@
  */
 package com.ibm.whi.hl7.expression;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -90,46 +87,27 @@ public class ResourceExpression extends AbstractExpression {
 
   @Override
   public GenericResult evaluateExpression(InputData dataSource,
-      Map<String, GenericResult> contextValues, GenericResult hl7SpecValues) {
+      Map<String, GenericResult> contextValues, GenericResult hl7SpecValue) {
     Preconditions.checkArgument(dataSource != null, "dataSource cannot be null");
     Preconditions.checkArgument(contextValues != null, "contextValues cannot be null");
     LOGGER.info("Evaluating expression {}", this.resourceToGenerate);
     GenericResult evaluationResult = null;
-    if (this.isMultiple() && hl7SpecValues != null) {
-      List<?> dataValues = (List<?>) hl7SpecValues.getValue();
-      List<GenericResult> baseValues = new ArrayList<>();
 
-      dataValues.removeIf(Objects::isNull);
-      dataValues.forEach(d -> baseValues.add(new GenericResult(d)));
-      ResourceResult result = this.data.evaluateMultiple(dataSource,
-          ImmutableMap.copyOf(contextValues), baseValues, this.getVariables());
-      if (result != null) {
-        List<ResourceValue> resolvedvalues = result.getResources();
-        LOGGER.info("Evaluated expression {}, returning {} ", this.resourceToGenerate,
-            resolvedvalues);
-        if (resolvedvalues != null && !resolvedvalues.isEmpty()) {
-          List<Map<String, Object>> values = new ArrayList<>();
-          resolvedvalues.forEach(v -> values.add(v.getResource()));
-          evaluationResult = new GenericResult(values, result.getAdditionalResources());
-        }
-      }
-    } else {
-      GenericResult baseValue = new GenericResult(getSingleValue(hl7SpecValues));
+    GenericResult baseValue = hl7SpecValue;
 
-      ResourceResult result =
-          this.data.evaluateSingle(dataSource, ImmutableMap.copyOf(contextValues), baseValue);
-      if (result != null && result.getResources() != null && !result.getResources().isEmpty()) {
-        List<ResourceValue> resolvedvalues = result.getResources();
+    ResourceResult result =
+        this.data.evaluate(dataSource, ImmutableMap.copyOf(contextValues), baseValue);
+    if (result != null && result.getResource() != null) {
+      ResourceValue resolvedvalues = result.getResource();
 
-        LOGGER.info("Evaluated expression {}, returning {} ", this.resourceToGenerate,
-            resolvedvalues);
-        if (resolvedvalues != null && !resolvedvalues.isEmpty()) {
-          evaluationResult =
-              new GenericResult(resolvedvalues.get(0).getResource(),
-                  result.getAdditionalResources());
-        }
+      LOGGER.info("Evaluated expression {}, returning {} ", this.resourceToGenerate,
+          resolvedvalues);
+      if (resolvedvalues != null) {
+        evaluationResult =
+            new GenericResult(resolvedvalues.getResource(), result.getAdditionalResources());
       }
     }
+
 
     return evaluationResult;
 
@@ -137,10 +115,8 @@ public class ResourceExpression extends AbstractExpression {
 
 
 
-  public String getReference() {
+  public String getResourceName() {
     return resourceToGenerate;
   }
-
-
 
 }

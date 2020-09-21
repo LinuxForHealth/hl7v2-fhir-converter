@@ -71,8 +71,4 @@ public class Hl7Expression extends AbstractExpression {
     }
   }
 
-
-
-
-
 }

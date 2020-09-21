@@ -12,8 +12,6 @@ import org.slf4j.LoggerFactory;
 import ca.uhn.hl7v2.model.Composite;
 import ca.uhn.hl7v2.model.DataTypeException;
 import ca.uhn.hl7v2.model.Primitive;
-import ca.uhn.hl7v2.model.Structure;
-import ca.uhn.hl7v2.model.Type;
 import ca.uhn.hl7v2.model.Variable;
 
 
@@ -74,18 +72,6 @@ public class Hl7DataHandlerUtil {
   }
 
 
-  public static String getDataType(Object data) {
-    String dataType = null;
-    if (data instanceof Structure) {
-      dataType = ((Structure) data).getName();
-    } else if (data instanceof Type) {
-      dataType = ((Type) data).getName();
-    } else if (data != null) {
-      dataType = data.getClass().getSimpleName();
-    } else {
-      dataType = null;
-    }
-    return dataType;
-  }
+
 
 }

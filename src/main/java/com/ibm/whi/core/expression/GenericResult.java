@@ -7,7 +7,7 @@ package com.ibm.whi.core.expression;
 
 import java.util.ArrayList;
 import java.util.List;
-import com.ibm.whi.core.expression.util.GeneralUtil;
+import com.ibm.whi.core.data.DataTypeUtil;
 import com.ibm.whi.core.resource.ResourceValue;
 
 /**
@@ -36,7 +36,7 @@ public class GenericResult {
     this.value = value;
     if (value != null) {
       this.klass = value.getClass();
-      this.klassName = GeneralUtil.getDataType(value);
+      this.klassName = DataTypeUtil.getDataType(value);
     }
     this.additionalResources = additionalResources;
   }
@@ -48,7 +48,7 @@ public class GenericResult {
   @Override
   public String toString() {
     if (value != null) {
-      return "Type: [" + value.getClass().getName() + "] Value : [" + value.toString() + "]";
+      return "Type: [" + this.klassName + "] Value : [" + value.toString() + "]";
     } else {
       return "";
     }

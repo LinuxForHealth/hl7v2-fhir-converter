@@ -52,7 +52,7 @@ public class FHIRConverterTest {
     List<Resource> pracResource =
         e.stream().filter(v -> ResourceType.Practitioner == v.getResource().getResourceType())
             .map(BundleEntryComponent::getResource).collect(Collectors.toList());
-    assertThat(pracResource).hasSize(1);
+    assertThat(pracResource).hasSize(5);
 
     System.out.println(json);
   }

@@ -16,11 +16,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Lists;
 import com.ibm.whi.core.expression.Expression;
 import com.ibm.whi.core.expression.GenericResult;
-import com.ibm.whi.core.expression.Variable;
-import com.ibm.whi.core.expression.util.GeneralUtil;
 import com.ibm.whi.core.message.InputData;
 import com.ibm.whi.core.resource.ResourceModel;
 import com.ibm.whi.core.resource.ResourceResult;
@@ -73,31 +70,10 @@ public class HL7DataBasedResourceModel implements ResourceModel {
     return expressions;
   }
 
-  @Override
-  public ResourceResult evaluateMultiple(InputData dataSource,
-      Map<String, GenericResult> contextValues, List<GenericResult> baseVariables,
-      List<Variable> variables) {
 
-    List<ResourceValue> additionalResources = new ArrayList<>();
-    List<ResourceValue> resolvedvalues = new ArrayList<>();
-    for (GenericResult baseVar : baseVariables) {
-      Map<String, GenericResult> localContext =
-          resolveLocalVariables(dataSource, baseVar, variables, ImmutableMap.copyOf(contextValues));
-      ResourceResult obj = evaluateSingle(dataSource, localContext, baseVar);
-      if (obj != null) {
-        resolvedvalues.addAll(obj.getResources());
-        additionalResources.addAll(obj.getAdditionalResources());
-      }
-    }
-    if (resolvedvalues.isEmpty()) {
-      return null;
-    }
-    return new ResourceResult(resolvedvalues, additionalResources);
-
-  }
 
   @Override
-  public ResourceResult evaluateSingle(InputData dataSource, Map<String, GenericResult> variables,
+  public ResourceResult evaluate(InputData dataSource, Map<String, GenericResult> variables,
       GenericResult baseVariable) {
     ResourceResult resources = null;
     try {
@@ -161,7 +137,7 @@ public class HL7DataBasedResourceModel implements ResourceModel {
       resolveValues.values().removeIf(Objects::isNull);
       if (!resolveValues.isEmpty()) {
         resources =
-            new ResourceResult(Lists.newArrayList(new ResourceValue(resolveValues, this.name)),
+            new ResourceResult(new ResourceValue(resolveValues, this.name),
                 additionalResolveValues);
 
       }
@@ -208,13 +184,13 @@ public class HL7DataBasedResourceModel implements ResourceModel {
 
       ResourceExpression exp = (ResourceExpression) entry.getValue();
       LOGGER.info("----Evaluating {} {}", exp.getType(), entry.getKey());
-      LOGGER.info("----Extracted reference resource  {} {} reference {}", exp.getType(),
-          entry.getKey(), exp.getReference());
+      LOGGER.info("----Extracted resource  {} {} reference {}", exp.getType(),
+          entry.getKey(), exp.getResourceName());
       if (exp.getData() != null) {
 
         GenericResult obj = exp.evaluate(dataSource, ImmutableMap.copyOf(localContext));
         LOGGER.info("----Extracted object from reference resource  {} {} reference {}  value {}",
-            exp.getType(), entry.getKey(), exp.getReference(), obj);
+            exp.getType(), entry.getKey(), exp.getResourceName(), obj);
         if (obj != null) {
           resolveValues.put(entry.getKey(), obj.getValue());
           if (obj.getAdditionalResources() != null && !obj.getAdditionalResources().isEmpty()) {
@@ -261,23 +237,23 @@ public class HL7DataBasedResourceModel implements ResourceModel {
     return this.name;
   }
 
-  private static Map<String, GenericResult> resolveLocalVariables(InputData dataExtractor,
-      Object hl7Value, List<Variable> variableNames,
-      ImmutableMap<String, GenericResult> contextValues) {
-    Map<String, GenericResult> localVariables = new HashMap<>(contextValues);
-
-    if (hl7Value != null) {
-      String type = GeneralUtil.getDataType(hl7Value);
-
-      LOGGER.info(type);
-      localVariables.put(type, new GenericResult(hl7Value));
-    }
-
-    localVariables
-        .putAll(dataExtractor.resolveVariables(variableNames, ImmutableMap.copyOf(localVariables)));
-
-    return ImmutableMap.copyOf(localVariables);
-  }
+  // private static Map<String, GenericResult> resolveLocalVariables(InputData dataExtractor,
+  // Object hl7Value, List<Variable> variableNames,
+  // ImmutableMap<String, GenericResult> contextValues) {
+  // Map<String, GenericResult> localVariables = new HashMap<>(contextValues);
+  //
+  // if (hl7Value != null) {
+  // String type = GeneralUtil.getDataType(hl7Value);
+  //
+  // LOGGER.info(type);
+  // localVariables.put(type, new GenericResult(hl7Value));
+  // }
+  //
+  // localVariables
+  // .putAll(dataExtractor.resolveVariables(variableNames, ImmutableMap.copyOf(localVariables)));
+  //
+  // return ImmutableMap.copyOf(localVariables);
+  // }
 
 
 

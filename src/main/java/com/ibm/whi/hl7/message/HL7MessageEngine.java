@@ -89,38 +89,44 @@ public class HL7MessageEngine implements MessageEngine {
       segments.forEach(d -> baseValues.add(new GenericResult(d)));
 
         Map<String, GenericResult> localVariables = new HashMap<>(variables);
-        ResourceResult result=rs.evaluateMultiple(dataExtractor, ImmutableMap.copyOf(localVariables),
-            baseValues, new ArrayList<>());
+      List<ResourceValue> resourcevalues = new ArrayList<>();
+      List<ResourceValue> additionalResources = new ArrayList<>();
+      for (GenericResult baseValue : baseValues) {
+        ResourceResult result =
+            rs.evaluate(dataExtractor, ImmutableMap.copyOf(localVariables), baseValue);
+        if (result != null && result.getResource() != null) {
+          resourcevalues.add(result.getResource());
+          additionalResources.addAll(result.getAdditionalResources());
 
-      if (result != null && result.getResources() != null && !result.getResources().isEmpty()) {
-      List<ResourceValue> resourceObjects = result.getResources();
-      addValues(bundle, resourceObjects);
-      List<ResourceValue> additionalResourceObjects = result.getAdditionalResources();
-      addValues(bundle, additionalResourceObjects);
+        }
+      }
+
+      if (!resourcevalues.isEmpty()) {
+        addValues(bundle, resourcevalues);
+        addValues(bundle, additionalResources);
       }
 
     } else {
-
-
       Map<String, GenericResult> localVariables = new HashMap<>(variables);
       localVariables.put(res.getSegment(), new GenericResult(segments.get(0)));
 
       ResourceResult evaluatedValue =
-          rs.evaluateSingle(dataExtractor, ImmutableMap.copyOf(localVariables),
+          rs.evaluate(dataExtractor, ImmutableMap.copyOf(localVariables),
               new GenericResult(segments.get(0)));
 
-      if (evaluatedValue != null && evaluatedValue.getResources() != null
-          && !evaluatedValue.getResources().isEmpty()) {
+      if (evaluatedValue != null && evaluatedValue.getResource() != null) {
 
-        addEntry(res.getResourceName(), evaluatedValue.getResources().get(0), bundle);
+        addEntry(res.getResourceName(), evaluatedValue.getResource(), bundle);
         variables.put(res.getResourceName(), new GenericResult(evaluatedValue));
         List<ResourceValue> additionalResourceObjects = evaluatedValue.getAdditionalResources();
         addValues(bundle, additionalResourceObjects);
       }
 
 
+
     }
   }
+
 
 
   private static void addValues(Bundle bundle, List<ResourceValue> objects) {

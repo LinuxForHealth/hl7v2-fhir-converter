@@ -14,6 +14,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Preconditions;
 import com.ibm.whi.core.expression.GenericResult;
+import com.ibm.whi.core.expression.VariableUtils;
 import com.ibm.whi.core.message.InputData;
 
 
@@ -86,7 +87,7 @@ public class ValueExtractionGeneralExpression extends AbstractExpression {
         .forEach((key, value) -> localContext.put(key, value.getValue()));
     String[] token = fetch.split(":");
     if (token.length == 2) {
-      Object resource = localContext.get(token[0].replace("$", ""));
+      Object resource = localContext.get(VariableUtils.getVarName(token[0]));
     if (resource instanceof Map) {
       Map<String, Object> resourceMap = (Map<String, Object>) resource;
         return new GenericResult(resourceMap.get(token[1]));
@@ -94,7 +95,6 @@ public class ValueExtractionGeneralExpression extends AbstractExpression {
     }
     return null;
   }
-
 
 
 }

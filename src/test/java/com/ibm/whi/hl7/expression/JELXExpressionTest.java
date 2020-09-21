@@ -99,9 +99,9 @@ public class JELXExpressionTest {
 
 
     Map<String, String> var = new HashMap<>();
-      var.put("var1", "String CX.1");
-      var.put("var2", "String CX.2");
-      var.put("var3", "String CX.2");
+      var.put("var1", "String, CX.1");
+      var.put("var2", "String, CX.2");
+      var.put("var3", "String, CX.2");
 
       JELXExpression exp = new JELXExpression("String.join(\" \",  var1,var2, var3)", var);
 
