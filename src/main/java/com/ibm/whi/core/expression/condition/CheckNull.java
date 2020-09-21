@@ -7,7 +7,7 @@ package com.ibm.whi.core.expression.condition;
 
 import java.util.Map;
 import com.ibm.whi.core.expression.GenericResult;
-import com.ibm.whi.core.expression.util.GeneralUtil;
+import com.ibm.whi.core.expression.VariableUtils;
 
 public class CheckNull implements Condition {
   public static final String NULL = "NULL";
@@ -23,7 +23,7 @@ public class CheckNull implements Condition {
 
   @Override
   public boolean test(Map<String, GenericResult> contextVariables) {
-    GenericResult variable1 = contextVariables.get(GeneralUtil.getVarName(var1));
+    GenericResult variable1 = contextVariables.get(VariableUtils.getVarName(var1));
     
     return variable1 == null || variable1.isEmpty();
   }

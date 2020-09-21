@@ -3,7 +3,7 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  */
-package com.ibm.whi.hl7.expression;
+package com.ibm.whi.core.data;
 
 import java.util.HashMap;
 import java.util.List;
@@ -22,12 +22,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
-import com.ibm.whi.hl7.data.HL7GeneralUtils;
 import com.ibm.whi.hl7.exception.NoMoreRepititionException;
 
 
-public final class WHIAJexlEngine {
-  private static final Logger LOGGER = LoggerFactory.getLogger(WHIAJexlEngine.class);
+public final class JexlEngineUtil {
+  private static final Logger LOGGER = LoggerFactory.getLogger(JexlEngineUtil.class);
   private static final List<String> OPERATORS =
       Lists.newArrayList(">", "<", "==", "!=", ">=", "<=");
 
@@ -36,20 +35,30 @@ public final class WHIAJexlEngine {
 
 
 
-  public WHIAJexlEngine() {
+  public JexlEngineUtil() {
     jexl = new JexlBuilder().silent(false).debug(true).strict(true).create();
     LOGGER.info("silent:{} , strict :{} ", jexl.isSilent(), jexl.isStrict());
     functions.put(StringUtils.class.getSimpleName(), StringUtils.class);
     functions.put(NumberUtils.class.getSimpleName(), NumberUtils.class);
     functions.put(String.class.getSimpleName(), String.class);
     functions.put(UUID.class.getSimpleName(), UUID.class);
-    functions.put("GeneralUtils", HL7GeneralUtils.class);
-
-
 
   }
 
-  Object evaluate(String jexlExp, Map<String, Object> context) {
+  public JexlEngineUtil(Map<String, Object> functions) {
+    this();
+    functions.putAll(functions);
+
+  }
+
+
+  public JexlEngineUtil(String name, Object function) {
+    this();
+    functions.put(name, function);
+
+  }
+
+  public Object evaluate(String jexlExp, Map<String, Object> context) {
     Preconditions.checkArgument(StringUtils.isNotBlank(jexlExp), "jexlExp cannot be blank");
     Preconditions.checkArgument(context != null, "context cannot be null");
     String trimedJexlExp = StringUtils.trim(jexlExp);

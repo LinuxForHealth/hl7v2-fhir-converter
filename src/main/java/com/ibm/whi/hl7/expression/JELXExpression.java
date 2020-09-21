@@ -5,7 +5,6 @@
  */
 package com.ibm.whi.hl7.expression;
 
-import java.util.HashMap;
 import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -21,7 +20,7 @@ import com.ibm.whi.core.message.InputData;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class JELXExpression extends AbstractExpression {
   private static final Logger LOGGER = LoggerFactory.getLogger(JELXExpression.class);
-  private static final WHIAJexlEngine JEXL = new WHIAJexlEngine();
+
   private String evaluate;
 
 
@@ -53,24 +52,7 @@ public class JELXExpression extends AbstractExpression {
   @Override
   public GenericResult evaluateExpression(InputData dataSource,
       Map<String, GenericResult> contextValues, GenericResult hl7SpecValues) {
-    Preconditions.checkArgument(dataSource != null, "dataSource cannot be null");
-    Preconditions.checkArgument(contextValues != null, "contextValues cannot be null");
-    LOGGER.info("Evaluating expression {}", this.evaluate);
-    Map<String, Object> localContext = new HashMap<>();
-
-    Map<String, GenericResult> resolvedVariables = new HashMap<>(contextValues);
-    resolvedVariables
-        .forEach((key, value) -> localContext.put(key, value.getValue()));
-    Object obj = JEXL.evaluate(this.evaluate, localContext);
-    LOGGER.info("Evaluated expression {}, returning {}", this.evaluate, obj);
-    if (obj != null) {
-      return new GenericResult(obj);
-    } else {
-      return null;
-    }
+    return dataSource.evaluateJexlExpression(this.evaluate, contextValues);
   }
-
-
-
 
 }

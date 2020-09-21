@@ -5,8 +5,10 @@
  */
 package com.ibm.whi.core.expression;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import com.ibm.whi.core.message.InputData;
+
 
 /**
  * Defines Variable object that can be used during the expression evaluation.
@@ -14,52 +16,41 @@ import java.util.List;
  *
  * @author pbhallam
  */
-public class Variable {
-  public static final String OBJECT_TYPE = Object.class.getSimpleName();
-  private String name;
-  private String type;
-  private List<String> spec;
+public interface Variable {
 
   /**
-   * Constructor for Variable with default type: Object
+   * Return the list of specs that should be used for evaluating the variable. If the list of specs
+   * is empty then variable value will be extracted from contextValues. If the list of specs is not
+   * empty then data source will be used to extract the value of the specs.
    * 
-   * @param name
-   * @param spec
+   * @return
    */
-  public Variable(String name, List<String> spec) {
-    this(name, spec, OBJECT_TYPE);
-  }
+  List<String> getSpec();
 
   /**
+   * Return the Class type for the value to be extracted.
    * 
-   * @param name
-   * @param spec
-   * @param type
+   * @return
    */
-  public Variable(String name, List<String> spec, String type) {
-    this.name = name;
-    this.spec = new ArrayList<>();
-    if (spec != null && !spec.isEmpty()) {
-      this.spec.addAll(spec);
-    }
+  String getType();
 
-    this.type = type;
-  }
+  /**
+   * Return the name of the variable
+   * 
+   * @return
+   */
+  String getVariableName();
 
-  public List<String> getSpec() {
-    return new ArrayList<>(spec);
-  }
-
-
-
-  public String getType() {
-    return type;
-  }
-
-
-  public String getName() {
-    return name;
-  }
+  /**
+   * Evaluates the variable and extracts the value based on the provided context values and input
+   * data source.
+   * 
+   * @param contextValues
+   * @param dataSource
+   * @return {@link GenericResult}
+   */
+  GenericResult extractVariableValue(Map<String, GenericResult> contextValues,
+      InputData dataSource);
 
 
 }

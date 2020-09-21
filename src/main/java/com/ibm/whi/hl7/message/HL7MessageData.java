@@ -15,11 +15,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
+import com.ibm.whi.core.data.JexlEngineUtil;
 import com.ibm.whi.core.expression.GenericResult;
-import com.ibm.whi.core.expression.Variable;
 import com.ibm.whi.core.message.InputData;
-import com.ibm.whi.hl7.data.SimpleDataTypeMapper;
-import com.ibm.whi.hl7.data.ValueExtractor;
+import com.ibm.whi.hl7.data.Hl7RelatedGeneralUtils;
 import com.ibm.whi.hl7.exception.DataExtractionException;
 import com.ibm.whi.hl7.parsing.HL7DataExtractor;
 import com.ibm.whi.hl7.parsing.result.ParsingResult;
@@ -31,51 +30,13 @@ public class HL7MessageData implements InputData {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(HL7MessageData.class);
   protected static final Pattern HL7_SPEC_SPLITTER = Pattern.compile(".");
-
+  private static final JexlEngineUtil JEXL =
+      new JexlEngineUtil("GeneralUtils", Hl7RelatedGeneralUtils.class);
 
   public HL7MessageData(HL7DataExtractor hde) {
     Preconditions.checkArgument(hde != null, "Hl7DataExtractor cannot be null.");
     this.hde = hde;
   }
-
-
-  @Override
-  public Map<String, GenericResult> resolveVariables(List<Variable> variables,
-      Map<String, GenericResult> contextValues) {
-
-    Map<String, GenericResult> localVariables = new HashMap<>();
-
-    for (Variable var : variables) {
-      try {
-        GenericResult value = getValueVariable(var.getSpec(), ImmutableMap.copyOf(contextValues));
-        Object resolvedValue = value;
-        if (value != null && !var.getType().equalsIgnoreCase(Variable.OBJECT_TYPE)) {
-
-          ValueExtractor<Object, ?> resolver = SimpleDataTypeMapper.getValueResolver(var.getType());
-          if (resolver != null) {
-            resolvedValue = resolver.apply(value.getValue());
-            LOGGER.info("Evaluating variable type {} , spec {} resolved value {} ", var.getType(),
-                var.getSpec(), resolvedValue);
-          }
-
-          localVariables.put(var.getName(), new GenericResult(resolvedValue));
-        } else if (value != null) {
-
-          localVariables.put(var.getName(), new GenericResult(value.getValue()));
-        } else {
-          // enclose null in GenericParsingResult
-          localVariables.put(var.getName(), new GenericResult(null));
-        }
-      } catch (DataExtractionException e) {
-        LOGGER.error("cannot extract value for variable {} ", var.getName(), e);
-      }
-    }
-    return localVariables;
-  }
-
-
-
-
 
 
   @Override
@@ -120,33 +81,6 @@ public class HL7MessageData implements InputData {
 
 
 
-  private GenericResult getValueVariable(List<String> variableOptions,
-      ImmutableMap<String, GenericResult> variables) {
-    if (variableOptions.isEmpty()) {
-      return null;
-    }
-    GenericResult fetchedValue = null;
-    for (String varName : variableOptions) {
-
-      if (isVar(varName)) {
-
-        fetchedValue = getVariableValueFromVariableContextMap(varName, variables);
-      } else {
-
-        ParsingResult<?> p = valuesFromHl7Message(varName, variables);
-        if (p != null) {
-          fetchedValue = new GenericResult(p.getValue());
-        }
-      }
-      // break the loop and return
-      if (fetchedValue != null) {
-        return fetchedValue;
-      }
-    }
-    return fetchedValue;
-
-
-  }
 
 
 
@@ -205,26 +139,28 @@ public class HL7MessageData implements InputData {
 
 
 
-  private static GenericResult getVariableValueFromVariableContextMap(String varName,
-      ImmutableMap<String, GenericResult> varables) {
-    if (StringUtils.isNotBlank(varName)) {
-      GenericResult fetchedValue;
-      fetchedValue = varables.get(varName.replace("$", ""));
-      return fetchedValue;
-    } else {
-      return null;
-    }
-  }
-
-
-
-  private static boolean isVar(String hl7spec) {
-    return StringUtils.isNotBlank(hl7spec) && hl7spec.startsWith("$") && hl7spec.length() > 1;
-  }
 
 
   public HL7DataExtractor getHL7DataParser() {
     return hde;
+  }
+
+
+  @Override
+  public GenericResult evaluateJexlExpression(String expression,
+      Map<String, GenericResult> contextValues) {
+    Preconditions.checkArgument(StringUtils.isNotBlank(expression), "jexlExp cannot be blank");
+    Preconditions.checkArgument(contextValues != null, "context cannot be null");
+    String trimedJexlExp = StringUtils.trim(expression);
+    Map<String, Object> localContext = new HashMap<>();
+    Map<String, GenericResult> resolvedVariables = new HashMap<>(contextValues);
+    resolvedVariables.forEach((key, value) -> localContext.put(key, value.getValue()));
+    Object obj = JEXL.evaluate(trimedJexlExp, localContext);
+    if (obj != null) {
+      return new GenericResult(obj);
+    } else {
+      return null;
+    }
   }
 
 }

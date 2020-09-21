@@ -17,9 +17,9 @@ status:
     type: STRING
     evaluate: 'GeneralUtils.getEncounterStatus(var1,var2,var3)'
     var: 
-      var1: String PV1.45
-      var2: String PV1.44
-      var3: String PV2.16
+      var1: String, PV1.45
+      var2: String, PV1.44
+      var3: String, PV2.16
 
 class:
     resource: datatype/Coding
@@ -54,8 +54,8 @@ period:
 length:
     resource: datatype/Duration
     var: 
-      time1: DATE_TIME PV1.44
-      time2: DATE_TIME PV1.45
+      time1: DATE_TIME, PV1.44
+      time2: DATE_TIME, PV1.45
 
 reasonCode:
     resource: datatype/CodeableConcept *

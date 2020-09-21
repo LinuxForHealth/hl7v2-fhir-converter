@@ -16,6 +16,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import com.ibm.whi.core.expression.GenericResult;
+import com.ibm.whi.core.expression.VariableUtils;
 import com.ibm.whi.core.message.InputData;
 import com.ibm.whi.hl7.data.SimpleDataTypeMapper;
 import com.ibm.whi.hl7.data.ValueExtractor;
@@ -76,17 +77,15 @@ public class SimpleExpression extends AbstractExpression {
   }
 
   private static GenericResult getVariableValueFromVariableContextMap(String varName,
-      ImmutableMap<String, GenericResult> varables) {
+      ImmutableMap<String, GenericResult> contextValues) {
     if (StringUtils.isNotBlank(varName)) {
       GenericResult fetchedValue;
-      fetchedValue = varables.get(varName.replace("$", ""));
+      fetchedValue = contextValues.get(VariableUtils.getVarName(varName));
       return fetchedValue;
     } else {
       return null;
     }
   }
-
-
 
 
 }

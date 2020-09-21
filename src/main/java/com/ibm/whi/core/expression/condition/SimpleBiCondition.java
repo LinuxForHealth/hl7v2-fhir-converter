@@ -7,7 +7,7 @@ package com.ibm.whi.core.expression.condition;
 
 import java.util.Map;
 import com.ibm.whi.core.expression.GenericResult;
-import com.ibm.whi.core.expression.util.GeneralUtil;
+import com.ibm.whi.core.expression.VariableUtils;
 
 public class SimpleBiCondition implements Condition {
 
@@ -31,8 +31,8 @@ public class SimpleBiCondition implements Condition {
   public boolean test(Map<String, GenericResult> contextVariables) {
     Object var1Value = null;
     GenericResult variable1;
-    if (GeneralUtil.isVar(var1)) {
-      variable1 = contextVariables.get(GeneralUtil.getVarName(var1));
+    if (VariableUtils.isVar(var1)) {
+      variable1 = contextVariables.get(VariableUtils.getVarName(var1));
       if (variable1 != null && !variable1.isEmpty()) {
         var1Value = variable1.getValue();
       }
@@ -59,8 +59,8 @@ public class SimpleBiCondition implements Condition {
 
   private Object getValue(Map<String, GenericResult> contextVariables) {
     Object var2Value = null;
-    if (var2 instanceof String && GeneralUtil.isVar((String) var2)) {
-      GenericResult variable = contextVariables.get(GeneralUtil.getVarName((String) var2));
+    if (var2 instanceof String && VariableUtils.isVar((String) var2)) {
+      GenericResult variable = contextVariables.get(VariableUtils.getVarName((String) var2));
       if (variable != null && !variable.isEmpty()) {
         var2Value = variable.getValue();
       }

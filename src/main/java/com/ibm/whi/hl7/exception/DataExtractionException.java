@@ -11,9 +11,5 @@ public class DataExtractionException extends RuntimeException {
     super(message, e);
   }
 
-  /**
-   * 
-   */
-  private static final long serialVersionUID = 1L;
 
 }
