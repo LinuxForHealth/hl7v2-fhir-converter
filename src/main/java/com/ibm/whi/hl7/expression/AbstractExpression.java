@@ -39,6 +39,7 @@ public abstract class AbstractExpression implements Expression {
   private final String type;
   private final GenericResult defaultValue;
   private final boolean required;
+  private final boolean extractMultiple;
   private final List<String> hl7specs;
   private List<Variable> variables;
   private Condition condition;
@@ -58,13 +59,26 @@ public abstract class AbstractExpression implements Expression {
     }
 
     this.required = required;
-    this.hl7specs = getTokens(hl7spec);
+    this.extractMultiple = isExtractMultipleFromSpec(hl7spec);
+    this.hl7specs = getHl7SpecList(hl7spec);
     if (StringUtils.isNotBlank(condition)) {
       this.condition = ConditionUtil.createCondition(condition);
     }
 
     initVariables(rawvariables);
 
+  }
+
+  /**
+   * If HL7 spec ends with a * then all the repetitions for this value are extracted when generating
+   * single resource or evaluating single expression. When generating multiple resources then by
+   * default all repetitions of the value are extracted and used.
+   * 
+   * @param hl7spec
+   * @return
+   */
+  private static boolean isExtractMultipleFromSpec(String hl7spec) {
+    return StringUtils.endsWith(hl7spec, "*");
   }
 
   private void initVariables(Map<String, String> rawvariables) {
@@ -106,14 +120,31 @@ public abstract class AbstractExpression implements Expression {
 
 
 
-
+  /**
+   * Evaluates the expression and generated single or multiple resources based on the expression
+   * values. If expression (reference and resource) ends with * then for that expression a the
+   * Generic result includes list of values.
+   * 
+   * @see com.ibm.whi.core.expression.Expression#evaluate(com.ibm.whi.core.message.InputData,
+   *      java.util.Map)
+   */
   public GenericResult evaluate(InputData dataSource, Map<String, GenericResult> contextValues) {
     Preconditions.checkArgument(dataSource != null, "dataSource cannot be null");
     Preconditions.checkArgument(contextValues != null, "contextValues cannot be null");
+    GenericResult result;
     if (this.isMultiple) {
-      return evaluateMultiple(dataSource, contextValues);
+      result = evaluateMultiple(dataSource, contextValues);
     } else {
-      return evaluateSingle(dataSource, contextValues);
+      result = evaluateSingle(dataSource, contextValues);
+    }
+
+
+    if (this.isRequired() && (result == null || result.isEmpty())) {
+      String stringRep = this.toString();
+      throw new RequiredConstraintFailureException(
+          "Failure in Evaluating expression   :" + stringRep);
+    } else {
+      return result;
     }
   }
 
@@ -124,16 +155,16 @@ public abstract class AbstractExpression implements Expression {
     String stringRep = this.toString();
     // resolve hl7spec
     LOGGER.info("Evaluating expression {}", stringRep);
-    GenericResult hl7Value = dataSource.extractSingleValueForSpec(this.getspecs(),
+    GenericResult hl7Value;
+    if (this.extractMultiple) {
+      hl7Value = dataSource.extractMultipleValuesForSpec(this.getspecs(),
+          ImmutableMap.copyOf(contextValues));
+    } else {
+      hl7Value = dataSource.extractSingleValueForSpec(this.getspecs(),
         ImmutableMap.copyOf(contextValues));
+    }
     LOGGER.info("Evaluating expression {} returned hl7 value {} ", stringRep, hl7Value);
-    GenericResult gen = generateValue(dataSource, contextValues, hl7Value);
-      if (this.isRequired() && (gen == null || gen.isEmpty())) {
-        throw new RequiredConstraintFailureException(
-          "Failure in Evaluating expression   :" + stringRep);
-      } else {
-        return gen;
-      }
+    return generateValue(dataSource, contextValues, hl7Value);
 
   }
 
@@ -157,9 +188,8 @@ public abstract class AbstractExpression implements Expression {
       GenericResult gen = generateValue(dataSource, contextValues, new GenericResult(o));
       if (gen != null && gen.getValue() != null && !gen.isEmpty()) {
         result.add(gen.getValue());
-        if (gen.getAdditionalResources() != null && !gen.getAdditionalResources().isEmpty()) {
-          additionalresourcesresult.addAll(gen.getAdditionalResources());
-        }
+        additionalresourcesresult.addAll(gen.getAdditionalResources());
+
       }
     }
 
@@ -174,20 +204,20 @@ public abstract class AbstractExpression implements Expression {
   }
 
   private GenericResult generateValue(InputData dataSource,
-      Map<String, GenericResult> contextValues, GenericResult obj) {
+      Map<String, GenericResult> contextValues, GenericResult hl7SpecValue) {
     String stringRep = this.toString();
-    LOGGER.info("Evaluating expression {} for spec value {}  ", stringRep, obj);
+    LOGGER.info("Evaluating expression {} for spec value {}  ", stringRep, hl7SpecValue);
     // resolve variables
     Map<String, GenericResult> localContextValues = new HashMap<>(contextValues);
-    if (obj != null && obj.getValue() != null) {
-      localContextValues.put(DataTypeUtil.getDataType(obj.getValue()), obj);
+    if (hl7SpecValue != null && hl7SpecValue.getValue() != null) {
+      localContextValues.put(DataTypeUtil.getDataType(hl7SpecValue.getValue()), hl7SpecValue);
     }
     localContextValues.putAll(
         resolveVariables(this.getVariables(), ImmutableMap.copyOf(localContextValues), dataSource));
 
     if (this.isConditionSatisfied(localContextValues)) {
       GenericResult gen = evaluateExpression(dataSource, ImmutableMap.copyOf(localContextValues),
-          obj);
+          hl7SpecValue);
       // Use the default value if the generated value is null and provided default value is not
       // null
       if (gen == null && this.getDefaultValue() != null && !this.getDefaultValue().isEmpty()) {
@@ -196,7 +226,7 @@ public abstract class AbstractExpression implements Expression {
 
       if (this.isRequired() && (gen == null || gen.isEmpty())) {
         LOGGER.warn("Failure in Evaluating expression {} for hl7spec obj {} value generated {}",
-            stringRep, obj, gen);
+            stringRep, hl7SpecValue, gen);
         return null;
       } else {
         return gen;
@@ -260,11 +290,11 @@ public abstract class AbstractExpression implements Expression {
     this.isMultiple = true;
   }
 
-  static Object getSingleValue(GenericResult hl7SpecValues) {
+  Object getValue(GenericResult hl7SpecValues) {
     Object hl7Value = null;
     if (hl7SpecValues != null && !hl7SpecValues.isEmpty()) {
       Object valList = hl7SpecValues.getValue();
-      if (valList instanceof List && !((List) valList).isEmpty()) {
+      if (valList instanceof List && !((List) valList).isEmpty() && !this.extractMultiple) {
         hl7Value = ((List) valList).get(0);
       } else {
         hl7Value = hl7SpecValues.getValue();
@@ -274,9 +304,12 @@ public abstract class AbstractExpression implements Expression {
   }
 
 
-  private static List<String> getTokens(String value) {
-    if (StringUtils.isNotBlank(value)) {
-      StringTokenizer st = new StringTokenizer(value, "|").setIgnoreEmptyTokens(true)
+  private static List<String> getHl7SpecList(String inputString) {
+
+    String hl7SpecExpression = StringUtils.removeEnd(inputString, "*");
+    hl7SpecExpression = StringUtils.strip(hl7SpecExpression);
+    if (StringUtils.isNotBlank(hl7SpecExpression)) {
+      StringTokenizer st = new StringTokenizer(hl7SpecExpression, "|").setIgnoreEmptyTokens(true)
           .setTrimmerMatcher(StringMatcherFactory.INSTANCE.spaceMatcher());
       return st.getTokenList();
     }

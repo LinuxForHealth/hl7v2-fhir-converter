@@ -21,7 +21,6 @@ import com.ibm.whi.hl7.data.date.DateUtil;
 public class SimpleDataValueResolver {
   private static final Logger LOGGER = LoggerFactory.getLogger(SimpleDataValueResolver.class);
 
-  private SimpleDataValueResolver() {}
   public static final ValueExtractor<Object, String> DATE = (Object value) -> {
 
       String val = Hl7DataHandlerUtil.getStringValue(value);
@@ -43,6 +42,10 @@ public class SimpleDataValueResolver {
   public static final ValueExtractor<Object, String> STRING = (Object value) -> {
     return Hl7DataHandlerUtil.getStringValue(value);
 
+  };
+
+  public static final ValueExtractor<Object, String> STRING_ALL = (Object value) -> {
+    return Hl7DataHandlerUtil.getStringValue(value, true);
 
   };
 
@@ -149,11 +152,6 @@ public class SimpleDataValueResolver {
   };
 
 
-
-
-
-
-
   public static final ValueExtractor<Object, UUID> UUID_VAL = (Object value) -> {
     String val = Hl7DataHandlerUtil.getStringValue(value);
     return getUUID(val);
@@ -166,6 +164,7 @@ public class SimpleDataValueResolver {
   };
 
 
+  private SimpleDataValueResolver() {}
 
   private static UUID getUUID(String value) {
     if (value != null) {

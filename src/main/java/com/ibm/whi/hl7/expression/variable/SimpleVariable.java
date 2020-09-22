@@ -27,14 +27,19 @@ public class SimpleVariable implements Variable {
   public static final String OBJECT_TYPE = Object.class.getSimpleName();
   private String name;
   private List<String> spec;
+  private boolean extractMultiple;
 
   public SimpleVariable(String name, List<String> spec) {
+    this(name, spec, false);
+  }
+
+  public SimpleVariable(String name, List<String> spec, boolean extractMultiple) {
     this.name = name;
     this.spec = new ArrayList<>();
     if (spec != null && !spec.isEmpty()) {
       this.spec.addAll(spec);
     }
-
+    this.extractMultiple = extractMultiple;
   }
 
   public List<String> getSpec() {
@@ -73,13 +78,18 @@ public class SimpleVariable implements Variable {
   protected GenericResult getValueFromSpecs(Map<String, GenericResult> contextValues,
       InputData dataSource) {
     GenericResult fetchedValue = null;
-    for (String varName : this.spec) {
-      if (VariableUtils.isVar(varName)) {
+    for (String specValue : this.spec) {
+      if (VariableUtils.isVar(specValue)) {
         fetchedValue =
-            getVariableValueFromVariableContextMap(varName, ImmutableMap.copyOf(contextValues));
+            getVariableValueFromVariableContextMap(specValue, ImmutableMap.copyOf(contextValues));
       } else {
-        GenericResult gen =
-            dataSource.extractSingleValueForSpec(Lists.newArrayList(varName), contextValues);
+        GenericResult gen;
+        if (this.extractMultiple) {
+          gen =
+              dataSource.extractMultipleValuesForSpec(Lists.newArrayList(specValue), contextValues);
+        } else {
+          gen = dataSource.extractSingleValueForSpec(Lists.newArrayList(specValue), contextValues);
+        }
         if (gen != null && !gen.isEmpty()) {
           fetchedValue = gen;
       }
@@ -113,6 +123,14 @@ public class SimpleVariable implements Variable {
     return VariableUtils.getVarName(this.name);
   }
 
+  /**
+   * Return if variable value should extracted from all repititions of the spec
+   * 
+   * @return
+   */
+  public boolean extractMultiple() {
+    return this.extractMultiple;
+  }
 
 
 }

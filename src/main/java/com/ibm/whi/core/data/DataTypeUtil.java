@@ -5,6 +5,7 @@
  */
 package com.ibm.whi.core.data;
 
+import java.util.List;
 import ca.uhn.hl7v2.model.Structure;
 import ca.uhn.hl7v2.model.Type;
 
@@ -16,12 +17,17 @@ public class DataTypeUtil {
 
   public static String getDataType(Object data) {
     String dataType = null;
-    if (data instanceof Structure) {
-      dataType = ((Structure) data).getName();
-    } else if (data instanceof Type) {
-      dataType = ((Type) data).getName();
-    } else if (data != null) {
-      dataType = data.getClass().getSimpleName();
+    Object value = data;
+    if (data instanceof List && !((List) data).isEmpty()) {
+      value = ((List) data).get(0);
+    }
+
+    if (value instanceof Structure) {
+      dataType = ((Structure) value).getName();
+    } else if (value instanceof Type) {
+      dataType = ((Type) value).getName();
+    } else if (value != null) {
+      dataType = value.getClass().getSimpleName();
     } else {
       dataType = null;
     }

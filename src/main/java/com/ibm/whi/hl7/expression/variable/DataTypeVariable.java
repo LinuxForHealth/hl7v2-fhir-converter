@@ -32,8 +32,9 @@ public class DataTypeVariable extends SimpleVariable {
    * @param spec
    */
 
-  public DataTypeVariable(String name, String valueType, List<String> spec) {
-    super(name, spec);
+  public DataTypeVariable(String name, String valueType, List<String> spec,
+      boolean extractMultiple) {
+    super(name, spec, extractMultiple);
 
     this.valueType = valueType;
     this.resolver = SimpleDataTypeMapper.getValueResolver(this.valueType);
