@@ -69,7 +69,7 @@ public class DifferentObservationValueTest {
   public void test_observation_TX_result() throws IOException {
 
     String hl7message = baseMessage
-        + "OBX|3|TX|||Fourth Line: HYPERDYNAMIC LV SYSTOLIC FUNCTION, VISUAL EF 80%||||||F||||Alex||";
+        + "OBX|1|TX|||Fourth Line: HYPERDYNAMIC LV SYSTOLIC FUNCTION, VISUAL EF 80%||||||F||||Alex||";
     String json = message.convert(hl7message, engine);
     IBaseResource bundleResource = FHIRContext.getIParserInstance().parseResource(json);
     assertThat(bundleResource).isNotNull();
@@ -84,6 +84,31 @@ public class DifferentObservationValueTest {
     StringType q = obs.getValueStringType();
     assertThat(q.asStringValue())
         .isEqualTo("Fourth Line: HYPERDYNAMIC LV SYSTOLIC FUNCTION, VISUAL EF 80%");
+
+
+  }
+
+
+  @Test
+  public void test_observation_TX_multiple_parts_result() throws IOException {
+
+    String hl7message = baseMessage
+        + "OBX|1|TX|||HYPERDYNAMIC LV SYSTOLIC FUNCTION, VISUAL EF 80%~Fifth line, as part of a repeated field||||||F||";
+    String json = message.convert(hl7message, engine);
+    IBaseResource bundleResource = FHIRContext.getIParserInstance().parseResource(json);
+    assertThat(bundleResource).isNotNull();
+    Bundle b = (Bundle) bundleResource;
+    List<BundleEntryComponent> e = b.getEntry();
+    List<Resource> obsResource =
+        e.stream().filter(v -> ResourceType.Observation == v.getResource().getResourceType())
+            .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+    assertThat(obsResource).hasSize(1);
+    Observation obs = (Observation) obsResource.get(0);
+    assertThat(obs.getValueStringType()).isNotNull();
+    StringType q = obs.getValueStringType();
+    assertThat(q.asStringValue())
+        .isEqualTo(
+            "HYPERDYNAMIC LV SYSTOLIC FUNCTION, VISUAL EF 80%. Fifth line, as part of a repeated field.");
 
 
   }

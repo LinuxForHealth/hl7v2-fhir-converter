@@ -13,6 +13,7 @@ public enum SimpleDataTypeMapper {
   BOOLEAN(SimpleDataValueResolver.BOOLEAN), //
   INTEGER(SimpleDataValueResolver.INTEGER), //
   STRING(SimpleDataValueResolver.STRING), //
+  STRING_ALL(SimpleDataValueResolver.STRING_ALL), //
   FLOAT(SimpleDataValueResolver.FLOAT), //
   
   URI(SimpleDataValueResolver.URI_VAL), //

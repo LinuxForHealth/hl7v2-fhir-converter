@@ -28,8 +28,9 @@ public class ExpressionVariable extends SimpleVariable {
    * @param name
    * @param spec
    */
-  public ExpressionVariable(String name, String expression, List<String> spec) {
-    super(name, spec);
+  public ExpressionVariable(String name, String expression, List<String> spec,
+      boolean extractMultiple) {
+    super(name, spec, extractMultiple);
     this.expression = expression;
   }
 

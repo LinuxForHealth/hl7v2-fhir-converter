@@ -56,7 +56,7 @@ valueQuantity:
 valueString:
     condition: $obx2 EQUALS TX || $obx2 EQUALS ST
     type: STRING
-    hl7spec: OBX.5
+    hl7spec: OBX.5 *
     var: 
       obx2: STRING, OBX.2
   

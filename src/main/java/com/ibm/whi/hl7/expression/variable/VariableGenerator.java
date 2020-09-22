@@ -22,28 +22,33 @@ public class VariableGenerator {
 
 
 
-  public static Variable parse(String varName, String rawVariable) {
+  public static Variable parse(String varName, String variableExpression) {
     Preconditions.checkArgument(StringUtils.isNotBlank(varName), "varName string cannot be null");
-    Preconditions.checkArgument(StringUtils.isNotBlank(rawVariable),
+    Preconditions.checkArgument(StringUtils.isNotBlank(variableExpression),
         "rawVariable string cannot be null");
-
+    boolean extractMultiple = false;
+    if (StringUtils.endsWith(variableExpression, "*")) {
+      extractMultiple = true;
+    }
+    String rawVariable = StringUtils.removeEnd(variableExpression, "*");
+    rawVariable = StringUtils.strip(rawVariable);
     if (StringUtils.contains(rawVariable, "GeneralUtils")) {
       String[] values = rawVariable.split(",", 2);
       if (values.length == COMPONENT_LENGTH_FOR_VAR_EXPRESSION) {
         List<String> specs = getTokens(values[0]);
-        return new ExpressionVariable(varName, values[1], specs);
+        return new ExpressionVariable(varName, values[1], specs, extractMultiple);
       }
       throw new IllegalArgumentException("rawVariable not in correct format ");
     } else if (StringUtils.contains(rawVariable, ",")) {
       String[] values = rawVariable.split(",", 2);
       if (values.length == COMPONENT_LENGTH_FOR_VAR_EXPRESSION) {
         List<String> specs = getTokens(values[1]);
-        return new DataTypeVariable(varName, values[0], specs);
+        return new DataTypeVariable(varName, values[0], specs, extractMultiple);
       }
       throw new IllegalArgumentException("rawVariable not in correct format ");
     } else {
       List<String> specs = getTokens(rawVariable);
-      return new SimpleVariable(varName, specs);
+      return new SimpleVariable(varName, specs, extractMultiple);
     }
   }
 

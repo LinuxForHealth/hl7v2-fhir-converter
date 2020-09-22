@@ -7,11 +7,13 @@ package com.ibm.whi.hl7.data;
 
 import java.util.Collection;
 import java.util.List;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ca.uhn.hl7v2.model.Composite;
 import ca.uhn.hl7v2.model.DataTypeException;
 import ca.uhn.hl7v2.model.Primitive;
+import ca.uhn.hl7v2.model.Type;
 import ca.uhn.hl7v2.model.Variable;
 
 
@@ -21,35 +23,57 @@ public class Hl7DataHandlerUtil {
 
   private Hl7DataHandlerUtil() {}
 
-
   public static String getStringValue(Object obj) {
+    return getStringValue(obj, false);
+  }
+
+  public static String getStringValue(Object obj, boolean allComponents) {
     if (obj == null) {
       return null;
     }
     LOGGER.info("Extracting string value for {} type {}", obj, obj.getClass());
 
     Object local = obj;
+    String returnValue;
     if (local instanceof Collection) {
-      List list = ((List) local);
-      if (!list.isEmpty()) {
-        local = list.get(0);
+      List<Object> list = ((List) local);
+      if (list.size() == 1) {
+        returnValue = toStringValue(list.get(0), allComponents);
+      } else if (!list.isEmpty()) {
+        StringBuilder sb = new StringBuilder();
+        list.forEach(e -> sb.append(toStringValue(e, allComponents)).append(". "));
+        returnValue = StringUtils.strip(sb.toString());
+
       } else {
-        return null;
+        returnValue = null;
       }
+
+
+    } else {
+      returnValue = toStringValue(local, allComponents);
     }
+
+    return returnValue;
+
+  }
+
+
+
+  private static String toStringValue(Object local, boolean allComponents) {
     String returnvalue;
-
-
     if (local instanceof Variable) {
-      returnvalue = convertVariesDataTypeToString(local);
+      returnvalue = convertVariesDataTypeToString(local, allComponents);
     } else if (local instanceof Composite) {
       Composite com = (Composite) local;
-
-      try {
-        returnvalue = com.getComponent(0).toString();
-      } catch (DataTypeException e) {
-        LOGGER.error("Failure when extracting string value for {}", local, e);
-        returnvalue = null;
+      if (allComponents) {
+        returnvalue = getValueFromComposite(com);
+      } else {
+        try {
+          returnvalue = com.getComponent(0).toString();
+        } catch (DataTypeException e) {
+          LOGGER.error("Failure when extracting string value for {}", local, e);
+          returnvalue = null;
+        }
       }
     } else if (local instanceof Primitive) {
       Primitive prem = (Primitive) local;
@@ -59,19 +83,32 @@ public class Hl7DataHandlerUtil {
     }
 
     return returnvalue;
-
   }
 
 
-  private static String convertVariesDataTypeToString(Object obj) {
+
+  private static String convertVariesDataTypeToString(Object obj, boolean allComponents) {
     if (obj instanceof Variable) {
       Variable v = (Variable) obj;
-      return getStringValue(v.getData());
+      return getStringValue(v.getData(), allComponents);
     }
     return obj.toString();
   }
 
+  private static String getValueFromComposite(Composite com) {
+
+      Type[] types = com.getComponents();
+      StringBuilder sb = new StringBuilder();
+      for (Type t : types) {
+      String text = t.toString();
+      if (StringUtils.isNotBlank(text)) {
+        sb.append(t.toString()).append(", ");
+      }
+
+      }
+    return StringUtils.stripEnd(sb.toString(), ", ");
 
 
+  }
 
 }

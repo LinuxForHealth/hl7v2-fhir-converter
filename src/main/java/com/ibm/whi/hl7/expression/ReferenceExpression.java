@@ -108,7 +108,7 @@ public class ReferenceExpression extends AbstractExpression {
       Map<String, GenericResult> localContextValues = new HashMap<>(contextValues);
       localContextValues.put("ref-type",
           new GenericResult(primaryResourceResult.getResource().getResource()));
-      GenericResult baseValue = new GenericResult(getSingleValue(hl7SpecValues));
+      GenericResult baseValue = new GenericResult(getValue(hl7SpecValues));
 
       ResourceResult result = this.referenceModel.evaluate(dataSource,
           ImmutableMap.copyOf(localContextValues), baseValue);
