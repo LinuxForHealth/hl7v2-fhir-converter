@@ -25,6 +25,7 @@ import ca.uhn.hl7v2.model.Message;
 import ca.uhn.hl7v2.model.Segment;
 import ca.uhn.hl7v2.model.Structure;
 import ca.uhn.hl7v2.model.Type;
+import ca.uhn.hl7v2.model.Variable;
 import ca.uhn.hl7v2.util.Terser;
 
 public class HL7DataExtractor {
@@ -198,9 +199,13 @@ public class HL7DataExtractor {
 
 
 
-  public ParsingResult<Type> getComponent(Type type, int component) {
+  public ParsingResult<Type> getComponent(Type inputType, int component) {
     try {
-      Preconditions.checkArgument(type != null, "type!=null");
+      Preconditions.checkArgument(inputType != null, "type!=null");
+      Type type = inputType;
+      if (inputType instanceof Variable) {
+        type = ((Variable) inputType).getData();
+      }
       if (type instanceof Composite) {
         return new Hl7ParsingTypeResult(((Composite) type).getComponent(component - 1));
       }
@@ -224,9 +229,13 @@ public class HL7DataExtractor {
     }
   }
 
-  public ParsingResult<Type> getComponent(Type type, int component, int subComponent) {
+  public ParsingResult<Type> getComponent(Type inputType, int component, int subComponent) {
     try {
-      Preconditions.checkArgument(type != null, "type!=null");
+      Preconditions.checkArgument(inputType != null, "inputType!=null");
+      Type type = inputType;
+      if (inputType instanceof Variable) {
+        type = ((Variable) inputType).getData();
+      }
       return new Hl7ParsingTypeResult(Terser.getPrimitive(type, component, subComponent));
 
 
@@ -281,6 +290,4 @@ public class HL7DataExtractor {
 
     }
   }
-
-
 }

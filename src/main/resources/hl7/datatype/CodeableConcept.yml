@@ -5,13 +5,16 @@
 #
 # Represents codeable concept that can be derived from CE/CNE/CWE 
 ---
-
+# coding requires code,display and system defined as variables from the resource that calls this resource
  coding : 
     resource: datatype/Coding *
-    vars:
-       code: $code
+    hl7spec: CWE |CE |CNE
+    var:
+      code: CWE.1 |CE.1 |CNE.1
+      system: CWE.3 |CE.3 |CNE.3
+      display: CWE.2 |CE.2 |CNE.2
     
  text :  
-     type: STRING
-     value: $code
+     type: STRING_ALL
+     hl7spec: CWE |CE |CNE
   

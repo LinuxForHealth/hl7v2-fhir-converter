@@ -7,16 +7,13 @@
 ---
 system: 
      type: STRING
-     value: $system
+     hl7spec: CWE.3 |CE.3 |CNE.3
 version:
      type: STRING
-     value: $version
+     hl7spec: CWE.7 |CNE.7
 code: 
      type: STRING
      value: $code
 display: 
-     type: STRING
-     value: $display
-    
-userSelected: 
-     default: ''
+     type: STRING_ALL
+     hl7spec: CWE.2 |CE.2 |CNE.2

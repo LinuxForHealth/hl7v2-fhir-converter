@@ -12,9 +12,11 @@ import org.apache.commons.lang3.StringUtils;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.ibm.whi.core.expression.GenericResult;
+import com.ibm.whi.core.expression.Specification;
 import com.ibm.whi.core.expression.Variable;
 import com.ibm.whi.core.expression.VariableUtils;
 import com.ibm.whi.core.message.InputData;
+import com.ibm.whi.hl7.expression.HL7Specification;
 
 
 /**
@@ -84,12 +86,10 @@ public class SimpleVariable implements Variable {
             getVariableValueFromVariableContextMap(specValue, ImmutableMap.copyOf(contextValues));
       } else {
         GenericResult gen;
-        if (this.extractMultiple) {
-          gen =
-              dataSource.extractMultipleValuesForSpec(Lists.newArrayList(specValue), contextValues);
-        } else {
-          gen = dataSource.extractSingleValueForSpec(Lists.newArrayList(specValue), contextValues);
-        }
+        Specification hl7spec = HL7Specification.parse(specValue, this.extractMultiple);
+
+        gen = dataSource.extractValueForSpec(Lists.newArrayList(hl7spec), contextValues);
+
         if (gen != null && !gen.isEmpty()) {
           fetchedValue = gen;
       }
@@ -105,10 +105,11 @@ public class SimpleVariable implements Variable {
 
 
   private static GenericResult getVariableValueFromVariableContextMap(String varName,
-      ImmutableMap<String, GenericResult> varables) {
+      ImmutableMap<String, GenericResult> contextValues) {
     if (StringUtils.isNotBlank(varName)) {
       GenericResult fetchedValue;
-      fetchedValue = varables.get(varName.replace("$", ""));
+      fetchedValue = contextValues.get(VariableUtils.getVarName(varName));
+
       return fetchedValue;
     } else {
       return null;

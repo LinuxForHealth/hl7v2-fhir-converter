@@ -41,19 +41,20 @@ public class ExpressionVariable extends SimpleVariable {
   @Override
   public GenericResult extractVariableValue(Map<String, GenericResult> contextValues,
       InputData dataSource) {
-    GenericResult result;
+    GenericResult result = null;
     if (!this.getSpec().isEmpty()) {
       result = getValueFromSpecs(contextValues, dataSource);
-    } else {
-      result = null;
+    }
+    if (result == null) {
+      result = new GenericResult(null);
     }
 
     if (this.expression != null) {
       // resolve expression
       Map<String, GenericResult> localContextValues = new HashMap<>(contextValues);
-      if (result != null) {
+
         localContextValues.put(this.getName(), result);
-      }
+
       result = dataSource.evaluateJexlExpression(expression, localContextValues);
     }
     return result;

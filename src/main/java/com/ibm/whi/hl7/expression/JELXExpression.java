@@ -5,6 +5,7 @@
  */
 package com.ibm.whi.hl7.expression;
 
+import java.util.HashMap;
 import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -14,6 +15,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Preconditions;
 import com.ibm.whi.core.expression.GenericResult;
+import com.ibm.whi.core.expression.Variable;
 import com.ibm.whi.core.message.InputData;
 
 
@@ -52,6 +54,12 @@ public class JELXExpression extends AbstractExpression {
   @Override
   public GenericResult evaluateExpression(InputData dataSource,
       Map<String, GenericResult> contextValues, GenericResult hl7SpecValues) {
+    Map<String, GenericResult> localContextValues = new HashMap<>(contextValues);
+    for (Variable v : this.getVariables()) {
+      if (!localContextValues.containsKey(v.getVariableName())) {
+        localContextValues.put(v.getVariableName(), new GenericResult(null));
+      }
+    }
     return dataSource.evaluateJexlExpression(this.evaluate, contextValues);
   }
 

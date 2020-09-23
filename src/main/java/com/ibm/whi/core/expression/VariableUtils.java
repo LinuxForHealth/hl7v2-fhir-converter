@@ -6,6 +6,7 @@
 package com.ibm.whi.core.expression;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.text.StringTokenizer;
 
 public class VariableUtils {
 
@@ -17,10 +18,15 @@ public class VariableUtils {
 
 
   public static String getVarName(String name) {
-    if (isVar(name)) {
+    if (isVar(name) && StringUtils.contains(name, ".")) {
+      StringTokenizer stk = new StringTokenizer(name, ".");
+      return StringUtils.removeStart(stk.nextToken(), "$");
+    } else if (isVar(name)) {
       return StringUtils.removeStart(name, "$");
+    } else {
+      return name;
     }
-    return name;
+
   }
 
 
