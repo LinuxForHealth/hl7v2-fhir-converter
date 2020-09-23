@@ -34,11 +34,11 @@ public interface Expression {
   GenericResult getDefaultValue();
 
   /**
-   * List of String values that would be passed to the Evaluator to extract value.
+   * List of Specification values that would be passed to the Evaluator to extract value.
    * 
    * @return
    */
-  List<String> getspecs();
+  List<Specification> getspecs();
 
   /**
    * Evaluates the expression and returns the GenericResult Object

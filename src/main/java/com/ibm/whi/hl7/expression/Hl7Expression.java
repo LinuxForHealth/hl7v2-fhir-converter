@@ -54,7 +54,7 @@ public class Hl7Expression extends AbstractExpression {
     Preconditions.checkArgument(contextValues != null, "contextValues cannot be null");
 
 
-    Object hl7Value = getValue(hl7SpecValues);
+    Object hl7Value = hl7SpecValues.getValue();
     LOGGER.info("Evaluating expression type {} , hl7spec {} returned hl7 value {} ", this.getType(),
         this.getspecs(), hl7Value);
     Object resolvedValue = null;

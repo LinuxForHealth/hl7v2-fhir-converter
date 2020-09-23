@@ -22,6 +22,7 @@ import com.google.common.collect.ImmutableMap;
 import com.ibm.whi.core.data.DataTypeUtil;
 import com.ibm.whi.core.expression.Expression;
 import com.ibm.whi.core.expression.GenericResult;
+import com.ibm.whi.core.expression.Specification;
 import com.ibm.whi.core.expression.Variable;
 import com.ibm.whi.core.expression.VariableUtils;
 import com.ibm.whi.core.expression.condition.Condition;
@@ -39,8 +40,7 @@ public abstract class AbstractExpression implements Expression {
   private final String type;
   private final GenericResult defaultValue;
   private final boolean required;
-  private final boolean extractMultiple;
-  private final List<String> hl7specs;
+  private final List<Specification> hl7specs;
   private List<Variable> variables;
   private Condition condition;
   private boolean isMultiple;
@@ -59,7 +59,6 @@ public abstract class AbstractExpression implements Expression {
     }
 
     this.required = required;
-    this.extractMultiple = isExtractMultipleFromSpec(hl7spec);
     this.hl7specs = getHl7SpecList(hl7spec);
     if (StringUtils.isNotBlank(condition)) {
       this.condition = ConditionUtil.createCondition(condition);
@@ -85,10 +84,7 @@ public abstract class AbstractExpression implements Expression {
     this.variables = new ArrayList<>();
     if (rawvariables != null) {
       for (Entry<String, String> e : rawvariables.entrySet()) {
-
         this.variables.add(VariableGenerator.parse(e.getKey(), e.getValue()));
-
-
       }
 
     }
@@ -109,7 +105,7 @@ public abstract class AbstractExpression implements Expression {
   }
 
   @Override
-  public List<String> getspecs() {
+  public List<Specification> getspecs() {
     return new ArrayList<>(this.hl7specs);
   }
 
@@ -155,14 +151,9 @@ public abstract class AbstractExpression implements Expression {
     String stringRep = this.toString();
     // resolve hl7spec
     LOGGER.info("Evaluating expression {}", stringRep);
-    GenericResult hl7Value;
-    if (this.extractMultiple) {
-      hl7Value = dataSource.extractMultipleValuesForSpec(this.getspecs(),
+    GenericResult hl7Value = dataSource.extractValueForSpec(this.getspecs(),
           ImmutableMap.copyOf(contextValues));
-    } else {
-      hl7Value = dataSource.extractSingleValueForSpec(this.getspecs(),
-        ImmutableMap.copyOf(contextValues));
-    }
+
     LOGGER.info("Evaluating expression {} returned hl7 value {} ", stringRep, hl7Value);
     return generateValue(dataSource, contextValues, hl7Value);
 
@@ -175,14 +166,20 @@ public abstract class AbstractExpression implements Expression {
     LOGGER.info("Evaluating multiple values for expression {} ", stringRep);
     GenericResult hl7Values = dataSource.extractMultipleValuesForSpec(this.getspecs(),
         ImmutableMap.copyOf(contextValues));
-    if (hl7Values == null || hl7Values.getValue() == null
-        || !(hl7Values.getValue() instanceof List)) {
-      return null;
-    }
-
-
     List<Object> result = new ArrayList<>();
     List<ResourceValue> additionalresourcesresult = new ArrayList<>();
+
+
+    if (hl7Values == null || hl7Values.getValue() == null
+        || !(hl7Values.getValue() instanceof List)) {
+      GenericResult gen = generateValue(dataSource, contextValues, new GenericResult(null));
+      if (gen != null && gen.getValue() != null && !gen.isEmpty()) {
+        result.add(gen.getValue());
+        additionalresourcesresult.addAll(gen.getAdditionalResources());
+
+      }
+    } else {
+
     List<Object> baseHl7Specvalues = (List<Object>) hl7Values.getValue();
     for (Object o : baseHl7Specvalues) {
       GenericResult gen = generateValue(dataSource, contextValues, new GenericResult(o));
@@ -192,7 +189,7 @@ public abstract class AbstractExpression implements Expression {
 
       }
     }
-
+    }
 
     if (!result.isEmpty()) {
     return new GenericResult(result, additionalresourcesresult);
@@ -290,31 +287,27 @@ public abstract class AbstractExpression implements Expression {
     this.isMultiple = true;
   }
 
-  Object getValue(GenericResult hl7SpecValues) {
-    Object hl7Value = null;
-    if (hl7SpecValues != null && !hl7SpecValues.isEmpty()) {
-      Object valList = hl7SpecValues.getValue();
-      if (valList instanceof List && !((List) valList).isEmpty() && !this.extractMultiple) {
-        hl7Value = ((List) valList).get(0);
-      } else {
-        hl7Value = hl7SpecValues.getValue();
-      }
+
+
+  private static List<Specification> getHl7SpecList(String inputString) {
+    final boolean extractMultiple;
+    String hl7SpecExpression = inputString;
+    if (StringUtils.endsWith(inputString, "*")) {
+      hl7SpecExpression = StringUtils.removeEnd(inputString, "*");
+      extractMultiple = true;
+    } else {
+      extractMultiple = false;
     }
-    return hl7Value;
-  }
 
-
-  private static List<String> getHl7SpecList(String inputString) {
-
-    String hl7SpecExpression = StringUtils.removeEnd(inputString, "*");
     hl7SpecExpression = StringUtils.strip(hl7SpecExpression);
+    List<Specification> specs = new ArrayList<>();
     if (StringUtils.isNotBlank(hl7SpecExpression)) {
       StringTokenizer st = new StringTokenizer(hl7SpecExpression, "|").setIgnoreEmptyTokens(true)
           .setTrimmerMatcher(StringMatcherFactory.INSTANCE.spaceMatcher());
-      return st.getTokenList();
+      st.getTokenList().forEach(s -> specs.add(HL7Specification.parse(s, extractMultiple)));
     }
 
-    return new ArrayList<>();
+    return specs;
   }
 
 

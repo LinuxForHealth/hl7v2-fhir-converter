@@ -62,9 +62,9 @@ valueString:
   
 valueCodeableConcept:
      condition:  $obx2 EQUALS  CF || $obx2 EQUALS CNE || $obx2 EQUALS CWE || $obx2 EQUALS CE
-     resource: datatype/CodeableConcept
+     resource: datatype/CodeableConcept *
+     hl7spec: OBX.5
      var:
-       code: OBX.5
        obx2: STRING, OBX.2
 
 valuePeriod:

@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
+import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Observation;
 import org.hl7.fhir.r4.model.Quantity;
 import org.hl7.fhir.r4.model.Resource;
@@ -113,6 +114,33 @@ public class DifferentObservationValueTest {
 
   }
 
+  @Test
+  public void test_observation_CE_result() throws IOException {
+
+    String hl7message =
+        baseMessage + "OBX|1|CE|93000&CMP^LIN^CPT4|11|1305^No significant change was found^MEIECG";
+    String json = message.convert(hl7message, engine);
+    IBaseResource bundleResource = FHIRContext.getIParserInstance().parseResource(json);
+    assertThat(bundleResource).isNotNull();
+    Bundle b = (Bundle) bundleResource;
+    List<BundleEntryComponent> e = b.getEntry();
+    List<Resource> obsResource =
+        e.stream().filter(v -> ResourceType.Observation == v.getResource().getResourceType())
+            .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+    assertThat(obsResource).hasSize(1);
+    Observation obs = (Observation) obsResource.get(0);
+    assertThat(obs.getValueCodeableConcept()).isNotNull();
+    CodeableConcept cc = obs.getValueCodeableConcept();
+    assertThat(cc.getCoding()).isNotNull();
+    assertThat(cc.getCoding().get(0)).isNotNull();
+    assertThat(cc.getCoding().get(0).getSystem()).isEqualTo("MEIECG");
+    assertThat(cc.getCoding().get(0).getCode()).isEqualTo("1305");
+    assertThat(cc.getCoding().get(0).getDisplay()).isEqualTo("No significant change was found");
+
+    assertThat(cc.getText()).isEqualTo("1305, No significant change was found, MEIECG");
+
+
+  }
 
 
 
