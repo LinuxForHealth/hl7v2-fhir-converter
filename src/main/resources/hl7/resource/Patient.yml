@@ -13,10 +13,10 @@ id:
   evaluate: 'UUID.randomUUID()'
   
 identifier:
-    resource: datatype/Identifier_CX *
+    resource: datatype/Identifier *
     hl7spec: PID.3  
 name: 
-    resource: datatype/HumanName_XPN *
+    resource: datatype/HumanName *
     hl7spec: PID.5  
 gender: 
      type: ADMINISTRATIVE_GENDER

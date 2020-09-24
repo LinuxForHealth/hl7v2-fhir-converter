@@ -20,6 +20,6 @@ identifier:
 name: 
     required: true
     hl7spec: XCN.2 | XCN.3
-    resource: datatype/HumanName_XCN *
+    resource: datatype/HumanName *
 
   

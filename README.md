@@ -5,28 +5,28 @@ FHIR converter utilized the open source  [HAPI Library](https://hapifhir.github.
 
 
 
-## Features and Concepts of Hl7 to FHIR conversion
+## Features and Concepts of HL7 to FHIR conversion
 HL7v2-FHIR converter converts a given HL7 message to FHIR bundle resource using the message templates. These templates are [yaml](https://yaml.org/) files. Each message template defines what all FHIR resources needs to be generated from a particular message. <br>
 
 ### Structure of a message template
 A message template file consists of list of resources that can be generated from that message type.
 For each resource in a template following attributes needs to be defined:
+
 ```yml
       resourceName: [REQUIRED]
       segment: [REQUIRED]
       resourcePath: [REQUIRED]
-      order: [DEFAULT 0]
       repeats:  [DEFAULT false]
       additionalSegments: [DEFAULT empty]
 ```
 Attribute description: 
 * resourceName:  Name of the resource example: Patient
-* segment: Primary segment that this resource depends on. Example patient resource depends on PID segment
-* resourcePath: Path for resource file example: Patient resource :src/main/resources/resource/Patient.yml
-* order: Order of resource generation, example -- generate Patient resource followed by Encounter and so on.
+* segment: Primary segment that this resource depends on. Example patient resource depends on PID segment. If the primary segment is not in the message then the resource will not be generated.
+* resourcePath: Path for resource file relative to the directory that has all the templates. The default path for the templates is src/main/resources/hl7. Example: Patient resource :resource/Patient (no need for file extension).
 * repeats:  HL7 have certain segments that repeat and so the converter needs to generate multiple resources from those segments. Example OBX segment. If this field is set to false then only the first occurrence of that segment will be used for resource generation. If this is set to true then multiple resources will be generated from each of the occurrences of that segment.  
 * additionalSegments: Any additional segments the resource needs.
-Example:
+
+Example of a message template:
 
 ```yml
 # FHIR Resources to extract from ADT_A01 message
@@ -36,14 +36,12 @@ resources:
     - resourceName: Patient
       segment: PID
       resourcePath: resource/Patient
-      order: 1
       repeats: false
       additionalSegments:
       
     - resourceName: Encounter
       segment: PV1
       resourcePath: resource/Encounter
-      order: 2
       repeats: false
       additionalSegments:
              - PV2
@@ -51,14 +49,13 @@ resources:
     - resourceName: Observation
       segment: OBX
       resourcePath: resource/Observation
-      order: 3
       repeats: true
       additionalSegments:
 
 ```
 
 ### Structure of a resource template
-Resource template represents a [FHIR resource](https://hl7.org/FHIR/resourcelist.html). In order to generate a resource, a resource template for that resource should exist in this location: master/src/main/resources/hl7/resource. The resource template defines list of fields and a way to extract values for each of these fields.
+Resource template represents a [FHIR resource](https://hl7.org/FHIR/resourcelist.html). In order to generate a resource, a resource template for that resource should exist in this location: src/main/resources/hl7/resource. The resource template defines list of fields and a way to extract values for each of these fields.
 
 
 Sample resource template:
@@ -69,31 +66,39 @@ Sample resource template:
 ---
 resourceType: Patient
 id:
+  type: STRING
   evaluate: 'UUID.randomUUID()'
-identifier: 
-    reference: datatype/IdentifierCX *
+  
+identifier:
+    resource: datatype/Identifier *
     hl7spec: PID.3  
 name: 
-    reference: datatype/HumanName *
+    resource: datatype/HumanName *
     hl7spec: PID.5  
 gender: 
      type: ADMINISTRATIVE_GENDER
      hl7spec: PID.8
 
 birthDate:
-     type: LOCAL_DATE
+     type: DATE
      hl7spec: PID.7
 ```
 
 
 ### Different expressions types 
 The extraction logic for each field can be defined by using expressions. This component supports 4 different type of expressions. All expressions have following attributes:
-* type: [DEFAULT - Object] Class type of the field .
-* hl7spec: [DEFAULT - NONE] The value that needs to be extracted usiing the HL7 spec.
-* defaultValue: [DEFAULT - NULL]if extraction of the value fails, then the default value can be used.
-* required : [DEFAULT - false] If a field is required and cannot be extracted then the resource generation will fail even if other fields were extracted.
-* variables: [DEFAULT - EMPTY] List of variables and there value can be provided which can be used during the extraction process.
-* condition: [DEFAULT - true] if a condition is provided then the expression will be resolved only if condition evaluates to true. Condition is simple string of this format Var1 Operator Var2 (Currently supported operators are: == != > < >= <=)
+* type: DEFAULT - Object <br>
+        Class type final return value extracted for the field.
+* hl7spec: DEFAULT - NONE<br>
+           The value that needs to be extracted using the HL7 spec. Refer to the section on supported formats for [Specification](Specification).
+* defaultValue: DEFAULT - NULL<br>
+                If extraction of the value fails, then the default value can be used.
+* required : DEFAULT - false<br>
+            If a field is required and cannot be extracted then the resource generation will fail even if other fields were extracted.
+* variables: DEFAULT - EMPTY<br>
+             List of variables and there value can be provided which can be used during the extraction process. Refer to the section on supported formats for [Variables](Variable).
+* condition: DEFAULT - true<br>
+             If a condition is provided then the expression will be resolved only if condition evaluates to true. Refer to the section on supported formats for [Condition](Condition).
 
 
 ```yml
@@ -107,9 +112,39 @@ The extraction logic for each field can be defined by using expressions. This co
         var2: CX.2
 
  ```
- 
+#### Specification
+Specification represents expression that helps to identify the value to extracted from the HL7 message.<br>
+The specification expression has the following format :
+* Single SPEC - where spec can be <br>
+    - SEGMENT 
+    - SEGMENT.FIELD
+    - SEGMENT.FIELD.COMPONENT
+    - FIELD
+    - FIELD.COMPONENT
+    - FIELD.COMPONENT.SUBCOMPONENT<br>
+Example:  `` OBX, OBX.1, CWE, CWE.1, OBX.3.1``
+* Multiple SPEC - Where each single spec is separated by |, where | represents "or'. If the value from first spec is extracted, then the remaining specs are ignored.<br>
+Example: ``OBX.1 |OBX.2|OBX.3`` , if OBX.1 is null then only OBX.2 will be extracted.
+* Multiple value extraction - In HL7 several fields can have repeated values, so extract all repetition for that field the spec string should end with *.<br>
+ Example: ``PID.3 *`` , ``OBX.1 |OBX.2 |OBX.3 *``
 
-Different types of expressions
+
+#### Variable
+Variables can be used during expression evaluation.  This engine supports defining 3 types of variables:
+* SimpleVariable : These are variables where value is extracted from simple [HL7Spec](Specification) or another variable from the context values. Example: ``var1: CWE.1 |CE.1 |CNE.1``
+* ExpressionVariable : Value of a variable is extracted by evaluating a java function. Example:  `` low: OBX.7, GeneralUtils.split(low, "-", 0)``
+* DataTypeVariable: Value of a variable is extracted from [HL7Spec](Specification) and this value is converted to a particular data type. Example: `` var1: STRING, OBX.2``
+
+#### Condition
+Conditions evaluate to true or false.<br>
+Engine supports the following condition types:
+* Null check,  example: ``condition:$var1 NULL``
+* Not null check, example: ``condition:$var1 NOT_NULL``
+* Simple condition,  example: ``condition: $obx2 EQUALS DR``
+* Conditions with AND,   example: ``condition: $obx2 EQUALS SN && $obx5.3 EQUALS ':'``
+* Conditions with OR, example: ``condition: $obx2 EQUALS TX || $obx2 EQUALS ST``
+
+#### Different types of expressions
 * ResourceExpression : This type of expression is used when a field is a data type defined in one of the [data type templates](master/src/main/resources/hl7/datatype). These data type templates define different [FHIR data types](https://hl7.org/FHIR/datatypes.html). 
 Example:
   
@@ -163,7 +198,8 @@ Example 1: Constant value
 code: 'ABX'
 
 ```
-Example 2: Value needs to be extracted from a variable. 
+Example 2: Value needs to be extracted from a variable.
+
 ```yml
 code: $var
 

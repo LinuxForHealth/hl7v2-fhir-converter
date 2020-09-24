@@ -11,7 +11,7 @@ id:
   type: STRING
   evaluate: 'UUID.randomUUID()'
 identifier:
-    resource: datatype/Identifier_CWE *
+    resource: datatype/Identifier *
     hl7spec: OBX.3 |  OBX.21 
 
 status:
