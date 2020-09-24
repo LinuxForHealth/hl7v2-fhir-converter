@@ -5,7 +5,7 @@
 #
 ---
 preAdmissionIdentifier:
-    resource: datatype/Identifier_CX *
+    resource: datatype/Identifier *
     hl7spec:  PV1.5	
 admitSource: 
    resource: datatype/CodeableConcept

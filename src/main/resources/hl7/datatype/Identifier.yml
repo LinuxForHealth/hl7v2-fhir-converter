@@ -4,25 +4,25 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 ---
-type:
+type: 
    resource: datatype/CodeableConcept
    var:
-     code: CWE.5
+     code: CX.5 |CWE.5
 
 system: 
      type: STRING
-     hl7spec: CWE.4
+     hl7spec: CX.4 | CWE.4
     
 value: 
      type: STRING
-     hl7spec: CWE.1
+     hl7spec: CX.1 | CWE.1
      required: true
 
-period: 
-    resource: datatype/Period
+period:  
+    resource: datatype/Period   
     var: 
-       start: CWE.7
-       end: CWE.8
+       start: CX.7 | CWE.7
+       end: CX.8 | CWE.8
   
 
 

@@ -10,7 +10,7 @@ id:
   evaluate: 'UUID.randomUUID()'
 
 identifier:
-    resource: datatype/Identifier_CX *
+    resource: datatype/Identifier *
     hl7spec: PV1.19
 
 status:
