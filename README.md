@@ -171,10 +171,10 @@ Example:
     type: STRING
     evaluate: 'GeneralUtils.generateName( prefix, given,family, suffix)'
     var:
-      prefix: STRING XPN.4
-      given: STRING XPN.2
-      family: STRING XPN.1
-      suffix: STRING XPN.5
+      prefix: STRING, XPN.4
+      given: STRING, XPN.2
+      family: STRING, XPN.1
+      suffix: STRING, XPN.5
 ```
 
 * ValueExtractionGeneralExpression : This type of expression is used when a field value can be extracted from a field of another resource or variable.
