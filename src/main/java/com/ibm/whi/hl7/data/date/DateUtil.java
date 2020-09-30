@@ -36,10 +36,13 @@ public class DateUtil {
       }
 
     }
-
+    try {
     LocalDate ldt = LocalDate.parse(input, DateFormats.getFormatterInstance());
     return ldt.format(format);
-
+    } catch (DateTimeParseException e) {
+      LOGGER.error("Date parsing exception for {}", input, e);
+      return null;
+    }
   }
 
 
@@ -73,10 +76,14 @@ public class DateUtil {
       }
 
     }
-
+    try {
     LocalDateTime ldt = LocalDateTime.parse(input, DateFormats.getFormatterInstance());
     returnValue = ldt.format(format);
     return returnValue;
+    } catch (DateTimeParseException e) {
+      LOGGER.error("Date parsing exception for {}", input, e);
+      return null;
+    }
   }
 
 
@@ -92,8 +99,13 @@ public class DateUtil {
 
     }
     if (format != null) {
+      try {
       LocalDate ldt = LocalDate.parse(input, DateFormats.getFormatterInstance());
       return ldt.atStartOfDay().format(format);
+      } catch (DateTimeParseException e) {
+        LOGGER.error("Date parsing exception for {}", input, e);
+        return null;
+      }
     }
     return null;
   }
@@ -110,8 +122,13 @@ public class DateUtil {
 
     }
     if (format != null) {
+      try {
       ZonedDateTime zdt = ZonedDateTime.parse(input, DateFormats.getFormatterInstance());
       return zdt.format(format);
+      } catch (DateTimeParseException e) {
+        LOGGER.error("Date parsing exception for {}", input, e);
+        return null;
+      }
     }
     return null;
   }

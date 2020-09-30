@@ -13,6 +13,7 @@ import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import com.ibm.whi.core.Constants;
+import com.ibm.whi.core.ObjectMapperUtil;
 import com.ibm.whi.core.resource.ResourceModel;
 
 public class ResourceModelReader {

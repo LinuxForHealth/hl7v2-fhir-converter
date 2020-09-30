@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -167,7 +168,7 @@ public class HL7DataBasedResourceModel implements ResourceModel {
         LOGGER.info("----Extracted object from reference resource  {} {} reference {}  value {}",
             exp.getType(), entry.getKey(), exp.getReference(), obj);
         if (obj != null) {
-          resolveValues.put(entry.getKey(), obj.getValue());
+          resolveValues.put(getKeyName(entry.getKey()), obj.getValue());
           if (obj.getAdditionalResources() != null && !obj.getAdditionalResources().isEmpty()) {
             additionalResolveValues.addAll(obj.getAdditionalResources());
           }
@@ -192,13 +193,17 @@ public class HL7DataBasedResourceModel implements ResourceModel {
         LOGGER.info("----Extracted object from reference resource  {} {} reference {}  value {}",
             exp.getType(), entry.getKey(), exp.getResourceName(), obj);
         if (obj != null) {
-          resolveValues.put(entry.getKey(), obj.getValue());
+          resolveValues.put(getKeyName(entry.getKey()), obj.getValue());
           if (obj.getAdditionalResources() != null && !obj.getAdditionalResources().isEmpty()) {
             additionalResolveValues.addAll(obj.getAdditionalResources());
           }
         }
       }
     }
+  }
+
+  private static String getKeyName(String key) {
+    return StringUtils.split(key, "_")[0];
   }
 
   private static void executeExpression(InputData dataSource,
@@ -212,7 +217,7 @@ public class HL7DataBasedResourceModel implements ResourceModel {
 
       if (obj != null) {
 
-        resolveValues.put(entry.getKey(), obj.getValue());
+        resolveValues.put(getKeyName(entry.getKey()), obj.getValue());
       } else if (exp.getDefaultValue() != null) {
         resolveValues.put(entry.getKey(), exp.getDefaultValue());
       }

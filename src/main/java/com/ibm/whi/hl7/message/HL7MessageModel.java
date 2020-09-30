@@ -20,7 +20,6 @@ import com.ibm.whi.hl7.parsing.HL7DataExtractor;
 import com.ibm.whi.hl7.parsing.HL7HapiParser;
 import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Message;
-import ca.uhn.hl7v2.model.Unmodifiable;
 
 public class HL7MessageModel extends AbstractMessageModel<Message> {
 
@@ -41,7 +40,7 @@ public class HL7MessageModel extends AbstractMessageModel<Message> {
     try {
       hparser = new HL7HapiParser();
 
-      Message hl7message = Unmodifiable.unmodifiableMessage(hparser.getParser().parse(message));
+      Message hl7message = hparser.getParser().parse(message);
       return convert(hl7message, engine);
 
 

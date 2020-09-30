@@ -32,14 +32,16 @@ public class SimpleDataValueResolverTest {
   @Test
   public void get_adm_gender_value() {
     String gen = "F";
-    assertThat(SimpleDataValueResolver.ADMINISTRATIVE_GENDER_FHIR.apply(gen)).isEqualTo("female");
+    assertThat(SimpleDataValueResolver.ADMINISTRATIVE_GENDER_CODE_FHIR.apply(gen))
+        .isEqualTo("female");
   }
 
 
   @Test
   public void get_adm_gender_value_unknow() {
     String gen = "ABC";
-    assertThat(SimpleDataValueResolver.ADMINISTRATIVE_GENDER_FHIR.apply(gen)).isEqualTo("unknown");
+    assertThat(SimpleDataValueResolver.ADMINISTRATIVE_GENDER_CODE_FHIR.apply(gen))
+        .isEqualTo("unknown");
   }
 
   @Test
@@ -134,14 +136,14 @@ public class SimpleDataValueResolverTest {
   @Test
   public void get_observation_status_value_valid() {
     String gen = "d";
-    assertThat(SimpleDataValueResolver.OBSERVATION_STATUS_FHIR.apply(gen))
+    assertThat(SimpleDataValueResolver.OBSERVATION_STATUS_CODE_FHIR.apply(gen))
         .isEqualTo(ObservationStatus.CANCELLED.toCode());
   }
 
   @Test
   public void get_observation_status_value_invalid() {
     String gen = "ddx";
-    assertThat(SimpleDataValueResolver.OBSERVATION_STATUS_FHIR.apply(gen))
+    assertThat(SimpleDataValueResolver.OBSERVATION_STATUS_CODE_FHIR.apply(gen))
         .isEqualTo(ObservationStatus.UNKNOWN.toCode());
   }
 

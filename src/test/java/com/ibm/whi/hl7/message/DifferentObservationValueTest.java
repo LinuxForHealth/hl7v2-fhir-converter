@@ -137,7 +137,7 @@ public class DifferentObservationValueTest {
     assertThat(cc.getCoding().get(0).getCode()).isEqualTo("1305");
     assertThat(cc.getCoding().get(0).getDisplay()).isEqualTo("No significant change was found");
 
-    assertThat(cc.getText()).isEqualTo("1305, No significant change was found, MEIECG");
+    assertThat(cc.getText()).isEqualTo("No significant change was found");
 
 
   }

@@ -17,6 +17,7 @@ import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ibm.whi.core.ObjectMapperUtil;
 import com.ibm.whi.core.expression.Expression;
 import com.ibm.whi.hl7.expression.Hl7Expression;
 import com.ibm.whi.hl7.expression.JELXExpression;
@@ -25,7 +26,7 @@ import com.ibm.whi.hl7.expression.ResourceExpression;
 import com.ibm.whi.hl7.expression.SimpleExpression;
 import com.ibm.whi.hl7.expression.ValueExtractionGeneralExpression;
 import com.ibm.whi.hl7.resource.HL7DataBasedResourceModel;
-import com.ibm.whi.hl7.resource.ObjectMapperUtil;
+
 
 
 

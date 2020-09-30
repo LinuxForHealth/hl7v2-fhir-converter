@@ -1,0 +1,15 @@
+#
+# (C) Copyright IBM Corp. 2020
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+---
+manifestation:
+   resource: datatype/CodeableConcept *
+   hl7spec: AL1.5
+   var:
+     code: AL1.5 *
+
+onset:
+   type: DATE_TIME
+   hl7spec: AL1.6

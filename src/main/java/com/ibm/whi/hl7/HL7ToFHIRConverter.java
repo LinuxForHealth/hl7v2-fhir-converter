@@ -17,14 +17,13 @@ import java.util.stream.Stream;
 import org.apache.commons.lang3.StringUtils;
 import com.google.common.base.Preconditions;
 import com.ibm.whi.core.Constants;
+import com.ibm.whi.core.ObjectMapperUtil;
 import com.ibm.whi.hl7.message.HL7MessageEngine;
 import com.ibm.whi.hl7.message.HL7MessageModel;
 import com.ibm.whi.hl7.parsing.HL7DataExtractor;
 import com.ibm.whi.hl7.parsing.HL7HapiParser;
-import com.ibm.whi.hl7.resource.ObjectMapperUtil;
 import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Message;
-import ca.uhn.hl7v2.model.Unmodifiable;
 
 public class HL7ToFHIRConverter {
   private Map<String, HL7MessageModel> messagetemplates = new HashMap<>();
@@ -54,7 +53,7 @@ public class HL7ToFHIRConverter {
     try { 
     hparser = new HL7HapiParser();
 
-      Message hl7message = Unmodifiable.unmodifiableMessage(hparser.getParser().parse(rawmessage));
+      Message hl7message = hparser.getParser().parse(rawmessage);
       String messageType = HL7DataExtractor.getMessageType(hl7message);
       HL7MessageModel hl7MessageTemplateModel = messagetemplates.get(messageType);
       return hl7MessageTemplateModel.convert(hl7message, engine);

@@ -1,0 +1,32 @@
+#
+# (C) Copyright IBM Corp. 2020
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+---
+resourceType: AllergyIntolerance
+id:
+  type: STRING
+  evaluate: 'UUID.randomUUID()'
+
+category:
+    type: ALLERGY_INTOLERANCE_CATEGORY
+    hl7spec: AL1.2 *
+    
+criticality:
+    type: ALLERGY_INTOLERANCE_CRITICALITY 
+    hl7spec: AL1.4
+    
+code:
+   resource: datatype/CodeableConcept *
+   hl7spec: AL1.3
+   var:
+     code: AL1.3
+patient:
+    resource: datatype/Reference
+    var: 
+      ref-type: $Patient
+
+reaction:
+    resource: secondary/Reaction
+    hl7spec: AL1.5
