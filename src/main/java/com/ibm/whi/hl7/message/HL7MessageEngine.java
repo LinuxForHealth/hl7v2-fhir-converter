@@ -18,6 +18,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
+import com.ibm.whi.core.ObjectMapperUtil;
 import com.ibm.whi.core.expression.GenericResult;
 import com.ibm.whi.core.message.AbstractFHIRResource;
 import com.ibm.whi.core.message.InputData;
@@ -27,7 +28,6 @@ import com.ibm.whi.core.resource.ResourceResult;
 import com.ibm.whi.core.resource.ResourceValue;
 import com.ibm.whi.fhir.FHIRContext;
 import com.ibm.whi.fhir.FHIRResourceMapper;
-import com.ibm.whi.hl7.resource.ObjectMapperUtil;
 import ca.uhn.hl7v2.model.Structure;
 
 public class HL7MessageEngine implements MessageEngine {

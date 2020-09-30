@@ -15,6 +15,8 @@ import ca.uhn.hl7v2.model.DataTypeException;
 import ca.uhn.hl7v2.model.Primitive;
 import ca.uhn.hl7v2.model.Type;
 import ca.uhn.hl7v2.model.Variable;
+import ca.uhn.hl7v2.model.primitive.ID;
+import ca.uhn.hl7v2.model.primitive.IS;
 
 
 public class Hl7DataHandlerUtil {
@@ -57,6 +59,17 @@ public class Hl7DataHandlerUtil {
 
   }
 
+  public static String getTableNumber(Object obj) {
+
+    if (obj instanceof ID) {
+      ID id = (ID) obj;
+      return StringUtils.leftPad(String.valueOf(id.getTable()), 4, '0');
+    } else if (obj instanceof IS) {
+      IS id = (IS) obj;
+      return StringUtils.leftPad(String.valueOf(id.getTable()), 4, '0');
+    }
+    return null;
+  }
 
 
   private static String toStringValue(Object local, boolean allComponents) {
@@ -104,11 +117,12 @@ public class Hl7DataHandlerUtil {
       if (StringUtils.isNotBlank(text)) {
         sb.append(t.toString()).append(", ");
       }
-
       }
     return StringUtils.stripEnd(sb.toString(), ", ");
 
 
   }
+
+
 
 }

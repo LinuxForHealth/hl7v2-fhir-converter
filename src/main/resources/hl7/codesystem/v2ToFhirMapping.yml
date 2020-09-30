@@ -1,0 +1,36 @@
+#
+# (C) Copyright IBM Corp. 2020
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+---
+AllergyIntoleranceCategory:
+   AA: environment
+   DA: medication
+   EA: environment
+   FA: food
+   LA: environment
+   PA: environment
+   
+AllergyIntoleranceCriticality:
+    MI: low
+    MO: low
+    SV: high
+    U: unable-to-assess
+    
+ObservationStatus:
+    C: corrected
+    D: cancelled
+    F: final
+    I: registered
+    P: preliminary
+    W: entered-in-error
+
+AdministrativeGender:
+   A: other
+   F: female
+   M: male
+   N: unknown
+   O: other
+   U: unknown
+

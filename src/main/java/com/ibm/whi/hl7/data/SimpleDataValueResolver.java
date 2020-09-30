@@ -8,14 +8,21 @@ package com.ibm.whi.hl7.data;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Locale;
+import java.util.Map;
 import java.util.UUID;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.hl7.fhir.r4.model.AllergyIntolerance.AllergyIntoleranceCategory;
+import org.hl7.fhir.r4.model.AllergyIntolerance.AllergyIntoleranceCriticality;
 import org.hl7.fhir.r4.model.Enumerations.AdministrativeGender;
 import org.hl7.fhir.r4.model.Observation.ObservationStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.ibm.whi.core.terminology.Hl7v2Mapping;
+import com.ibm.whi.core.terminology.SimpleCode;
+import com.ibm.whi.core.terminology.SystemUrlLookup;
+import com.ibm.whi.core.terminology.TerminologyLookup;
 import com.ibm.whi.hl7.data.date.DateUtil;
 
 public class SimpleDataValueResolver {
@@ -78,41 +85,49 @@ public class SimpleDataValueResolver {
 
   };
 
-  public static final ValueExtractor<Object, String> ADMINISTRATIVE_GENDER_FHIR =
+  public static final ValueExtractor<Object, String> ADMINISTRATIVE_GENDER_CODE_FHIR =
       (Object value) -> {
 
-    String val = Hl7DataHandlerUtil.getStringValue(value);
-    if (null == val) {
-      return AdministrativeGender.UNKNOWN.toCode();
-    }
-        String code;
-    if ("F".equalsIgnoreCase(val) || ("Female").equalsIgnoreCase(val)) {
-          code = "female";
-    } else if ("M".equalsIgnoreCase(val) || "male".equalsIgnoreCase(val)) {
-          code = "male";
-    } else if ("O".equalsIgnoreCase(val) || "other".equalsIgnoreCase(val)) {
-          code = "other";
+        String val = Hl7DataHandlerUtil.getStringValue(value);
+        String code = getFHIRCode(val, AdministrativeGender.class);
+        if (code != null) {
+          return code;
+        } else if (val == null) {
+          return AdministrativeGender.NULL.toCode();
         } else {
-          code = "unknown";
+          return AdministrativeGender.UNKNOWN.toCode();
         }
-
-        return AdministrativeGender.fromCode(code).toCode();
-
   };
   
-  public static final ValueExtractor<Object, String> OBSERVATION_STATUS_FHIR = (Object value) -> {
-    String val = Hl7DataHandlerUtil.getStringValue(value);
-    if (null == val) {
+  public static final ValueExtractor<Object, String> OBSERVATION_STATUS_CODE_FHIR =
+      (Object value) -> {
+        String val = Hl7DataHandlerUtil.getStringValue(value);
+        String code = getFHIRCode(val, ObservationStatus.class);
+        if (code != null) {
+          return code;
+        } else if (val == null) {
+          return ObservationStatus.NULL.toCode();
+        } else {
           return ObservationStatus.UNKNOWN.toCode();
         }
-        ObservationStatus status = getObservationStatus(val);
 
-        return status.toCode();
 
-  };
+      };
 
-  
-  
+
+  public static final ValueExtractor<Object, SimpleCode> OBSERVATION_STATUS_FHIR =
+      (Object value) -> {
+        String val = Hl7DataHandlerUtil.getStringValue(value);
+        String code = getFHIRCode(val, ObservationStatus.class);
+        if (code != null) {
+          ObservationStatus status = ObservationStatus.fromCode(code);
+          return new SimpleCode(code, status.getSystem(), status.getDisplay());
+        } else {
+          return null;
+        }
+      };
+
+
 
   public static final ValueExtractor<Object, Boolean> BOOLEAN = (Object value) -> {
     String val = Hl7DataHandlerUtil.getStringValue(value);
@@ -163,7 +178,56 @@ public class SimpleDataValueResolver {
 
   };
 
+  public static final ValueExtractor<Object, Object> CODING_SYSTEM_V2 = (Object value) -> {
+    String table = Hl7DataHandlerUtil.getTableNumber(value);
+    String val = Hl7DataHandlerUtil.getStringValue(value);
+    if (table != null && val != null) {
+      return TerminologyLookup.lookup(table, val);
+    } else if (val != null) {
+      return new SimpleCode(val, null, null);
+    } else {
+      return null;
+    }
 
+  };
+
+  public static final ValueExtractor<Object, String> ALLERGY_INTOLERANCE_CRITICALITY_CODE_FHIR =
+      (Object value) -> {
+        String val = Hl7DataHandlerUtil.getStringValue(value);
+        String code = getFHIRCode(val, AllergyIntoleranceCriticality.class);
+        if (code != null) {
+          return code;
+        } else {
+          return AllergyIntoleranceCriticality.UNABLETOASSESS.toCode();
+        }
+      };
+
+
+  public static final ValueExtractor<Object, String> ALLERGY_INTOLERANCE_CATEGORY_CODE_FHIR =
+      (Object value) -> {
+
+        String val = Hl7DataHandlerUtil.getStringValue(value);
+        String code = getFHIRCode(val, AllergyIntoleranceCategory.class);
+        if (code != null) {
+          return code;
+        } else {
+          return null;
+        }
+
+      };
+
+  public static final ValueExtractor<Object, String> SYSTEM_URL = (Object value) -> {
+
+    String val = Hl7DataHandlerUtil.getStringValue(value);
+    String systemUrl = SystemUrlLookup.getSystemUrl(val);
+    if (systemUrl != null) {
+      return systemUrl;
+    } else {
+      return val;
+    }
+  };
+
+  //
   private SimpleDataValueResolver() {}
 
   private static UUID getUUID(String value) {
@@ -191,35 +255,17 @@ public class SimpleDataValueResolver {
 
   }
 
-  private static ObservationStatus getObservationStatus(String val) {
-    ObservationStatus status;
-    switch (StringUtils.upperCase(val, Locale.ENGLISH)) {
-      case "C":
-        status = ObservationStatus.CORRECTED;
-        break;
-      case "D":
-        status = ObservationStatus.CANCELLED;
-        break;
-      case "F":
-        status = ObservationStatus.FINAL;
-        break;
-      case "I":
-        status = ObservationStatus.REGISTERED;
-        break;
-      case "P":
-        status = ObservationStatus.PRELIMINARY;
-        break;
-      case "W":
-        status = ObservationStatus.ENTEREDINERROR;
-        break;
-      default:
-        status = ObservationStatus.UNKNOWN;
 
+
+  private static String getFHIRCode(String hl7Value, Class<?> fhirConceptClassName) {
+    if (hl7Value != null) {
+    Map<String, String> mapping = Hl7v2Mapping.getMapping(fhirConceptClassName.getSimpleName());
+    if (mapping != null && !mapping.isEmpty()) {
+        return mapping.get(StringUtils.upperCase(hl7Value, Locale.ENGLISH));
+      }
     }
-    return status;
+    return null;
   }
-
-
 
 
 

@@ -13,6 +13,7 @@ import java.util.Map;
 import org.junit.Test;
 import com.google.common.collect.ImmutableMap;
 import com.ibm.whi.core.expression.GenericResult;
+import com.ibm.whi.core.terminology.SimpleCode;
 import com.ibm.whi.hl7.message.HL7MessageData;
 import com.ibm.whi.hl7.parsing.HL7DataExtractor;
 import com.ibm.whi.hl7.parsing.HL7HapiParser;
@@ -20,50 +21,36 @@ import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Message;
 import ca.uhn.hl7v2.model.Segment;
 import ca.uhn.hl7v2.model.Structure;
-import ca.uhn.hl7v2.model.Unmodifiable;
 
 public class ReferenceExpressionTest {
+  String message = "MSH|^~\\&|hl7Integration|hl7Integration|||||ADT^A01|||2.3|\r"
+      + "EVN|A01|20130617154644\r"
+      + "PID|1|465 306 5961|000010016^^^MR^SSS^^20091020^20200101~000010017^^^MR~000010018^^^MR|407623|Wood^Patrick^^^MR||19700101|female|||High Street^^Oxford^^Ox1 4DP~George St^^Oxford^^Ox1 5AP|||||||\r"
+      + "NK1|1|Wood^John^^^MR|Father||999-9999\r" + "NK1|2|Jones^Georgie^^^MSS|MOTHER||999-9999\r"
+      + "PV1|1||Location||||||||||||||||261938_6_201306171546|||||||||||||||||||||||||20130617134644|||||||||";
 
   @Test
-  public void test1_segment() throws IOException, HL7Exception {
-    String message = "MSH|^~\\&|hl7Integration|hl7Integration|||||ADT^A01|||2.3|\r"
-        + "EVN|A01|20130617154644\r"
-        + "PID|1|465 306 5961|000010016^^^MR^SSS^^20091020^20200101~000010017^^^MR~000010018^^^MR|407623|Wood^Patrick^^^MR||19700101|female|||High Street^^Oxford^^Ox1 4DP~George St^^Oxford^^Ox1 5AP|||||||\r"
-        + "NK1|1|Wood^John^^^MR|Father||999-9999\r" + "NK1|2|Jones^Georgie^^^MSS|MOTHER||999-9999\r"
-        + "PV1|1||Location||||||||||||||||261938_6_201306171546|||||||||||||||||||||||||20130617134644|||||||||";
+  public void test1_segment() throws IOException {
+    
+    Message hl7message = getMessage(message);
+    HL7DataExtractor hl7DTE = new HL7DataExtractor(hl7message);
 
-    HL7HapiParser hparser = null;
-    try {
-      hparser = new HL7HapiParser();
+    Structure s = hl7DTE.getStructure("PID", 0).getValue();
 
-      Message hl7message = Unmodifiable.unmodifiableMessage(hparser.getParser().parse(message));
-
-      HL7DataExtractor hl7DTE = new HL7DataExtractor(hl7message);
-
-      Structure s = hl7DTE.getStructure("PID", 0).getValue();
-
-      ResourceExpression exp = new ResourceExpression("Single", "datatype/Identifier", "PID.3");
-      assertThat(exp.getData()).isNotNull();
+    ResourceExpression exp = new ResourceExpression("Single", "datatype/Identifier", "PID.3");
+    assertThat(exp.getData()).isNotNull();
 
 
-      Map<String, GenericResult> context = new HashMap<>();
-      context.put("PID", new GenericResult(s));
+    Map<String, GenericResult> context = new HashMap<>();
+    context.put("PID", new GenericResult(s));
 
-      GenericResult value =
-          exp.evaluate(new HL7MessageData(hl7DTE),
-              ImmutableMap.copyOf(context));
+    GenericResult value = exp.evaluate(new HL7MessageData(hl7DTE), ImmutableMap.copyOf(context));
 
-      Map<String, Object> result = (Map<String, Object>) value.getValue();
-      assertThat(result.get("use")).isEqualTo(null);
-      assertThat(result.get("value")).isEqualTo("000010016");
-      assertThat(result.get("system")).isEqualTo("MR");
+    Map<String, Object> result = (Map<String, Object>) value.getValue();
+    assertThat(result.get("use")).isEqualTo(null);
+    assertThat(result.get("value")).isEqualTo("000010016");
+    assertThat(result.get("system")).isEqualTo("MR");
 
-
-    } finally {
-      if (hparser != null) {
-        hparser.getContext().close();
-      }
-    }
 
 
   }
@@ -71,40 +58,28 @@ public class ReferenceExpressionTest {
 
 
   @Test
-  public void test1_segment_required_missing() throws IOException, HL7Exception {
+  public void test1_segment_required_missing() throws IOException {
     String message = "MSH|^~\\&|hl7Integration|hl7Integration|||||ADT^A01|||2.3|\r"
         + "EVN|A01|20130617154644\r"
         + "PID|1|465 306 5961|^^^MR^SSS^^20091020^20200101~000010017^^^MR~000010018^^^MR|407623|Wood^Patrick^^^MR||19700101|female|||High Street^^Oxford^^Ox1 4DP~George St^^Oxford^^Ox1 5AP|||||||\r"
         + "NK1|1|Wood^John^^^MR|Father||999-9999\r" + "NK1|2|Jones^Georgie^^^MSS|MOTHER||999-9999\r"
         + "PV1|1||Location||||||||||||||||261938_6_201306171546|||||||||||||||||||||||||20130617134644|||||||||";
 
-    HL7HapiParser hparser = null;
-    try {
-      hparser = new HL7HapiParser();
+    Message hl7message = getMessage(message);
+    HL7DataExtractor hl7DTE = new HL7DataExtractor(hl7message);
 
-      Message hl7message = Unmodifiable.unmodifiableMessage(hparser.getParser().parse(message));
+    Structure s = hl7DTE.getStructure("PID", 0).getValue();
 
-      HL7DataExtractor hl7DTE = new HL7DataExtractor(hl7message);
-
-      Structure s = hl7DTE.getStructure("PID", 0).getValue();
-
-      ResourceExpression exp = new ResourceExpression("Single", "datatype/Identifier", "PID.3");
-      assertThat(exp.getData()).isNotNull();
+    ResourceExpression exp = new ResourceExpression("Single", "datatype/Identifier", "PID.3");
+    assertThat(exp.getData()).isNotNull();
 
 
-      Map<String, GenericResult> context = new HashMap<>();
-      context.put("PID", new GenericResult(s));
+    Map<String, GenericResult> context = new HashMap<>();
+    context.put("PID", new GenericResult(s));
 
-      GenericResult value = exp.evaluate(new HL7MessageData(hl7DTE), ImmutableMap.copyOf(context));
+    GenericResult value = exp.evaluate(new HL7MessageData(hl7DTE), ImmutableMap.copyOf(context));
 
-      assertThat(value).isEqualTo(null);
-
-
-    } finally {
-      if (hparser != null) {
-        hparser.getContext().close();
-      }
-    }
+    assertThat(value).isEqualTo(null);
 
 
 
@@ -113,151 +88,199 @@ public class ReferenceExpressionTest {
 
 
   @Test
-  public void test1_segment_rep() throws IOException, HL7Exception {
+  public void test1_segment_rep() throws IOException {
     String message = "MSH|^~\\&|hl7Integration|hl7Integration|||||ADT^A01|||2.3|\r"
         + "EVN|A01|20130617154644\r"
         + "PID|1|465 306 5961|000010016^^^MR~000010017^^^MR~000010018^^^MR|407623|Wood^Patrick^^^MR||19700101|female|||High Street^^Oxford^^Ox1 4DP~George St^^Oxford^^Ox1 5AP|||||||\r"
         + "NK1|1|Wood^John^^^MR|Father||999-9999\r" + "NK1|2|Jones^Georgie^^^MSS|MOTHER||999-9999\r"
         + "PV1|1||Location||||||||||||||||261938_6_201306171546|||||||||||||||||||||||||20130617134644|||||||||";
-
-    HL7HapiParser hparser = null;
-    try {
-      hparser = new HL7HapiParser();
-
-      Message hl7message = Unmodifiable.unmodifiableMessage(hparser.getParser().parse(message));
-
-      HL7DataExtractor hl7DTE = new HL7DataExtractor(hl7message);
+    Message hl7message = getMessage(message);
+    HL7DataExtractor hl7DTE = new HL7DataExtractor(hl7message);
 
 
-      Structure s = hl7DTE.getStructure("PID", 0).getValue();
+    Structure s = hl7DTE.getStructure("PID", 0).getValue();
 
-      ResourceExpression exp =
-          new ResourceExpression("Array", "datatype/Identifier *", "PID.3");
-      assertThat(exp.getData()).isNotNull();
-
-
-      Map<String, GenericResult> context = new HashMap<>();
-      context.put("PID", new GenericResult(s));
-      context.put("code", new GenericResult(hl7DTE.getTypes((Segment) s, 3)));
+    ResourceExpression exp = new ResourceExpression("Array", "datatype/Identifier *", "PID.3");
+    assertThat(exp.getData()).isNotNull();
 
 
-      GenericResult value =
-          exp.evaluate(new HL7MessageData(hl7DTE),
-              ImmutableMap.copyOf(context));
-
-      List<Object> results = (List<Object>) value.getValue();
-      assertThat(results).hasSize(3);
+    Map<String, GenericResult> context = new HashMap<>();
+    context.put("PID", new GenericResult(s));
+    context.put("code", new GenericResult(hl7DTE.getTypes((Segment) s, 3)));
 
 
-      Map<String, Object> result = (Map<String, Object>) results.get(0);
-      assertThat(result.get("use")).isEqualTo(null);
-      assertThat(result.get("value")).isEqualTo("000010016");
-      assertThat(result.get("system")).isEqualTo("MR");
+    GenericResult value = exp.evaluate(new HL7MessageData(hl7DTE), ImmutableMap.copyOf(context));
+
+    List<Object> results = (List<Object>) value.getValue();
+    assertThat(results).hasSize(3);
 
 
-    } finally {
-      if (hparser != null) {
-        hparser.getContext().close();
-      }
-    }
+    Map<String, Object> result = (Map<String, Object>) results.get(0);
+    assertThat(result.get("use")).isEqualTo(null);
+    assertThat(result.get("value")).isEqualTo("000010016");
+    assertThat(result.get("system")).isEqualTo("MR");
+
+
 
   }
 
 
 
   @Test
-  public void test1_segment_identifier_obx() throws IOException, HL7Exception {
+  public void test1_segment_identifier_obx() throws IOException {
     String message = "MSH|^~\\&|hl7Integration|hl7Integration|||||ADT^A01|||2.3|\r"
         + "EVN|A01|20130617154644\r"
         + "PID|1|465 306 5961|000010016^^^MR~000010017^^^MR~000010018^^^MR|407623|Wood^Patrick^^^MR||19700101|female|||High Street^^Oxford^^Ox1 4DP~George St^^Oxford^^Ox1 5AP|||||||\r"
         + "NK1|1|Wood^John^^^MR|Father||999-9999\r" + "NK1|2|Jones^Georgie^^^MSS|MOTHER||999-9999\r"
         + "PV1|1||Location||||||||||||||||261938_6_201306171546|||||||||||||||||||||||||20130617134644|||||||||\r"
         + "OBX|1|TX|1234||First line: ECHOCARDIOGRAPHIC REPORT||||||F||\r";
-
-    HL7HapiParser hparser = null;
-    try {
-      hparser = new HL7HapiParser();
-
-      Message hl7message = Unmodifiable.unmodifiableMessage(hparser.getParser().parse(message));
-
-      HL7DataExtractor hl7DTE = new HL7DataExtractor(hl7message);
+    Message hl7message = getMessage(message);
+    HL7DataExtractor hl7DTE = new HL7DataExtractor(hl7message);
 
 
-      Structure s = hl7DTE.getStructure("OBX", 0).getValue();
+    Structure s = hl7DTE.getStructure("OBX", 0).getValue();
 
-      ResourceExpression exp =
-          new ResourceExpression("Single", "datatype/Identifier", "OBX.3");
-      assertThat(exp.getData()).isNotNull();
-
-
-      Map<String, GenericResult> context = new HashMap<>();
-      context.put("OBX", new GenericResult(s));
+    ResourceExpression exp = new ResourceExpression("Single", "datatype/Identifier", "OBX.3");
+    assertThat(exp.getData()).isNotNull();
 
 
-      GenericResult value =
-          exp.evaluate(new HL7MessageData(hl7DTE), 
-              ImmutableMap.copyOf(context));
-      Map<String, Object> result = (Map<String, Object>) value.getValue();
-      assertThat(result.get("use")).isEqualTo(null);
-      assertThat(result.get("value")).isEqualTo("1234");
-      assertThat(result.get("system")).isEqualTo(null);
+    Map<String, GenericResult> context = new HashMap<>();
+    context.put("OBX", new GenericResult(s));
 
 
-    } finally {
-      if (hparser != null) {
-        hparser.getContext().close();
-      }
-    }
+    GenericResult value = exp.evaluate(new HL7MessageData(hl7DTE), ImmutableMap.copyOf(context));
+    Map<String, Object> result = (Map<String, Object>) value.getValue();
+    assertThat(result.get("use")).isEqualTo(null);
+    assertThat(result.get("value")).isEqualTo("1234");
+    assertThat(result.get("system")).isEqualTo(null);
 
 
 
   }
 
   @Test
-  public void test1_segment_identifier_obx_cc() throws IOException, HL7Exception {
+  public void test1_segment_identifier_obx_cc() throws IOException {
     String message = "MSH|^~\\&|hl7Integration|hl7Integration|||||ADT^A01|||2.3|\r"
         + "EVN|A01|20130617154644\r"
         + "PID|1|465 306 5961|000010016^^^MR~000010017^^^MR~000010018^^^MR|407623|Wood^Patrick^^^MR||19700101|female|||High Street^^Oxford^^Ox1 4DP~George St^^Oxford^^Ox1 5AP|||||||\r"
         + "NK1|1|Wood^John^^^MR|Father||999-9999\r" + "NK1|2|Jones^Georgie^^^MSS|MOTHER||999-9999\r"
         + "PV1|1||Location||||||||||||||||261938_6_201306171546|||||||||||||||||||||||||20130617134644|||||||||\r"
-        + "OBX|1|TX|1234||First line: ECHOCARDIOGRAPHIC REPORT||||||F||\r";
+        + "OBX|1|TX|1234^some text^SCTCT||First line: ECHOCARDIOGRAPHIC REPORT||||||F||\r";
 
+
+    Message hl7message = getMessage(message);
+
+    HL7DataExtractor hl7DTE = new HL7DataExtractor(hl7message);
+
+
+    Structure s = hl7DTE.getStructure("OBX", 0).getValue();
+
+    ResourceExpression exp = new ResourceExpression("Array", "datatype/CodeableConcept *", "OBX.3");
+    assertThat(exp.getData()).isNotNull();
+
+    Map<String, GenericResult> context = new HashMap<>();
+    context.put("OBX", new GenericResult(s));
+
+    GenericResult value = exp.evaluate(new HL7MessageData(hl7DTE), ImmutableMap.copyOf(context));
+
+    List<Map<String, Object>> result = (List<Map<String, Object>>) value.getValue();
+    assertThat(result.get(0).get("text")).isEqualTo("some text");
+    assertThat(result.get(0).get("coding")).isNotNull();
+    List<Object> list = (List) result.get(0).get("coding");
+    Map<String, String> sp = (Map<String, String>) list.get(0);
+    assertThat(sp.get("code")).isEqualTo("1234");
+    assertThat(sp.get("system")).isEqualTo("SCTCT");
+
+
+  }
+
+
+  @Test
+  public void test1_segment_identifier_obx_cc_known_system() throws IOException {
+    String message = "MSH|^~\\&|hl7Integration|hl7Integration|||||ADT^A01|||2.3|\r"
+        + "EVN|A01|20130617154644\r"
+        + "PID|1|465 306 5961|000010016^^^MR~000010017^^^MR~000010018^^^MR|407623|Wood^Patrick^^^MR||19700101|female|||High Street^^Oxford^^Ox1 4DP~George St^^Oxford^^Ox1 5AP|||||||\r"
+        + "NK1|1|Wood^John^^^MR|Father||999-9999\r" + "NK1|2|Jones^Georgie^^^MSS|MOTHER||999-9999\r"
+        + "PV1|1||Location||||||||||||||||261938_6_201306171546|||||||||||||||||||||||||20130617134644|||||||||\r"
+        + "OBX|1|TX|1234^some text^SCT||First line: ECHOCARDIOGRAPHIC REPORT||||||F||\r";
+
+
+    Message hl7message = getMessage(message);
+
+    HL7DataExtractor hl7DTE = new HL7DataExtractor(hl7message);
+
+
+    Structure s = hl7DTE.getStructure("OBX", 0).getValue();
+
+    ResourceExpression exp = new ResourceExpression("Array", "datatype/CodeableConcept *", "OBX.3");
+    assertThat(exp.getData()).isNotNull();
+
+    Map<String, GenericResult> context = new HashMap<>();
+    context.put("OBX", new GenericResult(s));
+
+    GenericResult value = exp.evaluate(new HL7MessageData(hl7DTE), ImmutableMap.copyOf(context));
+
+    List<Map<String, Object>> result = (List<Map<String, Object>>) value.getValue();
+    assertThat(result.get(0).get("text")).isEqualTo("some text");
+    assertThat(result.get(0).get("coding")).isNotNull();
+    List<Object> list = (List) result.get(0).get("coding");
+    Map<String, String> sp = (Map<String, String>) list.get(0);
+    assertThat(sp.get("code")).isEqualTo("1234");
+    assertThat(sp.get("system")).isEqualTo("http://snomed.info/sct");
+
+
+  }
+
+  @Test
+  public void test1_codeable_concept_from_IS_type() throws IOException {
+    String message = "MSH|^~\\&|hl7Integration|hl7Integration|||||ADT^A01|||2.3|\r"
+        + "EVN|A01|20130617154644\r"
+        + "PID|1|465 306 5961|000010016^^^MR~000010017^^^MR~000010018^^^MR|407623|Wood^Patrick^^^MR||19700101|female|||High Street^^Oxford^^Ox1 4DP~George St^^Oxford^^Ox1 5AP|||||||\r"
+        + "NK1|1|Wood^John^^^MR|Father||999-9999\r" + "NK1|2|Jones^Georgie^^^MSS|MOTHER||999-9999\r"
+        + "PV1|1||Location||||||||||||||||261938_6_201306171546|||||||||||||||||||||||||20130617134644|||||||||\r"
+        + "OBX|1|TX|1234^^SCT||First line: ECHOCARDIOGRAPHIC REPORT|||AA|||F||\r";
+
+
+    Message hl7message = getMessage(message);
+
+    HL7DataExtractor hl7DTE = new HL7DataExtractor(hl7message);
+
+
+    Structure s = hl7DTE.getStructure("OBX", 0).getValue();
+
+    ResourceExpression exp = new ResourceExpression("Array", "datatype/CodeableConcept *", "OBX.8");
+    assertThat(exp.getData()).isNotNull();
+
+    Map<String, GenericResult> context = new HashMap<>();
+    context.put("OBX", new GenericResult(s));
+
+    GenericResult value = exp.evaluate(new HL7MessageData(hl7DTE), ImmutableMap.copyOf(context));
+
+    List<Map<String, Object>> result = (List<Map<String, Object>>) value.getValue();
+    assertThat(result.get(0).get("text")).isEqualTo("AA");
+    assertThat(result.get(0).get("coding")).isNotNull();
+    SimpleCode sc = (SimpleCode) result.get(0).get("coding");
+    assertThat(sc.getCode()).isEqualTo("AA");
+    assertThat(sc.getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/v2-0078");
+    assertThat(sc.getDisplay()).isEqualTo("Critically abnormal");
+
+
+  }
+
+
+  private static Message getMessage(String message) throws IOException {
     HL7HapiParser hparser = null;
+
     try {
       hparser = new HL7HapiParser();
-
-      Message hl7message = Unmodifiable.unmodifiableMessage(hparser.getParser().parse(message));
-
-      HL7DataExtractor hl7DTE = new HL7DataExtractor(hl7message);
-
-
-      Structure s = hl7DTE.getStructure("OBX", 0).getValue();
-
-      ResourceExpression exp =
-          new ResourceExpression("Array", "datatype/CodeableConcept *", "OBX.3");
-      assertThat(exp.getData()).isNotNull();
-
-      Map<String, GenericResult> context = new HashMap<>();
-      context.put("OBX", new GenericResult(s));
-      context.put("code", new GenericResult(hl7DTE.getTypes((Segment) s, 3).getValue()));
-
-
-      GenericResult value =
-          exp.evaluate(new HL7MessageData(hl7DTE), 
-              ImmutableMap.copyOf(context));
-
-      List<Map<String, Object>> result = (List<Map<String, Object>>) value.getValue();
-      assertThat(result.get(0).get("text")).isEqualTo("1234");
-
-
-
+      return hparser.getParser().parse(message);
+    } catch (HL7Exception e) {
+      throw new IllegalArgumentException(e);
     } finally {
       if (hparser != null) {
         hparser.getContext().close();
       }
     }
-
-
 
   }
 

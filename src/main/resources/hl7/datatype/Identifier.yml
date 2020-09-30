@@ -7,7 +7,7 @@
 type: 
    resource: datatype/CodeableConcept
    var:
-     code: CX.5 |CWE.5
+     code: CX.3 |CWE.3
 
 system: 
      type: STRING
@@ -19,7 +19,7 @@ value:
      required: true
 
 period:  
-    resource: datatype/Period   
+    resource: datatype/Period
     var: 
        start: CX.7 | CWE.7
        end: CX.8 | CWE.8

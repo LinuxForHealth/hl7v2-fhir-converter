@@ -1,0 +1,12 @@
+#
+# (C) Copyright IBM Corp. 2020
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+---
+I9: http://hl7.org/fhir/sid/icd-9-cm
+I9C: http://hl7.org/fhir/sid/icd-9-cm
+I10: http://hl7.org/fhir/sid/icd-10
+SNM: http://snomed.info/sct
+SCT: http://snomed.info/sct
+LN: http://loinc.org

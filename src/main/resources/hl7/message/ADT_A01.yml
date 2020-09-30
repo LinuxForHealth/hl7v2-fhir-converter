@@ -28,6 +28,13 @@ resources:
       order: 3
       repeats: true
       additionalSegments:
+      
+    - resourceName: AllergyIntolerance
+      segment: AL1
+      resourcePath: resource/AllergyIntolerance
+      order: 4
+      repeats: true
+      additionalSegments:
 
       
   

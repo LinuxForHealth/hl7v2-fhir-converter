@@ -16,8 +16,8 @@ import com.ibm.whi.hl7.message.HL7MessageData;
 import com.ibm.whi.hl7.parsing.HL7DataExtractor;
 import com.ibm.whi.hl7.parsing.HL7HapiParser;
 import ca.uhn.hl7v2.HL7Exception;
+import ca.uhn.hl7v2.model.DataTypeException;
 import ca.uhn.hl7v2.model.Message;
-import ca.uhn.hl7v2.model.Unmodifiable;
 import ca.uhn.hl7v2.model.v26.datatype.CX;
 
 public class JELXExpressionTest {
@@ -28,7 +28,7 @@ public class JELXExpressionTest {
   private static final String SOME_VALUE_3 = "SOME_VALUE_3";
 
   @Test
-  public void test_simple() throws HL7Exception, IOException {
+  public void test_simple() throws IOException {
 
     String message = "MSH|^~\\&|hl7Integration|hl7Integration|||||ADT^A01|||2.3|\r"
         + "EVN|A01|20130617154644\r"
@@ -36,36 +36,23 @@ public class JELXExpressionTest {
         + "NK1|1|Wood^John^^^MR|Father||999-9999\r" + "NK1|2|Jones^Georgie^^^MSS|MOTHER||999-9999\r"
         + "PV1|1||Location||||||||||||||||261938_6_201306171546|||||||||||||||||||||||||20130617134644|||||||||";
 
-    HL7HapiParser hparser = null;
-    try {
-      hparser = new HL7HapiParser();
-
-      Message hl7message = Unmodifiable.unmodifiableMessage(hparser.getParser().parse(message));
-
-      HL7DataExtractor hl7DTE = new HL7DataExtractor(hl7message);
+    Message hl7message = getMessage(message);
+    HL7DataExtractor hl7DTE = new HL7DataExtractor(hl7message);
 
 
-      JELXExpression exp =
-          new JELXExpression("String.join(\" \",  var1,var2, var3)", new HashMap<>());
+    JELXExpression exp =
+        new JELXExpression("String.join(\" \",  var1,var2, var3)", new HashMap<>());
 
 
 
-      Map<String, GenericResult> context = new HashMap<>();
-      context.put("var1", new GenericResult(SOME_VALUE_1));
-      context.put("var2", new GenericResult(SOME_VALUE_2));
-      context.put("var3", new GenericResult(SOME_VALUE_3));
+    Map<String, GenericResult> context = new HashMap<>();
+    context.put("var1", new GenericResult(SOME_VALUE_1));
+    context.put("var2", new GenericResult(SOME_VALUE_2));
+    context.put("var3", new GenericResult(SOME_VALUE_3));
 
-      GenericResult value = exp.evaluate(new HL7MessageData(hl7DTE), ImmutableMap.copyOf(context));
+    GenericResult value = exp.evaluate(new HL7MessageData(hl7DTE), ImmutableMap.copyOf(context));
 
-      assertThat(value.getValue())
-          .isEqualTo(SOME_VALUE_1 + " " + SOME_VALUE_2 + " " + SOME_VALUE_3);
-
-
-    } finally {
-      if (hparser != null) {
-        hparser.getContext().close();
-      }
-    }
+    assertThat(value.getValue()).isEqualTo(SOME_VALUE_1 + " " + SOME_VALUE_2 + " " + SOME_VALUE_3);
 
 
 
@@ -73,7 +60,7 @@ public class JELXExpressionTest {
 
 
   @Test
-  public void test_with_variables() throws IOException, HL7Exception {
+  public void test_with_variables() throws IOException, DataTypeException {
 
     String message = "MSH|^~\\&|hl7Integration|hl7Integration|||||ADT^A01|||2.3|\r"
         + "EVN|A01|20130617154644\r"
@@ -81,39 +68,45 @@ public class JELXExpressionTest {
         + "NK1|1|Wood^John^^^MR|Father||999-9999\r" + "NK1|2|Jones^Georgie^^^MSS|MOTHER||999-9999\r"
         + "PV1|1||Location||||||||||||||||261938_6_201306171546|||||||||||||||||||||||||20130617134644|||||||||";
 
-    HL7HapiParser hparser = null;
-    try {
-      hparser = new HL7HapiParser();
-
-      Message hl7message = Unmodifiable.unmodifiableMessage(hparser.getParser().parse(message));
-
-      HL7DataExtractor hl7DTE = new HL7DataExtractor(hl7message);
-
-      CX cx = new CX(hl7message);
-      cx.getCx1_IDNumber().setValue(SOME_VALUE_1);
-      cx.getCx2_IdentifierCheckDigit().setValue(SOME_VALUE_2);
 
 
-      Map<String, GenericResult> context = new HashMap<>();
-      context.put("CX", new GenericResult(cx));
+    Message hl7message = getMessage(message);
+
+    HL7DataExtractor hl7DTE = new HL7DataExtractor(hl7message);
+
+    CX cx = new CX(hl7message);
+    cx.getCx1_IDNumber().setValue(SOME_VALUE_1);
+    cx.getCx2_IdentifierCheckDigit().setValue(SOME_VALUE_2);
+
+
+    Map<String, GenericResult> context = new HashMap<>();
+    context.put("CX", new GenericResult(cx));
 
 
     Map<String, String> var = new HashMap<>();
-      var.put("var1", "String, CX.1");
-      var.put("var2", "String, CX.2");
-      var.put("var3", "String, CX.2");
+    var.put("var1", "String, CX.1");
+    var.put("var2", "String, CX.2");
+    var.put("var3", "String, CX.2");
 
-      JELXExpression exp = new JELXExpression("String.join(\" \",  var1,var2, var3)", var);
-
-
-      GenericResult value =
-          exp.evaluate(new HL7MessageData(hl7DTE), 
-              ImmutableMap.copyOf(context));
-
-      assertThat(value.getValue())
-          .isEqualTo(SOME_VALUE_1 + " " + SOME_VALUE_2 + " " + SOME_VALUE_2);
+    JELXExpression exp = new JELXExpression("String.join(\" \",  var1,var2, var3)", var);
 
 
+    GenericResult value = exp.evaluate(new HL7MessageData(hl7DTE), ImmutableMap.copyOf(context));
+
+    assertThat(value.getValue()).isEqualTo(SOME_VALUE_1 + " " + SOME_VALUE_2 + " " + SOME_VALUE_2);
+
+
+  }
+
+
+  private static Message getMessage(String message) throws IOException {
+    HL7HapiParser hparser = null;
+
+    try {
+      hparser = new HL7HapiParser();
+      return hparser.getParser().parse(message);
+    } catch (HL7Exception e) {
+      throw new IllegalArgumentException(e);
     } finally {
       if (hparser != null) {
         hparser.getContext().close();
@@ -121,5 +114,4 @@ public class JELXExpressionTest {
     }
 
   }
-
 }

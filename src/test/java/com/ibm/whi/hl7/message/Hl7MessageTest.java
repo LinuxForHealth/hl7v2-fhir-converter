@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.hl7.fhir.instance.model.api.IBaseResource;
+import org.hl7.fhir.r4.model.AllergyIntolerance;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
 import org.hl7.fhir.r4.model.Observation;
@@ -213,6 +214,70 @@ public class Hl7MessageTest {
     assertThat(obsResource).hasSize(1);
     Observation obs = (Observation) obsResource.get(0);
     assertThat(obs.getValueQuantity()).isNotNull();
+
+  }
+
+
+  @Test
+  public void test_allergy_single() throws IOException {
+
+    ResourceModel rsm =
+        ResourceModelReader.getInstance().generateResourceModel("resource/AllergyIntolerance");
+    HL7FHIRResource observation =
+        new HL7FHIRResource("AllergyIntolerance", "AL1", rsm, 0, false, new ArrayList<>());
+    HL7MessageModel message = new HL7MessageModel("ADT", Lists.newArrayList(observation));
+    String hl7message = "MSH|^~\\&|hl7Integration|hl7Integration|||||ADT^A01|||2.3|\r"
+        + "EVN|A01|20130617154644\r"
+        + "PID|1|465 306 5961|000010016^^^MR~000010017^^^MR~000010018^^^MR|407623|Wood^Patrick^^Sr^MR||19700101|female|||High Street^^Oxford^^Ox1 4DP~George St^^Oxford^^Ox1 5AP|||||||\r"
+        + "NK1|1|Wood^John^^^MR|Father||999-9999\r" + "NK1|2|Jones^Georgie^^^MSS|MOTHER||999-9999\r"
+        + "PV1|1||Location||||||||||||||||261938_6_201306171546|||||||||||||||||||||||||20130617134644|||||||||\r"
+        + "AL1|1|DA|^PENICILLIN|MO|PRODUCES HIVES~RASH|MO\r" //
+        + "AL1|2|AA|^CAT DANDER|SV";
+    String json = message.convert(hl7message, engine);
+    IBaseResource bundleResource = FHIRContext.getIParserInstance().parseResource(json);
+    assertThat(bundleResource).isNotNull();
+    Bundle b = (Bundle) bundleResource;
+    List<BundleEntryComponent> e = b.getEntry();
+    List<Resource> allergyRes =
+        e.stream().filter(v -> ResourceType.AllergyIntolerance == v.getResource().getResourceType())
+            .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+    assertThat(allergyRes).hasSize(1);
+    AllergyIntolerance allergy = (AllergyIntolerance) allergyRes.get(0);
+    assertThat(allergy.getCriticality().toCode()).isEqualTo("low");
+    assertThat(allergy.getCategory().get(0).getCode()).isEqualTo("medication");
+    assertThat(allergy.getCode().getText()).isEqualTo("PENICILLIN");
+    assertThat(allergy.getReaction().get(0).getManifestation()).extracting(m -> m.getText())
+        .containsExactlyInAnyOrder("PRODUCES HIVES", "RASH");
+
+  }
+
+
+
+  @Test
+  public void test_allergy_multiple() throws IOException {
+
+    ResourceModel rsm =
+        ResourceModelReader.getInstance().generateResourceModel("resource/AllergyIntolerance");
+    HL7FHIRResource observation =
+        new HL7FHIRResource("AllergyIntolerance", "AL1", rsm, 0, true, new ArrayList<>());
+    HL7MessageModel message = new HL7MessageModel("ADT", Lists.newArrayList(observation));
+    String hl7message = "MSH|^~\\&|hl7Integration|hl7Integration|||||ADT^A01|||2.3|\r"
+        + "EVN|A01|20130617154644\r"
+        + "PID|1|465 306 5961|000010016^^^MR~000010017^^^MR~000010018^^^MR|407623|Wood^Patrick^^Sr^MR||19700101|female|||High Street^^Oxford^^Ox1 4DP~George St^^Oxford^^Ox1 5AP|||||||\r"
+        + "NK1|1|Wood^John^^^MR|Father||999-9999\r" + "NK1|2|Jones^Georgie^^^MSS|MOTHER||999-9999\r"
+        + "PV1|1||Location||||||||||||||||261938_6_201306171546|||||||||||||||||||||||||20130617134644|||||||||\r"
+        + "AL1|1|DA|^PENICILLIN|MO|PRODUCES HIVES~RASH|MO\r" //
+        + "AL1|2|AA|^CAT DANDER|SV";
+    String json = message.convert(hl7message, engine);
+    IBaseResource bundleResource = FHIRContext.getIParserInstance().parseResource(json);
+    assertThat(bundleResource).isNotNull();
+    Bundle b = (Bundle) bundleResource;
+    List<BundleEntryComponent> e = b.getEntry();
+    List<Resource> obsResource =
+        e.stream().filter(v -> ResourceType.AllergyIntolerance == v.getResource().getResourceType())
+            .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+    assertThat(obsResource).hasSize(2);
+
 
   }
 

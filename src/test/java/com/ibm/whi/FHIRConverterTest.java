@@ -28,7 +28,15 @@ public class FHIRConverterTest {
         + "PID|0010||ADTNew^^^1231||ADT01New||19800202|F||W|111 TEST_STREET_NAME^^TEST_CITY^NY^111-1111^USA||(905)111-1111|||S|ZZ|12^^^124|34-13-312||||TEST_BIRTH_PLACE\r"
         + "PV1|1|ff|yyy|EL|ABC||200^ATTEND_DOC_FAMILY_TEST^ATTEND_DOC_GIVEN_TEST|201^REFER_DOC_FAMILY_TEST^REFER_DOC_GIVEN_TEST|202^CONSULTING_DOC_FAMILY_TEST^CONSULTING_DOC_GIVEN_TEST|MED|||||B6|E|272^ADMITTING_DOC_FAMILY_TEST^ADMITTING_DOC_GIVEN_TEST||48390|||||||||||||||||||||||||201409122200|20150206031726\r"
         + "OBX|1|TX|1234||ECHOCARDIOGRAPHIC REPORT||||||F|||||2740^Tsadok^Janetary~2913^Merrit^Darren^F~3065^Mahoney^Paul^J~4723^Loh^Robert^L~9052^Winter^Oscar^|\r"
-        + "AL1|0001|DA|98798^problem|SV|sneeze|20120808\r";
+        + "AL1|1|DRUG|00000741^OXYCODONE||HYPOTENSION\r"
+        + "AL1|2|DRUG|00001433^TRAMADOL||SEIZURES~VOMITING\r"
+        + "AL1|3|DRUG|00004700^INFLUENZA VIRUS VACCINE||\r"
+        + "AL1|4|BRANDNAME|00008604^LEVAQUIN||RASH ITCHING\r"
+        + "AL1|5|BRANDNAME|00010302^PNEUMOVAX 23||\r"
+        + "AL1|1||99999998^No Known Drug Allergies||\r"
+        + "AL1|1|CLASS|00000020^PCN (penicillin)||\r" + "AL1|1||No Known Allergies^^^^^Multum\r"
+        + "AL1|1||^Penicillin||Respiratory distress\r"
+        + "AL1|2||^Cat dander|Produces hives ";
 
     HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
     String json = ftv.convert(hl7message);

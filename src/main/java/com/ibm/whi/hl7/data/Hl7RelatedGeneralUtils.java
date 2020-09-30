@@ -127,6 +127,4 @@ public class Hl7RelatedGeneralUtils {
   }
 
 
-
-
 }

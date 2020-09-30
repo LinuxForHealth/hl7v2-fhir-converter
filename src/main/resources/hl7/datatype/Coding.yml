@@ -6,7 +6,7 @@
 # represents coding system.
 ---
 system: 
-     type: STRING
+     type: SYSTEM_URL
      hl7spec: CWE.3 |CE.3 |CNE.3
 version:
      type: STRING
@@ -15,5 +15,5 @@ code:
      type: STRING
      value: $code
 display: 
-     type: STRING_ALL
+     type: STRING
      hl7spec: CWE.2 |CE.2 |CNE.2

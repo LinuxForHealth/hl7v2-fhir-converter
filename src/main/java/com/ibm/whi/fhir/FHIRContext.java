@@ -11,9 +11,11 @@ import ca.uhn.fhir.parser.IParser;
 public class FHIRContext {
 
   private static FHIRContext fhirContext;
+
   private IParser parser;
+  private FhirContext ctx;
   private FHIRContext() {
-    FhirContext ctx = FhirContext.forR4();
+    ctx = FhirContext.forR4();
     parser = ctx.newJsonParser();
     parser.setSuppressNarratives(true);
   }
@@ -25,4 +27,15 @@ public class FHIRContext {
     }
     return fhirContext.parser;
   }
+
+
+
+  public static FhirContext getFhirContext() {
+    if (fhirContext == null) {
+      fhirContext = new FHIRContext();
+    }
+    return fhirContext.ctx;
+  }
+
+
 }
