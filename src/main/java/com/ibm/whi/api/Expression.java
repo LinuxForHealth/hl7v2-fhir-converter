@@ -3,11 +3,10 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  */
-package com.ibm.whi.core.expression;
+package com.ibm.whi.api;
 
 import java.util.List;
 import java.util.Map;
-import com.ibm.whi.core.message.InputData;
 
 /**
  * Each expression defines how to extract the value for a field. The execute method defines the
@@ -29,28 +28,33 @@ public interface Expression {
    * Specifies the default value for the field that should be returned if the evaluated value is
    * null
    * 
-   * @return {@link GenericResult}
+   * @return {@link EvaluationResult}
    */
-  GenericResult getDefaultValue();
+  EvaluationResult getDefaultValue();
 
   /**
    * List of Specification values that would be passed to the Evaluator to extract value.
    * 
-   * @return
+   * @return List {@link Specification}
    */
   List<Specification> getspecs();
 
   /**
    * Evaluates the expression and returns the GenericResult Object
    * 
-   * @param {@link DataSource} input data
+   * @param dataSource {@link DataSource} input data
    * @param contextValues - Map of values for variables
-   * @return {@link GenericResult}
+   * @return {@link EvaluationResult}
    */
-  GenericResult evaluate(InputData dataSource, Map<String, GenericResult> contextValues);
+  EvaluationResult evaluate(InputData dataSource, Map<String, EvaluationResult> contextValues);
 
-
-  boolean isConditionSatisfied(Map<String, GenericResult> contextValues);
+  /**
+   * Evaluates an expression if the condition is satisfied
+   * 
+   * @param contextValues {@link Map}
+   * @return true if condition satisfied otherwise returns false;
+   */
+  boolean isConditionSatisfied(Map<String, EvaluationResult> contextValues);
 
 
 

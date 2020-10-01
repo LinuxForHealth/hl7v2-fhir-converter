@@ -3,12 +3,10 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  */
-package com.ibm.whi.core.resource;
+package com.ibm.whi.api;
 
 import java.util.Map;
-import com.ibm.whi.core.expression.Expression;
-import com.ibm.whi.core.expression.GenericResult;
-import com.ibm.whi.core.message.InputData;
+import com.ibm.whi.core.resource.ResourceResult;
 
 /**
  * Represents FHIR resource that needs to be generated based on the provided expressions
@@ -18,8 +16,8 @@ import com.ibm.whi.core.message.InputData;
  */
 public interface ResourceModel {
 
-  ResourceResult evaluate(InputData dataExtractor, Map<String, GenericResult> contextValues,
-      GenericResult baseValue);
+  ResourceResult evaluate(InputData dataExtractor, Map<String, EvaluationResult> contextValues,
+      EvaluationResult baseValue);
 
   Map<String, Expression> getExpressions();
 

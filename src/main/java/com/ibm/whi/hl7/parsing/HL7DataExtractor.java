@@ -54,7 +54,7 @@ public class HL7DataExtractor {
   }
 
   public boolean doesSegmentExists(String spec) {
-    LOGGER.info("Checking if segment exists: {}", spec);
+    LOGGER.debug("Checking if segment exists: {}", spec);
     try {
       Preconditions.checkArgument(StringUtils.isNotBlank(spec),
           "Not a valid string to extract from Message");
@@ -70,7 +70,7 @@ public class HL7DataExtractor {
   }
 
   public boolean doesSegmentExists(String spec, int rep) {
-    LOGGER.info("Checking if segment exists: {}", spec);
+    LOGGER.debug("Checking if segment exists: {}", spec);
     try {
       Preconditions.checkArgument(StringUtils.isNotBlank(spec),
           "Not a valid string to extract from Terser");
@@ -95,7 +95,7 @@ public class HL7DataExtractor {
       Preconditions.checkArgument(StringUtils.isNotBlank(spec),
           "Not a valid string to extract from Hl7");
       Preconditions.checkArgument(rep >= 0, REP_CANNOT_BE_NEGATIVE);
-      LOGGER.info("fetching values for spec {} rep {}", spec, rep);
+        LOGGER.debug("fetching values for spec {} rep {}", spec, rep);
 
         parsingResult = new Hl7ParsingStructureResult(message.get(spec, rep));
       } else {
@@ -125,7 +125,7 @@ public class HL7DataExtractor {
       if (doesSegmentExists(spec)) {
       Preconditions.checkArgument(StringUtils.isNotBlank(spec),
           "Not a valid string to extract from Hl7");
-      LOGGER.info("fetching values for spec {}, ", spec);
+        LOGGER.debug("fetching values for spec {}, ", spec);
       List<Structure> segments = new ArrayList<>();
         Structure[] strs = message.getAll(spec);
 
@@ -159,7 +159,7 @@ public class HL7DataExtractor {
       Preconditions.checkArgument(segment != null, "segment cannot be null");
       Preconditions.checkArgument(field >= 1, "field cannot be negative");
       Preconditions.checkArgument(rep >= 0, REP_CANNOT_BE_NEGATIVE);
-      LOGGER.info("fetching values for Segment {} field {} rep {}, ", segment, field, rep);
+      LOGGER.debug("fetching values for Segment {} field {} rep {}, ", segment, field, rep);
       return new Hl7ParsingTypeResult(segment.getField(field, rep));
 
     } catch (HL7Exception | IllegalArgumentException e) {
@@ -185,7 +185,7 @@ public class HL7DataExtractor {
       Preconditions.checkArgument(segment != null, "segment cannot be null");
       Preconditions.checkArgument(field >= 1, "field cannot be negative");
 
-      LOGGER.info("fetching values for Segment {} field {}  ", segment, field);
+      LOGGER.debug("fetching values for Segment {} field {}  ", segment, field);
 
       List<Type> types = new ArrayList<>();
 

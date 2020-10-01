@@ -10,8 +10,9 @@ import java.util.HashMap;
 import java.util.Map;
 import org.junit.Test;
 import com.google.common.collect.ImmutableMap;
-import com.ibm.whi.core.expression.GenericResult;
-import com.ibm.whi.core.message.InputData;
+import com.ibm.whi.api.EvaluationResult;
+import com.ibm.whi.api.InputData;
+import com.ibm.whi.core.expression.SimpleEvaluationResult;
 import com.ibm.whi.hl7.expression.util.TestBlankInputData;
 
 public class DefaultExpressionTest {
@@ -23,9 +24,9 @@ public class DefaultExpressionTest {
   public void test_constant() {
 
     SimpleExpression exp = new SimpleExpression(SOME_VALUE);
-    Map<String, GenericResult> context = new HashMap<>();
+    Map<String, EvaluationResult> context = new HashMap<>();
 
-    GenericResult value =
+    EvaluationResult value =
         exp.evaluate(data, ImmutableMap.copyOf(context));
     assertThat(value.getValue()).isEqualTo(SOME_VALUE);
   }
@@ -35,11 +36,11 @@ public class DefaultExpressionTest {
   public void test_variable() {
 
     SimpleExpression exp = new SimpleExpression("$var1");
-    Map<String, GenericResult> context = new HashMap<>();
+    Map<String, EvaluationResult> context = new HashMap<>();
 
-    context.put("var1", new GenericResult(SOME_VALUE));
+    context.put("var1", new SimpleEvaluationResult(SOME_VALUE));
 
-    GenericResult value =
+    EvaluationResult value =
         exp.evaluate(data, ImmutableMap.copyOf(context));
     assertThat(value.getValue()).isEqualTo(SOME_VALUE);
   }
@@ -50,11 +51,11 @@ public class DefaultExpressionTest {
 
     SimpleExpression exp = new SimpleExpression("$");
 
-    Map<String, GenericResult> context = new HashMap<>();
+    Map<String, EvaluationResult> context = new HashMap<>();
 
-    context.put("", new GenericResult(SOME_VALUE));
+    context.put("", new SimpleEvaluationResult(SOME_VALUE));
 
-    GenericResult value =
+    EvaluationResult value =
         exp.evaluate(data, ImmutableMap.copyOf(context));
     assertThat(value.getValue()).isEqualTo("$");
   }
@@ -64,11 +65,11 @@ public class DefaultExpressionTest {
   public void test_variable_no_context() {
 
     SimpleExpression exp = new SimpleExpression("$var1");
-    Map<String, GenericResult> context = new HashMap<>();
+    Map<String, EvaluationResult> context = new HashMap<>();
 
 
 
-    GenericResult value =
+    EvaluationResult value =
         exp.evaluate(data, ImmutableMap.copyOf(context));
     assertThat(value).isNull();
   }
@@ -77,10 +78,10 @@ public class DefaultExpressionTest {
   public void test_blank() {
 
     SimpleExpression exp = new SimpleExpression("");
-    Map<String, GenericResult> context = new HashMap<>();
+    Map<String, EvaluationResult> context = new HashMap<>();
 
 
-    GenericResult value =
+    EvaluationResult value =
         exp.evaluate(data, ImmutableMap.copyOf(context));
     assertThat(value.getValue()).isEqualTo("");
   }

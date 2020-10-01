@@ -9,7 +9,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.HashMap;
 import java.util.Map;
 import org.junit.Test;
-import com.ibm.whi.core.expression.GenericResult;
+import com.ibm.whi.api.EvaluationResult;
+import com.ibm.whi.core.expression.SimpleEvaluationResult;
 
 public class SimpleBiConditionTest {
 
@@ -18,8 +19,8 @@ public class SimpleBiConditionTest {
     String condition = "$var1 EQUALS abc";
     SimpleBiCondition simplecondition =
         (SimpleBiCondition) ConditionUtil.createCondition(condition);
-    Map<String, GenericResult> contextVariables = new HashMap<>();
-    contextVariables.put("var1", new GenericResult("abc"));
+    Map<String, EvaluationResult> contextVariables = new HashMap<>();
+    contextVariables.put("var1", new SimpleEvaluationResult("abc"));
     assertThat(simplecondition.test(contextVariables)).isTrue();
   }
 
@@ -29,9 +30,9 @@ public class SimpleBiConditionTest {
     String condition = "$var1 EQUALS $var2";
     SimpleBiCondition simplecondition =
         (SimpleBiCondition) ConditionUtil.createCondition(condition);
-    Map<String, GenericResult> contextVariables = new HashMap<>();
-    contextVariables.put("var1", new GenericResult("abc"));
-    contextVariables.put("var2", new GenericResult("abc"));
+    Map<String, EvaluationResult> contextVariables = new HashMap<>();
+    contextVariables.put("var1", new SimpleEvaluationResult("abc"));
+    contextVariables.put("var2", new SimpleEvaluationResult("abc"));
     assertThat(simplecondition.test(contextVariables)).isTrue();
   }
 
@@ -40,9 +41,9 @@ public class SimpleBiConditionTest {
     String condition = "$var1 EQUALS $var2";
     SimpleBiCondition simplecondition =
         (SimpleBiCondition) ConditionUtil.createCondition(condition);
-    Map<String, GenericResult> contextVariables = new HashMap<>();
-    contextVariables.put("var1", new GenericResult("abc"));
-    contextVariables.put("var2", new GenericResult("xyz"));
+    Map<String, EvaluationResult> contextVariables = new HashMap<>();
+    contextVariables.put("var1", new SimpleEvaluationResult("abc"));
+    contextVariables.put("var2", new SimpleEvaluationResult("xyz"));
     assertThat(simplecondition.test(contextVariables)).isFalse();
   }
 
@@ -53,8 +54,8 @@ public class SimpleBiConditionTest {
     String condition = "$var1 EQUALS abc";
     SimpleBiCondition simplecondition =
         (SimpleBiCondition) ConditionUtil.createCondition(condition);
-    Map<String, GenericResult> contextVariables = new HashMap<>();
-    contextVariables.put("var1", new GenericResult("abcdf"));
+    Map<String, EvaluationResult> contextVariables = new HashMap<>();
+    contextVariables.put("var1", new SimpleEvaluationResult("abcdf"));
     assertThat(simplecondition.test(contextVariables)).isFalse();
   }
 
@@ -64,7 +65,7 @@ public class SimpleBiConditionTest {
     String condition = "$var1 EQUALS abc";
     SimpleBiCondition simplecondition =
         (SimpleBiCondition) ConditionUtil.createCondition(condition);
-    Map<String, GenericResult> contextVariables = new HashMap<>();
+    Map<String, EvaluationResult> contextVariables = new HashMap<>();
 
     assertThat(simplecondition.test(contextVariables)).isFalse();
   }

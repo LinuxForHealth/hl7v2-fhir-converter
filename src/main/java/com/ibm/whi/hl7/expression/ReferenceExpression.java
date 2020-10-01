@@ -10,6 +10,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -17,8 +19,9 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
-import com.ibm.whi.core.expression.GenericResult;
-import com.ibm.whi.core.message.InputData;
+import com.ibm.whi.api.EvaluationResult;
+import com.ibm.whi.api.InputData;
+import com.ibm.whi.core.expression.EvaluationResultFactory;
 import com.ibm.whi.core.resource.ResourceResult;
 import com.ibm.whi.core.resource.ResourceValue;
 import com.ibm.whi.hl7.resource.HL7DataBasedResourceModel;
@@ -90,12 +93,12 @@ public class ReferenceExpression extends AbstractExpression {
 
 
   @Override
-  public GenericResult evaluateExpression(InputData dataSource,
-      Map<String, GenericResult> contextValues, GenericResult hl7SpecValues) {
+  public EvaluationResult evaluateExpression(InputData dataSource,
+      Map<String, EvaluationResult> contextValues, EvaluationResult hl7SpecValues) {
     Preconditions.checkArgument(dataSource != null, "dataSource cannot be null");
     Preconditions.checkArgument(contextValues != null, "contextValues cannot be null");
     LOGGER.info("Evaluating expression {}", this.reference);
-    GenericResult resourceReferenceResult = null;
+    EvaluationResult resourceReferenceResult = null;
     // Evaluate the resource first and add it to the list of additional resources generated
     ResourceResult primaryResourceResult =
         evaluateResource(dataSource, contextValues, hl7SpecValues);
@@ -105,9 +108,10 @@ public class ReferenceExpression extends AbstractExpression {
       additionalResources.addAll(primaryResourceResult.getAdditionalResources());
       additionalResources.add(primaryResourceResult.getResource());
 
-      Map<String, GenericResult> localContextValues = new HashMap<>(contextValues);
+      Map<String, EvaluationResult> localContextValues = new HashMap<>(contextValues);
       localContextValues.put("ref-type",
-          new GenericResult(primaryResourceResult.getResource().getResource()));
+          EvaluationResultFactory
+              .getEvaluationResult(primaryResourceResult.getResource().getResource()));
 
 
       ResourceResult result = this.referenceModel.evaluate(dataSource,
@@ -118,7 +122,8 @@ public class ReferenceExpression extends AbstractExpression {
         LOGGER.info("Evaluated expression {}, returning {} ", this.reference, resolvedvalues);
         if (resolvedvalues != null) {
           resourceReferenceResult =
-              new GenericResult(resolvedvalues.getResource(), additionalResources);
+              EvaluationResultFactory.getEvaluationResult(resolvedvalues.getResource(),
+                  additionalResources);
         }
       }
     }
@@ -130,16 +135,11 @@ public class ReferenceExpression extends AbstractExpression {
 
 
   private ResourceResult evaluateResource(InputData dataSource,
-      Map<String, GenericResult> contextValues, GenericResult hl7SpecValue) {
+      Map<String, EvaluationResult> contextValues, EvaluationResult hl7SpecValue) {
     ResourceResult result =
         this.data.evaluate(dataSource, ImmutableMap.copyOf(contextValues), hl7SpecValue);
     if (result != null && result.getResource() != null) {
-
-      LOGGER.info("Evaluated expression {}, returning {} ", this.reference,
-          result.getResource().getResource());
-
       return result;
-
     }
     return null;
 
@@ -148,6 +148,15 @@ public class ReferenceExpression extends AbstractExpression {
 
   public String getReference() {
     return reference;
+  }
+
+
+  @Override
+  public String toString() {
+    ToStringBuilder.setDefaultStyle(ToStringStyle.JSON_STYLE);
+    return new ToStringBuilder(this.getClass().getSimpleName()).append("hl7spec", this.getspecs())
+        .append("isMultiple", this.isMultiple()).append("variables", this.getVariables())
+        .append("reference", this.reference).build();
   }
 
 }

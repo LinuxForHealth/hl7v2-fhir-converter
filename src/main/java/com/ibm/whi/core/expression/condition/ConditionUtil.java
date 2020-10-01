@@ -10,6 +10,7 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringTokenizer;
 import com.google.common.base.Preconditions;
+import com.ibm.whi.api.Condition;
 
 /**
  * Utility class to create different conditions from string value.

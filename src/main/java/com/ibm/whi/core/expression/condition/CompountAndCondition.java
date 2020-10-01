@@ -9,7 +9,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import com.google.common.base.Preconditions;
-import com.ibm.whi.core.expression.GenericResult;
+import com.ibm.whi.api.Condition;
+import com.ibm.whi.api.EvaluationResult;
 
 public class CompountAndCondition implements Condition {
 
@@ -25,7 +26,7 @@ public class CompountAndCondition implements Condition {
 
 
   @Override
-  public boolean test(Map<String, GenericResult> contextVariables) {
+  public boolean test(Map<String, EvaluationResult> contextVariables) {
     for (Condition c : conditions) {
       if (!c.test(contextVariables)) {
         return false;

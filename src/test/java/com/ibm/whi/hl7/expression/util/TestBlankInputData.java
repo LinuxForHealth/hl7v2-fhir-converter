@@ -7,29 +7,29 @@ package com.ibm.whi.hl7.expression.util;
 
 import java.util.List;
 import java.util.Map;
-import com.ibm.whi.core.expression.GenericResult;
-import com.ibm.whi.core.expression.Specification;
-import com.ibm.whi.core.message.InputData;
+import com.ibm.whi.api.EvaluationResult;
+import com.ibm.whi.api.InputData;
+import com.ibm.whi.api.Specification;
 
 public class TestBlankInputData implements InputData {
 
 
   @Override
-  public GenericResult extractMultipleValuesForSpec(List<Specification> hl7specs,
-      Map<String, GenericResult> contextValues) {
+  public EvaluationResult extractMultipleValuesForSpec(List<Specification> hl7specs,
+      Map<String, EvaluationResult> contextValues) {
     return null;
   }
 
   @Override
-  public GenericResult evaluateJexlExpression(String expression,
-      Map<String, GenericResult> contextValues) {
+  public EvaluationResult evaluateJexlExpression(String expression,
+      Map<String, EvaluationResult> contextValues) {
 
     return null;
   }
 
   @Override
-  public GenericResult extractValueForSpec(List<Specification> hl7specs,
-      Map<String, GenericResult> contextValues) {
+  public EvaluationResult extractValueForSpec(List<Specification> hl7specs,
+      Map<String, EvaluationResult> contextValues) {
 
     return null;
   }

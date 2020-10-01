@@ -8,8 +8,9 @@ package com.ibm.whi.hl7.expression.variable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import com.ibm.whi.core.expression.GenericResult;
-import com.ibm.whi.core.message.InputData;
+import com.ibm.whi.api.EvaluationResult;
+import com.ibm.whi.api.InputData;
+import com.ibm.whi.core.expression.EmptyEvaluationResult;
 
 
 /**
@@ -39,19 +40,19 @@ public class ExpressionVariable extends SimpleVariable {
 
   // resolve variable value
   @Override
-  public GenericResult extractVariableValue(Map<String, GenericResult> contextValues,
+  public EvaluationResult extractVariableValue(Map<String, EvaluationResult> contextValues,
       InputData dataSource) {
-    GenericResult result = null;
+    EvaluationResult result = null;
     if (!this.getSpec().isEmpty()) {
       result = getValueFromSpecs(contextValues, dataSource);
     }
     if (result == null) {
-      result = new GenericResult(null);
+      result = new EmptyEvaluationResult();
     }
 
     if (this.expression != null) {
       // resolve expression
-      Map<String, GenericResult> localContextValues = new HashMap<>(contextValues);
+      Map<String, EvaluationResult> localContextValues = new HashMap<>(contextValues);
 
         localContextValues.put(this.getName(), result);
 

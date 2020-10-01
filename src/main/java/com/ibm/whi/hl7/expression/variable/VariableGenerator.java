@@ -11,7 +11,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringTokenizer;
 import org.apache.commons.text.matcher.StringMatcherFactory;
 import com.google.common.base.Preconditions;
-import com.ibm.whi.core.expression.Variable;
+import com.ibm.whi.api.Variable;
 
 public class VariableGenerator {
 

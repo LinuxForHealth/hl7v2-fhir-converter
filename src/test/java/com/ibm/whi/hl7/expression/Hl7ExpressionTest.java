@@ -11,7 +11,8 @@ import java.util.HashMap;
 import java.util.Map;
 import org.junit.Test;
 import com.google.common.collect.ImmutableMap;
-import com.ibm.whi.core.expression.GenericResult;
+import com.ibm.whi.api.EvaluationResult;
+import com.ibm.whi.core.expression.SimpleEvaluationResult;
 import com.ibm.whi.core.terminology.SimpleCode;
 import com.ibm.whi.hl7.message.HL7MessageData;
 import com.ibm.whi.hl7.parsing.HL7DataExtractor;
@@ -41,11 +42,11 @@ public class Hl7ExpressionTest {
 
 
 
-    Map<String, GenericResult> context = new HashMap<>();
-    context.put("PID", new GenericResult(s));
+    Map<String, EvaluationResult> context = new HashMap<>();
+    context.put("PID", new SimpleEvaluationResult(s));
 
 
-    GenericResult value = exp.evaluate(new HL7MessageData(hl7DTE), ImmutableMap.copyOf(context));
+    EvaluationResult value = exp.evaluate(new HL7MessageData(hl7DTE), ImmutableMap.copyOf(context));
     assertThat(value.getValue()).isEqualTo("000010016");
 
 
@@ -73,12 +74,12 @@ public class Hl7ExpressionTest {
 
 
 
-    Map<String, GenericResult> context = new HashMap<>();
-    context.put("PID", new GenericResult(s));
-    context.put(type.getName(), new GenericResult(type));
+    Map<String, EvaluationResult> context = new HashMap<>();
+    context.put("PID", new SimpleEvaluationResult(s));
+    context.put(type.getName(), new SimpleEvaluationResult(type));
 
 
-    GenericResult value = exp.evaluate(new HL7MessageData(hl7DTE), ImmutableMap.copyOf(context));
+    EvaluationResult value = exp.evaluate(new HL7MessageData(hl7DTE), ImmutableMap.copyOf(context));
 
 
     assertThat(value.getValue()).isEqualTo("000010016");
@@ -107,11 +108,11 @@ public class Hl7ExpressionTest {
 
 
 
-    Map<String, GenericResult> context = new HashMap<>();
-    context.put("PID", new GenericResult(s));
+    Map<String, EvaluationResult> context = new HashMap<>();
+    context.put("PID", new SimpleEvaluationResult(s));
 
 
-    GenericResult value = exp.evaluate(new HL7MessageData(hl7DTE), ImmutableMap.copyOf(context));
+    EvaluationResult value = exp.evaluate(new HL7MessageData(hl7DTE), ImmutableMap.copyOf(context));
 
 
     assertThat(value.getValue()).isEqualTo("000010016");
@@ -136,11 +137,11 @@ public class Hl7ExpressionTest {
     Structure s = hl7DTE.getStructure("PV1", 0).getValue();
     Hl7Expression exp = new Hl7Expression("String", "PV1.3 | PV1.4 |PV1.59");
 
-    Map<String, GenericResult> context = new HashMap<>();
-    context.put("PV1", new GenericResult(s));
+    Map<String, EvaluationResult> context = new HashMap<>();
+    context.put("PV1", new SimpleEvaluationResult(s));
 
 
-    GenericResult value = exp.evaluate(new HL7MessageData(hl7DTE), ImmutableMap.copyOf(context));
+    EvaluationResult value = exp.evaluate(new HL7MessageData(hl7DTE), ImmutableMap.copyOf(context));
 
 
 
@@ -170,11 +171,11 @@ public class Hl7ExpressionTest {
 
 
 
-    Map<String, GenericResult> context = new HashMap<>();
-    context.put("OBX", new GenericResult(s));
+    Map<String, EvaluationResult> context = new HashMap<>();
+    context.put("OBX", new SimpleEvaluationResult(s));
 
 
-    GenericResult value = exp.evaluate(new HL7MessageData(hl7DTE), ImmutableMap.copyOf(context));
+    EvaluationResult value = exp.evaluate(new HL7MessageData(hl7DTE), ImmutableMap.copyOf(context));
 
 
     assertThat(value.getValue()).isNotNull();

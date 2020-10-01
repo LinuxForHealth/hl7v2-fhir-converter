@@ -3,11 +3,10 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  */
-package com.ibm.whi.core.expression;
+package com.ibm.whi.api;
 
 import java.util.List;
 import java.util.Map;
-import com.ibm.whi.core.message.InputData;
 
 
 /**
@@ -47,9 +46,9 @@ public interface Variable {
    * 
    * @param contextValues
    * @param dataSource
-   * @return {@link GenericResult}
+   * @return {@link EvaluationResult}
    */
-  GenericResult extractVariableValue(Map<String, GenericResult> contextValues,
+  EvaluationResult extractVariableValue(Map<String, EvaluationResult> contextValues,
       InputData dataSource);
 
 

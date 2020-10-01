@@ -15,10 +15,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
+import com.ibm.whi.api.EvaluationResult;
+import com.ibm.whi.api.InputData;
+import com.ibm.whi.api.Specification;
 import com.ibm.whi.core.data.JexlEngineUtil;
-import com.ibm.whi.core.expression.GenericResult;
-import com.ibm.whi.core.expression.Specification;
-import com.ibm.whi.core.message.InputData;
+import com.ibm.whi.core.expression.EmptyEvaluationResult;
+import com.ibm.whi.core.expression.EvaluationResultFactory;
+import com.ibm.whi.core.expression.SimpleEvaluationResult;
 import com.ibm.whi.hl7.data.Hl7RelatedGeneralUtils;
 import com.ibm.whi.hl7.exception.DataExtractionException;
 import com.ibm.whi.hl7.expression.HL7Specification;
@@ -42,10 +45,10 @@ public class HL7MessageData implements InputData {
 
 
   @Override
-  public GenericResult extractValueForSpec(List<Specification> hl7specs,
-      Map<String, GenericResult> contextValues) {
+  public EvaluationResult extractValueForSpec(List<Specification> hl7specs,
+      Map<String, EvaluationResult> contextValues) {
     
-    GenericResult fetchedValue = null;
+    EvaluationResult fetchedValue = null;
     for (Specification hl7specValue : hl7specs) {
       if (hl7specValue instanceof HL7Specification) {
 
@@ -57,16 +60,16 @@ public class HL7MessageData implements InputData {
         }
       }
     }
-    return new GenericResult(null);
+    return new EmptyEvaluationResult();
 
 
   }
 
 
   @Override
-  public GenericResult extractMultipleValuesForSpec(List<Specification> hl7specs,
-      Map<String, GenericResult> contextValues) {
-    GenericResult fetchedValue = null;
+  public EvaluationResult extractMultipleValuesForSpec(List<Specification> hl7specs,
+      Map<String, EvaluationResult> contextValues) {
+    EvaluationResult fetchedValue = null;
     for (Specification hl7specValue : hl7specs) {
       if (hl7specValue instanceof HL7Specification) {
 
@@ -78,17 +81,17 @@ public class HL7MessageData implements InputData {
         }
       }
     }
-    return new GenericResult(null);
+    return new EmptyEvaluationResult();
 
   }
 
 
-  private static GenericResult getReturnValue(GenericResult fetchedValue,
+  private static EvaluationResult getReturnValue(EvaluationResult fetchedValue,
       HL7Specification hl7spec) {
     if (hl7spec.isExtractMultiple()) {
       return fetchedValue;
     } else {
-      return new GenericResult(getSingleValue(fetchedValue.getValue()));
+      return new SimpleEvaluationResult(getSingleValue(fetchedValue.getValue()));
     }
   }
 
@@ -108,10 +111,10 @@ public class HL7MessageData implements InputData {
   }
 
 
-  private GenericResult valuesFromHl7Message(HL7Specification hl7spec,
-      ImmutableMap<String, GenericResult> contextValues) {
+  private EvaluationResult valuesFromHl7Message(HL7Specification hl7spec,
+      ImmutableMap<String, EvaluationResult> contextValues) {
 
-    GenericResult valuefromVariables;
+    EvaluationResult valuefromVariables;
     if (StringUtils.isNotBlank(hl7spec.getSegment())) {
       valuefromVariables = contextValues.get(hl7spec.getSegment());
     } else if (StringUtils.isNotBlank(hl7spec.getField())) {
@@ -124,7 +127,7 @@ public class HL7MessageData implements InputData {
     if (valuefromVariables != null) {
       obj = valuefromVariables.getValue();
     }
-    GenericResult res = null;
+    EvaluationResult res = null;
     try {
       if (obj instanceof Segment) {
         res = extractSpecValuesFromSegment(obj, hl7spec);
@@ -147,7 +150,7 @@ public class HL7MessageData implements InputData {
 
 
 
-  private GenericResult extractSpecValues(HL7Specification hl7spec) {
+  private EvaluationResult extractSpecValues(HL7Specification hl7spec) {
     if (StringUtils.isNotBlank(hl7spec.getSegment())) {
       ParsingResult<?> res;
       if (StringUtils.isNotBlank(hl7spec.getField())) {
@@ -157,30 +160,30 @@ public class HL7MessageData implements InputData {
       }
 
       if (res != null) {
-      return new GenericResult(res.getValue());
+        return EvaluationResultFactory.getEvaluationResult(res.getValue());
     }
     }
-    return null;
+    return new EmptyEvaluationResult();
   }
 
 
-  private GenericResult extractSpecValuesFromSegment(Object obj, HL7Specification hl7spec) {
+  private EvaluationResult extractSpecValuesFromSegment(Object obj, HL7Specification hl7spec) {
     if (StringUtils.isNotBlank(hl7spec.getField()) && NumberUtils.isCreatable(hl7spec.getField())) {
       int field = NumberUtils.toInt(hl7spec.getField());
       ParsingResult<?> res = hde.getTypes((Segment) obj, field);
       if (res != null && !res.isEmpty()) {
-        return new GenericResult(res.getValues());
+        return new SimpleEvaluationResult(res.getValues());
       } else {
         return null;
       }
 
     } else {
-      return new GenericResult(obj);
+      return new SimpleEvaluationResult(obj);
     }
   }
 
 
-  private GenericResult extractSpecValuesFromField(Object obj, HL7Specification hl7spec) {
+  private EvaluationResult extractSpecValuesFromField(Object obj, HL7Specification hl7spec) {
 
     if (hl7spec.getComponent() >= 0) {
       ParsingResult<?> res;
@@ -191,12 +194,12 @@ public class HL7MessageData implements InputData {
       }
       
       if(res!=null && !res.isEmpty()) {
-        return new GenericResult(res.getValues());
+        return new SimpleEvaluationResult(res.getValues());
       } else {
         return null;
       }
     } else {
-      return new GenericResult(obj);
+      return new SimpleEvaluationResult(obj);
     }
 
 
@@ -210,19 +213,19 @@ public class HL7MessageData implements InputData {
 
 
   @Override
-  public GenericResult evaluateJexlExpression(String expression,
-      Map<String, GenericResult> contextValues) {
+  public EvaluationResult evaluateJexlExpression(String expression,
+      Map<String, EvaluationResult> contextValues) {
     Preconditions.checkArgument(StringUtils.isNotBlank(expression), "jexlExp cannot be blank");
     Preconditions.checkArgument(contextValues != null, "context cannot be null");
     String trimedJexlExp = StringUtils.trim(expression);
     Map<String, Object> localContext = new HashMap<>();
-    Map<String, GenericResult> resolvedVariables = new HashMap<>(contextValues);
+    Map<String, EvaluationResult> resolvedVariables = new HashMap<>(contextValues);
     resolvedVariables.forEach((key, value) -> localContext.put(key, value.getValue()));
     Object obj = JEXL.evaluate(trimedJexlExp, localContext);
     if (obj != null) {
-      return new GenericResult(obj);
+      return new SimpleEvaluationResult(obj);
     } else {
-      return null;
+      return new EmptyEvaluationResult();
     }
   }
 

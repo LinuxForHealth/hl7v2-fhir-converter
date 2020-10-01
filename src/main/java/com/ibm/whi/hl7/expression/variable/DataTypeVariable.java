@@ -7,8 +7,9 @@ package com.ibm.whi.hl7.expression.variable;
 
 import java.util.List;
 import java.util.Map;
-import com.ibm.whi.core.expression.GenericResult;
-import com.ibm.whi.core.message.InputData;
+import com.ibm.whi.api.EvaluationResult;
+import com.ibm.whi.api.InputData;
+import com.ibm.whi.core.expression.EvaluationResultFactory;
 import com.ibm.whi.hl7.data.SimpleDataTypeMapper;
 import com.ibm.whi.hl7.data.ValueExtractor;
 
@@ -44,17 +45,18 @@ public class DataTypeVariable extends SimpleVariable {
 
   // resolve variable value
   @Override
-  public GenericResult extractVariableValue(Map<String, GenericResult> contextValues,
+  public EvaluationResult extractVariableValue(Map<String, EvaluationResult> contextValues,
       InputData dataSource) {
-    GenericResult result;
+    EvaluationResult result;
     if (!this.getSpec().isEmpty()) {
       result = getValueFromSpecs(contextValues, dataSource);
     } else {
       result = null;
     }
-    GenericResult resolvedvalue = null;
+    EvaluationResult resolvedvalue = null;
     if (result != null && this.resolver != null) {
-      resolvedvalue = new GenericResult(this.resolver.apply(result.getValue()));
+      resolvedvalue =
+          EvaluationResultFactory.getEvaluationResult(this.resolver.apply(result.getValue()));
     } else {
       resolvedvalue = result;
     }

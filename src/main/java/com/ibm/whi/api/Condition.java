@@ -3,13 +3,12 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  */
-package com.ibm.whi.core.expression.condition;
+package com.ibm.whi.api;
 
 import java.util.Map;
-import com.ibm.whi.core.expression.GenericResult;
 
 @FunctionalInterface
 public interface Condition {
 
-  boolean test(Map<String, GenericResult> contextVariables);
+  boolean test(Map<String, EvaluationResult> contextVariables);
 }

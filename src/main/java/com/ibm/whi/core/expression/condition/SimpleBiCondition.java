@@ -6,7 +6,8 @@
 package com.ibm.whi.core.expression.condition;
 
 import java.util.Map;
-import com.ibm.whi.core.expression.GenericResult;
+import com.ibm.whi.api.Condition;
+import com.ibm.whi.api.EvaluationResult;
 import com.ibm.whi.core.expression.VariableUtils;
 
 public class SimpleBiCondition implements Condition {
@@ -28,9 +29,9 @@ public class SimpleBiCondition implements Condition {
 
 
   @Override
-  public boolean test(Map<String, GenericResult> contextVariables) {
+  public boolean test(Map<String, EvaluationResult> contextVariables) {
     Object var1Value = null;
-    GenericResult variable1;
+    EvaluationResult variable1;
     if (VariableUtils.isVar(var1)) {
       variable1 = contextVariables.get(VariableUtils.getVarName(var1));
       if (variable1 != null && !variable1.isEmpty()) {
@@ -46,7 +47,7 @@ public class SimpleBiCondition implements Condition {
     if (var1Value != null && var2Value != null) {
     
       ConditionPredicateEnum condEnum = ConditionPredicateEnum
-          .getConditionPredicate(this.conditionOperator, variable1.getKlassName());
+          .getConditionPredicate(this.conditionOperator, variable1.getName());
       if (condEnum != null) {
         return condEnum.getPredicate().test(var1Value, var2Value);
       }
@@ -57,10 +58,10 @@ public class SimpleBiCondition implements Condition {
 
 
 
-  private Object getValue(Map<String, GenericResult> contextVariables) {
+  private Object getValue(Map<String, EvaluationResult> contextVariables) {
     Object var2Value = null;
     if (var2 instanceof String && VariableUtils.isVar((String) var2)) {
-      GenericResult variable = contextVariables.get(VariableUtils.getVarName((String) var2));
+      EvaluationResult variable = contextVariables.get(VariableUtils.getVarName((String) var2));
       if (variable != null && !variable.isEmpty()) {
         var2Value = variable.getValue();
       }

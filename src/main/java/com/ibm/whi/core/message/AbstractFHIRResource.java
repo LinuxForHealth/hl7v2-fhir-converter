@@ -7,7 +7,7 @@ package com.ibm.whi.core.message;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.ibm.whi.core.resource.ResourceModel;
+import com.ibm.whi.api.ResourceModel;
 
 
 public abstract class AbstractFHIRResource {

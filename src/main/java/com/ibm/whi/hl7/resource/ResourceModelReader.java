@@ -12,9 +12,9 @@ import org.apache.commons.configuration2.builder.fluent.Configurations;
 import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
+import com.ibm.whi.api.ResourceModel;
 import com.ibm.whi.core.Constants;
 import com.ibm.whi.core.ObjectMapperUtil;
-import com.ibm.whi.core.resource.ResourceModel;
 
 public class ResourceModelReader {
 
@@ -52,7 +52,8 @@ public class ResourceModelReader {
         HL7DataBasedResourceModel rm =
             ObjectMapperUtil.getYAMLInstance().readValue(templateFile,
                 HL7DataBasedResourceModel.class);
-        if (StringUtils.isBlank(rm.getName())) {
+        if (StringUtils.isBlank(rm.getName())
+            || StringUtils.equalsIgnoreCase(rm.getName(), "unknown")) {
           rm.setName(FilenameUtils.removeExtension(templateFile.getName()));
         }
         return rm;

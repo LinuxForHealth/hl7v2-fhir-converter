@@ -7,6 +7,8 @@ package com.ibm.whi.hl7.expression;
 
 import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -14,8 +16,9 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
-import com.ibm.whi.core.expression.GenericResult;
-import com.ibm.whi.core.message.InputData;
+import com.ibm.whi.api.EvaluationResult;
+import com.ibm.whi.api.InputData;
+import com.ibm.whi.core.expression.EvaluationResultFactory;
 import com.ibm.whi.core.resource.ResourceResult;
 import com.ibm.whi.core.resource.ResourceValue;
 import com.ibm.whi.hl7.resource.HL7DataBasedResourceModel;
@@ -86,14 +89,14 @@ public class ResourceExpression extends AbstractExpression {
 
 
   @Override
-  public GenericResult evaluateExpression(InputData dataSource,
-      Map<String, GenericResult> contextValues, GenericResult hl7SpecValue) {
+  public EvaluationResult evaluateExpression(InputData dataSource,
+      Map<String, EvaluationResult> contextValues, EvaluationResult hl7SpecValue) {
     Preconditions.checkArgument(dataSource != null, "dataSource cannot be null");
     Preconditions.checkArgument(contextValues != null, "contextValues cannot be null");
     LOGGER.info("Evaluating expression {}", this.resourceToGenerate);
-    GenericResult evaluationResult = null;
+    EvaluationResult evaluationResult = null;
 
-    GenericResult baseValue = hl7SpecValue;
+    EvaluationResult baseValue = hl7SpecValue;
 
     ResourceResult result =
         this.data.evaluate(dataSource, ImmutableMap.copyOf(contextValues), baseValue);
@@ -104,7 +107,8 @@ public class ResourceExpression extends AbstractExpression {
           resolvedvalues);
       if (resolvedvalues != null) {
         evaluationResult =
-            new GenericResult(resolvedvalues.getResource(), result.getAdditionalResources());
+            EvaluationResultFactory.getEvaluationResult(resolvedvalues.getResource(),
+                result.getAdditionalResources());
       }
     }
 
@@ -117,6 +121,15 @@ public class ResourceExpression extends AbstractExpression {
 
   public String getResourceName() {
     return resourceToGenerate;
+  }
+
+
+  @Override
+  public String toString() {
+    ToStringBuilder.setDefaultStyle(ToStringStyle.JSON_STYLE);
+    return new ToStringBuilder(this.getClass().getSimpleName()).append("hl7spec", this.getspecs())
+        .append("isMultiple", this.isMultiple()).append("variables", this.getVariables())
+        .append("resourceToGenerate", this.resourceToGenerate).build();
   }
 
 }

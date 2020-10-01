@@ -3,12 +3,12 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  */
-package com.ibm.whi.core.message;
+package com.ibm.whi.api;
 
 import java.io.IOException;
 import java.util.Map;
 import org.hl7.fhir.r4.model.Bundle;
-import com.ibm.whi.core.expression.GenericResult;
+import com.ibm.whi.core.message.AbstractFHIRResource;
 
 /**
  * Implement this interface for each Data type that needs to be transformed into FHIR resource
@@ -30,7 +30,7 @@ public interface MessageEngine {
    * @throws IOException
    */
   Bundle transform(InputData dataSource, Iterable<? extends AbstractFHIRResource> resources,
-      Map<String, GenericResult> contextValues) throws IOException;
+      Map<String, EvaluationResult> contextValues) throws IOException;
 
 
 

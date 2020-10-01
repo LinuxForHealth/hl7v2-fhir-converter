@@ -6,10 +6,9 @@
 package com.ibm.whi.hl7.expression;
 
 import org.apache.commons.lang3.EnumUtils;
-import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.text.StringTokenizer;
-import com.ibm.whi.core.expression.Specification;
+import com.ibm.whi.api.Specification;
 import com.ibm.whi.hl7.message.SupportedSegments;
 
 
@@ -28,7 +27,7 @@ public class HL7Specification implements Specification {
   private int component;
   private int subComponent;
   private boolean isExtractMultiple;
-
+  private String stringRep;
   public HL7Specification(String segment, String field, int component, int subComponent,
       boolean isMultiple) {
     this.segment = segment;
@@ -36,7 +35,7 @@ public class HL7Specification implements Specification {
     this.component = component;
     this.subComponent = subComponent;
     this.isExtractMultiple = isMultiple;
-
+    stringRep = getToStringRep();
   }
 
 
@@ -96,9 +95,33 @@ public class HL7Specification implements Specification {
 
   }
 
-
+  @Override
   public String toString() {
-    return ReflectionToStringBuilder.toString(this);
+    return this.stringRep;
+
+
+  }
+
+  private String getToStringRep() {
+    StringBuilder sb = new StringBuilder();
+    sb.append("[");
+    if (segment != null) {
+      sb.append(segment);
+    }
+
+    if (field != null) {
+      sb.append(".").append(field);
+    }
+    if (component > -1) {
+      sb.append(".").append(component);
+    }
+    if (subComponent > -1) {
+      sb.append(".").append(subComponent);
+    }
+
+    return sb.append("]").toString();
+
+
   }
 
 
