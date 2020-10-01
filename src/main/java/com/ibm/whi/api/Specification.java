@@ -3,7 +3,7 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  */
-package com.ibm.whi.core.expression;
+package com.ibm.whi.api;
 
 /**
  * Defines Data source specific data extraction String Example: for HL7 data, specification defines

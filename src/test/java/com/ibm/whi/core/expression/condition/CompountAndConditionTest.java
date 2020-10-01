@@ -9,7 +9,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.HashMap;
 import java.util.Map;
 import org.junit.Test;
-import com.ibm.whi.core.expression.GenericResult;
+import com.ibm.whi.api.EvaluationResult;
+import com.ibm.whi.core.expression.SimpleEvaluationResult;
 
 public class CompountAndConditionTest {
 
@@ -19,9 +20,9 @@ public class CompountAndConditionTest {
     CompountAndCondition simplecondition =
         (CompountAndCondition) ConditionUtil.createCondition(condition);
 
-    Map<String, GenericResult> contextVariables = new HashMap<>();
-    contextVariables.put("var1", new GenericResult("abc"));
-    contextVariables.put("var2", new GenericResult("xyz"));
+    Map<String, EvaluationResult> contextVariables = new HashMap<>();
+    contextVariables.put("var1", new SimpleEvaluationResult("abc"));
+    contextVariables.put("var2", new SimpleEvaluationResult("xyz"));
     assertThat(simplecondition.test(contextVariables)).isTrue();
   }
 
@@ -32,8 +33,8 @@ public class CompountAndConditionTest {
     CompountAndCondition simplecondition =
         (CompountAndCondition) ConditionUtil.createCondition(condition);
 
-    Map<String, GenericResult> contextVariables = new HashMap<>();
-    contextVariables.put("var1", new GenericResult("abc"));
+    Map<String, EvaluationResult> contextVariables = new HashMap<>();
+    contextVariables.put("var1", new SimpleEvaluationResult("abc"));
     assertThat(simplecondition.test(contextVariables)).isFalse();
   }
 

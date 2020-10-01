@@ -10,8 +10,8 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.ibm.whi.api.ResourceModel;
 import com.ibm.whi.core.message.AbstractFHIRResource;
-import com.ibm.whi.core.resource.ResourceModel;
 import com.ibm.whi.hl7.resource.ResourceModelReader;
 
 

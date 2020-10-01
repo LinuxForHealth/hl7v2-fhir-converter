@@ -8,15 +8,18 @@ package com.ibm.whi.hl7.expression;
 import java.util.HashMap;
 import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Preconditions;
-import com.ibm.whi.core.expression.GenericResult;
-import com.ibm.whi.core.expression.Variable;
-import com.ibm.whi.core.message.InputData;
+import com.ibm.whi.api.EvaluationResult;
+import com.ibm.whi.api.InputData;
+import com.ibm.whi.api.Variable;
+import com.ibm.whi.core.expression.EmptyEvaluationResult;
 
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -37,7 +40,6 @@ public class JELXExpression extends AbstractExpression {
     super(type, defaultValue, required, hl7spec, variables, condition);
     Preconditions.checkArgument(StringUtils.isNotBlank(evaluate), "evaluate file cannot be blank");
 
-
     this.evaluate = evaluate;
 
 
@@ -52,15 +54,25 @@ public class JELXExpression extends AbstractExpression {
 
 
   @Override
-  public GenericResult evaluateExpression(InputData dataSource,
-      Map<String, GenericResult> contextValues, GenericResult hl7SpecValues) {
-    Map<String, GenericResult> localContextValues = new HashMap<>(contextValues);
+  public EvaluationResult evaluateExpression(InputData dataSource,
+      Map<String, EvaluationResult> contextValues, EvaluationResult hl7SpecValues) {
+    Map<String, EvaluationResult> localContextValues = new HashMap<>(contextValues);
     for (Variable v : this.getVariables()) {
       if (!localContextValues.containsKey(v.getVariableName())) {
-        localContextValues.put(v.getVariableName(), new GenericResult(null));
+        localContextValues.put(v.getVariableName(), new EmptyEvaluationResult());
       }
     }
     return dataSource.evaluateJexlExpression(this.evaluate, contextValues);
   }
+
+
+  @Override
+  public String toString() {
+    ToStringBuilder.setDefaultStyle(ToStringStyle.JSON_STYLE);
+    return new ToStringBuilder(this.getClass().getSimpleName()).append("hl7spec", this.getspecs())
+        .append("isMultiple", this.isMultiple()).append("variables", this.getVariables())
+        .append("evaluate", this.evaluate).build();
+  }
+
 
 }

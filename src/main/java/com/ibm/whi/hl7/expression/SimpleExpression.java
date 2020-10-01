@@ -8,6 +8,8 @@ package com.ibm.whi.hl7.expression;
 import java.util.HashMap;
 import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -15,9 +17,10 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
-import com.ibm.whi.core.expression.GenericResult;
+import com.ibm.whi.api.EvaluationResult;
+import com.ibm.whi.api.InputData;
+import com.ibm.whi.core.expression.EvaluationResultFactory;
 import com.ibm.whi.core.expression.VariableUtils;
-import com.ibm.whi.core.message.InputData;
 import com.ibm.whi.hl7.data.SimpleDataTypeMapper;
 import com.ibm.whi.hl7.data.ValueExtractor;
 
@@ -50,36 +53,36 @@ public class SimpleExpression extends AbstractExpression {
 
 
   @Override
-  public GenericResult evaluateExpression(InputData dataSource,
-      Map<String, GenericResult> contextValues, GenericResult hl7SpecValues) {
+  public EvaluationResult evaluateExpression(InputData dataSource,
+      Map<String, EvaluationResult> contextValues, EvaluationResult hl7SpecValues) {
 
     Preconditions.checkArgument(contextValues != null, "contextValues cannot be null");
-    Map<String, GenericResult> localContextValues = new HashMap<>(contextValues);
+    Map<String, EvaluationResult> localContextValues = new HashMap<>(contextValues);
     if (hl7SpecValues != null && !hl7SpecValues.isEmpty()) {
-      localContextValues.put(hl7SpecValues.getKlassName(), hl7SpecValues);
+      localContextValues.put(hl7SpecValues.getName(), hl7SpecValues);
     }
-    LOGGER.info("Evaluating {}", this.value);
-    if (isVar(value)) {
-      GenericResult obj =
+
+    if (VariableUtils.isVar(value)) {
+      EvaluationResult obj =
           getVariableValueFromVariableContextMap(value, ImmutableMap.copyOf(localContextValues));
-      LOGGER.info("Evaluated value {} to {} ", this.value, obj);
+      LOGGER.debug("Evaluated value {} to {} ", this.value, obj);
       if (obj != null) {
-        LOGGER.info("Evaluated value {} to {} type {} ", this.value, obj, obj.getClass());
+        LOGGER.debug("Evaluated value {} to {} type {} ", this.value, obj, obj.getClass());
         ValueExtractor<Object, ?> resolver = SimpleDataTypeMapper.getValueResolver(this.getType());
-        return new GenericResult(resolver.apply(obj.getValue()));
+        return EvaluationResultFactory.getEvaluationResult(resolver.apply(obj.getValue()));
       }
-      LOGGER.info("Evaluated {} returning null", this.value);
+      LOGGER.debug("Evaluated {} returning null", this.value);
       return null;
     } else {
-      LOGGER.info("Evaluated {} returning value enclosed as GenericResult.", this.value);
-      return new GenericResult(this.value);
+      LOGGER.debug("Evaluated {} returning value enclosed as GenericResult.", this.value);
+      return EvaluationResultFactory.getEvaluationResult(this.value);
     }
   }
 
-  private static GenericResult getVariableValueFromVariableContextMap(String varName,
-      ImmutableMap<String, GenericResult> contextValues) {
+  private static EvaluationResult getVariableValueFromVariableContextMap(String varName,
+      ImmutableMap<String, EvaluationResult> contextValues) {
     if (StringUtils.isNotBlank(varName)) {
-      GenericResult fetchedValue;
+      EvaluationResult fetchedValue;
       fetchedValue = contextValues.get(VariableUtils.getVarName(varName));
       return fetchedValue;
     } else {
@@ -88,4 +91,12 @@ public class SimpleExpression extends AbstractExpression {
   }
 
 
+
+  @Override
+  public String toString() {
+    ToStringBuilder.setDefaultStyle(ToStringStyle.JSON_STYLE);
+    return new ToStringBuilder(this.getClass().getSimpleName()).append("hl7spec", this.getspecs())
+        .append("isMultiple", this.isMultiple()).append("variables", this.getVariables())
+        .append("value", this.value).build();
+  }
 }

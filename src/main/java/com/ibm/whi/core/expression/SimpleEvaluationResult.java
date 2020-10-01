@@ -7,6 +7,8 @@ package com.ibm.whi.core.expression;
 
 import java.util.ArrayList;
 import java.util.List;
+import com.google.common.base.Preconditions;
+import com.ibm.whi.api.EvaluationResult;
 import com.ibm.whi.core.data.DataTypeUtil;
 import com.ibm.whi.core.resource.ResourceValue;
 
@@ -16,7 +18,7 @@ import com.ibm.whi.core.resource.ResourceValue;
  *
  * @author pbhallam
  */
-public class GenericResult {
+public class SimpleEvaluationResult implements EvaluationResult {
 
 
   private Object value;
@@ -25,28 +27,29 @@ public class GenericResult {
   private List<ResourceValue> additionalResources;
 
 
-  public GenericResult(Object value) {
+  public SimpleEvaluationResult(Object value) {
     this(value, new ArrayList<>());
   }
 
 
 
-  public GenericResult(Object value, List<ResourceValue> additionalResources) {
-
+  public SimpleEvaluationResult(Object value, List<ResourceValue> additionalResources) {
+    Preconditions.checkArgument(value != null, "value cannot be null");
+    Preconditions.checkArgument(additionalResources != null, "additionalResources cannot be null");
     this.value = value;
-    if (value != null) {
-      this.klass = value.getClass();
-      this.klassName = DataTypeUtil.getDataType(value);
-    }
+
+    this.klass = value.getClass();
+    this.klassName = DataTypeUtil.getDataType(value);
+
     this.additionalResources = new ArrayList<>();
-    if (additionalResources != null) {
-      this.additionalResources.addAll(additionalResources);
-    }
+
+    this.additionalResources.addAll(additionalResources);
 
 
 
   }
 
+  @Override
   public Object getValue() {
     return value;
   }
@@ -60,26 +63,24 @@ public class GenericResult {
     }
   }
 
-
-  public Class<?> getKlass() {
+  @Override
+  public Class<?> getValueType() {
     return klass;
   }
 
 
-
-
-
-  public String getKlassName() {
+  @Override
+  public String getName() {
     return klassName;
   }
 
+  @Override
   public boolean isEmpty() {
     if (this.value == null) {
       return true;
     }
     return false;
   }
-
 
 
 

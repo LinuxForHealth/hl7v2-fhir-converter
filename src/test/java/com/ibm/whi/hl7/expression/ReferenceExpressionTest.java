@@ -12,7 +12,8 @@ import java.util.List;
 import java.util.Map;
 import org.junit.Test;
 import com.google.common.collect.ImmutableMap;
-import com.ibm.whi.core.expression.GenericResult;
+import com.ibm.whi.api.EvaluationResult;
+import com.ibm.whi.core.expression.SimpleEvaluationResult;
 import com.ibm.whi.core.terminology.SimpleCode;
 import com.ibm.whi.hl7.message.HL7MessageData;
 import com.ibm.whi.hl7.parsing.HL7DataExtractor;
@@ -41,10 +42,10 @@ public class ReferenceExpressionTest {
     assertThat(exp.getData()).isNotNull();
 
 
-    Map<String, GenericResult> context = new HashMap<>();
-    context.put("PID", new GenericResult(s));
+    Map<String, EvaluationResult> context = new HashMap<>();
+    context.put("PID", new SimpleEvaluationResult(s));
 
-    GenericResult value = exp.evaluate(new HL7MessageData(hl7DTE), ImmutableMap.copyOf(context));
+    EvaluationResult value = exp.evaluate(new HL7MessageData(hl7DTE), ImmutableMap.copyOf(context));
 
     Map<String, Object> result = (Map<String, Object>) value.getValue();
     assertThat(result.get("use")).isEqualTo(null);
@@ -74,10 +75,10 @@ public class ReferenceExpressionTest {
     assertThat(exp.getData()).isNotNull();
 
 
-    Map<String, GenericResult> context = new HashMap<>();
-    context.put("PID", new GenericResult(s));
+    Map<String, EvaluationResult> context = new HashMap<>();
+    context.put("PID", new SimpleEvaluationResult(s));
 
-    GenericResult value = exp.evaluate(new HL7MessageData(hl7DTE), ImmutableMap.copyOf(context));
+    EvaluationResult value = exp.evaluate(new HL7MessageData(hl7DTE), ImmutableMap.copyOf(context));
 
     assertThat(value).isEqualTo(null);
 
@@ -104,12 +105,12 @@ public class ReferenceExpressionTest {
     assertThat(exp.getData()).isNotNull();
 
 
-    Map<String, GenericResult> context = new HashMap<>();
-    context.put("PID", new GenericResult(s));
-    context.put("code", new GenericResult(hl7DTE.getTypes((Segment) s, 3)));
+    Map<String, EvaluationResult> context = new HashMap<>();
+    context.put("PID", new SimpleEvaluationResult(s));
+    context.put("code", new SimpleEvaluationResult(hl7DTE.getTypes((Segment) s, 3)));
 
 
-    GenericResult value = exp.evaluate(new HL7MessageData(hl7DTE), ImmutableMap.copyOf(context));
+    EvaluationResult value = exp.evaluate(new HL7MessageData(hl7DTE), ImmutableMap.copyOf(context));
 
     List<Object> results = (List<Object>) value.getValue();
     assertThat(results).hasSize(3);
@@ -144,11 +145,11 @@ public class ReferenceExpressionTest {
     assertThat(exp.getData()).isNotNull();
 
 
-    Map<String, GenericResult> context = new HashMap<>();
-    context.put("OBX", new GenericResult(s));
+    Map<String, EvaluationResult> context = new HashMap<>();
+    context.put("OBX", new SimpleEvaluationResult(s));
 
 
-    GenericResult value = exp.evaluate(new HL7MessageData(hl7DTE), ImmutableMap.copyOf(context));
+    EvaluationResult value = exp.evaluate(new HL7MessageData(hl7DTE), ImmutableMap.copyOf(context));
     Map<String, Object> result = (Map<String, Object>) value.getValue();
     assertThat(result.get("use")).isEqualTo(null);
     assertThat(result.get("value")).isEqualTo("1234");
@@ -178,10 +179,10 @@ public class ReferenceExpressionTest {
     ResourceExpression exp = new ResourceExpression("Array", "datatype/CodeableConcept *", "OBX.3");
     assertThat(exp.getData()).isNotNull();
 
-    Map<String, GenericResult> context = new HashMap<>();
-    context.put("OBX", new GenericResult(s));
+    Map<String, EvaluationResult> context = new HashMap<>();
+    context.put("OBX", new SimpleEvaluationResult(s));
 
-    GenericResult value = exp.evaluate(new HL7MessageData(hl7DTE), ImmutableMap.copyOf(context));
+    EvaluationResult value = exp.evaluate(new HL7MessageData(hl7DTE), ImmutableMap.copyOf(context));
 
     List<Map<String, Object>> result = (List<Map<String, Object>>) value.getValue();
     assertThat(result.get(0).get("text")).isEqualTo("some text");
@@ -215,10 +216,10 @@ public class ReferenceExpressionTest {
     ResourceExpression exp = new ResourceExpression("Array", "datatype/CodeableConcept *", "OBX.3");
     assertThat(exp.getData()).isNotNull();
 
-    Map<String, GenericResult> context = new HashMap<>();
-    context.put("OBX", new GenericResult(s));
+    Map<String, EvaluationResult> context = new HashMap<>();
+    context.put("OBX", new SimpleEvaluationResult(s));
 
-    GenericResult value = exp.evaluate(new HL7MessageData(hl7DTE), ImmutableMap.copyOf(context));
+    EvaluationResult value = exp.evaluate(new HL7MessageData(hl7DTE), ImmutableMap.copyOf(context));
 
     List<Map<String, Object>> result = (List<Map<String, Object>>) value.getValue();
     assertThat(result.get(0).get("text")).isEqualTo("some text");
@@ -251,10 +252,10 @@ public class ReferenceExpressionTest {
     ResourceExpression exp = new ResourceExpression("Array", "datatype/CodeableConcept *", "OBX.8");
     assertThat(exp.getData()).isNotNull();
 
-    Map<String, GenericResult> context = new HashMap<>();
-    context.put("OBX", new GenericResult(s));
+    Map<String, EvaluationResult> context = new HashMap<>();
+    context.put("OBX", new SimpleEvaluationResult(s));
 
-    GenericResult value = exp.evaluate(new HL7MessageData(hl7DTE), ImmutableMap.copyOf(context));
+    EvaluationResult value = exp.evaluate(new HL7MessageData(hl7DTE), ImmutableMap.copyOf(context));
 
     List<Map<String, Object>> result = (List<Map<String, Object>>) value.getValue();
     assertThat(result.get(0).get("text")).isEqualTo("AA");

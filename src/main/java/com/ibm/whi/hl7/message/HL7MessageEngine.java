@@ -14,16 +14,18 @@ import java.util.Objects;
 import org.hl7.fhir.r4.model.Bundle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
+import com.ibm.whi.api.EvaluationResult;
+import com.ibm.whi.api.InputData;
+import com.ibm.whi.api.MessageEngine;
+import com.ibm.whi.api.ResourceModel;
 import com.ibm.whi.core.ObjectMapperUtil;
-import com.ibm.whi.core.expression.GenericResult;
+import com.ibm.whi.core.expression.EvaluationResultFactory;
 import com.ibm.whi.core.message.AbstractFHIRResource;
-import com.ibm.whi.core.message.InputData;
-import com.ibm.whi.core.message.MessageEngine;
-import com.ibm.whi.core.resource.ResourceModel;
 import com.ibm.whi.core.resource.ResourceResult;
 import com.ibm.whi.core.resource.ResourceValue;
 import com.ibm.whi.fhir.FHIRContext;
@@ -47,7 +49,7 @@ public class HL7MessageEngine implements MessageEngine {
    */
   @Override
   public Bundle transform(InputData dataInput,
-      Iterable<? extends AbstractFHIRResource> resources, Map<String, GenericResult> contextValues)
+      Iterable<? extends AbstractFHIRResource> resources, Map<String, EvaluationResult> contextValues)
       throws IOException {
     Preconditions.checkArgument(dataInput != null, "dataInput cannot be null");
     Preconditions.checkArgument(contextValues != null, "contextValues cannot be null");
@@ -80,18 +82,20 @@ public class HL7MessageEngine implements MessageEngine {
 
 
   private static void generateFHIRResources(InputData dataExtractor, HL7FHIRResource res,
-      ResourceModel rs, List<Structure> segments, Map<String, GenericResult> variables,
+      ResourceModel rs, List<Structure> segments, Map<String, EvaluationResult> variables,
       Bundle bundle) {
+    try {
 
+      MDC.put("Resource", rs.getName());
     if (res.isRepeats()) {
-      List<GenericResult> baseValues = new ArrayList<>();
+      List<EvaluationResult> baseValues = new ArrayList<>();
       segments.removeIf(Objects::isNull);
-      segments.forEach(d -> baseValues.add(new GenericResult(d)));
+      segments.forEach(d -> baseValues.add(EvaluationResultFactory.getEvaluationResult(d)));
 
-        Map<String, GenericResult> localVariables = new HashMap<>(variables);
+        Map<String, EvaluationResult> localVariables = new HashMap<>(variables);
       List<ResourceValue> resourcevalues = new ArrayList<>();
       List<ResourceValue> additionalResources = new ArrayList<>();
-      for (GenericResult baseValue : baseValues) {
+      for (EvaluationResult baseValue : baseValues) {
         ResourceResult result =
             rs.evaluate(dataExtractor, ImmutableMap.copyOf(localVariables), baseValue);
         if (result != null && result.getResource() != null) {
@@ -107,23 +111,32 @@ public class HL7MessageEngine implements MessageEngine {
       }
 
     } else {
-      Map<String, GenericResult> localVariables = new HashMap<>(variables);
-      localVariables.put(res.getSegment(), new GenericResult(segments.get(0)));
+      Map<String, EvaluationResult> localVariables = new HashMap<>(variables);
+      localVariables.put(res.getSegment(),
+          EvaluationResultFactory.getEvaluationResult(segments.get(0)));
 
       ResourceResult evaluatedValue =
           rs.evaluate(dataExtractor, ImmutableMap.copyOf(localVariables),
-              new GenericResult(segments.get(0)));
+              EvaluationResultFactory.getEvaluationResult(segments.get(0)));
 
       if (evaluatedValue != null && evaluatedValue.getResource() != null) {
 
         addEntry(res.getResourceName(), evaluatedValue.getResource(), bundle);
-        variables.put(res.getResourceName(), new GenericResult(evaluatedValue));
+        variables.put(res.getResourceName(),
+            EvaluationResultFactory.getEvaluationResult(evaluatedValue));
         List<ResourceValue> additionalResourceObjects = evaluatedValue.getAdditionalResources();
         addValues(bundle, additionalResourceObjects);
       }
 
 
 
+    }
+    } catch (IllegalArgumentException | IllegalStateException e) {
+      LOGGER.error("Exception during  resource {} generation", rs.getName(), e);
+
+
+    } finally {
+      MDC.remove("Resource");
     }
   }
 
@@ -141,7 +154,6 @@ public class HL7MessageEngine implements MessageEngine {
 
 
   private static void addEntry(String resourceClass, ResourceValue obj, Bundle bundle) {
-    LOGGER.info("Converting resourceName {} to FHIR {}", resourceClass, obj);
 
     try {
       if (obj != null) {

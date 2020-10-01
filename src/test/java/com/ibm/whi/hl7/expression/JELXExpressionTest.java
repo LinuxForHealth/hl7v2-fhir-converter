@@ -11,7 +11,8 @@ import java.util.HashMap;
 import java.util.Map;
 import org.junit.Test;
 import com.google.common.collect.ImmutableMap;
-import com.ibm.whi.core.expression.GenericResult;
+import com.ibm.whi.api.EvaluationResult;
+import com.ibm.whi.core.expression.SimpleEvaluationResult;
 import com.ibm.whi.hl7.message.HL7MessageData;
 import com.ibm.whi.hl7.parsing.HL7DataExtractor;
 import com.ibm.whi.hl7.parsing.HL7HapiParser;
@@ -45,12 +46,12 @@ public class JELXExpressionTest {
 
 
 
-    Map<String, GenericResult> context = new HashMap<>();
-    context.put("var1", new GenericResult(SOME_VALUE_1));
-    context.put("var2", new GenericResult(SOME_VALUE_2));
-    context.put("var3", new GenericResult(SOME_VALUE_3));
+    Map<String, EvaluationResult> context = new HashMap<>();
+    context.put("var1", new SimpleEvaluationResult(SOME_VALUE_1));
+    context.put("var2", new SimpleEvaluationResult(SOME_VALUE_2));
+    context.put("var3", new SimpleEvaluationResult(SOME_VALUE_3));
 
-    GenericResult value = exp.evaluate(new HL7MessageData(hl7DTE), ImmutableMap.copyOf(context));
+    EvaluationResult value = exp.evaluate(new HL7MessageData(hl7DTE), ImmutableMap.copyOf(context));
 
     assertThat(value.getValue()).isEqualTo(SOME_VALUE_1 + " " + SOME_VALUE_2 + " " + SOME_VALUE_3);
 
@@ -79,8 +80,8 @@ public class JELXExpressionTest {
     cx.getCx2_IdentifierCheckDigit().setValue(SOME_VALUE_2);
 
 
-    Map<String, GenericResult> context = new HashMap<>();
-    context.put("CX", new GenericResult(cx));
+    Map<String, EvaluationResult> context = new HashMap<>();
+    context.put("CX", new SimpleEvaluationResult(cx));
 
 
     Map<String, String> var = new HashMap<>();
@@ -91,7 +92,7 @@ public class JELXExpressionTest {
     JELXExpression exp = new JELXExpression("String.join(\" \",  var1,var2, var3)", var);
 
 
-    GenericResult value = exp.evaluate(new HL7MessageData(hl7DTE), ImmutableMap.copyOf(context));
+    EvaluationResult value = exp.evaluate(new HL7MessageData(hl7DTE), ImmutableMap.copyOf(context));
 
     assertThat(value.getValue()).isEqualTo(SOME_VALUE_1 + " " + SOME_VALUE_2 + " " + SOME_VALUE_2);
 

@@ -19,7 +19,7 @@ import org.hl7.fhir.r4.model.Resource;
 import org.hl7.fhir.r4.model.ResourceType;
 import org.junit.Test;
 import com.google.common.collect.Lists;
-import com.ibm.whi.core.resource.ResourceModel;
+import com.ibm.whi.api.ResourceModel;
 import com.ibm.whi.fhir.FHIRContext;
 import com.ibm.whi.hl7.resource.ResourceModelReader;
 

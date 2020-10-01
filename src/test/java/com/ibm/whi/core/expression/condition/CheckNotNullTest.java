@@ -9,7 +9,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.HashMap;
 import java.util.Map;
 import org.junit.Test;
-import com.ibm.whi.core.expression.GenericResult;
+import com.ibm.whi.api.EvaluationResult;
+import com.ibm.whi.core.expression.EmptyEvaluationResult;
+import com.ibm.whi.core.expression.SimpleEvaluationResult;
 
 public class CheckNotNullTest {
 
@@ -20,8 +22,8 @@ public class CheckNotNullTest {
   public void not_null_condition_with_is_evaluated_True() {
     String condition = VAR1_NOT_NULL;
     CheckNotNull simplecondition = (CheckNotNull) ConditionUtil.createCondition(condition);
-    Map<String, GenericResult> contextVariables = new HashMap<>();
-    contextVariables.put("var1", new GenericResult("abc"));
+    Map<String, EvaluationResult> contextVariables = new HashMap<>();
+    contextVariables.put("var1", new SimpleEvaluationResult("abc"));
     assertThat(simplecondition.test(contextVariables)).isTrue();
   }
 
@@ -30,8 +32,8 @@ public class CheckNotNullTest {
   public void not_null_condition_with_is_evaluated_false() {
     String condition = VAR1_NOT_NULL;
     CheckNotNull simplecondition = (CheckNotNull) ConditionUtil.createCondition(condition);
-    Map<String, GenericResult> contextVariables = new HashMap<>();
-    contextVariables.put("var1", new GenericResult(null));
+    Map<String, EvaluationResult> contextVariables = new HashMap<>();
+    contextVariables.put("var1", new EmptyEvaluationResult());
     assertThat(simplecondition.test(contextVariables)).isFalse();
   }
 
@@ -40,7 +42,7 @@ public class CheckNotNullTest {
   public void not_null_condition_is_evaluated_false_if_var_is_not_present() {
     String condition = VAR1_NOT_NULL;
     CheckNotNull simplecondition = (CheckNotNull) ConditionUtil.createCondition(condition);
-    Map<String, GenericResult> contextVariables = new HashMap<>();
+    Map<String, EvaluationResult> contextVariables = new HashMap<>();
     assertThat(simplecondition.test(contextVariables)).isFalse();
   }
 

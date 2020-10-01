@@ -11,11 +11,11 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
-import com.ibm.whi.core.expression.GenericResult;
-import com.ibm.whi.core.expression.Specification;
-import com.ibm.whi.core.expression.Variable;
+import com.ibm.whi.api.EvaluationResult;
+import com.ibm.whi.api.InputData;
+import com.ibm.whi.api.Specification;
+import com.ibm.whi.api.Variable;
 import com.ibm.whi.core.expression.VariableUtils;
-import com.ibm.whi.core.message.InputData;
 import com.ibm.whi.hl7.expression.HL7Specification;
 
 
@@ -27,6 +27,7 @@ import com.ibm.whi.hl7.expression.HL7Specification;
  */
 public class SimpleVariable implements Variable {
   public static final String OBJECT_TYPE = Object.class.getSimpleName();
+
   private String name;
   private List<String> spec;
   private boolean extractMultiple;
@@ -63,9 +64,9 @@ public class SimpleVariable implements Variable {
 
   // resolve variable value
 
-  public GenericResult extractVariableValue(Map<String, GenericResult> contextValues,
+  public EvaluationResult extractVariableValue(Map<String, EvaluationResult> contextValues,
       InputData dataSource) {
-    GenericResult result;
+    EvaluationResult result;
     if (!this.spec.isEmpty()) {
       result = getValueFromSpecs(contextValues, dataSource);
     } else {
@@ -77,15 +78,15 @@ public class SimpleVariable implements Variable {
   }
 
 
-  protected GenericResult getValueFromSpecs(Map<String, GenericResult> contextValues,
+  protected EvaluationResult getValueFromSpecs(Map<String, EvaluationResult> contextValues,
       InputData dataSource) {
-    GenericResult fetchedValue = null;
+    EvaluationResult fetchedValue = null;
     for (String specValue : this.spec) {
       if (VariableUtils.isVar(specValue)) {
         fetchedValue =
             getVariableValueFromVariableContextMap(specValue, ImmutableMap.copyOf(contextValues));
       } else {
-        GenericResult gen;
+        EvaluationResult gen;
         Specification hl7spec = HL7Specification.parse(specValue, this.extractMultiple);
 
         gen = dataSource.extractValueForSpec(Lists.newArrayList(hl7spec), contextValues);
@@ -104,10 +105,10 @@ public class SimpleVariable implements Variable {
   }
 
 
-  private static GenericResult getVariableValueFromVariableContextMap(String varName,
-      ImmutableMap<String, GenericResult> contextValues) {
+  private static EvaluationResult getVariableValueFromVariableContextMap(String varName,
+      ImmutableMap<String, EvaluationResult> contextValues) {
     if (StringUtils.isNotBlank(varName)) {
-      GenericResult fetchedValue;
+      EvaluationResult fetchedValue;
       fetchedValue = contextValues.get(VariableUtils.getVarName(varName));
 
       return fetchedValue;

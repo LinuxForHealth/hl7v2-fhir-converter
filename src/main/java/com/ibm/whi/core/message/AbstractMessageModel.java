@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.ibm.whi.api.MessageEngine;
 
 public abstract class AbstractMessageModel<T> {
 

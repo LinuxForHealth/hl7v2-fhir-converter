@@ -7,15 +7,19 @@ package com.ibm.whi.hl7.expression;
 
 import java.util.HashMap;
 import java.util.Map;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Preconditions;
-import com.ibm.whi.core.expression.GenericResult;
+import com.ibm.whi.api.EvaluationResult;
+import com.ibm.whi.api.InputData;
+import com.ibm.whi.core.expression.EmptyEvaluationResult;
+import com.ibm.whi.core.expression.EvaluationResultFactory;
 import com.ibm.whi.core.expression.VariableUtils;
-import com.ibm.whi.core.message.InputData;
 
 
 /**
@@ -71,16 +75,16 @@ public class ValueExtractionGeneralExpression extends AbstractExpression {
    * from the context.
    * 
    * 
-   * @see com.ibm.whi.hl7.expression.Expression#execute(java.util.Map)
+   * @see com.ibm.whi.api.Expression#execute(java.util.Map)
    */
 
   @Override
-  public GenericResult evaluateExpression(InputData dataSource,
-      Map<String, GenericResult> contextValues, GenericResult hl7SpecValues) {
+  public EvaluationResult evaluateExpression(InputData dataSource,
+      Map<String, EvaluationResult> contextValues, EvaluationResult hl7SpecValues) {
     Preconditions.checkArgument(dataSource != null, "dataSource cannot be null");
     Preconditions.checkArgument(contextValues != null, "contextValues cannot be null");
 
-    Map<String, GenericResult> resolvedVariables = new HashMap<>(contextValues);
+    Map<String, EvaluationResult> resolvedVariables = new HashMap<>(contextValues);
 
     Map<String, Object> localContext = new HashMap<>();
     resolvedVariables
@@ -90,11 +94,17 @@ public class ValueExtractionGeneralExpression extends AbstractExpression {
       Object resource = localContext.get(VariableUtils.getVarName(token[0]));
     if (resource instanceof Map) {
       Map<String, Object> resourceMap = (Map<String, Object>) resource;
-        return new GenericResult(resourceMap.get(token[1]));
+        return EvaluationResultFactory.getEvaluationResult(resourceMap.get(token[1]));
       }
     }
-    return null;
+    return new EmptyEvaluationResult();
   }
 
-
+  @Override
+  public String toString() {
+    ToStringBuilder.setDefaultStyle(ToStringStyle.JSON_STYLE);
+    return new ToStringBuilder(this.getClass().getSimpleName()).append("hl7spec", this.getspecs())
+        .append("isMultiple", this.isMultiple()).append("variables", this.getVariables())
+        .append("fetch", this.fetch).build();
+  }
 }

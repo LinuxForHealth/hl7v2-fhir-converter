@@ -6,7 +6,8 @@
 package com.ibm.whi.core.expression.condition;
 
 import java.util.Map;
-import com.ibm.whi.core.expression.GenericResult;
+import com.ibm.whi.api.Condition;
+import com.ibm.whi.api.EvaluationResult;
 import com.ibm.whi.core.expression.VariableUtils;
 
 public class CheckNotNull implements Condition {
@@ -24,8 +25,8 @@ public class CheckNotNull implements Condition {
 
 
   @Override
-  public boolean test(Map<String, GenericResult> contextVariables) {
-    GenericResult variable1 = contextVariables.get(VariableUtils.getVarName(var1));
+  public boolean test(Map<String, EvaluationResult> contextVariables) {
+    EvaluationResult variable1 = contextVariables.get(VariableUtils.getVarName(var1));
     
     return variable1 != null && !variable1.isEmpty();
   }
