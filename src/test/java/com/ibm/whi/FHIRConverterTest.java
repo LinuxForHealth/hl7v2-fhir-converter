@@ -39,6 +39,9 @@ public class FHIRConverterTest {
     IBaseResource bundleResource = context.getParser().parseResource(json);
     assertThat(bundleResource).isNotNull();
     Bundle b = (Bundle) bundleResource;
+    assertThat(b.getId()).isNotNull();
+    assertThat(b.getMeta().getLastUpdated()).isNotNull();
+    assertThat(b.getMeta().getSource()).contains("Message: ADT_A01, Message Control Id: 102");
     List<BundleEntryComponent> e = b.getEntry();
     List<Resource> patientResource =
         e.stream().filter(v -> ResourceType.Patient == v.getResource().getResourceType())
@@ -57,6 +60,12 @@ public class FHIRConverterTest {
         e.stream().filter(v -> ResourceType.Practitioner == v.getResource().getResourceType())
             .map(BundleEntryComponent::getResource).collect(Collectors.toList());
     assertThat(pracResource).hasSize(4);
+
+    List<Resource> allergyResources =
+        e.stream().filter(v -> ResourceType.AllergyIntolerance == v.getResource().getResourceType())
+            .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+    assertThat(allergyResources).hasSize(2);
+
 
     System.out.println(json);
   }
