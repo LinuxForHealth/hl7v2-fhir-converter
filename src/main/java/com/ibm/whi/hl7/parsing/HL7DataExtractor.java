@@ -323,7 +323,8 @@ public class HL7DataExtractor {
   public String getMessageId() {
     try {
       return getTerser().get("/MSH-10");
-    } catch (HL7Exception e) {
+    } catch (HL7Exception | IllegalArgumentException e) {
+      LOGGER.warn("Cannot extract message control id", e);
       return null;
     }
   }
