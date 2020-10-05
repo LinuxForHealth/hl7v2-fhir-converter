@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.UUID;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Bundle.BundleType;
 import org.hl7.fhir.r4.model.Meta;
@@ -89,10 +90,11 @@ public class HL7MessageEngine implements MessageEngine {
   private Bundle initBundle(InputData dataInput) {
     Bundle bundle = new Bundle();
     bundle.setType(this.bundleType);
+    bundle.setId(UUID.randomUUID().toString());
     Meta m = new Meta();
-    m.setSource(dataInput.getName());
+    m.setSource("Message: " + dataInput.getName() + ", Message Control Id: " + dataInput.getId());
     m.setLastUpdated(LocalDateTime.now().toDate());
-    m.setId(dataInput.getId());
+
     bundle.setMeta(m);
     return bundle;
   }
