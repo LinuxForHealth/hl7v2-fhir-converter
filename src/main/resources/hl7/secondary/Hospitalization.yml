@@ -9,35 +9,29 @@ preAdmissionIdentifier:
     hl7spec:  PV1.5	
 admitSource: 
    resource: datatype/CodeableConcept
-   var:
-     code: PV1.14
+   hl7spec: PV1.14
 
 reAdmission:
    resource: datatype/CodeableConcept
-   var:
-     code: PV1.13
+   hl7spec: PV1.13
 
 
 dietPreference:
    resource: datatype/CodeableConcept
-   var:
-     code: PV1.38
+   hl7spec: PV1.38
    
 
 specialCourtesy:
    resource: datatype/CodeableConcept *
-   var:
-     code: PV1.16
+   hl7spec: PV1.16
 
 
 specialArrangement: 
    resource: datatype/CodeableConcept *
-   var:
-     code: PV1.15 | OBR.30 | OBR.43
+   hl7spec: PV1.15 | OBR.30 | OBR.43
 
 
 dischargeDisposition:
    resource: datatype/CodeableConcept
-   var:
-     code: PV1.36
+   hl7spec: PV1.36
 

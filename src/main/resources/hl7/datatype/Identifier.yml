@@ -6,8 +6,7 @@
 ---
 type: 
    resource: datatype/CodeableConcept
-   var:
-     code: CX.3 |CWE.3
+   hl7spec: CX.5 | CWE.5
 
 system: 
      type: STRING

@@ -46,14 +46,16 @@ public class ValueExtractionGeneralExpression extends AbstractExpression {
    * @param defaultValue
    * @param required
    * @param variables
+   * @param constants
    */
   @JsonCreator
   public ValueExtractionGeneralExpression(@JsonProperty("type") String type,
       @JsonProperty("fetch") String fetch, @JsonProperty("hl7spec") String hl7spec,
       @JsonProperty("default") Object defaultValue, @JsonProperty("required") boolean required,
       @JsonProperty("var") Map<String, String> variables,
-      @JsonProperty("condition") String condition) {
-    super(type, defaultValue, required, hl7spec, variables, condition);
+      @JsonProperty("condition") String condition,
+      @JsonProperty("constants") Map<String, String> constants) {
+    super(type, defaultValue, required, hl7spec, variables, condition, constants);
     Preconditions.checkArgument(fetch != null && fetch.split(":").length >= 2,
         "value of fetch should include name of the resource and field. ");
 
@@ -62,9 +64,15 @@ public class ValueExtractionGeneralExpression extends AbstractExpression {
 
   }
 
+  /**
+   * 
+   * @param type
+   * @param fetch
+   * @param hl7spec
+   */
 
   public ValueExtractionGeneralExpression(String type, String fetch, String hl7spec) {
-    this(type, fetch, hl7spec, null, false, null, null);
+    this(type, fetch, hl7spec, null, false, null, null, null);
   }
 
 

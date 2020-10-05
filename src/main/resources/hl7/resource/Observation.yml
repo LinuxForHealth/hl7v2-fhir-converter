@@ -20,8 +20,8 @@ status:
 
 code:
    resource: datatype/CodeableConcept
-   var:
-     code: OBX.3
+   hl7spec: OBX.3
+
      
 subject:
     resource: datatype/Reference
@@ -101,17 +101,17 @@ valueRatio:
 
 interpretation: 
    resource: datatype/CodeableConcept
-   var:
-     code: OBX.8
+   hl7spec: OBX.8
+
 
 bodySite:
    resource: datatype/CodeableConcept
-   var:
-     code: OBX.20
+   hl7spec: OBX.20
+
 method:
    resource: datatype/CodeableConcept
-   var:
-     code: OBX.17
+   hl7spec: OBX.17
+
 referenceRange: 
    resource: secondary/ReferenceRange *
    hl7spec: OBX.7

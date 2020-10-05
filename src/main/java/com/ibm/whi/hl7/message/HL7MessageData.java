@@ -230,6 +230,17 @@ public class HL7MessageData implements InputData {
   }
 
 
+  @Override
+  public String getName() {
+    return this.hde.getMessageType();
+  }
+
+
+  @Override
+  public String getId() {
+    return this.hde.getMessageId();
+  }
+
 
 
 }

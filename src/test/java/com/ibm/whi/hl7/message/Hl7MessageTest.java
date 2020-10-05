@@ -24,7 +24,9 @@ import com.ibm.whi.fhir.FHIRContext;
 import com.ibm.whi.hl7.resource.ResourceModelReader;
 
 public class Hl7MessageTest {
-  private static HL7MessageEngine engine = new HL7MessageEngine();
+  private static FHIRContext context = new FHIRContext();
+  private static HL7MessageEngine engine = new HL7MessageEngine(context);
+
   @Test
   public void test_patient() throws IOException {
 
@@ -40,7 +42,7 @@ public class Hl7MessageTest {
     assertThat(json).isNotBlank();
 
 
-    IBaseResource bundleResource = FHIRContext.getIParserInstance().parseResource(json);
+    IBaseResource bundleResource = context.getParser().parseResource(json);
     assertThat(bundleResource).isNotNull();
     Bundle b = (Bundle) bundleResource;
     List<BundleEntryComponent> e = b.getEntry();
@@ -75,7 +77,7 @@ public class Hl7MessageTest {
 
 
 
-    IBaseResource bundleResource = FHIRContext.getIParserInstance().parseResource(json);
+    IBaseResource bundleResource = context.getParser().parseResource(json);
     assertThat(bundleResource).isNotNull();
     Bundle b = (Bundle) bundleResource;
     List<BundleEntryComponent> e = b.getEntry();
@@ -113,7 +115,7 @@ public class Hl7MessageTest {
 
 
 
-    IBaseResource bundleResource = FHIRContext.getIParserInstance().parseResource(json);
+    IBaseResource bundleResource = context.getParser().parseResource(json);
     assertThat(bundleResource).isNotNull();
     Bundle b = (Bundle) bundleResource;
     List<BundleEntryComponent> e = b.getEntry();
@@ -141,7 +143,7 @@ public class Hl7MessageTest {
         + "OBX|3|TX|||Fourth Line: HYPERDYNAMIC LV SYSTOLIC FUNCTION, VISUAL EF 80%~Fifth line, as part of a repeated field||||||F||||Alex||";
     String json = message.convert(hl7message, engine);
 
-    IBaseResource bundleResource = FHIRContext.getIParserInstance().parseResource(json);
+    IBaseResource bundleResource = context.getParser().parseResource(json);
     assertThat(bundleResource).isNotNull();
     Bundle b = (Bundle) bundleResource;
     List<BundleEntryComponent> e = b.getEntry();
@@ -174,7 +176,7 @@ public class Hl7MessageTest {
         + "OBX|2|TX|||Second Line: NORMAL LV CHAMBER SIZE WITH MILD CONCENTRIC LVH\\.br\\Third Line in the same field, after the escape character for line break.||||||F||\r"
         + "OBX|3|TX|||Fourth Line: HYPERDYNAMIC LV SYSTOLIC FUNCTION, VISUAL EF 80%~Fifth line, as part of a repeated field||||||F||";
     String json = message.convert(hl7message, engine);
-    IBaseResource bundleResource = FHIRContext.getIParserInstance().parseResource(json);
+    IBaseResource bundleResource = context.getParser().parseResource(json);
     assertThat(bundleResource).isNotNull();
     Bundle b = (Bundle) bundleResource;
     List<BundleEntryComponent> e = b.getEntry();
@@ -204,7 +206,7 @@ public class Hl7MessageTest {
         + "PV1|1||Location||||||||||||||||261938_6_201306171546|||||||||||||||||||||||||20130617134644|||||||||\r"
         + "OBX|1|NM|0135–4^TotalProtein||7.3|gm/dl|5.9-8.4||||F";
     String json = message.convert(hl7message, engine);
-    IBaseResource bundleResource = FHIRContext.getIParserInstance().parseResource(json);
+    IBaseResource bundleResource = context.getParser().parseResource(json);
     assertThat(bundleResource).isNotNull();
     Bundle b = (Bundle) bundleResource;
     List<BundleEntryComponent> e = b.getEntry();
@@ -234,7 +236,7 @@ public class Hl7MessageTest {
         + "AL1|1|DA|^PENICILLIN|MO|PRODUCES HIVES~RASH|MO\r" //
         + "AL1|2|AA|^CAT DANDER|SV";
     String json = message.convert(hl7message, engine);
-    IBaseResource bundleResource = FHIRContext.getIParserInstance().parseResource(json);
+    IBaseResource bundleResource = context.getParser().parseResource(json);
     assertThat(bundleResource).isNotNull();
     Bundle b = (Bundle) bundleResource;
     List<BundleEntryComponent> e = b.getEntry();
@@ -269,7 +271,7 @@ public class Hl7MessageTest {
         + "AL1|1|DA|^PENICILLIN|MO|PRODUCES HIVES~RASH|MO\r" //
         + "AL1|2|AA|^CAT DANDER|SV";
     String json = message.convert(hl7message, engine);
-    IBaseResource bundleResource = FHIRContext.getIParserInstance().parseResource(json);
+    IBaseResource bundleResource = context.getParser().parseResource(json);
     assertThat(bundleResource).isNotNull();
     Bundle b = (Bundle) bundleResource;
     List<BundleEntryComponent> e = b.getEntry();
@@ -277,6 +279,33 @@ public class Hl7MessageTest {
         e.stream().filter(v -> ResourceType.AllergyIntolerance == v.getResource().getResourceType())
             .map(BundleEntryComponent::getResource).collect(Collectors.toList());
     assertThat(obsResource).hasSize(2);
+
+
+  }
+
+  @Test
+  public void test_condition() throws IOException {
+
+    ResourceModel rsm =
+        ResourceModelReader.getInstance().generateResourceModel("resource/Condition");
+    HL7FHIRResource observation =
+        new HL7FHIRResource("Condition", "PRB", rsm, 0, true, new ArrayList<>());
+    HL7MessageModel message = new HL7MessageModel("ADT", Lists.newArrayList(observation));
+    String hl7message = "MSH|^~\\&|hl7Integration|hl7Integration|||||ADT^A01|||2.3|\r"
+        + "EVN|A01|20130617154644\r"
+        + "PID|1|465 306 5961|000010016^^^MR~000010017^^^MR~000010018^^^MR|407623|Wood^Patrick^^Sr^MR||19700101|female|||High Street^^Oxford^^Ox1 4DP~George St^^Oxford^^Ox1 5AP|||||||\r"
+        + "NK1|1|Wood^John^^^MR|Father||999-9999\r" + "NK1|2|Jones^Georgie^^^MSS|MOTHER||999-9999\r"
+        + "PV1|1||Location||||||||||||||||261938_6_201306171546|||||||||||||||||||||||||20130617134644|||||||||\r"
+        + "PRB|AD|200603150625|aortic stenosis|53692||2||200603150625";
+    String json = message.convert(hl7message, engine);
+    IBaseResource bundleResource = context.getParser().parseResource(json);
+    assertThat(bundleResource).isNotNull();
+    Bundle b = (Bundle) bundleResource;
+    List<BundleEntryComponent> e = b.getEntry();
+    List<Resource> cond =
+        e.stream().filter(v -> ResourceType.Condition == v.getResource().getResourceType())
+            .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+    assertThat(cond).hasSize(1);
 
 
   }

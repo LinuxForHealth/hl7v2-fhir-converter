@@ -7,6 +7,8 @@ package com.ibm.whi.hl7.data;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
@@ -17,6 +19,7 @@ import org.hl7.fhir.r4.model.AllergyIntolerance.AllergyIntoleranceCategory;
 import org.hl7.fhir.r4.model.AllergyIntolerance.AllergyIntoleranceCriticality;
 import org.hl7.fhir.r4.model.Enumerations.AdministrativeGender;
 import org.hl7.fhir.r4.model.Observation.ObservationStatus;
+import org.hl7.fhir.r4.model.codesystems.ConditionCategory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.ibm.whi.core.terminology.Hl7v2Mapping;
@@ -127,6 +130,17 @@ public class SimpleDataValueResolver {
         }
       };
 
+  public static final ValueExtractor<Object, SimpleCode> CONDITION_CATEGORY_CODES =
+      (Object value) -> {
+        String val = Hl7DataHandlerUtil.getStringValue(value);
+        if (val != null) {
+          ConditionCategory status = ConditionCategory.fromCode(val);
+          return new SimpleCode(val, status.getSystem(), status.getDisplay());
+        } else {
+          return null;
+        }
+      };
+
 
 
   public static final ValueExtractor<Object, Boolean> BOOLEAN = (Object value) -> {
@@ -227,7 +241,17 @@ public class SimpleDataValueResolver {
     }
   };
 
-  //
+  public static final ValueExtractor<Object, List<?>> ARRAY = (Object value) -> {
+
+    if (value != null) {
+      List list = new ArrayList<>();
+      list.add(value);
+      return list;
+    }
+    return null;
+  };
+
+
   private SimpleDataValueResolver() {}
 
   private static UUID getUUID(String value) {

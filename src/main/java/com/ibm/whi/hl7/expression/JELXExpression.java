@@ -36,8 +36,9 @@ public class JELXExpression extends AbstractExpression {
       @JsonProperty("default") Object defaultValue, @JsonProperty("required") boolean required,
       @JsonProperty("hl7spec") String hl7spec, @JsonProperty("evaluate") String evaluate,
       @JsonProperty("var") Map<String, String> variables,
-      @JsonProperty("condition") String condition) {
-    super(type, defaultValue, required, hl7spec, variables, condition);
+      @JsonProperty("condition") String condition,
+      @JsonProperty("constants") Map<String, String> constants) {
+    super(type, defaultValue, required, hl7spec, variables, condition, constants);
     Preconditions.checkArgument(StringUtils.isNotBlank(evaluate), "evaluate file cannot be blank");
 
     this.evaluate = evaluate;
@@ -47,7 +48,7 @@ public class JELXExpression extends AbstractExpression {
 
 
   public JELXExpression(String evaluate, Map<String, String> variables) {
-    this("String", null, false, null, evaluate, variables, null);
+    this("String", null, false, null, evaluate, variables, null, null);
 
 
   }

@@ -44,7 +44,7 @@ public class ReferenceExpression extends AbstractExpression {
   private HL7DataBasedResourceModel referenceModel = (HL7DataBasedResourceModel) ResourceModelReader
       .getInstance().generateResourceModel("datatype/Reference");
   private String reference;
-
+  private boolean isGenerateMultipleResource;
 
 
   /**
@@ -62,12 +62,13 @@ public class ReferenceExpression extends AbstractExpression {
       @JsonProperty("reference") String reference, @JsonProperty("hl7spec") String hl7spec,
       @JsonProperty("default") Object defaultValue, @JsonProperty("required") boolean required,
       @JsonProperty("var") Map<String, String> variables,
-      @JsonProperty("condition") String condition) {
-    super(type, defaultValue, required, hl7spec, variables, condition);
+      @JsonProperty("condition") String condition,
+      @JsonProperty("constants") Map<String, String> constants) {
+    super(type, defaultValue, required, hl7spec, variables, condition, constants);
 
     Preconditions.checkArgument(StringUtils.isNotBlank(reference), "reference cannot be blank");
     if (reference.endsWith("*")) {
-      this.setMultiple();
+      isGenerateMultipleResource = true;
       reference = StringUtils.removeEnd(reference, "*");
     }
     this.reference = StringUtils.strip(reference);
@@ -81,7 +82,7 @@ public class ReferenceExpression extends AbstractExpression {
 
   public ReferenceExpression(@JsonProperty("type") String type,
       @JsonProperty("reference") String reference, @JsonProperty("hl7spec") String hl7spec) {
-    this(type, reference, hl7spec, null, false, null, null);
+    this(type, reference, hl7spec, null, false, null, null, null);
   }
 
 
@@ -159,4 +160,8 @@ public class ReferenceExpression extends AbstractExpression {
         .append("reference", this.reference).build();
   }
 
+  @Override
+  public boolean isMultiple() {
+    return this.isGenerateMultipleResource;
+  }
 }

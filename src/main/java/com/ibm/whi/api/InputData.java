@@ -10,13 +10,45 @@ import java.util.Map;
 
 public interface InputData {
 
+  /**
+   * Extract the single value from the input for the given list of specifications.
+   * 
+   * @param hl7specs - List of specifications example: PID.3
+   * @param contextValues - Map of key value pair
+   * @return {@link EvaluationResult}
+   */
   EvaluationResult extractValueForSpec(List<Specification> hl7specs,
       Map<String, EvaluationResult> contextValues);
 
+  /**
+   * Extract the multiple values from the input for the given list of specifications.
+   * 
+   * @param hl7specs - List of specifications example: PID.3
+   * @param contextValues - Map of key value pair
+   * @return {@link EvaluationResult}
+   */
   EvaluationResult extractMultipleValuesForSpec(List<Specification> hl7specs,
       Map<String, EvaluationResult> contextValues);
 
+  /**
+   * Evaluate JEXL Expression that handles extracting data from this data source.
+   * 
+   * @param expression - example:
+   * @param contextValues - Map of key value pair
+   * @return {@link EvaluationResult}
+   */
   EvaluationResult evaluateJexlExpression(String expression, Map<String, EvaluationResult> contextValues);
 
 
+  /**
+   * Return the name /identifier of this resource Example: for ADT_A01 message, return the message
+   * type.
+   */
+  String getName();
+
+  /**
+   * Return the unique identifier of this resource Example: for a ADT_A01 message, return the
+   * message id.
+   */
+  String getId();
 }

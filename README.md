@@ -234,118 +234,212 @@ In order to convert a Hl7 message to FHIR resource, create a new instance of the
 Sample output:
 
 ```json
-{"resourceType": "Bundle",
+{
+  "resourceType": "Bundle",
   "meta": {
-    "tag": [ {
-      "system": "http://terminology.hl7.org/CodeSystem/v3-ObservationValue",
-      "code": "SUBSETTED",
-      "display": "Resource encoded in summary mode"
-    } ]
+    "id": "102",
+    "lastUpdated": "2020-10-05T22:12:57.548+08:00",
+    "source": "ADT_A01"
   },
   "type": "collection",
   "entry": [ {
     "resource": {
       "resourceType": "Patient",
-      "id": "ee746e04-80b1-4822-9c63-9e3bffe8cee3",
-      "meta": {
-        "tag": [ {
-          "system": "http://terminology.hl7.org/CodeSystem/v3-ObservationValue",
-          "code": "SUBSETTED",
-          "display": "Resource encoded in summary mode"
-        } ]
-      },
+      "id": "f7146386-4700-4e5e-b05b-1cd8d8cb5481",
       "identifier": [ {
-        "system": "1231",
-        "value": "ADTNew"
+        "type": {
+          "coding": [ {
+            "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+            "code": "MR",
+            "display": "Medical record number"
+          } ],
+          "text": "MR"
+        },
+        "system": "A",
+        "value": "PID1234"
+      }, {
+        "type": {
+          "coding": [ {
+            "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+            "code": "SS",
+            "display": "Social Security number"
+          } ],
+          "text": "SS"
+        },
+        "system": "USA",
+        "value": "1234568965"
       } ],
       "name": [ {
-        "text": "familyname",
-        "family": "familyname"
+        "family": "DOE",
+        "given": [ "JOHN" ]
       } ],
       "gender": "female",
-      "birthDate": "1983-02-02"
+      "birthDate": "1980-02-02"
     }
   }, {
     "resource": {
       "resourceType": "Encounter",
-      "id": "a0a44360-0543-4a01-abbe-8cc16d9aa5ee",
-      "meta": {
-        "tag": [ {
-          "system": "http://terminology.hl7.org/CodeSystem/v3-ObservationValue",
-          "code": "SUBSETTED",
-          "display": "Resource encoded in summary mode"
-        } ]
-      },
+      "id": "9b08c455-721b-49c8-ac72-79f39822a05f",
       "identifier": [ {
         "value": "48390"
       } ],
       "status": "finished",
+      "type": [ {
+        "text": "EL"
+      } ],
       "serviceType": {
         "coding": [ {
-          "code": "MED"
+          "system": "http://terminology.hl7.org/CodeSystem/v2-0069",
+          "code": "MED",
+          "display": "Medical Service"
         } ],
         "text": "MED"
       },
       "period": {
         "start": "2014-09-12T22:00:00",
-        "end": "2000-02-06T03:17:26"
+        "end": "2015-02-06T03:17:26"
       },
       "length": {
-        "value": 7679202,
+        "value": 210557,
         "unit": "Minutes"
       },
       "hospitalization": {
         "preAdmissionIdentifier": {
           "value": "ABC"
-        }
+        },
+        "specialCourtesy": [ {
+          "text": "E"
+        } ],
+        "specialArrangement": [ {
+          "coding": [ {
+            "system": "http://terminology.hl7.org/CodeSystem/v2-0009",
+            "code": "B6",
+            "display": "Pregnant"
+          } ],
+          "text": "B6"
+        } ]
       }
     }
   }, {
     "resource": {
       "resourceType": "Observation",
-      "id": "5834de56-ad14-472a-9302-0b8f7458beb8",
-      "meta": {
-        "tag": [ {
-          "system": "http://terminology.hl7.org/CodeSystem/v3-ObservationValue",
-          "code": "SUBSETTED",
-          "display": "Resource encoded in summary mode"
-        } ]
-      },
+      "id": "fdab3063-1365-43ea-9f0d-6c55520d600b",
       "identifier": [ {
+        "type": {
+          "coding": [ {
+            "code": "1234"
+          } ]
+        },
         "value": "1234"
       } ],
       "status": "final",
       "code": {
         "coding": [ {
           "code": "1234"
-        } ],
-        "text": "1234"
+        } ]
       },
       "issued": "2012-09-12T01:12:30",
       "performer": [ {
-        "reference": "438ab808-0c21-4969-90e0-b0748fe098da",
+        "reference": "2a540f3b-9994-47a0-b4ba-ad1b86dac82f",
+        "type": "Practitioner"
+      }, {
+        "reference": "35fe016c-5e26-468a-a426-b3fd8bb3a2a6",
+        "type": "Practitioner"
+      }, {
+        "reference": "28fd3e3a-ca1a-4f72-ac2d-49251af1cb8e",
+        "type": "Practitioner"
+      }, {
+        "reference": "d78dc350-46fe-453a-9e48-49391e36f9d1",
         "type": "Practitioner"
       } ],
-      "valueString": "First line: ECHOCARDIOGRAPHIC REPORT"
+      "valueString": "ECHOCARDIOGRAPHIC REPORT"
     }
   }, {
     "resource": {
       "resourceType": "Practitioner",
-      "id": "438ab808-0c21-4969-90e0-b0748fe098da",
-      "meta": {
-        "tag": [ {
-          "system": "http://terminology.hl7.org/CodeSystem/v3-ObservationValue",
-          "code": "SUBSETTED",
-          "display": "Resource encoded in summary mode"
-        } ]
-      },
+      "id": "2a540f3b-9994-47a0-b4ba-ad1b86dac82f",
       "identifier": [ {
         "value": "2740"
       } ],
       "name": [ {
-        "text": "Jane FamilyName",
-        "family": "FamilyName",
-        "given": [ "Jane" ]
+        "text": "Janetary TRDSE",
+        "family": "TRDSE",
+        "given": [ "Janetary" ]
+      } ]
+    }
+  }, {
+    "resource": {
+      "resourceType": "Practitioner",
+      "id": "35fe016c-5e26-468a-a426-b3fd8bb3a2a6",
+      "identifier": [ {
+        "value": "2913"
+      } ],
+      "name": [ {
+        "text": "Darren MRTTE",
+        "family": "MRTTE",
+        "given": [ "Darren" ]
+      } ]
+    }
+  }, {
+    "resource": {
+      "resourceType": "Practitioner",
+      "id": "28fd3e3a-ca1a-4f72-ac2d-49251af1cb8e",
+      "identifier": [ {
+        "value": "3065"
+      } ],
+      "name": [ {
+        "text": "Paul MGHOBT",
+        "family": "MGHOBT",
+        "given": [ "Paul" ]
+      } ]
+    }
+  }, {
+    "resource": {
+      "resourceType": "Practitioner",
+      "id": "d78dc350-46fe-453a-9e48-49391e36f9d1",
+      "identifier": [ {
+        "value": "4723"
+      } ],
+      "name": [ {
+        "text": "Robert LOTHDEW",
+        "family": "LOTHDEW",
+        "given": [ "Robert" ]
+      } ]
+    }
+  }, {
+    "resource": {
+      "resourceType": "AllergyIntolerance",
+      "id": "5d74f7ff-11d5-44b2-8fc9-e6dd45700494",
+      "code": {
+        "coding": [ {
+          "code": "00000741",
+          "display": "OXYCODONE"
+        } ],
+        "text": "OXYCODONE"
+      },
+      "reaction": [ {
+        "manifestation": [ {
+          "text": "HYPOTENSION"
+        } ]
+      } ]
+    }
+  }, {
+    "resource": {
+      "resourceType": "AllergyIntolerance",
+      "id": "a418b654-bb07-4203-9a23-ba9781e1ab12",
+      "code": {
+        "coding": [ {
+          "code": "00001433",
+          "display": "TRAMADOL"
+        } ],
+        "text": "TRAMADOL"
+      },
+      "reaction": [ {
+        "manifestation": [ {
+          "text": "SEIZURES"
+        }, {
+          "text": "VOMITING"
+        } ]
       } ]
     }
   } ]

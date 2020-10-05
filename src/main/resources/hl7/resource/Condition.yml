@@ -1,0 +1,64 @@
+#
+# (C) Copyright IBM Corp. 2020
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+---
+resourceType: Condition
+id:
+  type: STRING
+  evaluate: 'UUID.randomUUID()'
+
+
+category_x1:
+   resource: datatype/CodeableConcept_var *
+   condition:  $source NOT_NULL
+   var:     
+     code: CONDITION_CATEGORY_CODES, $type
+     text: $type
+     source: PRB.3
+   constants:
+      type: problem-list-item
+
+category_x2:
+   resource: datatype/CodeableConcept_var *
+   condition:  $source NULL
+   var:     
+     code: CONDITION_CATEGORY_CODES, $type
+     text: $type
+     source: PRB.3
+   constants:
+      type: encounter-diagnosis
+           
+
+severity:
+   resource: datatype/CodeableConcept *
+   hl7spec: PRB.26
+   var:
+     code: PRB.26
+code:
+   resource: datatype/CodeableConcept *
+   hl7spec: PRB.3
+   var:
+     code: PRB.3
+     
+     
+encounter:
+    resource: datatype/Reference
+    var: 
+      ref-type: $Encounter
+      
+subject:
+    resource: datatype/Reference
+    var: 
+      ref-type: $Patient
+
+onsetDateTime:
+     type: DATE_TIME
+     hl7spec: PRB.16 
+
+stage:
+   resource: secondary/Stage *
+   hl7spec: PRB.14
+   var:
+     code: PRB.14

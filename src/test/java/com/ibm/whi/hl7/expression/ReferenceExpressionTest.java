@@ -26,7 +26,7 @@ import ca.uhn.hl7v2.model.Structure;
 public class ReferenceExpressionTest {
   String message = "MSH|^~\\&|hl7Integration|hl7Integration|||||ADT^A01|||2.3|\r"
       + "EVN|A01|20130617154644\r"
-      + "PID|1|465 306 5961|000010016^^^MR^SSS^^20091020^20200101~000010017^^^MR~000010018^^^MR|407623|Wood^Patrick^^^MR||19700101|female|||High Street^^Oxford^^Ox1 4DP~George St^^Oxford^^Ox1 5AP|||||||\r"
+      + "PID|1|465 306 5961|000010016^5^M11^SY1^MR^|407623|Wood^Patrick^^^MR||19700101|female|||High Street^^Oxford^^Ox1 4DP~George St^^Oxford^^Ox1 5AP|||||||\r"
       + "NK1|1|Wood^John^^^MR|Father||999-9999\r" + "NK1|2|Jones^Georgie^^^MSS|MOTHER||999-9999\r"
       + "PV1|1||Location||||||||||||||||261938_6_201306171546|||||||||||||||||||||||||20130617134644|||||||||";
 
@@ -50,7 +50,7 @@ public class ReferenceExpressionTest {
     Map<String, Object> result = (Map<String, Object>) value.getValue();
     assertThat(result.get("use")).isEqualTo(null);
     assertThat(result.get("value")).isEqualTo("000010016");
-    assertThat(result.get("system")).isEqualTo("MR");
+    assertThat(result.get("system")).isEqualTo("SY1");
 
 
 
@@ -92,7 +92,7 @@ public class ReferenceExpressionTest {
   public void test1_segment_rep() throws IOException {
     String message = "MSH|^~\\&|hl7Integration|hl7Integration|||||ADT^A01|||2.3|\r"
         + "EVN|A01|20130617154644\r"
-        + "PID|1|465 306 5961|000010016^^^MR~000010017^^^MR~000010018^^^MR|407623|Wood^Patrick^^^MR||19700101|female|||High Street^^Oxford^^Ox1 4DP~George St^^Oxford^^Ox1 5AP|||||||\r"
+        + "PID|1|465 306 5961|000010016^^^SY1^MR~000010017^^^SY2^SS~000010018^^^MR|407623|Wood^Patrick^^^MR||19700101|female|||High Street^^Oxford^^Ox1 4DP~George St^^Oxford^^Ox1 5AP|||||||\r"
         + "NK1|1|Wood^John^^^MR|Father||999-9999\r" + "NK1|2|Jones^Georgie^^^MSS|MOTHER||999-9999\r"
         + "PV1|1||Location||||||||||||||||261938_6_201306171546|||||||||||||||||||||||||20130617134644|||||||||";
     Message hl7message = getMessage(message);
@@ -119,7 +119,7 @@ public class ReferenceExpressionTest {
     Map<String, Object> result = (Map<String, Object>) results.get(0);
     assertThat(result.get("use")).isEqualTo(null);
     assertThat(result.get("value")).isEqualTo("000010016");
-    assertThat(result.get("system")).isEqualTo("MR");
+    assertThat(result.get("system")).isEqualTo("SY1");
 
 
 

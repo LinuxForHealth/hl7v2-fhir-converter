@@ -1,0 +1,9 @@
+#
+# (C) Copyright IBM Corp. 2020
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+---
+summary: 
+   resource: datatype/CodeableConcept
+   hl7spec: $code

@@ -12,6 +12,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import org.hl7.fhir.r4.model.Bundle;
+import org.hl7.fhir.r4.model.Bundle.BundleType;
+import org.hl7.fhir.r4.model.Meta;
+import org.joda.time.LocalDateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
@@ -23,6 +26,7 @@ import com.ibm.whi.api.EvaluationResult;
 import com.ibm.whi.api.InputData;
 import com.ibm.whi.api.MessageEngine;
 import com.ibm.whi.api.ResourceModel;
+import com.ibm.whi.core.Constants;
 import com.ibm.whi.core.ObjectMapperUtil;
 import com.ibm.whi.core.expression.EvaluationResultFactory;
 import com.ibm.whi.core.message.AbstractFHIRResource;
@@ -33,10 +37,22 @@ import com.ibm.whi.fhir.FHIRResourceMapper;
 import ca.uhn.hl7v2.model.Structure;
 
 public class HL7MessageEngine implements MessageEngine {
+
+
+
   private static final Logger LOGGER = LoggerFactory.getLogger(HL7MessageEngine.class);
   private static final ObjectMapper OBJ_MAPPER = ObjectMapperUtil.getJSONInstance();
+  private FHIRContext context;
+  private BundleType bundleType;
 
+  public HL7MessageEngine(FHIRContext context) {
+    this(context, Constants.DEFAULT_BUNDLE_TYPE);
+  }
 
+  public HL7MessageEngine(FHIRContext context, BundleType bundleType) {
+    this.context = context;
+    this.bundleType = bundleType;
+  }
 
   /**
    * Converts a HL7 message to a FHIR bundle with the list of resources specified
@@ -49,15 +65,14 @@ public class HL7MessageEngine implements MessageEngine {
    */
   @Override
   public Bundle transform(InputData dataInput,
-      Iterable<? extends AbstractFHIRResource> resources, Map<String, EvaluationResult> contextValues)
-      throws IOException {
+      Iterable<? extends AbstractFHIRResource> resources,
+      Map<String, EvaluationResult> contextValues) {
     Preconditions.checkArgument(dataInput != null, "dataInput cannot be null");
     Preconditions.checkArgument(contextValues != null, "contextValues cannot be null");
     Preconditions.checkArgument(resources != null, "resources cannot be null");
 
     HL7MessageData hl7DataInput = (HL7MessageData) dataInput;
-    Bundle bundle = new Bundle();
-    bundle.setType(Bundle.BundleType.COLLECTION);
+    Bundle bundle = initBundle(dataInput);
 
     for (AbstractFHIRResource res : resources) {
       HL7FHIRResource hres = (HL7FHIRResource) res;
@@ -65,23 +80,25 @@ public class HL7MessageEngine implements MessageEngine {
       List<Structure> segments =
           hl7DataInput.getHL7DataParser().getAllStructures(hres.getSegment()).getValues();
       if (!segments.isEmpty()) {
-
         generateFHIRResources(hl7DataInput, hres, rs, segments, contextValues, bundle);
-
       }
-
-
-
     }
-
     return bundle;
+  }
 
-
-
+  private Bundle initBundle(InputData dataInput) {
+    Bundle bundle = new Bundle();
+    bundle.setType(this.bundleType);
+    Meta m = new Meta();
+    m.setSource(dataInput.getName());
+    m.setLastUpdated(LocalDateTime.now().toDate());
+    m.setId(dataInput.getId());
+    bundle.setMeta(m);
+    return bundle;
   }
 
 
-  private static void generateFHIRResources(InputData dataExtractor, HL7FHIRResource res,
+  private void generateFHIRResources(InputData dataExtractor, HL7FHIRResource res,
       ResourceModel rs, List<Structure> segments, Map<String, EvaluationResult> variables,
       Bundle bundle) {
     try {
@@ -128,12 +145,9 @@ public class HL7MessageEngine implements MessageEngine {
         addValues(bundle, additionalResourceObjects);
       }
 
-
-
     }
     } catch (IllegalArgumentException | IllegalStateException e) {
       LOGGER.error("Exception during  resource {} generation", rs.getName(), e);
-
 
     } finally {
       MDC.remove("Resource");
@@ -141,8 +155,7 @@ public class HL7MessageEngine implements MessageEngine {
   }
 
 
-
-  private static void addValues(Bundle bundle, List<ResourceValue> objects) {
+  private void addValues(Bundle bundle, List<ResourceValue> objects) {
     if (objects != null && !objects.isEmpty()) {
       objects.forEach(obj -> {
         addEntry(obj.getResourceClass(), obj, bundle);
@@ -153,15 +166,17 @@ public class HL7MessageEngine implements MessageEngine {
 
 
 
-  private static void addEntry(String resourceClass, ResourceValue obj, Bundle bundle) {
+  private void addEntry(String resourceClass, ResourceValue obj, Bundle bundle) {
 
     try {
       if (obj != null) {
         LOGGER.info("Converting resourceName {} to FHIR {}", resourceClass, obj.getResource());
         String json = OBJ_MAPPER.writeValueAsString(obj.getResource());
         if (json != null) {
-          org.hl7.fhir.r4.model.Resource parsed = FHIRContext.getIParserInstance()
-              .parseResource(FHIRResourceMapper.getResourceClass(resourceClass), json);
+          org.hl7.fhir.r4.model.Resource parsed =
+              context.getParser()
+                  .parseResource(FHIRResourceMapper.getResourceClass(resourceClass), json);
+
           bundle.addEntry().setResource(parsed);
         }
       }
@@ -171,5 +186,11 @@ public class HL7MessageEngine implements MessageEngine {
 
 
   }
+
+  @Override
+  public FHIRContext getFHIRContext() {
+    return context;
+  }
+
 
 }

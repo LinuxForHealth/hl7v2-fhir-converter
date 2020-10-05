@@ -288,9 +288,12 @@ public class HL7DataExtractor {
   }
 
   public static String getMessageType(Message message) {
-
     return message.getName();
+  }
 
+
+  public String getMessageType() {
+    return message.getName();
   }
 
 
@@ -314,6 +317,15 @@ public class HL7DataExtractor {
       LOGGER.debug(HL7_STRING, segment + "-" + field, e);
       return new Hl7ParsingStringResult(null);
 
+    }
+  }
+
+  public String getMessageId() {
+    try {
+      return getTerser().get("/MSH-10");
+    } catch (HL7Exception | IllegalArgumentException e) {
+      LOGGER.warn("Cannot extract message control id", e);
+      return null;
     }
   }
 }
