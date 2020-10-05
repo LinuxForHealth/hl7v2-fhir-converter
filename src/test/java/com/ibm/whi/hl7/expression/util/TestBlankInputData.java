@@ -34,4 +34,15 @@ public class TestBlankInputData implements InputData {
     return null;
   }
 
+  @Override
+  public String getName() {
+    return null;
+  }
+
+  @Override
+  public String getId() {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
 }

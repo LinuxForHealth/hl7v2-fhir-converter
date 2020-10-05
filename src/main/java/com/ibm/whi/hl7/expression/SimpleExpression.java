@@ -38,11 +38,18 @@ public class SimpleExpression extends AbstractExpression {
 
   }
 
+  /**
+   * 
+   * @param type
+   * @param value
+   * @param variables
+   * @param condition
+   */
   @JsonCreator
   public SimpleExpression(@JsonProperty("type") String type, @JsonProperty("value") String value,
       @JsonProperty("var") Map<String, String> variables,
       @JsonProperty("condition") String condition) {
-    super(type, null, false, "", variables, condition);
+    super(type, null, false, "", variables, condition, null);
     this.value = value;
   }
 
@@ -67,15 +74,27 @@ public class SimpleExpression extends AbstractExpression {
           getVariableValueFromVariableContextMap(value, ImmutableMap.copyOf(localContextValues));
       LOGGER.debug("Evaluated value {} to {} ", this.value, obj);
       if (obj != null) {
-        LOGGER.debug("Evaluated value {} to {} type {} ", this.value, obj, obj.getClass());
-        ValueExtractor<Object, ?> resolver = SimpleDataTypeMapper.getValueResolver(this.getType());
-        return EvaluationResultFactory.getEvaluationResult(resolver.apply(obj.getValue()));
+
+        return getValueOfSpecifiedType(obj.getValue());
+      } else {
+        LOGGER.debug("Evaluated {} returning null", this.value);
+        return null;
       }
-      LOGGER.debug("Evaluated {} returning null", this.value);
-      return null;
+
     } else {
       LOGGER.debug("Evaluated {} returning value enclosed as GenericResult.", this.value);
-      return EvaluationResultFactory.getEvaluationResult(this.value);
+      return getValueOfSpecifiedType(this.value);
+    }
+  }
+
+  private EvaluationResult getValueOfSpecifiedType(Object obj) {
+    if (obj != null) {
+      LOGGER.debug("Evaluated value {} to {} type {} ", this.value, obj, obj.getClass());
+      ValueExtractor<Object, ?> resolver = SimpleDataTypeMapper.getValueResolver(this.getType());
+      return EvaluationResultFactory.getEvaluationResult(resolver.apply(obj));
+    } else {
+      LOGGER.debug("Evaluated {} returning null", this.value);
+      return null;
     }
   }
 

@@ -26,7 +26,9 @@ import com.ibm.whi.fhir.FHIRContext;
 import com.ibm.whi.hl7.resource.ResourceModelReader;
 
 public class DifferentObservationValueTest {
-  private static HL7MessageEngine engine = new HL7MessageEngine();
+  private static FHIRContext context = new FHIRContext();
+  private static HL7MessageEngine engine = new HL7MessageEngine(context);
+
   private String baseMessage = "MSH|^~\\&|hl7Integration|hl7Integration|||||ADT^A01|||2.6|\r"
       + "EVN|A01|20130617154644\r"
       + "PID|1|465 306 5961|000010016^^^MR~000010017^^^MR~000010018^^^MR|407623|Wood^Patrick^^Sr^MR||19700101|female|||High Street^^Oxford^^Ox1 4DP~George St^^Oxford^^Ox1 5AP|||||||\r"
@@ -49,7 +51,7 @@ public class DifferentObservationValueTest {
     String hl7message = baseMessage
         + "OBX|1|NM|0135–4^TotalProtein||7.3|gm/dl|5.9-8.4||||F";
     String json = message.convert(hl7message, engine);
-    IBaseResource bundleResource = FHIRContext.getIParserInstance().parseResource(json);
+    IBaseResource bundleResource = context.getParser().parseResource(json);
     assertThat(bundleResource).isNotNull();
     Bundle b = (Bundle) bundleResource;
     List<BundleEntryComponent> e = b.getEntry();
@@ -72,7 +74,7 @@ public class DifferentObservationValueTest {
     String hl7message = baseMessage
         + "OBX|1|TX|||Fourth Line: HYPERDYNAMIC LV SYSTOLIC FUNCTION, VISUAL EF 80%||||||F||||Alex||";
     String json = message.convert(hl7message, engine);
-    IBaseResource bundleResource = FHIRContext.getIParserInstance().parseResource(json);
+    IBaseResource bundleResource = context.getParser().parseResource(json);
     assertThat(bundleResource).isNotNull();
     Bundle b = (Bundle) bundleResource;
     List<BundleEntryComponent> e = b.getEntry();
@@ -96,7 +98,7 @@ public class DifferentObservationValueTest {
     String hl7message = baseMessage
         + "OBX|1|TX|||HYPERDYNAMIC LV SYSTOLIC FUNCTION, VISUAL EF 80%~Fifth line, as part of a repeated field||||||F||";
     String json = message.convert(hl7message, engine);
-    IBaseResource bundleResource = FHIRContext.getIParserInstance().parseResource(json);
+    IBaseResource bundleResource = context.getParser().parseResource(json);
     assertThat(bundleResource).isNotNull();
     Bundle b = (Bundle) bundleResource;
     List<BundleEntryComponent> e = b.getEntry();
@@ -120,7 +122,7 @@ public class DifferentObservationValueTest {
     String hl7message =
         baseMessage + "OBX|1|CE|93000&CMP^LIN^CPT4|11|1305^No significant change was found^MEIECG";
     String json = message.convert(hl7message, engine);
-    IBaseResource bundleResource = FHIRContext.getIParserInstance().parseResource(json);
+    IBaseResource bundleResource = context.getParser().parseResource(json);
     assertThat(bundleResource).isNotNull();
     Bundle b = (Bundle) bundleResource;
     List<BundleEntryComponent> e = b.getEntry();

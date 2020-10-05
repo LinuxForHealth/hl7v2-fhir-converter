@@ -15,9 +15,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Stream;
 import org.apache.commons.lang3.StringUtils;
+import org.hl7.fhir.r4.model.Bundle.BundleType;
 import com.google.common.base.Preconditions;
 import com.ibm.whi.core.Constants;
 import com.ibm.whi.core.ObjectMapperUtil;
+import com.ibm.whi.fhir.FHIRContext;
 import com.ibm.whi.hl7.message.HL7MessageEngine;
 import com.ibm.whi.hl7.message.HL7MessageModel;
 import com.ibm.whi.hl7.parsing.HL7DataExtractor;
@@ -29,23 +31,28 @@ public class HL7ToFHIRConverter {
   private Map<String, HL7MessageModel> messagetemplates = new HashMap<>();
   private HL7MessageEngine engine;
 
-  public HL7ToFHIRConverter() throws IOException {
+  public HL7ToFHIRConverter(boolean isPrettyPrint, BundleType bundleType) throws IOException {
     initTemplates();
-    engine = new HL7MessageEngine();
+    FHIRContext context = new FHIRContext(isPrettyPrint);
+    engine = new HL7MessageEngine(context, bundleType);
   }
 
+  public HL7ToFHIRConverter() throws IOException {
+    this(Constants.DEFAULT_PRETTY_PRINT, Constants.DEFAULT_BUNDLE_TYPE);
+  }
 
 
 
   private void initTemplates() throws IOException {
     try (Stream<Path> paths =
-        Files.walk(Paths.get(Constants.DEAFULT_HL7_MESSAGE_FOLDER.getAbsolutePath()))) {
+        Files.walk(Paths.get(Constants.DEFAULT_HL7_MESSAGE_FOLDER.getAbsolutePath()))) {
       paths.filter(p -> p.toFile().isFile()).forEach(this::addMessageModel);
     }
   }
 
 
-  public String convert(String rawmessage) throws IOException {
+  public String convert(String rawmessage)
+      throws IOException {
     Preconditions.checkArgument(StringUtils.isNotBlank(rawmessage),
         "Input HL7 message cannot be blank");
    

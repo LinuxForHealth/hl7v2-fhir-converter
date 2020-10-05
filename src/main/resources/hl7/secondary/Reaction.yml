@@ -7,8 +7,7 @@
 manifestation:
    resource: datatype/CodeableConcept *
    hl7spec: AL1.5
-   var:
-     code: AL1.5 *
+
 
 onset:
    type: DATE_TIME

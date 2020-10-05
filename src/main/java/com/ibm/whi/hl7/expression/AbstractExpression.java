@@ -44,10 +44,10 @@ public abstract class AbstractExpression implements Expression {
   private final List<Specification> hl7specs;
   private List<Variable> variables;
   private Condition condition;
-  private boolean isMultiple;
+  private Map<String, String> constants;
 
   public AbstractExpression(String type, Object defaultValue, boolean required, String hl7spec,
-      Map<String, String> rawvariables, String condition) {
+      Map<String, String> rawvariables, String condition, Map<String, String> constants) {
     if (type == null) {
       this.type = OBJECT_TYPE;
     } else {
@@ -65,6 +65,11 @@ public abstract class AbstractExpression implements Expression {
       this.condition = ConditionUtil.createCondition(condition);
     }
 
+
+    this.constants = new HashMap<>();
+    if (constants != null && !constants.isEmpty()) {
+      this.constants.putAll(constants);
+    }
     initVariables(rawvariables);
 
   }
@@ -99,6 +104,7 @@ public abstract class AbstractExpression implements Expression {
     return new ArrayList<>(this.hl7specs);
   }
 
+  @Override
   public List<Variable> getVariables() {
     return new ArrayList<>(variables);
   }
@@ -114,15 +120,19 @@ public abstract class AbstractExpression implements Expression {
    * @see com.ibm.whi.api.Expression#evaluate(com.ibm.whi.api.InputData,
    *      java.util.Map)
    */
+  @Override
   public EvaluationResult evaluate(InputData dataSource, Map<String, EvaluationResult> contextValues) {
     Preconditions.checkArgument(dataSource != null, "dataSource cannot be null");
     Preconditions.checkArgument(contextValues != null, "contextValues cannot be null");
     EvaluationResult result;
     LOGGER.info("Started Evaluating expression {} ", this);
-    if (this.isMultiple) {
-      result = evaluateMultiple(dataSource, contextValues);
+    Map<String, EvaluationResult> localContextValues = new HashMap<>(contextValues);
+    this.constants.entrySet().forEach(e -> localContextValues.put(e.getKey(),
+        EvaluationResultFactory.getEvaluationResult(e.getValue())));
+    if (this.isMultiple()) {
+      result = evaluateMultiple(dataSource, localContextValues);
     } else {
-      result = evaluateSingle(dataSource, contextValues);
+      result = evaluateSingle(dataSource, localContextValues);
     }
 
     LOGGER.info("Completed Evaluating the expression {} returned result {}", this, result);
@@ -265,12 +275,9 @@ public abstract class AbstractExpression implements Expression {
   }
 
   public boolean isMultiple() {
-    return isMultiple;
+    return false;
   }
 
-  public void setMultiple() {
-    this.isMultiple = true;
-  }
 
 
 
@@ -295,6 +302,9 @@ public abstract class AbstractExpression implements Expression {
     return specs;
   }
 
-
+  @Override
+  public Map<String, String> getConstants() {
+    return this.constants;
+  }
 
 }

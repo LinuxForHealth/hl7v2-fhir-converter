@@ -15,7 +15,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Preconditions;
 import com.ibm.whi.api.MessageEngine;
 import com.ibm.whi.core.message.AbstractMessageModel;
-import com.ibm.whi.fhir.FHIRContext;
 import com.ibm.whi.hl7.parsing.HL7DataExtractor;
 import com.ibm.whi.hl7.parsing.HL7HapiParser;
 import ca.uhn.hl7v2.HL7Exception;
@@ -65,10 +64,8 @@ public class HL7MessageModel extends AbstractMessageModel<Message> {
 
     Bundle bundle =
         engine.transform(dataSource, this.getResources(), new HashMap<>());
-
-    return FHIRContext.getIParserInstance().setPrettyPrint(true).encodeResourceToString(bundle);
-
-
+    return engine.getFHIRContext()
+        .encodeResourceToString(bundle);
 
   }
 

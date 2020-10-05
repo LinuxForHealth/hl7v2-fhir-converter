@@ -38,7 +38,7 @@ public class ResourceExpression extends AbstractExpression {
 
   private HL7DataBasedResourceModel data;
   private String resourceToGenerate;
-
+  private boolean isGenerateMultipleResource;
 
 
   /**
@@ -50,19 +50,21 @@ public class ResourceExpression extends AbstractExpression {
    * @param required
    * @param variables
    * @param referencesResources
+   * @param constants
    */
   @JsonCreator
   public ResourceExpression(@JsonProperty("type") String type,
       @JsonProperty("resource") String resourceToGenerate, @JsonProperty("hl7spec") String hl7spec,
       @JsonProperty("default") Object defaultValue, @JsonProperty("required") boolean required,
       @JsonProperty("var") Map<String, String> variables,
-      @JsonProperty("condition") String condition) {
-    super(type, defaultValue, required, hl7spec, variables, condition);
+      @JsonProperty("condition") String condition,
+      @JsonProperty("constants") Map<String, String> constants) {
+    super(type, defaultValue, required, hl7spec, variables, condition, constants);
 
     Preconditions.checkArgument(StringUtils.isNotBlank(resourceToGenerate),
         "reference cannot be blank");
     if (resourceToGenerate.endsWith("*")) {
-      this.setMultiple();
+      this.isGenerateMultipleResource = true;
       resourceToGenerate = StringUtils.removeEnd(resourceToGenerate, "*");
     }
     this.resourceToGenerate = StringUtils.strip(resourceToGenerate);
@@ -77,7 +79,7 @@ public class ResourceExpression extends AbstractExpression {
   public ResourceExpression(@JsonProperty("type") String type,
       @JsonProperty("resource") String resourceToGenerate,
       @JsonProperty("hl7spec") String hl7spec) {
-    this(type, resourceToGenerate, hl7spec, null, false, null, null);
+    this(type, resourceToGenerate, hl7spec, null, false, null, null, null);
   }
 
 
@@ -132,4 +134,8 @@ public class ResourceExpression extends AbstractExpression {
         .append("resourceToGenerate", this.resourceToGenerate).build();
   }
 
+  @Override
+  public boolean isMultiple() {
+    return this.isGenerateMultipleResource;
+  }
 }

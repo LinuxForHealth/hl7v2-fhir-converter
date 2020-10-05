@@ -20,6 +20,7 @@ public class TemplateFieldNames {
   public static final String RESOURCE = "resource";
   public static final String REFERENCE_RESOURCES = "reference-resources";
   public static final String FETCH = "fetch";
+  public static final String CONSTANT = "constant";
 
 
   private TemplateFieldNames() {}

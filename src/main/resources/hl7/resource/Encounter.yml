@@ -28,18 +28,18 @@ class:
 
 type:
    resource: datatype/CodeableConcept *
-   var:
-     code: PV1.4 | PV1.18
+   hl7spec: PV1.4 | PV1.18
+
 
 serviceType:
    resource: datatype/CodeableConcept
-   var:
-     code: PV1.10
+   hl7spec: PV1.10
+
 
 priority:
    resource: datatype/CodeableConcept
-   var:
-     code: PV2.25
+   hl7spec: PV2.25
+
 
 episodeOfCare:
    type: STRING
@@ -59,8 +59,8 @@ length:
 
 reasonCode:
     resource: datatype/CodeableConcept *
-    var:
-      code: EVN.4 | PV2.3
+    hl7spec: EVN.4 | PV2.3
+
 
 
 hospitalization:
