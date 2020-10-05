@@ -39,6 +39,9 @@ public class FHIRConverterTest {
     IBaseResource bundleResource = context.getParser().parseResource(json);
     assertThat(bundleResource).isNotNull();
     Bundle b = (Bundle) bundleResource;
+    assertThat(b.getId()).isNotNull();
+    assertThat(b.getMeta().getLastUpdated()).isNotNull();
+    assertThat(b.getMeta().getSource()).contains("Message: ADT_A01, Message Control Id: 102");
     List<BundleEntryComponent> e = b.getEntry();
     List<Resource> patientResource =
         e.stream().filter(v -> ResourceType.Patient == v.getResource().getResourceType())
