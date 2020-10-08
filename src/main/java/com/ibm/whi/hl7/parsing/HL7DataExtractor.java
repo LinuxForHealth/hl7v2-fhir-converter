@@ -7,18 +7,19 @@ package com.ibm.whi.hl7.parsing;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
-import com.ibm.whi.hl7.exception.DataExtractionException;
 import com.ibm.whi.hl7.parsing.result.Hl7ParsingStringResult;
 import com.ibm.whi.hl7.parsing.result.Hl7ParsingStructureResult;
 import com.ibm.whi.hl7.parsing.result.Hl7ParsingTypeResult;
 import com.ibm.whi.hl7.parsing.result.ParsingResult;
 import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Composite;
+import ca.uhn.hl7v2.model.Group;
 import ca.uhn.hl7v2.model.Message;
 import ca.uhn.hl7v2.model.Primitive;
 import ca.uhn.hl7v2.model.Segment;
@@ -29,19 +30,14 @@ import ca.uhn.hl7v2.model.Variable;
 import ca.uhn.hl7v2.util.Terser;
 
 public class HL7DataExtractor {
+  private static final String SEGMENT_CANNOT_BE_NULL_OR_EMPTY = "segment cannot be null or empty";
+
   private static final String REP_CANNOT_BE_NEGATIVE = "rep cannot be negative";
 
   private static final String HL7_STRING = "HL7 String {}  ";
 
-  private static final String CANNOT_EXTRACT_VALUE_FROM_OF_TAG =
-      "Cannot extract value from of tag ";
+  private static final String CANNOT_EXTRACT_VALUE = "Cannot extract value :";
 
-  private static final String CANNOT_EXTRACT_VALUE_FROM_OF_TAG_STRING =
-      "Cannot extract value from of tag , string:";
-
-  private static final String CANNOT_ADD_REPETITION_WITH_INDEX = "Cannot add repetition with index";
-
-  private static final String CAN_T_GET_REPETITION = "Can't get repetition";
 
   private static final Logger LOGGER = LoggerFactory.getLogger(HL7DataExtractor.class);
 
@@ -52,6 +48,91 @@ public class HL7DataExtractor {
     this.message = message;
 
   }
+
+
+  private static Predicate<Structure> isEmpty() {
+    return (Structure p) -> {
+      try {
+        return p == null || p.isEmpty();
+      } catch (HL7Exception e) {
+        LOGGER.debug("Error", e);
+        return true;
+      }
+    };
+  }
+
+
+
+  public ParsingResult<Structure> getStructure(String group, int groupRep, String segment,
+      int rep) {
+
+    LOGGER.debug("Fetching segment: {} {} {} {}", group, groupRep, segment, rep);
+    try {
+      ParsingResult<Structure> parsingResult = null;
+
+      Preconditions.checkArgument(StringUtils.isNotBlank(group), "group cannot be null or empty");
+      Preconditions.checkArgument(StringUtils.isNotBlank(segment), SEGMENT_CANNOT_BE_NULL_OR_EMPTY);
+      Preconditions.checkArgument(groupRep >= 0, "groupRep should be greater than or equal to 0");
+      Preconditions.checkArgument(rep >= 0, "Segment rep cannot be less than 0");
+
+
+      Structure groupStr = message.get(group, groupRep);
+      if (groupStr instanceof Group) {
+        Group gp = (Group) groupStr;
+        Structure s = gp.get(segment, rep);
+        if (s != null && !s.isEmpty()) {
+          parsingResult = new Hl7ParsingStructureResult(s);
+        } else {
+          parsingResult = new Hl7ParsingStructureResult(new ArrayList<>());
+        }
+
+      } else {
+        parsingResult = new Hl7ParsingStructureResult(new ArrayList<>());
+      }
+
+
+      return parsingResult;
+    } catch (HL7Exception | IllegalArgumentException | ArrayIndexOutOfBoundsException e) {
+      String spec = group + " " + groupRep + " " + segment;
+      LOGGER.warn(CANNOT_EXTRACT_VALUE + spec + " rep:" + rep, e);
+        return new Hl7ParsingStructureResult(new ArrayList<>());
+
+    }
+  }
+
+
+
+  public ParsingResult<Structure> getAllStructures(String group, int groupRep, String segment) {
+
+    LOGGER.debug("Fetching segment: {} {} {} ", group, groupRep, segment);
+    try {
+      ParsingResult<Structure> parsingResult = null;
+
+      Preconditions.checkArgument(StringUtils.isNotBlank(group), "group cannot be null or empty");
+      Preconditions.checkArgument(StringUtils.isNotBlank(segment), SEGMENT_CANNOT_BE_NULL_OR_EMPTY);
+      Preconditions.checkArgument(groupRep >= 0, "groupRep should be greater than or equal to 0");
+
+      Structure groupStr = message.get(group, groupRep);
+      if (groupStr instanceof Group) {
+        Group gp = (Group) groupStr;
+        Structure[] s = gp.getAll(segment);
+        List<Structure> list = Lists.newArrayList(s);
+        list.removeIf(isEmpty());
+        parsingResult = new Hl7ParsingStructureResult(Lists.newArrayList(list));
+      } else {
+        parsingResult = new Hl7ParsingStructureResult(new ArrayList<>());
+      }
+
+
+      return parsingResult;
+    } catch (HL7Exception | IllegalArgumentException | ArrayIndexOutOfBoundsException e) {
+      String spec = group + " " + groupRep + " " + segment;
+      LOGGER.warn(CANNOT_EXTRACT_VALUE + spec, e);
+        return new Hl7ParsingStructureResult(new ArrayList<>());
+
+    }
+  }
+
 
   public boolean doesSegmentExists(String spec) {
     LOGGER.debug("Checking if segment exists: {}", spec);
@@ -77,7 +158,7 @@ public class HL7DataExtractor {
       Preconditions.checkArgument(rep >= 0, "Segment rep cannot be less than 0");
       Message unmodifiableMessage = Unmodifiable.unmodifiableMessage(message);
       Structure s = unmodifiableMessage.get(spec, rep);
-        return s != null;
+      return s != null;
 
 
     } catch (IllegalArgumentException | HL7Exception | ArrayIndexOutOfBoundsException e) {
@@ -88,65 +169,46 @@ public class HL7DataExtractor {
 
 
 
-  public ParsingResult<Structure> getStructure(String spec, int rep) {
+  public ParsingResult<Structure> getStructure(String structure, int rep) {
     try {
       ParsingResult<Structure> parsingResult = null;
-      if (doesSegmentExists(spec, rep)) {
-      Preconditions.checkArgument(StringUtils.isNotBlank(spec),
-          "Not a valid string to extract from Hl7");
-      Preconditions.checkArgument(rep >= 0, REP_CANNOT_BE_NEGATIVE);
-        LOGGER.debug("fetching values for spec {} rep {}", spec, rep);
+      if (doesSegmentExists(structure, rep)) {
+        Preconditions.checkArgument(StringUtils.isNotBlank(structure),
+            "Not a valid string to extract from Hl7");
+        Preconditions.checkArgument(rep >= 0, REP_CANNOT_BE_NEGATIVE);
+        LOGGER.debug("fetching values for spec {} rep {}", structure, rep);
 
-        parsingResult = new Hl7ParsingStructureResult(message.get(spec, rep));
+        parsingResult = new Hl7ParsingStructureResult(message.get(structure, rep));
       } else {
         parsingResult = new Hl7ParsingStructureResult(new ArrayList<>());
       }
       return parsingResult;
-    } catch (HL7Exception | IllegalArgumentException e) {
-      if (e.getMessage().contains(CAN_T_GET_REPETITION)
-          || e.getMessage().contains(CANNOT_ADD_REPETITION_WITH_INDEX)) {
-        LOGGER.warn(CANNOT_EXTRACT_VALUE_FROM_OF_TAG_STRING + spec + " rep:" + rep, e);
+    } catch (HL7Exception | IllegalArgumentException | ArrayIndexOutOfBoundsException e) {
+      LOGGER.warn(CANNOT_EXTRACT_VALUE + structure + " rep:" + rep, e);
         return new Hl7ParsingStructureResult(new ArrayList<>());
-      } else {
-        throw new DataExtractionException(CANNOT_EXTRACT_VALUE_FROM_OF_TAG, e);
-      }
 
-    } catch (ArrayIndexOutOfBoundsException are) {
-      LOGGER.error(HL7_STRING, spec, are);
-      return new Hl7ParsingStructureResult(new ArrayList<>());
     }
   }
 
 
 
-  public ParsingResult<Structure> getAllStructures(String spec) {
+  public ParsingResult<Structure> getAllStructures(String structure) {
     try {
       ParsingResult<Structure> parsingResult = null;
-      if (doesSegmentExists(spec)) {
-      Preconditions.checkArgument(StringUtils.isNotBlank(spec),
-          "Not a valid string to extract from Hl7");
-        LOGGER.debug("fetching values for spec {}, ", spec);
-      List<Structure> segments = new ArrayList<>();
-        Structure[] strs = message.getAll(spec);
+      if (doesSegmentExists(structure)) {
+        Preconditions.checkArgument(StringUtils.isNotBlank(structure),
+            "Not a valid string to extract from Hl7");
+        LOGGER.debug("fetching values for spec {}, ", structure);
+        Structure[] strs = message.getAll(structure);
 
-      segments.addAll(Lists.newArrayList(strs));
-        parsingResult = new Hl7ParsingStructureResult(segments);
+        parsingResult = new Hl7ParsingStructureResult(Lists.newArrayList(strs));
       } else {
         parsingResult = new Hl7ParsingStructureResult(new ArrayList<>());
       }
       return parsingResult;
-    } catch (HL7Exception | IllegalArgumentException e) {
-      if (e.getMessage().contains(CAN_T_GET_REPETITION)
-          || e.getMessage().contains(CANNOT_ADD_REPETITION_WITH_INDEX)) {
-        LOGGER.warn(CANNOT_EXTRACT_VALUE_FROM_OF_TAG_STRING + spec, e);
+    } catch (HL7Exception | IllegalArgumentException | ArrayIndexOutOfBoundsException e) {
+      LOGGER.warn(CANNOT_EXTRACT_VALUE + structure, e);
         return new Hl7ParsingStructureResult(new ArrayList<>());
-      } else {
-        throw new DataExtractionException(CANNOT_EXTRACT_VALUE_FROM_OF_TAG, e);
-      }
-
-    } catch (ArrayIndexOutOfBoundsException are) {
-      LOGGER.error(HL7_STRING, spec, are);
-      return new Hl7ParsingStructureResult(new ArrayList<>());
 
     }
   }
@@ -162,18 +224,10 @@ public class HL7DataExtractor {
       LOGGER.debug("fetching values for Segment {} field {} rep {}, ", segment, field, rep);
       return new Hl7ParsingTypeResult(segment.getField(field, rep));
 
-    } catch (HL7Exception | IllegalArgumentException e) {
-      if (e.getMessage().contains(CAN_T_GET_REPETITION)
-          || e.getMessage().contains(CANNOT_ADD_REPETITION_WITH_INDEX)) {
-        LOGGER.warn(CANNOT_EXTRACT_VALUE_FROM_OF_TAG_STRING + segment, e);
-        return new Hl7ParsingTypeResult(new ArrayList<>());
-      } else {
-        throw new DataExtractionException(CANNOT_EXTRACT_VALUE_FROM_OF_TAG, e);
-      }
+    } catch (HL7Exception | IllegalArgumentException | ArrayIndexOutOfBoundsException e) {
 
-    } catch (ArrayIndexOutOfBoundsException are) {
-      LOGGER.error(HL7_STRING, segment, are);
-      return new Hl7ParsingTypeResult(new ArrayList<>());
+      LOGGER.warn(CANNOT_EXTRACT_VALUE + segment, e);
+        return new Hl7ParsingTypeResult(new ArrayList<>());
 
     }
   }
@@ -186,26 +240,15 @@ public class HL7DataExtractor {
       Preconditions.checkArgument(field >= 1, "field cannot be negative");
 
       LOGGER.debug("fetching values for Segment {} field {}  ", segment, field);
-
-      List<Type> types = new ArrayList<>();
-
       Type[] fields = segment.getField(field);
-      types.addAll(Lists.newArrayList(fields));
 
-      return new Hl7ParsingTypeResult(types);
+      return new Hl7ParsingTypeResult(Lists.newArrayList(fields));
 
-    } catch (HL7Exception | IllegalArgumentException e) {
-      if (e.getMessage().contains(CAN_T_GET_REPETITION)
-          || e.getMessage().contains(CANNOT_ADD_REPETITION_WITH_INDEX)) {
-        LOGGER.warn(CANNOT_EXTRACT_VALUE_FROM_OF_TAG_STRING + segment, e);
+    } catch (HL7Exception | IllegalArgumentException | ArrayIndexOutOfBoundsException e) {
+
+      LOGGER.warn(CANNOT_EXTRACT_VALUE + segment, e);
         return new Hl7ParsingTypeResult(new ArrayList<>());
-      } else {
-        throw new DataExtractionException(CANNOT_EXTRACT_VALUE_FROM_OF_TAG, e);
-      }
 
-    } catch (ArrayIndexOutOfBoundsException are) {
-      LOGGER.error(HL7_STRING, segment, are);
-      return new Hl7ParsingTypeResult(new ArrayList<>());
 
     }
   }
@@ -224,27 +267,19 @@ public class HL7DataExtractor {
         Type value = ((Composite) type).getComponent(component - 1);
         if (value != null && !value.isEmpty()) {
           result = new Hl7ParsingTypeResult(((Composite) type).getComponent(component - 1));
-      } else {
+        } else {
           result = new Hl7ParsingTypeResult(new ArrayList<>());
-      }
+        }
       } else {
         result = new Hl7ParsingTypeResult(type);
       }
       return result;
 
-    } catch (HL7Exception | IllegalArgumentException e) {
-      if (e.getMessage().contains(CAN_T_GET_REPETITION)
-          || e.getMessage().contains(CANNOT_ADD_REPETITION_WITH_INDEX)) {
-        LOGGER.warn(
-            CANNOT_EXTRACT_VALUE_FROM_OF_TAG_STRING + component, e);
-        return new Hl7ParsingTypeResult(new ArrayList<>());
-      } else {
-        throw new DataExtractionException(CANNOT_EXTRACT_VALUE_FROM_OF_TAG, e);
-      }
+    } catch (HL7Exception | IllegalArgumentException | ArrayIndexOutOfBoundsException e) {
 
-    } catch (ArrayIndexOutOfBoundsException are) {
-      LOGGER.error(HL7_STRING, component, are);
-      return new Hl7ParsingTypeResult(new ArrayList<>());
+      LOGGER.warn(CANNOT_EXTRACT_VALUE + component, e);
+        return new Hl7ParsingTypeResult(new ArrayList<>());
+
     }
   }
 
@@ -263,19 +298,9 @@ public class HL7DataExtractor {
         result = new Hl7ParsingTypeResult(new ArrayList<>());
       }
       return result;
-    } catch (IllegalArgumentException | HL7Exception e) {
-      if (e.getMessage().contains(CAN_T_GET_REPETITION)
-          || e.getMessage().contains(CANNOT_ADD_REPETITION_WITH_INDEX)) {
-        LOGGER.warn(
-            CANNOT_EXTRACT_VALUE_FROM_OF_TAG_STRING + component, e);
+    } catch (IllegalArgumentException | HL7Exception | ArrayIndexOutOfBoundsException e) {
+      LOGGER.warn(CANNOT_EXTRACT_VALUE + component, e);
         return new Hl7ParsingTypeResult(new ArrayList<>());
-      } else {
-        throw new DataExtractionException(CANNOT_EXTRACT_VALUE_FROM_OF_TAG, e);
-      }
-
-    } catch (ArrayIndexOutOfBoundsException are) {
-      LOGGER.error(HL7_STRING, component, are);
-      return new Hl7ParsingTypeResult(new ArrayList<>());
 
     }
   }
@@ -305,11 +330,11 @@ public class HL7DataExtractor {
    * @return
    */
   public ParsingResult<String> get(String segment, String field) {
-  
-   Preconditions.checkArgument(StringUtils.isNotBlank(segment), "segment cannot be blank");
-   Preconditions.checkArgument(StringUtils.isNotBlank(field), "field cannot be blank");
 
-   try {
+    Preconditions.checkArgument(StringUtils.isNotBlank(segment), "segment cannot be blank");
+    Preconditions.checkArgument(StringUtils.isNotBlank(field), "field cannot be blank");
+
+    try {
       return new Hl7ParsingStringResult(getTerser().get("/" + segment + "-" + field));
 
     } catch (HL7Exception | IllegalArgumentException | ArrayIndexOutOfBoundsException e) {
@@ -328,4 +353,34 @@ public class HL7DataExtractor {
       return null;
     }
   }
+
+  public ParsingResult<Structure> getAllStructures(Structure struct, String segment) {
+    LOGGER.debug("Fetching segment: {} {}  ", struct, segment);
+    try {
+      ParsingResult<Structure> parsingResult = null;
+
+      Preconditions.checkArgument(struct != null, "struct cannot be null ");
+      Preconditions.checkArgument(StringUtils.isNotBlank(segment), SEGMENT_CANNOT_BE_NULL_OR_EMPTY);
+
+
+
+      if (struct instanceof Group) {
+        Group gp = (Group) struct;
+
+        Structure[] s = gp.getAll(segment);
+        List<Structure> list = Lists.newArrayList(s);
+        list.removeIf(isEmpty());
+
+        parsingResult = new Hl7ParsingStructureResult(list);
+      } else {
+        parsingResult = new Hl7ParsingStructureResult(new ArrayList<>());
+      }
+      return parsingResult;
+    } catch (HL7Exception | IllegalArgumentException | ArrayIndexOutOfBoundsException e) {
+      LOGGER.warn(CANNOT_EXTRACT_VALUE + struct, e);
+        return new Hl7ParsingStructureResult(new ArrayList<>());
+
+    }
+  }
+
 }

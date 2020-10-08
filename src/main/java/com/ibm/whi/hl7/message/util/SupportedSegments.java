@@ -3,7 +3,7 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  */
-package com.ibm.whi.hl7.message;
+package com.ibm.whi.hl7.message.util;
 
 public enum SupportedSegments {
   ABS, //

@@ -14,7 +14,9 @@ import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r4.model.AllergyIntolerance;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
+import org.hl7.fhir.r4.model.Encounter;
 import org.hl7.fhir.r4.model.Observation;
+import org.hl7.fhir.r4.model.Reference;
 import org.hl7.fhir.r4.model.Resource;
 import org.hl7.fhir.r4.model.ResourceType;
 import org.junit.Test;
@@ -90,6 +92,17 @@ public class Hl7MessageTest {
         e.stream().filter(v -> ResourceType.Encounter == v.getResource().getResourceType())
             .map(BundleEntryComponent::getResource).collect(Collectors.toList());
     assertThat(encounterResource).hasSize(1);
+    Encounter enc = getResource(encounterResource.get(0));
+    Reference ref = enc.getSubject();
+    assertThat(ref.isEmpty()).isFalse();
+
+  }
+
+
+  private static Encounter getResource(Resource resource) {
+    String s = context.getParser().encodeResourceToString(resource);
+    Class<? extends IBaseResource> klass = (Class<? extends IBaseResource>) Encounter.class;
+    return (Encounter) context.getParser().parseResource(klass, s);
   }
 
 

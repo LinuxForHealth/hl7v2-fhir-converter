@@ -1,0 +1,39 @@
+#
+# (C) Copyright IBM Corp. 2020
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+# FHIR Resources to extract from ADT_A01 message
+---
+resources:
+    - resourceName: Patient
+      segment: PID
+      resourcePath: resource/Patient
+      repeats: false
+      additionalSegments:
+
+      
+    - resourceName: Encounter
+      segment: PATIENT_VISIT.PV1
+      resourcePath: resource/Encounter
+      repeats: false
+      additionalSegments:
+             - .PV2
+             - .EVN
+      
+    - resourceName: Observation
+      segment: PROBLEM.PROBLEM_OBSERVATION.OBX
+      resourcePath: resource/Observation
+      repeats: true
+      additionalSegments:
+      
+            
+    - resourceName: Condition
+      segment: PROBLEM.PRB
+      resourcePath: resource/Condition
+      repeats: true
+      additionalSegments:
+      
+
+      
+  

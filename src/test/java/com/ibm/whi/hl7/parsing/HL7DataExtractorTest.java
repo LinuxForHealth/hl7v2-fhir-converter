@@ -40,6 +40,70 @@ public class HL7DataExtractorTest {
 
 
   @Test
+  public void returns_segment_if_exists_group() throws IOException {
+    String message =
+        "MSH|^~\\&|SendTest1|Sendfac1|Receiveapp1|Receivefac1|200603081747|security|PPR^PC1^PPR_PC1|1|P^I|2.6||||||ASCII||\r"
+            + "PID|||555444222111^^^MPI&GenHosp&L^MR||james^anderson||19600614|M||C|99 Oakland #106^^qwerty^OH^44889||^^^^^626^5641111|^^^^^626^5647654|||||343132266|||N\r"
+            + "PV1||I|6N^1234^A^GENHOS||||0100^ANDERSON^CARL|0148^ADDISON^JAMES||SUR|||||||0148^ANDERSON^CARL|S|1400|A|||||||||||||||||||SF|K||||199501102300\r"
+            + "PRB|AD|200603150625|aortic stenosis|53692||2||200603150625\r";
+
+
+    Message hl7message = getMessage(message);
+    HL7DataExtractor hl7DTE = new HL7DataExtractor(hl7message);
+
+
+    Structure s = hl7DTE.getStructure("PROBLEM", 0, "PRB", 0).getValue();
+    assertThat(s).isNotNull();
+    assertThat(s.getName()).isEqualTo("PRB");
+
+  }
+
+
+  @Test
+  public void returns_segment_if_exists_group_no_segment() throws IOException {
+    String message =
+        "MSH|^~\\&|SendTest1|Sendfac1|Receiveapp1|Receivefac1|200603081747|security|PPR^PC1^PPR_PC1|1|P^I|2.6||||||ASCII||\r"
+            + "PID|||555444222111^^^MPI&GenHosp&L^MR||james^anderson||19600614|M||C|99 Oakland #106^^qwerty^OH^44889||^^^^^626^5641111|^^^^^626^5647654|||||343132266|||N\r"
+            + "PV1||I|6N^1234^A^GENHOS||||0100^ANDERSON^CARL|0148^ADDISON^JAMES||SUR|||||||0148^ANDERSON^CARL|S|1400|A|||||||||||||||||||SF|K||||199501102300\r"
+            + "PRB|AD|200603150625|aortic stenosis|53692||2||200603150625\r";
+
+
+    Message hl7message = getMessage(message);
+    HL7DataExtractor hl7DTE = new HL7DataExtractor(hl7message);
+
+
+    Structure s = hl7DTE.getStructure("PROBLEM", 0, "NTE", 0).getValue();
+    assertThat(s).isNull();
+
+  }
+
+
+
+  @Test
+  public void get_group_then_segment_for_non_existing_segment() throws IOException {
+    String message =
+        "MSH|^~\\&|SendTest1|Sendfac1|Receiveapp1|Receivefac1|200603081747|security|PPR^PC1^PPR_PC1|1|P^I|2.6||||||ASCII||\r"
+            + "PID|||555444222111^^^MPI&GenHosp&L^MR||james^anderson||19600614|M||C|99 Oakland #106^^qwerty^OH^44889||^^^^^626^5641111|^^^^^626^5647654|||||343132266|||N\r"
+            + "PV1||I|6N^1234^A^GENHOS||||0100^ANDERSON^CARL|0148^ADDISON^JAMES||SUR|||||||0148^ANDERSON^CARL|S|1400|A|||||||||||||||||||SF|K||||199501102300\r"
+            + "PRB|AD|200603150625|aortic stenosis|53692||2||200603150625\r";
+
+
+    Message hl7message = getMessage(message);
+    HL7DataExtractor hl7DTE = new HL7DataExtractor(hl7message);
+
+
+    Structure s = hl7DTE.getStructure("PROBLEM", 0).getValue();
+    assertThat(s).isNotNull();
+
+    Structure sub = hl7DTE.getAllStructures(s, "NTE").getValue();
+    assertThat(sub).isNull();
+
+
+  }
+
+
+
+  @Test
   public void returns_null_if_segment_does_not_exists() throws IOException {
     String message = "MSH|^~\\&|hl7Integration|hl7Integration|||||ADT^A01|||2.3|\r"
         + "PID|1|465 306 5961|000010016^^^MR~000010017^^^MR~000010018^^^MR|407623|Wood^Patrick^^^MR||19700101|female|||High Street^^Oxford^^Ox1 4DP~George St^^Oxford^^Ox1 5AP|||||||\r"
