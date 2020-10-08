@@ -9,7 +9,7 @@ import org.apache.commons.lang3.EnumUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.text.StringTokenizer;
 import com.ibm.whi.api.Specification;
-import com.ibm.whi.hl7.message.SupportedSegments;
+import com.ibm.whi.hl7.message.util.SupportedSegments;
 
 
 /**
@@ -28,6 +28,7 @@ public class HL7Specification implements Specification {
   private int subComponent;
   private boolean isExtractMultiple;
   private String stringRep;
+  
   public HL7Specification(String segment, String field, int component, int subComponent,
       boolean isMultiple) {
     this.segment = segment;
@@ -35,7 +36,7 @@ public class HL7Specification implements Specification {
     this.component = component;
     this.subComponent = subComponent;
     this.isExtractMultiple = isMultiple;
-    stringRep = getToStringRep();
+    this.stringRep = getToStringRep();
   }
 
 

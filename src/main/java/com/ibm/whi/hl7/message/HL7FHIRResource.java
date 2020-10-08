@@ -17,8 +17,9 @@ import com.ibm.whi.hl7.resource.ResourceModelReader;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class HL7FHIRResource extends AbstractFHIRResource {
-  private String segment;// primary segment
-  private List<String> additionalSegments;
+  private HL7Segment segment;// primary segment
+  private List<HL7Segment> additionalSegments;
+
   private ResourceModel resource;
 
   public HL7FHIRResource(String resourceName, String segment, ResourceModel resource, int order,
@@ -26,9 +27,10 @@ public class HL7FHIRResource extends AbstractFHIRResource {
     super(resourceName, "", order, repeats);
     this.additionalSegments = new ArrayList<>();
     if (additionalSegments != null) {
-      this.additionalSegments.addAll(additionalSegments);
+      additionalSegments.forEach(e -> this.additionalSegments.add(HL7Segment.parse(e)));
     }
-    this.segment = segment;
+
+    this.segment = HL7Segment.parse(segment);
     this.resource = resource;
   }
 
@@ -46,9 +48,10 @@ public class HL7FHIRResource extends AbstractFHIRResource {
 
     this.additionalSegments = new ArrayList<>();
     if (additionalSegments != null) {
-      this.additionalSegments.addAll(additionalSegments);
+      additionalSegments.forEach(e -> this.additionalSegments.add(HL7Segment.parse(e)));
     }
-    this.segment = segment;
+
+    this.segment = HL7Segment.parse(segment);
     this.resource = generateResourceModel(resourcePath);
   }
 
@@ -62,8 +65,13 @@ public class HL7FHIRResource extends AbstractFHIRResource {
     return this.resource;
   }
 
-  public String getSegment() {
+  public HL7Segment getSegment() {
     return segment;
+  }
+
+
+  public List<HL7Segment> getAdditionalSegments() {
+    return additionalSegments;
   }
 
 
