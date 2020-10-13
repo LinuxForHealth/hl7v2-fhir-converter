@@ -92,3 +92,58 @@ publishing {
     }
   }
 }
+
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+javadoc.failOnError = false
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+artifacts {
+    archives sourcesJar
+    archives javadocJar
+}
+
+def pomConfig = {
+    licenses {
+        license {
+            name "The Apache Software License, Version 2.0"
+            url "http://www.apache.org/licenses/LICENSE-2.0.txt"
+            distribution "https://github.com/LinuxForHealth/hl7v2-fhir-converter"
+        }
+    }
+    
+
+    scm {
+        url "https://github.com/LinuxForHealth/hl7v2-fhir-converter"
+    }
+}
+
+publishing {
+    publications {
+        mavenPublication(MavenPublication) {
+            from components.java
+            artifact sourcesJar {
+                classifier "sources"
+            }
+            artifact javadocJar {
+                classifier "javadoc"
+            }
+            groupId 'com.ibm.whi'
+            artifactId 'hl7v2-fhir-converter'
+            version '1.0.0'
+            pom.withXml {
+                def root = asNode()
+                root.appendNode('description', 'FHIR converter that enables converting Hl7v2 messages to FHIR resources.')
+                root.appendNode('name', 'IBM')
+                root.appendNode('url', 'https://github.com/LinuxForHealth/hl7v2-fhir-converter')
+                root.children().last() + pomConfig
+            }
+        }
+    }
+}
