@@ -14,9 +14,8 @@ import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableMap;
 import com.ibm.whi.api.EvaluationResult;
-import com.ibm.whi.api.InputData;
+import com.ibm.whi.api.InputDataExtractor;
 import com.ibm.whi.api.Specification;
 import com.ibm.whi.core.data.JexlEngineUtil;
 import com.ibm.whi.core.expression.EmptyEvaluationResult;
@@ -24,13 +23,13 @@ import com.ibm.whi.core.expression.EvaluationResultFactory;
 import com.ibm.whi.core.expression.SimpleEvaluationResult;
 import com.ibm.whi.hl7.data.Hl7RelatedGeneralUtils;
 import com.ibm.whi.hl7.exception.DataExtractionException;
-import com.ibm.whi.hl7.expression.HL7Specification;
+import com.ibm.whi.hl7.expression.specification.HL7Specification;
 import com.ibm.whi.hl7.parsing.HL7DataExtractor;
 import com.ibm.whi.hl7.parsing.result.ParsingResult;
 import ca.uhn.hl7v2.model.Segment;
 import ca.uhn.hl7v2.model.Type;
 
-public class HL7MessageData implements InputData {
+public class HL7MessageData implements InputDataExtractor {
   private HL7DataExtractor hde;
 
   private static final Logger LOGGER = LoggerFactory.getLogger(HL7MessageData.class);
@@ -44,76 +43,14 @@ public class HL7MessageData implements InputData {
   }
 
 
-  @Override
-  public EvaluationResult extractValueForSpec(List<Specification> hl7specs,
-      Map<String, EvaluationResult> contextValues) {
-    
-    EvaluationResult fetchedValue = null;
-    for (Specification hl7specValue : hl7specs) {
-      if (hl7specValue instanceof HL7Specification) {
-
-      HL7Specification hl7spec = (HL7Specification) hl7specValue;
-      fetchedValue = valuesFromHl7Message(hl7spec, ImmutableMap.copyOf(contextValues));
-      // break the loop and return
-      if (fetchedValue != null && !fetchedValue.isEmpty()) {
-          return getReturnValue(fetchedValue, hl7spec);
-        }
-      }
-    }
-    return new EmptyEvaluationResult();
 
 
-  }
 
 
   @Override
-  public EvaluationResult extractMultipleValuesForSpec(List<Specification> hl7specs,
+  public EvaluationResult extractMultipleValuesForSpec(Specification spec,
       Map<String, EvaluationResult> contextValues) {
-    EvaluationResult fetchedValue = null;
-    for (Specification hl7specValue : hl7specs) {
-      if (hl7specValue instanceof HL7Specification) {
-
-        HL7Specification hl7spec = (HL7Specification) hl7specValue;
-        fetchedValue = valuesFromHl7Message(hl7spec, ImmutableMap.copyOf(contextValues));
-        // break the loop and return
-        if (fetchedValue != null && !fetchedValue.isEmpty()) {
-          return fetchedValue;
-        }
-      }
-    }
-    return new EmptyEvaluationResult();
-
-  }
-
-
-  private static EvaluationResult getReturnValue(EvaluationResult fetchedValue,
-      HL7Specification hl7spec) {
-    if (hl7spec.isExtractMultiple()) {
-      return fetchedValue;
-    } else {
-      return new SimpleEvaluationResult(getSingleValue(fetchedValue.getValue()));
-    }
-  }
-
-
-
-  private static Object getSingleValue(Object object) {
-    if (object instanceof List) {
-      List value = (List) object;
-      if (value.isEmpty()) {
-        return null;
-      } else {
-        return value.get(0);
-      }
-
-    }
-    return object;
-  }
-
-
-  private EvaluationResult valuesFromHl7Message(HL7Specification hl7spec,
-      ImmutableMap<String, EvaluationResult> contextValues) {
-
+    HL7Specification hl7spec = (HL7Specification) spec;
     EvaluationResult valuefromVariables;
     if (StringUtils.isNotBlank(hl7spec.getSegment())) {
       valuefromVariables = contextValues.get(hl7spec.getSegment());
@@ -172,13 +109,13 @@ public class HL7MessageData implements InputData {
       int field = NumberUtils.toInt(hl7spec.getField());
       ParsingResult<?> res = hde.getTypes((Segment) obj, field);
       if (res != null && !res.isEmpty()) {
-        return new SimpleEvaluationResult(res.getValues());
+        return new SimpleEvaluationResult<>(res.getValues());
       } else {
         return null;
       }
 
     } else {
-      return new SimpleEvaluationResult(obj);
+      return new SimpleEvaluationResult<>(obj);
     }
   }
 
@@ -194,12 +131,12 @@ public class HL7MessageData implements InputData {
       }
       
       if(res!=null && !res.isEmpty()) {
-        return new SimpleEvaluationResult(res.getValues());
+        return new SimpleEvaluationResult<>(res.getValues());
       } else {
         return null;
       }
     } else {
-      return new SimpleEvaluationResult(obj);
+      return new SimpleEvaluationResult<>(obj);
     }
 
 
@@ -223,7 +160,7 @@ public class HL7MessageData implements InputData {
     resolvedVariables.forEach((key, value) -> localContext.put(key, value.getValue()));
     Object obj = JEXL.evaluate(trimedJexlExp, localContext);
     if (obj != null) {
-      return new SimpleEvaluationResult(obj);
+      return new SimpleEvaluationResult<>(obj);
     } else {
       return new EmptyEvaluationResult();
     }
@@ -240,6 +177,36 @@ public class HL7MessageData implements InputData {
   public String getId() {
     return this.hde.getMessageId();
   }
+
+
+
+  @Override
+  public EvaluationResult extractValueForSpec(Specification spec,
+      Map<String, EvaluationResult> contextValues) {
+    EvaluationResult fetchedValue = this.extractMultipleValuesForSpec(spec, contextValues);
+    if (fetchedValue != null && !fetchedValue.isEmpty()) {
+      return new SimpleEvaluationResult<>(getSingleValue(fetchedValue.getValue()));
+    } else {
+      return new EmptyEvaluationResult();
+    }
+
+  }
+
+  private static Object getSingleValue(Object object) {
+    if (object instanceof List) {
+      List value = (List) object;
+      if (value.isEmpty()) {
+        return null;
+      } else {
+        return value.get(0);
+      }
+
+    }
+    return object;
+  }
+
+
+
 
 
 

@@ -3,13 +3,13 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  */
-package com.ibm.whi.hl7.expression;
+package com.ibm.whi.hl7.expression.specification;
 
-import org.apache.commons.lang3.EnumUtils;
-import org.apache.commons.lang3.math.NumberUtils;
-import org.apache.commons.text.StringTokenizer;
+import java.util.Map;
+import com.ibm.whi.api.EvaluationResult;
+import com.ibm.whi.api.InputDataExtractor;
 import com.ibm.whi.api.Specification;
-import com.ibm.whi.hl7.message.util.SupportedSegments;
+import com.ibm.whi.hl7.message.HL7MessageData;
 
 
 /**
@@ -28,6 +28,7 @@ public class HL7Specification implements Specification {
   private int subComponent;
   private boolean isExtractMultiple;
   private String stringRep;
+  private Class<? extends InputDataExtractor> sourceInputDataClass = HL7MessageData.class;
   
   public HL7Specification(String segment, String field, int component, int subComponent,
       boolean isMultiple) {
@@ -62,39 +63,7 @@ public class HL7Specification implements Specification {
   }
 
 
-  public static Specification parse(String rawSpec, boolean extractMultiple) {
-    StringTokenizer stk = new StringTokenizer(rawSpec, ".");
-    String segment = null;
-    String field = null;
-    int component = -1;
-    int subComponent = -1;
-    if (stk.hasNext()) {
-      String tok = stk.next();
-      if (EnumUtils.isValidEnumIgnoreCase(SupportedSegments.class, tok)) {
-        segment = tok;
-        if (stk.hasNext()) {
-          field = stk.nextToken();
-        }
-        if (stk.hasNext()) {
-          component = NumberUtils.toInt(stk.nextToken());
-        }
 
-
-      } else {
-        field = tok;
-        if (stk.hasNext()) {
-          component = NumberUtils.toInt(stk.nextToken());
-        }
-        if (stk.hasNext()) {
-          subComponent = NumberUtils.toInt(stk.nextToken());
-        }
-      }
-    }
-
-
-    return new HL7Specification(segment, field, component, subComponent, extractMultiple);
-
-  }
 
   @Override
   public String toString() {
@@ -129,6 +98,30 @@ public class HL7Specification implements Specification {
   public boolean isExtractMultiple() {
     return isExtractMultiple;
   }
+
+
+  public Class<? extends InputDataExtractor> getSourceInputDataClass() {
+    return sourceInputDataClass;
+  }
+
+
+  @Override
+  public EvaluationResult extractValueForSpec(InputDataExtractor dataSource,
+      Map<String, EvaluationResult> contextValues) {
+    if (this.isExtractMultiple()) {
+      return dataSource.extractMultipleValuesForSpec(this, contextValues);
+    } else {
+    return dataSource.extractValueForSpec(this, contextValues);
+    }
+  }
+
+
+  @Override
+  public EvaluationResult extractMultipleValuesForSpec(InputDataExtractor dataSource,
+      Map<String, EvaluationResult> contextValues) {
+    return dataSource.extractMultipleValuesForSpec(this, contextValues);
+  }
+
 
 
 }

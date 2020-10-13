@@ -5,29 +5,34 @@
  */
 package com.ibm.whi.api;
 
-import java.util.List;
 import java.util.Map;
 
-public interface InputData {
+/**
+ * Represents class that encapsulates how to extract information from a particular source.
+ * 
+ *
+ * @author pbhallam
+ */
+public interface InputDataExtractor {
 
   /**
-   * Extract the single value from the input for the given list of specifications.
+   * Extract the single value from the input for the given specification.
    * 
-   * @param hl7specs - List of specifications example: PID.3
+   * @param spec - List of specifications example: PID.3
    * @param contextValues - Map of key value pair
    * @return {@link EvaluationResult}
    */
-  EvaluationResult extractValueForSpec(List<Specification> hl7specs,
+  EvaluationResult extractValueForSpec(Specification spec,
       Map<String, EvaluationResult> contextValues);
 
   /**
-   * Extract the multiple values from the input for the given list of specifications.
+   * Extract the multiple values from the input for the given specification.
    * 
-   * @param hl7specs - List of specifications example: PID.3
+   * @param specs - List of specifications example: PID.3
    * @param contextValues - Map of key value pair
    * @return {@link EvaluationResult}
    */
-  EvaluationResult extractMultipleValuesForSpec(List<Specification> hl7specs,
+  EvaluationResult extractMultipleValuesForSpec(Specification specs,
       Map<String, EvaluationResult> contextValues);
 
   /**
@@ -37,7 +42,8 @@ public interface InputData {
    * @param contextValues - Map of key value pair
    * @return {@link EvaluationResult}
    */
-  EvaluationResult evaluateJexlExpression(String expression, Map<String, EvaluationResult> contextValues);
+  EvaluationResult evaluateJexlExpression(String expression,
+      Map<String, EvaluationResult> contextValues);
 
 
   /**

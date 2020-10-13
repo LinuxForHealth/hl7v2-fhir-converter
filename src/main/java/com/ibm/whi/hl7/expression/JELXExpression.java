@@ -17,9 +17,10 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Preconditions;
 import com.ibm.whi.api.EvaluationResult;
-import com.ibm.whi.api.InputData;
+import com.ibm.whi.api.InputDataExtractor;
 import com.ibm.whi.api.Variable;
 import com.ibm.whi.core.expression.EmptyEvaluationResult;
+import com.ibm.whi.hl7.resource.deserializer.TemplateFieldNames;
 
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -30,15 +31,17 @@ public class JELXExpression extends AbstractExpression {
 
 
 
-
   @JsonCreator
-  public JELXExpression(@JsonProperty("type") String type,
-      @JsonProperty("default") Object defaultValue, @JsonProperty("required") boolean required,
-      @JsonProperty("hl7spec") String hl7spec, @JsonProperty("evaluate") String evaluate,
-      @JsonProperty("var") Map<String, String> variables,
-      @JsonProperty("condition") String condition,
-      @JsonProperty("constants") Map<String, String> constants) {
-    super(type, defaultValue, required, hl7spec, variables, condition, constants);
+  public JELXExpression(@JsonProperty(TemplateFieldNames.TYPE) String type,
+      @JsonProperty(TemplateFieldNames.DEFAULT_VALUE) String defaultValue,
+      @JsonProperty(TemplateFieldNames.REQUIRED) boolean required,
+      @JsonProperty(TemplateFieldNames.SPEC) String specs,
+      @JsonProperty(TemplateFieldNames.EVALUATE) String evaluate,
+      @JsonProperty(TemplateFieldNames.VARIABLES) Map<String, String> variables,
+      @JsonProperty(TemplateFieldNames.CONDITION) String condition,
+      @JsonProperty(TemplateFieldNames.CONSTANTS) Map<String, String> constants,
+      @JsonProperty(TemplateFieldNames.USE_GROUP) boolean useGroup) {
+    super(type, defaultValue, required, specs, variables, condition, constants, useGroup);
     Preconditions.checkArgument(StringUtils.isNotBlank(evaluate), "evaluate file cannot be blank");
 
     this.evaluate = evaluate;
@@ -48,15 +51,15 @@ public class JELXExpression extends AbstractExpression {
 
 
   public JELXExpression(String evaluate, Map<String, String> variables) {
-    this("String", null, false, null, evaluate, variables, null, null);
+    this("String", null, false, null, evaluate, variables, null, null, false);
 
 
   }
 
 
   @Override
-  public EvaluationResult evaluateExpression(InputData dataSource,
-      Map<String, EvaluationResult> contextValues, EvaluationResult hl7SpecValues) {
+  public EvaluationResult evaluateExpression(InputDataExtractor dataSource,
+      Map<String, EvaluationResult> contextValues, EvaluationResult baseValue) {
     Map<String, EvaluationResult> localContextValues = new HashMap<>(contextValues);
     for (Variable v : this.getVariables()) {
       if (!localContextValues.containsKey(v.getVariableName())) {
@@ -70,9 +73,11 @@ public class JELXExpression extends AbstractExpression {
   @Override
   public String toString() {
     ToStringBuilder.setDefaultStyle(ToStringStyle.JSON_STYLE);
-    return new ToStringBuilder(this.getClass().getSimpleName()).append("hl7spec", this.getspecs())
-        .append("isMultiple", this.isMultiple()).append("variables", this.getVariables())
-        .append("evaluate", this.evaluate).build();
+    return new ToStringBuilder(this)
+        .append(TemplateFieldNames.TYPE, this.getClass().getSimpleName())
+        .append(TemplateFieldNames.SPEC, this.getspecs()).append("isMultiple", this.isMultiple())
+        .append(TemplateFieldNames.VARIABLES, this.getVariables())
+        .append(TemplateFieldNames.EVALUATE, this.evaluate).build();
   }
 
 

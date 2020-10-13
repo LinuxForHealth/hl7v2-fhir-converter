@@ -17,6 +17,7 @@ For each resource in a template following attributes needs to be defined:
       segment: [REQUIRED]
       resourcePath: [REQUIRED]
       repeats:  [DEFAULT false]
+      isReferenced: [DEFAULT false]
       additionalSegments: [DEFAULT empty]
 ```
 Attribute description: 
@@ -25,24 +26,28 @@ Attribute description:
 * resourcePath: Path for resource file relative to the directory that has all the templates. The default path for the templates is src/main/resources/hl7. Example: Patient resource :resource/Patient (no need for file extension).
 * repeats:  HL7 have certain segments that repeat and so the converter needs to generate multiple resources from those segments. Example OBX segment. If this field is set to false then only the first occurrence of that segment will be used for resource generation. If this is set to true then multiple resources will be generated from each of the occurrences of that segment.  
 * additionalSegments: Any additional segments the resource needs.
+* isReferenced : If this resource would be references by other resources then this field should be true. 
+
+Note: The order of resource template is important within a message template. The resources are generated in the order in which they are listed in the message template. If a resource needs to reference another resource then that resource should ve generated before this resource. 
 
 Example of a message template:
 
 ```yml
 # FHIR Resources to extract from ADT_A01 message
-
 resources:
-
     - resourceName: Patient
       segment: PID
       resourcePath: resource/Patient
       repeats: false
+      isReferenced: true
       additionalSegments:
+
       
     - resourceName: Encounter
       segment: PV1
       resourcePath: resource/Encounter
       repeats: false
+      isReferenced: true
       additionalSegments:
              - PV2
              - EVN
@@ -50,7 +55,15 @@ resources:
       segment: OBX
       resourcePath: resource/Observation
       repeats: true
+      isReferenced: true
       additionalSegments:
+      
+    - resourceName: AllergyIntolerance
+      segment: AL1
+      resourcePath: resource/AllergyIntolerance
+      repeats: true
+      additionalSegments:
+
 
 ```
 
@@ -71,49 +84,127 @@ id:
   
 identifier:
     resource: datatype/Identifier *
-    hl7spec: PID.3  
+    specs: PID.3  
 name: 
     resource: datatype/HumanName *
-    hl7spec: PID.5  
+    specs: PID.5  
 gender: 
      type: ADMINISTRATIVE_GENDER
-     hl7spec: PID.8
+     specs: PID.8
 
 birthDate:
      type: DATE
-     hl7spec: PID.7
+     specs: PID.7
 ```
 
+
+```
+# Represents data that needs to be extracted for a Condition Resource in FHIR
+# reference: https://www.hl7.org/fhir/condition.html
+---
+resourceType: Condition
+id:
+  type: STRING
+  evaluate: 'UUID.randomUUID()'
+
+
+category_x1:
+   resource: datatype/CodeableConcept_var *
+   condition:  $source NOT_NULL
+   vars:     
+     code: CONDITION_CATEGORY_CODES, $type
+     text: $type
+     source: PRB.3
+   constants:
+      type: problem-list-item
+
+category_x2:
+   resource: datatype/CodeableConcept_var *
+   condition:  $source NULL
+   vars:     
+     code: CONDITION_CATEGORY_CODES, $type
+     text: $type
+     source: PRB.3
+   constants:
+      type: encounter-diagnosis
+           
+
+severity:
+   resource: datatype/CodeableConcept *
+   specs: PRB.26
+   vars:
+     code: PRB.26
+code:
+   resource: datatype/CodeableConcept *
+   specs: PRB.3
+   vars:
+     code: PRB.3
+     
+     
+encounter:
+    resource: datatype/Reference
+    specs: $Encounter
+      
+subject:
+    resource: datatype/Reference
+    specs: $Patient
+
+onsetDateTime:
+     type: DATE_TIME
+     specs: PRB.16 
+
+stage:
+   resource: secondary/Stage *
+   specs: PRB.14
+   vars:
+     code: PRB.14
+evidence:
+   resource: secondary/evidence *
+   specs: $Observation
+   useGroup: true
+
+```
 
 ### Different expressions types 
 The extraction logic for each field can be defined by using expressions. This component supports 4 different type of expressions. All expressions have following attributes:
 * type: DEFAULT - Object <br>
         Class type final return value extracted for the field.
-* hl7spec: DEFAULT - NONE<br>
+* specs: DEFAULT - NONE<br>
+           Represents the base value for a resource, if no spec is provided then parents base value would be used as base value for child resource.
            The value that needs to be extracted using the HL7 spec. Refer to the section on supported formats for [Specification](Specification).
 * defaultValue: DEFAULT - NULL<br>
                 If extraction of the value fails, then the default value can be used.
 * required : DEFAULT - false<br>
             If a field is required and cannot be extracted then the resource generation will fail even if other fields were extracted.
-* variables: DEFAULT - EMPTY<br>
+* vars: DEFAULT - EMPTY<br>
              List of variables and there value can be provided which can be used during the extraction process. Refer to the section on supported formats for [Variables](Variable).
 * condition: DEFAULT - true<br>
              If a condition is provided then the expression will be resolved only if condition evaluates to true. Refer to the section on supported formats for [Condition](Condition).
+* Constants: DEFAULT - EMPTY<br>
+              List of Constants (string values) which can be used during the extraction process.
 
 
 ```yml
       type: String
-      hl7spec: CX.1
+      specs: CX.1
       defaultValue: 'abc'
       required: true 
       condition: var1 != null
-      variables:
+      vars:
         var1: CX.1
         var2: CX.2
+      constants:
+          code: 'some code'
 
  ```
 #### Specification
-Specification represents expression that helps to identify the value to extracted from the HL7 message.<br>
+Specification represents the base value for a expression. There are two types of Specifications - 
+* SimpleSpecification  -- Represents simple specification that can be extracted from context values. Example: specs: $Patient
+* HL7Specification -- Represents specification for extracting values from HL7 message.
+
+##### HL7Specification
+
+HL7Specification represents expression that helps to identify the value to extracted from the HL7 message.<br>
 The specification expression has the following format :
 * Single SPEC - where spec can be <br>
     - SEGMENT 
@@ -161,7 +252,7 @@ Example:
 ```yml
  performer: 
    reference: resource/Practitioner
-   hl7spec: OBX.16
+   specs: OBX.16
 
 ```
 
@@ -188,7 +279,7 @@ identifier:
 ```yml
 given: 
      type: STRING
-     hl7spec: XPN.2
+     specs: XPN.2
 ```
 
 * SimpleExpression : If the field value is constant and no extraction or conversion is required then this expression is used.

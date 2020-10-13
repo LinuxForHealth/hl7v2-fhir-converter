@@ -5,37 +5,37 @@
  */
 package com.ibm.whi.hl7.expression.util;
 
-import java.util.List;
 import java.util.Map;
 import com.ibm.whi.api.EvaluationResult;
-import com.ibm.whi.api.InputData;
+import com.ibm.whi.api.InputDataExtractor;
 import com.ibm.whi.api.Specification;
 
-public class TestBlankInputData implements InputData {
-
+public class TestBlankInputData implements InputDataExtractor {
 
   @Override
-  public EvaluationResult extractMultipleValuesForSpec(List<Specification> hl7specs,
+  public EvaluationResult extractValueForSpec(Specification spec,
       Map<String, EvaluationResult> contextValues) {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public EvaluationResult extractMultipleValuesForSpec(Specification specs,
+      Map<String, EvaluationResult> contextValues) {
+    // TODO Auto-generated method stub
     return null;
   }
 
   @Override
   public EvaluationResult evaluateJexlExpression(String expression,
       Map<String, EvaluationResult> contextValues) {
-
-    return null;
-  }
-
-  @Override
-  public EvaluationResult extractValueForSpec(List<Specification> hl7specs,
-      Map<String, EvaluationResult> contextValues) {
-
+    // TODO Auto-generated method stub
     return null;
   }
 
   @Override
   public String getName() {
+    // TODO Auto-generated method stub
     return null;
   }
 

@@ -35,6 +35,8 @@ public class FHIRConverterTest {
 
     HL7ToFHIRConverter ftv = new HL7ToFHIRConverter(true, BundleType.COLLECTION);
     String json = ftv.convert(hl7message);
+
+    System.out.println(json);
     FHIRContext context = new FHIRContext();
     IBaseResource bundleResource = context.getParser().parseResource(json);
     assertThat(bundleResource).isNotNull();
@@ -67,7 +69,6 @@ public class FHIRConverterTest {
     assertThat(allergyResources).hasSize(2);
 
 
-    System.out.println(json);
   }
 
 

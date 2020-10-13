@@ -11,21 +11,20 @@ id:
 
 category:
     type: ALLERGY_INTOLERANCE_CATEGORY
-    hl7spec: AL1.2 *
+    specs: AL1.2 *
     
 criticality:
     type: ALLERGY_INTOLERANCE_CRITICALITY 
-    hl7spec: AL1.4
+    specs: AL1.4
     
 code:
    resource: datatype/CodeableConcept *
-   hl7spec: AL1.3
+   specs: AL1.3
 
 patient:
     resource: datatype/Reference
-    var: 
-      ref-type: $Patient
+    specs: $Patient
 
 reaction:
     resource: secondary/Reaction
-    hl7spec: AL1.5
+    specs: AL1.5

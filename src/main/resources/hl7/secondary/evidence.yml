@@ -4,6 +4,6 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 ---
-summary: 
-   resource: datatype/CodeableConcept
-   specs: $code
+detail:
+    resource: datatype/Reference
+

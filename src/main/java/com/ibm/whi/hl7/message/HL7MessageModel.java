@@ -6,6 +6,7 @@
 package com.ibm.whi.hl7.message;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
@@ -13,25 +14,33 @@ import org.hl7.fhir.r4.model.Bundle;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Preconditions;
+import com.ibm.whi.api.FHIRResourceTemplate;
 import com.ibm.whi.api.MessageEngine;
-import com.ibm.whi.core.message.AbstractMessageModel;
+import com.ibm.whi.api.MessageTemplate;
 import com.ibm.whi.hl7.parsing.HL7DataExtractor;
 import com.ibm.whi.hl7.parsing.HL7HapiParser;
 import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Message;
 
-public class HL7MessageModel extends AbstractMessageModel<Message> {
+public class HL7MessageModel implements MessageTemplate<Message> {
+
+  private List<FHIRResourceTemplate> resources;
+  private String messageName;
 
 
   @JsonCreator
   public HL7MessageModel(@JsonProperty("messageName") String messageName,
-      @JsonProperty("resources") List<HL7FHIRResource> resources) {
-    super(messageName, resources);
+      @JsonProperty("resources") List<HL7FHIRResourceTemplate> resources) {
+    this.messageName = messageName;
+    this.resources = new ArrayList<>();
+    if (resources != null && !resources.isEmpty()) {
+      this.resources.addAll(resources);
+    }
 
   }
 
 
-  @Override
+
   public String convert(String message, MessageEngine engine) throws IOException {
     Preconditions.checkArgument(StringUtils.isNotBlank(message),
         "Input Hl7 message cannot be blank");
@@ -55,7 +64,7 @@ public class HL7MessageModel extends AbstractMessageModel<Message> {
 
 
   @Override
-  public String convert(Message message, MessageEngine engine) throws IOException {
+  public String convert(Message message, MessageEngine engine) {
     Preconditions.checkArgument(message != null, "Input Hl7 message cannot be null");
     Preconditions.checkArgument(engine != null, "MessageEngine cannot be null");
 
@@ -67,6 +76,21 @@ public class HL7MessageModel extends AbstractMessageModel<Message> {
     return engine.getFHIRContext()
         .encodeResourceToString(bundle);
 
+  }
+
+
+  @Override
+  public String getMessageName() {
+    return messageName;
+  }
+
+  public void setMessageName(String messageName) {
+    this.messageName = messageName;
+  }
+
+  @Override
+  public List<FHIRResourceTemplate> getResources() {
+    return new ArrayList<>(resources);
   }
 
 

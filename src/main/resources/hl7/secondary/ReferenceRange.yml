@@ -6,20 +6,20 @@
 ---
 low:
    resource: datatype/Quantity
-   var:
+   vars:
      value: $low
      unit: $unit
 high:
    resource: datatype/Quantity
-   var:
+   vars:
      value: $high
      unit: $unit
 type:
-  type: STRING
-  value: $type
+    type: STRING
+    value: $type
 appliesTo:
-  type: STRING
-  value: $appliesto
+    type: STRING
+    value: $appliesto
 text:
-  type: STRING
-  value: $text
+    type: STRING
+    value: $text

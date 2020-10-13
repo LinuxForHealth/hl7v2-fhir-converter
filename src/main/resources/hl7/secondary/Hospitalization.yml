@@ -6,32 +6,32 @@
 ---
 preAdmissionIdentifier:
     resource: datatype/Identifier *
-    hl7spec:  PV1.5	
+    specs:  PV1.5	
 admitSource: 
    resource: datatype/CodeableConcept
-   hl7spec: PV1.14
+   specs: PV1.14
 
 reAdmission:
    resource: datatype/CodeableConcept
-   hl7spec: PV1.13
+   specs: PV1.13
 
 
 dietPreference:
    resource: datatype/CodeableConcept
-   hl7spec: PV1.38
+   specs: PV1.38
    
 
 specialCourtesy:
    resource: datatype/CodeableConcept *
-   hl7spec: PV1.16
+   specs: PV1.16
 
 
 specialArrangement: 
    resource: datatype/CodeableConcept *
-   hl7spec: PV1.15 | OBR.30 | OBR.43
+   specs: PV1.15 | OBR.30 | OBR.43
 
 
 dischargeDisposition:
    resource: datatype/CodeableConcept
-   hl7spec: PV1.36
+   specs: PV1.36
 

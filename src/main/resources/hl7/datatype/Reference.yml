@@ -6,10 +6,10 @@
 ---
 reference:
     type: STRING
-    fetch:  '$ref-type:id'
+    fetch:  'id'
 type:
     type: STRING
-    fetch: '$ref-type:resourceType'
+    fetch: 'resourceType'
 
 display:
    type: STRING

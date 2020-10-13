@@ -18,11 +18,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import com.ibm.whi.api.EvaluationResult;
-import com.ibm.whi.api.InputData;
+import com.ibm.whi.api.InputDataExtractor;
 import com.ibm.whi.core.expression.EvaluationResultFactory;
 import com.ibm.whi.core.expression.VariableUtils;
 import com.ibm.whi.hl7.data.SimpleDataTypeMapper;
 import com.ibm.whi.hl7.data.ValueExtractor;
+import com.ibm.whi.hl7.resource.deserializer.TemplateFieldNames;
 
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -34,7 +35,7 @@ public class SimpleExpression extends AbstractExpression {
 
   @JsonCreator
   public SimpleExpression(String var) {
-    this("String", var, new HashMap<>(), null);
+    this("String", var, new HashMap<>(), null, false);
 
   }
 
@@ -46,10 +47,12 @@ public class SimpleExpression extends AbstractExpression {
    * @param condition
    */
   @JsonCreator
-  public SimpleExpression(@JsonProperty("type") String type, @JsonProperty("value") String value,
-      @JsonProperty("var") Map<String, String> variables,
-      @JsonProperty("condition") String condition) {
-    super(type, null, false, "", variables, condition, null);
+  public SimpleExpression(@JsonProperty(TemplateFieldNames.TYPE) String type,
+      @JsonProperty(TemplateFieldNames.VALUE) String value,
+      @JsonProperty(TemplateFieldNames.VARIABLES) Map<String, String> variables,
+      @JsonProperty(TemplateFieldNames.CONDITION) String condition,
+      @JsonProperty(TemplateFieldNames.USE_GROUP) boolean useGroup) {
+    super(type, null, false, "", variables, condition, null, useGroup);
     this.value = value;
   }
 
@@ -60,13 +63,13 @@ public class SimpleExpression extends AbstractExpression {
 
 
   @Override
-  public EvaluationResult evaluateExpression(InputData dataSource,
-      Map<String, EvaluationResult> contextValues, EvaluationResult hl7SpecValues) {
+  public EvaluationResult evaluateExpression(InputDataExtractor dataSource,
+      Map<String, EvaluationResult> contextValues, EvaluationResult baseValue) {
 
     Preconditions.checkArgument(contextValues != null, "contextValues cannot be null");
     Map<String, EvaluationResult> localContextValues = new HashMap<>(contextValues);
-    if (hl7SpecValues != null && !hl7SpecValues.isEmpty()) {
-      localContextValues.put(hl7SpecValues.getName(), hl7SpecValues);
+    if (baseValue != null && !baseValue.isEmpty()) {
+      localContextValues.put(baseValue.getIdentifier(), baseValue);
     }
 
     if (VariableUtils.isVar(value)) {
@@ -114,8 +117,13 @@ public class SimpleExpression extends AbstractExpression {
   @Override
   public String toString() {
     ToStringBuilder.setDefaultStyle(ToStringStyle.JSON_STYLE);
-    return new ToStringBuilder(this.getClass().getSimpleName()).append("hl7spec", this.getspecs())
-        .append("isMultiple", this.isMultiple()).append("variables", this.getVariables())
-        .append("value", this.value).build();
+    return new ToStringBuilder(this)
+        .append(TemplateFieldNames.TYPE, this.getClass().getSimpleName())
+        .append(TemplateFieldNames.SPEC, this.getspecs()).append("isMultiple", this.isMultiple())
+        .append(TemplateFieldNames.VARIABLES, this.getVariables())
+        .append(TemplateFieldNames.VALUE, this.value).build();
   }
+
+
+
 }

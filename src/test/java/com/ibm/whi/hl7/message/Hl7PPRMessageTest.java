@@ -21,7 +21,6 @@ import com.ibm.whi.hl7.HL7ToFHIRConverter;
 
 public class Hl7PPRMessageTest {
   private static FHIRContext context = new FHIRContext();
-  private static HL7MessageEngine engine = new HL7MessageEngine(context);
 
   @Test
   public void test_patient() throws IOException {
@@ -36,6 +35,7 @@ public class Hl7PPRMessageTest {
 
     HL7ToFHIRConverter ftv = new HL7ToFHIRConverter(true, BundleType.COLLECTION);
     String json = ftv.convert(hl7message);
+    System.out.println(json);
     assertThat(json).isNotBlank();
     IBaseResource bundleResource = context.getParser().parseResource(json);
     assertThat(bundleResource).isNotNull();
@@ -60,7 +60,6 @@ public class Hl7PPRMessageTest {
         e.stream().filter(v -> ResourceType.Condition == v.getResource().getResourceType())
             .map(BundleEntryComponent::getResource).collect(Collectors.toList());
     assertThat(conditionresource).hasSize(1);
-
 
   }
 

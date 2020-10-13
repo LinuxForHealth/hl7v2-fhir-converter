@@ -6,4 +6,4 @@
 ---
 location:
     type: STRING
-    hl7spec: PV1.3 | PV1.6 | PV1.11 | PV1.42 | PV1.43
+    specs: PV1.3 | PV1.6 | PV1.11 | PV1.42 | PV1.43

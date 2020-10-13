@@ -9,6 +9,7 @@ resources:
     - resourceName: Patient
       segment: PID
       resourcePath: resource/Patient
+      isReferenced: true
       repeats: false
       additionalSegments:
 
@@ -16,6 +17,7 @@ resources:
     - resourceName: Encounter
       segment: PATIENT_VISIT.PV1
       resourcePath: resource/Encounter
+      isReferenced: true
       repeats: false
       additionalSegments:
              - .PV2
@@ -23,13 +25,16 @@ resources:
       
     - resourceName: Observation
       segment: PROBLEM.PROBLEM_OBSERVATION.OBX
+      group: PROBLEM
       resourcePath: resource/Observation
       repeats: true
+      isReferenced: true
       additionalSegments:
       
             
     - resourceName: Condition
       segment: PROBLEM.PRB
+      group: PROBLEM
       resourcePath: resource/Condition
       repeats: true
       additionalSegments:

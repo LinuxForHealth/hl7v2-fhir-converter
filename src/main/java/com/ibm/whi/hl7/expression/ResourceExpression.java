@@ -17,12 +17,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import com.ibm.whi.api.EvaluationResult;
-import com.ibm.whi.api.InputData;
+import com.ibm.whi.api.InputDataExtractor;
+import com.ibm.whi.api.ResourceValue;
 import com.ibm.whi.core.expression.EvaluationResultFactory;
 import com.ibm.whi.core.resource.ResourceResult;
-import com.ibm.whi.core.resource.ResourceValue;
 import com.ibm.whi.hl7.resource.HL7DataBasedResourceModel;
 import com.ibm.whi.hl7.resource.ResourceModelReader;
+import com.ibm.whi.hl7.resource.deserializer.TemplateFieldNames;
 
 /**
  * Represent a expression that represents resolving a json template
@@ -53,13 +54,16 @@ public class ResourceExpression extends AbstractExpression {
    * @param constants
    */
   @JsonCreator
-  public ResourceExpression(@JsonProperty("type") String type,
-      @JsonProperty("resource") String resourceToGenerate, @JsonProperty("hl7spec") String hl7spec,
-      @JsonProperty("default") Object defaultValue, @JsonProperty("required") boolean required,
-      @JsonProperty("var") Map<String, String> variables,
-      @JsonProperty("condition") String condition,
-      @JsonProperty("constants") Map<String, String> constants) {
-    super(type, defaultValue, required, hl7spec, variables, condition, constants);
+  public ResourceExpression(@JsonProperty(TemplateFieldNames.TYPE) String type,
+      @JsonProperty(TemplateFieldNames.RESOURCE) String resourceToGenerate,
+      @JsonProperty(TemplateFieldNames.SPEC) String specs,
+      @JsonProperty(TemplateFieldNames.DEFAULT_VALUE) String defaultValue,
+      @JsonProperty(TemplateFieldNames.REQUIRED) boolean required,
+      @JsonProperty(TemplateFieldNames.VARIABLES) Map<String, String> variables,
+      @JsonProperty(TemplateFieldNames.CONDITION) String condition,
+      @JsonProperty(TemplateFieldNames.CONSTANTS) Map<String, String> constants,
+      @JsonProperty(TemplateFieldNames.USE_GROUP) boolean useGroup) {
+    super(type, defaultValue, required, specs, variables, condition, constants, useGroup);
 
     Preconditions.checkArgument(StringUtils.isNotBlank(resourceToGenerate),
         "reference cannot be blank");
@@ -76,10 +80,8 @@ public class ResourceExpression extends AbstractExpression {
   }
 
 
-  public ResourceExpression(@JsonProperty("type") String type,
-      @JsonProperty("resource") String resourceToGenerate,
-      @JsonProperty("hl7spec") String hl7spec) {
-    this(type, resourceToGenerate, hl7spec, null, false, null, null, null);
+  public ResourceExpression(String type, String resourceToGenerate, String hl7spec) {
+    this(type, resourceToGenerate, hl7spec, null, false, null, null, null, false);
   }
 
 
@@ -91,19 +93,17 @@ public class ResourceExpression extends AbstractExpression {
 
 
   @Override
-  public EvaluationResult evaluateExpression(InputData dataSource,
-      Map<String, EvaluationResult> contextValues, EvaluationResult hl7SpecValue) {
+  public EvaluationResult evaluateExpression(InputDataExtractor dataSource,
+      Map<String, EvaluationResult> contextValues, EvaluationResult baseValue) {
     Preconditions.checkArgument(dataSource != null, "dataSource cannot be null");
     Preconditions.checkArgument(contextValues != null, "contextValues cannot be null");
     LOGGER.info("Evaluating expression {}", this.resourceToGenerate);
     EvaluationResult evaluationResult = null;
 
-    EvaluationResult baseValue = hl7SpecValue;
-
     ResourceResult result =
         this.data.evaluate(dataSource, ImmutableMap.copyOf(contextValues), baseValue);
-    if (result != null && result.getResource() != null) {
-      ResourceValue resolvedvalues = result.getResource();
+    if (result != null && result.getValue() != null) {
+      ResourceValue resolvedvalues = result.getValue();
 
       LOGGER.info("Evaluated expression {}, returning {} ", this.resourceToGenerate,
           resolvedvalues);
@@ -129,9 +129,12 @@ public class ResourceExpression extends AbstractExpression {
   @Override
   public String toString() {
     ToStringBuilder.setDefaultStyle(ToStringStyle.JSON_STYLE);
-    return new ToStringBuilder(this.getClass().getSimpleName()).append("hl7spec", this.getspecs())
-        .append("isMultiple", this.isMultiple()).append("variables", this.getVariables())
-        .append("resourceToGenerate", this.resourceToGenerate).build();
+    return new ToStringBuilder(this)
+        .append(TemplateFieldNames.TYPE, this.getClass().getSimpleName())
+        .append(TemplateFieldNames.SPEC, this.getspecs()).append("isMultiple", this.isMultiple())
+        .append(TemplateFieldNames.VARIABLES, this.getVariables())
+        .append(TemplateFieldNames.USE_GROUP, this.isUseGroup())
+        .append(TemplateFieldNames.RESOURCE, this.resourceToGenerate).build();
   }
 
   @Override

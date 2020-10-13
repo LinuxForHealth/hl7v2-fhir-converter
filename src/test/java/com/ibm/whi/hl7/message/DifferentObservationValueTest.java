@@ -38,8 +38,8 @@ public class DifferentObservationValueTest {
 
   private ResourceModel rsm =
       ResourceModelReader.getInstance().generateResourceModel("resource/Observation");
-  private HL7FHIRResource observation =
-      new HL7FHIRResource("Observation", "OBX", rsm, 0, true, new ArrayList<>());
+  private HL7FHIRResourceTemplate observation =
+      new HL7FHIRResourceTemplate("Observation", "OBX", rsm, false, true, new ArrayList<>());
 
   private HL7MessageModel message = new HL7MessageModel("ADT", Lists.newArrayList(observation));
 

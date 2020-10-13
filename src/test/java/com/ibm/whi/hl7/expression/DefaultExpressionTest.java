@@ -11,14 +11,15 @@ import java.util.Map;
 import org.junit.Test;
 import com.google.common.collect.ImmutableMap;
 import com.ibm.whi.api.EvaluationResult;
-import com.ibm.whi.api.InputData;
+import com.ibm.whi.api.InputDataExtractor;
+import com.ibm.whi.core.expression.EmptyEvaluationResult;
 import com.ibm.whi.core.expression.SimpleEvaluationResult;
 import com.ibm.whi.hl7.expression.util.TestBlankInputData;
 
 public class DefaultExpressionTest {
 
   private static final String SOME_VALUE = "SOME_VALUE";
-  private static final InputData data = new TestBlankInputData();
+  private static final InputDataExtractor data = new TestBlankInputData();
 
   @Test
   public void test_constant() {
@@ -27,8 +28,8 @@ public class DefaultExpressionTest {
     Map<String, EvaluationResult> context = new HashMap<>();
 
     EvaluationResult value =
-        exp.evaluate(data, ImmutableMap.copyOf(context));
-    assertThat(value.getValue()).isEqualTo(SOME_VALUE);
+        exp.evaluate(data, ImmutableMap.copyOf(context), new EmptyEvaluationResult());
+    assertThat((String) value.getValue()).isEqualTo(SOME_VALUE);
   }
 
 
@@ -41,8 +42,8 @@ public class DefaultExpressionTest {
     context.put("var1", new SimpleEvaluationResult(SOME_VALUE));
 
     EvaluationResult value =
-        exp.evaluate(data, ImmutableMap.copyOf(context));
-    assertThat(value.getValue()).isEqualTo(SOME_VALUE);
+        exp.evaluate(data, ImmutableMap.copyOf(context), new EmptyEvaluationResult());
+    assertThat((String) value.getValue()).isEqualTo(SOME_VALUE);
   }
 
 
@@ -56,8 +57,8 @@ public class DefaultExpressionTest {
     context.put("", new SimpleEvaluationResult(SOME_VALUE));
 
     EvaluationResult value =
-        exp.evaluate(data, ImmutableMap.copyOf(context));
-    assertThat(value.getValue()).isEqualTo("$");
+        exp.evaluate(data, ImmutableMap.copyOf(context), new EmptyEvaluationResult());
+    assertThat((String) value.getValue()).isEqualTo("$");
   }
 
 
@@ -70,7 +71,7 @@ public class DefaultExpressionTest {
 
 
     EvaluationResult value =
-        exp.evaluate(data, ImmutableMap.copyOf(context));
+        exp.evaluate(data, ImmutableMap.copyOf(context), new EmptyEvaluationResult());
     assertThat(value).isNull();
   }
 
@@ -82,8 +83,8 @@ public class DefaultExpressionTest {
 
 
     EvaluationResult value =
-        exp.evaluate(data, ImmutableMap.copyOf(context));
-    assertThat(value.getValue()).isEqualTo("");
+        exp.evaluate(data, ImmutableMap.copyOf(context), new EmptyEvaluationResult());
+    assertThat((String) value.getValue()).isEqualTo("");
   }
 
 }

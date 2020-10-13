@@ -8,7 +8,8 @@ package com.ibm.whi.core.expression;
 import java.util.ArrayList;
 import java.util.List;
 import com.ibm.whi.api.EvaluationResult;
-import com.ibm.whi.core.resource.ResourceValue;
+import com.ibm.whi.api.ResourceValue;
+
 
 /**
  * Represents value returned after the expression is evaluated.
@@ -42,7 +43,7 @@ public class EmptyEvaluationResult implements EvaluationResult {
   }
 
   @Override
-  public String getName() {
+  public String getIdentifier() {
     return null;
   }
 

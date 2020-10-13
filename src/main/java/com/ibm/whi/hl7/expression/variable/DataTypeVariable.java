@@ -8,7 +8,7 @@ package com.ibm.whi.hl7.expression.variable;
 import java.util.List;
 import java.util.Map;
 import com.ibm.whi.api.EvaluationResult;
-import com.ibm.whi.api.InputData;
+import com.ibm.whi.api.InputDataExtractor;
 import com.ibm.whi.core.expression.EvaluationResultFactory;
 import com.ibm.whi.hl7.data.SimpleDataTypeMapper;
 import com.ibm.whi.hl7.data.ValueExtractor;
@@ -46,7 +46,7 @@ public class DataTypeVariable extends SimpleVariable {
   // resolve variable value
   @Override
   public EvaluationResult extractVariableValue(Map<String, EvaluationResult> contextValues,
-      InputData dataSource) {
+      InputDataExtractor dataSource) {
     EvaluationResult result;
     if (!this.getSpec().isEmpty()) {
       result = getValueFromSpecs(contextValues, dataSource);

@@ -9,7 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import com.ibm.whi.api.EvaluationResult;
-import com.ibm.whi.api.InputData;
+import com.ibm.whi.api.InputDataExtractor;
 import com.ibm.whi.core.expression.EmptyEvaluationResult;
 
 
@@ -41,7 +41,7 @@ public class ExpressionVariable extends SimpleVariable {
   // resolve variable value
   @Override
   public EvaluationResult extractVariableValue(Map<String, EvaluationResult> contextValues,
-      InputData dataSource) {
+      InputDataExtractor dataSource) {
     EvaluationResult result = null;
     if (!this.getSpec().isEmpty()) {
       result = getValueFromSpecs(contextValues, dataSource);

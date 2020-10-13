@@ -6,20 +6,20 @@
 ---
 type: 
    resource: datatype/CodeableConcept
-   hl7spec: CX.5 | CWE.5
+   specs: CX.5 | CWE.5
 
 system: 
      type: STRING
-     hl7spec: CX.4 | CWE.4
+     specs: CX.4 | CWE.4
     
 value: 
      type: STRING
-     hl7spec: CX.1 | CWE.1
+     specs: CX.1 | CWE.1
      required: true
 
 period:  
     resource: datatype/Period
-    var: 
+    vars: 
        start: CX.7 | CWE.7
        end: CX.8 | CWE.8
   

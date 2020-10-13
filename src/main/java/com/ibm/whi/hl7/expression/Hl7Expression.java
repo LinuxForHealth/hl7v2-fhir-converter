@@ -9,18 +9,17 @@ package com.ibm.whi.hl7.expression;
 import java.util.Map;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Preconditions;
 import com.ibm.whi.api.EvaluationResult;
-import com.ibm.whi.api.InputData;
+import com.ibm.whi.api.InputDataExtractor;
 import com.ibm.whi.core.expression.EmptyEvaluationResult;
 import com.ibm.whi.core.expression.EvaluationResultFactory;
 import com.ibm.whi.hl7.data.SimpleDataTypeMapper;
 import com.ibm.whi.hl7.data.ValueExtractor;
+import com.ibm.whi.hl7.resource.deserializer.TemplateFieldNames;
 
 
 
@@ -33,33 +32,31 @@ import com.ibm.whi.hl7.data.ValueExtractor;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Hl7Expression extends AbstractExpression {
-
-
-  private static final Logger LOGGER = LoggerFactory.getLogger(Hl7Expression.class);
-
-
-  public Hl7Expression(@JsonProperty("type") String type, @JsonProperty("hl7spec") String hl7spec) {
-    this(type, hl7spec, null, false, null, null, null);
+  public Hl7Expression(String type, String hl7spec) {
+    this(type, hl7spec, null, false, null, null, null, false);
   }
 
   @JsonCreator
-  public Hl7Expression(@JsonProperty("type") String type, @JsonProperty("hl7spec") String hl7spec,
-      @JsonProperty("default") Object defaultValue, @JsonProperty("required") boolean required,
-      @JsonProperty("var") Map<String, String> variables,
-      @JsonProperty("condition") String condition,
-      @JsonProperty("constants") Map<String, String> constants) {
-    super(type, defaultValue, required, hl7spec, variables, condition, constants);
+  public Hl7Expression(@JsonProperty(TemplateFieldNames.TYPE) String type,
+      @JsonProperty(TemplateFieldNames.SPEC) String specs,
+      @JsonProperty(TemplateFieldNames.DEFAULT_VALUE) String defaultValue,
+      @JsonProperty(TemplateFieldNames.REQUIRED) boolean required,
+      @JsonProperty(TemplateFieldNames.VARIABLES) Map<String, String> variables,
+      @JsonProperty(TemplateFieldNames.CONDITION) String condition,
+      @JsonProperty(TemplateFieldNames.CONSTANTS) Map<String, String> constants,
+      @JsonProperty(TemplateFieldNames.USE_GROUP) boolean useGroup) {
+    super(type, defaultValue, required, specs, variables, condition, constants, useGroup);
 
   }
 
   @Override
-  public EvaluationResult evaluateExpression(InputData dataSource,
-      Map<String, EvaluationResult> contextValues, EvaluationResult hl7SpecValues) {
+  public EvaluationResult evaluateExpression(InputDataExtractor dataSource,
+      Map<String, EvaluationResult> contextValues, EvaluationResult baseValue) {
     Preconditions.checkArgument(dataSource != null, "dataSource cannot be null");
     Preconditions.checkArgument(contextValues != null, "contextValues cannot be null");
 
 
-    Object hl7Value = hl7SpecValues.getValue();
+    Object hl7Value = baseValue.getValue();
     Object resolvedValue = null;
 
     ValueExtractor<Object, ?> resolver = SimpleDataTypeMapper.getValueResolver(this.getType());
@@ -76,8 +73,10 @@ public class Hl7Expression extends AbstractExpression {
   @Override
   public String toString() {
     ToStringBuilder.setDefaultStyle(ToStringStyle.JSON_STYLE);
-    return new ToStringBuilder(this).append("hl7spec", this.getspecs())
-        .append("isMultiple", this.isMultiple()).append("variables", this.getVariables())
+    return new ToStringBuilder(this)
+        .append(TemplateFieldNames.TYPE, this.getClass().getSimpleName())
+        .append(TemplateFieldNames.SPEC, this.getspecs()).append("isMultiple", this.isMultiple())
+        .append(TemplateFieldNames.VARIABLES, this.getVariables())
         .toString();
   }
 }

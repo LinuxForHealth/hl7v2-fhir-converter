@@ -12,6 +12,7 @@ import java.util.Map;
 import org.junit.Test;
 import com.google.common.collect.ImmutableMap;
 import com.ibm.whi.api.EvaluationResult;
+import com.ibm.whi.core.expression.EmptyEvaluationResult;
 import com.ibm.whi.core.expression.SimpleEvaluationResult;
 import com.ibm.whi.hl7.message.HL7MessageData;
 import com.ibm.whi.hl7.parsing.HL7DataExtractor;
@@ -51,9 +52,11 @@ public class JELXExpressionTest {
     context.put("var2", new SimpleEvaluationResult(SOME_VALUE_2));
     context.put("var3", new SimpleEvaluationResult(SOME_VALUE_3));
 
-    EvaluationResult value = exp.evaluate(new HL7MessageData(hl7DTE), ImmutableMap.copyOf(context));
+    EvaluationResult value = exp.evaluate(new HL7MessageData(hl7DTE), ImmutableMap.copyOf(context),
+        new EmptyEvaluationResult());
 
-    assertThat(value.getValue()).isEqualTo(SOME_VALUE_1 + " " + SOME_VALUE_2 + " " + SOME_VALUE_3);
+    assertThat((String) value.getValue())
+        .isEqualTo(SOME_VALUE_1 + " " + SOME_VALUE_2 + " " + SOME_VALUE_3);
 
 
 
@@ -92,9 +95,11 @@ public class JELXExpressionTest {
     JELXExpression exp = new JELXExpression("String.join(\" \",  var1,var2, var3)", var);
 
 
-    EvaluationResult value = exp.evaluate(new HL7MessageData(hl7DTE), ImmutableMap.copyOf(context));
+    EvaluationResult value = exp.evaluate(new HL7MessageData(hl7DTE), ImmutableMap.copyOf(context),
+        new EmptyEvaluationResult());
 
-    assertThat(value.getValue()).isEqualTo(SOME_VALUE_1 + " " + SOME_VALUE_2 + " " + SOME_VALUE_2);
+    assertThat((String) value.getValue())
+        .isEqualTo(SOME_VALUE_1 + " " + SOME_VALUE_2 + " " + SOME_VALUE_2);
 
 
   }
