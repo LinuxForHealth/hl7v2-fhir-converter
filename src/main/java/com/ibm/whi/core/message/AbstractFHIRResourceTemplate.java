@@ -7,34 +7,35 @@ package com.ibm.whi.core.message;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.ibm.whi.api.ResourceModel;
+import com.ibm.whi.api.FHIRResourceTemplate;
 
 
-public abstract class AbstractFHIRResource {
+public abstract class AbstractFHIRResourceTemplate implements FHIRResourceTemplate {
 
 
   private String resourceName;
-  private int order;
   private boolean repeats;
   private String resourcePath;
-
+  private boolean isReferenced;
 
 
   @JsonCreator
-  public AbstractFHIRResource(@JsonProperty("resourceName") String resourceName,
-      @JsonProperty("resourcePath") String resourcePath, @JsonProperty("order") int order,
+  public AbstractFHIRResourceTemplate(@JsonProperty("resourceName") String resourceName,
+      @JsonProperty("resourcePath") String resourcePath,
+      @JsonProperty("isReferenced") boolean isReferenced,
       @JsonProperty("repeats") boolean repeats) {
     this.resourceName = resourceName;
     this.resourcePath = resourcePath;
-    this.order = order;
     this.repeats = repeats;
+    this.isReferenced = isReferenced;
   }
 
 
-  public AbstractFHIRResource(String resourceName, String resourcePath, int order) {
-    this(resourceName, resourcePath, order, false);
+  public AbstractFHIRResourceTemplate(String resourceName, String resourcePath) {
+    this(resourceName, resourcePath, false, false);
   }
 
+  @Override
   public String getResourceName() {
     return resourceName;
   }
@@ -42,14 +43,7 @@ public abstract class AbstractFHIRResource {
 
 
 
-  public abstract ResourceModel getResource();
-
-
-  public int getOrder() {
-    return order;
-  }
-
-
+  @Override
   public boolean isRepeats() {
     return repeats;
   }
@@ -65,6 +59,10 @@ public abstract class AbstractFHIRResource {
   }
 
 
+  @Override
+  public boolean isReferenced() {
+    return isReferenced;
+  }
 
 
 

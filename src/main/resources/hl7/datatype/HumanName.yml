@@ -9,27 +9,27 @@
 text: 
     type: STRING
     evaluate: 'GeneralUtils.generateName( prefix, given,family, suffix)'
-    var:
+    vars:
       prefix: STRING XPN.4 |XCN.5
       given: STRING XPN.2 |XCN.3
       family: STRING XPN.1 |XCN.2
       suffix: STRING XPN.5 |XCN.6
 family:
      type: STRING
-     hl7spec: XPN.1 | XCN.2
+     specs: XPN.1 | XCN.2
 given: 
      type: STRING
-     hl7spec: XPN.2 | XCN.3
+     specs: XPN.2 | XCN.3
 prefix:
      type: STRING
-     hl7spec: XPN.4 | XCN.5
+     specs: XPN.4 | XCN.5
 
 suffix: 
      type: STRING
-     hl7spec: XPN.5 | XCN.6
+     specs: XPN.5 | XCN.6
 period:
     resource: datatype/Period
-    var:
+    vars:
        start: XPN.12 |XCN.19
        end: XPN.13 |XCN.20
      

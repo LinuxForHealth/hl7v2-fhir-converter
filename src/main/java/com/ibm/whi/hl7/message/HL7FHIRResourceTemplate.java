@@ -11,20 +11,21 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.ibm.whi.api.ResourceModel;
-import com.ibm.whi.core.message.AbstractFHIRResource;
+import com.ibm.whi.core.message.AbstractFHIRResourceTemplate;
 import com.ibm.whi.hl7.resource.ResourceModelReader;
 
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class HL7FHIRResource extends AbstractFHIRResource {
+public class HL7FHIRResourceTemplate extends AbstractFHIRResourceTemplate {
   private HL7Segment segment;// primary segment
   private List<HL7Segment> additionalSegments;
-
   private ResourceModel resource;
+  private String group;
 
-  public HL7FHIRResource(String resourceName, String segment, ResourceModel resource, int order,
-      boolean repeats, List<String> additionalSegments) {
-    super(resourceName, "", order, repeats);
+
+  public HL7FHIRResourceTemplate(String resourceName, String segment, ResourceModel resource,
+      boolean isReferenced, boolean repeats, List<String> additionalSegments, String group) {
+    super(resourceName, "", isReferenced, repeats);
     this.additionalSegments = new ArrayList<>();
     if (additionalSegments != null) {
       additionalSegments.forEach(e -> this.additionalSegments.add(HL7Segment.parse(e)));
@@ -32,19 +33,21 @@ public class HL7FHIRResource extends AbstractFHIRResource {
 
     this.segment = HL7Segment.parse(segment);
     this.resource = resource;
+    this.group = group;
   }
 
-  public HL7FHIRResource(String resourceName, String segment, ResourceModel resource, int order,
-      boolean repeats) {
-    this(resourceName, segment, resource, order, repeats, new ArrayList<>());
+  public HL7FHIRResourceTemplate(String resourceName, String segment, ResourceModel resource,
+      boolean isReferenced, boolean repeats, List<String> additionalSegments) {
+    this(resourceName, segment, resource, isReferenced, repeats, additionalSegments, null);
   }
 
   @JsonCreator
-  public HL7FHIRResource(@JsonProperty("resourceName") String resourceName,
+  public HL7FHIRResourceTemplate(@JsonProperty("resourceName") String resourceName,
       @JsonProperty("segment") String segment, @JsonProperty("resourcePath") String resourcePath,
-      @JsonProperty("order") int order, @JsonProperty("repeats") boolean repeats,
-      @JsonProperty("additionalSegments") List<String> additionalSegments) {
-    super(resourceName, resourcePath, order, repeats);
+      @JsonProperty("isReferenced") boolean isReferenced, @JsonProperty("repeats") boolean repeats,
+      @JsonProperty("additionalSegments") List<String> additionalSegments,
+      @JsonProperty("group") String group) {
+    super(resourceName, resourcePath, isReferenced, repeats);
 
     this.additionalSegments = new ArrayList<>();
     if (additionalSegments != null) {
@@ -53,7 +56,12 @@ public class HL7FHIRResource extends AbstractFHIRResource {
 
     this.segment = HL7Segment.parse(segment);
     this.resource = generateResourceModel(resourcePath);
+    this.group = group;
   }
+
+
+
+
 
 
   public static ResourceModel generateResourceModel(String resourcePath) {
@@ -71,7 +79,11 @@ public class HL7FHIRResource extends AbstractFHIRResource {
 
 
   public List<HL7Segment> getAdditionalSegments() {
-    return additionalSegments;
+    return new ArrayList<>(additionalSegments);
+  }
+
+  public String getGroup() {
+    return group;
   }
 
 

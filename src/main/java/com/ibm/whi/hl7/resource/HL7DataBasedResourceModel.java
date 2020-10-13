@@ -19,10 +19,12 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.common.collect.ImmutableMap;
 import com.ibm.whi.api.EvaluationResult;
 import com.ibm.whi.api.Expression;
-import com.ibm.whi.api.InputData;
+import com.ibm.whi.api.InputDataExtractor;
 import com.ibm.whi.api.ResourceModel;
+import com.ibm.whi.api.ResourceValue;
+import com.ibm.whi.core.Constants;
 import com.ibm.whi.core.resource.ResourceResult;
-import com.ibm.whi.core.resource.ResourceValue;
+import com.ibm.whi.core.resource.SimpleResourceValue;
 import com.ibm.whi.hl7.exception.RequiredConstraintFailureException;
 import com.ibm.whi.hl7.expression.Hl7Expression;
 import com.ibm.whi.hl7.expression.JELXExpression;
@@ -44,23 +46,25 @@ public class HL7DataBasedResourceModel implements ResourceModel {
 
   private Map<String, Expression> expressions;
   private String spec;
-  private int order;
+
   private String name;
+  private String group;
 
   public HL7DataBasedResourceModel(String name, Map<String, Expression> expressions,
       String hl7spec) {
-    this(name, expressions, hl7spec, 0);
+    this(name, expressions, hl7spec, null);
 
 
   }
 
   public HL7DataBasedResourceModel(String name, Map<String, Expression> expressions, String hl7spec,
-      int order) {
+      String group) {
     this.expressions = new HashMap<>();
     this.expressions.putAll(expressions);
     this.spec = hl7spec;
-    this.order = order;
+
     this.name = name;
+    this.group = group;
 
   }
 
@@ -77,16 +81,15 @@ public class HL7DataBasedResourceModel implements ResourceModel {
 
 
   @Override
-  public ResourceResult evaluate(InputData dataSource, Map<String, EvaluationResult> variables,
-      EvaluationResult baseVariable) {
+  public ResourceResult evaluate(InputDataExtractor dataSource, Map<String, EvaluationResult> variables,
+      EvaluationResult baseValue) {
     ResourceResult resources = null;
+
     try {
 
       LOGGER.info("Started Evaluating resource {}", this.name);
       Map<String, EvaluationResult> localContext = new HashMap<>(variables);
-      if (baseVariable != null && !baseVariable.isEmpty()) {
-        localContext.put(baseVariable.getName(), baseVariable);
-      }
+
 
       Map<String, Expression> expressionMap = this.getExpressions();
 
@@ -125,25 +128,26 @@ public class HL7DataBasedResourceModel implements ResourceModel {
       Map<String, Object> resolveValues = new HashMap<>();
 
       evaluateResourceExpression(dataSource, localContext, resourceExp, additionalResolveValues,
-          resolveValues);
+          resolveValues, baseValue);
 
       evaluateReferenceExpression(dataSource, localContext, refResourceExp, additionalResolveValues,
-          resolveValues);
+          resolveValues, baseValue);
 
 
-      executeExpression(dataSource, localContext, resolveValues, hl7Exps);
-      executeExpression(dataSource, localContext, resolveValues, valueExtractionExp);
+      executeExpression(dataSource, localContext, resolveValues, hl7Exps, baseValue);
+      executeExpression(dataSource, localContext, resolveValues, valueExtractionExp, baseValue);
 
-      executeExpression(dataSource, localContext, resolveValues, defaultExp);
+      executeExpression(dataSource, localContext, resolveValues, defaultExp, baseValue);
 
-      executeExpression(dataSource, localContext, resolveValues, jexlExp);
+      executeExpression(dataSource, localContext, resolveValues, jexlExp, baseValue);
 
 
       resolveValues.values().removeIf(Objects::isNull);
       if (!resolveValues.isEmpty()) {
+        String groupId = getGroupId(localContext);
         resources =
-            new ResourceResult(new ResourceValue(resolveValues, this.name),
-                additionalResolveValues);
+            new ResourceResult(new SimpleResourceValue(resolveValues, this.name),
+                additionalResolveValues, groupId);
 
       }
 
@@ -161,18 +165,28 @@ public class HL7DataBasedResourceModel implements ResourceModel {
     return resources;
   }
 
-  private static void evaluateReferenceExpression(InputData dataSource,
+  private static String getGroupId(Map<String, EvaluationResult> localContext) {
+    EvaluationResult result = localContext.get(Constants.GROUP_ID);
+    if (result != null && result.getValue() instanceof String) {
+      return result.getValue();
+    }
+    return null;
+  }
+
+  private static void evaluateReferenceExpression(InputDataExtractor dataSource,
       Map<String, EvaluationResult> localContext, Map<String, Expression> refResourceExp,
-      List<ResourceValue> additionalResolveValues, Map<String, Object> resolveValues) {
+      List<ResourceValue> additionalResolveValues, Map<String, Object> resolveValues,
+      EvaluationResult baseValue) {
     for (Entry<String, Expression> entry : refResourceExp.entrySet()) {
 
       ReferenceExpression exp = (ReferenceExpression) entry.getValue();
       LOGGER.debug(EVALUATING, exp.getType(), entry.getKey());
-      LOGGER.debug("Extracted reference resource  {} {} reference {}", exp.getType(),
+      LOGGER.debug("Extracting reference resource  {} {} reference {}", exp.getType(),
           entry.getKey(), exp.getReference());
       if (exp.getData() != null) {
 
-        EvaluationResult obj = exp.evaluate(dataSource, ImmutableMap.copyOf(localContext));
+        EvaluationResult obj =
+            exp.evaluate(dataSource, ImmutableMap.copyOf(localContext), baseValue);
         LOGGER.debug("Extracted object from reference resource  {} {} reference {}  value {}",
             exp.getType(), entry.getKey(), exp.getReference(), obj);
         if (obj != null && !obj.isEmpty()) {
@@ -186,9 +200,10 @@ public class HL7DataBasedResourceModel implements ResourceModel {
 
   }
 
-  private static void evaluateResourceExpression(InputData dataSource,
+  private static void evaluateResourceExpression(InputDataExtractor dataSource,
       Map<String, EvaluationResult> localContext, Map<String, Expression> resourceExp,
-      List<ResourceValue> additionalResolveValues, Map<String, Object> resolveValues) {
+      List<ResourceValue> additionalResolveValues, Map<String, Object> resolveValues,
+      EvaluationResult baseValue) {
     for (Entry<String, Expression> entry : resourceExp.entrySet()) {
 
       ResourceExpression exp = (ResourceExpression) entry.getValue();
@@ -197,7 +212,8 @@ public class HL7DataBasedResourceModel implements ResourceModel {
           entry.getKey(), exp.getResourceName());
       if (exp.getData() != null) {
 
-        EvaluationResult obj = exp.evaluate(dataSource, ImmutableMap.copyOf(localContext));
+        EvaluationResult obj =
+            exp.evaluate(dataSource, ImmutableMap.copyOf(localContext), baseValue);
         LOGGER.debug("Extracted object from reference resource  {} {} reference {}  value {}",
             exp.getType(), entry.getKey(), exp.getResourceName(), obj);
         if (obj != null && !obj.isEmpty()) {
@@ -214,13 +230,13 @@ public class HL7DataBasedResourceModel implements ResourceModel {
     return StringUtils.split(key, "_")[0];
   }
 
-  private static void executeExpression(InputData dataSource,
+  private static void executeExpression(InputDataExtractor dataSource,
       Map<String, EvaluationResult> localContext, Map<String, Object> resolveValues,
-      Map<String, Expression> hl7Exps) {
+      Map<String, Expression> hl7Exps, EvaluationResult baseValue) {
     for (Entry<String, Expression> entry : hl7Exps.entrySet()) {
       Expression exp = entry.getValue();
       LOGGER.debug(EVALUATING, entry.getKey(), entry.getValue());
-      EvaluationResult obj = exp.evaluate(dataSource, localContext);
+      EvaluationResult obj = exp.evaluate(dataSource, localContext, baseValue);
       LOGGER.debug("Evaluated {} {} value returned {} ", entry.getKey(), entry.getValue(), obj);
 
       if (obj != null && !obj.isEmpty()) {
@@ -232,9 +248,6 @@ public class HL7DataBasedResourceModel implements ResourceModel {
     }
   }
 
-  public int getOrder() {
-    return order;
-  }
 
   public String getSpec() {
     return spec;

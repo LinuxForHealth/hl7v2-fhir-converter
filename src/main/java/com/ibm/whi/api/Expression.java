@@ -47,11 +47,13 @@ public interface Expression {
   /**
    * Evaluates the expression and returns the GenericResult Object
    * 
-   * @param dataSource {@link DataSource} input data
+   * @param primaryDataSource {@link DataSource} input data
    * @param contextValues - Map of values for variables
+   * @param baseValue {@link EvaluationResult}
    * @return {@link EvaluationResult}
    */
-  EvaluationResult evaluate(InputData dataSource, Map<String, EvaluationResult> contextValues);
+  EvaluationResult evaluate(InputDataExtractor primaryDataSource,
+      Map<String, EvaluationResult> contextValues, EvaluationResult baseValue);
 
   /**
    * Evaluates an expression if the condition is satisfied

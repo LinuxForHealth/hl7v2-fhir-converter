@@ -43,7 +43,7 @@ public class HL7DataBasedResourceDeserializer extends JsonDeserializer<HL7DataBa
   public HL7DataBasedResourceModel deserialize(JsonParser jsonParser, DeserializationContext ctxt)
       throws IOException {
       JsonNode node = jsonParser.getCodec().readTree(jsonParser);
-    JsonNode hl7PrefixNode = node.get(TemplateFieldNames.HL7_SPEC);
+    JsonNode hl7PrefixNode = node.get(TemplateFieldNames.SPEC);
     String hl7Prefix = null;
     if (hl7PrefixNode != null) {
       hl7Prefix = hl7PrefixNode.toString();
@@ -68,7 +68,7 @@ public class HL7DataBasedResourceDeserializer extends JsonDeserializer<HL7DataBa
       } else if (entry.getValue() != null && entry.getValue().has(TemplateFieldNames.EVALUATE)) {
         e = MAPPER.convertValue(entry.getValue(), JELXExpression.class);
 
-      } else if (entry.getValue() != null && entry.getValue().has(TemplateFieldNames.HL7_SPEC)) {
+      } else if (entry.getValue() != null && entry.getValue().has(TemplateFieldNames.SPEC)) {
         e = MAPPER.convertValue(entry.getValue(), Hl7Expression.class);
       } else {
         e = MAPPER.convertValue(entry.getValue(), SimpleExpression.class);

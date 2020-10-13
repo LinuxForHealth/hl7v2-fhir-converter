@@ -10,13 +10,12 @@ import java.util.List;
 import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Lists;
 import com.ibm.whi.api.EvaluationResult;
-import com.ibm.whi.api.InputData;
+import com.ibm.whi.api.InputDataExtractor;
 import com.ibm.whi.api.Specification;
 import com.ibm.whi.api.Variable;
 import com.ibm.whi.core.expression.VariableUtils;
-import com.ibm.whi.hl7.expression.HL7Specification;
+import com.ibm.whi.hl7.expression.specification.SpecificationParser;
 
 
 /**
@@ -65,7 +64,7 @@ public class SimpleVariable implements Variable {
   // resolve variable value
 
   public EvaluationResult extractVariableValue(Map<String, EvaluationResult> contextValues,
-      InputData dataSource) {
+      InputDataExtractor dataSource) {
     EvaluationResult result;
     if (!this.spec.isEmpty()) {
       result = getValueFromSpecs(contextValues, dataSource);
@@ -79,7 +78,7 @@ public class SimpleVariable implements Variable {
 
 
   protected EvaluationResult getValueFromSpecs(Map<String, EvaluationResult> contextValues,
-      InputData dataSource) {
+      InputDataExtractor dataSource) {
     EvaluationResult fetchedValue = null;
     for (String specValue : this.spec) {
       if (VariableUtils.isVar(specValue)) {
@@ -87,9 +86,9 @@ public class SimpleVariable implements Variable {
             getVariableValueFromVariableContextMap(specValue, ImmutableMap.copyOf(contextValues));
       } else {
         EvaluationResult gen;
-        Specification hl7spec = HL7Specification.parse(specValue, this.extractMultiple);
+        Specification hl7spec = SpecificationParser.parse(specValue, this.extractMultiple, false);
 
-        gen = dataSource.extractValueForSpec(Lists.newArrayList(hl7spec), contextValues);
+        gen = hl7spec.extractValueForSpec(dataSource, contextValues);
 
         if (gen != null && !gen.isEmpty()) {
           fetchedValue = gen;

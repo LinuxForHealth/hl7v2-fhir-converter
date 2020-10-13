@@ -47,7 +47,7 @@ public class SimpleBiCondition implements Condition {
     if (var1Value != null && var2Value != null) {
     
       ConditionPredicateEnum condEnum = ConditionPredicateEnum
-          .getConditionPredicate(this.conditionOperator, variable1.getName());
+          .getConditionPredicate(this.conditionOperator, variable1.getIdentifier());
       if (condEnum != null) {
         return condEnum.getPredicate().test(var1Value, var2Value);
       }

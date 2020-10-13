@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.ibm.whi.hl7.message.HL7Segment;
@@ -31,8 +32,7 @@ public class SegmentExtractorUtil {
    * @return
    */
   public static List<SegmentGroup> extractSegmentGroups(List<String> groups, String segment,
-      List<HL7Segment> additionalSegments,
-      HL7DataExtractor dataExtractor) {
+      List<HL7Segment> additionalSegments, HL7DataExtractor dataExtractor, String groupName) {
     LOGGER.debug("Extracting segment from group {} segment name {}", groups, segment);
     List<Structure> values = getSegments(groups.get(0), dataExtractor);
     List<String> subGroups = groups.subList(1, groups.size());
@@ -46,7 +46,8 @@ public class SegmentExtractorUtil {
       if (segments != null && !segments.isEmpty()) {
         Map<String, List<Structure>> additionalSegmentValues =
             extractAdditionalSegmentValue(s, additionalSegments, dataExtractor);
-        returnValues.add(new SegmentGroup(segments, additionalSegmentValues));
+        String groupId = generateGroupId(s, groupName);
+        returnValues.add(new SegmentGroup(segments, additionalSegmentValues, groupId));
       }
 
     }
@@ -54,10 +55,16 @@ public class SegmentExtractorUtil {
     return returnValues;
   }
 
+
+  public static List<SegmentGroup> extractSegmentGroups(List<String> groups, String segment,
+      List<HL7Segment> additionalSegments, HL7DataExtractor dataExtractor) {
+    return extractSegmentGroups(groups, segment, additionalSegments, dataExtractor, null);
+  }
+
   private static Map<String, List<Structure>> extractAdditionalSegmentValue(Structure s,
       List<HL7Segment> additionalSegments, HL7DataExtractor dataExtractor) {
     Map<String, List<Structure>> additionalSegmentValues = new HashMap<>();
-    for(HL7Segment seg: additionalSegments) {
+    for (HL7Segment seg : additionalSegments) {
       List<Structure> values = null;
       if (seg.isFromGroup()) {
         values = getSegments(s, seg.getSegment(), dataExtractor);
@@ -77,8 +84,7 @@ public class SegmentExtractorUtil {
 
 
   private static Map<String, List<Structure>> extractAdditionalSegmentValue(
-      List<HL7Segment> additionalSegments,
-      HL7DataExtractor dataExtractor) {
+      List<HL7Segment> additionalSegments, HL7DataExtractor dataExtractor) {
     Map<String, List<Structure>> additionalSegmentValues = new HashMap<>();
     for (HL7Segment seg : additionalSegments) {
       List<Structure> values = null;
@@ -143,21 +149,21 @@ public class SegmentExtractorUtil {
 
   public static List<SegmentGroup> extractSegmentGroups(String segment,
       List<HL7Segment> additionalSegments, HL7DataExtractor dataExtractor) {
-    LOGGER.debug("Extracting segment name {}",  segment);
-  
+    LOGGER.debug("Extracting segment name {}", segment);
+
     List<SegmentGroup> returnValues = new ArrayList<>();
 
-      List<Structure> segments = getSegments(segment, dataExtractor);
+    List<Structure> segments = getSegments(segment, dataExtractor);
 
-      if (segments != null && !segments.isEmpty()) {
+    if (segments != null && !segments.isEmpty()) {
       Map<String, List<Structure>> additionalSegmentValues =
-            extractAdditionalSegmentValue(additionalSegments, dataExtractor);
-        returnValues.add(new SegmentGroup(segments, additionalSegmentValues));
-      }
+          extractAdditionalSegmentValue(additionalSegments, dataExtractor);
+      returnValues.add(new SegmentGroup(segments, additionalSegmentValues));
+    }
 
 
 
-  return returnValues;
+    return returnValues;
   }
 
   public static SegmentGroup extractSegmentGroup(String segment,
@@ -180,21 +186,28 @@ public class SegmentExtractorUtil {
 
   public static SegmentGroup extractSegmentGroup(List<String> groups, String segment,
       List<HL7Segment> additionalSegments, HL7DataExtractor dataExtractor) {
+    return extractSegmentGroup(groups, segment, additionalSegments, dataExtractor, null);
+  }
+
+  public static SegmentGroup extractSegmentGroup(List<String> groups, String segment,
+      List<HL7Segment> additionalSegments, HL7DataExtractor dataExtractor, String groupName) {
     LOGGER.debug("Extracting segment from group {} segment name {}", groups, segment);
     List<Structure> values = getSegments(groups.get(0), dataExtractor);
+
     List<String> subGroups = groups.subList(1, groups.size());
     SegmentGroup returnValue = null;
     if (values != null && !values.isEmpty()) {
+
       Structure struct = getFirstChildStructures(dataExtractor, values.get(0), subGroups);
 
       if (struct != null) {
-
+        String groupId = generateGroupId(struct, groupName);
         List<Structure> segments = getSegments(struct, segment, dataExtractor);
 
         if (segments != null && !segments.isEmpty()) {
           Map<String, List<Structure>> additionalSegmentValues =
               extractAdditionalSegmentValue(struct, additionalSegments, dataExtractor);
-          returnValue = new SegmentGroup(segments, additionalSegmentValues);
+          returnValue = new SegmentGroup(segments, additionalSegmentValues, groupId);
         }
 
       }
@@ -202,6 +215,35 @@ public class SegmentExtractorUtil {
     return returnValue;
   }
 
+
+  private static String generateGroupId(Structure struct, String groupName) {
+    if (groupName == null) {
+      return null;
+    }
+
+    boolean parentMatchFound = false;
+    Structure parent = struct;
+    boolean noMoreParent = false;
+    while (!parentMatchFound && !noMoreParent) {
+
+      if (parent != null && StringUtils.endsWith(parent.getName(), groupName)) {
+        parentMatchFound = true;
+      } else if (parent == null
+          || parent.getName().equalsIgnoreCase(parent.getMessage().getName())) {
+        noMoreParent = true;
+      } else {
+        parent = parent.getParent();
+      }
+
+    }
+
+    if (parent != null && parentMatchFound) {
+      return parent.getName() + "_" + parent.hashCode();
+
+    } else {
+      return null;
+    }
+  }
 
   private static Structure getFirstChildStructures(HL7DataExtractor dataExtractor, Structure value,
       List<String> subGroups) {

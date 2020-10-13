@@ -17,7 +17,7 @@ import com.google.common.collect.Lists;
 import ca.uhn.hl7v2.model.Structure;
 
 public class SegmentGroup {
-
+  private String groupId;
   private List<Structure> segments;
   private Map<String, List<Structure>> additionalSegments;
 
@@ -27,13 +27,22 @@ public class SegmentGroup {
   }
 
 
-  public SegmentGroup(List<Structure> segment, Map<String, List<Structure>> additionalSegments) {
+  public SegmentGroup(List<Structure> segment, Map<String, List<Structure>> additionalSegments,
+      String groupId) {
     Preconditions.checkArgument(segment != null && !segment.isEmpty(),
         "Segment cannot be null or empty");
     Preconditions.checkArgument(additionalSegments != null, "additionalSegments cannot be null");
     this.segments = new ArrayList<>(segment);
     this.additionalSegments = new HashMap<>();
     this.additionalSegments.putAll(additionalSegments);
+
+    this.groupId = groupId;
+
+  }
+
+
+  public SegmentGroup(List<Structure> segments, Map<String, List<Structure>> additionalSegments) {
+    this(segments, additionalSegments, null);
   }
 
 
@@ -62,6 +71,11 @@ public class SegmentGroup {
       }
     }
     return additionalSegmentsSingleInstance;
+  }
+
+
+  public String getGroupId() {
+    return groupId;
   }
 
 

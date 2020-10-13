@@ -7,50 +7,65 @@ package com.ibm.whi.core.expression;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import com.google.common.base.Preconditions;
 import com.ibm.whi.api.EvaluationResult;
+import com.ibm.whi.api.ResourceValue;
 import com.ibm.whi.core.data.DataTypeUtil;
-import com.ibm.whi.core.resource.ResourceValue;
+
 
 /**
  * Represents value returned after the expression is evaluated.
  * 
  *
  * @author pbhallam
+ * @param <V>
+ * 
  */
-public class SimpleEvaluationResult implements EvaluationResult {
+public class SimpleEvaluationResult<V> implements EvaluationResult {
 
-
-  private Object value;
+  private UUID groupId;
+  private V value;
   private Class<?> klass;
   private String klassName;
   private List<ResourceValue> additionalResources;
 
 
-  public SimpleEvaluationResult(Object value) {
+  public SimpleEvaluationResult(V value) {
     this(value, new ArrayList<>());
   }
 
 
 
-  public SimpleEvaluationResult(Object value, List<ResourceValue> additionalResources) {
+  public SimpleEvaluationResult(V value, List<ResourceValue> additionalResources,
+      UUID groupId) {
     Preconditions.checkArgument(value != null, "value cannot be null");
     Preconditions.checkArgument(additionalResources != null, "additionalResources cannot be null");
     this.value = value;
 
     this.klass = value.getClass();
     this.klassName = DataTypeUtil.getDataType(value);
-
     this.additionalResources = new ArrayList<>();
-
     this.additionalResources.addAll(additionalResources);
+    this.groupId = groupId;
+
+  }
 
 
+  public SimpleEvaluationResult(V value, List<ResourceValue> additionalResources) {
+    Preconditions.checkArgument(value != null, "value cannot be null");
+    Preconditions.checkArgument(additionalResources != null, "additionalResources cannot be null");
+    this.value = value;
+
+    this.klass = value.getClass();
+    this.klassName = DataTypeUtil.getDataType(value);
+    this.additionalResources = new ArrayList<>();
+    this.additionalResources.addAll(additionalResources);
 
   }
 
   @Override
-  public Object getValue() {
+  public V getValue() {
     return value;
   }
 
@@ -70,22 +85,21 @@ public class SimpleEvaluationResult implements EvaluationResult {
 
 
   @Override
-  public String getName() {
+  public String getIdentifier() {
     return klassName;
   }
 
   @Override
   public boolean isEmpty() {
-    if (this.value == null) {
-      return true;
-    }
-    return false;
+    return this.value == null;
   }
-
-
 
   public List<ResourceValue> getAdditionalResources() {
     return new ArrayList<>(additionalResources);
+  }
+
+  public UUID getGroupId() {
+    return groupId;
   }
 
 

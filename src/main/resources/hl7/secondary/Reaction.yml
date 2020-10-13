@@ -6,9 +6,9 @@
 ---
 manifestation:
    resource: datatype/CodeableConcept *
-   hl7spec: AL1.5
+   specs: AL1.5
 
 
 onset:
    type: DATE_TIME
-   hl7spec: AL1.6
+   specs: AL1.6

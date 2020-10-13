@@ -43,11 +43,12 @@ public class Hl7ExpressionTest {
 
 
     Map<String, EvaluationResult> context = new HashMap<>();
-    context.put("PID", new SimpleEvaluationResult(s));
+    // context.put("PID", new SimpleEvaluationResult(s));
 
 
-    EvaluationResult value = exp.evaluate(new HL7MessageData(hl7DTE), ImmutableMap.copyOf(context));
-    assertThat(value.getValue()).isEqualTo("000010016");
+    EvaluationResult value = exp.evaluate(new HL7MessageData(hl7DTE), ImmutableMap.copyOf(context),
+        new SimpleEvaluationResult(s));
+    assertThat((String) value.getValue()).isEqualTo("000010016");
 
 
   }
@@ -75,14 +76,15 @@ public class Hl7ExpressionTest {
 
 
     Map<String, EvaluationResult> context = new HashMap<>();
-    context.put("PID", new SimpleEvaluationResult(s));
-    context.put(type.getName(), new SimpleEvaluationResult(type));
+    // context.put("PID", new SimpleEvaluationResult(s));
+    // context.put(type.getName(), new SimpleEvaluationResult(type));
 
 
-    EvaluationResult value = exp.evaluate(new HL7MessageData(hl7DTE), ImmutableMap.copyOf(context));
+    EvaluationResult value = exp.evaluate(new HL7MessageData(hl7DTE), ImmutableMap.copyOf(context),
+        new SimpleEvaluationResult(type));
 
 
-    assertThat(value.getValue()).isEqualTo("000010016");
+    assertThat((String) value.getValue()).isEqualTo("000010016");
 
 
 
@@ -109,13 +111,14 @@ public class Hl7ExpressionTest {
 
 
     Map<String, EvaluationResult> context = new HashMap<>();
-    context.put("PID", new SimpleEvaluationResult(s));
+    // context.put("PID", new SimpleEvaluationResult(s));
 
 
-    EvaluationResult value = exp.evaluate(new HL7MessageData(hl7DTE), ImmutableMap.copyOf(context));
+    EvaluationResult value = exp.evaluate(new HL7MessageData(hl7DTE), ImmutableMap.copyOf(context),
+        new SimpleEvaluationResult(s));
 
 
-    assertThat(value.getValue()).isEqualTo("000010016");
+    assertThat((String) value.getValue()).isEqualTo("000010016");
 
 
 
@@ -138,14 +141,15 @@ public class Hl7ExpressionTest {
     Hl7Expression exp = new Hl7Expression("String", "PV1.3 | PV1.4 |PV1.59");
 
     Map<String, EvaluationResult> context = new HashMap<>();
-    context.put("PV1", new SimpleEvaluationResult(s));
+    // context.put("PV1", new SimpleEvaluationResult(s));
 
 
-    EvaluationResult value = exp.evaluate(new HL7MessageData(hl7DTE), ImmutableMap.copyOf(context));
+    EvaluationResult value = exp.evaluate(new HL7MessageData(hl7DTE), ImmutableMap.copyOf(context),
+        new SimpleEvaluationResult(s));
 
 
 
-    assertThat(value.getValue()).isEqualTo("Location");
+    assertThat((String) value.getValue()).isEqualTo("Location");
 
 
 
@@ -172,13 +176,14 @@ public class Hl7ExpressionTest {
 
 
     Map<String, EvaluationResult> context = new HashMap<>();
-    context.put("OBX", new SimpleEvaluationResult(s));
+    // context.put("OBX", new SimpleEvaluationResult(s));
 
 
-    EvaluationResult value = exp.evaluate(new HL7MessageData(hl7DTE), ImmutableMap.copyOf(context));
+    EvaluationResult value = exp.evaluate(new HL7MessageData(hl7DTE), ImmutableMap.copyOf(context),
+        new SimpleEvaluationResult(s));
 
 
-    assertThat(value.getValue()).isNotNull();
+    assertThat((SimpleCode) value.getValue()).isNotNull();
     SimpleCode sc = (SimpleCode) value.getValue();
     assertThat(sc.getCode()).isEqualTo("AA");
     assertThat(sc.getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/v2-0078");

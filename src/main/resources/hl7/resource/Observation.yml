@@ -12,41 +12,39 @@ id:
   evaluate: 'UUID.randomUUID()'
 identifier:
     resource: datatype/Identifier *
-    hl7spec: OBX.3 |  OBX.21 
+    specs: OBX.3 |  OBX.21 
 
 status:
    type: OBSERVATION_STATUS
-   hl7spec: OBX.11
+   specs: OBX.11
 
 code:
    resource: datatype/CodeableConcept
-   hl7spec: OBX.3
+   specs: OBX.3
 
      
 subject:
     resource: datatype/Reference
-    var: 
-      ref-type: $Patient
+    specs: $Patient
 
 encounter:
     resource: datatype/Reference
-    var: 
-      ref-type: $Encounter
+    specs: $Encounter
 
 
 effectiveDateTime:
      type: DATE_TIME
-     hl7spec: OBX.14 | OBX.19
+     specs: OBX.14 | OBX.19
 
 
 issued:
      type: INSTANT
-     hl7spec: OBR.22 | MSH.7| OBX.19
+     specs: OBR.22 | MSH.7| OBX.19
 
 valueQuantity:
     resource: datatype/Quantity
     condition: $obx2 EQUALS NM
-    var: 
+    vars: 
       value: OBX.5
       unit: OBX.6
       #comparator: '='
@@ -56,43 +54,43 @@ valueQuantity:
 valueString:
     condition: $obx2 EQUALS TX || $obx2 EQUALS ST
     type: STRING
-    hl7spec: OBX.5 *
-    var: 
+    specs: OBX.5 *
+    vars: 
       obx2: STRING, OBX.2
   
 valueCodeableConcept:
      condition:  $obx2 EQUALS  CF || $obx2 EQUALS CNE || $obx2 EQUALS CWE || $obx2 EQUALS CE
      resource: datatype/CodeableConcept *
-     hl7spec: OBX.5
-     var:
+     specs: OBX.5
+     vars:
        obx2: STRING, OBX.2
 
 valuePeriod:
    condition: $obx2 EQUALS DR
    resource: datatype/Period
-   var:
+   vars:
      code: OBX.5
      obx2: STRING, OBX.2
      
 valueDateTime:
    condition: $obx2 EQUALS DT || $obx2 EQUALS DTM
    type: DATE_TIME
-   hl7spec: OBX.5
-   var:
+   specs: OBX.5
+   vars:
      obx2: STRING, OBX.2
 
 valueTime:
    condition: $obx2 EQUALS TM
    type: TIME
-   hl7spec: OBX.5
-   var:
+   specs: OBX.5
+   vars:
      obx2: STRING, OBX.2
 
 valueRatio:
    condition: $obx2 EQUALS SN && $obx5.3 EQUALS ':'
    resource: datatype/Ratio
-   hl7spec: OBX.5
-   var:
+   specs: OBX.5
+   vars:
      numerator: SN.2
      denominator: SN.4
      obx2: STRING, OBX.2
@@ -101,21 +99,21 @@ valueRatio:
 
 interpretation: 
    resource: datatype/CodeableConcept
-   hl7spec: OBX.8
+   specs: OBX.8
 
 
 bodySite:
    resource: datatype/CodeableConcept
-   hl7spec: OBX.20
+   specs: OBX.20
 
 method:
    resource: datatype/CodeableConcept
-   hl7spec: OBX.17
+   specs: OBX.17
 
 referenceRange: 
    resource: secondary/ReferenceRange *
-   hl7spec: OBX.7
-   var:
+   specs: OBX.7
+   vars:
      low:  OBX.7, GeneralUtils.split(low, "-", 0)
      high: OBX.7, GeneralUtils.split(high, "-", 1)
      appliesto: OBX.10
@@ -125,5 +123,6 @@ referenceRange:
      
 performer: 
    reference: resource/Practitioner *
-   hl7spec: OBX.16
+   specs: OBX.16
+
 

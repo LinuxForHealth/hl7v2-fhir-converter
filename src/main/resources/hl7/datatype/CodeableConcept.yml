@@ -9,8 +9,8 @@
 coding_1 : 
     resource: datatype/Coding *
     condition: $code NOT_NULL
-    hl7spec: CWE |CE |CNE
-    var:
+    specs: CWE |CE |CNE
+    vars:
       code: CWE.1 |CE.1 |CNE.1
       system: CWE.3 |CE.3 |CNE.3
       display: CWE.2 |CE.2 |CNE.2
@@ -18,11 +18,11 @@ coding_1 :
 coding_2: 
     condition: $code NOT_NULL
     type: CODING_SYSTEM_V2
-    hl7spec: ID |IS |TX
-    var:
+    specs: ID |IS |TX
+    vars:
        code: ID |IS |TX
 
        
 text:  
      type: STRING
-     hl7spec: CWE.2 |CWE.9 |CE.2 |CNE.2| ST |TX |ID |IS
+     specs: CWE.2 |CWE.9 |CE.2 |CNE.2| ST |TX |ID |IS

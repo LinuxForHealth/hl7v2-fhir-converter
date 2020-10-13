@@ -7,8 +7,20 @@ package com.ibm.whi.api;
 
 import java.util.Map;
 
+/**
+ * 
+ * Interface that represents a condition. The implementing class should define how to resolve the
+ * condition using the context values.
+ *
+ * @author pbhallam
+ */
 @FunctionalInterface
 public interface Condition {
-
-  boolean test(Map<String, EvaluationResult> contextVariables);
+  /**
+   * Returns True if the condition is satisfied.
+   * 
+   * @param contextValues - Map of String, {@link EvaluationResult}
+   * @return boolean
+   */
+  boolean test(Map<String, EvaluationResult> contextValues);
 }

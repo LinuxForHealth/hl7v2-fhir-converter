@@ -14,6 +14,8 @@ import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r4.model.AllergyIntolerance;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
+import org.hl7.fhir.r4.model.Condition;
+import org.hl7.fhir.r4.model.Condition.ConditionEvidenceComponent;
 import org.hl7.fhir.r4.model.Encounter;
 import org.hl7.fhir.r4.model.Observation;
 import org.hl7.fhir.r4.model.Reference;
@@ -33,7 +35,8 @@ public class Hl7MessageTest {
   public void test_patient() throws IOException {
 
     ResourceModel rsm = ResourceModelReader.getInstance().generateResourceModel("resource/Patient");
-    HL7FHIRResource patient = new HL7FHIRResource("Patient", "PID", rsm, 0, false);
+    HL7FHIRResourceTemplate patient =
+        new HL7FHIRResourceTemplate("Patient", "PID", rsm, false, false, new ArrayList<>());
     HL7MessageModel message = new HL7MessageModel("ADT", Lists.newArrayList(patient));
     String hl7message = "MSH|^~\\&|hl7Integration|hl7Integration|||||ADT^A01|||2.3|\r"
         + "EVN|A01|20130617154644\r"
@@ -60,11 +63,13 @@ public class Hl7MessageTest {
   public void test_patient_encounter() throws IOException {
 
     ResourceModel rsm = ResourceModelReader.getInstance().generateResourceModel("resource/Patient");
-    HL7FHIRResource patient = new HL7FHIRResource("Patient", "PID", rsm, 0, false);
+    HL7FHIRResourceTemplate patient =
+        new HL7FHIRResourceTemplate("Patient", "PID", rsm, true, false, new ArrayList<>());
     ResourceModel encounter =
         ResourceModelReader.getInstance().generateResourceModel("resource/Encounter");
-    HL7FHIRResource encounterFH =
-        new HL7FHIRResource("Encounter", "PV1", encounter, 0, false, Lists.newArrayList("PV2"));
+    HL7FHIRResourceTemplate encounterFH =
+        new HL7FHIRResourceTemplate("Encounter", "PV1", encounter, false, false,
+            Lists.newArrayList("PV2"));
 
 
 
@@ -99,12 +104,6 @@ public class Hl7MessageTest {
   }
 
 
-  private static Encounter getResource(Resource resource) {
-    String s = context.getParser().encodeResourceToString(resource);
-    Class<? extends IBaseResource> klass = (Class<? extends IBaseResource>) Encounter.class;
-    return (Encounter) context.getParser().parseResource(klass, s);
-  }
-
 
   @Test
   public void test_patient_encounter_only() throws IOException {
@@ -112,8 +111,9 @@ public class Hl7MessageTest {
 
     ResourceModel encounter =
         ResourceModelReader.getInstance().generateResourceModel("resource/Encounter");
-    HL7FHIRResource encounterFH =
-        new HL7FHIRResource("Encounter", "PV1", encounter, 0, false, Lists.newArrayList("PV2"));
+    HL7FHIRResourceTemplate encounterFH =
+        new HL7FHIRResourceTemplate("Encounter", "PV1", encounter, true, false,
+            Lists.newArrayList("PV2"));
 
 
 
@@ -144,7 +144,8 @@ public class Hl7MessageTest {
 
     ResourceModel rsm =
         ResourceModelReader.getInstance().generateResourceModel("resource/Observation");
-    HL7FHIRResource observation = new HL7FHIRResource("Observation", "OBX", rsm, 0, false);
+    HL7FHIRResourceTemplate observation =
+        new HL7FHIRResourceTemplate("Observation", "OBX", rsm, true, false, new ArrayList<>());
     HL7MessageModel message = new HL7MessageModel("ADT", Lists.newArrayList(observation));
     String hl7message = "MSH|^~\\&|hl7Integration|hl7Integration|||||ADT^A01|||2.3|\r"
         + "EVN|A01|20130617154644\r"
@@ -177,8 +178,8 @@ public class Hl7MessageTest {
 
     ResourceModel rsm =
         ResourceModelReader.getInstance().generateResourceModel("resource/Observation");
-    HL7FHIRResource observation =
-        new HL7FHIRResource("Observation", "OBX", rsm, 0, true, new ArrayList<>());
+    HL7FHIRResourceTemplate observation =
+        new HL7FHIRResourceTemplate("Observation", "OBX", rsm, true, true, new ArrayList<>());
     HL7MessageModel message = new HL7MessageModel("ADT", Lists.newArrayList(observation));
     String hl7message = "MSH|^~\\&|hl7Integration|hl7Integration|||||ADT^A01|||2.3|\r"
         + "EVN|A01|20130617154644\r"
@@ -209,8 +210,8 @@ public class Hl7MessageTest {
 
     ResourceModel rsm =
         ResourceModelReader.getInstance().generateResourceModel("resource/Observation");
-    HL7FHIRResource observation =
-        new HL7FHIRResource("Observation", "OBX", rsm, 0, true, new ArrayList<>());
+    HL7FHIRResourceTemplate observation =
+        new HL7FHIRResourceTemplate("Observation", "OBX", rsm, true, true, new ArrayList<>());
     HL7MessageModel message = new HL7MessageModel("ADT", Lists.newArrayList(observation));
     String hl7message = "MSH|^~\\&|hl7Integration|hl7Integration|||||ADT^A01|||2.3|\r"
         + "EVN|A01|20130617154644\r"
@@ -238,8 +239,9 @@ public class Hl7MessageTest {
 
     ResourceModel rsm =
         ResourceModelReader.getInstance().generateResourceModel("resource/AllergyIntolerance");
-    HL7FHIRResource observation =
-        new HL7FHIRResource("AllergyIntolerance", "AL1", rsm, 0, false, new ArrayList<>());
+    HL7FHIRResourceTemplate observation =
+        new HL7FHIRResourceTemplate("AllergyIntolerance", "AL1", rsm, true, false,
+            new ArrayList<>());
     HL7MessageModel message = new HL7MessageModel("ADT", Lists.newArrayList(observation));
     String hl7message = "MSH|^~\\&|hl7Integration|hl7Integration|||||ADT^A01|||2.3|\r"
         + "EVN|A01|20130617154644\r"
@@ -273,8 +275,9 @@ public class Hl7MessageTest {
 
     ResourceModel rsm =
         ResourceModelReader.getInstance().generateResourceModel("resource/AllergyIntolerance");
-    HL7FHIRResource observation =
-        new HL7FHIRResource("AllergyIntolerance", "AL1", rsm, 0, true, new ArrayList<>());
+    HL7FHIRResourceTemplate observation =
+        new HL7FHIRResourceTemplate("AllergyIntolerance", "AL1", rsm, true, true,
+            new ArrayList<>());
     HL7MessageModel message = new HL7MessageModel("ADT", Lists.newArrayList(observation));
     String hl7message = "MSH|^~\\&|hl7Integration|hl7Integration|||||ADT^A01|||2.3|\r"
         + "EVN|A01|20130617154644\r"
@@ -301,8 +304,8 @@ public class Hl7MessageTest {
 
     ResourceModel rsm =
         ResourceModelReader.getInstance().generateResourceModel("resource/Condition");
-    HL7FHIRResource observation =
-        new HL7FHIRResource("Condition", "PRB", rsm, 0, true, new ArrayList<>());
+    HL7FHIRResourceTemplate observation =
+        new HL7FHIRResourceTemplate("Condition", "PRB", rsm, true, true, new ArrayList<>());
     HL7MessageModel message = new HL7MessageModel("ADT", Lists.newArrayList(observation));
     String hl7message = "MSH|^~\\&|hl7Integration|hl7Integration|||||ADT^A01|||2.3|\r"
         + "EVN|A01|20130617154644\r"
@@ -322,5 +325,75 @@ public class Hl7MessageTest {
 
 
   }
+
+
+
+  @Test
+  public void test_observation_condition() throws IOException {
+
+    ResourceModel obsModel =
+        ResourceModelReader.getInstance().generateResourceModel("resource/Observation");
+    HL7FHIRResourceTemplate observation = new HL7FHIRResourceTemplate("Observation",
+        "PROBLEM.PROBLEM_OBSERVATION.OBX", obsModel, true, true, new ArrayList<>(), "PROBLEM");
+    ResourceModel condModel =
+        ResourceModelReader.getInstance().generateResourceModel("resource/Condition");
+    HL7FHIRResourceTemplate condition = new HL7FHIRResourceTemplate("Condition", "PROBLEM.PRB",
+        condModel, false, true, Lists.newArrayList(), "PROBLEM");
+
+
+
+    HL7MessageModel message =
+        new HL7MessageModel("ADT", Lists.newArrayList(observation, condition));
+    String hl7message =
+        "MSH|^~\\&|SendTest1|Sendfac1|Receiveapp1|Receivefac1|200603081747|security|PPR^PC1^PPR_PC1|1|P^I|2.6||||||ASCII||\r"
+            + "PID|||555444222111^^^MPI&GenHosp&L^MR||james^anderson||19600614|M||C|99 Oakland #106^^qwerty^OH^44889||^^^^^626^5641111|^^^^^626^5647654|||||343132266|||N\r"
+            + "PV1||I|6N^1234^A^GENHOS||||0100^ANDERSON^CARL|0148^ADDISON^JAMES||SUR|||||||0148^ANDERSON^CARL|S|1400|A|||||||||||||||||||SF|K||||199501102300\r"
+            + "PRB|AD|200603150625|aortic stenosis|53692||2||200603150625\r"
+            + "NTE|1|P|Problem Comments\r" + "VAR|varid1|200603150610\r"
+            + "OBX|1|TX|||ECHOCARDIOGRAPHIC REPORT||||||F|||20150930164100|||\r"
+            + "OBX|2|TX|||NORMAL LV CHAMBER SIZE WITH MILD CONCENTRIC LVH||||||F|||20150930164100|||";
+    String json = message.convert(hl7message, engine);
+    assertThat(json).isNotBlank();
+
+
+
+    IBaseResource bundleResource = context.getParser().parseResource(json);
+    assertThat(bundleResource).isNotNull();
+    Bundle b = (Bundle) bundleResource;
+    List<BundleEntryComponent> e = b.getEntry();
+    List<Resource> observationResource =
+        e.stream().filter(v -> ResourceType.Observation == v.getResource().getResourceType())
+            .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+    assertThat(observationResource).hasSize(2);
+    List<String> ids =
+        observationResource.stream().map(m -> m.getId()).collect(Collectors.toList());
+    List<Resource> conditionResource =
+        e.stream().filter(v -> ResourceType.Condition == v.getResource().getResourceType())
+            .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+    assertThat(conditionResource).hasSize(1);
+    Condition cond = getResourceCondition(conditionResource.get(0));
+    List<ConditionEvidenceComponent> evidences = cond.getEvidence();
+    assertThat(evidences).isNotEmpty();
+    assertThat(evidences.get(0).hasDetail()).isTrue();
+    assertThat("Observation/" + evidences.get(0).getDetail().get(0).getReference()).isIn(ids);
+    assertThat("Observation/" + evidences.get(1).getDetail().get(0).getReference()).isIn(ids);
+    assertThat(evidences.get(0).getDetail().get(0).getReference())
+        .isNotEqualTo(evidences.get(1).getDetail().get(0).getReference());
+  }
+
+
+  private Condition getResourceCondition(Resource resource) {
+    String s = context.getParser().encodeResourceToString(resource);
+    Class<? extends IBaseResource> klass = (Class<? extends IBaseResource>) Condition.class;
+    return (Condition) context.getParser().parseResource(klass, s);
+  }
+
+
+  private static Encounter getResource(Resource resource) {
+    String s = context.getParser().encodeResourceToString(resource);
+    Class<? extends IBaseResource> klass = (Class<? extends IBaseResource>) Encounter.class;
+    return (Encounter) context.getParser().parseResource(klass, s);
+  }
+
 
 }

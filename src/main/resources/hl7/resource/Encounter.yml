@@ -11,55 +11,55 @@ id:
 
 identifier:
     resource: datatype/Identifier *
-    hl7spec: PV1.19
+    specs: PV1.19
 
 status:
     type: STRING
-    evaluate: 'GeneralUtils.getEncounterStatus(var1,var2,var3)'
-    var: 
-      var1: String, PV1.45
-      var2: String, PV1.44
-      var3: String, PV2.16
+    evaluate: 'GeneralUtils.getEncounterStatus(vars1,vars2,vars3)'
+    vars: 
+      vars1: String, PV1.45
+      vars2: String, PV1.44
+      vars3: String, PV2.16
 
 class:
     resource: datatype/Coding
-    vars:
+    varss:
        code: PV1.2
 
 type:
    resource: datatype/CodeableConcept *
-   hl7spec: PV1.4 | PV1.18
+   specs: PV1.4 | PV1.18
 
 
 serviceType:
    resource: datatype/CodeableConcept
-   hl7spec: PV1.10
+   specs: PV1.10
 
 
 priority:
    resource: datatype/CodeableConcept
-   hl7spec: PV2.25
+   specs: PV2.25
 
 
 episodeOfCare:
    type: STRING
-   hl7spec: PV1.54 | PV1.53
+   specs: PV1.54 | PV1.53
 
 period: 
     resource: datatype/Period
-    var: 
+    vars: 
        start: PV1.44
        end: PV1.45
 
 length:
     resource: datatype/Duration
-    var: 
+    vars: 
       time1: DATE_TIME, PV1.44
       time2: DATE_TIME, PV1.45
 
 reasonCode:
     resource: datatype/CodeableConcept *
-    hl7spec: EVN.4 | PV2.3
+    specs: EVN.4 | PV2.3
 
 
 
@@ -68,6 +68,6 @@ hospitalization:
 
 subject:
     resource: datatype/Reference
-    var: 
-      ref-type: $Patient
+    specs: $Patient
+
 

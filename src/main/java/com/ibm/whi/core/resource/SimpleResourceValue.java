@@ -8,13 +8,14 @@ package com.ibm.whi.core.resource;
 import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import com.google.common.base.Preconditions;
+import com.ibm.whi.api.ResourceValue;
 
-public class ResourceValue {
+public class SimpleResourceValue implements ResourceValue {
 
   private Map<String, Object> resource;
   private String resourceClass;
 
-  public ResourceValue(Map<String, Object> resource, String resourceClass) {
+  public SimpleResourceValue(Map<String, Object> resource, String resourceClass) {
     Preconditions.checkArgument(resource != null && !resource.isEmpty(),
         "resource cannot be null or empty.");
     Preconditions.checkArgument(StringUtils.isNotBlank(resourceClass),
@@ -28,8 +29,13 @@ public class ResourceValue {
   }
 
 
-  public String getResourceClass() {
+  public String getFHIRResourceType() {
     return resourceClass;
+  }
+
+  @Override
+  public boolean isEmpty() {
+   return (resource==null || resource.isEmpty());
   }
 
 

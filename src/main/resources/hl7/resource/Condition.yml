@@ -13,7 +13,7 @@ id:
 category_x1:
    resource: datatype/CodeableConcept_var *
    condition:  $source NOT_NULL
-   var:     
+   vars:     
      code: CONDITION_CATEGORY_CODES, $type
      text: $type
      source: PRB.3
@@ -23,7 +23,7 @@ category_x1:
 category_x2:
    resource: datatype/CodeableConcept_var *
    condition:  $source NULL
-   var:     
+   vars:     
      code: CONDITION_CATEGORY_CODES, $type
      text: $type
      source: PRB.3
@@ -33,32 +33,35 @@ category_x2:
 
 severity:
    resource: datatype/CodeableConcept *
-   hl7spec: PRB.26
-   var:
+   specs: PRB.26
+   vars:
      code: PRB.26
 code:
    resource: datatype/CodeableConcept *
-   hl7spec: PRB.3
-   var:
+   specs: PRB.3
+   vars:
      code: PRB.3
      
      
 encounter:
     resource: datatype/Reference
-    var: 
-      ref-type: $Encounter
+    specs: $Encounter
       
 subject:
     resource: datatype/Reference
-    var: 
-      ref-type: $Patient
+    specs: $Patient
 
 onsetDateTime:
      type: DATE_TIME
-     hl7spec: PRB.16 
+     specs: PRB.16 
 
 stage:
    resource: secondary/Stage *
-   hl7spec: PRB.14
-   var:
+   specs: PRB.14
+   vars:
      code: PRB.14
+evidence:
+   resource: secondary/evidence *
+   specs: $Observation
+   useGroup: true
+

@@ -43,9 +43,9 @@ public class ReferenceExpressionTest {
 
 
     Map<String, EvaluationResult> context = new HashMap<>();
-    context.put("PID", new SimpleEvaluationResult(s));
 
-    EvaluationResult value = exp.evaluate(new HL7MessageData(hl7DTE), ImmutableMap.copyOf(context));
+    EvaluationResult value = exp.evaluate(new HL7MessageData(hl7DTE), ImmutableMap.copyOf(context),
+        new SimpleEvaluationResult(s));
 
     Map<String, Object> result = (Map<String, Object>) value.getValue();
     assertThat(result.get("use")).isEqualTo(null);
@@ -76,9 +76,9 @@ public class ReferenceExpressionTest {
 
 
     Map<String, EvaluationResult> context = new HashMap<>();
-    context.put("PID", new SimpleEvaluationResult(s));
 
-    EvaluationResult value = exp.evaluate(new HL7MessageData(hl7DTE), ImmutableMap.copyOf(context));
+    EvaluationResult value = exp.evaluate(new HL7MessageData(hl7DTE), ImmutableMap.copyOf(context),
+        new SimpleEvaluationResult(s));
 
     assertThat(value).isEqualTo(null);
 
@@ -106,11 +106,11 @@ public class ReferenceExpressionTest {
 
 
     Map<String, EvaluationResult> context = new HashMap<>();
-    context.put("PID", new SimpleEvaluationResult(s));
     context.put("code", new SimpleEvaluationResult(hl7DTE.getTypes((Segment) s, 3)));
 
 
-    EvaluationResult value = exp.evaluate(new HL7MessageData(hl7DTE), ImmutableMap.copyOf(context));
+    EvaluationResult value = exp.evaluate(new HL7MessageData(hl7DTE), ImmutableMap.copyOf(context),
+        new SimpleEvaluationResult(s));
 
     List<Object> results = (List<Object>) value.getValue();
     assertThat(results).hasSize(3);
@@ -146,10 +146,10 @@ public class ReferenceExpressionTest {
 
 
     Map<String, EvaluationResult> context = new HashMap<>();
-    context.put("OBX", new SimpleEvaluationResult(s));
 
 
-    EvaluationResult value = exp.evaluate(new HL7MessageData(hl7DTE), ImmutableMap.copyOf(context));
+    EvaluationResult value = exp.evaluate(new HL7MessageData(hl7DTE), ImmutableMap.copyOf(context),
+        new SimpleEvaluationResult(s));
     Map<String, Object> result = (Map<String, Object>) value.getValue();
     assertThat(result.get("use")).isEqualTo(null);
     assertThat(result.get("value")).isEqualTo("1234");
@@ -180,9 +180,9 @@ public class ReferenceExpressionTest {
     assertThat(exp.getData()).isNotNull();
 
     Map<String, EvaluationResult> context = new HashMap<>();
-    context.put("OBX", new SimpleEvaluationResult(s));
 
-    EvaluationResult value = exp.evaluate(new HL7MessageData(hl7DTE), ImmutableMap.copyOf(context));
+    EvaluationResult value = exp.evaluate(new HL7MessageData(hl7DTE), ImmutableMap.copyOf(context),
+        new SimpleEvaluationResult(s));
 
     List<Map<String, Object>> result = (List<Map<String, Object>>) value.getValue();
     assertThat(result.get(0).get("text")).isEqualTo("some text");
@@ -217,9 +217,9 @@ public class ReferenceExpressionTest {
     assertThat(exp.getData()).isNotNull();
 
     Map<String, EvaluationResult> context = new HashMap<>();
-    context.put("OBX", new SimpleEvaluationResult(s));
 
-    EvaluationResult value = exp.evaluate(new HL7MessageData(hl7DTE), ImmutableMap.copyOf(context));
+    EvaluationResult value = exp.evaluate(new HL7MessageData(hl7DTE), ImmutableMap.copyOf(context),
+        new SimpleEvaluationResult(s));
 
     List<Map<String, Object>> result = (List<Map<String, Object>>) value.getValue();
     assertThat(result.get(0).get("text")).isEqualTo("some text");
@@ -253,9 +253,9 @@ public class ReferenceExpressionTest {
     assertThat(exp.getData()).isNotNull();
 
     Map<String, EvaluationResult> context = new HashMap<>();
-    context.put("OBX", new SimpleEvaluationResult(s));
 
-    EvaluationResult value = exp.evaluate(new HL7MessageData(hl7DTE), ImmutableMap.copyOf(context));
+    EvaluationResult value = exp.evaluate(new HL7MessageData(hl7DTE), ImmutableMap.copyOf(context),
+        new SimpleEvaluationResult(s));
 
     List<Map<String, Object>> result = (List<Map<String, Object>>) value.getValue();
     assertThat(result.get(0).get("text")).isEqualTo("AA");

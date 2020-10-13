@@ -6,11 +6,11 @@
 ---
 numerator:
     resource: datatype/Quantity
-    var: 
+    vars: 
       value: $numerator
 
 denominator:
    resource: datatype/Quantity
-   var: 
+   vars: 
       value: $denominator
   

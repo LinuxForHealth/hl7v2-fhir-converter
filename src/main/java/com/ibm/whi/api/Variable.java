@@ -49,7 +49,7 @@ public interface Variable {
    * @return {@link EvaluationResult}
    */
   EvaluationResult extractVariableValue(Map<String, EvaluationResult> contextValues,
-      InputData dataSource);
+      InputDataExtractor dataSource);
 
 
 }

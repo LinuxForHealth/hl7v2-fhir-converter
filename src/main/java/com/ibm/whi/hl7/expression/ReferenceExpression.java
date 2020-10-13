@@ -20,12 +20,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import com.ibm.whi.api.EvaluationResult;
-import com.ibm.whi.api.InputData;
+import com.ibm.whi.api.InputDataExtractor;
+import com.ibm.whi.api.ResourceValue;
 import com.ibm.whi.core.expression.EvaluationResultFactory;
 import com.ibm.whi.core.resource.ResourceResult;
-import com.ibm.whi.core.resource.ResourceValue;
 import com.ibm.whi.hl7.resource.HL7DataBasedResourceModel;
 import com.ibm.whi.hl7.resource.ResourceModelReader;
+import com.ibm.whi.hl7.resource.deserializer.TemplateFieldNames;
 
 /**
  * Represent a expression that represents resolving a json template and creating a reference data
@@ -46,7 +47,6 @@ public class ReferenceExpression extends AbstractExpression {
   private String reference;
   private boolean isGenerateMultipleResource;
 
-
   /**
    * 
    * @param type
@@ -58,15 +58,19 @@ public class ReferenceExpression extends AbstractExpression {
    * @param referencesResources
    */
   @JsonCreator
-  public ReferenceExpression(@JsonProperty("type") String type,
-      @JsonProperty("reference") String reference, @JsonProperty("hl7spec") String hl7spec,
-      @JsonProperty("default") Object defaultValue, @JsonProperty("required") boolean required,
-      @JsonProperty("var") Map<String, String> variables,
-      @JsonProperty("condition") String condition,
-      @JsonProperty("constants") Map<String, String> constants) {
-    super(type, defaultValue, required, hl7spec, variables, condition, constants);
+  public ReferenceExpression(@JsonProperty(TemplateFieldNames.TYPE) String type,
+      @JsonProperty(TemplateFieldNames.REFERENCE) String reference,
+      @JsonProperty(TemplateFieldNames.SPEC) String specs,
+      @JsonProperty(TemplateFieldNames.DEFAULT_VALUE) String defaultValue,
+      @JsonProperty(TemplateFieldNames.REQUIRED) boolean required,
+      @JsonProperty(TemplateFieldNames.VARIABLES) Map<String, String> variables,
+      @JsonProperty(TemplateFieldNames.CONDITION) String condition,
+      @JsonProperty(TemplateFieldNames.CONSTANTS) Map<String, String> constants,
+      @JsonProperty(TemplateFieldNames.USE_GROUP) boolean useGroup) {
+    super(type, defaultValue, required, specs, variables, condition, constants, useGroup);
 
     Preconditions.checkArgument(StringUtils.isNotBlank(reference), "reference cannot be blank");
+
     if (reference.endsWith("*")) {
       isGenerateMultipleResource = true;
       reference = StringUtils.removeEnd(reference, "*");
@@ -80,9 +84,8 @@ public class ReferenceExpression extends AbstractExpression {
   }
 
 
-  public ReferenceExpression(@JsonProperty("type") String type,
-      @JsonProperty("reference") String reference, @JsonProperty("hl7spec") String hl7spec) {
-    this(type, reference, hl7spec, null, false, null, null, null);
+  public ReferenceExpression(String type, String reference, String hl7spec) {
+    this(type, reference, hl7spec, null, false, null, null, null, false);
   }
 
 
@@ -94,31 +97,31 @@ public class ReferenceExpression extends AbstractExpression {
 
 
   @Override
-  public EvaluationResult evaluateExpression(InputData dataSource,
-      Map<String, EvaluationResult> contextValues, EvaluationResult hl7SpecValues) {
+  public EvaluationResult evaluateExpression(InputDataExtractor dataSource,
+      Map<String, EvaluationResult> contextValues, EvaluationResult baseValue) {
     Preconditions.checkArgument(dataSource != null, "dataSource cannot be null");
     Preconditions.checkArgument(contextValues != null, "contextValues cannot be null");
     LOGGER.info("Evaluating expression {}", this.reference);
     EvaluationResult resourceReferenceResult = null;
     // Evaluate the resource first and add it to the list of additional resources generated
     ResourceResult primaryResourceResult =
-        evaluateResource(dataSource, contextValues, hl7SpecValues);
+        evaluateResource(dataSource, contextValues, baseValue);
     // If the primary resource is generated then create the reference
-    if (primaryResourceResult != null && primaryResourceResult.getResource() != null) {
+    if (primaryResourceResult != null && primaryResourceResult.getValue() != null) {
       List<ResourceValue> additionalResources = new ArrayList<>();
       additionalResources.addAll(primaryResourceResult.getAdditionalResources());
-      additionalResources.add(primaryResourceResult.getResource());
+      additionalResources.add(primaryResourceResult.getValue());
+
+
+      EvaluationResult genBaseValue = EvaluationResultFactory
+          .getEvaluationResult(primaryResourceResult.getValue().getResource());
 
       Map<String, EvaluationResult> localContextValues = new HashMap<>(contextValues);
-      localContextValues.put("ref-type",
-          EvaluationResultFactory
-              .getEvaluationResult(primaryResourceResult.getResource().getResource()));
-
 
       ResourceResult result = this.referenceModel.evaluate(dataSource,
-          ImmutableMap.copyOf(localContextValues), hl7SpecValues);
-      if (result != null && result.getResource() != null) {
-        ResourceValue resolvedvalues = result.getResource();
+          ImmutableMap.copyOf(localContextValues), genBaseValue);
+      if (result != null && result.getValue() != null) {
+        ResourceValue resolvedvalues = result.getValue();
 
         LOGGER.info("Evaluated expression {}, returning {} ", this.reference, resolvedvalues);
         if (resolvedvalues != null) {
@@ -135,11 +138,11 @@ public class ReferenceExpression extends AbstractExpression {
 
 
 
-  private ResourceResult evaluateResource(InputData dataSource,
+  private ResourceResult evaluateResource(InputDataExtractor dataSource,
       Map<String, EvaluationResult> contextValues, EvaluationResult hl7SpecValue) {
     ResourceResult result =
         this.data.evaluate(dataSource, ImmutableMap.copyOf(contextValues), hl7SpecValue);
-    if (result != null && result.getResource() != null) {
+    if (result != null && result.getValue() != null) {
       return result;
     }
     return null;
@@ -155,9 +158,11 @@ public class ReferenceExpression extends AbstractExpression {
   @Override
   public String toString() {
     ToStringBuilder.setDefaultStyle(ToStringStyle.JSON_STYLE);
-    return new ToStringBuilder(this.getClass().getSimpleName()).append("hl7spec", this.getspecs())
-        .append("isMultiple", this.isMultiple()).append("variables", this.getVariables())
-        .append("reference", this.reference).build();
+    return new ToStringBuilder(this)
+        .append(TemplateFieldNames.TYPE, this.getClass().getSimpleName())
+        .append(TemplateFieldNames.SPEC, this.getspecs()).append("isMultiple", this.isMultiple())
+        .append(TemplateFieldNames.VARIABLES, this.getVariables())
+        .append(TemplateFieldNames.REFERENCE, this.reference).build();
   }
 
   @Override
