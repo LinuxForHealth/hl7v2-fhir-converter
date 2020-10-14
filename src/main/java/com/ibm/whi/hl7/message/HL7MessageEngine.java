@@ -5,7 +5,6 @@
  */
 package com.ibm.whi.hl7.message;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -43,7 +42,12 @@ import com.ibm.whi.hl7.message.util.SegmentExtractorUtil;
 import com.ibm.whi.hl7.message.util.SegmentGroup;
 import ca.uhn.hl7v2.model.Structure;
 
-@SuppressWarnings("rawtypes")
+/**
+ * Implements Message engine for HL7 message data
+ * 
+ *
+ * @author pbhallam
+ */
 public class HL7MessageEngine implements MessageEngine {
 
 
@@ -53,25 +57,31 @@ public class HL7MessageEngine implements MessageEngine {
   private FHIRContext context;
   private BundleType bundleType;
 
+  /**
+   * 
+   * @param context
+   */
   public HL7MessageEngine(FHIRContext context) {
     this(context, Constants.DEFAULT_BUNDLE_TYPE);
   }
 
+  /**
+   * 
+   * @param context
+   * @param bundleType
+   */
   public HL7MessageEngine(FHIRContext context, BundleType bundleType) {
     this.context = context;
     this.bundleType = bundleType;
   }
 
+
   /**
    * Converts a HL7 message to a FHIR bundle with the list of resources specified
    * 
-   * @param dataExtractor
-   * @param resources
-   * @param context
-   * @return
-   * @throws IOException
+   * @see com.ibm.whi.api.MessageEngine#transform(com.ibm.whi.api.InputDataExtractor,
+   *      java.lang.Iterable, java.util.Map)
    */
-
   @Override
   public Bundle transform(final InputDataExtractor dataInput, final Iterable<FHIRResourceTemplate> resources,
       final Map<String, EvaluationResult> contextValues) {

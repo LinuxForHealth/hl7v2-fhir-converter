@@ -33,14 +33,14 @@ public interface  MessageTemplate<T> {
   /**
    * Name of the message
    * 
-   * @return
+   * @return String
    */
   String getMessageName();
 
   /**
    * List of templates for FHIR resources that needs to be generated
    * 
-   * @return
+   * @return {@link List} of {@link FHIRResourceTemplate}
    */
   List<FHIRResourceTemplate> getResources();
 

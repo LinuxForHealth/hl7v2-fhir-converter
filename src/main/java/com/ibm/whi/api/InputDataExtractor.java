@@ -49,12 +49,16 @@ public interface InputDataExtractor {
   /**
    * Return the name /identifier of this resource Example: for ADT_A01 message, return the message
    * type.
+   * 
+   * @return String
    */
   String getName();
 
   /**
    * Return the unique identifier of this resource Example: for a ADT_A01 message, return the
    * message id.
+   * 
+   * @return String
    */
   String getId();
 }

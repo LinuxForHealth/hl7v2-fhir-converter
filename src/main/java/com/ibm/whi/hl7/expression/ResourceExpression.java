@@ -46,12 +46,13 @@ public class ResourceExpression extends AbstractExpression {
    * 
    * @param type
    * @param resourceToGenerate
-   * @param hl7spec
+   * @param specs
    * @param defaultValue
    * @param required
    * @param variables
-   * @param referencesResources
+   * @param condition
    * @param constants
+   * @param useGroup
    */
   @JsonCreator
   public ResourceExpression(@JsonProperty(TemplateFieldNames.TYPE) String type,

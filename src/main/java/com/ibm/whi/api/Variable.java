@@ -22,21 +22,21 @@ public interface Variable {
    * is empty then variable value will be extracted from contextValues. If the list of specs is not
    * empty then data source will be used to extract the value of the specs.
    * 
-   * @return
+   * @return {@link List} of String
    */
   List<String> getSpec();
 
   /**
    * Return the Class type for the value to be extracted.
    * 
-   * @return
+   * @return String
    */
   String getType();
 
   /**
    * Return the name of the variable
    * 
-   * @return
+   * @return String
    */
   String getVariableName();
 
@@ -44,8 +44,8 @@ public interface Variable {
    * Evaluates the variable and extracts the value based on the provided context values and input
    * data source.
    * 
-   * @param contextValues
-   * @param dataSource
+   * @param contextValues {@link Map} of String and value {@link EvaluationResult }
+   * @param dataSource {@link InputDataExtractor}
    * @return {@link EvaluationResult}
    */
   EvaluationResult extractVariableValue(Map<String, EvaluationResult> contextValues,

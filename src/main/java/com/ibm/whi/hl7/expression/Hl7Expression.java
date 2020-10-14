@@ -36,6 +36,17 @@ public class Hl7Expression extends AbstractExpression {
     this(type, hl7spec, null, false, null, null, null, false);
   }
 
+  /**
+   * 
+   * @param type
+   * @param specs
+   * @param defaultValue
+   * @param required
+   * @param variables
+   * @param condition
+   * @param constants
+   * @param useGroup
+   */
   @JsonCreator
   public Hl7Expression(@JsonProperty(TemplateFieldNames.TYPE) String type,
       @JsonProperty(TemplateFieldNames.SPEC) String specs,

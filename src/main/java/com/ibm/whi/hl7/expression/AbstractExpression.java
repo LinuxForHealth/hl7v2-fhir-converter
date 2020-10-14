@@ -124,8 +124,8 @@ public abstract class AbstractExpression implements Expression {
    * values. If expression (reference and resource) ends with * then for that expression a the
    * Generic result includes list of values.
    * 
-   * @see com.ibm.whi.api.Expression#evaluate(com.ibm.whi.api.InputDataExtractor,
-   *      java.util.Map)
+   * @see com.ibm.whi.api.Expression#evaluate(com.ibm.whi.api.InputDataExtractor, java.util.Map,
+   *      EvaluationResult)
    */
   @Override
   public EvaluationResult evaluate(InputDataExtractor dataSource,

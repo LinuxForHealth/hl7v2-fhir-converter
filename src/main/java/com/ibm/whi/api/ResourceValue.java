@@ -24,8 +24,9 @@ public interface ResourceValue {
   Map<String, Object> getResource();
 
   /**
+   * FHIR Resource Type Example: Observation/Patient
    * 
-   * @return
+   * @return String
    */
   String getFHIRResourceType();
 

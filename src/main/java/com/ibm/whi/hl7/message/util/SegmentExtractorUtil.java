@@ -24,12 +24,15 @@ public class SegmentExtractorUtil {
   private SegmentExtractorUtil() {}
 
   /**
-   * Returns list of segment from all the repetitions of the group
+   * Returns list of segments from all the repetitions of the group with a group name included in
+   * groupId
    * 
    * @param groups
    * @param segment
+   * @param additionalSegments
    * @param dataExtractor
-   * @return
+   * @param groupName
+   * @return List of {@link SegmentGroup}
    */
   public static List<SegmentGroup> extractSegmentGroups(List<String> groups, String segment,
       List<HL7Segment> additionalSegments, HL7DataExtractor dataExtractor, String groupName) {
@@ -55,10 +58,70 @@ public class SegmentExtractorUtil {
     return returnValues;
   }
 
-
+  /**
+   * Returns list of segments from all the repetitions of the group
+   * 
+   * @param groups
+   * @param segment
+   * @param additionalSegments
+   * @param dataExtractor
+   * @return @return List of {@link SegmentGroup}
+   */
   public static List<SegmentGroup> extractSegmentGroups(List<String> groups, String segment,
       List<HL7Segment> additionalSegments, HL7DataExtractor dataExtractor) {
     return extractSegmentGroups(groups, segment, additionalSegments, dataExtractor, null);
+  }
+
+
+  /**
+   * Returns single segment from the group
+   * 
+   * @param groups
+   * @param segment
+   * @param additionalSegments
+   * @param dataExtractor
+   * @return {@link SegmentGroup}
+   */
+
+  public static SegmentGroup extractSegmentGroup(List<String> groups, String segment,
+      List<HL7Segment> additionalSegments, HL7DataExtractor dataExtractor) {
+    return extractSegmentGroup(groups, segment, additionalSegments, dataExtractor, null);
+  }
+
+  /**
+   * Returns single segment from the group with a group name included in groupId
+   * 
+   * @param groups
+   * @param segment
+   * @param additionalSegments
+   * @param dataExtractor
+   * @param groupName
+   * @return {@link SegmentGroup}
+   */
+  public static SegmentGroup extractSegmentGroup(List<String> groups, String segment,
+      List<HL7Segment> additionalSegments, HL7DataExtractor dataExtractor, String groupName) {
+    LOGGER.debug("Extracting segment from group {} segment name {}", groups, segment);
+    List<Structure> values = getSegments(groups.get(0), dataExtractor);
+
+    List<String> subGroups = groups.subList(1, groups.size());
+    SegmentGroup returnValue = null;
+    if (values != null && !values.isEmpty()) {
+
+      Structure struct = getFirstChildStructures(dataExtractor, values.get(0), subGroups);
+
+      if (struct != null) {
+        String groupId = generateGroupId(struct, groupName);
+        List<Structure> segments = getSegments(struct, segment, dataExtractor);
+
+        if (segments != null && !segments.isEmpty()) {
+          Map<String, List<Structure>> additionalSegmentValues =
+              extractAdditionalSegmentValue(struct, additionalSegments, dataExtractor);
+          returnValue = new SegmentGroup(segments, additionalSegmentValues, groupId);
+        }
+
+      }
+    }
+    return returnValue;
   }
 
   private static Map<String, List<Structure>> extractAdditionalSegmentValue(Structure s,
@@ -147,6 +210,14 @@ public class SegmentExtractorUtil {
 
   }
 
+  /**
+   * Returns list of segments from parent segment
+   * 
+   * @param segment
+   * @param additionalSegments
+   * @param dataExtractor
+   * @return @return List of {@link SegmentGroup}
+   */
   public static List<SegmentGroup> extractSegmentGroups(String segment,
       List<HL7Segment> additionalSegments, HL7DataExtractor dataExtractor) {
     LOGGER.debug("Extracting segment name {}", segment);
@@ -166,6 +237,14 @@ public class SegmentExtractorUtil {
     return returnValues;
   }
 
+  /**
+   * Returns a single segment from parent segment
+   * 
+   * @param segment
+   * @param additionalSegments
+   * @param dataExtractor
+   * @return a {@link SegmentGroup}
+   */
   public static SegmentGroup extractSegmentGroup(String segment,
       List<HL7Segment> additionalSegments, HL7DataExtractor dataExtractor) {
     LOGGER.debug("Extracting segment name {}", segment);
@@ -184,36 +263,7 @@ public class SegmentExtractorUtil {
 
   }
 
-  public static SegmentGroup extractSegmentGroup(List<String> groups, String segment,
-      List<HL7Segment> additionalSegments, HL7DataExtractor dataExtractor) {
-    return extractSegmentGroup(groups, segment, additionalSegments, dataExtractor, null);
-  }
 
-  public static SegmentGroup extractSegmentGroup(List<String> groups, String segment,
-      List<HL7Segment> additionalSegments, HL7DataExtractor dataExtractor, String groupName) {
-    LOGGER.debug("Extracting segment from group {} segment name {}", groups, segment);
-    List<Structure> values = getSegments(groups.get(0), dataExtractor);
-
-    List<String> subGroups = groups.subList(1, groups.size());
-    SegmentGroup returnValue = null;
-    if (values != null && !values.isEmpty()) {
-
-      Structure struct = getFirstChildStructures(dataExtractor, values.get(0), subGroups);
-
-      if (struct != null) {
-        String groupId = generateGroupId(struct, groupName);
-        List<Structure> segments = getSegments(struct, segment, dataExtractor);
-
-        if (segments != null && !segments.isEmpty()) {
-          Map<String, List<Structure>> additionalSegmentValues =
-              extractAdditionalSegmentValue(struct, additionalSegments, dataExtractor);
-          returnValue = new SegmentGroup(segments, additionalSegmentValues, groupId);
-        }
-
-      }
-    }
-    return returnValue;
-  }
 
 
   private static String generateGroupId(Structure struct, String groupName) {

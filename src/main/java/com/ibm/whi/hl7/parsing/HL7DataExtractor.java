@@ -327,7 +327,7 @@ public class HL7DataExtractor {
    * 
    * @param segment
    * @param field
-   * @return
+   * @return {@link ParsingResult}
    */
   public ParsingResult<String> get(String segment, String field) {
 

@@ -41,16 +41,17 @@ public class ValueExtractionGeneralExpression extends AbstractExpression {
   private ImmutablePair<String, String> fetch;
 
 
-
   /**
    * 
    * @param type
-   * @param reference
-   * @param hl7prefix
+   * @param fetch
+   * @param specs
    * @param defaultValue
    * @param required
    * @param variables
+   * @param condition
    * @param constants
+   * @param useGroup
    */
   @JsonCreator
   public ValueExtractionGeneralExpression(@JsonProperty(TemplateFieldNames.TYPE) String type,
@@ -88,7 +89,6 @@ public class ValueExtractionGeneralExpression extends AbstractExpression {
    * from the context.
    * 
    * 
-   * @see com.ibm.whi.api.Expression#execute(java.util.Map)
    */
 
   @Override
