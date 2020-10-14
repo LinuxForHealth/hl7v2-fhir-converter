@@ -60,6 +60,10 @@ compile group:'com.ibm.fhir', name:'fhir-term', version:'4.4.0'
 repositories {
     // Use jcenter for resolving your dependencies.
     // You can declare any Maven/Ivy/file repository here.
+    mavenCentral()
+    maven {
+        url "https://oss.sonatype.org/content/repositories/snapshots/"
+    }
     jcenter()
     maven {
      url "https://dl.bintray.com/ibm-watson-health/ibm-fhir-server-releases"
