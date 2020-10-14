@@ -7,7 +7,6 @@ package com.ibm.whi.core.terminology;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -47,9 +46,9 @@ public class SystemUrlLookup {
   /**
    * Get the system associated with the value
    * 
-   * @param value
-   * @return
-   * @throws MalformedURLException
+   * @param value -String
+   * @return String
+   * 
    */
   public static String getSystemUrl(String value) {
     if (systemURLLookupInstance == null) {

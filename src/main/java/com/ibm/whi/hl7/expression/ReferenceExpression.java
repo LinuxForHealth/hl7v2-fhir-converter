@@ -51,11 +51,13 @@ public class ReferenceExpression extends AbstractExpression {
    * 
    * @param type
    * @param reference
-   * @param hl7spec
+   * @param specs
    * @param defaultValue
    * @param required
    * @param variables
-   * @param referencesResources
+   * @param condition
+   * @param constants
+   * @param useGroup
    */
   @JsonCreator
   public ReferenceExpression(@JsonProperty(TemplateFieldNames.TYPE) String type,

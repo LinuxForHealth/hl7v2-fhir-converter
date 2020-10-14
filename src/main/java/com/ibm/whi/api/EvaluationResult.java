@@ -11,7 +11,6 @@ import java.util.List;
 /**
  * Represents value returned after the expression is evaluated.
  * 
- * @param <T> the parameter value generated after the evaluation or an resource or an expression
  *
  * @author pbhallam
  */
@@ -36,14 +35,14 @@ public interface EvaluationResult {
   /**
    * Class type of the value
    * 
-   * @return
+   * @return Class type of the value
    */
   Class<?> getValueType();
 
   /**
    * If the value is empty return true.
    * 
-   * @return
+   * @return True if the value is null or empty
    */
   boolean isEmpty();
 

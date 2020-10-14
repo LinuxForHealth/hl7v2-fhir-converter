@@ -20,7 +20,7 @@ public interface ParsingResult<T> {
    * Returns single value of type T. If the parsing returned multiple values, then this method would
    * return the first occurrence of that value
    * 
-   * @return
+   * @return Value of type T
    */
 
   T getValue();
@@ -28,16 +28,16 @@ public interface ParsingResult<T> {
   /**
    * Returns all values of type T .
    * 
-   * @return
+   * @return List of values of type T
    */
 
   List<T> getValues();
 
 
   /**
-   * Returns if this object has no value
+   * Returns True if this object has no value
    * 
-   * @return
+   * @return boolean
    */
   boolean isEmpty();
 

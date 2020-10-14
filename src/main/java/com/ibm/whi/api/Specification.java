@@ -18,16 +18,12 @@ import java.util.Map;
 
 public interface Specification {
 
-
-  Class<? extends InputDataExtractor> getSourceInputDataClass();
-
-
   /**
    * Extract the single value for the specifications.
    * 
    * 
-   * @param dataSource {@link InputData)
-   * @param contextValues {@link Map<String, EvaluationResult> }
+   * @param dataSource {@link InputDataExtractor}
+   * @param contextValues {@link Map} of String and value {@link EvaluationResult }
    * @return {@link EvaluationResult}
    */
   EvaluationResult extractValueForSpec(InputDataExtractor dataSource,
@@ -37,8 +33,8 @@ public interface Specification {
    * Extract the multiple values for the specifications.
    * 
    *
-   * @param dataSource {@link InputData)
-   * @param contextValues {@link Map<String, EvaluationResult> }
+   * @param dataSource {@link InputDataExtractor}
+   * @param contextValues {@link Map} of String and value {@link EvaluationResult }
    * @return {@link EvaluationResult}
    */
   EvaluationResult extractMultipleValuesForSpec(InputDataExtractor dataSource,

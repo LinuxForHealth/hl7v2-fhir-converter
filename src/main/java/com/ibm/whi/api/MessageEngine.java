@@ -7,7 +7,6 @@ package com.ibm.whi.api;
 
 import java.util.Map;
 import org.hl7.fhir.r4.model.Bundle;
-import com.ibm.whi.core.message.AbstractFHIRResourceTemplate;
 import com.ibm.whi.fhir.FHIRContext;
 
 /**
@@ -23,9 +22,9 @@ public interface MessageEngine {
    * Transforms source data to a FHIR bundle with the list of resources specified
    * 
    * @param dataSource - {@link InputDataExtractor}
-   * @param resources -{@link AbstractFHIRResourceTemplate
+   * @param resources -{@link FHIRResourceTemplate}
    * @param contextValues - Map of context values
-   * @return Fhir {@link Bundle}
+   * @return FHIR {@link Bundle}
    */
   Bundle transform(InputDataExtractor dataSource, Iterable<FHIRResourceTemplate> resources,
       Map<String, EvaluationResult> contextValues);

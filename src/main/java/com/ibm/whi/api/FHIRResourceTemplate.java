@@ -38,7 +38,7 @@ public interface  FHIRResourceTemplate {
   /**
    * If multiple resources of this type needs to be generated
    * 
-   * @return
+   * @return True/False
    */
   default boolean isRepeats() {
     return false;
@@ -47,7 +47,7 @@ public interface  FHIRResourceTemplate {
   /**
    * If this resource is referenced by other resources
    * 
-   * @return
+   * @return True/False
    */
   default boolean isReferenced() {
     return false;

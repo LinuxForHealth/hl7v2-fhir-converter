@@ -29,7 +29,18 @@ public class JELXExpression extends AbstractExpression {
 
   private String evaluate;
 
-
+  /**
+   * 
+   * @param type
+   * @param defaultValue
+   * @param required
+   * @param specs
+   * @param evaluate
+   * @param variables
+   * @param condition
+   * @param constants
+   * @param useGroup
+   */
 
   @JsonCreator
   public JELXExpression(@JsonProperty(TemplateFieldNames.TYPE) String type,

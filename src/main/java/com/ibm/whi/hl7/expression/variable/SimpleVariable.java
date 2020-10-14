@@ -125,9 +125,9 @@ public class SimpleVariable implements Variable {
   }
 
   /**
-   * Return if variable value should extracted from all repititions of the spec
+   * Return if variable value should extracted from all repetitions of the spec
    * 
-   * @return
+   * @return boolean
    */
   public boolean extractMultiple() {
     return this.extractMultiple;

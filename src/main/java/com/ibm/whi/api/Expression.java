@@ -23,7 +23,7 @@ public interface Expression {
   /**
    * Defines the return type of the object value evaluated/extracted.
    * 
-   * @return
+   * @return Return the type of the expression
    */
   String getType();
 
@@ -47,7 +47,7 @@ public interface Expression {
   /**
    * Evaluates the expression and returns the GenericResult Object
    * 
-   * @param primaryDataSource {@link DataSource} input data
+   * @param primaryDataSource {@link InputDataExtractor} input data
    * @param contextValues - Map of values for variables
    * @param baseValue {@link EvaluationResult}
    * @return {@link EvaluationResult}
