@@ -1,0 +1,299 @@
+/*
+ * (C) Copyright IBM Corp. 2020
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+package io.github.linuxforhealth.hl7.data;
+
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.UUID;
+import org.apache.commons.lang3.BooleanUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
+import org.hl7.fhir.r4.model.AllergyIntolerance.AllergyIntoleranceCategory;
+import org.hl7.fhir.r4.model.AllergyIntolerance.AllergyIntoleranceCriticality;
+import org.hl7.fhir.r4.model.Enumerations.AdministrativeGender;
+import org.hl7.fhir.r4.model.Observation.ObservationStatus;
+import org.hl7.fhir.r4.model.codesystems.ConditionCategory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import io.github.linuxforhealth.core.terminology.Hl7v2Mapping;
+import io.github.linuxforhealth.core.terminology.SimpleCode;
+import io.github.linuxforhealth.core.terminology.SystemUrlLookup;
+import io.github.linuxforhealth.core.terminology.TerminologyLookup;
+import io.github.linuxforhealth.hl7.data.date.DateUtil;
+
+public class SimpleDataValueResolver {
+  private static final Logger LOGGER = LoggerFactory.getLogger(SimpleDataValueResolver.class);
+
+  public static final ValueExtractor<Object, String> DATE = (Object value) -> {
+
+      String val = Hl7DataHandlerUtil.getStringValue(value);
+    if (val != null) {
+      return DateUtil.formatToDate(val);
+    }
+    return null;
+  };
+
+  public static final ValueExtractor<Object, String> DATE_TIME = (Object value) -> {
+
+    String val = Hl7DataHandlerUtil.getStringValue(value);
+    if (val != null) {
+      return DateUtil.formatToDateTime(val);
+    }
+    return null;
+  };
+
+  public static final ValueExtractor<Object, String> STRING = (Object value) -> {
+    return Hl7DataHandlerUtil.getStringValue(value);
+
+  };
+
+  public static final ValueExtractor<Object, String> STRING_ALL = (Object value) -> {
+    return Hl7DataHandlerUtil.getStringValue(value, true);
+
+  };
+
+  public static final ValueExtractor<Object, String> INSTANT = (Object value) -> {
+
+    String val = Hl7DataHandlerUtil.getStringValue(value);
+    if (val != null) {
+      return DateUtil.formatToZonedDateTime(val);
+    }
+    return null;
+  };
+
+
+
+
+  public static final ValueExtractor<Object, URI> URI_VAL = (Object value) -> {
+
+    try {
+      String val = Hl7DataHandlerUtil.getStringValue(value);
+      if (val != null && isValidUUID(val)) {
+        return new URI("urn", "uuid", val);
+      } else {
+        return null;
+      }
+
+    } catch (IllegalArgumentException | URISyntaxException e) {
+      LOGGER.warn("Value not valid URI, value: {}", value, e);
+      return null;
+    }
+
+  };
+
+  public static final ValueExtractor<Object, String> ADMINISTRATIVE_GENDER_CODE_FHIR =
+      (Object value) -> {
+
+        String val = Hl7DataHandlerUtil.getStringValue(value);
+        String code = getFHIRCode(val, AdministrativeGender.class);
+        if (code != null) {
+          return code;
+        } else if (val == null) {
+          return AdministrativeGender.NULL.toCode();
+        } else {
+          return AdministrativeGender.UNKNOWN.toCode();
+        }
+  };
+  
+  public static final ValueExtractor<Object, String> OBSERVATION_STATUS_CODE_FHIR =
+      (Object value) -> {
+        String val = Hl7DataHandlerUtil.getStringValue(value);
+        String code = getFHIRCode(val, ObservationStatus.class);
+        if (code != null) {
+          return code;
+        } else if (val == null) {
+          return ObservationStatus.NULL.toCode();
+        } else {
+          return ObservationStatus.UNKNOWN.toCode();
+        }
+
+
+      };
+
+
+  public static final ValueExtractor<Object, SimpleCode> OBSERVATION_STATUS_FHIR =
+      (Object value) -> {
+        String val = Hl7DataHandlerUtil.getStringValue(value);
+        String code = getFHIRCode(val, ObservationStatus.class);
+        if (code != null) {
+          ObservationStatus status = ObservationStatus.fromCode(code);
+          return new SimpleCode(code, status.getSystem(), status.getDisplay());
+        } else {
+          return null;
+        }
+      };
+
+  public static final ValueExtractor<Object, SimpleCode> CONDITION_CATEGORY_CODES =
+      (Object value) -> {
+        String val = Hl7DataHandlerUtil.getStringValue(value);
+        if (val != null) {
+          ConditionCategory status = ConditionCategory.fromCode(val);
+          return new SimpleCode(val, status.getSystem(), status.getDisplay());
+        } else {
+          return null;
+        }
+      };
+
+
+
+  public static final ValueExtractor<Object, Boolean> BOOLEAN = (Object value) -> {
+    String val = Hl7DataHandlerUtil.getStringValue(value);
+    if (null == val) {
+      return false;
+    }
+    return BooleanUtils.toBoolean(val);
+
+  };
+
+  public static final ValueExtractor<Object, Integer> INTEGER = (Object value) -> {
+    String val = Hl7DataHandlerUtil.getStringValue(value);
+    if (null == val) {
+      return null;
+    }
+    if (NumberUtils.isCreatable(val)) {
+      return NumberUtils.createInteger(val);
+    } else {
+      LOGGER.warn("Value {} for INTEGER is not a valid number so returning null.", value);
+      return null;
+    }
+    
+  };
+
+  public static final ValueExtractor<Object, Float> FLOAT = (Object value) -> {
+    String val = Hl7DataHandlerUtil.getStringValue(value);
+    if (null == val) {
+      return null;
+    }
+    if (NumberUtils.isCreatable(val)) {
+      return NumberUtils.createFloat(val);
+      } else {
+      LOGGER.warn("Value {} for DECIMAL is not a valid number so returning null.", value);
+        return null;
+      }
+
+  };
+
+
+  public static final ValueExtractor<Object, UUID> UUID_VAL = (Object value) -> {
+    String val = Hl7DataHandlerUtil.getStringValue(value);
+    return getUUID(val);
+
+  };
+
+  public static final ValueExtractor<Object, Object> OBJECT = (Object value) -> {
+    return value;
+
+  };
+
+  public static final ValueExtractor<Object, Object> CODING_SYSTEM_V2 = (Object value) -> {
+    String table = Hl7DataHandlerUtil.getTableNumber(value);
+    String val = Hl7DataHandlerUtil.getStringValue(value);
+    if (table != null && val != null) {
+      return TerminologyLookup.lookup(table, val);
+    } else if (val != null) {
+      return new SimpleCode(val, null, null);
+    } else {
+      return null;
+    }
+
+  };
+
+  public static final ValueExtractor<Object, String> ALLERGY_INTOLERANCE_CRITICALITY_CODE_FHIR =
+      (Object value) -> {
+        String val = Hl7DataHandlerUtil.getStringValue(value);
+        String code = getFHIRCode(val, AllergyIntoleranceCriticality.class);
+        if (code != null) {
+          return code;
+        } else {
+          return AllergyIntoleranceCriticality.UNABLETOASSESS.toCode();
+        }
+      };
+
+
+  public static final ValueExtractor<Object, String> ALLERGY_INTOLERANCE_CATEGORY_CODE_FHIR =
+      (Object value) -> {
+
+        String val = Hl7DataHandlerUtil.getStringValue(value);
+        String code = getFHIRCode(val, AllergyIntoleranceCategory.class);
+        if (code != null) {
+          return code;
+        } else {
+          return null;
+        }
+
+      };
+
+  public static final ValueExtractor<Object, String> SYSTEM_URL = (Object value) -> {
+
+    String val = Hl7DataHandlerUtil.getStringValue(value);
+    String systemUrl = SystemUrlLookup.getSystemUrl(val);
+    if (systemUrl != null) {
+      return systemUrl;
+    } else {
+      return val;
+    }
+  };
+
+  public static final ValueExtractor<Object, List<?>> ARRAY = (Object value) -> {
+
+    if (value != null) {
+      List list = new ArrayList<>();
+      list.add(value);
+      return list;
+    }
+    return null;
+  };
+
+
+  private SimpleDataValueResolver() {}
+
+  private static UUID getUUID(String value) {
+    if (value != null) {
+      try {
+        return UUID.fromString(value);
+      } catch (IllegalArgumentException e) {
+        LOGGER.warn("Value not valid UUID, value: {}", value, e);
+        return null;
+      }
+    } else {
+      LOGGER.info("Value for  UUID is null, value: {}", value);
+      return null;
+    }
+  }
+
+  private static boolean isValidUUID(String val) {
+    try {
+      UUID.fromString(val);
+      return true;
+    } catch (IllegalArgumentException e) {
+      LOGGER.warn("Not a valid UUID ", e);
+      return false;
+    }
+
+  }
+
+
+
+  private static String getFHIRCode(String hl7Value, Class<?> fhirConceptClassName) {
+    if (hl7Value != null) {
+    Map<String, String> mapping = Hl7v2Mapping.getMapping(fhirConceptClassName.getSimpleName());
+    if (mapping != null && !mapping.isEmpty()) {
+        return mapping.get(StringUtils.upperCase(hl7Value, Locale.ENGLISH));
+      }
+    }
+    return null;
+  }
+
+
+
+
+
+
+}
