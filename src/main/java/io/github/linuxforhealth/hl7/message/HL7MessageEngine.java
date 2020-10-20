@@ -34,11 +34,11 @@ import io.github.linuxforhealth.api.ResourceModel;
 import io.github.linuxforhealth.api.ResourceValue;
 import io.github.linuxforhealth.core.Constants;
 import io.github.linuxforhealth.core.ObjectMapperUtil;
+import io.github.linuxforhealth.core.exception.RequiredConstraintFailureException;
 import io.github.linuxforhealth.core.expression.EvaluationResultFactory;
 import io.github.linuxforhealth.core.resource.ResourceResult;
 import io.github.linuxforhealth.fhir.FHIRContext;
 import io.github.linuxforhealth.fhir.FHIRResourceMapper;
-import io.github.linuxforhealth.hl7.exception.RequiredConstraintFailureException;
 import io.github.linuxforhealth.hl7.message.util.SegmentExtractorUtil;
 import io.github.linuxforhealth.hl7.message.util.SegmentGroup;
 

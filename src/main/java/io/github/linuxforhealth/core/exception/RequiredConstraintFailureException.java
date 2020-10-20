@@ -3,7 +3,7 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  */
-package io.github.linuxforhealth.hl7.exception;
+package io.github.linuxforhealth.core.exception;
 
 public class RequiredConstraintFailureException extends RuntimeException {
 

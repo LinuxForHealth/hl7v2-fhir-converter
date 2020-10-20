@@ -27,12 +27,12 @@ import io.github.linuxforhealth.api.Specification;
 import io.github.linuxforhealth.api.Variable;
 import io.github.linuxforhealth.core.Constants;
 import io.github.linuxforhealth.core.data.DataTypeUtil;
+import io.github.linuxforhealth.core.exception.DataExtractionException;
+import io.github.linuxforhealth.core.exception.RequiredConstraintFailureException;
 import io.github.linuxforhealth.core.expression.EmptyEvaluationResult;
 import io.github.linuxforhealth.core.expression.EvaluationResultFactory;
 import io.github.linuxforhealth.core.expression.VariableUtils;
 import io.github.linuxforhealth.core.expression.condition.ConditionUtil;
-import io.github.linuxforhealth.hl7.exception.DataExtractionException;
-import io.github.linuxforhealth.hl7.exception.RequiredConstraintFailureException;
 import io.github.linuxforhealth.hl7.expression.specification.SpecificationParser;
 import io.github.linuxforhealth.hl7.expression.specification.SpecificationUtil;
 import io.github.linuxforhealth.hl7.expression.variable.VariableGenerator;
@@ -134,6 +134,7 @@ public abstract class AbstractExpression implements Expression {
     Preconditions.checkArgument(contextValues != null, "contextValues cannot be null");
     Preconditions.checkArgument(baseValue != null, "baseValue cannot be null");
     EvaluationResult result;
+    try {
     LOGGER.info("Started Evaluating expression {} ", this);
     Map<String, EvaluationResult> localContextValues = new HashMap<>(contextValues);
     if (!baseValue.isEmpty()) {
@@ -156,6 +157,11 @@ public abstract class AbstractExpression implements Expression {
       throw e;
     } else {
       return result;
+    }
+    } catch (DataExtractionException e) {
+      LOGGER.error("Failure encountered during evaluation of expression {} , exception {}", this,
+          e);
+      return null;
     }
   }
 

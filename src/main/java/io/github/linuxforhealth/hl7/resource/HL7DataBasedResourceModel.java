@@ -23,9 +23,10 @@ import io.github.linuxforhealth.api.InputDataExtractor;
 import io.github.linuxforhealth.api.ResourceModel;
 import io.github.linuxforhealth.api.ResourceValue;
 import io.github.linuxforhealth.core.Constants;
+import io.github.linuxforhealth.core.exception.DataExtractionException;
+import io.github.linuxforhealth.core.exception.RequiredConstraintFailureException;
 import io.github.linuxforhealth.core.resource.ResourceResult;
 import io.github.linuxforhealth.core.resource.SimpleResourceValue;
-import io.github.linuxforhealth.hl7.exception.RequiredConstraintFailureException;
 import io.github.linuxforhealth.hl7.expression.Hl7Expression;
 import io.github.linuxforhealth.hl7.expression.JELXExpression;
 import io.github.linuxforhealth.hl7.expression.ReferenceExpression;
@@ -157,7 +158,7 @@ public class HL7DataBasedResourceModel implements ResourceModel {
           e);
       return null;
 
-    } catch (IllegalArgumentException | IllegalStateException e) {
+    } catch (IllegalArgumentException | IllegalStateException | DataExtractionException e) {
       LOGGER.error("Exception during  resource {} evaluation", this.name, e);
       return null;
 

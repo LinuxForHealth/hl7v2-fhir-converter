@@ -22,7 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
-import io.github.linuxforhealth.hl7.exception.NoMoreRepititionException;
+import io.github.linuxforhealth.core.exception.DataExtractionException;
 
 public final class JexlEngineUtil {
   private static final Logger LOGGER = LoggerFactory.getLogger(JexlEngineUtil.class);
@@ -77,16 +77,13 @@ public final class JexlEngineUtil {
       LOGGER.info("Evaluated expression : {}, returning object {}", trimedJexlExp, obj);
       return obj;
     } catch (JexlException e) {
-      if (e.getCause() instanceof NoMoreRepititionException) {
-        throw new NoMoreRepititionException(
-            e.getCause().getMessage() + ": expression" + trimedJexlExp,
-            e.getCause());
-      } else {
-        throw e;
+
+      throw new DataExtractionException("Exception encountered during JEXL expression evaluation",
+          e);
       }
     }
 
-  }
+
 
 
 

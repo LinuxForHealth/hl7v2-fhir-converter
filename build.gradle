@@ -139,9 +139,9 @@ publishing {
             artifact javadocJar {
                 classifier "javadoc"
             }
-            groupId 'io.github.linuxforhealth'
+            groupId = group
             artifactId 'hl7v2-fhir-converter'
-            version '1.0.0-snapshot'
+            version = version
            
         }
     }
