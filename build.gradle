@@ -11,8 +11,8 @@ plugins {
     id 'maven-publish'
 }
 
-group = 'com.ibm.linuxforhealth'
-version = (findProperty('version') == 'unspecified') ? '1.0.0' : version
+group = 'io.github.linuxforhealth'
+version = (findProperty('version') == 'unspecified') ? '1.0.0-snapshot' : version
 
 
 dependencies {
@@ -139,9 +139,9 @@ publishing {
             artifact javadocJar {
                 classifier "javadoc"
             }
-            groupId 'com.ibm.linuxforhealth'
+            groupId = group
             artifactId 'hl7v2-fhir-converter'
-            version '1.0.0'
+            version = version
            
         }
     }
