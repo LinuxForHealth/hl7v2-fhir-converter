@@ -9,11 +9,12 @@ plugins {
     id 'java-library'
     id 'jacoco'
     id 'maven-publish'
+
 }
 
 group = 'io.github.linuxforhealth'
-version = (findProperty('version') == 'unspecified') ? '1.0.0-snapshot' : version
-
+version = (findProperty('version') == 'unspecified') ? '1.0.0-SNAPSHOT' : version
+ext.isReleaseVersion = !version.endsWith("SNAPSHOT")
 
 dependencies {
 // This dependency is exported to consumers, that is to say found on their compile classpath.
@@ -27,7 +28,7 @@ implementation 'ca.uhn.hapi:hapi-base:2.3'
 implementation 'ca.uhn.hapi:hapi-structures-v26:2.3'
 implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.10.1'
 implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.10.1'
-// https://mvnrepository.com/artifact/com.fasterxml.jackson.dataformat/jackson-dataformat-yaml
+
 compile group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-yaml', version: '2.10.1'
     
 api 'com.fasterxml.jackson.core:jackson-databind:2.10.1' 
@@ -59,12 +60,8 @@ testImplementation 'junit:junit:4.12'
 
 // In this section you declare where to find the dependencies of your project
 repositories {
-    // Use jcenter for resolving your dependencies.
-    // You can declare any Maven/Ivy/file repository here.
+
     mavenCentral()
-    maven {
-        url "https://oss.sonatype.org/content/repositories/snapshots/"
-    }
     jcenter()
     maven {
      url "https://dl.bintray.com/ibm-watson-health/ibm-fhir-server-releases"
@@ -89,7 +86,10 @@ publishing {
   repositories {
     maven {
       name = "OSSRH"
-      url = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
+      def releaseRepo = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
+      def snapshotRepo = "https://oss.sonatype.org/content/repositories/snapshots/"
+      url = isReleaseVersion ? releaseRepo : snapshotRepo
+      
       credentials {
         username = System.getenv("MAVEN_USERNAME")
         password = System.getenv("MAVEN_PASSWORD")
@@ -114,20 +114,8 @@ artifacts {
     archives javadocJar
 }
 
-def pomConfig = {
-    licenses {
-        license {
-            name "The Apache Software License, Version 2.0"
-            url "http://www.apache.org/licenses/LICENSE-2.0.txt"
-            distribution "https://github.com/LinuxForHealth/hl7v2-fhir-converter"
-        }
-    }
-    
 
-    scm {
-        url "https://github.com/LinuxForHealth/hl7v2-fhir-converter"
-    }
-}
+
 
 publishing {
     publications {
@@ -142,7 +130,31 @@ publishing {
             groupId = group
             artifactId 'hl7v2-fhir-converter'
             version = version
+            
+            pom {
+                    name = "hl7v2-fhir-converter"
+                    description = "FHIR converter is a Java based library that enables converting Hl7v2 messages to FHIR resources"
+                    url = "https://github.com/LinuxForHealth/hl7v2-fhir-converter"
+                    licenses {
+                      license {
+                        name = "The Apache License, Version 2.0"
+                        url = "http://www.apache.org/licenses/LICENSE-2.0.txt"
+                      }
+                    }
+                    developers {
+                      developer {
+                        id = "pbhallam"
+                        
+                      }
+                    }
+                    scm {
+                      url = "https://github.com/LinuxForHealth/hl7v2-fhir-converter.git"
+                     
+                    }
+                  }
            
         }
     }
 }
+
+

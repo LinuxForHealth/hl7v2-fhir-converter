@@ -16,6 +16,14 @@ import io.github.linuxforhealth.api.ResourceModel;
 import io.github.linuxforhealth.core.Constants;
 import io.github.linuxforhealth.core.ObjectMapperUtil;
 
+/**
+ * Reads resources. If the configuration file has base path defined (base.path.resource) then the
+ * resources are loaded from that path. If the configuration is not defined then default path would
+ * be used.
+ * 
+ *
+ * @author pbhallam
+ */
 public class ResourceModelReader {
 
   private static ResourceModelReader reader;
