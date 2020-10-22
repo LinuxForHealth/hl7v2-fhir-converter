@@ -222,9 +222,9 @@ Example: ``OBX.1 |OBX.2|OBX.3`` , if OBX.1 is null then only OBX.2 will be extra
 
 #### Variable
 Variables can be used during expression evaluation.  This engine supports defining 3 types of variables:
-* SimpleVariable : These are variables where value is extracted from simple [HL7Spec](Specification) or another variable from the context values. Example: ``var1: CWE.1 |CE.1 |CNE.1``
+* SimpleVariable : These are variables where value is extracted from simple [Specification](Specification) or another variable from the context values. Example: ``var1: CWE.1 |CE.1 |CNE.1``
 * ExpressionVariable : Value of a variable is extracted by evaluating a java function. Example:  `` low: OBX.7, GeneralUtils.split(low, "-", 0)``
-* DataTypeVariable: Value of a variable is extracted from [HL7Spec](Specification) and this value is converted to a particular data type. Example: `` var1: STRING, OBX.2``
+* DataTypeVariable: Value of a variable is extracted from [Specification](Specification) and this value is converted to a particular data type. Example: `` var1: STRING, OBX.2``
 
 #### Condition
 Conditions evaluate to true or false.<br>
