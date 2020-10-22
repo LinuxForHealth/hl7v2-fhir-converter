@@ -12,7 +12,7 @@ jobs:
         with:
           java-version: 1.8
       - name: Publish package
-        run: gradle publish -stacktrace
+        run: gradle publish -stacktrace -Pversion=1.0.0
         env:
           MAVEN_USERNAME: ${{ secrets.LFH_USERNAME }}
           MAVEN_PASSWORD: ${{ secrets.LFH_TOKEN }}
