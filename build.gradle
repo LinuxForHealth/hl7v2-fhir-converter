@@ -9,6 +9,7 @@ plugins {
     id 'java-library'
     id 'jacoco'
     id 'maven-publish'
+    id 'signing'
 
 }
 
@@ -156,5 +157,13 @@ publishing {
         }
     }
 }
+signing {
+    useGpgCmd()
+    sign configurations.archives
+    sign publishing.publications.mavenPublication
+}
 
+tasks.withType(Sign) {
+    onlyIf { isReleaseVersion }
+}
 
