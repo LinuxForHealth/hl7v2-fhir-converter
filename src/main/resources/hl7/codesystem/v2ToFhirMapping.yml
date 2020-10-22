@@ -3,7 +3,6 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 #
----
 AllergyIntoleranceCategory:
    AA: environment
    DA: medication
@@ -11,21 +10,18 @@ AllergyIntoleranceCategory:
    FA: food
    LA: environment
    PA: environment
-   
 AllergyIntoleranceCriticality:
-    MI: low
-    MO: low
-    SV: high
-    U: unable-to-assess
-    
+   MI: low
+   MO: low
+   SV: high
+   U: unable-to-assess
 ObservationStatus:
-    C: corrected
-    D: cancelled
-    F: final
-    I: registered
-    P: preliminary
-    W: entered-in-error
-
+   C: corrected
+   D: cancelled
+   F: final
+   I: registered
+   P: preliminary
+   W: entered-in-error
 AdministrativeGender:
    A: other
    F: female
@@ -33,4 +29,15 @@ AdministrativeGender:
    N: unknown
    O: other
    U: unknown
-
+DiagnosticReportStatus:
+   A: partial
+   C: corrected
+   F: final
+   I: unknown
+   O: unknown
+   P: preliminary
+   R: registered
+   S: unknown
+   X: cancelled
+   Y: unknown
+   Z: unknownn

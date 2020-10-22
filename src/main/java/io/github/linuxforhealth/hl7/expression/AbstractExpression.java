@@ -135,7 +135,7 @@ public abstract class AbstractExpression implements Expression {
     Preconditions.checkArgument(baseValue != null, "baseValue cannot be null");
     EvaluationResult result;
     try {
-    LOGGER.info("Started Evaluating expression {} ", this);
+      LOGGER.debug("Started Evaluating expression {} ", this);
     Map<String, EvaluationResult> localContextValues = new HashMap<>(contextValues);
     if (!baseValue.isEmpty()) {
       localContextValues.put(baseValue.getIdentifier(), baseValue);
@@ -148,12 +148,13 @@ public abstract class AbstractExpression implements Expression {
       result = evaluateSingle(dataSource, localContextValues, baseValue);
     }
 
-    LOGGER.info("Completed Evaluating the expression {} returned result {}", this, result);
+      LOGGER.debug("Completed Evaluating the expression {} returned result {}", this, result);
     if (this.isRequired() && (result == null || result.isEmpty())) {
       String stringRep = this.toString();
       RuntimeException e = new RequiredConstraintFailureException(
           "Failure in Evaluating expression   :" + stringRep);
-      LOGGER.info("Failure encountered during evaluation of expression {} , exception {}", this, e);
+        LOGGER.warn("Failure encountered during evaluation of expression {} , exception {}", this,
+            e);
       throw e;
     } else {
       return result;
@@ -177,7 +178,7 @@ public abstract class AbstractExpression implements Expression {
           ImmutableMap.copyOf(contextValues));
     }
 
-    LOGGER.info("Evaluating Single value for expression  {} returned hl7 value {} ", this,
+    LOGGER.debug("Evaluating Single value for expression  {} returned hl7 value {} ", this,
         baseValue);
     return generateValue(dataSource, contextValues, baseValue);
 
@@ -191,7 +192,7 @@ public abstract class AbstractExpression implements Expression {
     List<Object> result = new ArrayList<>();
     List<ResourceValue> additionalresourcesresult = new ArrayList<>();
     List<Object> baseHl7Specvalues = getBaseValues(dataSource, contextValues, baseinputValue);
-    LOGGER.info("Base values evaluated {} values {} ", this, baseHl7Specvalues);
+    LOGGER.debug("Base values evaluated {} values {} ", this, baseHl7Specvalues);
     if (!baseHl7Specvalues.isEmpty()) {
       for (Object o : baseHl7Specvalues) {
         EvaluationResult gen = generateValue(dataSource, contextValues,

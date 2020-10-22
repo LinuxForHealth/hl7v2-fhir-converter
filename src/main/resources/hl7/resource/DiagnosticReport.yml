@@ -1,0 +1,44 @@
+#
+# (C) Copyright IBM Corp. 2020
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+resourceType: DiagnosticReport
+id:
+   type: STRING
+   evaluate: UUID.randomUUID()
+identifier:
+   resource: datatype/Identifier *
+   specs: OBR.3
+status:
+   type: DIAGNOSTIC_REPORT_STATUS
+   specs: OBR.25
+category:
+   resource: datatype/CodeableConcept *
+   specs: OBR.24
+   vars:
+      code: OBR.24
+code:
+   resource: datatype/CodeableConcept
+   specs: OBR.4
+   vars:
+      code: OBR.4
+encounter:
+   resource: datatype/Reference
+   specs: $Encounter
+subject:
+   resource: datatype/Reference
+   specs: $Patient
+effectiveDateTime:
+   type: DATE_TIME
+   specs: OBR.7
+issued:
+   type: INSTANT
+   specs: OBR.22
+resultsInterpreter:
+   reference: resource/Practitioner *
+   specs: OBR.32
+result:
+   resource: datatype/Reference *
+   specs: $Observation
+   useGroup: true

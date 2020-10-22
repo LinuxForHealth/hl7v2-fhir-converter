@@ -10,23 +10,23 @@ text:
     type: STRING
     evaluate: 'GeneralUtils.generateName( prefix, given,family, suffix)'
     vars:
-      prefix: STRING XPN.4 |XCN.5
-      given: STRING XPN.2 |XCN.3
-      family: STRING XPN.1 |XCN.2
-      suffix: STRING XPN.5 |XCN.6
+      prefix: STRING XPN.4 |XCN.5 |CNN.5|NDL.5
+      given: STRING XPN.2 |XCN.3 |CNN.3|NDL.3
+      family: STRING XPN.1 |XCN.2 |CNN.2|NDL.2
+      suffix: STRING XPN.5 |XCN.6 |CNN.6|NDL.6
 family:
      type: STRING
-     specs: XPN.1 | XCN.2
+     specs: XPN.1 | XCN.2 |CNN.2|NDL.2
 given: 
      type: STRING
-     specs: XPN.2 | XCN.3
+     specs: XPN.2 | XCN.3 |CNN.3|NDL.3
 prefix:
      type: STRING
-     specs: XPN.4 | XCN.5
+     specs: XPN.4 | XCN.5 |CNN.5|NDL.5
 
 suffix: 
      type: STRING
-     specs: XPN.5 | XCN.6
+     specs: XPN.5 | XCN.6 |CNN.6|NDL.6
 period:
     resource: datatype/Period
     vars:

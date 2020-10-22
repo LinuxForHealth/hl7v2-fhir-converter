@@ -15,7 +15,8 @@ public enum FHIRResourceMapper {
   OBSERVATION(org.hl7.fhir.r4.model.Observation.class), //
   ALLERGYINTOLERANCE(org.hl7.fhir.r4.model.AllergyIntolerance.class), //
   CONDITION(org.hl7.fhir.r4.model.Condition.class), //
-  PRACTITIONER(org.hl7.fhir.r4.model.Practitioner.class);
+  PRACTITIONER(org.hl7.fhir.r4.model.Practitioner.class), //
+  DIAGNOSTICREPORT(org.hl7.fhir.r4.model.DiagnosticReport.class);
 
   private Class<? extends Resource> klass;
 

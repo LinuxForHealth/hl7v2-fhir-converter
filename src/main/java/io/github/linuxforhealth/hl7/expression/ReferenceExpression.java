@@ -103,7 +103,7 @@ public class ReferenceExpression extends AbstractExpression {
       Map<String, EvaluationResult> contextValues, EvaluationResult baseValue) {
     Preconditions.checkArgument(dataSource != null, "dataSource cannot be null");
     Preconditions.checkArgument(contextValues != null, "contextValues cannot be null");
-    LOGGER.info("Evaluating expression {}", this.reference);
+    LOGGER.debug("Evaluating expression {}", this.reference);
     EvaluationResult resourceReferenceResult = null;
     // Evaluate the resource first and add it to the list of additional resources generated
     ResourceResult primaryResourceResult =
@@ -125,7 +125,7 @@ public class ReferenceExpression extends AbstractExpression {
       if (result != null && result.getValue() != null) {
         ResourceValue resolvedvalues = result.getValue();
 
-        LOGGER.info("Evaluated expression {}, returning {} ", this.reference, resolvedvalues);
+        LOGGER.debug("Evaluated expression {}, returning {} ", this.reference, resolvedvalues);
         if (resolvedvalues != null) {
           resourceReferenceResult =
               EvaluationResultFactory.getEvaluationResult(resolvedvalues.getResource(),

@@ -102,13 +102,17 @@ public class HL7MessageEngine implements MessageEngine {
         if (res.isRepeats()) {
           List<ResourceResult> results =
               generateMultiple(hl7DataInput, template, localContextValues, bundle);
-          resourceResults.addAll(results);
+          if (results != null) {
+            resourceResults.addAll(results);
+          }
 
 
         } else {
           ResourceResult resourceValue =
               generateSingle(hl7DataInput, template, localContextValues, bundle);
+          if (resourceValue != null) {
           resourceResults.add(resourceValue);
+          }
         }
 
         resourceResults.removeIf(isEmpty());
