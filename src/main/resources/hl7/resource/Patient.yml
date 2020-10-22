@@ -14,10 +14,10 @@ id:
   
 identifier:
     resource: datatype/Identifier *
-    specs: PID.3  
+    specs: PID.3
 name: 
     resource: datatype/HumanName *
-    specs: PID.5  
+    specs: PID.5
 gender: 
      type: ADMINISTRATIVE_GENDER
      specs: PID.8

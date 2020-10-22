@@ -17,6 +17,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.hl7.fhir.r4.model.AllergyIntolerance.AllergyIntoleranceCategory;
 import org.hl7.fhir.r4.model.AllergyIntolerance.AllergyIntoleranceCriticality;
+import org.hl7.fhir.r4.model.DiagnosticReport.DiagnosticReportStatus;
 import org.hl7.fhir.r4.model.Enumerations.AdministrativeGender;
 import org.hl7.fhir.r4.model.Observation.ObservationStatus;
 import org.hl7.fhir.r4.model.codesystems.ConditionCategory;
@@ -251,7 +252,17 @@ public class SimpleDataValueResolver {
     return null;
   };
 
+  public static ValueExtractor<Object, String> DIAGNOSTIC_REPORT_STATUS_CODES = (Object value) -> {
 
+    String val = Hl7DataHandlerUtil.getStringValue(value);
+    String code = getFHIRCode(val, DiagnosticReportStatus.class);
+    if (code != null) {
+      return code;
+    } else {
+      return null;
+    }
+
+  };
   private SimpleDataValueResolver() {}
 
   private static UUID getUUID(String value) {

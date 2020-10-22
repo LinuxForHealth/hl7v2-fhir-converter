@@ -108,7 +108,11 @@ public class HL7MessageData implements InputDataExtractor {
     if (StringUtils.isNotBlank(hl7spec.getField()) && NumberUtils.isCreatable(hl7spec.getField())) {
       int field = NumberUtils.toInt(hl7spec.getField());
       ParsingResult<?> res = hde.getTypes((Segment) obj, field);
-      if (res != null && !res.isEmpty()) {
+      if (res != null && !res.isEmpty() && hl7spec.getComponent() > 0) {
+        // if component needs to be extracted too then only the first repetition of the field will
+        // be used.
+        return extractSpecValuesFromField(res.getValues().get(0), hl7spec);
+      } else if (res != null && !res.isEmpty()) {
         return new SimpleEvaluationResult<>(res.getValues());
       } else {
         return null;

@@ -20,8 +20,6 @@ import ca.uhn.hl7v2.model.primitive.IS;
 import ca.uhn.hl7v2.model.v26.datatype.CX;
 import ca.uhn.hl7v2.model.v26.datatype.ST;
 import ca.uhn.hl7v2.model.v26.segment.AL1;
-import io.github.linuxforhealth.hl7.parsing.HL7DataExtractor;
-import io.github.linuxforhealth.hl7.parsing.HL7HapiParser;
 public class HL7DataExtractorTest {
 
   @Test

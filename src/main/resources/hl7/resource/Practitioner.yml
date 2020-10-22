@@ -11,15 +11,15 @@ id:
   
 identifier:
     resource: datatype/IdentifierGen *
-    specs: XCN.1
+    specs: XCN | CNN|NDL
     vars:
-      system: XCN.9
-      id: XCN.1 
+      system: XCN.9 |CNN.9|NDL.9
+      id: XCN.1 | CNN.1|NDL.1
       start: XCN.19 
       end: XCN.20
 name: 
     required: true
-    specs: XCN.2 | XCN.3
+    specs: XCN | XCN |CNN|NDL
     resource: datatype/HumanName *
 
   

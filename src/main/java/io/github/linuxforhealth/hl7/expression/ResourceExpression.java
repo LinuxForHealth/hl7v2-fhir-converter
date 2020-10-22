@@ -98,7 +98,7 @@ public class ResourceExpression extends AbstractExpression {
       Map<String, EvaluationResult> contextValues, EvaluationResult baseValue) {
     Preconditions.checkArgument(dataSource != null, "dataSource cannot be null");
     Preconditions.checkArgument(contextValues != null, "contextValues cannot be null");
-    LOGGER.info("Evaluating expression {}", this.resourceToGenerate);
+    LOGGER.debug("Evaluating expression {}", this.resourceToGenerate);
     EvaluationResult evaluationResult = null;
 
     ResourceResult result =
@@ -106,7 +106,7 @@ public class ResourceExpression extends AbstractExpression {
     if (result != null && result.getValue() != null) {
       ResourceValue resolvedvalues = result.getValue();
 
-      LOGGER.info("Evaluated expression {}, returning {} ", this.resourceToGenerate,
+      LOGGER.debug("Evaluated expression {}, returning {} ", this.resourceToGenerate,
           resolvedvalues);
       if (resolvedvalues != null) {
         evaluationResult =
