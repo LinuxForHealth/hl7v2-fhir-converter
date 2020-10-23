@@ -5,15 +5,16 @@
  */
 package io.github.linuxforhealth.core.terminology;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 import com.fasterxml.jackson.core.type.TypeReference;
+import io.github.linuxforhealth.core.Constants;
 import io.github.linuxforhealth.core.ObjectMapperUtil;
+import io.github.linuxforhealth.hl7.resource.ResourceReader;
 
 /**
  * 
- * Utility class for converting from Hl7V2 codes to FHIR codes
+ * Utility class for converting from HL7V2 codes to FHIR codes
  *
  * @author pbhallam
  */
@@ -32,9 +33,10 @@ public class Hl7v2Mapping {
 
     TypeReference<Map<String, Map<String, String>>> typeRef =
         new TypeReference<Map<String, Map<String, String>>>() {};
+    String content =
+        ResourceReader.getInstance().getResourceInHl7Folder(Constants.V2_TO_FHIR_MAPPING_PATH);
     return ObjectMapperUtil.getYAMLInstance()
-        .readValue(new File("src/main/resources/hl7/codesystem/v2ToFhirMapping.yml"),
-        typeRef);
+        .readValue(content, typeRef);
   }
 
 

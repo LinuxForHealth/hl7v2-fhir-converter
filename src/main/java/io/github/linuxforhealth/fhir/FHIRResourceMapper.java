@@ -5,39 +5,53 @@
  */
 package io.github.linuxforhealth.fhir;
 
-import org.apache.commons.lang3.EnumUtils;
+import java.util.Map;
+import org.apache.commons.lang3.ClassUtils;
 import org.hl7.fhir.r4.model.Resource;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import io.github.linuxforhealth.core.Constants;
+import io.github.linuxforhealth.core.ObjectMapperUtil;
+import io.github.linuxforhealth.hl7.resource.ResourceReader;
 
-public enum FHIRResourceMapper {
+public class FHIRResourceMapper {
 
-  PATIENT(org.hl7.fhir.r4.model.Patient.class), //
-  ENCOUNTER(org.hl7.fhir.r4.model.Encounter.class), //
-  OBSERVATION(org.hl7.fhir.r4.model.Observation.class), //
-  ALLERGYINTOLERANCE(org.hl7.fhir.r4.model.AllergyIntolerance.class), //
-  CONDITION(org.hl7.fhir.r4.model.Condition.class), //
-  PRACTITIONER(org.hl7.fhir.r4.model.Practitioner.class), //
-  DIAGNOSTICREPORT(org.hl7.fhir.r4.model.DiagnosticReport.class);
+  private static FHIRResourceMapper fhirResourceMapper;
 
-  private Class<? extends Resource> klass;
-
-  FHIRResourceMapper(Class<? extends Resource> klass) {
-    this.klass = klass;
-
+  private Map<String, String> resourceMapping;
+  private FHIRResourceMapper() {
+    String resource =
+        ResourceReader.getInstance()
+            .getResource(Constants.RESOURCE_MAPPING_PATH);
+    try {
+      resourceMapping = ObjectMapperUtil.getYAMLInstance().readValue(resource, Map.class);
+    } catch (JsonProcessingException e) {
+      throw new IllegalArgumentException(
+          "Cannot read resource mapping file fhir/resourcemapping.yml ", e);
+    }
   }
 
 
-  public Class<? extends Resource> getFHIRClass() {
-    return klass;
-  }
 
 
   public static Class<? extends Resource> getResourceClass(String name) {
-    FHIRResourceMapper fm = EnumUtils.getEnumIgnoreCase(FHIRResourceMapper.class, name);
-    if (fm == null) {
+    if (fhirResourceMapper == null) {
+      fhirResourceMapper = new FHIRResourceMapper();
+    }
+    String resourceName = fhirResourceMapper.resourceMapping.get(name);
+
+    if (resourceName != null) {
+      try {
+        return (Class<? extends Resource>) ClassUtils.getClass(resourceName);
+      } catch (ClassNotFoundException e) {
+        throw new IllegalStateException(
+            "Resource type not mapped in FHIRResourceMapper , resource name" + name, e);
+      }
+    } else {
+
       throw new IllegalStateException(
           "Resource type not mapped in FHIRResourceMapper , resource name" + name);
     }
-    return fm.klass;
+
   }
 
 

@@ -26,7 +26,7 @@ import io.github.linuxforhealth.fhir.FHIRContext;
 import io.github.linuxforhealth.hl7.message.HL7FHIRResourceTemplate;
 import io.github.linuxforhealth.hl7.message.HL7MessageEngine;
 import io.github.linuxforhealth.hl7.message.HL7MessageModel;
-import io.github.linuxforhealth.hl7.resource.ResourceModelReader;
+import io.github.linuxforhealth.hl7.resource.ResourceReader;
 
 public class DifferentObservationValueTest {
   private static FHIRContext context = new FHIRContext();
@@ -40,7 +40,7 @@ public class DifferentObservationValueTest {
 
 
   private ResourceModel rsm =
-      ResourceModelReader.getInstance().generateResourceModel("resource/Observation");
+      ResourceReader.getInstance().generateResourceModel("resource/Observation");
   private HL7FHIRResourceTemplate observation =
       new HL7FHIRResourceTemplate("Observation", "OBX", rsm, false, true, new ArrayList<>());
 

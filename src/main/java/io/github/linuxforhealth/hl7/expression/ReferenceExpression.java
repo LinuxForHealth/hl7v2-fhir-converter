@@ -25,7 +25,7 @@ import io.github.linuxforhealth.api.ResourceValue;
 import io.github.linuxforhealth.core.expression.EvaluationResultFactory;
 import io.github.linuxforhealth.core.resource.ResourceResult;
 import io.github.linuxforhealth.hl7.resource.HL7DataBasedResourceModel;
-import io.github.linuxforhealth.hl7.resource.ResourceModelReader;
+import io.github.linuxforhealth.hl7.resource.ResourceReader;
 import io.github.linuxforhealth.hl7.resource.deserializer.TemplateFieldNames;
 
 /**
@@ -42,7 +42,7 @@ public class ReferenceExpression extends AbstractExpression {
   private static final Logger LOGGER = LoggerFactory.getLogger(ReferenceExpression.class);
 
   private HL7DataBasedResourceModel data;
-  private HL7DataBasedResourceModel referenceModel = (HL7DataBasedResourceModel) ResourceModelReader
+  private HL7DataBasedResourceModel referenceModel = (HL7DataBasedResourceModel) ResourceReader
       .getInstance().generateResourceModel("datatype/Reference");
   private String reference;
   private boolean isGenerateMultipleResource;
@@ -78,7 +78,7 @@ public class ReferenceExpression extends AbstractExpression {
       reference = StringUtils.removeEnd(reference, "*");
     }
     this.reference = StringUtils.strip(reference);
-    this.data = (HL7DataBasedResourceModel) ResourceModelReader.getInstance()
+    this.data = (HL7DataBasedResourceModel) ResourceReader.getInstance()
         .generateResourceModel(this.reference);
     Preconditions.checkState(this.data != null, "Resource reference model cannot be null");
 
