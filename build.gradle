@@ -157,13 +157,18 @@ publishing {
         }
     }
 }
+
+
 signing {
-    useGpgCmd()
-    sign configurations.archives
+if (isReleaseVersion && gradle.taskGraph.hasTask("publish")) {
+    def signingKeyId = System.getenv("signingKeyId")
+    def signingKey = System.getenv("signingKey")
+    def signingPassword = System.getenv("signingPassword")
+    useInMemoryPgpKeys(signingKeyId, signingKey, signingPassword)
+    }   
     sign publishing.publications.mavenPublication
 }
 
 tasks.withType(Sign) {
     onlyIf { isReleaseVersion }
 }
-
