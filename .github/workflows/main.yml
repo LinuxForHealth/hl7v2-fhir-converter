@@ -16,3 +16,6 @@ jobs:
         env:
           MAVEN_USERNAME: ${{ secrets.LFH_USERNAME }}
           MAVEN_PASSWORD: ${{ secrets.LFH_TOKEN }}
+          signingKeyId: ${{ secrets.GPG_KEY_ID }}
+          signingKey: ${{ secrets.GPG_SIGNING_KEY }}
+          signingPassword: ${{ secrets.GPG_KEY_PHRASE }}
