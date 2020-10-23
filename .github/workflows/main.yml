@@ -13,7 +13,7 @@ jobs:
           java-version: 1.8
       - name: Print environment variables
         run: |
-         echo ${{ secrets.GPG_KEY_ID }}
+         echo ${{ secrets.GITHUB_GPG_KEY_ID }}
         
         
       - name: Publish package        
@@ -21,6 +21,6 @@ jobs:
         env:
           MAVEN_USERNAME: ${{ secrets.LFH_USERNAME }}
           MAVEN_PASSWORD: ${{ secrets.LFH_TOKEN }}
-          signingKeyId: ${{ secrets.GPG_KEY_ID }}
-          signingKey: ${{ secrets.GPG_SIGNING_KEY }}
-          signingPassword: ${{ secrets.GPG_KEY_PHRASE }}
+          signingKeyId: ${{ secrets.GITHUB_GPG_KEY_ID }}
+          signingKey: ${{ secrets.GITHUB_GPG_KEY }}
+          #signingPassword: ${{ secrets.GPG_KEY_PHRASE }}
