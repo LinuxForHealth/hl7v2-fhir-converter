@@ -22,7 +22,7 @@ import io.github.linuxforhealth.api.ResourceValue;
 import io.github.linuxforhealth.core.expression.EvaluationResultFactory;
 import io.github.linuxforhealth.core.resource.ResourceResult;
 import io.github.linuxforhealth.hl7.resource.HL7DataBasedResourceModel;
-import io.github.linuxforhealth.hl7.resource.ResourceModelReader;
+import io.github.linuxforhealth.hl7.resource.ResourceReader;
 import io.github.linuxforhealth.hl7.resource.deserializer.TemplateFieldNames;
 
 /**
@@ -73,7 +73,7 @@ public class ResourceExpression extends AbstractExpression {
       resourceToGenerate = StringUtils.removeEnd(resourceToGenerate, "*");
     }
     this.resourceToGenerate = StringUtils.strip(resourceToGenerate);
-    this.data = (HL7DataBasedResourceModel) ResourceModelReader.getInstance()
+    this.data = (HL7DataBasedResourceModel) ResourceReader.getInstance()
         .generateResourceModel(this.resourceToGenerate);
     Preconditions.checkState(this.data != null, "Resource reference model cannot be null");
 

@@ -5,12 +5,13 @@
  */
 package io.github.linuxforhealth.core.terminology;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import com.fasterxml.jackson.core.type.TypeReference;
+import io.github.linuxforhealth.core.Constants;
 import io.github.linuxforhealth.core.ObjectMapperUtil;
+import io.github.linuxforhealth.hl7.resource.ResourceReader;
 
 /**
  * Utility class for mapping HL7 codes from table 0396 ( https://www.hl7.org/fhir/v2/0396/index.html
@@ -33,12 +34,13 @@ public class SystemUrlLookup {
   private static Map<String, String> loadFromFile() {
     TypeReference<Map<String, String>> typeRef = new TypeReference<Map<String, String>>() {};
     try {
-      return ObjectMapperUtil.getYAMLInstance().readValue(
-          new File("src/main/resources/hl7/codesystem/CodingSystemMapping.yml"), typeRef);
+      String content =
+          ResourceReader.getInstance().getResourceInHl7Folder(Constants.CODING_SYSTEM_MAPPING_PATH);
+      return ObjectMapperUtil.getYAMLInstance().readValue(content, typeRef);
 
     } catch (IOException e) {
       throw new IllegalArgumentException(
-          "Cannot read \"src/main/resources/hl7/codesystem/CodingSystemMapping.yml\"", e);
+          "Cannot read codesystem/CodingSystemMapping.yml", e);
     }
   }
 

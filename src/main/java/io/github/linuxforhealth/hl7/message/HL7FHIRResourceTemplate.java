@@ -12,7 +12,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.github.linuxforhealth.api.ResourceModel;
 import io.github.linuxforhealth.core.message.AbstractFHIRResourceTemplate;
-import io.github.linuxforhealth.hl7.resource.ResourceModelReader;
+import io.github.linuxforhealth.hl7.resource.ResourceReader;
 
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -65,7 +65,7 @@ public class HL7FHIRResourceTemplate extends AbstractFHIRResourceTemplate {
 
 
   public static ResourceModel generateResourceModel(String resourcePath) {
-    return ResourceModelReader.getInstance().generateResourceModel(resourcePath);
+    return ResourceReader.getInstance().generateResourceModel(resourcePath);
   }
 
   @Override

@@ -1,0 +1,13 @@
+#
+# (C) Copyright IBM Corp. 2020
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+Patient: org.hl7.fhir.r4.model.Patient
+Encounter: org.hl7.fhir.r4.model.Encounter
+Observation: org.hl7.fhir.r4.model.Observation
+AllergyIntolerance: org.hl7.fhir.r4.model.AllergyIntolerance
+Condition: org.hl7.fhir.r4.model.Condition
+Practitioner: org.hl7.fhir.r4.model.Practitioner
+DiagnosticReport: org.hl7.fhir.r4.model.DiagnosticReport

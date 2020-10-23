@@ -5,18 +5,27 @@
  */
 package io.github.linuxforhealth.core;
 
-import java.io.File;
 import org.hl7.fhir.r4.model.Bundle.BundleType;
 
 public class Constants {
 
-  public static final File DEFAULT_HL7_RESOURCES = new File("src/main/resources/hl7");
-  public static final File DEFAULT_HL7_MESSAGE_FOLDER = new File(DEFAULT_HL7_RESOURCES, "message");
+
+
   public static final boolean DEFAULT_PRETTY_PRINT = false;
   public static final BundleType DEFAULT_BUNDLE_TYPE = BundleType.COLLECTION;
   public static final String GROUP_ID = "GROUP_ID";
   public static final String BASE_VALUE_NAME = "base";
   public static final String USE_GROUP = "useGroup";
+
+  //
+  public static final String CODING_SYSTEM_MAPPING_PATH = "codesystem/CodingSystemMapping.yml";
+  public static final String V2_TO_FHIR_MAPPING_PATH = "codesystem/v2ToFhirMapping.yml";
+  public static final String RESOURCE_MAPPING_PATH = "fhir/resourcemapping.yml";
+
+
+  public static final String HL7_BASE_PATH = "hl7/";
+  public static final String FHIR_BASE_PATH = "fhir/";
+  public static final String MESSAGE_BASE_PATH = "message/";
 
   private Constants() {}
 }

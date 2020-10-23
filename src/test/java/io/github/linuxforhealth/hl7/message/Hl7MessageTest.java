@@ -28,7 +28,7 @@ import io.github.linuxforhealth.fhir.FHIRContext;
 import io.github.linuxforhealth.hl7.message.HL7FHIRResourceTemplate;
 import io.github.linuxforhealth.hl7.message.HL7MessageEngine;
 import io.github.linuxforhealth.hl7.message.HL7MessageModel;
-import io.github.linuxforhealth.hl7.resource.ResourceModelReader;
+import io.github.linuxforhealth.hl7.resource.ResourceReader;
 
 public class Hl7MessageTest {
   private static FHIRContext context = new FHIRContext();
@@ -37,7 +37,7 @@ public class Hl7MessageTest {
   @Test
   public void test_patient() throws IOException {
 
-    ResourceModel rsm = ResourceModelReader.getInstance().generateResourceModel("resource/Patient");
+    ResourceModel rsm = ResourceReader.getInstance().generateResourceModel("resource/Patient");
     HL7FHIRResourceTemplate patient =
         new HL7FHIRResourceTemplate("Patient", "PID", rsm, false, false, new ArrayList<>());
     HL7MessageModel message = new HL7MessageModel("ADT", Lists.newArrayList(patient));
@@ -65,11 +65,11 @@ public class Hl7MessageTest {
   @Test
   public void test_patient_encounter() throws IOException {
 
-    ResourceModel rsm = ResourceModelReader.getInstance().generateResourceModel("resource/Patient");
+    ResourceModel rsm = ResourceReader.getInstance().generateResourceModel("resource/Patient");
     HL7FHIRResourceTemplate patient =
         new HL7FHIRResourceTemplate("Patient", "PID", rsm, true, false, new ArrayList<>());
     ResourceModel encounter =
-        ResourceModelReader.getInstance().generateResourceModel("resource/Encounter");
+        ResourceReader.getInstance().generateResourceModel("resource/Encounter");
     HL7FHIRResourceTemplate encounterFH =
         new HL7FHIRResourceTemplate("Encounter", "PV1", encounter, false, false,
             Lists.newArrayList("PV2"));
@@ -113,7 +113,7 @@ public class Hl7MessageTest {
 
 
     ResourceModel encounter =
-        ResourceModelReader.getInstance().generateResourceModel("resource/Encounter");
+        ResourceReader.getInstance().generateResourceModel("resource/Encounter");
     HL7FHIRResourceTemplate encounterFH =
         new HL7FHIRResourceTemplate("Encounter", "PV1", encounter, true, false,
             Lists.newArrayList("PV2"));
@@ -146,7 +146,7 @@ public class Hl7MessageTest {
   public void test_observation() throws IOException {
 
     ResourceModel rsm =
-        ResourceModelReader.getInstance().generateResourceModel("resource/Observation");
+        ResourceReader.getInstance().generateResourceModel("resource/Observation");
     HL7FHIRResourceTemplate observation =
         new HL7FHIRResourceTemplate("Observation", "OBX", rsm, true, false, new ArrayList<>());
     HL7MessageModel message = new HL7MessageModel("ADT", Lists.newArrayList(observation));
@@ -180,7 +180,7 @@ public class Hl7MessageTest {
   public void test_observation_multiple() throws IOException {
 
     ResourceModel rsm =
-        ResourceModelReader.getInstance().generateResourceModel("resource/Observation");
+        ResourceReader.getInstance().generateResourceModel("resource/Observation");
     HL7FHIRResourceTemplate observation =
         new HL7FHIRResourceTemplate("Observation", "OBX", rsm, true, true, new ArrayList<>());
     HL7MessageModel message = new HL7MessageModel("ADT", Lists.newArrayList(observation));
@@ -212,7 +212,7 @@ public class Hl7MessageTest {
   public void test_observation_NM_result() throws IOException {
 
     ResourceModel rsm =
-        ResourceModelReader.getInstance().generateResourceModel("resource/Observation");
+        ResourceReader.getInstance().generateResourceModel("resource/Observation");
     HL7FHIRResourceTemplate observation =
         new HL7FHIRResourceTemplate("Observation", "OBX", rsm, true, true, new ArrayList<>());
     HL7MessageModel message = new HL7MessageModel("ADT", Lists.newArrayList(observation));
@@ -241,7 +241,7 @@ public class Hl7MessageTest {
   public void test_allergy_single() throws IOException {
 
     ResourceModel rsm =
-        ResourceModelReader.getInstance().generateResourceModel("resource/AllergyIntolerance");
+        ResourceReader.getInstance().generateResourceModel("resource/AllergyIntolerance");
     HL7FHIRResourceTemplate observation =
         new HL7FHIRResourceTemplate("AllergyIntolerance", "AL1", rsm, true, false,
             new ArrayList<>());
@@ -277,7 +277,7 @@ public class Hl7MessageTest {
   public void test_allergy_multiple() throws IOException {
 
     ResourceModel rsm =
-        ResourceModelReader.getInstance().generateResourceModel("resource/AllergyIntolerance");
+        ResourceReader.getInstance().generateResourceModel("resource/AllergyIntolerance");
     HL7FHIRResourceTemplate observation =
         new HL7FHIRResourceTemplate("AllergyIntolerance", "AL1", rsm, true, true,
             new ArrayList<>());
@@ -306,7 +306,7 @@ public class Hl7MessageTest {
   public void test_condition() throws IOException {
 
     ResourceModel rsm =
-        ResourceModelReader.getInstance().generateResourceModel("resource/Condition");
+        ResourceReader.getInstance().generateResourceModel("resource/Condition");
     HL7FHIRResourceTemplate observation =
         new HL7FHIRResourceTemplate("Condition", "PRB", rsm, true, true, new ArrayList<>());
     HL7MessageModel message = new HL7MessageModel("ADT", Lists.newArrayList(observation));
@@ -335,11 +335,11 @@ public class Hl7MessageTest {
   public void test_observation_condition() throws IOException {
 
     ResourceModel obsModel =
-        ResourceModelReader.getInstance().generateResourceModel("resource/Observation");
+        ResourceReader.getInstance().generateResourceModel("resource/Observation");
     HL7FHIRResourceTemplate observation = new HL7FHIRResourceTemplate("Observation",
         "PROBLEM.PROBLEM_OBSERVATION.OBX", obsModel, true, true, new ArrayList<>(), "PROBLEM");
     ResourceModel condModel =
-        ResourceModelReader.getInstance().generateResourceModel("resource/Condition");
+        ResourceReader.getInstance().generateResourceModel("resource/Condition");
     HL7FHIRResourceTemplate condition = new HL7FHIRResourceTemplate("Condition", "PROBLEM.PRB",
         condModel, false, true, Lists.newArrayList(), "PROBLEM");
 
