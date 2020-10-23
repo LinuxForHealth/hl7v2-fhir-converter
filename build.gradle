@@ -158,7 +158,7 @@ publishing {
     }
 }
 signing {
-    required { isReleaseVersion && gradle.taskGraph.hasTask("publish") }
+    onlyIf { isReleaseVersion && gradle.taskGraph.hasTask("publish") }
     def signingKeyId = System.getenv("signingKeyId")
     def signingKey = System.getenv("signingKey")
     def signingPassword = System.getenv("signingPassword")
@@ -166,4 +166,6 @@ signing {
     sign publishing.publications.mavenPublication
 }
 
-
+tasks.withType(Sign) {
+    onlyIf { isReleaseVersion }
+}
