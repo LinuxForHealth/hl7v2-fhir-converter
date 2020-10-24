@@ -19,6 +19,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import io.github.linuxforhealth.api.EvaluationResult;
 import io.github.linuxforhealth.api.InputDataExtractor;
+import io.github.linuxforhealth.core.Constants;
 import io.github.linuxforhealth.core.expression.EvaluationResultFactory;
 import io.github.linuxforhealth.core.expression.VariableUtils;
 import io.github.linuxforhealth.hl7.data.SimpleDataTypeMapper;
@@ -70,6 +71,7 @@ public class SimpleExpression extends AbstractExpression {
     Map<String, EvaluationResult> localContextValues = new HashMap<>(contextValues);
     if (baseValue != null && !baseValue.isEmpty()) {
       localContextValues.put(baseValue.getIdentifier(), baseValue);
+      localContextValues.put(Constants.BASE_VALUE_NAME, baseValue);
     }
 
     if (VariableUtils.isVar(value)) {

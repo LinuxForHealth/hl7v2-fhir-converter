@@ -23,6 +23,7 @@ import org.hl7.fhir.r4.model.Observation.ObservationStatus;
 import org.hl7.fhir.r4.model.codesystems.ConditionCategory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import io.github.linuxforhealth.api.ResourceValue;
 import io.github.linuxforhealth.core.terminology.Hl7v2Mapping;
 import io.github.linuxforhealth.core.terminology.SimpleCode;
 import io.github.linuxforhealth.core.terminology.SystemUrlLookup;
@@ -251,8 +252,31 @@ public class SimpleDataValueResolver {
     }
     return null;
   };
+  public static final ValueExtractor<Object, String> RELATIVE_REFERENCE = (Object value) -> {
+    Map<String, Object> mapValue = null;
+    if (value instanceof Map) {
+      mapValue = (Map<String, Object>) value;
 
-  public static ValueExtractor<Object, String> DIAGNOSTIC_REPORT_STATUS_CODES = (Object value) -> {
+    } else if (value instanceof ResourceValue) {
+      ResourceValue rv = (ResourceValue) value;
+      mapValue = rv.getResource();
+
+    }
+    if (mapValue != null) {
+      String type = Hl7DataHandlerUtil.getStringValue(mapValue.get("resourceType"));
+      String refId = Hl7DataHandlerUtil.getStringValue(mapValue.get("id"));
+      if (StringUtils.isNotBlank(type) && StringUtils.isNotBlank(refId)) {
+        return type + "/" + refId;
+      }
+    }
+    return null;
+
+  };
+
+
+
+  public static final ValueExtractor<Object, String> DIAGNOSTIC_REPORT_STATUS_CODES =
+      (Object value) -> {
 
     String val = Hl7DataHandlerUtil.getStringValue(value);
     String code = getFHIRCode(val, DiagnosticReportStatus.class);

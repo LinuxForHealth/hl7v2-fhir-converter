@@ -5,12 +5,5 @@
 #
 ---
 reference:
-    type: STRING
-    fetch:  'id'
-type:
-    type: STRING
-    fetch: 'resourceType'
-
-display:
-   type: STRING
-   value: $ref-display
+    type: RELATIVE_REFERENCE
+    value:  $BASE_VALUE
