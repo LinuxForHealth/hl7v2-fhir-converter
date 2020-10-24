@@ -25,9 +25,6 @@ import org.junit.Test;
 import com.google.common.collect.Lists;
 import io.github.linuxforhealth.api.ResourceModel;
 import io.github.linuxforhealth.fhir.FHIRContext;
-import io.github.linuxforhealth.hl7.message.HL7FHIRResourceTemplate;
-import io.github.linuxforhealth.hl7.message.HL7MessageEngine;
-import io.github.linuxforhealth.hl7.message.HL7MessageModel;
 import io.github.linuxforhealth.hl7.resource.ResourceReader;
 
 public class Hl7MessageTest {
@@ -378,8 +375,8 @@ public class Hl7MessageTest {
     List<ConditionEvidenceComponent> evidences = cond.getEvidence();
     assertThat(evidences).isNotEmpty();
     assertThat(evidences.get(0).hasDetail()).isTrue();
-    assertThat("Observation/" + evidences.get(0).getDetail().get(0).getReference()).isIn(ids);
-    assertThat("Observation/" + evidences.get(1).getDetail().get(0).getReference()).isIn(ids);
+    assertThat(evidences.get(0).getDetail().get(0).getReference()).isIn(ids);
+    assertThat(evidences.get(1).getDetail().get(0).getReference()).isIn(ids);
     assertThat(evidences.get(0).getDetail().get(0).getReference())
         .isNotEqualTo(evidences.get(1).getDetail().get(0).getReference());
   }

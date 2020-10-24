@@ -3,6 +3,44 @@
 FHIR converter is a Java based library that enables converting [Hl7v2](https://www.hl7.org/implement/standards/product_section.cfm?section=13) messages to [FHIR](https://hl7.org/FHIR/) resources.<br>
 FHIR converter utilized the open source  [HAPI Library](https://hapifhir.github.io/hapi-hl7v2/) for parsing Hl7 messages and it also utilizes the [HAPI library for FHIR](https://hapifhir.io/) resources to validate the generated FHIR resources.
 
+## Usage
+
+
+### Installation
+
+What you’ll need
+* JDK 8 or later
+* Install Gradle
+
+
+Steps:
+
+```
+git clone git@github.com:LinuxForHealth/hl7v2-fhir-converter.git
+cd hl7v2-fhir-converter
+gradle build
+
+```
+
+### Converting HL7v2 message to FHIR resources
+
+In order to convert a Hl7 message to FHIR resource, create a new instance of the class FHIRConverter and invoke the function  convert and pass the hl7message data (file contents).
+
+```
+    HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
+    String output= ftv.convert(hl7message); // generated a FHIR output
+```
+
+### Configuration Options:
+Converter supports following configuration options using the config.properties file.
+* base.path.resource=
+* supported.hl7.messages=ADT\_A01, ORU\_R01, PPR_PC1
+
+If the base.path.resource is empty then the resources (templates) then default resources(templates) are used during the conversion.<br>
+supported.hl7.messages lists the messages that are currently supported for conversion.
+
+The converter looks for the config.properties file in the location specified by System property config.home. Example: -Dconfig.home=/path/to/folder/containing/config/test
+
 
 
 ## Features and Concepts of HL7 to FHIR conversion
@@ -98,7 +136,7 @@ birthDate:
 ```
 
 
-```
+``` yml
 # Represents data that needs to be extracted for a Condition Resource in FHIR
 # reference: https://www.hl7.org/fhir/condition.html
 ---
@@ -171,7 +209,8 @@ The extraction logic for each field can be defined by using expressions. This co
         Class type final return value extracted for the field.
 * specs: DEFAULT - NONE<br>
            Represents the base value for a resource, if no spec is provided then parents base value would be used as base value for child resource.
-           The value that needs to be extracted using the HL7 spec. Refer to the section on supported formats for [Specification](Specification).
+           The value that needs to be extracted using the HL7 spec. Refer to the section on supported formats for [Specification](Specification).<br>
+
 * defaultValue: DEFAULT - NULL<br>
                 If extraction of the value fails, then the default value can be used.
 * required : DEFAULT - false<br>
@@ -199,7 +238,7 @@ The extraction logic for each field can be defined by using expressions. This co
  ```
 #### Specification
 Specification represents the base value for a expression. There are two types of Specifications - 
-* SimpleSpecification  -- Represents simple specification that can be extracted from context values. Example: specs: $Patient
+* SimpleSpecification  -- Represents simple specification that can be extracted from context values. Example: specs: $Patient. Note BASE_VALUE is reserved for base value provided to an expression during evaluation. Do not use or name variable as BASE_VALUE.
 * HL7Specification -- Represents specification for extracting values from HL7 message.
 
 ##### HL7Specification
@@ -226,6 +265,8 @@ Variables can be used during expression evaluation.  This engine supports defini
 * ExpressionVariable : Value of a variable is extracted by evaluating a java function. Example:  `` low: OBX.7, GeneralUtils.split(low, "-", 0)``
 * DataTypeVariable: Value of a variable is extracted from [Specification](Specification) and this value is converted to a particular data type. Example: `` var1: STRING, OBX.2``
 
+Note: BASE_VALUE is reserved for base value provided to an expression during evaluation. Do not use or name variable as BASE_VALUE.
+
 #### Condition
 Conditions evaluate to true or false.<br>
 Engine supports the following condition types:
@@ -243,7 +284,7 @@ Example:
   identifier:
     type: Array
     resource: datatype/IdentifierCX
-    hl7spec: PID.3 
+    specs: PID.3 
 ```
   
 * ReferenceExpression : This type of expression is used when a field  references a FHIR resource which has to be first generated based on provided hl7spec data. Then in thhe current resource this FHIR resource is referenced using Reference data type.
@@ -295,48 +336,22 @@ Example 2: Value needs to be extracted from a variable.
 code: $var
 
 ```
-## Usage
 
-
-### Installation
-
-What you’ll need
-* JDK 8 or later
-* Install Gradle
-
-
-Steps:
-
-```
-git clone git@github.com:LinuxForHealth/hl7v2-fhir-converter.git
-cd hl7v2-fhir-converter
-gradle build
-
-```
-
-### Converting HL7v2 message to FHIR resources
-
-In order to convert a Hl7 message to FHIR resource, create a new instance of the class FHIRConverter and invoke the function  convert and pass the hl7message data (file contents).
-
-```
-    HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
-    String output= ftv.convert(hl7message); // generated a FHIR output
-```
-Sample output:
+## Sample output:
 
 ```json
 {
   "resourceType": "Bundle",
+  "id": "cf56324b-e43a-4cc7-8768-eaba5eb61214",
   "meta": {
-    "id": "102",
-    "lastUpdated": "2020-10-05T22:12:57.548+08:00",
-    "source": "ADT_A01"
+    "lastUpdated": "2020-10-24T15:59:07.418+08:00",
+    "source": "Message: ADT_A01, Message Control Id: 102"
   },
   "type": "collection",
   "entry": [ {
     "resource": {
       "resourceType": "Patient",
-      "id": "f7146386-4700-4e5e-b05b-1cd8d8cb5481",
+      "id": "0f61c0c7-1d9e-46de-9bba-2ee908582804",
       "identifier": [ {
         "type": {
           "coding": [ {
@@ -370,7 +385,7 @@ Sample output:
   }, {
     "resource": {
       "resourceType": "Encounter",
-      "id": "9b08c455-721b-49c8-ac72-79f39822a05f",
+      "id": "0c2ff935-39e5-43e9-a4c3-6df4e281cc47",
       "identifier": [ {
         "value": "48390"
       } ],
@@ -385,6 +400,9 @@ Sample output:
           "display": "Medical Service"
         } ],
         "text": "MED"
+      },
+      "subject": {
+        "reference": "Patient/0f61c0c7-1d9e-46de-9bba-2ee908582804"
       },
       "period": {
         "start": "2014-09-12T22:00:00",
@@ -414,7 +432,7 @@ Sample output:
   }, {
     "resource": {
       "resourceType": "Observation",
-      "id": "fdab3063-1365-43ea-9f0d-6c55520d600b",
+      "id": "e56b6d84-5418-4fc6-b172-48de133c364e",
       "identifier": [ {
         "type": {
           "coding": [ {
@@ -429,26 +447,28 @@ Sample output:
           "code": "1234"
         } ]
       },
+      "subject": {
+        "reference": "Patient/0f61c0c7-1d9e-46de-9bba-2ee908582804"
+      },
+      "encounter": {
+        "reference": "Encounter/0c2ff935-39e5-43e9-a4c3-6df4e281cc47"
+      },
       "issued": "2012-09-12T01:12:30",
       "performer": [ {
-        "reference": "2a540f3b-9994-47a0-b4ba-ad1b86dac82f",
-        "type": "Practitioner"
+        "reference": "Practitioner/05dae019-4686-4140-a001-07f7f2ca9260"
       }, {
-        "reference": "35fe016c-5e26-468a-a426-b3fd8bb3a2a6",
-        "type": "Practitioner"
+        "reference": "Practitioner/86be217b-7cdf-4044-80e6-b8469a5660fa"
       }, {
-        "reference": "28fd3e3a-ca1a-4f72-ac2d-49251af1cb8e",
-        "type": "Practitioner"
+        "reference": "Practitioner/3cc53aeb-ccd1-494d-a44d-6017942b616e"
       }, {
-        "reference": "d78dc350-46fe-453a-9e48-49391e36f9d1",
-        "type": "Practitioner"
+        "reference": "Practitioner/28bb5b0d-4ab3-4157-8ca2-007cb6bda84c"
       } ],
       "valueString": "ECHOCARDIOGRAPHIC REPORT"
     }
   }, {
     "resource": {
       "resourceType": "Practitioner",
-      "id": "2a540f3b-9994-47a0-b4ba-ad1b86dac82f",
+      "id": "05dae019-4686-4140-a001-07f7f2ca9260",
       "identifier": [ {
         "value": "2740"
       } ],
@@ -461,7 +481,7 @@ Sample output:
   }, {
     "resource": {
       "resourceType": "Practitioner",
-      "id": "35fe016c-5e26-468a-a426-b3fd8bb3a2a6",
+      "id": "86be217b-7cdf-4044-80e6-b8469a5660fa",
       "identifier": [ {
         "value": "2913"
       } ],
@@ -474,7 +494,7 @@ Sample output:
   }, {
     "resource": {
       "resourceType": "Practitioner",
-      "id": "28fd3e3a-ca1a-4f72-ac2d-49251af1cb8e",
+      "id": "3cc53aeb-ccd1-494d-a44d-6017942b616e",
       "identifier": [ {
         "value": "3065"
       } ],
@@ -487,7 +507,7 @@ Sample output:
   }, {
     "resource": {
       "resourceType": "Practitioner",
-      "id": "d78dc350-46fe-453a-9e48-49391e36f9d1",
+      "id": "28bb5b0d-4ab3-4157-8ca2-007cb6bda84c",
       "identifier": [ {
         "value": "4723"
       } ],
@@ -500,13 +520,16 @@ Sample output:
   }, {
     "resource": {
       "resourceType": "AllergyIntolerance",
-      "id": "5d74f7ff-11d5-44b2-8fc9-e6dd45700494",
+      "id": "9765d5ab-a8f0-406d-8798-ea6102e9bba5",
       "code": {
         "coding": [ {
           "code": "00000741",
           "display": "OXYCODONE"
         } ],
         "text": "OXYCODONE"
+      },
+      "patient": {
+        "reference": "Patient/0f61c0c7-1d9e-46de-9bba-2ee908582804"
       },
       "reaction": [ {
         "manifestation": [ {
@@ -517,13 +540,16 @@ Sample output:
   }, {
     "resource": {
       "resourceType": "AllergyIntolerance",
-      "id": "a418b654-bb07-4203-9a23-ba9781e1ab12",
+      "id": "5cf3b829-556f-4d25-a674-86b57a6f5a85",
       "code": {
         "coding": [ {
           "code": "00001433",
           "display": "TRAMADOL"
         } ],
         "text": "TRAMADOL"
+      },
+      "patient": {
+        "reference": "Patient/0f61c0c7-1d9e-46de-9bba-2ee908582804"
       },
       "reaction": [ {
         "manifestation": [ {
@@ -535,6 +561,7 @@ Sample output:
     }
   } ]
 }
+
 ```
 
 
