@@ -5,8 +5,25 @@ FHIR converter utilized the open source  [HAPI Library](https://hapifhir.github.
 
 ## Usage
 
+Maven dependency
+```
+<dependency>
+  <groupId>io.github.linuxforhealth</groupId>
+  <artifactId>hl7v2-fhir-converter</artifactId>
+  <version>1.0.0</version>
+</dependency>
+```
 
-### Installation
+### Converting HL7v2 message to FHIR resources
+
+In order to convert a Hl7 message to FHIR resource, create a new instance of the class FHIRConverter and invoke the function  convert and pass the hl7message data (file contents).
+
+```
+    HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
+    String output= ftv.convert(hl7message); // generated a FHIR output
+```
+
+### Checkout
 
 What you’ll need
 * JDK 8 or later
@@ -22,14 +39,6 @@ gradle build
 
 ```
 
-### Converting HL7v2 message to FHIR resources
-
-In order to convert a Hl7 message to FHIR resource, create a new instance of the class FHIRConverter and invoke the function  convert and pass the hl7message data (file contents).
-
-```
-    HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
-    String output= ftv.convert(hl7message); // generated a FHIR output
-```
 
 ### Configuration Options:
 Converter supports following configuration options using the config.properties file.
