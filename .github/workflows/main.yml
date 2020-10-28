@@ -11,10 +11,16 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 1.8
+      - name: Set env
+        run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
+      - name: Test
+        run: |
+          echo $RELEASE_VERSION
+          echo ${{ env.RELEASE_VERSION }}  
         
         
       - name: Publish package        
-        run: gradle publish -stacktrace -Pversion=1.0.0
+        run: gradle publish -stacktrace -Pversion=${{ env.RELEASE_VERSION }}
         env:
           MAVEN_USERNAME: ${{ secrets.LFH_USERNAME }}
           MAVEN_PASSWORD: ${{ secrets.LFH_TOKEN }}
