@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
+import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Bundle.BundleType;
 import com.google.common.base.Preconditions;
 import ca.uhn.hl7v2.HL7Exception;
@@ -39,25 +40,23 @@ public class HL7ToFHIRConverter {
   }
 
 
-
-  public String convert(String rawmessage)
-      throws IOException {
+  /**
+   * 
+   * @param rawmessage
+   * @return FHIR {@link Bundle} resource in json format
+   * @throws IOException
+   * @throws UnsupportedOperationException - if message type is not supported
+   * @throws IllegalArgumentException
+   */
+  public String convert(String rawmessage) throws IOException {
     Preconditions.checkArgument(StringUtils.isNotBlank(rawmessage),
         "Input HL7 message cannot be blank");
-   
+
     HL7HapiParser hparser = null;
-    try { 
-    hparser = new HL7HapiParser();
-
-      Message hl7message = hparser.getParser().parse(rawmessage);
-      String messageType = HL7DataExtractor.getMessageType(hl7message);
-      HL7MessageModel hl7MessageTemplateModel = messagetemplates.get(messageType);
-      if (hl7MessageTemplateModel != null) {
-        return hl7MessageTemplateModel.convert(hl7message, engine);
-      } else {
-        throw new IllegalArgumentException("Message type not yet supported " + messageType);
-      }
-
+    Message hl7message = null;
+    try {
+      hparser = new HL7HapiParser();
+      hl7message = hparser.getParser().parse(rawmessage);
 
     } catch (HL7Exception e) {
       throw new IllegalArgumentException("Cannot parse the message.", e);
@@ -65,11 +64,22 @@ public class HL7ToFHIRConverter {
       if (hparser != null) {
         hparser.getContext().close();
       }
-  }
-  
+    }
+    if (hl7message != null) {
+      String messageType = HL7DataExtractor.getMessageType(hl7message);
+      HL7MessageModel hl7MessageTemplateModel = messagetemplates.get(messageType);
+      if (hl7MessageTemplateModel != null) {
+        return hl7MessageTemplateModel.convert(hl7message, engine);
+      } else {
+        throw new UnsupportedOperationException("Message type not yet supported " + messageType);
+      }
+    } else {
+      throw new IllegalArgumentException("Parsed HL7 message was null.");
+    }
+
+
 
   }
-
 
 
 

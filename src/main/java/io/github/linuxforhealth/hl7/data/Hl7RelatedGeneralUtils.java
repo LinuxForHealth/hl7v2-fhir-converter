@@ -108,7 +108,7 @@ public class Hl7RelatedGeneralUtils {
 
       }
     } catch (UnsupportedTemporalTypeException e) {
-      LOGGER.error("Cannot evaluate time difference for {} {} ", start, end, e);
+      LOGGER.warn("Cannot evaluate time difference for {} {} ", start, end, e);
       return null;
     }
     return null;

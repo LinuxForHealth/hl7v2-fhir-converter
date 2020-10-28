@@ -31,6 +31,7 @@ public class DataTypeVariable extends SimpleVariable {
    * @param name
    * @param valueType
    * @param spec
+   * @param extractMultiple
    */
 
   public DataTypeVariable(String name, String valueType, List<String> spec,
