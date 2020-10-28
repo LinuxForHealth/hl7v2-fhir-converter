@@ -21,7 +21,7 @@ public class Constants {
   public static final String CODING_SYSTEM_MAPPING_PATH = "codesystem/CodingSystemMapping.yml";
   public static final String V2_TO_FHIR_MAPPING_PATH = "codesystem/v2ToFhirMapping.yml";
   public static final String RESOURCE_MAPPING_PATH = "fhir/resourcemapping.yml";
-
+  public static final String HL7V2_SYSTEM_PREFIX = "http://terminology.hl7.org/CodeSystem/v2-";
 
   public static final String HL7_BASE_PATH = "hl7/";
   public static final String FHIR_BASE_PATH = "fhir/";

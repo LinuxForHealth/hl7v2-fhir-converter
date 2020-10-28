@@ -159,8 +159,8 @@ public abstract class AbstractExpression implements Expression {
     } else {
       return result;
     }
-    } catch (DataExtractionException e) {
-      LOGGER.error("Failure encountered during evaluation of expression {} , exception {}", this,
+    } catch (DataExtractionException | IllegalArgumentException e) {
+      LOGGER.warn("Failure encountered during evaluation of expression {} , exception {}", this,
           e);
       return null;
     }

@@ -64,7 +64,7 @@ public final class JexlEngineUtil {
     // ensure that expression
     validateExpression(trimedJexlExp);
 
-    LOGGER.info("Evaluating expression : {}", trimedJexlExp);
+    LOGGER.debug("Evaluating expression : {}", trimedJexlExp);
     Map<String, Object> localContext = new HashMap<>(functions);
     localContext.putAll(context);
 
@@ -74,7 +74,7 @@ public final class JexlEngineUtil {
     // Now evaluate the expression, getting the result
     try {
       Object obj = exp.evaluate(jc);
-      LOGGER.info("Evaluated expression : {}, returning object {}", trimedJexlExp, obj);
+      LOGGER.debug("Evaluated expression : {}, returning object {}", trimedJexlExp, obj);
       return obj;
     } catch (JexlException e) {
 
@@ -94,7 +94,7 @@ public final class JexlEngineUtil {
     // ensure that expression
     validateCondition(trimedJexlExp);
 
-    LOGGER.info("Evaluating condiitional expression : {}", trimedJexlExp);
+    LOGGER.debug("Evaluating condiitional expression : {}", trimedJexlExp);
     Map<String, Object> localContext = new HashMap<>(functions);
     localContext.putAll(context);
 
@@ -104,7 +104,7 @@ public final class JexlEngineUtil {
     // Now evaluate the expression, getting the result
 
     boolean obj = (boolean) exp.evaluate(jc);
-      LOGGER.info("Evaluated expression : {}, returning object {}", trimedJexlExp, obj);
+    LOGGER.debug("Evaluated expression : {}, returning object {}", trimedJexlExp, obj);
       return obj;
 
 

@@ -33,7 +33,7 @@ public class Hl7DataHandlerUtil {
     if (obj == null) {
       return null;
     }
-    LOGGER.info("Extracting string value for {} type {}", obj, obj.getClass());
+    LOGGER.debug("Extracting string value for {} type {}", obj, obj.getClass());
 
     Object local = obj;
     String returnValue;
@@ -84,7 +84,7 @@ public class Hl7DataHandlerUtil {
         try {
           returnvalue = com.getComponent(0).toString();
         } catch (DataTypeException e) {
-          LOGGER.error("Failure when extracting string value for {}", local, e);
+          LOGGER.warn("Failure when extracting string value for {}", local, e);
           returnvalue = null;
         }
       }
