@@ -47,7 +47,7 @@ public class FHIRConverterTest {
     String json = ftv.convert(hl7message, true, BundleType.TRANSACTION);
 
     System.out.println(json);
-    verifyResult(json);
+    verifyResult(json, BundleType.TRANSACTION);
 
 
   }
@@ -56,9 +56,9 @@ public class FHIRConverterTest {
 
   @Test
   public void convert_hl7_from_file_to_fhir_unix_line_endings() throws IOException {
-    HL7ToFHIRConverter ftv = new HL7ToFHIRConverter(true, BundleType.COLLECTION);
+    HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
     String json = ftv.convert(new File(HL7_FILE_UNIX_NEWLINE));
-    verifyResult(json);
+    verifyResult(json, BundleType.COLLECTION);
 
 
   }
@@ -67,9 +67,9 @@ public class FHIRConverterTest {
 
   @Test
   public void convert_hl7_from_file_to_fhir_wiin_line_endings() throws IOException {
-    HL7ToFHIRConverter ftv = new HL7ToFHIRConverter(true, BundleType.COLLECTION);
-    String json = ftv.convert(new File(HL7_FILE_WIN_NEWLINE));
-    verifyResult(json);
+    HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
+    String json = ftv.convert(new File(HL7_FILE_WIN_NEWLINE), true, BundleType.MESSAGE);
+    verifyResult(json, BundleType.MESSAGE);
 
 
   }
@@ -114,12 +114,12 @@ public class FHIRConverterTest {
 
   }
 
-  private void verifyResult(String json) {
+  private void verifyResult(String json, BundleType expectedBundleType) {
     FHIRContext context = new FHIRContext();
     IBaseResource bundleResource = context.getParser().parseResource(json);
     assertThat(bundleResource).isNotNull();
     Bundle b = (Bundle) bundleResource;
-    assertThat(b.getType()).isEqualTo(BundleType.TRANSACTION);
+    assertThat(b.getType()).isEqualTo(expectedBundleType);
     assertThat(b.getId()).isNotNull();
     assertThat(b.getMeta().getLastUpdated()).isNotNull();
     assertThat(b.getMeta().getSource()).contains("Message: ADT_A01, Message Control Id: 102");

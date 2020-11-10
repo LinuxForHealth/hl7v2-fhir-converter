@@ -11,20 +11,14 @@ import ca.uhn.fhir.parser.IParser;
 import io.github.linuxforhealth.core.Constants;
 
 public class FHIRContext {
-
-
+  private static final FhirContext CTX = FhirContext.forR4();
   private IParser parser;
-
-
-
-  private FhirContext ctx;
 
   /**
    * Constructor for FHIRContext
    */
   public FHIRContext(boolean isPrettyPrint) {
-    ctx = FhirContext.forR4();
-    parser = ctx.newJsonParser();
+    parser = CTX.newJsonParser();
     parser.setPrettyPrint(isPrettyPrint);
   }
 
@@ -37,7 +31,7 @@ public class FHIRContext {
   }
 
   public FhirContext getCtx() {
-    return ctx;
+    return CTX;
   }
 
 
