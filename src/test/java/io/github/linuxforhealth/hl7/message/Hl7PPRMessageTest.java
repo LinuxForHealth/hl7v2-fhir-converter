@@ -33,13 +33,14 @@ public class Hl7PPRMessageTest {
             + "OBX|1|TX|||ECHOCARDIOGRAPHIC REPORT||||||F|||20150930164100|||\r"
             + "OBX|2|TX|||NORMAL LV CHAMBER SIZE WITH MILD CONCENTRIC LVH||||||F|||20150930164100|||";
 
-    HL7ToFHIRConverter ftv = new HL7ToFHIRConverter(true, BundleType.COLLECTION);
-    String json = ftv.convert(hl7message);
+    HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
+    String json = ftv.convert(hl7message, true, BundleType.COLLECTION);
     System.out.println(json);
     assertThat(json).isNotBlank();
     IBaseResource bundleResource = context.getParser().parseResource(json);
     assertThat(bundleResource).isNotNull();
     Bundle b = (Bundle) bundleResource;
+    assertThat(b.getType()).isEqualTo(BundleType.COLLECTION);
     List<BundleEntryComponent> e = b.getEntry();
     List<Resource> patientResource =
         e.stream().filter(v -> ResourceType.Patient == v.getResource().getResourceType())
