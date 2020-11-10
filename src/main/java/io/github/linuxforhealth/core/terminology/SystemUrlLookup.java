@@ -23,7 +23,6 @@ import io.github.linuxforhealth.hl7.resource.ResourceReader;
 public class SystemUrlLookup {
   private final Map<String, String> systemUrls;
 
-  private static final String HL7V2_SYSTEM_PREFIX = "http://terminology.hl7.org/CodeSystem/v2-";
   private static SystemUrlLookup systemURLLookupInstance;
 
   private SystemUrlLookup() {
@@ -68,7 +67,7 @@ public class SystemUrlLookup {
 
   public static String getSystemV2Url(String value) {
     if (value != null) {
-      return HL7V2_SYSTEM_PREFIX + value;
+      return Constants.HL7V2_SYSTEM_PREFIX + value;
     } else {
       return null;
     }
