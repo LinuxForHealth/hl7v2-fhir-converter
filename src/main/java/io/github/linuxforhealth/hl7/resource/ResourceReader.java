@@ -15,6 +15,8 @@ import java.util.Map;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import io.github.linuxforhealth.api.ResourceModel;
 import io.github.linuxforhealth.core.Constants;
 import io.github.linuxforhealth.core.ObjectMapperUtil;
@@ -33,6 +35,7 @@ public class ResourceReader {
 
   private static ResourceReader reader;
 
+  private static final Logger LOGGER = LoggerFactory.getLogger(ResourceReader.class);
 
 
   public String getResource(String filePath) {
@@ -50,6 +53,7 @@ public class ResourceReader {
       }
       return resource;
     } catch (IOException e) {
+      LOGGER.error(e.getMessage(), e);
       throw new IllegalArgumentException("IOexception encountered:" + f.getPath(), e);
     }
 
@@ -84,6 +88,7 @@ public class ResourceReader {
         rm.setMessageName(templateName);
         return rm;
       } catch (IOException e) {
+        LOGGER.error(e.getMessage(), e);
         throw new IllegalArgumentException(
             "Error encountered in processing the template" + templateName, e);
       }
