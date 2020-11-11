@@ -39,12 +39,15 @@ public class ResourceReader {
 
 
   public String getResource(String filePath) {
+    LOGGER.info("Attempting to read resource {}", filePath);
     String basePath = ConverterConfiguration.getInstance().getResourceFolder();
     File f = new File(basePath, filePath);
     boolean resourcefromClassPath = ConverterConfiguration.getInstance().isResourcefromClassPath();
     String resource;
     try {
       if (resourcefromClassPath) {
+        LOGGER.info("Loading resource {}", f.getPath());
+
         try (InputStream inputStream = this.getClass().getResourceAsStream(f.getPath())) {
           resource = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
         }
