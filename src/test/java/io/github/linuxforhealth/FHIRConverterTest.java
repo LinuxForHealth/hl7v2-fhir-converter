@@ -42,12 +42,16 @@ public class FHIRConverterTest {
         + "AL1|1|DRUG|00000741^OXYCODONE||HYPOTENSION\r"
         + "AL1|2|DRUG|00001433^TRAMADOL||SEIZURES~VOMITING\r"
         + "PRB|AD|200603150625|aortic stenosis|53692||2||200603150625";
+    try {
+      HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
 
-    HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
     String json = ftv.convert(hl7message, true, BundleType.TRANSACTION);
 
     System.out.println(json);
     verifyResult(json, BundleType.TRANSACTION);
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
 
 
   }
