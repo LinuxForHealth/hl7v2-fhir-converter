@@ -33,8 +33,8 @@ public class Hl7ORUMessageTest {
             + "OBX|1|TX|||obs report||||||F\r"
             + "OBX|2|TX|||ECHOCARDIOGRAPHIC REPORT||||||F\r";
 
-    HL7ToFHIRConverter ftv = new HL7ToFHIRConverter(true, BundleType.COLLECTION);
-    String json = ftv.convert(hl7message);
+    HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
+    String json = ftv.convert(hl7message, true, BundleType.COLLECTION);
     assertThat(json).isNotBlank();
 
     IBaseResource bundleResource = context.getParser().parseResource(json);
@@ -90,13 +90,14 @@ public class Hl7ORUMessageTest {
             + "OBX|1|CWE|625-4^Bacteria identified in Stool by Culture^LN^^^^2.33^^result1|1|27268008^Salmonella^SCT^^^^20090731^^Salmonella species|||A^A^HL70078^^^^2.5|||P|||20120301|||^^^^^^^^Bacterial Culture||201203140957||||State Hygienic Laboratory^L^^^^IA Public HealthLab&2.16.840.1.114222.4.1.10411&ISO^FI^^^16D0648109|State Hygienic Laboratory^UI Research Park -Coralville^Iowa City^IA^52242-5002^USA^B^^19103|^Atchison^Christopher^^^^^^^L\r"
             + "OBX|2|TX|||ECHOCARDIOGRAPHIC REPORT Grroup 2||||||F\r";
 
-    HL7ToFHIRConverter ftv = new HL7ToFHIRConverter(true, BundleType.COLLECTION);
+    HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
     String json = ftv.convert(hl7message);
 
     assertThat(json).isNotBlank();
     IBaseResource bundleResource = context.getParser().parseResource(json);
     assertThat(bundleResource).isNotNull();
     Bundle b = (Bundle) bundleResource;
+    assertThat(b.getType()).isEqualTo(BundleType.COLLECTION);
     List<BundleEntryComponent> e = b.getEntry();
     List<Resource> patientResource =
         e.stream().filter(v -> ResourceType.Patient == v.getResource().getResourceType())
