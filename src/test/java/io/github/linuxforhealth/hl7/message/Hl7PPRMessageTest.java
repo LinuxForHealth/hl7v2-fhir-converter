@@ -7,6 +7,7 @@ package io.github.linuxforhealth.hl7.message;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.hl7.fhir.instance.model.api.IBaseResource;
@@ -23,7 +24,7 @@ public class Hl7PPRMessageTest {
   private static FHIRContext context = new FHIRContext();
 
   @Test
-  public void test_patient() throws IOException {
+  public void test_patient() throws IOException, URISyntaxException {
     String hl7message =
         "MSH|^~\\&|SendTest1|Sendfac1|Receiveapp1|Receivefac1|200603081747|security|PPR^PC1^PPR_PC1|1|P^I|2.6||||||ASCII||\r"
             + "PID|||555444222111^^^MPI&GenHosp&L^MR||james^anderson||19600614|M||C|99 Oakland #106^^qwerty^OH^44889||^^^^^626^5641111|^^^^^626^5647654|||||343132266|||N\r"
@@ -62,7 +63,4 @@ public class Hl7PPRMessageTest {
     assertThat(conditionresource).hasSize(1);
 
   }
-
-
-
 }

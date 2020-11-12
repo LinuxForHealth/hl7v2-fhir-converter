@@ -6,12 +6,14 @@
 package io.github.linuxforhealth.core;
 
 import java.io.File;
+import java.nio.file.Paths;
+
 import org.hl7.fhir.r4.model.Bundle.BundleType;
 
 public class Constants {
 
-  public static final File DEFAULT_HL7_RESOURCES = new File("src/main/resources/hl7");
-  public static final File DEFAULT_HL7_MESSAGE_FOLDER = new File(DEFAULT_HL7_RESOURCES, "message");
+  public static final String DEFAULT_HL7_RESOURCES = "hl7";
+  public static final String DEFAULT_HL7_MESSAGE_FOLDER = Paths.get(DEFAULT_HL7_RESOURCES, "message").toString();
   public static final boolean DEFAULT_PRETTY_PRINT = false;
   public static final BundleType DEFAULT_BUNDLE_TYPE = BundleType.COLLECTION;
   public static final String GROUP_ID = "GROUP_ID";

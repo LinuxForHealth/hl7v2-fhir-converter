@@ -8,6 +8,9 @@ package io.github.linuxforhealth.hl7;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -31,23 +34,29 @@ public class HL7ToFHIRConverter {
   private Map<String, HL7MessageModel> messagetemplates = new HashMap<>();
   private HL7MessageEngine engine;
 
-  public HL7ToFHIRConverter(boolean isPrettyPrint, BundleType bundleType) throws IOException {
+  public HL7ToFHIRConverter(boolean isPrettyPrint, BundleType bundleType) throws IOException,
+          URISyntaxException{
     initTemplates();
     FHIRContext context = new FHIRContext(isPrettyPrint);
     engine = new HL7MessageEngine(context, bundleType);
   }
 
-  public HL7ToFHIRConverter() throws IOException {
+  public HL7ToFHIRConverter() throws IOException, URISyntaxException{
     this(Constants.DEFAULT_PRETTY_PRINT, Constants.DEFAULT_BUNDLE_TYPE);
   }
 
 
 
-  private void initTemplates() throws IOException {
-    try (Stream<Path> paths =
-        Files.walk(Paths.get(Constants.DEFAULT_HL7_MESSAGE_FOLDER.getAbsolutePath()))) {
-      paths.filter(p -> p.toFile().isFile()).forEach(this::addMessageModel);
-    }
+  private void initTemplates() throws IOException, URISyntaxException {
+    URL url = Thread
+            .currentThread()
+            .getContextClassLoader()
+            .getResource(Constants.DEFAULT_HL7_MESSAGE_FOLDER);
+
+   Path templatePath = Paths.get(url.toURI());
+   try (Stream<Path> paths = Files.walk(templatePath)) {
+     paths.filter(p -> p.toFile().isFile()).forEach(this::addMessageModel);
+   }
   }
 
 

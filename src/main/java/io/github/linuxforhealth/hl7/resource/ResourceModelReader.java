@@ -6,7 +6,13 @@
 package io.github.linuxforhealth.hl7.resource;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 import org.apache.commons.configuration2.PropertiesConfiguration;
 import org.apache.commons.configuration2.builder.fluent.Configurations;
 import org.apache.commons.configuration2.ex.ConfigurationException;
@@ -20,51 +26,59 @@ public class ResourceModelReader {
 
   private static ResourceModelReader reader;
 
-  private File resourceFolder;
+  /**
+   * The top level resource folder/directory.
+   * External locations are supported by using the base.path.resource property. If the property is not set, a
+   * default location is assigned
+   */
+  private Path resourceFolder;
 
+  /**
+   * Creates the ResourceModelReader instance
+   */
   private ResourceModelReader() {
     try {
-    Configurations configs = new Configurations();
-    // Read data from this file
-    File propertiesFile = new File("config.properties");
-      PropertiesConfiguration config;
-
-      config = configs.properties(propertiesFile);
-
-    String resourceLoc = config.getString("base.path.resource");
-    if (StringUtils.isNotBlank(resourceLoc)) {
-      resourceFolder = new File(resourceLoc);
-    } else {
-      resourceFolder = Constants.DEFAULT_HL7_RESOURCES;
-    }
+      Configurations configs = new Configurations();
+      // Read data from this file
+      PropertiesConfiguration config = configs.properties(new File("config.properties"));
+      String resourceLoc = config.getString("base.path.resource");
+      resourceFolder= (StringUtils.isNotBlank(resourceLoc)) ? Paths.get(resourceLoc): Paths.get(Constants.DEFAULT_HL7_RESOURCES);
     } catch (ConfigurationException e) {
       throw new IllegalStateException("Cannot read configuration for resource location", e);
     }
   }
 
 
-  public ResourceModel generateResourceModel(String path) {
+  /**
+   * Loads a resource model from a path within a resource folder.
+   * @param resourcePath The resource
+   * @return
+   */
+  public ResourceModel generateResourceModel(String resourcePath) {
 
-    File templateFile = new File(resourceFolder, path + ".yml");
+    Path templateFilePath = Paths.get(resourceFolder.toString(), resourcePath + ".yml");
+    InputStream templateFileStream = null;
+    HL7DataBasedResourceModel resourceModel = null;
 
-    if (templateFile.exists()) {
-      try {
-        HL7DataBasedResourceModel rm =
-            ObjectMapperUtil.getYAMLInstance().readValue(templateFile,
-                HL7DataBasedResourceModel.class);
-        if (StringUtils.isBlank(rm.getName())
-            || StringUtils.equalsIgnoreCase(rm.getName(), "unknown")) {
-          rm.setName(FilenameUtils.removeExtension(templateFile.getName()));
-        }
-        return rm;
-      } catch (IOException e) {
-        throw new IllegalArgumentException(
-            "Error encountered in processing the template" + templateFile, e);
+    try {
+      if (Files.exists(templateFilePath)) {
+        templateFileStream = new FileInputStream(templateFilePath.toFile());
+      } else {
+        templateFileStream = Thread.currentThread().getContextClassLoader().getResourceAsStream(templateFilePath.toString());
       }
-    } else {
-      throw new IllegalArgumentException("File not present:" + templateFile);
+      resourceModel = ObjectMapperUtil
+              .getYAMLInstance()
+              .readValue(templateFileStream, HL7DataBasedResourceModel.class);
+
+    } catch (IOException e) {
+        throw new RuntimeException("Error accessing template file " + templateFilePath.toString(), e);
     }
 
+    if (StringUtils.isBlank(resourceModel.getName()) ||
+            StringUtils.equalsIgnoreCase(resourceModel.getName(), "unknown")) {
+      resourceModel.setName(FilenameUtils.removeExtension(templateFilePath.toFile().getName()));
+    }
+    return resourceModel;
   }
 
   public static ResourceModelReader getInstance() {

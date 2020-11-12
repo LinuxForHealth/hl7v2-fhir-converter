@@ -7,6 +7,7 @@ package io.github.linuxforhealth;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.hl7.fhir.instance.model.api.IBaseResource;
@@ -22,7 +23,7 @@ import io.github.linuxforhealth.hl7.HL7ToFHIRConverter;
 public class FHIRConverterTest {
 
   @Test
-  public void test_patient_encounter() throws IOException {
+  public void test_patient_encounter() throws IOException, URISyntaxException {
 
     String hl7message = "MSH|^~\\&|SE050|050|PACS|050|20120912011230||ADT^A01|102|T|2.7|||AL|NE\r"
         + "EVN||201209122222\r"
