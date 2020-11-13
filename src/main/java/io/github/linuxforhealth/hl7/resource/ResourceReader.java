@@ -9,6 +9,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,6 +23,8 @@ import io.github.linuxforhealth.core.Constants;
 import io.github.linuxforhealth.core.ObjectMapperUtil;
 import io.github.linuxforhealth.core.config.ConverterConfiguration;
 import io.github.linuxforhealth.hl7.message.HL7MessageModel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Reads resources. If the configuration file has base path defined (base.path.resource) then the
@@ -31,31 +36,60 @@ import io.github.linuxforhealth.hl7.message.HL7MessageModel;
  */
 public class ResourceReader {
 
+  private final Logger logger = LoggerFactory.getLogger(ResourceReader.class);
+
   private static ResourceReader reader;
 
+  private final ConverterConfiguration converterConfig = ConverterConfiguration.getInstance();
 
-
-  public String getResource(String filePath) {
-    String basePath = ConverterConfiguration.getInstance().getResourceFolder();
-    File f = new File(basePath, filePath);
-    boolean resourcefromClassPath = ConverterConfiguration.getInstance().isResourcefromClassPath();
-    String resource;
-    try {
-      if (resourcefromClassPath) {
-        try (InputStream inputStream = this.getClass().getResourceAsStream(f.getPath())) {
-          resource = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
-        }
-      } else {
-        resource = FileUtils.readFileToString(f, StandardCharsets.UTF_8);
-      }
-      return resource;
-    } catch (IOException e) {
-      throw new IllegalArgumentException("IOexception encountered:" + f.getPath(), e);
-    }
-
+  /**
+   * Loads a file resource configuration, returning a String
+   * @param fileResourceConfiguration The configuration resource to load
+   * @return String
+   * @throws IOException if an error occurs loading the file resource
+   */
+  private String loadFileResource (File fileResourceConfiguration) throws IOException {
+    return FileUtils.readFileToString(fileResourceConfiguration, StandardCharsets.UTF_8);
   }
 
+  /**
+   * Loads a class path configuration resource, returning a String
+   * @param classpathConfigurationResource The class path configuration resource
+   * @return String
+   * @throws IOException if an error occurs loading the configuration resource
+   */
+  private String loadClassPathResource(String classpathConfigurationResource) throws IOException {
+    String resource;
+    try (InputStream inputStream = Thread.currentThread()
+            .getContextClassLoader()
+            .getResourceAsStream(classpathConfigurationResource)) {
+      resource = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
+    }
+    return resource;
+  }
 
+  /**
+   * Loads a resource using a path.
+   * @param resourcePath The relative path to the resource (hl7/, fhir/, etc)
+   * @return The resource as a String
+   */
+  public String getResource(String resourcePath) {
+    Path path = Paths.get(converterConfig.getResourceFolder(), resourcePath);
+    String resource;
+
+    try {
+      if (Files.exists(path)) {
+        resource = loadFileResource(path.toFile());
+      } else {
+        resource = loadClassPathResource(path.toString());
+      }
+    } catch (IOException ioEx) {
+      String msg = "Error loading resource from " + path.toString();
+      logger.error(msg, ioEx);
+      throw new RuntimeException(msg, ioEx);
+    }
+    return resource;
+  }
 
   public Map<String, HL7MessageModel> getMessageTemplates() throws IOException {
     Map<String, HL7MessageModel> messagetemplates = new HashMap<>();
