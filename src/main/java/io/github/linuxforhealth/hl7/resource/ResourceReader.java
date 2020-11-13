@@ -84,9 +84,9 @@ public class ResourceReader {
         resource = loadClassPathResource(path.toString());
       }
     } catch (IOException ioEx) {
-      String msg = "Error loading resource from " + path.toString();
+      String msg = "Resource path  " + path.toString() + " is not valid";
       logger.error(msg, ioEx);
-      throw new RuntimeException(msg, ioEx);
+      throw new IllegalArgumentException(msg, ioEx);
     }
     return resource;
   }
