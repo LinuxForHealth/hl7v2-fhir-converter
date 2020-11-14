@@ -10,6 +10,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import io.github.linuxforhealth.core.Constants;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
@@ -44,12 +46,11 @@ public class FHIRConverterTest {
         + "PRB|AD|200603150625|aortic stenosis|53692||2||200603150625";
 
     HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
-    String json = ftv.convert(hl7message, true, BundleType.TRANSACTION);
+    String json = ftv.convert(hl7message);
+    verifyResult(json, Constants.DEFAULT_BUNDLE_TYPE);
 
-    System.out.println(json);
+    json = ftv.convert(hl7message, true, BundleType.TRANSACTION);
     verifyResult(json, BundleType.TRANSACTION);
-
-
   }
 
 

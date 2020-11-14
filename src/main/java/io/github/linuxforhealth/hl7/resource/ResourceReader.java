@@ -7,7 +7,6 @@ package io.github.linuxforhealth.hl7.resource;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -54,37 +53,33 @@ public class ResourceReader {
 
   /**
    * Loads a class path configuration resource, returning a String
-   * @param classpathConfigurationResource The class path configuration resource
-   * @return String
+   * @param resourceConfigurationPath The class path configuration resource
+   * @return String the resource content
    * @throws IOException if an error occurs loading the configuration resource
    */
-  private String loadClassPathResource(String classpathConfigurationResource) throws IOException {
-    String resource;
-    try (InputStream inputStream = Thread.currentThread()
-            .getContextClassLoader()
-            .getResourceAsStream(classpathConfigurationResource)) {
-      resource = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
-    }
-    return resource;
+  private String loadClassPathResource(String resourceConfigurationPath) throws IOException {
+    return IOUtils.resourceToString(resourceConfigurationPath, StandardCharsets.UTF_8, ClassLoader.getSystemClassLoader());
   }
 
   /**
-   * Loads a resource using a path.
+   * Loads a file based resource using a two pass approach.
+   * The first pass attempts to load the resource from the file system.
+   * if the file is not found on the file system, the resource is loaded from the classpath.
    * @param resourcePath The relative path to the resource (hl7/, fhir/, etc)
    * @return The resource as a String
    */
   public String getResource(String resourcePath) {
-    Path path = Paths.get(converterConfig.getResourceFolder(), resourcePath);
+    Path filePath = Paths.get(converterConfig.getResourceFolder(), resourcePath);
     String resource;
 
     try {
-      if (Files.exists(path)) {
-        resource = loadFileResource(path.toFile());
+      if (Files.exists(filePath)) {
+        resource = loadFileResource(filePath.toFile());
       } else {
-        resource = loadClassPathResource(path.toString());
+        resource = loadClassPathResource(resourcePath);
       }
     } catch (IOException ioEx) {
-      String msg = "Resource path  " + path.toString() + " is not valid";
+      String msg = "Unable to load resource " + resourcePath;
       logger.error(msg, ioEx);
       throw new IllegalArgumentException(msg, ioEx);
     }
