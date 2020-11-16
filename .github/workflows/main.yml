@@ -20,7 +20,7 @@ jobs:
         
         
       - name: Publish package        
-        run: gradle publish -stacktrace -Pversion=${{ env.RELEASE_VERSION }}
+        run: ./gradlew publish -stacktrace -Pversion=${{ env.RELEASE_VERSION }}
         env:
           MAVEN_USERNAME: ${{ secrets.LFH_USERNAME }}
           MAVEN_PASSWORD: ${{ secrets.LFH_TOKEN }}
