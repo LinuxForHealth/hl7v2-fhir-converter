@@ -13,6 +13,13 @@ Maven dependency
   <version>1.0.0</version>
 </dependency>
 ```
+Also add following repo to your build file to fetch requiired dependency:
+```
+jcenter()
+    maven {
+     url "https://dl.bintray.com/ibm-watson-health/ibm-fhir-server-releases"
+     }
+```     
 
 ### Converting HL7v2 message to FHIR resources
 
