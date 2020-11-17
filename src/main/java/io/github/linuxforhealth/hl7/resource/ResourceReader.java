@@ -8,7 +8,6 @@ package io.github.linuxforhealth.hl7.resource;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
@@ -17,13 +16,13 @@ import java.util.Map;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import io.github.linuxforhealth.api.ResourceModel;
 import io.github.linuxforhealth.core.Constants;
 import io.github.linuxforhealth.core.ObjectMapperUtil;
 import io.github.linuxforhealth.core.config.ConverterConfiguration;
 import io.github.linuxforhealth.hl7.message.HL7MessageModel;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Reads resources. If the configuration file has base path defined (base.path.resource) then the
@@ -35,7 +34,7 @@ import org.slf4j.LoggerFactory;
  */
 public class ResourceReader {
 
-  private final Logger logger = LoggerFactory.getLogger(ResourceReader.class);
+  private final Logger LOGGER = LoggerFactory.getLogger(ResourceReader.class);
 
   private static ResourceReader reader;
 
@@ -47,7 +46,7 @@ public class ResourceReader {
    * @return String
    * @throws IOException if an error occurs loading the file resource
    */
-  private String loadFileResource (File fileResourceConfiguration) throws IOException {
+  private static String loadFileResource(File fileResourceConfiguration) throws IOException {
     return FileUtils.readFileToString(fileResourceConfiguration, StandardCharsets.UTF_8);
   }
 
@@ -57,8 +56,9 @@ public class ResourceReader {
    * @return String the resource content
    * @throws IOException if an error occurs loading the configuration resource
    */
-  private String loadClassPathResource(String resourceConfigurationPath) throws IOException {
-    return IOUtils.resourceToString(resourceConfigurationPath, StandardCharsets.UTF_8, ClassLoader.getSystemClassLoader());
+  private static String loadClassPathResource(String resourceConfigurationPath) throws IOException {
+    return IOUtils.resourceToString(resourceConfigurationPath, StandardCharsets.UTF_8,
+        ResourceReader.class.getClassLoader());
   }
 
   /**
@@ -73,14 +73,13 @@ public class ResourceReader {
     String resource;
 
     try {
-      if (Files.exists(filePath)) {
+      if (filePath != null && filePath.toFile().exists()) {
         resource = loadFileResource(filePath.toFile());
       } else {
         resource = loadClassPathResource(resourcePath);
       }
     } catch (IOException ioEx) {
       String msg = "Unable to load resource " + resourcePath;
-      logger.error(msg, ioEx);
       throw new IllegalArgumentException(msg, ioEx);
     }
     return resource;
