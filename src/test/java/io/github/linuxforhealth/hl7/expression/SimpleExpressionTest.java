@@ -16,15 +16,15 @@ import io.github.linuxforhealth.core.expression.EmptyEvaluationResult;
 import io.github.linuxforhealth.core.expression.SimpleEvaluationResult;
 import io.github.linuxforhealth.hl7.expression.util.TestBlankInputData;
 
-public class DefaultExpressionTest {
+public class SimpleExpressionTest {
 
   private static final String SOME_VALUE = "SOME_VALUE";
   private static final InputDataExtractor data = new TestBlankInputData();
 
   @Test
   public void test_constant() {
-
-    SimpleExpression exp = new SimpleExpression(SOME_VALUE);
+    ExpressionAttributes attr = new ExpressionAttributes.Builder().withValue(SOME_VALUE).build();
+    SimpleExpression exp = new SimpleExpression(attr);
     Map<String, EvaluationResult> context = new HashMap<>();
 
     EvaluationResult value =
@@ -35,8 +35,8 @@ public class DefaultExpressionTest {
 
   @Test
   public void test_variable() {
-
-    SimpleExpression exp = new SimpleExpression("$var1");
+    ExpressionAttributes attr = new ExpressionAttributes.Builder().withValue(SOME_VALUE).build();
+    SimpleExpression exp = new SimpleExpression(attr);
     Map<String, EvaluationResult> context = new HashMap<>();
 
     context.put("var1", new SimpleEvaluationResult(SOME_VALUE));
@@ -49,8 +49,8 @@ public class DefaultExpressionTest {
 
   @Test
   public void test_variable_invalid_var() {
-
-    SimpleExpression exp = new SimpleExpression("$");
+    ExpressionAttributes attr = new ExpressionAttributes.Builder().withValue("$").build();
+    SimpleExpression exp = new SimpleExpression(attr);
 
     Map<String, EvaluationResult> context = new HashMap<>();
 
@@ -64,8 +64,9 @@ public class DefaultExpressionTest {
 
   @Test
   public void test_variable_no_context() {
+    ExpressionAttributes attr = new ExpressionAttributes.Builder().withValue("$var1").build();
+    SimpleExpression exp = new SimpleExpression(attr);
 
-    SimpleExpression exp = new SimpleExpression("$var1");
     Map<String, EvaluationResult> context = new HashMap<>();
 
 
@@ -77,8 +78,8 @@ public class DefaultExpressionTest {
 
   @Test
   public void test_blank() {
-
-    SimpleExpression exp = new SimpleExpression("");
+    ExpressionAttributes attr = new ExpressionAttributes.Builder().withValue("").build();
+    SimpleExpression exp = new SimpleExpression(attr);
     Map<String, EvaluationResult> context = new HashMap<>();
 
 

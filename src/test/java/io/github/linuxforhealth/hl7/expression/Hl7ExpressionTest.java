@@ -19,7 +19,6 @@ import ca.uhn.hl7v2.model.Type;
 import io.github.linuxforhealth.api.EvaluationResult;
 import io.github.linuxforhealth.core.expression.SimpleEvaluationResult;
 import io.github.linuxforhealth.core.terminology.SimpleCode;
-import io.github.linuxforhealth.hl7.expression.Hl7Expression;
 import io.github.linuxforhealth.hl7.message.HL7MessageData;
 import io.github.linuxforhealth.hl7.parsing.HL7DataExtractor;
 import io.github.linuxforhealth.hl7.parsing.HL7HapiParser;
@@ -38,8 +37,9 @@ public class Hl7ExpressionTest {
 
 
     Structure s = hl7DTE.getStructure("PID", 0).getValue();
-
-    Hl7Expression exp = new Hl7Expression("String", "PID.3");
+    ExpressionAttributes attr =
+        new ExpressionAttributes.Builder().withSpecs("PID.3").withType("String").build();
+    Hl7Expression exp = new Hl7Expression(attr);
 
 
 
@@ -72,7 +72,9 @@ public class Hl7ExpressionTest {
     Type type = hl7DTE.getType((Segment) s, 3, 0).getValue();
 
 
-    Hl7Expression exp = new Hl7Expression("String", "CX.1");
+    ExpressionAttributes attr =
+        new ExpressionAttributes.Builder().withSpecs("CX.1").withType("String").build();
+    Hl7Expression exp = new Hl7Expression(attr);
 
 
 
@@ -107,8 +109,9 @@ public class Hl7ExpressionTest {
     Structure s = hl7DTE.getStructure("PID", 0).getValue();
 
 
-    Hl7Expression exp = new Hl7Expression("String", "PID.3.1");
-
+    ExpressionAttributes attr =
+        new ExpressionAttributes.Builder().withSpecs("PID.3.1").withType("String").build();
+    Hl7Expression exp = new Hl7Expression(attr);
 
 
     Map<String, EvaluationResult> context = new HashMap<>();
@@ -139,7 +142,9 @@ public class Hl7ExpressionTest {
     HL7DataExtractor hl7DTE = new HL7DataExtractor(hl7message);
 
     Structure s = hl7DTE.getStructure("PV1", 0).getValue();
-    Hl7Expression exp = new Hl7Expression("String", "PV1.3 | PV1.4 |PV1.59");
+    ExpressionAttributes attr = new ExpressionAttributes.Builder()
+        .withSpecs("PV1.3 | PV1.4 |PV1.59").withType("String").build();
+    Hl7Expression exp = new Hl7Expression(attr);
 
     Map<String, EvaluationResult> context = new HashMap<>();
     // context.put("PV1", new SimpleEvaluationResult(s));
@@ -172,7 +177,9 @@ public class Hl7ExpressionTest {
 
 
     Structure s = hl7DTE.getStructure("OBX", 0).getValue();
-    Hl7Expression exp = new Hl7Expression("CODING_SYSTEM_V2", "OBX.8");
+    ExpressionAttributes attr =
+        new ExpressionAttributes.Builder().withSpecs("OBX.8").withType("CODING_SYSTEM_V2").build();
+    Hl7Expression exp = new Hl7Expression(attr);
 
 
 

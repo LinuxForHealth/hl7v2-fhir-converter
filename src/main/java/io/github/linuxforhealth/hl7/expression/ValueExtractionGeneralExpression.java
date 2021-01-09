@@ -13,8 +13,6 @@ import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Preconditions;
 import io.github.linuxforhealth.api.EvaluationResult;
 import io.github.linuxforhealth.api.InputDataExtractor;
@@ -22,7 +20,6 @@ import io.github.linuxforhealth.api.ResourceValue;
 import io.github.linuxforhealth.core.Constants;
 import io.github.linuxforhealth.core.expression.EmptyEvaluationResult;
 import io.github.linuxforhealth.core.expression.EvaluationResultFactory;
-import io.github.linuxforhealth.core.expression.VariableUtils;
 import io.github.linuxforhealth.hl7.resource.deserializer.TemplateFieldNames;
 
 
@@ -32,53 +29,23 @@ import io.github.linuxforhealth.hl7.resource.deserializer.TemplateFieldNames;
  *
  * @author {user}
  */
-@JsonIgnoreProperties(ignoreUnknown = true)
+
 public class ValueExtractionGeneralExpression extends AbstractExpression {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(ValueExtractionGeneralExpression.class);
+  private static final Logger LOGGER =
+      LoggerFactory.getLogger(ValueExtractionGeneralExpression.class);
 
 
   private ImmutablePair<String, String> fetch;
 
+  private boolean isUseGroup;
 
-  /**
-   * 
-   * @param type
-   * @param fetch
-   * @param specs
-   * @param defaultValue
-   * @param required
-   * @param variables
-   * @param condition
-   * @param constants
-   * @param useGroup
-   */
+
   @JsonCreator
-  public ValueExtractionGeneralExpression(@JsonProperty(TemplateFieldNames.TYPE) String type,
-      @JsonProperty(TemplateFieldNames.FETCH) String fetch,
-      @JsonProperty(TemplateFieldNames.SPEC) String specs,
-      @JsonProperty(TemplateFieldNames.DEFAULT_VALUE) String defaultValue,
-      @JsonProperty(TemplateFieldNames.REQUIRED) boolean required,
-      @JsonProperty(TemplateFieldNames.VARIABLES) Map<String, String> variables,
-      @JsonProperty(TemplateFieldNames.CONDITION) String condition,
-      @JsonProperty(TemplateFieldNames.CONSTANTS) Map<String, String> constants,
-      @JsonProperty(TemplateFieldNames.USE_GROUP) boolean useGroup) {
-    super(type, defaultValue, required, specs, variables, condition, constants, useGroup);
-
-    this.fetch = get(fetch);
-
-
-  }
-
-  /**
-   * 
-   * @param type
-   * @param fetch
-   * @param hl7spec
-   */
-
-  public ValueExtractionGeneralExpression(String type, String fetch, String hl7spec) {
-    this(type, fetch, hl7spec, null, false, null, null, null, false);
+  public ValueExtractionGeneralExpression(ExpressionAttributes expAttr) {
+    super(expAttr);
+    this.fetch = expAttr.getFetch();
+    this.isUseGroup = expAttr.isUseGroup();
   }
 
 
@@ -113,14 +80,14 @@ public class ValueExtractionGeneralExpression extends AbstractExpression {
       return EvaluationResultFactory.getEvaluationResult(resourceMap.get(fetch.getValue()));
     } else {
       return new EmptyEvaluationResult();
-      }
+    }
 
 
   }
 
   private String getKeyName(Map<String, EvaluationResult> contextValues) {
 
-    if (this.isUseGroup()) {
+    if (this.isUseGroup) {
       String groupId = getGroupId(contextValues);
       return fetch.getKey() + "_" + groupId;
     } else {
@@ -131,16 +98,6 @@ public class ValueExtractionGeneralExpression extends AbstractExpression {
 
 
 
-  private static ImmutablePair<String, String> get(String tok) {
-    String[] token = tok.split(":");
-    if (token.length == 2) {
-      return new ImmutablePair<>(VariableUtils.getVarName(token[0]), token[1]);
-    } else if (token.length == 1) {
-      return new ImmutablePair<>(Constants.BASE_VALUE_NAME, token[0]);
-    }
-    throw new IllegalArgumentException(
-        "fetch token not in correct format, expected format $varName:key, input" + tok);
-  }
   @Override
   public String toString() {
     ToStringBuilder.setDefaultStyle(ToStringStyle.JSON_STYLE);
@@ -149,7 +106,7 @@ public class ValueExtractionGeneralExpression extends AbstractExpression {
         .append(TemplateFieldNames.SPEC, this.getspecs()).append("isMultiple", this.isMultiple())
         .append(TemplateFieldNames.VARIABLES, this.getVariables())
         .append(TemplateFieldNames.FETCH, this.fetch)
-        .append(TemplateFieldNames.USE_GROUP, this.isUseGroup()).build();
+        .append(TemplateFieldNames.USE_GROUP, this.isUseGroup).build();
   }
 
 

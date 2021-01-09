@@ -14,7 +14,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import io.github.linuxforhealth.api.EvaluationResult;
@@ -35,32 +34,11 @@ public class SimpleExpression extends AbstractExpression {
 
 
   @JsonCreator
-  public SimpleExpression(String var) {
-    this("String", var, new HashMap<>(), null, false);
-
+  public SimpleExpression(ExpressionAttributes expAttr) {
+    super(expAttr);
+    this.value = expAttr.getValue();
   }
 
-  /**
-   * 
-   * @param type
-   * @param value
-   * @param variables
-   * @param condition
-   */
-  @JsonCreator
-  public SimpleExpression(@JsonProperty(TemplateFieldNames.TYPE) String type,
-      @JsonProperty(TemplateFieldNames.VALUE) String value,
-      @JsonProperty(TemplateFieldNames.VARIABLES) Map<String, String> variables,
-      @JsonProperty(TemplateFieldNames.CONDITION) String condition,
-      @JsonProperty(TemplateFieldNames.USE_GROUP) boolean useGroup) {
-    super(type, null, false, "", variables, condition, null, useGroup);
-    this.value = value;
-  }
-
-
-  public String getValue() {
-    return value;
-  }
 
 
   @Override

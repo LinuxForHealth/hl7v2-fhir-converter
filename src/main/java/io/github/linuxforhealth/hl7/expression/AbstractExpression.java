@@ -9,11 +9,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.regex.Pattern;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.text.StringTokenizer;
-import org.apache.commons.text.matcher.StringMatcherFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.google.common.base.Preconditions;
@@ -32,65 +27,32 @@ import io.github.linuxforhealth.core.exception.RequiredConstraintFailureExceptio
 import io.github.linuxforhealth.core.expression.EmptyEvaluationResult;
 import io.github.linuxforhealth.core.expression.EvaluationResultFactory;
 import io.github.linuxforhealth.core.expression.VariableUtils;
-import io.github.linuxforhealth.core.expression.condition.ConditionUtil;
-import io.github.linuxforhealth.hl7.expression.specification.SpecificationParser;
 import io.github.linuxforhealth.hl7.expression.specification.SpecificationUtil;
-import io.github.linuxforhealth.hl7.expression.variable.VariableGenerator;
 
 public abstract class AbstractExpression implements Expression {
   private static final Logger LOGGER = LoggerFactory.getLogger(AbstractExpression.class);
-  public static final String OBJECT_TYPE = Object.class.getSimpleName();
-  protected static final Pattern HL7_SPEC_SPLITTER = Pattern.compile(".");
-  private final String type;
-  private final EvaluationResult defaultValue;
-  private final boolean required;
-  private final List<Specification> hl7specs;
+
+  private String type;
+  private EvaluationResult defaultValue;
+  private boolean required;
+  private List<Specification> hl7specs;
   private List<Variable> variables;
   private Condition condition;
   private Map<String, String> constants;
-  private boolean useGroup;
-
-  public AbstractExpression(String type, String defaultValue, boolean required, String specs,
-      Map<String, String> rawvariables, String condition, Map<String, String> constants,
-      boolean useGroup) {
-    if (type == null) {
-      this.type = OBJECT_TYPE;
-    } else {
-      this.type = type;
-    }
-    if (defaultValue != null) {
-      this.defaultValue = EvaluationResultFactory.getEvaluationResult(defaultValue);
-    } else {
-      this.defaultValue = null;
-    }
-    this.useGroup = useGroup;
-    this.required = required;
-    this.hl7specs = getSpecList(specs, useGroup);
-    if (StringUtils.isNotBlank(condition)) {
-      this.condition = ConditionUtil.createCondition(condition);
-    }
 
 
-    this.constants = new HashMap<>();
-    if (constants != null && !constants.isEmpty()) {
-      this.constants.putAll(constants);
-    }
-    initVariables(rawvariables);
-
+  public AbstractExpression(ExpressionAttributes attr) {
+    this.type = attr.getType();
+    this.defaultValue = attr.getDefaultValue();
+    this.required = attr.isRequired();
+    this.hl7specs = attr.getSpecs();
+    this.condition = attr.getFilter();
+    this.constants = attr.getConstants();
+    this.variables = attr.getVariables();
 
   }
 
 
-
-  private void initVariables(Map<String, String> rawvariables) {
-    this.variables = new ArrayList<>();
-    if (rawvariables != null) {
-      for (Entry<String, String> e : rawvariables.entrySet()) {
-        this.variables.add(VariableGenerator.parse(e.getKey(), e.getValue()));
-      }
-
-    }
-  }
 
   @Override
   public String getType() {
@@ -118,7 +80,6 @@ public abstract class AbstractExpression implements Expression {
 
 
 
-
   /**
    * Evaluates the expression and generated single or multiple resources based on the expression
    * values. If expression (reference and resource) ends with * then for that expression a the
@@ -136,32 +97,31 @@ public abstract class AbstractExpression implements Expression {
     EvaluationResult result;
     try {
       LOGGER.debug("Started Evaluating expression {} ", this);
-    Map<String, EvaluationResult> localContextValues = new HashMap<>(contextValues);
-    if (!baseValue.isEmpty()) {
-      localContextValues.put(baseValue.getIdentifier(), baseValue);
-    }
-    this.constants.entrySet().forEach(e -> localContextValues.put(e.getKey(),
-        EvaluationResultFactory.getEvaluationResult(e.getValue())));
-    if (this.isMultiple()) {
-      result = evaluateMultiple(dataSource, localContextValues, baseValue);
-    } else {
-      result = evaluateSingle(dataSource, localContextValues, baseValue);
-    }
+      Map<String, EvaluationResult> localContextValues = new HashMap<>(contextValues);
+      if (!baseValue.isEmpty()) {
+        localContextValues.put(baseValue.getIdentifier(), baseValue);
+      }
+      this.constants.entrySet().forEach(e -> localContextValues.put(e.getKey(),
+          EvaluationResultFactory.getEvaluationResult(e.getValue())));
+      if (this.isMultiple()) {
+        result = evaluateMultiple(dataSource, localContextValues, baseValue);
+      } else {
+        result = evaluateSingle(dataSource, localContextValues, baseValue);
+      }
 
       LOGGER.debug("Completed Evaluating the expression {} returned result {}", this, result);
-    if (this.isRequired() && (result == null || result.isEmpty())) {
-      String stringRep = this.toString();
-      RuntimeException e = new RequiredConstraintFailureException(
-          "Failure in Evaluating expression   :" + stringRep);
+      if (this.isRequired() && (result == null || result.isEmpty())) {
+        String stringRep = this.toString();
+        RuntimeException e = new RequiredConstraintFailureException(
+            "Failure in Evaluating expression   :" + stringRep);
         LOGGER.warn("Failure encountered during evaluation of expression {} , exception {}", this,
             e);
-      throw e;
-    } else {
-      return result;
-    }
+        throw e;
+      } else {
+        return result;
+      }
     } catch (DataExtractionException | IllegalArgumentException e) {
-      LOGGER.warn("Failure encountered during evaluation of expression {} , exception {}", this,
-          e);
+      LOGGER.warn("Failure encountered during evaluation of expression {} , exception {}", this, e);
       return null;
     }
   }
@@ -205,13 +165,12 @@ public abstract class AbstractExpression implements Expression {
 
       }
     } else {
-      EvaluationResult gen =
-          generateValue(dataSource, contextValues, baseinputValue);
+      EvaluationResult gen = generateValue(dataSource, contextValues, baseinputValue);
       if (gen != null && gen.getValue() != null && !gen.isEmpty()) {
         result.add(gen.getValue());
         additionalresourcesresult.addAll(gen.getAdditionalResources());
 
-    }
+      }
 
     }
 
@@ -233,8 +192,7 @@ public abstract class AbstractExpression implements Expression {
     if (this.getspecs() == null || this.getspecs().isEmpty()) {
       specValues = baseinputValue;
     } else {
-      specValues =
-        SpecificationUtil.extractMultipleValuesForSpec(this.getspecs(), dataSource,
+      specValues = SpecificationUtil.extractMultipleValuesForSpec(this.getspecs(), dataSource,
           ImmutableMap.copyOf(contextValues));
     }
 
@@ -261,8 +219,7 @@ public abstract class AbstractExpression implements Expression {
 
     if (this.isConditionSatisfied(localContextValues)) {
       EvaluationResult gen =
-          evaluateExpression(dataSource, ImmutableMap.copyOf(localContextValues),
-              baseValue);
+          evaluateExpression(dataSource, ImmutableMap.copyOf(localContextValues), baseValue);
       // Use the default value if the generated value is null and provided default value is not
       // null
       if (gen == null && this.getDefaultValue() != null && !this.getDefaultValue().isEmpty()) {
@@ -313,7 +270,6 @@ public abstract class AbstractExpression implements Expression {
 
 
 
-
   @Override
   public boolean isConditionSatisfied(Map<String, EvaluationResult> contextValues) {
     if (this.condition != null) {
@@ -329,39 +285,12 @@ public abstract class AbstractExpression implements Expression {
 
 
 
-
-  private static List<Specification> getSpecList(String inputString, boolean useGroup) {
-    final boolean extractMultiple;
-    String hl7SpecExpression = inputString;
-    if (StringUtils.endsWith(inputString, "*")) {
-      hl7SpecExpression = StringUtils.removeEnd(inputString, "*");
-      extractMultiple = true;
-    } else {
-      extractMultiple = false;
-    }
-
-    hl7SpecExpression = StringUtils.strip(hl7SpecExpression);
-    List<Specification> specs = new ArrayList<>();
-    if (StringUtils.isNotBlank(hl7SpecExpression)) {
-      StringTokenizer st = new StringTokenizer(hl7SpecExpression, "|").setIgnoreEmptyTokens(true)
-          .setTrimmerMatcher(StringMatcherFactory.INSTANCE.spaceMatcher());
-      st.getTokenList()
-          .forEach(s -> specs.add(SpecificationParser.parse(s, extractMultiple, useGroup)));
-    }
-
-    return specs;
-  }
-
   @Override
   public Map<String, String> getConstants() {
     return this.constants;
   }
 
 
-
-  public boolean isUseGroup() {
-    return useGroup;
-  }
 
   protected static String getGroupId(Map<String, EvaluationResult> localContext) {
     EvaluationResult result = localContext.get(Constants.GROUP_ID);

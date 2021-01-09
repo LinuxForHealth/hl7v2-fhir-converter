@@ -18,10 +18,9 @@ public class FHIRResourceMapper {
   private static FHIRResourceMapper fhirResourceMapper;
 
   private Map<String, String> resourceMapping;
+
   private FHIRResourceMapper() {
-    String resource =
-        ResourceReader.getInstance()
-            .getResource(Constants.RESOURCE_MAPPING_PATH);
+    String resource = ResourceReader.getInstance().getResource(Constants.RESOURCE_MAPPING_PATH);
     try {
       resourceMapping = ObjectMapperUtil.getYAMLInstance().readValue(resource, Map.class);
     } catch (JsonProcessingException e) {
@@ -29,7 +28,6 @@ public class FHIRResourceMapper {
           "Cannot read resource mapping file fhir/resourcemapping.yml ", e);
     }
   }
-
 
 
 
@@ -44,12 +42,12 @@ public class FHIRResourceMapper {
         return (Class<? extends Resource>) ClassUtils.getClass(resourceName);
       } catch (ClassNotFoundException e) {
         throw new IllegalStateException(
-            "Resource type not mapped in FHIRResourceMapper , resource name" + name, e);
+            "Resource type not mapped in FHIRResourceMapper , resource name: " + name, e);
       }
     } else {
 
       throw new IllegalStateException(
-          "Resource type not mapped in FHIRResourceMapper , resource name" + name);
+          "Resource type not mapped in FHIRResourceMapper , resource name: " + name);
     }
 
   }

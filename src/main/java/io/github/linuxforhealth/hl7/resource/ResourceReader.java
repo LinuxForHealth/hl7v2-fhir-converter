@@ -18,6 +18,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.google.common.base.Preconditions;
 import io.github.linuxforhealth.api.ResourceModel;
 import io.github.linuxforhealth.core.Constants;
 import io.github.linuxforhealth.core.ObjectMapperUtil;
@@ -42,6 +43,7 @@ public class ResourceReader {
 
   /**
    * Loads a file resource configuration, returning a String
+   * 
    * @param fileResourceConfiguration The configuration resource to load
    * @return String
    * @throws IOException if an error occurs loading the file resource
@@ -52,6 +54,7 @@ public class ResourceReader {
 
   /**
    * Loads a class path configuration resource, returning a String
+   * 
    * @param resourceConfigurationPath The class path configuration resource
    * @return String the resource content
    * @throws IOException if an error occurs loading the configuration resource
@@ -62,9 +65,10 @@ public class ResourceReader {
   }
 
   /**
-   * Loads a file based resource using a two pass approach.
-   * The first pass attempts to load the resource from the file system.
-   * if the file is not found on the file system, the resource is loaded from the classpath.
+   * Loads a file based resource using a two pass approach. The first pass attempts to load the
+   * resource from the file system. if the file is not found on the file system, the resource is
+   * loaded from the classpath.
+   * 
    * @param resourcePath The relative path to the resource (hl7/, fhir/, etc)
    * @return The resource as a String
    */
@@ -106,9 +110,8 @@ public class ResourceReader {
     if (StringUtils.isNotBlank(templateFileContent)) {
       try {
 
-        HL7MessageModel rm =
-            ObjectMapperUtil.getYAMLInstance().readValue(templateFileContent,
-                HL7MessageModel.class);
+        HL7MessageModel rm = ObjectMapperUtil.getYAMLInstance().readValue(templateFileContent,
+            HL7MessageModel.class);
         rm.setMessageName(templateName);
         return rm;
       } catch (IOException e) {
@@ -122,25 +125,21 @@ public class ResourceReader {
   }
 
   public ResourceModel generateResourceModel(String path) {
-
+    Preconditions.checkArgument(StringUtils.isNotBlank(path), "Path for resource cannot be blank");
     String templateFileContent = getResourceInHl7Folder(path + ".yml");
 
-    if (StringUtils.isNotBlank(templateFileContent)) {
-      try {
-        HL7DataBasedResourceModel rm = ObjectMapperUtil.getYAMLInstance()
-            .readValue(templateFileContent, HL7DataBasedResourceModel.class);
-        if (StringUtils.isBlank(rm.getName())
-            || StringUtils.equalsIgnoreCase(rm.getName(), "unknown")) {
-          rm.setName(path);
-        }
-        return rm;
-      } catch (IOException e) {
-        throw new IllegalArgumentException("Error encountered in processing the template" + path,
-            e);
+    try {
+      HL7DataBasedResourceModel rm = ObjectMapperUtil.getYAMLInstance()
+          .readValue(templateFileContent, HL7DataBasedResourceModel.class);
+      if (StringUtils.isBlank(rm.getName())
+          || StringUtils.equalsIgnoreCase(rm.getName(), "unknown")) {
+        rm.setName(path);
       }
-    } else {
-      throw new IllegalArgumentException("File not present:" + path);
+      return rm;
+    } catch (IOException e) {
+      throw new IllegalArgumentException("Error encountered in processing the template" + path, e);
     }
+
 
   }
 

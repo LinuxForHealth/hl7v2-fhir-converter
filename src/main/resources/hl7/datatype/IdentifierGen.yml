@@ -16,7 +16,7 @@ value:
 
 period:  
     resource: datatype/Period
-    var: 
+    vars: 
        start: $start
        end: $end
   

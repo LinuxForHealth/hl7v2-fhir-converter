@@ -23,7 +23,7 @@ status:
 
 class:
     resource: datatype/Coding
-    varss:
+    vars:
        code: PV1.2
 
 type:

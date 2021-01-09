@@ -6,14 +6,12 @@
 package io.github.linuxforhealth.hl7.expression;
 
 import java.util.Map;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import io.github.linuxforhealth.api.EvaluationResult;
@@ -42,47 +40,15 @@ public class ResourceExpression extends AbstractExpression {
   private boolean isGenerateMultipleResource;
 
 
-  /**
-   * 
-   * @param type
-   * @param resourceToGenerate
-   * @param specs
-   * @param defaultValue
-   * @param required
-   * @param variables
-   * @param condition
-   * @param constants
-   * @param useGroup
-   */
-  @JsonCreator
-  public ResourceExpression(@JsonProperty(TemplateFieldNames.TYPE) String type,
-      @JsonProperty(TemplateFieldNames.RESOURCE) String resourceToGenerate,
-      @JsonProperty(TemplateFieldNames.SPEC) String specs,
-      @JsonProperty(TemplateFieldNames.DEFAULT_VALUE) String defaultValue,
-      @JsonProperty(TemplateFieldNames.REQUIRED) boolean required,
-      @JsonProperty(TemplateFieldNames.VARIABLES) Map<String, String> variables,
-      @JsonProperty(TemplateFieldNames.CONDITION) String condition,
-      @JsonProperty(TemplateFieldNames.CONSTANTS) Map<String, String> constants,
-      @JsonProperty(TemplateFieldNames.USE_GROUP) boolean useGroup) {
-    super(type, defaultValue, required, specs, variables, condition, constants, useGroup);
 
-    Preconditions.checkArgument(StringUtils.isNotBlank(resourceToGenerate),
-        "reference cannot be blank");
-    if (resourceToGenerate.endsWith("*")) {
-      this.isGenerateMultipleResource = true;
-      resourceToGenerate = StringUtils.removeEnd(resourceToGenerate, "*");
-    }
-    this.resourceToGenerate = StringUtils.strip(resourceToGenerate);
+  @JsonCreator
+  public ResourceExpression(ExpressionAttributes expAttr) {
+    super(expAttr);
+    isGenerateMultipleResource = expAttr.isGenerateMultipleResource();
+    this.resourceToGenerate = expAttr.getResourceToGenerate();
     this.data = (HL7DataBasedResourceModel) ResourceReader.getInstance()
         .generateResourceModel(this.resourceToGenerate);
-    Preconditions.checkState(this.data != null, "Resource reference model cannot be null");
-
-
-  }
-
-
-  public ResourceExpression(String type, String resourceToGenerate, String hl7spec) {
-    this(type, resourceToGenerate, hl7spec, null, false, null, null, null, false);
+    Preconditions.checkState(this.data != null, "Resource model cannot be null");
   }
 
 
@@ -109,9 +75,8 @@ public class ResourceExpression extends AbstractExpression {
       LOGGER.debug("Evaluated expression {}, returning {} ", this.resourceToGenerate,
           resolvedvalues);
       if (resolvedvalues != null) {
-        evaluationResult =
-            EvaluationResultFactory.getEvaluationResult(resolvedvalues.getResource(),
-                result.getAdditionalResources());
+        evaluationResult = EvaluationResultFactory.getEvaluationResult(resolvedvalues.getResource(),
+            result.getAdditionalResources());
       }
     }
 
@@ -134,7 +99,7 @@ public class ResourceExpression extends AbstractExpression {
         .append(TemplateFieldNames.TYPE, this.getClass().getSimpleName())
         .append(TemplateFieldNames.SPEC, this.getspecs()).append("isMultiple", this.isMultiple())
         .append(TemplateFieldNames.VARIABLES, this.getVariables())
-        .append(TemplateFieldNames.USE_GROUP, this.isUseGroup())
+        // .append(TemplateFieldNames.USE_GROUP, this.isUseGroup())
         .append(TemplateFieldNames.RESOURCE, this.resourceToGenerate).build();
   }
 

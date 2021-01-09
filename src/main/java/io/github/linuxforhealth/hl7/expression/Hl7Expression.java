@@ -11,7 +11,6 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Preconditions;
 import io.github.linuxforhealth.api.EvaluationResult;
 import io.github.linuxforhealth.api.InputDataExtractor;
@@ -32,31 +31,12 @@ import io.github.linuxforhealth.hl7.resource.deserializer.TemplateFieldNames;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Hl7Expression extends AbstractExpression {
-  public Hl7Expression(String type, String hl7spec) {
-    this(type, hl7spec, null, false, null, null, null, false);
-  }
 
-  /**
-   * 
-   * @param type
-   * @param specs
-   * @param defaultValue
-   * @param required
-   * @param variables
-   * @param condition
-   * @param constants
-   * @param useGroup
-   */
+
   @JsonCreator
-  public Hl7Expression(@JsonProperty(TemplateFieldNames.TYPE) String type,
-      @JsonProperty(TemplateFieldNames.SPEC) String specs,
-      @JsonProperty(TemplateFieldNames.DEFAULT_VALUE) String defaultValue,
-      @JsonProperty(TemplateFieldNames.REQUIRED) boolean required,
-      @JsonProperty(TemplateFieldNames.VARIABLES) Map<String, String> variables,
-      @JsonProperty(TemplateFieldNames.CONDITION) String condition,
-      @JsonProperty(TemplateFieldNames.CONSTANTS) Map<String, String> constants,
-      @JsonProperty(TemplateFieldNames.USE_GROUP) boolean useGroup) {
-    super(type, defaultValue, required, specs, variables, condition, constants, useGroup);
+  public Hl7Expression(ExpressionAttributes expAttr) {
+    super(expAttr);
+
 
   }
 
@@ -87,7 +67,6 @@ public class Hl7Expression extends AbstractExpression {
     return new ToStringBuilder(this)
         .append(TemplateFieldNames.TYPE, this.getClass().getSimpleName())
         .append(TemplateFieldNames.SPEC, this.getspecs()).append("isMultiple", this.isMultiple())
-        .append(TemplateFieldNames.VARIABLES, this.getVariables())
-        .toString();
+        .append(TemplateFieldNames.VARIABLES, this.getVariables()).toString();
   }
 }

@@ -28,7 +28,7 @@ import io.github.linuxforhealth.core.exception.RequiredConstraintFailureExceptio
 import io.github.linuxforhealth.core.resource.ResourceResult;
 import io.github.linuxforhealth.core.resource.SimpleResourceValue;
 import io.github.linuxforhealth.hl7.expression.Hl7Expression;
-import io.github.linuxforhealth.hl7.expression.JELXExpression;
+import io.github.linuxforhealth.hl7.expression.JEXLExpression;
 import io.github.linuxforhealth.hl7.expression.ReferenceExpression;
 import io.github.linuxforhealth.hl7.expression.ResourceExpression;
 import io.github.linuxforhealth.hl7.expression.SimpleExpression;
@@ -121,7 +121,7 @@ public class HL7DataBasedResourceModel implements ResourceModel {
 
 
       Map<String, Expression> jexlExp =
-          expressionMap.entrySet().stream().filter(e -> (e.getValue() instanceof JELXExpression))
+          expressionMap.entrySet().stream().filter(e -> (e.getValue() instanceof JEXLExpression))
               .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
       // initialize the map and list to collect values
