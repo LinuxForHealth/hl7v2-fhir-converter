@@ -60,7 +60,39 @@ public class ResourceExpressionTest {
 
 
   @Test
-  public void test1_segment_required_missing() throws IOException {
+  public void test_component_required_missing() throws IOException {
+    String message = "MSH|^~\\&|hl7Integration|hl7Integration|||||ADT^A01|||2.3|\r"
+        + "EVN|A01|20130617154644\r"
+        + "PID|1|465 306 5961||407623|Wood^Patrick^^^MR||19700101|female|||High Street^^Oxford^^Ox1 4DP~George St^^Oxford^^Ox1 5AP|||||||\r"
+        + "NK1|1|Wood^John^^^MR|Father||999-9999\r" + "NK1|2|Jones^Georgie^^^MSS|MOTHER||999-9999\r"
+        + "PV1|1||Location||||||||||||||||261938_6_201306171546|||||||||||||||||||||||||20130617134644|||||||||";
+
+    Message hl7message = getMessage(message);
+    HL7DataExtractor hl7DTE = new HL7DataExtractor(hl7message);
+
+    Structure s = hl7DTE.getStructure("PID", 0).getValue();
+    ExpressionAttributes attr = new ExpressionAttributes.Builder().withSpecs("PID.3")
+        .withValueOf("datatype/Identifier").build();
+
+    ResourceExpression exp = new ResourceExpression(attr);
+    assertThat(exp.getData()).isNotNull();
+
+
+    Map<String, EvaluationResult> context = new HashMap<>();
+
+    EvaluationResult value = exp.evaluate(new HL7MessageData(hl7DTE), ImmutableMap.copyOf(context),
+        new SimpleEvaluationResult(s));
+
+    assertThat(value).isNull();
+
+
+
+  }
+
+
+  @Test
+  public void test_picks_next_value_from_rep_if_first_fails_condition_or_check()
+      throws IOException {
     String message = "MSH|^~\\&|hl7Integration|hl7Integration|||||ADT^A01|||2.3|\r"
         + "EVN|A01|20130617154644\r"
         + "PID|1|465 306 5961|^^^MR^SSS^^20091020^20200101~000010017^^^MR~000010018^^^MR|407623|Wood^Patrick^^^MR||19700101|female|||High Street^^Oxford^^Ox1 4DP~George St^^Oxford^^Ox1 5AP|||||||\r"
@@ -83,7 +115,11 @@ public class ResourceExpressionTest {
     EvaluationResult value = exp.evaluate(new HL7MessageData(hl7DTE), ImmutableMap.copyOf(context),
         new SimpleEvaluationResult(s));
 
-    assertThat(value).isNull();
+    assertThat(value).isNotNull();
+    Map<String, Object> result = (Map<String, Object>) value.getValue();
+    assertThat(result.get("use")).isEqualTo(null);
+    assertThat(result.get("value")).isEqualTo("000010017");
+    assertThat(result.get("system")).isEqualTo("MR");
 
 
 

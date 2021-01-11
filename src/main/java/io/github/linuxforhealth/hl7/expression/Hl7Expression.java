@@ -80,7 +80,7 @@ public class Hl7Expression extends AbstractExpression {
             resolvedValues.add(data);
           }
 
-          if (!this.getExpressionAttr().isGenerateMultiple()) {
+          if (!this.getExpressionAttr().isGenerateMultiple() && !resolvedValues.isEmpty()) {
             break;
           }
         }

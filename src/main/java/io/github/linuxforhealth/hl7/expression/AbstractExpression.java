@@ -149,6 +149,7 @@ public abstract class AbstractExpression implements Expression {
       for (Object o : baseSpecvalues) {
         EvaluationResult gen = generateValue(dataSource, contextValues,
             EvaluationResultFactory.getEvaluationResult(o));
+
         if (gen != null && gen.getValue() != null && !gen.isEmpty()) {
           if (gen.getValue() instanceof List) {
             result.addAll(gen.getValue());
@@ -158,7 +159,7 @@ public abstract class AbstractExpression implements Expression {
           additionalresourcesresult.addAll(gen.getAdditionalResources());
         }
 
-        if (!this.attr.isGenerateMultiple()) {
+        if (!this.attr.isGenerateMultiple() && !result.isEmpty()) {
           break;
         }
 
