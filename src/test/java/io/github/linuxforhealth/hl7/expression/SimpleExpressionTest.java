@@ -64,12 +64,10 @@ public class SimpleExpressionTest {
 
   @Test
   public void test_variable_no_context() {
-    ExpressionAttributes attr = new ExpressionAttributes.Builder().withValue("$var1").build();
+    ExpressionAttributes attr = new ExpressionAttributes.Builder().withValueOf("$var1").build();
     SimpleExpression exp = new SimpleExpression(attr);
 
     Map<String, EvaluationResult> context = new HashMap<>();
-
-
 
     EvaluationResult value =
         exp.evaluate(data, ImmutableMap.copyOf(context), new EmptyEvaluationResult());
@@ -85,7 +83,7 @@ public class SimpleExpressionTest {
 
     EvaluationResult value =
         exp.evaluate(data, ImmutableMap.copyOf(context), new EmptyEvaluationResult());
-    assertThat((String) value.getValue()).isEqualTo("");
+    assertThat(value).isNull();
   }
 
 }

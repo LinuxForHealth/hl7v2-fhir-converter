@@ -95,7 +95,7 @@ public class HL7DataExtractor {
     } catch (HL7Exception | IllegalArgumentException | ArrayIndexOutOfBoundsException e) {
       String spec = group + " " + groupRep + " " + segment;
       LOGGER.warn(CANNOT_EXTRACT_VALUE + spec + " rep:" + rep, e);
-        return new Hl7ParsingStructureResult(new ArrayList<>());
+      return new Hl7ParsingStructureResult(new ArrayList<>());
 
     }
   }
@@ -128,7 +128,7 @@ public class HL7DataExtractor {
     } catch (HL7Exception | IllegalArgumentException | ArrayIndexOutOfBoundsException e) {
       String spec = group + " " + groupRep + " " + segment;
       LOGGER.warn(CANNOT_EXTRACT_VALUE + spec, e);
-        return new Hl7ParsingStructureResult(new ArrayList<>());
+      return new Hl7ParsingStructureResult(new ArrayList<>());
 
     }
   }
@@ -144,8 +144,11 @@ public class HL7DataExtractor {
       return s != null;
 
 
-    } catch (IllegalArgumentException | HL7Exception | ArrayIndexOutOfBoundsException e) {
-      LOGGER.warn("Failure in checking if segment exsts: {}", spec, e);
+    } catch (IllegalArgumentException | HL7Exception e) {
+      LOGGER.warn("Failure in checking if segment exists: {}", spec, e);
+      return false;
+    } catch (ArrayIndexOutOfBoundsException e) {
+      LOGGER.info("segment does not exists : {}, reason {}", spec, e.getMessage());
       return false;
     }
   }
@@ -161,8 +164,11 @@ public class HL7DataExtractor {
       return s != null;
 
 
-    } catch (IllegalArgumentException | HL7Exception | ArrayIndexOutOfBoundsException e) {
+    } catch (IllegalArgumentException | HL7Exception e) {
       LOGGER.warn("Failure in checking if segment exsts: {}", spec, e);
+      return false;
+    } catch (ArrayIndexOutOfBoundsException e) {
+      LOGGER.info("segment does not exists : {}, reason {}", spec, e.getMessage());
       return false;
     }
   }
@@ -183,10 +189,13 @@ public class HL7DataExtractor {
         parsingResult = new Hl7ParsingStructureResult(new ArrayList<>());
       }
       return parsingResult;
-    } catch (HL7Exception | IllegalArgumentException | ArrayIndexOutOfBoundsException e) {
+    } catch (HL7Exception | IllegalArgumentException e) {
       LOGGER.warn(CANNOT_EXTRACT_VALUE + structure + " rep:" + rep, e);
-        return new Hl7ParsingStructureResult(new ArrayList<>());
-
+      return new Hl7ParsingStructureResult(new ArrayList<>());
+    } catch (ArrayIndexOutOfBoundsException e) {
+      LOGGER.info("Segment does not exists : {}, reason {}", structure + " rep:" + rep,
+          e.getMessage());
+      return new Hl7ParsingStructureResult(new ArrayList<>());
     }
   }
 
@@ -208,7 +217,7 @@ public class HL7DataExtractor {
       return parsingResult;
     } catch (HL7Exception | IllegalArgumentException | ArrayIndexOutOfBoundsException e) {
       LOGGER.warn(CANNOT_EXTRACT_VALUE + structure, e);
-        return new Hl7ParsingStructureResult(new ArrayList<>());
+      return new Hl7ParsingStructureResult(new ArrayList<>());
 
     }
   }
@@ -227,7 +236,7 @@ public class HL7DataExtractor {
     } catch (HL7Exception | IllegalArgumentException | ArrayIndexOutOfBoundsException e) {
 
       LOGGER.warn(CANNOT_EXTRACT_VALUE + segment, e);
-        return new Hl7ParsingTypeResult(new ArrayList<>());
+      return new Hl7ParsingTypeResult(new ArrayList<>());
 
     }
   }
@@ -244,10 +253,18 @@ public class HL7DataExtractor {
 
       return new Hl7ParsingTypeResult(Lists.newArrayList(fields));
 
-    } catch (HL7Exception | IllegalArgumentException | ArrayIndexOutOfBoundsException e) {
+    } catch (HL7Exception | IllegalArgumentException e) {
 
       LOGGER.warn(CANNOT_EXTRACT_VALUE + segment, e);
-        return new Hl7ParsingTypeResult(new ArrayList<>());
+      return new Hl7ParsingTypeResult(new ArrayList<>());
+
+
+    }
+
+    catch (ArrayIndexOutOfBoundsException e) {
+
+      LOGGER.info("Component does not exists segment {} field {}, reason {}" + segment, field, e);
+      return new Hl7ParsingTypeResult(new ArrayList<>());
 
 
     }
@@ -275,10 +292,14 @@ public class HL7DataExtractor {
       }
       return result;
 
-    } catch (HL7Exception | IllegalArgumentException | ArrayIndexOutOfBoundsException e) {
 
+    } catch (IllegalArgumentException | HL7Exception e) {
       LOGGER.warn(CANNOT_EXTRACT_VALUE + component, e);
-        return new Hl7ParsingTypeResult(new ArrayList<>());
+      return new Hl7ParsingTypeResult(new ArrayList<>());
+
+    } catch (ArrayIndexOutOfBoundsException e) {
+      LOGGER.info("Component does not exists {}, reason {}", component, e.getMessage());
+      return new Hl7ParsingTypeResult(new ArrayList<>());
 
     }
   }
@@ -298,9 +319,13 @@ public class HL7DataExtractor {
         result = new Hl7ParsingTypeResult(new ArrayList<>());
       }
       return result;
-    } catch (IllegalArgumentException | HL7Exception | ArrayIndexOutOfBoundsException e) {
+    } catch (IllegalArgumentException | HL7Exception e) {
       LOGGER.warn(CANNOT_EXTRACT_VALUE + component, e);
-        return new Hl7ParsingTypeResult(new ArrayList<>());
+      return new Hl7ParsingTypeResult(new ArrayList<>());
+
+    } catch (ArrayIndexOutOfBoundsException e) {
+      LOGGER.info("Component does not exists {}, reason {}", component, e.getMessage());
+      return new Hl7ParsingTypeResult(new ArrayList<>());
 
     }
   }
@@ -337,9 +362,14 @@ public class HL7DataExtractor {
     try {
       return new Hl7ParsingStringResult(getTerser().get("/" + segment + "-" + field));
 
-    } catch (HL7Exception | IllegalArgumentException | ArrayIndexOutOfBoundsException e) {
-      LOGGER.error(HL7_STRING, segment + "-" + field + e.getMessage());
+    } catch (HL7Exception | IllegalArgumentException e) {
+      LOGGER.warn(HL7_STRING, segment + "-" + field + " reason: " + e.getMessage());
       LOGGER.debug(HL7_STRING, segment + "-" + field, e);
+      return new Hl7ParsingStringResult(null);
+
+
+    } catch (ArrayIndexOutOfBoundsException e) {
+      LOGGER.info(HL7_STRING, segment + "-" + field + " reason: " + e.getMessage());
       return new Hl7ParsingStringResult(null);
 
     }
@@ -349,7 +379,8 @@ public class HL7DataExtractor {
     try {
       return getTerser().get("/MSH-10");
     } catch (HL7Exception | IllegalArgumentException e) {
-      LOGGER.warn("Cannot extract message control id", e);
+      LOGGER.warn("Cannot extract message control id, reason {} ", e.getMessage());
+      LOGGER.debug("Cannot extract message control id", e);
       return null;
     }
   }
@@ -378,7 +409,7 @@ public class HL7DataExtractor {
       return parsingResult;
     } catch (HL7Exception | IllegalArgumentException | ArrayIndexOutOfBoundsException e) {
       LOGGER.warn(CANNOT_EXTRACT_VALUE + struct, e);
-        return new Hl7ParsingStructureResult(new ArrayList<>());
+      return new Hl7ParsingStructureResult(new ArrayList<>());
 
     }
   }

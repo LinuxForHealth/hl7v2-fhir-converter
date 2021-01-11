@@ -7,67 +7,83 @@
 resourceType: Encounter
 id:
   type: STRING
-  evaluate: 'UUID.randomUUID()'
+  valueOf: 'UUID.randomUUID()'
+  expressionType: JEXL
 
 identifier:
-    resource: datatype/Identifier *
+    valueOf: datatype/Identifier
+    generateList: true
+    expressionType: resource
     specs: PV1.19
 
 status:
     type: STRING
-    evaluate: 'GeneralUtils.getEncounterStatus(vars1,vars2,vars3)'
+    valueOf: 'GeneralUtils.getEncounterStatus(vars1,vars2,vars3)'
+    expressionType: JEXL
     vars: 
       vars1: String, PV1.45
       vars2: String, PV1.44
       vars3: String, PV2.16
 
 class:
-    resource: datatype/Coding
+    valueOf: datatype/Coding
+    expressionType: resource
     vars:
        code: PV1.2
 
 type:
-   resource: datatype/CodeableConcept *
+   valueOf: datatype/CodeableConcept
+   generateList: true
+   expressionType: resource
    specs: PV1.4 | PV1.18
 
 
 serviceType:
-   resource: datatype/CodeableConcept
+   valueOf: datatype/CodeableConcept
+   expressionType: resource
    specs: PV1.10
 
 
 priority:
-   resource: datatype/CodeableConcept
+   valueOf: datatype/CodeableConcept
+   expressionType: resource
    specs: PV2.25
 
 
 episodeOfCare:
    type: STRING
-   specs: PV1.54 | PV1.53
+   valueOf: PV1.54 | PV1.53
+   expressionType: HL7Spec
 
 period: 
-    resource: datatype/Period
+    valueOf: datatype/Period
+    expressionType: resource
     vars: 
        start: PV1.44
        end: PV1.45
 
 length:
-    resource: datatype/Duration
+    valueOf: datatype/Duration
+    expressionType: resource
     vars: 
       time1: DATE_TIME, PV1.44
       time2: DATE_TIME, PV1.45
 
 reasonCode:
-    resource: datatype/CodeableConcept *
+    valueOf: datatype/CodeableConcept
+    generateList: true
+    expressionType: resource
     specs: EVN.4 | PV2.3
 
 
 
 hospitalization:
-    resource: secondary/Hospitalization
+    valueOf: secondary/Hospitalization
+    expressionType: resource
 
 subject:
-    resource: datatype/Reference
+    valueOf: datatype/Reference
+    expressionType: resource
     specs: $Patient
 
 

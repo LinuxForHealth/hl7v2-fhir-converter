@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2020
+ * (C) Copyright IBM Corp. 2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -12,14 +12,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.EnumUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.text.StringTokenizer;
 import org.apache.commons.text.matcher.StringMatcherFactory;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import io.github.linuxforhealth.api.Condition;
-import io.github.linuxforhealth.api.EvaluationResult;
-import io.github.linuxforhealth.api.Expression;
 import io.github.linuxforhealth.api.Specification;
 import io.github.linuxforhealth.api.Variable;
 import io.github.linuxforhealth.core.Constants;
@@ -35,37 +37,26 @@ public class ExpressionAttributes {
 
   // Basic properties of an expression
   private String type;
-  private EvaluationResult defaultValue;
+  private String defaultValue;
   private boolean isRequired;
   private List<Specification> specs;
   private List<Variable> variables;
-  private Condition filter; // filter is applies to the specs, spec values that pass the condition
+  private Condition condition; // filter is applies to the specs, spec values that pass the condition
                             // are used for evaluating the expression.
   private Map<String, String> constants;
-
-
-  // Specific expression properties
-  // Property specific to JEXLExpression
-  private String evaluate;
-
-  // Property specific to ReferenceExpression
-  private String referenceResource;
-
-  // Property specific to ResourceExpression
-  private String resourceToGenerate;
-
-  // Property specific to ResourceExpression and ReferenceExpression
-  private boolean isGenerateMultipleResource;
-
-
-
-  // Property specific to SimpleExpression
   private String value;
+  private String valueOf;
+  private boolean useGroup;
+  private ExpressionType expressionType;
+  private String toString;
+
+  // if valueof attribute ends with * then list of values will be generated
+  private boolean generateMultiple;
+
+
 
   // Property specific to ValueExtractionGeneralExpression
   private ImmutablePair<String, String> fetch;
-  private boolean useGroup;
-  private Class<? extends Expression> expressionType;
 
   private ExpressionAttributes(Builder exBuilder) {
     if (exBuilder.type == null) {
@@ -73,16 +64,14 @@ public class ExpressionAttributes {
     } else {
       this.type = exBuilder.type;
     }
-    if (exBuilder.defaultValue != null) {
-      this.defaultValue = exBuilder.defaultValue;
-    } else {
-      this.defaultValue = null;
-    }
+
+    this.defaultValue = exBuilder.defaultValue;
+
 
     this.isRequired = exBuilder.isRequired;
     this.specs = getSpecList(exBuilder.rawSpecs, exBuilder.useGroup);
     if (StringUtils.isNotBlank(exBuilder.rawCondition)) {
-      this.filter = ConditionUtil.createCondition(exBuilder.rawCondition);
+      this.condition = ConditionUtil.createCondition(exBuilder.rawCondition);
     }
 
 
@@ -100,20 +89,18 @@ public class ExpressionAttributes {
 
     }
 
-    this.fetch = getPair(exBuilder.rawFetch);
+
     this.value = exBuilder.value;
-    this.resourceToGenerate = exBuilder.resourceToGenerate;
-    this.isGenerateMultipleResource = exBuilder.isGenerateMultipleResource;
-    this.evaluate = exBuilder.evaluate;
-    this.referenceResource = exBuilder.referenceResource;
+    this.valueOf = exBuilder.valueOf;
+    this.generateMultiple = exBuilder.generateList;
+
     this.value = exBuilder.value;
     this.expressionType = exBuilder.expressionType;
     this.useGroup = exBuilder.useGroup;
 
     if (this.expressionType == null && CollectionUtils.isNotEmpty(this.specs)) {
-      this.expressionType = Hl7Expression.class;
+      this.expressionType = ExpressionType.HL7SPEC;
     }
-
 
 
   }
@@ -129,7 +116,7 @@ public class ExpressionAttributes {
 
 
 
-  public EvaluationResult getDefaultValue() {
+  public String getDefaultValue() {
     return defaultValue;
   }
 
@@ -142,47 +129,31 @@ public class ExpressionAttributes {
 
 
   public List<Specification> getSpecs() {
-    return specs;
+    return ImmutableList.copyOf(specs);
   }
 
 
 
   public List<Variable> getVariables() {
-    return variables;
+    return ImmutableList.copyOf(variables);
   }
 
 
 
   public Condition getFilter() {
-    return filter;
+    return condition;
   }
 
 
 
   public Map<String, String> getConstants() {
-    return constants;
-  }
-
-  public String getEvaluate() {
-    return evaluate;
+    return ImmutableMap.copyOf(constants);
   }
 
 
 
-  public String getReferenceResource() {
-    return referenceResource;
-  }
-
-
-
-  public String getResourceToGenerate() {
-    return resourceToGenerate;
-  }
-
-
-
-  public boolean isGenerateMultipleResource() {
-    return isGenerateMultipleResource;
+  public boolean isGenerateMultiple() {
+    return generateMultiple;
   }
 
 
@@ -199,12 +170,17 @@ public class ExpressionAttributes {
 
 
 
-  public Class<? extends Expression> getExpressionType() {
+  public ExpressionType getExpressionType() {
     return expressionType;
   }
 
 
-  private static List<Specification> getSpecList(String inputString, boolean useGroup) {
+  public String getValueOf() {
+    return valueOf;
+  }
+
+
+  public static List<Specification> getSpecList(String inputString, boolean useGroup) {
     final boolean extractMultiple;
     String hl7SpecExpression = inputString;
     if (StringUtils.endsWith(inputString, "*")) {
@@ -244,6 +220,14 @@ public class ExpressionAttributes {
 
   }
 
+  @Override
+  public String toString() {
+    if (this.toString == null) {
+      this.toString = ReflectionToStringBuilder.toString(this);
+    }
+
+    return this.toString;
+  }
 
 
   public static class Builder {
@@ -251,41 +235,24 @@ public class ExpressionAttributes {
 
 
     private String type;
-    private EvaluationResult defaultValue;
+    private String defaultValue;
     private boolean isRequired;
     private String rawSpecs;
     private String rawCondition;
     private Map<String, String> rawVariables;
     private Map<String, String> constants;
     private boolean useGroup;
-    private Class<? extends Expression> expressionType;
-    // Specific expression properties
-    // Property specific to JEXLExpression
-    private String evaluate;
+    private ExpressionType expressionType;
 
-    // Property specific to ReferenceExpression
-    private String referenceResource;
-
-    // Property specific to ResourceExpression
-    private String resourceToGenerate;
-
-    // Property specific to ResourceExpression and ReferenceExpression
-    private boolean isGenerateMultipleResource;
-
-
-    // Property specific to SimpleExpression
+    private String valueOf;
     private String value;
-
-    // Property specific to ValueExtractionGeneralExpression
-    private String rawFetch;
-
-
+    private boolean generateList;
 
     public Builder() {}
 
     public Builder(String singleValue) {
       value = singleValue;
-      this.expressionType = SimpleExpression.class;
+      this.expressionType = ExpressionType.SIMPLE;
     }
 
     public boolean isUseGroup() {
@@ -299,7 +266,7 @@ public class ExpressionAttributes {
       return this;
     }
 
-    public Builder withDefault(EvaluationResult defaultValue) {
+    public Builder withDefault(String defaultValue) {
       this.defaultValue = defaultValue;
       return this;
     }
@@ -336,44 +303,34 @@ public class ExpressionAttributes {
       return this;
     }
 
-    public Builder withEvaluate(String evaluate) {
-      this.evaluate = evaluate;
-      this.expressionType = JEXLExpression.class;
-      return this;
-    }
+    public Builder withValueOf(String valueOf) {
 
-    public Builder withReference(String reference) {
-      if (reference.endsWith("*")) {
-        this.isGenerateMultipleResource = true;
-        reference = StringUtils.removeEnd(reference, "*");
+      this.valueOf = StringUtils.trim(valueOf);
+      if (this.expressionType == null) {
+        this.expressionType = ExpressionType.SIMPLE;
       }
-      this.referenceResource = StringUtils.strip(reference);
-      this.expressionType = ReferenceExpression.class;
+      return this;
+
+    }
+
+    public Builder withExpressionType(String expressionType) {
+      this.expressionType = EnumUtils.getEnumIgnoreCase(ExpressionType.class, expressionType);
       return this;
     }
 
-    public Builder withResource(String resourceToGenerate) {
-      if (resourceToGenerate.endsWith("*")) {
-        this.isGenerateMultipleResource = true;
-        resourceToGenerate = StringUtils.removeEnd(resourceToGenerate, "*");
-      }
-      this.resourceToGenerate = StringUtils.strip(resourceToGenerate);
-      this.expressionType = ResourceExpression.class;
 
-      return this;
-    }
 
     public Builder withValue(String value) {
       this.value = value;
-      this.expressionType = SimpleExpression.class;
+      this.expressionType = ExpressionType.SIMPLE;
       return this;
     }
 
-    public Builder withFetch(String fetch) {
-      this.rawFetch = fetch;
-      this.expressionType = ValueExtractionGeneralExpression.class;
+    public Builder withGenerateList(boolean generateList) {
+      this.generateList = generateList;
       return this;
     }
+
 
 
     public ExpressionAttributes build() {

@@ -8,7 +8,8 @@
 
 text: 
     type: STRING
-    evaluate: 'GeneralUtils.generateName( prefix, given,family, suffix)'
+    valueOf: 'GeneralUtils.generateName( prefix, given,family, suffix)'
+    expressionType: JEXL
     vars:
       prefix: STRING XPN.4 |XCN.5 |CNN.5|NDL.5
       given: STRING XPN.2 |XCN.3 |CNN.3|NDL.3
@@ -16,19 +17,25 @@ text:
       suffix: STRING XPN.5 |XCN.6 |CNN.6|NDL.6
 family:
      type: STRING
-     specs: XPN.1 | XCN.2 |CNN.2|NDL.2
+     valueOf: XPN.1 | XCN.2 |CNN.2|NDL.2
+     expressionType: HL7Spec
 given: 
      type: STRING
-     specs: XPN.2 | XCN.3 |CNN.3|NDL.3
+     valueOf: XPN.2 | XCN.3 |CNN.3|NDL.3
+     expressionType: HL7Spec
 prefix:
      type: STRING
-     specs: XPN.4 | XCN.5 |CNN.5|NDL.5
+     valueOf: XPN.4 | XCN.5 |CNN.5|NDL.5
+     expressionType: HL7Spec
 
 suffix: 
      type: STRING
-     specs: XPN.5 | XCN.6 |CNN.6|NDL.6
+     valueOf: XPN.5 | XCN.6 |CNN.6|NDL.6
+     expressionType: HL7Spec
+     
 period:
-    resource: datatype/Period
+    valueOf: datatype/Period
+    expressionType: resource
     vars:
        start: XPN.12 |XCN.19
        end: XPN.13 |XCN.20

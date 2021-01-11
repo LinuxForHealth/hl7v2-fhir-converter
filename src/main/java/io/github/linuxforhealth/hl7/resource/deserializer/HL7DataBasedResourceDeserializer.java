@@ -66,8 +66,8 @@ public class HL7DataBasedResourceDeserializer extends JsonDeserializer<HL7DataBa
 
         try {
           Constructor<?> ctor =
-              expAttr.getExpressionType().getConstructor(ExpressionAttributes.class);
-          e = (Expression) ctor.newInstance(new Object[] {expAttr});
+              expAttr.getExpressionType().getEvaluator().getConstructor(ExpressionAttributes.class);
+          e = (Expression) ctor.newInstance(expAttr);
 
         } catch (NoSuchMethodException | InstantiationException | IllegalAccessException
             | IllegalArgumentException | InvocationTargetException | SecurityException e1) {
@@ -82,6 +82,7 @@ public class HL7DataBasedResourceDeserializer extends JsonDeserializer<HL7DataBa
         LOGGER.info("deserialized {} expression type {}", entry, e);
 
       }
+
     }
     JsonNode namenode = node.get(RESOURCE_TYPE_FIELD_NAME);
     String name = "unknown";

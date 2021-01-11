@@ -7,11 +7,14 @@
 resourceType: Condition
 id:
   type: STRING
-  evaluate: 'UUID.randomUUID()'
+  valueOf: 'UUID.randomUUID()'
+  expressionType: JEXL
 
 
 category_x1:
-   resource: datatype/CodeableConcept_var *
+   valueOf: datatype/CodeableConcept_var
+   generateList: true
+   expressionType: resource
    condition:  $source NOT_NULL
    vars:     
      code: CONDITION_CATEGORY_CODES, $type
@@ -21,7 +24,9 @@ category_x1:
       type: problem-list-item
 
 category_x2:
-   resource: datatype/CodeableConcept_var *
+   valueOf: datatype/CodeableConcept_var
+   generateList: true
+   expressionType: resource
    condition:  $source NULL
    vars:     
      code: CONDITION_CATEGORY_CODES, $type
@@ -32,36 +37,48 @@ category_x2:
            
 
 severity:
-   resource: datatype/CodeableConcept *
+   valueOf: datatype/CodeableConcept
+   generateList: true
+   expressionType: resource
    specs: PRB.26
    vars:
      code: PRB.26
+     
 code:
-   resource: datatype/CodeableConcept *
+   valueOf: datatype/CodeableConcept
+   generateList: true
+   expressionType: resource
    specs: PRB.3
    vars:
      code: PRB.3
      
      
 encounter:
-    resource: datatype/Reference
+    valueOf: datatype/Reference
+    expressionType: resource
     specs: $Encounter
       
 subject:
-    resource: datatype/Reference
+    valueOf: datatype/Reference
+    expressionType: resource
     specs: $Patient
 
 onsetDateTime:
      type: DATE_TIME
-     specs: PRB.16 
+     valueOf: PRB.16 
+     expressionType: HL7Spec
 
 stage:
-   resource: secondary/Stage *
+   valueOf: secondary/Stage
+   generateList: true
+   expressionType: resource
    specs: PRB.14
    vars:
      code: PRB.14
 evidence:
-   resource: secondary/evidence *
+   valueOf: secondary/evidence
+   generateList: true
+   expressionType: resource
    specs: $Observation
    useGroup: true
 

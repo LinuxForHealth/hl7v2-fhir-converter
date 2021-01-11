@@ -8,12 +8,12 @@
 # coding requires code,display and system defined as variables from the resource that calls this resource
 
 coding:
-    type: ARRAY
-    value: $code
+    generateList: true
+    valueOf: $code
     condition: $code NOT_NULL
 
 text:  
-     value: $text
+     valueOf: $text
      condition: $text NOT_NULL
 
   

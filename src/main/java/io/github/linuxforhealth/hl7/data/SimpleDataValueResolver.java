@@ -35,7 +35,7 @@ public class SimpleDataValueResolver {
 
   public static final ValueExtractor<Object, String> DATE = (Object value) -> {
 
-      String val = Hl7DataHandlerUtil.getStringValue(value);
+    String val = Hl7DataHandlerUtil.getStringValue(value);
     if (val != null) {
       return DateUtil.formatToDate(val);
     }
@@ -72,7 +72,6 @@ public class SimpleDataValueResolver {
 
 
 
-
   public static final ValueExtractor<Object, URI> URI_VAL = (Object value) -> {
 
     try {
@@ -102,18 +101,16 @@ public class SimpleDataValueResolver {
         } else {
           return AdministrativeGender.UNKNOWN.toCode();
         }
-  };
-  
+      };
+
   public static final ValueExtractor<Object, String> OBSERVATION_STATUS_CODE_FHIR =
       (Object value) -> {
         String val = Hl7DataHandlerUtil.getStringValue(value);
         String code = getFHIRCode(val, ObservationStatus.class);
         if (code != null) {
           return code;
-        } else if (val == null) {
-          return ObservationStatus.NULL.toCode();
         } else {
-          return ObservationStatus.UNKNOWN.toCode();
+          return null;
         }
 
 
@@ -165,7 +162,7 @@ public class SimpleDataValueResolver {
       LOGGER.warn("Value {} for INTEGER is not a valid number so returning null.", value);
       return null;
     }
-    
+
   };
 
   public static final ValueExtractor<Object, Float> FLOAT = (Object value) -> {
@@ -175,10 +172,10 @@ public class SimpleDataValueResolver {
     }
     if (NumberUtils.isCreatable(val)) {
       return NumberUtils.createFloat(val);
-      } else {
+    } else {
       LOGGER.warn("Value {} for DECIMAL is not a valid number so returning null.", value);
-        return null;
-      }
+      return null;
+    }
 
   };
 
@@ -278,15 +275,16 @@ public class SimpleDataValueResolver {
   public static final ValueExtractor<Object, String> DIAGNOSTIC_REPORT_STATUS_CODES =
       (Object value) -> {
 
-    String val = Hl7DataHandlerUtil.getStringValue(value);
-    String code = getFHIRCode(val, DiagnosticReportStatus.class);
-    if (code != null) {
-      return code;
-    } else {
-      return null;
-    }
+        String val = Hl7DataHandlerUtil.getStringValue(value);
+        String code = getFHIRCode(val, DiagnosticReportStatus.class);
+        if (code != null) {
+          return code;
+        } else {
+          return null;
+        }
 
-  };
+      };
+
   private SimpleDataValueResolver() {}
 
   private static UUID getUUID(String value) {
@@ -318,16 +316,16 @@ public class SimpleDataValueResolver {
 
   private static String getFHIRCode(String hl7Value, Class<?> fhirConceptClassName) {
     if (hl7Value != null) {
-    Map<String, String> mapping = Hl7v2Mapping.getMapping(fhirConceptClassName.getSimpleName());
-    if (mapping != null && !mapping.isEmpty()) {
+      Map<String, String> mapping = Hl7v2Mapping.getMapping(fhirConceptClassName.getSimpleName());
+      if (mapping != null && !mapping.isEmpty()) {
         return mapping.get(StringUtils.upperCase(hl7Value, Locale.ENGLISH));
+      } else {
+        return null;
       }
+    } else {
+      return null;
     }
-    return null;
   }
-
-
-
 
 
 

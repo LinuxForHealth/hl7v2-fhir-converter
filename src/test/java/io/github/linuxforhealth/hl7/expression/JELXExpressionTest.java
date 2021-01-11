@@ -42,7 +42,7 @@ public class JELXExpressionTest {
     HL7DataExtractor hl7DTE = new HL7DataExtractor(hl7message);
 
     ExpressionAttributes attr = new ExpressionAttributes.Builder()
-        .withEvaluate("String.join(\" \",  var1,var2, var3)").build();
+        .withValueOf("String.join(\" \",  var1,var2, var3)").build();
     JEXLExpression exp = new JEXLExpression(attr);
 
 
@@ -93,7 +93,7 @@ public class JELXExpressionTest {
     var.put("var3", "String, CX.2");
 
     ExpressionAttributes attr = new ExpressionAttributes.Builder()
-        .withEvaluate("String.join(\" \",  var1,var2, var3)").withVars(var).build();
+        .withValueOf("String.join(\" \",  var1,var2, var3)").withVars(var).build();
     JEXLExpression exp = new JEXLExpression(attr);
 
 

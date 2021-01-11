@@ -6,8 +6,8 @@
 ---
 start: 
      type: DATE_TIME
-     value: $start
+     valueOf: $start
       
 end:
    type: DATE_TIME
-   value: $end
+   valueOf: $end

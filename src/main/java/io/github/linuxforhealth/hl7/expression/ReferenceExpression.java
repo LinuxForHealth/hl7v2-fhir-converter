@@ -9,8 +9,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringStyle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -24,7 +22,6 @@ import io.github.linuxforhealth.core.expression.EvaluationResultFactory;
 import io.github.linuxforhealth.core.resource.ResourceResult;
 import io.github.linuxforhealth.hl7.resource.HL7DataBasedResourceModel;
 import io.github.linuxforhealth.hl7.resource.ResourceReader;
-import io.github.linuxforhealth.hl7.resource.deserializer.TemplateFieldNames;
 
 /**
  * Represent a expression that represents resolving a json template and creating a reference data
@@ -43,23 +40,15 @@ public class ReferenceExpression extends AbstractExpression {
   private HL7DataBasedResourceModel referenceModel = (HL7DataBasedResourceModel) ResourceReader
       .getInstance().generateResourceModel("datatype/Reference");
   private String reference;
-  private boolean isGenerateMultipleResource;
-
 
   @JsonCreator
   public ReferenceExpression(ExpressionAttributes expAttr) {
     super(expAttr);
-    isGenerateMultipleResource = expAttr.isGenerateMultipleResource();
-    this.reference = expAttr.getReferenceResource();
+
+    this.reference = expAttr.getValueOf();
     this.data = (HL7DataBasedResourceModel) ResourceReader.getInstance()
         .generateResourceModel(this.reference);
     Preconditions.checkState(this.data != null, "Resource reference model cannot be null");
-  }
-
-
-
-  public HL7DataBasedResourceModel getData() {
-    return data;
   }
 
 
@@ -116,23 +105,11 @@ public class ReferenceExpression extends AbstractExpression {
   }
 
 
+
   public String getReference() {
-    return reference;
+    return this.reference;
   }
 
 
-  @Override
-  public String toString() {
-    ToStringBuilder.setDefaultStyle(ToStringStyle.JSON_STYLE);
-    return new ToStringBuilder(this)
-        .append(TemplateFieldNames.TYPE, this.getClass().getSimpleName())
-        .append(TemplateFieldNames.SPEC, this.getspecs()).append("isMultiple", this.isMultiple())
-        .append(TemplateFieldNames.VARIABLES, this.getVariables())
-        .append(TemplateFieldNames.REFERENCE, this.reference).build();
-  }
 
-  @Override
-  public boolean isMultiple() {
-    return this.isGenerateMultipleResource;
-  }
 }

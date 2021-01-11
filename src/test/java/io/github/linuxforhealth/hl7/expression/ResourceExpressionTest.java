@@ -38,7 +38,7 @@ public class ResourceExpressionTest {
 
     Structure s = hl7DTE.getStructure("PID", 0).getValue();
     ExpressionAttributes attr = new ExpressionAttributes.Builder().withSpecs("PID.3")
-        .withResource("datatype/Identifier").build();
+        .withValueOf("datatype/Identifier").build();
     ResourceExpression exp = new ResourceExpression(attr);
     assertThat(exp.getData()).isNotNull();
 
@@ -72,7 +72,7 @@ public class ResourceExpressionTest {
 
     Structure s = hl7DTE.getStructure("PID", 0).getValue();
     ExpressionAttributes attr = new ExpressionAttributes.Builder().withSpecs("PID.3")
-        .withResource("datatype/Identifier").build();
+        .withValueOf("datatype/Identifier").build();
 
     ResourceExpression exp = new ResourceExpression(attr);
     assertThat(exp.getData()).isNotNull();
@@ -83,7 +83,7 @@ public class ResourceExpressionTest {
     EvaluationResult value = exp.evaluate(new HL7MessageData(hl7DTE), ImmutableMap.copyOf(context),
         new SimpleEvaluationResult(s));
 
-    assertThat(value).isEqualTo(null);
+    assertThat(value).isNull();
 
 
 
@@ -104,7 +104,7 @@ public class ResourceExpressionTest {
 
     Structure s = hl7DTE.getStructure("PID", 0).getValue();
     ExpressionAttributes attr = new ExpressionAttributes.Builder().withSpecs("PID.3")
-        .withResource("datatype/Identifier *").build();
+        .withValueOf("datatype/Identifier").withGenerateList(true).build();
 
     ResourceExpression exp = new ResourceExpression(attr);
     assertThat(exp.getData()).isNotNull();
@@ -146,7 +146,7 @@ public class ResourceExpressionTest {
 
     Structure s = hl7DTE.getStructure("OBX", 0).getValue();
     ExpressionAttributes attr = new ExpressionAttributes.Builder().withSpecs("OBX.3")
-        .withResource("datatype/Identifier").build();
+        .withValueOf("datatype/Identifier").build();
 
     ResourceExpression exp = new ResourceExpression(attr);
     assertThat(exp.getData()).isNotNull();
@@ -183,7 +183,7 @@ public class ResourceExpressionTest {
 
     Structure s = hl7DTE.getStructure("OBX", 0).getValue();
     ExpressionAttributes attr = new ExpressionAttributes.Builder().withSpecs("OBX.3")
-        .withResource("datatype/Identifier *").build();
+        .withValueOf("datatype/Identifier").withGenerateList(true).build();
     ResourceExpression exp = new ResourceExpression(attr);
     assertThat(exp.getData()).isNotNull();
 
@@ -223,7 +223,7 @@ public class ResourceExpressionTest {
 
     Structure s = hl7DTE.getStructure("OBX", 0).getValue();
     ExpressionAttributes attr = new ExpressionAttributes.Builder().withSpecs("OBX.3")
-        .withResource("datatype/CodeableConcept *").build();
+        .withValueOf("datatype/CodeableConcept").withGenerateList(true).build();
 
     ResourceExpression exp = new ResourceExpression(attr);
     assertThat(exp.getData()).isNotNull();
@@ -261,7 +261,7 @@ public class ResourceExpressionTest {
 
     Structure s = hl7DTE.getStructure("OBX", 0).getValue();
     ExpressionAttributes attr = new ExpressionAttributes.Builder().withSpecs("OBX.8")
-        .withResource("datatype/CodeableConcept *").build();
+        .withValueOf("datatype/CodeableConcept").withGenerateList(true).build();
     ResourceExpression exp = new ResourceExpression(attr);
     assertThat(exp.getData()).isNotNull();
 
@@ -273,7 +273,8 @@ public class ResourceExpressionTest {
     List<Map<String, Object>> result = (List<Map<String, Object>>) value.getValue();
     assertThat(result.get(0).get("text")).isEqualTo("AA");
     assertThat(result.get(0).get("coding")).isNotNull();
-    SimpleCode sc = (SimpleCode) result.get(0).get("coding");
+    List<SimpleCode> scs = (List<SimpleCode>) result.get(0).get("coding");
+    SimpleCode sc = scs.get(0);
     assertThat(sc.getCode()).isEqualTo("AA");
     assertThat(sc.getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/v2-0078");
     assertThat(sc.getDisplay()).isEqualTo("Critically abnormal");

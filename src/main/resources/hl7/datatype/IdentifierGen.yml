@@ -7,15 +7,16 @@
 
 system: 
      type: STRING
-     value: $system
+     valueOf: $system
     
 value: 
      type: STRING
-     value: $id
+     valueOf: $id
      required: true
 
 period:  
-    resource: datatype/Period
+    valueOf: datatype/Period
+    expressionType: resource
     vars: 
        start: $start
        end: $end

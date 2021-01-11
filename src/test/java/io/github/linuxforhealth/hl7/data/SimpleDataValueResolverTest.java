@@ -14,7 +14,6 @@ import org.junit.Test;
 import ca.uhn.hl7v2.model.DataTypeException;
 import ca.uhn.hl7v2.model.v26.datatype.TX;
 import ca.uhn.hl7v2.model.v26.message.ORU_R01;
-import io.github.linuxforhealth.hl7.data.SimpleDataValueResolver;
 import io.github.linuxforhealth.hl7.data.date.DateUtil;
 
 public class SimpleDataValueResolverTest {
@@ -144,8 +143,7 @@ public class SimpleDataValueResolverTest {
   @Test
   public void get_observation_status_value_invalid() {
     String gen = "ddx";
-    assertThat(SimpleDataValueResolver.OBSERVATION_STATUS_CODE_FHIR.apply(gen))
-        .isEqualTo(ObservationStatus.UNKNOWN.toCode());
+    assertThat(SimpleDataValueResolver.OBSERVATION_STATUS_CODE_FHIR.apply(gen)).isNull();
   }
 
 
@@ -173,8 +171,7 @@ public class SimpleDataValueResolverTest {
   @Test
   public void get_UUID_value_valid() {
     String gen = VALID_UUID;
-    assertThat(SimpleDataValueResolver.UUID_VAL.apply(gen))
-        .isEqualTo(UUID.fromString(VALID_UUID));
+    assertThat(SimpleDataValueResolver.UUID_VAL.apply(gen)).isEqualTo(UUID.fromString(VALID_UUID));
   }
 
 

@@ -5,21 +5,23 @@
 #
 ---
 low:
-   resource: datatype/Quantity
+   valueOf: datatype/Quantity
+   expressionType: resource
    vars:
      value: $low
      unit: $unit
 high:
-   resource: datatype/Quantity
+   valueOf: datatype/Quantity
+   expressionType: resource
    vars:
      value: $high
      unit: $unit
 type:
     type: STRING
-    value: $type
+    valueOf: $type
 appliesTo:
     type: STRING
-    value: $appliesto
+    valueOf: $appliesto
 text:
     type: STRING
-    value: $text
+    valueOf: $text

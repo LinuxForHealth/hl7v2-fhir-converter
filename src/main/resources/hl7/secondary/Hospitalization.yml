@@ -5,33 +5,43 @@
 #
 ---
 preAdmissionIdentifier:
-    resource: datatype/Identifier *
+    valueOf: datatype/Identifier
+    generateList: true
+    expressionType: resource
     specs:  PV1.5	
 admitSource: 
-   resource: datatype/CodeableConcept
+   valueOf: datatype/CodeableConcept
+   expressionType: resource
    specs: PV1.14
 
 reAdmission:
-   resource: datatype/CodeableConcept
+   valueOf: datatype/CodeableConcept
+   expressionType: resource
    specs: PV1.13
 
 
 dietPreference:
-   resource: datatype/CodeableConcept
+   valueOf: datatype/CodeableConcept
+   expressionType: resource
    specs: PV1.38
    
 
 specialCourtesy:
-   resource: datatype/CodeableConcept *
+   valueOf: datatype/CodeableConcept
+   generateList: true
+   expressionType: resource
    specs: PV1.16
 
 
 specialArrangement: 
-   resource: datatype/CodeableConcept *
+   valueOf: datatype/CodeableConcept
+   generateList: true
+   expressionType: resource
    specs: PV1.15 | OBR.30 | OBR.43
 
 
 dischargeDisposition:
-   resource: datatype/CodeableConcept
+   valueOf: datatype/CodeableConcept
+   expressionType: resource
    specs: PV1.36
 

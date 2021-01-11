@@ -5,10 +5,14 @@
 #
 ---
 manifestation:
-   resource: datatype/CodeableConcept *
-   specs: AL1.5
+   valueOf: datatype/CodeableConcept
+   generateList: true
+   expressionType: resource
+   specs: AL1.5  
 
 
 onset:
    type: DATE_TIME
-   specs: AL1.6
+   valueOf: AL1.6
+   expressionType: HL7Spec
+   

@@ -7,10 +7,13 @@
 resourceType: Practitioner
 id:
   type: STRING
-  evaluate: 'UUID.randomUUID()'
+  valueOf: 'UUID.randomUUID()'
+  expressionType: JEXL
   
 identifier:
-    resource: datatype/IdentifierGen *
+    valueOf: datatype/IdentifierGen
+    generateList: true
+    expressionType: resource
     specs: XCN | CNN|NDL
     vars:
       system: XCN.9 |CNN.9|NDL.9
@@ -20,6 +23,8 @@ identifier:
 name: 
     required: true
     specs: XCN | XCN |CNN|NDL
-    resource: datatype/HumanName *
+    valueOf: datatype/HumanName
+    generateList: true
+    expressionType: resource
 
   

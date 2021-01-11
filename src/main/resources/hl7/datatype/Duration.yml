@@ -4,8 +4,9 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 ---
-value: 
-    evaluate: 'GeneralUtils.diffDateMin(var1,var2)'
+value:
+    valueOf: 'GeneralUtils.diffDateMin(var1,var2)'
+    expressionType: JEXL
     vars: 
       var1: $time1
       var2: $time2

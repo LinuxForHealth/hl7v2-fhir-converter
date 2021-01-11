@@ -6,8 +6,6 @@
 package io.github.linuxforhealth.hl7.expression;
 
 import java.util.Map;
-import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringStyle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -21,7 +19,6 @@ import io.github.linuxforhealth.core.expression.EvaluationResultFactory;
 import io.github.linuxforhealth.core.resource.ResourceResult;
 import io.github.linuxforhealth.hl7.resource.HL7DataBasedResourceModel;
 import io.github.linuxforhealth.hl7.resource.ResourceReader;
-import io.github.linuxforhealth.hl7.resource.deserializer.TemplateFieldNames;
 
 /**
  * Represent a expression that represents resolving a json template
@@ -37,24 +34,17 @@ public class ResourceExpression extends AbstractExpression {
 
   private HL7DataBasedResourceModel data;
   private String resourceToGenerate;
-  private boolean isGenerateMultipleResource;
 
 
 
   @JsonCreator
   public ResourceExpression(ExpressionAttributes expAttr) {
     super(expAttr);
-    isGenerateMultipleResource = expAttr.isGenerateMultipleResource();
-    this.resourceToGenerate = expAttr.getResourceToGenerate();
+
+    this.resourceToGenerate = expAttr.getValueOf();
     this.data = (HL7DataBasedResourceModel) ResourceReader.getInstance()
         .generateResourceModel(this.resourceToGenerate);
     Preconditions.checkState(this.data != null, "Resource model cannot be null");
-  }
-
-
-
-  public HL7DataBasedResourceModel getData() {
-    return data;
   }
 
 
@@ -87,24 +77,16 @@ public class ResourceExpression extends AbstractExpression {
 
 
 
-  public String getResourceName() {
-    return resourceToGenerate;
+  public String getResource() {
+    return this.resourceToGenerate;
   }
 
 
-  @Override
-  public String toString() {
-    ToStringBuilder.setDefaultStyle(ToStringStyle.JSON_STYLE);
-    return new ToStringBuilder(this)
-        .append(TemplateFieldNames.TYPE, this.getClass().getSimpleName())
-        .append(TemplateFieldNames.SPEC, this.getspecs()).append("isMultiple", this.isMultiple())
-        .append(TemplateFieldNames.VARIABLES, this.getVariables())
-        // .append(TemplateFieldNames.USE_GROUP, this.isUseGroup())
-        .append(TemplateFieldNames.RESOURCE, this.resourceToGenerate).build();
+
+  HL7DataBasedResourceModel getData() {
+    return this.data;
   }
 
-  @Override
-  public boolean isMultiple() {
-    return this.isGenerateMultipleResource;
-  }
+
+
 }
