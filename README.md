@@ -128,42 +128,61 @@ Resource template represents a [FHIR resource](https://hl7.org/FHIR/resourcelist
 Sample resource template:
 
 ```yml
+#
+# (C) Copyright IBM Corp. 2020
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
 # Represents data that needs to be extracted for a Patient Resource in FHIR
 # reference: https://www.hl7.org/fhir/patient.html
 ---
 resourceType: Patient
 id:
   type: STRING
-  evaluate: 'UUID.randomUUID()'
+  valueOf: 'UUID.randomUUID()'
+  expressionType: JEXL
   
 identifier:
-    resource: datatype/Identifier *
-    specs: PID.3  
+    valueOf: datatype/Identifier
+    generateList: true
+    expressionType: resource
+    specs: PID.3
 name: 
-    resource: datatype/HumanName *
-    specs: PID.5  
+    valueOf: datatype/HumanName
+    generateList: true
+    expressionType: resource
+    specs: PID.5
 gender: 
      type: ADMINISTRATIVE_GENDER
-     specs: PID.8
+     valueOf: PID.8
+     expressionType: HL7Spec
 
 birthDate:
      type: DATE
-     specs: PID.7
+     valueOf: PID.7
+     expressionType: HL7Spec
 ```
 
 
 ``` yml
-# Represents data that needs to be extracted for a Condition Resource in FHIR
-# reference: https://www.hl7.org/fhir/condition.html
+#
+# (C) Copyright IBM Corp. 2020
+#
+# SPDX-License-Identifier: Apache-2.0
+#
 ---
 resourceType: Condition
 id:
   type: STRING
-  evaluate: 'UUID.randomUUID()'
+  valueOf: 'UUID.randomUUID()'
+  expressionType: JEXL
 
 
 category_x1:
-   resource: datatype/CodeableConcept_var *
+   valueOf: datatype/CodeableConcept_var
+   generateList: true
+   expressionType: resource
    condition:  $source NOT_NULL
    vars:     
      code: CONDITION_CATEGORY_CODES, $type
@@ -173,7 +192,9 @@ category_x1:
       type: problem-list-item
 
 category_x2:
-   resource: datatype/CodeableConcept_var *
+   valueOf: datatype/CodeableConcept_var
+   generateList: true
+   expressionType: resource
    condition:  $source NULL
    vars:     
      code: CONDITION_CATEGORY_CODES, $type
@@ -184,50 +205,64 @@ category_x2:
            
 
 severity:
-   resource: datatype/CodeableConcept *
+   valueOf: datatype/CodeableConcept
+   generateList: true
+   expressionType: resource
    specs: PRB.26
    vars:
      code: PRB.26
+     
 code:
-   resource: datatype/CodeableConcept *
+   valueOf: datatype/CodeableConcept
+   generateList: true
+   expressionType: resource
    specs: PRB.3
    vars:
      code: PRB.3
      
      
 encounter:
-    resource: datatype/Reference
+    valueOf: datatype/Reference
+    expressionType: resource
     specs: $Encounter
       
 subject:
-    resource: datatype/Reference
+    valueOf: datatype/Reference
+    expressionType: resource
     specs: $Patient
 
 onsetDateTime:
      type: DATE_TIME
-     specs: PRB.16 
+     valueOf: PRB.16 
+     expressionType: HL7Spec
 
 stage:
-   resource: secondary/Stage *
+   valueOf: secondary/Stage
+   generateList: true
+   expressionType: resource
    specs: PRB.14
    vars:
      code: PRB.14
 evidence:
-   resource: secondary/evidence *
+   valueOf: secondary/evidence
+   generateList: true
+   expressionType: resource
    specs: $Observation
    useGroup: true
+
+
 
 ```
 
 ### Different expressions types 
 The extraction logic for each field can be defined by using expressions. This component supports 4 different type of expressions. All expressions have following attributes:
 * type: DEFAULT - Object <br>
-        Class type final return value extracted for the field.
+        Represents the class type for the final return value extracted for the field.
 * specs: DEFAULT - NONE<br>
            Represents the base value for a resource, if no spec is provided then parents base value would be used as base value for child resource.
-           The value that needs to be extracted using the HL7 spec. Refer to the section on supported formats for [Specification](Specification).<br>
+           Refer to the section on supported formats for [Specification](Specification).<br>
 
-* defaultValue: DEFAULT - NULL<br>
+* default: DEFAULT - NULL<br>
                 If extraction of the value fails, then the default value can be used.
 * required : DEFAULT - false<br>
             If a field is required and cannot be extracted then the resource generation will fail even if other fields were extracted.
@@ -235,16 +270,21 @@ The extraction logic for each field can be defined by using expressions. This co
              List of variables and there value can be provided which can be used during the extraction process. Refer to the section on supported formats for [Variables](Variable).
 * condition: DEFAULT - true<br>
              If a condition is provided then the expression will be resolved only if condition evaluates to true. Refer to the section on supported formats for [Condition](Condition).
+* value: This represents a constant value for the value to be extracted for an expression. This is attribute is only valid for SimpleExpression type.
+* valueOf: This represents the value to be extracted through the evaluation of the expression. This value extraction depends on expression type.
+* expressionType: Based on the expression type a valueOf attribute will get evaluated.
+* generateList: DEFAULT [false]
+                 When specified list output will be generated and all values of specs would be used. If this value is false, then first valid value of spec would be used for evaluating the expression.
 * Constants: DEFAULT - EMPTY<br>
               List of Constants (string values) which can be used during the extraction process.
 
 
 ```yml
       type: String
-      specs: CX.1
-      defaultValue: 'abc'
+      valueOf: CX.1
+      default: 'abc'
       required: true 
-      condition: var1 != null
+      condition: $var1 != null
       vars:
         var1: CX.1
         var2: CX.2
@@ -297,9 +337,9 @@ Engine supports the following condition types:
 Example:
   
 ```yml
-  identifier:
-    type: Array
-    resource: datatype/IdentifierCX
+  identifier:   
+    valueOf: datatype/IdentifierCX
+    expressionType: resource
     specs: PID.3 
 ```
   
@@ -308,16 +348,18 @@ Example:
 
 ```yml
  performer: 
-   reference: resource/Practitioner
+   valueOf: resource/Practitioner
+   expressionType: reference
    specs: OBX.16
 
 ```
 
-* JELXExpression: This type of expression is used when a field value needs to be extracted by executing a Java method.
+* JEXLExpression: This type of expression is used when a field value needs to be extracted by executing a Java method.
 
 ```yml
     type: STRING
-    evaluate: 'GeneralUtils.generateName( prefix, given,family, suffix)'
+    valueOf: 'GeneralUtils.generateName( prefix, given,family, suffix)'
+    expressionType: JEXL
     var:
       prefix: STRING, XPN.4
       given: STRING, XPN.2
@@ -325,31 +367,29 @@ Example:
       suffix: STRING, XPN.5
 ```
 
-* ValueExtractionGeneralExpression : This type of expression is used when a field value can be extracted from a field of another resource or variable.
 
-```yml
-identifier:
- fetch: '$ref-type:identifier'
-```
 * Hl7Expression : This type of expression is used when a field value has to be extracted directly from the HL7 segment/field/component.
 
 ```yml
 given: 
      type: STRING
-     specs: XPN.2
+     valueOf: XPN.2
+     expressionType: HL7Spec
 ```
 
 * SimpleExpression : If the field value is constant and no extraction or conversion is required then this expression is used.
 Example 1: Constant value
 
 ```yml
-code: 'ABX'
+text:
+  value: 'ABX'
 
 ```
 Example 2: Value needs to be extracted from a variable.
 
 ```yml
-code: $var
+text:
+   valueOf: $var
 
 ```
 

@@ -18,7 +18,6 @@ import ca.uhn.hl7v2.model.v26.datatype.CX;
 import io.github.linuxforhealth.api.EvaluationResult;
 import io.github.linuxforhealth.core.expression.EmptyEvaluationResult;
 import io.github.linuxforhealth.core.expression.SimpleEvaluationResult;
-import io.github.linuxforhealth.hl7.expression.JELXExpression;
 import io.github.linuxforhealth.hl7.message.HL7MessageData;
 import io.github.linuxforhealth.hl7.parsing.HL7DataExtractor;
 import io.github.linuxforhealth.hl7.parsing.HL7HapiParser;
@@ -42,9 +41,9 @@ public class JELXExpressionTest {
     Message hl7message = getMessage(message);
     HL7DataExtractor hl7DTE = new HL7DataExtractor(hl7message);
 
-
-    JELXExpression exp =
-        new JELXExpression("String.join(\" \",  var1,var2, var3)", new HashMap<>());
+    ExpressionAttributes attr = new ExpressionAttributes.Builder()
+        .withValueOf("String.join(\" \",  var1,var2, var3)").build();
+    JEXLExpression exp = new JEXLExpression(attr);
 
 
 
@@ -93,7 +92,10 @@ public class JELXExpressionTest {
     var.put("var2", "String, CX.2");
     var.put("var3", "String, CX.2");
 
-    JELXExpression exp = new JELXExpression("String.join(\" \",  var1,var2, var3)", var);
+    ExpressionAttributes attr = new ExpressionAttributes.Builder()
+        .withValueOf("String.join(\" \",  var1,var2, var3)").withVars(var).build();
+    JEXLExpression exp = new JEXLExpression(attr);
+
 
 
     EvaluationResult value = exp.evaluate(new HL7MessageData(hl7DTE), ImmutableMap.copyOf(context),

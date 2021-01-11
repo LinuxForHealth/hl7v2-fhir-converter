@@ -5,12 +5,14 @@
 #
 ---
 numerator:
-    resource: datatype/Quantity
+    valueOf: datatype/Quantity
+    expressionType: resource
     vars: 
       value: $numerator
 
 denominator:
-   resource: datatype/Quantity
+   valueOf: datatype/Quantity
+   expressionType: resource
    vars: 
       value: $denominator
   

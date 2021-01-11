@@ -7,13 +7,16 @@
 ---
 system: 
      type: SYSTEM_URL
-     specs: CWE.3 |CE.3 |CNE.3
+     valueOf: CWE.3 |CE.3 |CNE.3
+     expressionType: HL7Spec
 version:
      type: STRING
-     specs: CWE.7 |CNE.7
+     valueOf: CWE.7 |CNE.7
+     expressionType: HL7Spec
 code: 
      type: STRING
-     value: $code
+     valueOf: $code
 display: 
      type: STRING
-     specs: CWE.2 |CE.2 |CNE.2
+     valueOf: CWE.2 |CE.2 |CNE.2
+     expressionType: HL7Spec

@@ -19,12 +19,11 @@ import ca.uhn.hl7v2.model.Structure;
 import io.github.linuxforhealth.api.EvaluationResult;
 import io.github.linuxforhealth.core.expression.SimpleEvaluationResult;
 import io.github.linuxforhealth.core.terminology.SimpleCode;
-import io.github.linuxforhealth.hl7.expression.ResourceExpression;
 import io.github.linuxforhealth.hl7.message.HL7MessageData;
 import io.github.linuxforhealth.hl7.parsing.HL7DataExtractor;
 import io.github.linuxforhealth.hl7.parsing.HL7HapiParser;
 
-public class ReferenceExpressionTest {
+public class ResourceExpressionTest {
   String message = "MSH|^~\\&|hl7Integration|hl7Integration|||||ADT^A01|||2.3|\r"
       + "EVN|A01|20130617154644\r"
       + "PID|1|465 306 5961|000010016^5^M11^SY1^MR^|407623|Wood^Patrick^^^MR||19700101|female|||High Street^^Oxford^^Ox1 4DP~George St^^Oxford^^Ox1 5AP|||||||\r"
@@ -33,13 +32,14 @@ public class ReferenceExpressionTest {
 
   @Test
   public void test1_segment() throws IOException {
-    
+
     Message hl7message = getMessage(message);
     HL7DataExtractor hl7DTE = new HL7DataExtractor(hl7message);
 
     Structure s = hl7DTE.getStructure("PID", 0).getValue();
-
-    ResourceExpression exp = new ResourceExpression("Single", "datatype/Identifier", "PID.3");
+    ExpressionAttributes attr = new ExpressionAttributes.Builder().withSpecs("PID.3")
+        .withValueOf("datatype/Identifier").build();
+    ResourceExpression exp = new ResourceExpression(attr);
     assertThat(exp.getData()).isNotNull();
 
 
@@ -60,7 +60,39 @@ public class ReferenceExpressionTest {
 
 
   @Test
-  public void test1_segment_required_missing() throws IOException {
+  public void test_component_required_missing() throws IOException {
+    String message = "MSH|^~\\&|hl7Integration|hl7Integration|||||ADT^A01|||2.3|\r"
+        + "EVN|A01|20130617154644\r"
+        + "PID|1|465 306 5961||407623|Wood^Patrick^^^MR||19700101|female|||High Street^^Oxford^^Ox1 4DP~George St^^Oxford^^Ox1 5AP|||||||\r"
+        + "NK1|1|Wood^John^^^MR|Father||999-9999\r" + "NK1|2|Jones^Georgie^^^MSS|MOTHER||999-9999\r"
+        + "PV1|1||Location||||||||||||||||261938_6_201306171546|||||||||||||||||||||||||20130617134644|||||||||";
+
+    Message hl7message = getMessage(message);
+    HL7DataExtractor hl7DTE = new HL7DataExtractor(hl7message);
+
+    Structure s = hl7DTE.getStructure("PID", 0).getValue();
+    ExpressionAttributes attr = new ExpressionAttributes.Builder().withSpecs("PID.3")
+        .withValueOf("datatype/Identifier").build();
+
+    ResourceExpression exp = new ResourceExpression(attr);
+    assertThat(exp.getData()).isNotNull();
+
+
+    Map<String, EvaluationResult> context = new HashMap<>();
+
+    EvaluationResult value = exp.evaluate(new HL7MessageData(hl7DTE), ImmutableMap.copyOf(context),
+        new SimpleEvaluationResult(s));
+
+    assertThat(value).isNull();
+
+
+
+  }
+
+
+  @Test
+  public void test_picks_next_value_from_rep_if_first_fails_condition_or_check()
+      throws IOException {
     String message = "MSH|^~\\&|hl7Integration|hl7Integration|||||ADT^A01|||2.3|\r"
         + "EVN|A01|20130617154644\r"
         + "PID|1|465 306 5961|^^^MR^SSS^^20091020^20200101~000010017^^^MR~000010018^^^MR|407623|Wood^Patrick^^^MR||19700101|female|||High Street^^Oxford^^Ox1 4DP~George St^^Oxford^^Ox1 5AP|||||||\r"
@@ -71,8 +103,10 @@ public class ReferenceExpressionTest {
     HL7DataExtractor hl7DTE = new HL7DataExtractor(hl7message);
 
     Structure s = hl7DTE.getStructure("PID", 0).getValue();
+    ExpressionAttributes attr = new ExpressionAttributes.Builder().withSpecs("PID.3")
+        .withValueOf("datatype/Identifier").build();
 
-    ResourceExpression exp = new ResourceExpression("Single", "datatype/Identifier", "PID.3");
+    ResourceExpression exp = new ResourceExpression(attr);
     assertThat(exp.getData()).isNotNull();
 
 
@@ -81,7 +115,11 @@ public class ReferenceExpressionTest {
     EvaluationResult value = exp.evaluate(new HL7MessageData(hl7DTE), ImmutableMap.copyOf(context),
         new SimpleEvaluationResult(s));
 
-    assertThat(value).isEqualTo(null);
+    assertThat(value).isNotNull();
+    Map<String, Object> result = (Map<String, Object>) value.getValue();
+    assertThat(result.get("use")).isEqualTo(null);
+    assertThat(result.get("value")).isEqualTo("000010017");
+    assertThat(result.get("system")).isEqualTo("MR");
 
 
 
@@ -101,8 +139,10 @@ public class ReferenceExpressionTest {
 
 
     Structure s = hl7DTE.getStructure("PID", 0).getValue();
+    ExpressionAttributes attr = new ExpressionAttributes.Builder().withSpecs("PID.3")
+        .withValueOf("datatype/Identifier").withGenerateList(true).build();
 
-    ResourceExpression exp = new ResourceExpression("Array", "datatype/Identifier *", "PID.3");
+    ResourceExpression exp = new ResourceExpression(attr);
     assertThat(exp.getData()).isNotNull();
 
 
@@ -141,8 +181,10 @@ public class ReferenceExpressionTest {
 
 
     Structure s = hl7DTE.getStructure("OBX", 0).getValue();
+    ExpressionAttributes attr = new ExpressionAttributes.Builder().withSpecs("OBX.3")
+        .withValueOf("datatype/Identifier").build();
 
-    ResourceExpression exp = new ResourceExpression("Single", "datatype/Identifier", "OBX.3");
+    ResourceExpression exp = new ResourceExpression(attr);
     assertThat(exp.getData()).isNotNull();
 
 
@@ -176,8 +218,9 @@ public class ReferenceExpressionTest {
 
 
     Structure s = hl7DTE.getStructure("OBX", 0).getValue();
-
-    ResourceExpression exp = new ResourceExpression("Array", "datatype/CodeableConcept *", "OBX.3");
+    ExpressionAttributes attr = new ExpressionAttributes.Builder().withSpecs("OBX.3")
+        .withValueOf("datatype/Identifier").withGenerateList(true).build();
+    ResourceExpression exp = new ResourceExpression(attr);
     assertThat(exp.getData()).isNotNull();
 
     Map<String, EvaluationResult> context = new HashMap<>();
@@ -186,9 +229,11 @@ public class ReferenceExpressionTest {
         new SimpleEvaluationResult(s));
 
     List<Map<String, Object>> result = (List<Map<String, Object>>) value.getValue();
-    assertThat(result.get(0).get("text")).isEqualTo("some text");
-    assertThat(result.get(0).get("coding")).isNotNull();
-    List<Object> list = (List) result.get(0).get("coding");
+    Map<String, Object> type = (Map<String, Object>) result.get(0).get("type");
+
+    assertThat(type.get("text")).isEqualTo("some text");
+    assertThat(type.get("coding")).isNotNull();
+    List<Object> list = (List) type.get("coding");
     Map<String, String> sp = (Map<String, String>) list.get(0);
     assertThat(sp.get("code")).isEqualTo("1234");
     assertThat(sp.get("system")).isEqualTo("SCTCT");
@@ -213,8 +258,10 @@ public class ReferenceExpressionTest {
 
 
     Structure s = hl7DTE.getStructure("OBX", 0).getValue();
+    ExpressionAttributes attr = new ExpressionAttributes.Builder().withSpecs("OBX.3")
+        .withValueOf("datatype/CodeableConcept").withGenerateList(true).build();
 
-    ResourceExpression exp = new ResourceExpression("Array", "datatype/CodeableConcept *", "OBX.3");
+    ResourceExpression exp = new ResourceExpression(attr);
     assertThat(exp.getData()).isNotNull();
 
     Map<String, EvaluationResult> context = new HashMap<>();
@@ -249,8 +296,9 @@ public class ReferenceExpressionTest {
 
 
     Structure s = hl7DTE.getStructure("OBX", 0).getValue();
-
-    ResourceExpression exp = new ResourceExpression("Array", "datatype/CodeableConcept *", "OBX.8");
+    ExpressionAttributes attr = new ExpressionAttributes.Builder().withSpecs("OBX.8")
+        .withValueOf("datatype/CodeableConcept").withGenerateList(true).build();
+    ResourceExpression exp = new ResourceExpression(attr);
     assertThat(exp.getData()).isNotNull();
 
     Map<String, EvaluationResult> context = new HashMap<>();
@@ -261,7 +309,8 @@ public class ReferenceExpressionTest {
     List<Map<String, Object>> result = (List<Map<String, Object>>) value.getValue();
     assertThat(result.get(0).get("text")).isEqualTo("AA");
     assertThat(result.get(0).get("coding")).isNotNull();
-    SimpleCode sc = (SimpleCode) result.get(0).get("coding");
+    List<SimpleCode> scs = (List<SimpleCode>) result.get(0).get("coding");
+    SimpleCode sc = scs.get(0);
     assertThat(sc.getCode()).isEqualTo("AA");
     assertThat(sc.getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/v2-0078");
     assertThat(sc.getDisplay()).isEqualTo("Critically abnormal");

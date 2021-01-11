@@ -6,39 +6,61 @@
 resourceType: DiagnosticReport
 id:
    type: STRING
-   evaluate: UUID.randomUUID()
+   valueOf: 'UUID.randomUUID()'
+   expressionType: JEXL
+   
 identifier:
-   resource: datatype/Identifier *
+   valueOf: datatype/Identifier
+   generateList: true
+   expressionType: resource
    specs: OBR.3
+   
 status:
    type: DIAGNOSTIC_REPORT_STATUS
-   specs: OBR.25
+   valueOf: OBR.25
+   expressionType: HL7Spec
 category:
-   resource: datatype/CodeableConcept *
+   valueOf: datatype/CodeableConcept
+   generateList: true
+   expressionType: resource
    specs: OBR.24
    vars:
       code: OBR.24
 code:
-   resource: datatype/CodeableConcept
+   valueOf: datatype/CodeableConcept
+   expressionType: resource
    specs: OBR.4
    vars:
       code: OBR.4
 encounter:
-   resource: datatype/Reference
+   valueOf: datatype/Reference
+   expressionType: resource
    specs: $Encounter
+   
 subject:
-   resource: datatype/Reference
+   valueOf: datatype/Reference
+   expressionType: resource
    specs: $Patient
+   
 effectiveDateTime:
    type: DATE_TIME
-   specs: OBR.7
+   valueOf: OBR.7
+   expressionType: HL7Spec
+
 issued:
    type: INSTANT
-   specs: OBR.22
+   valueOf: OBR.22
+   expressionType: HL7Spec
+   
 resultsInterpreter:
-   reference: resource/Practitioner *
+   valueOf: resource/Practitioner
+   generateList: true
+   expressionType: reference
    specs: OBR.32
+
 result:
-   resource: datatype/Reference *
+   valueOf: datatype/Reference
+   generateList: true
+   expressionType: resource
    specs: $Observation
    useGroup: true

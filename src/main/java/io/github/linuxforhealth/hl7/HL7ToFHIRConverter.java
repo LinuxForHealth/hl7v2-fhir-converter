@@ -48,10 +48,9 @@ public class HL7ToFHIRConverter {
     try {
       messagetemplates.putAll(ResourceReader.getInstance().getMessageTemplates());
     } catch (IOException | IllegalArgumentException e) {
-      throw new IllegalStateException("Failure to initialize the templated for the converter.", e);
+      throw new IllegalStateException("Failure to initialize the templates for the converter.", e);
     }
   }
-
 
 
 
@@ -122,11 +121,11 @@ public class HL7ToFHIRConverter {
 
     Message hl7message = getHl7Message(hl7MessageData);
     if (hl7message != null) {
-    String messageType = HL7DataExtractor.getMessageType(hl7message);
-    HL7MessageModel hl7MessageTemplateModel = messagetemplates.get(messageType);
-    if (hl7MessageTemplateModel != null) {
-      return hl7MessageTemplateModel.convert(hl7message, engine);
-    } else {
+      String messageType = HL7DataExtractor.getMessageType(hl7message);
+      HL7MessageModel hl7MessageTemplateModel = messagetemplates.get(messageType);
+      if (hl7MessageTemplateModel != null) {
+        return hl7MessageTemplateModel.convert(hl7message, engine);
+      } else {
         throw new UnsupportedOperationException("Message type not yet supported " + messageType);
       }
     } else {

@@ -6,4 +6,6 @@
 ---
 location:
     type: STRING
-    specs: PV1.3 | PV1.6 | PV1.11 | PV1.42 | PV1.43
+    valueOf: PV1.3 | PV1.6 | PV1.11 | PV1.42 | PV1.43
+    expressionType: HL7Spec
+ 

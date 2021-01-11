@@ -7,7 +7,9 @@
 ---
 # coding requires code,display and system defined as variables from the resource that calls this resource
 coding_1 : 
-    resource: datatype/Coding *
+    valueOf: datatype/Coding
+    generateList: true
+    expressionType: resource
     condition: $code NOT_NULL
     specs: CWE |CE |CNE
     vars:
@@ -18,11 +20,15 @@ coding_1 :
 coding_2: 
     condition: $code NOT_NULL
     type: CODING_SYSTEM_V2
-    specs: ID |IS |TX
+    valueOf: ID |IS |TX
+    generateList: true
+    expressionType: HL7Spec
     vars:
        code: ID |IS |TX
 
        
 text:  
      type: STRING
-     specs: CWE.2 |CWE.9 |CE.2 |CNE.2| ST |TX |ID |IS
+     valueOf: CWE.2 |CWE.9 |CE.2 |CNE.2| ST |TX |ID |IS
+     expressionType: HL7Spec
+

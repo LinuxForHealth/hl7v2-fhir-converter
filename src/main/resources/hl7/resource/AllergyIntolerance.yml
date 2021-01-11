@@ -7,24 +7,32 @@
 resourceType: AllergyIntolerance
 id:
   type: STRING
-  evaluate: 'UUID.randomUUID()'
+  valueOf: 'UUID.randomUUID()'
+  expressionType: JEXL
 
 category:
     type: ALLERGY_INTOLERANCE_CATEGORY
-    specs: AL1.2 *
+    generateList: true
+    valueOf: AL1.2
+    expressionType: HL7Spec
     
 criticality:
     type: ALLERGY_INTOLERANCE_CRITICALITY 
-    specs: AL1.4
+    valueOf: AL1.4
+    expressionType: HL7Spec
     
 code:
-   resource: datatype/CodeableConcept *
+   valueOf: datatype/CodeableConcept
+   generateList: true
+   expressionType: resource
    specs: AL1.3
 
 patient:
-    resource: datatype/Reference
+    valueOf: datatype/Reference
+    expressionType: resource
     specs: $Patient
 
 reaction:
-    resource: secondary/Reaction
+    valueOf: secondary/Reaction
+    expressionType: resource
     specs: AL1.5

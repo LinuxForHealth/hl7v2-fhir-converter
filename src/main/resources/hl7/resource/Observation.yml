@@ -9,65 +9,82 @@
 resourceType: Observation
 id:
   type: STRING
-  evaluate: 'UUID.randomUUID()'
+  valueOf: 'UUID.randomUUID()'
+  expressionType: JEXL
+
 identifier:
-    resource: datatype/Identifier *
+    valueOf: datatype/Identifier
+    generateList: true
+    expressionType: resource
     specs: OBX.3 |  OBX.21 
 
 status:
    type: OBSERVATION_STATUS
-   specs: OBX.11
+   default: unknown
+   valueOf: OBX.11
+   expressionType: HL7Spec
 
 code:
-   resource: datatype/CodeableConcept
+   valueOf: datatype/CodeableConcept
+   expressionType: resource
    specs: OBX.3
 
      
 subject:
-    resource: datatype/Reference
+    valueOf: datatype/Reference
+    expressionType: resource
     specs: $Patient
 
 encounter:
-    resource: datatype/Reference
+    valueOf: datatype/Reference
+    expressionType: resource
     specs: $Encounter
 
 
 effectiveDateTime:
      type: DATE_TIME
-     specs: OBX.14 | OBX.19
+     valueOf: OBX.14 | OBX.19
+     expressionType: HL7Spec
 
 
 issued:
      type: INSTANT
-     specs: OBR.22 | MSH.7| OBX.19
+     valueOf: OBR.22 | MSH.7| OBX.19
+     expressionType: HL7Spec
 
-valueQuantity:
-    resource: datatype/Quantity
-    condition: $obx2 EQUALS NM
-    vars: 
-      value: OBX.5
-      unit: OBX.6
-      #comparator: '='
-      obx2: STRING, OBX.2
 
       
 valueString:
     condition: $obx2 EQUALS TX || $obx2 EQUALS ST
-    type: STRING
-    specs: OBX.5 *
+    type: STRING_ALL
+    valueOf: OBX.5
+    expressionType: HL7Spec
     vars: 
       obx2: STRING, OBX.2
+      
+valueQuantity:
+    valueOf: datatype/Quantity
+    expressionType: resource
+    condition: $obx2 EQUALS NM
+    vars: 
+      value: OBX.5
+      unit: OBX.6
+      obx2: STRING, OBX.2
+
   
 valueCodeableConcept:
      condition:  $obx2 EQUALS  CF || $obx2 EQUALS CNE || $obx2 EQUALS CWE || $obx2 EQUALS CE
-     resource: datatype/CodeableConcept *
+     valueOf: datatype/CodeableConcept
+     generateList: true
+     expressionType: resource
      specs: OBX.5
      vars:
        obx2: STRING, OBX.2
 
 valuePeriod:
    condition: $obx2 EQUALS DR
-   resource: datatype/Period
+   valueOf: datatype/Period
+   expressionType: resource
    vars:
      code: OBX.5
      obx2: STRING, OBX.2
@@ -75,20 +92,23 @@ valuePeriod:
 valueDateTime:
    condition: $obx2 EQUALS DT || $obx2 EQUALS DTM
    type: DATE_TIME
-   specs: OBX.5
+   valueOf: OBX.5
+   expressionType: HL7Spec
    vars:
      obx2: STRING, OBX.2
 
 valueTime:
    condition: $obx2 EQUALS TM
    type: TIME
-   specs: OBX.5
+   valueOf: OBX.5
+   expressionType: HL7Spec
    vars:
      obx2: STRING, OBX.2
 
 valueRatio:
    condition: $obx2 EQUALS SN && $obx5.3 EQUALS ':'
-   resource: datatype/Ratio
+   valueOf: datatype/Ratio
+   expressionType: resource
    specs: OBX.5
    vars:
      numerator: SN.2
@@ -98,20 +118,25 @@ valueRatio:
        
 
 interpretation: 
-   resource: datatype/CodeableConcept
+   valueOf: datatype/CodeableConcept
+   expressionType: resource
    specs: OBX.8
 
 
 bodySite:
-   resource: datatype/CodeableConcept
+   valueOf: datatype/CodeableConcept
+   expressionType: resource
    specs: OBX.20
 
 method:
-   resource: datatype/CodeableConcept
+   valueOf: datatype/CodeableConcept
+   expressionType: resource
    specs: OBX.17
 
 referenceRange: 
-   resource: secondary/ReferenceRange *
+   valueOf: secondary/ReferenceRange
+   generateList: true
+   expressionType: resource
    specs: OBX.7
    vars:
      low:  OBX.7, GeneralUtils.split(low, "-", 0)
@@ -122,7 +147,9 @@ referenceRange:
      unit: OBX.6
      
 performer: 
-   reference: resource/Practitioner *
+   valueOf: resource/Practitioner
+   generateList: true
+   expressionType: reference
    specs: OBX.16
 
 

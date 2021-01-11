@@ -6,14 +6,10 @@
 package io.github.linuxforhealth.hl7.expression;
 
 import java.util.Map;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringStyle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import io.github.linuxforhealth.api.EvaluationResult;
@@ -23,7 +19,6 @@ import io.github.linuxforhealth.core.expression.EvaluationResultFactory;
 import io.github.linuxforhealth.core.resource.ResourceResult;
 import io.github.linuxforhealth.hl7.resource.HL7DataBasedResourceModel;
 import io.github.linuxforhealth.hl7.resource.ResourceReader;
-import io.github.linuxforhealth.hl7.resource.deserializer.TemplateFieldNames;
 
 /**
  * Represent a expression that represents resolving a json template
@@ -39,56 +34,17 @@ public class ResourceExpression extends AbstractExpression {
 
   private HL7DataBasedResourceModel data;
   private String resourceToGenerate;
-  private boolean isGenerateMultipleResource;
 
 
-  /**
-   * 
-   * @param type
-   * @param resourceToGenerate
-   * @param specs
-   * @param defaultValue
-   * @param required
-   * @param variables
-   * @param condition
-   * @param constants
-   * @param useGroup
-   */
+
   @JsonCreator
-  public ResourceExpression(@JsonProperty(TemplateFieldNames.TYPE) String type,
-      @JsonProperty(TemplateFieldNames.RESOURCE) String resourceToGenerate,
-      @JsonProperty(TemplateFieldNames.SPEC) String specs,
-      @JsonProperty(TemplateFieldNames.DEFAULT_VALUE) String defaultValue,
-      @JsonProperty(TemplateFieldNames.REQUIRED) boolean required,
-      @JsonProperty(TemplateFieldNames.VARIABLES) Map<String, String> variables,
-      @JsonProperty(TemplateFieldNames.CONDITION) String condition,
-      @JsonProperty(TemplateFieldNames.CONSTANTS) Map<String, String> constants,
-      @JsonProperty(TemplateFieldNames.USE_GROUP) boolean useGroup) {
-    super(type, defaultValue, required, specs, variables, condition, constants, useGroup);
+  public ResourceExpression(ExpressionAttributes expAttr) {
+    super(expAttr);
 
-    Preconditions.checkArgument(StringUtils.isNotBlank(resourceToGenerate),
-        "reference cannot be blank");
-    if (resourceToGenerate.endsWith("*")) {
-      this.isGenerateMultipleResource = true;
-      resourceToGenerate = StringUtils.removeEnd(resourceToGenerate, "*");
-    }
-    this.resourceToGenerate = StringUtils.strip(resourceToGenerate);
+    this.resourceToGenerate = expAttr.getValueOf();
     this.data = (HL7DataBasedResourceModel) ResourceReader.getInstance()
         .generateResourceModel(this.resourceToGenerate);
-    Preconditions.checkState(this.data != null, "Resource reference model cannot be null");
-
-
-  }
-
-
-  public ResourceExpression(String type, String resourceToGenerate, String hl7spec) {
-    this(type, resourceToGenerate, hl7spec, null, false, null, null, null, false);
-  }
-
-
-
-  public HL7DataBasedResourceModel getData() {
-    return data;
+    Preconditions.checkState(this.data != null, "Resource model cannot be null");
   }
 
 
@@ -109,9 +65,8 @@ public class ResourceExpression extends AbstractExpression {
       LOGGER.debug("Evaluated expression {}, returning {} ", this.resourceToGenerate,
           resolvedvalues);
       if (resolvedvalues != null) {
-        evaluationResult =
-            EvaluationResultFactory.getEvaluationResult(resolvedvalues.getResource(),
-                result.getAdditionalResources());
+        evaluationResult = EvaluationResultFactory.getEvaluationResult(resolvedvalues.getResource(),
+            result.getAdditionalResources());
       }
     }
 
@@ -122,24 +77,16 @@ public class ResourceExpression extends AbstractExpression {
 
 
 
-  public String getResourceName() {
-    return resourceToGenerate;
+  public String getResource() {
+    return this.resourceToGenerate;
   }
 
 
-  @Override
-  public String toString() {
-    ToStringBuilder.setDefaultStyle(ToStringStyle.JSON_STYLE);
-    return new ToStringBuilder(this)
-        .append(TemplateFieldNames.TYPE, this.getClass().getSimpleName())
-        .append(TemplateFieldNames.SPEC, this.getspecs()).append("isMultiple", this.isMultiple())
-        .append(TemplateFieldNames.VARIABLES, this.getVariables())
-        .append(TemplateFieldNames.USE_GROUP, this.isUseGroup())
-        .append(TemplateFieldNames.RESOURCE, this.resourceToGenerate).build();
+
+  HL7DataBasedResourceModel getData() {
+    return this.data;
   }
 
-  @Override
-  public boolean isMultiple() {
-    return this.isGenerateMultipleResource;
-  }
+
+
 }

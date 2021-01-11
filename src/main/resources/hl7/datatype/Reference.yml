@@ -6,4 +6,4 @@
 ---
 reference:
     type: RELATIVE_REFERENCE
-    value:  $BASE_VALUE
+    valueOf:  $BASE_VALUE

@@ -8,13 +8,10 @@ package io.github.linuxforhealth.hl7.expression;
 import java.util.HashMap;
 import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringStyle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import io.github.linuxforhealth.api.EvaluationResult;
@@ -24,7 +21,6 @@ import io.github.linuxforhealth.core.expression.EvaluationResultFactory;
 import io.github.linuxforhealth.core.expression.VariableUtils;
 import io.github.linuxforhealth.hl7.data.SimpleDataTypeMapper;
 import io.github.linuxforhealth.hl7.data.ValueExtractor;
-import io.github.linuxforhealth.hl7.resource.deserializer.TemplateFieldNames;
 
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -34,33 +30,16 @@ public class SimpleExpression extends AbstractExpression {
   private String value;
 
 
+
   @JsonCreator
-  public SimpleExpression(String var) {
-    this("String", var, new HashMap<>(), null, false);
-
+  public SimpleExpression(ExpressionAttributes expAttr) {
+    super(expAttr);
+    this.value = expAttr.getValue();
+    if (StringUtils.isBlank(value)) {
+      this.value = expAttr.getValueOf();
+    }
   }
 
-  /**
-   * 
-   * @param type
-   * @param value
-   * @param variables
-   * @param condition
-   */
-  @JsonCreator
-  public SimpleExpression(@JsonProperty(TemplateFieldNames.TYPE) String type,
-      @JsonProperty(TemplateFieldNames.VALUE) String value,
-      @JsonProperty(TemplateFieldNames.VARIABLES) Map<String, String> variables,
-      @JsonProperty(TemplateFieldNames.CONDITION) String condition,
-      @JsonProperty(TemplateFieldNames.USE_GROUP) boolean useGroup) {
-    super(type, null, false, "", variables, condition, null, useGroup);
-    this.value = value;
-  }
-
-
-  public String getValue() {
-    return value;
-  }
 
 
   @Override
@@ -73,23 +52,28 @@ public class SimpleExpression extends AbstractExpression {
       localContextValues.put(baseValue.getIdentifier(), baseValue);
       localContextValues.put(Constants.BASE_VALUE_NAME, baseValue);
     }
-
+    Object resolvedValue = null;
     if (VariableUtils.isVar(value)) {
       EvaluationResult obj =
           getVariableValueFromVariableContextMap(value, ImmutableMap.copyOf(localContextValues));
-      LOGGER.debug("Evaluated value {} to {} ", this.value, obj);
-      if (obj != null) {
-
-        return getValueOfSpecifiedType(obj.getValue());
-      } else {
-        LOGGER.debug("Evaluated {} returning null", this.value);
-        return null;
+      if (obj != null && !obj.isEmpty()) {
+        resolvedValue = obj.getValue();
       }
 
     } else {
       LOGGER.debug("Evaluated {} returning value enclosed as GenericResult.", this.value);
-      return getValueOfSpecifiedType(this.value);
+      resolvedValue = this.value;
     }
+    LOGGER.debug("Evaluated value {} to {} ", this.value, resolvedValue);
+    if (resolvedValue != null) {
+
+      return getValueOfSpecifiedType(resolvedValue);
+    } else {
+      LOGGER.debug("Evaluated {} returning null", this.value);
+      return null;
+    }
+
+
   }
 
   private EvaluationResult getValueOfSpecifiedType(Object obj) {
@@ -113,19 +97,6 @@ public class SimpleExpression extends AbstractExpression {
       return null;
     }
   }
-
-
-
-  @Override
-  public String toString() {
-    ToStringBuilder.setDefaultStyle(ToStringStyle.JSON_STYLE);
-    return new ToStringBuilder(this)
-        .append(TemplateFieldNames.TYPE, this.getClass().getSimpleName())
-        .append(TemplateFieldNames.SPEC, this.getspecs()).append("isMultiple", this.isMultiple())
-        .append(TemplateFieldNames.VARIABLES, this.getVariables())
-        .append(TemplateFieldNames.VALUE, this.value).build();
-  }
-
 
 
 }

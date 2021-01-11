@@ -23,9 +23,6 @@ import org.junit.Test;
 import com.google.common.collect.Lists;
 import io.github.linuxforhealth.api.ResourceModel;
 import io.github.linuxforhealth.fhir.FHIRContext;
-import io.github.linuxforhealth.hl7.message.HL7FHIRResourceTemplate;
-import io.github.linuxforhealth.hl7.message.HL7MessageEngine;
-import io.github.linuxforhealth.hl7.message.HL7MessageModel;
 import io.github.linuxforhealth.hl7.resource.ResourceReader;
 
 public class DifferentObservationValueTest {
@@ -51,9 +48,9 @@ public class DifferentObservationValueTest {
   @Test
   public void test_observation_NM_result() throws IOException {
 
-    String hl7message = baseMessage
-        + "OBX|1|NM|0135–4^TotalProtein||7.3|gm/dl|5.9-8.4||||F";
+    String hl7message = baseMessage + "OBX|1|NM|0135–4^TotalProtein||7.3|gm/dl|5.9-8.4||||F";
     String json = message.convert(hl7message, engine);
+
     IBaseResource bundleResource = context.getParser().parseResource(json);
     assertThat(bundleResource).isNotNull();
     Bundle b = (Bundle) bundleResource;
@@ -77,6 +74,7 @@ public class DifferentObservationValueTest {
     String hl7message = baseMessage
         + "OBX|1|TX|||Fourth Line: HYPERDYNAMIC LV SYSTOLIC FUNCTION, VISUAL EF 80%||||||F||||Alex||";
     String json = message.convert(hl7message, engine);
+
     IBaseResource bundleResource = context.getParser().parseResource(json);
     assertThat(bundleResource).isNotNull();
     Bundle b = (Bundle) bundleResource;
@@ -112,9 +110,8 @@ public class DifferentObservationValueTest {
     Observation obs = (Observation) obsResource.get(0);
     assertThat(obs.getValueStringType()).isNotNull();
     StringType q = obs.getValueStringType();
-    assertThat(q.asStringValue())
-        .isEqualTo(
-            "HYPERDYNAMIC LV SYSTOLIC FUNCTION, VISUAL EF 80%. Fifth line, as part of a repeated field.");
+    assertThat(q.asStringValue()).isEqualTo(
+        "HYPERDYNAMIC LV SYSTOLIC FUNCTION, VISUAL EF 80%. Fifth line, as part of a repeated field.");
 
 
   }
@@ -125,6 +122,7 @@ public class DifferentObservationValueTest {
     String hl7message =
         baseMessage + "OBX|1|CE|93000&CMP^LIN^CPT4|11|1305^No significant change was found^MEIECG";
     String json = message.convert(hl7message, engine);
+
     IBaseResource bundleResource = context.getParser().parseResource(json);
     assertThat(bundleResource).isNotNull();
     Bundle b = (Bundle) bundleResource;
@@ -135,6 +133,7 @@ public class DifferentObservationValueTest {
     assertThat(obsResource).hasSize(1);
     Observation obs = (Observation) obsResource.get(0);
     assertThat(obs.getValueCodeableConcept()).isNotNull();
+    assertThat(obs.getStatus()).isNotNull();
     CodeableConcept cc = obs.getValueCodeableConcept();
     assertThat(cc.getCoding()).isNotNull();
     assertThat(cc.getCoding().get(0)).isNotNull();

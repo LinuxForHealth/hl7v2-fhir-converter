@@ -5,20 +5,24 @@
 #
 ---
 type: 
-   resource: datatype/CodeableConcept
+   valueOf: datatype/CodeableConcept
+   expressionType: resource
    specs: CX.5 | CWE.5|EI.4
 
 system: 
      type: STRING
-     specs: CX.4 | CWE.4 |EI.2
+     valueOf: CX.4 | CWE.4 |EI.2
+     expressionType: HL7Spec
     
 value: 
      type: STRING
-     specs: CX.1 | CWE.1 |EI.1
+     valueOf: CX.1 | CWE.1 |EI.1
+     expressionType: HL7Spec
      required: true
 
 period:  
-    resource: datatype/Period
+    valueOf: datatype/Period
+    expressionType: resource
     vars: 
        start: CX.7 | CWE.7
        end: CX.8 | CWE.8

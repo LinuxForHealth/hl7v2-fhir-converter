@@ -10,18 +10,25 @@
 resourceType: Patient
 id:
   type: STRING
-  evaluate: 'UUID.randomUUID()'
+  valueOf: 'UUID.randomUUID()'
+  expressionType: JEXL
   
 identifier:
-    resource: datatype/Identifier *
+    valueOf: datatype/Identifier
+    generateList: true
+    expressionType: resource
     specs: PID.3
 name: 
-    resource: datatype/HumanName *
+    valueOf: datatype/HumanName
+    generateList: true
+    expressionType: resource
     specs: PID.5
 gender: 
      type: ADMINISTRATIVE_GENDER
-     specs: PID.8
+     valueOf: PID.8
+     expressionType: HL7Spec
 
 birthDate:
      type: DATE
-     specs: PID.7
+     valueOf: PID.7
+     expressionType: HL7Spec

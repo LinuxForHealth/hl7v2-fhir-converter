@@ -9,13 +9,13 @@ import org.apache.commons.lang3.EnumUtils;
 
 
 public enum SimpleDataTypeMapper {
-  
+
   BOOLEAN(SimpleDataValueResolver.BOOLEAN), //
   INTEGER(SimpleDataValueResolver.INTEGER), //
   STRING(SimpleDataValueResolver.STRING), //
   STRING_ALL(SimpleDataValueResolver.STRING_ALL), //
   FLOAT(SimpleDataValueResolver.FLOAT), //
-  
+
   URI(SimpleDataValueResolver.URI_VAL), //
   URL(SimpleDataValueResolver.STRING), //
   INSTANT(SimpleDataValueResolver.INSTANT), //
@@ -28,8 +28,8 @@ public enum SimpleDataTypeMapper {
   // MARKDOWN(SimpleDataValueResolver.STRING),
   UNSIGNEDINT(SimpleDataValueResolver.INTEGER), //
   POSITIVEINT(SimpleDataValueResolver.INTEGER), //
-  UUID(SimpleDataValueResolver.UUID_VAL),
-  OBJECT(SimpleDataValueResolver.OBJECT),
+  UUID(SimpleDataValueResolver.UUID_VAL), //
+  OBJECT(SimpleDataValueResolver.OBJECT), //
   CODING_SYSTEM_V2(SimpleDataValueResolver.CODING_SYSTEM_V2), //
   SYSTEM_URL(SimpleDataValueResolver.SYSTEM_URL), //
 
@@ -42,7 +42,7 @@ public enum SimpleDataTypeMapper {
   ARRAY(SimpleDataValueResolver.ARRAY), //
   OBSERVATION_STATUS(SimpleDataValueResolver.OBSERVATION_STATUS_CODE_FHIR), //
   RELATIVE_REFERENCE(SimpleDataValueResolver.RELATIVE_REFERENCE);
- 
+
 
 
   private ValueExtractor<Object, ?> valueResolver;
@@ -53,12 +53,12 @@ public enum SimpleDataTypeMapper {
   }
 
   public static ValueExtractor<Object, ?> getValueResolver(String enumName) {
-  
+
 
     SimpleDataTypeMapper mapper = EnumUtils.getEnumIgnoreCase(SimpleDataTypeMapper.class, enumName);
-      if(mapper!=null) {
-        return mapper.valueResolver;
-      }
+    if (mapper != null) {
+      return mapper.valueResolver;
+    }
     throw new IllegalArgumentException("Cannot find data resolver" + enumName);
 
 

@@ -7,16 +7,16 @@
 
 value : 
    type: FLOAT
-   value: $value
+   valueOf: $value
 comparator : 
    type: String
-   value: $comparator
+   valueOf: $comparator
 unit : 
    type: String
-   value: $unit
+   valueOf: $unit
 system : 
    type: URI
-   value: $system
+   valueOf: $system
 code : 
    type: String
-   value: $code
+   valueOf: $code

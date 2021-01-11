@@ -31,11 +31,11 @@ public class Hl7PPRMessageTest {
             + "PRB|AD|200603150625|aortic stenosis|53692||2||200603150625\r"
             + "NTE|1|P|Problem Comments\r" + "VAR|varid1|200603150610\r"
             + "OBX|1|TX|||ECHOCARDIOGRAPHIC REPORT||||||F|||20150930164100|||\r"
-            + "OBX|2|TX|||NORMAL LV CHAMBER SIZE WITH MILD CONCENTRIC LVH||||||F|||20150930164100|||";
+            + "OBX|2|TX|||NORMAL LV CHAMBER SIZE WITH MILD CONCENTRIC LVH||||||F|||20150930165100|||";
 
     HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
     String json = ftv.convert(hl7message, true, BundleType.COLLECTION);
-    System.out.println(json);
+
     assertThat(json).isNotBlank();
     IBaseResource bundleResource = context.getParser().parseResource(json);
     assertThat(bundleResource).isNotNull();
