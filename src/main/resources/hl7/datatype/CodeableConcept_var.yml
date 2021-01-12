@@ -9,7 +9,8 @@
 
 coding:
     generateList: true
-    valueOf: $code
+    valueOf: datatype/Coding
+    expressionType: resource
     condition: $code NOT_NULL
 
 text:  

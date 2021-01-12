@@ -5,6 +5,7 @@
  */
 package io.github.linuxforhealth.hl7.message;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -44,9 +45,6 @@ public class HL7MessageData implements InputDataExtractor {
 
 
 
-
-
-
   @Override
   public EvaluationResult extractMultipleValuesForSpec(Specification spec,
       Map<String, EvaluationResult> contextValues) {
@@ -60,10 +58,34 @@ public class HL7MessageData implements InputDataExtractor {
       valuefromVariables = null;
     }
 
-    Object obj = null;
+    Object hl7object = null;
     if (valuefromVariables != null) {
-      obj = valuefromVariables.getValue();
+      hl7object = valuefromVariables.getValue();
+
     }
+
+    if (hl7object instanceof List) {
+      List<Object> extractedValues = new ArrayList<>();
+      for (Object hl7objectFromList : (List) hl7object) {
+        Object result = extractValue(hl7spec, hl7objectFromList);
+        if (result instanceof List) {
+          extractedValues.addAll((List) result);
+        } else if (result != null) {
+          extractedValues.add(result);
+        }
+      }
+      return EvaluationResultFactory.getEvaluationResult(extractedValues);
+
+    } else {
+      return EvaluationResultFactory.getEvaluationResult(extractValue(hl7spec, hl7object));
+    }
+
+
+  }
+
+
+
+  private Object extractValue(HL7Specification hl7spec, Object obj) {
     EvaluationResult res = null;
     try {
       if (obj instanceof Segment) {
@@ -78,12 +100,13 @@ public class HL7MessageData implements InputDataExtractor {
     } catch (DataExtractionException e) {
       LOGGER.warn("cannot extract value for variable {} ", hl7spec, e);
     }
-
-    return res;
+    if (res != null) {
+      return res.getValue();
+    } else {
+      return null;
+    }
 
   }
-
-
 
 
 
@@ -98,7 +121,7 @@ public class HL7MessageData implements InputDataExtractor {
 
       if (res != null) {
         return EvaluationResultFactory.getEvaluationResult(res.getValue());
-    }
+      }
     }
     return new EmptyEvaluationResult();
   }
@@ -119,7 +142,7 @@ public class HL7MessageData implements InputDataExtractor {
       }
 
     } else {
-      return new SimpleEvaluationResult<>(obj);
+      return EvaluationResultFactory.getEvaluationResult(obj);
     }
   }
 
@@ -133,14 +156,14 @@ public class HL7MessageData implements InputDataExtractor {
       } else {
         res = hde.getComponent((Type) obj, hl7spec.getComponent());
       }
-      
-      if(res!=null && !res.isEmpty()) {
+
+      if (res != null && !res.isEmpty()) {
         return new SimpleEvaluationResult<>(res.getValues());
       } else {
         return null;
       }
     } else {
-      return new SimpleEvaluationResult<>(obj);
+      return EvaluationResultFactory.getEvaluationResult(obj);
     }
 
 
@@ -163,11 +186,8 @@ public class HL7MessageData implements InputDataExtractor {
     Map<String, EvaluationResult> resolvedVariables = new HashMap<>(contextValues);
     resolvedVariables.forEach((key, value) -> localContext.put(key, value.getValue()));
     Object obj = JEXL.evaluate(trimedJexlExp, localContext);
-    if (obj != null) {
-      return new SimpleEvaluationResult<>(obj);
-    } else {
-      return new EmptyEvaluationResult();
-    }
+    return EvaluationResultFactory.getEvaluationResult(obj);
+
   }
 
 
@@ -189,7 +209,7 @@ public class HL7MessageData implements InputDataExtractor {
       Map<String, EvaluationResult> contextValues) {
     EvaluationResult fetchedValue = this.extractMultipleValuesForSpec(spec, contextValues);
     if (fetchedValue != null && !fetchedValue.isEmpty()) {
-      return new SimpleEvaluationResult<>(getSingleValue(fetchedValue.getValue()));
+      return EvaluationResultFactory.getEvaluationResult(getSingleValue(fetchedValue.getValue()));
     } else {
       return new EmptyEvaluationResult();
     }
@@ -208,9 +228,6 @@ public class HL7MessageData implements InputDataExtractor {
     }
     return object;
   }
-
-
-
 
 
 

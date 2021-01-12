@@ -41,8 +41,8 @@ public enum SimpleDataTypeMapper {
   DIAGNOSTIC_REPORT_STATUS(SimpleDataValueResolver.DIAGNOSTIC_REPORT_STATUS_CODES), //
   ARRAY(SimpleDataValueResolver.ARRAY), //
   OBSERVATION_STATUS(SimpleDataValueResolver.OBSERVATION_STATUS_CODE_FHIR), //
-  RELATIVE_REFERENCE(SimpleDataValueResolver.RELATIVE_REFERENCE);
-
+  RELATIVE_REFERENCE(SimpleDataValueResolver.RELATIVE_REFERENCE), //
+  IMMUNIZATION_STATUS_CODES(SimpleDataValueResolver.IMMUNIZATION_STATUS_CODES); //
 
 
   private ValueExtractor<Object, ?> valueResolver;

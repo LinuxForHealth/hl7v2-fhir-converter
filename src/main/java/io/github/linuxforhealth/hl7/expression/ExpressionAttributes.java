@@ -15,6 +15,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.EnumUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.text.StringTokenizer;
 import org.apache.commons.text.matcher.StringMatcherFactory;
@@ -41,8 +42,9 @@ public class ExpressionAttributes {
   private boolean isRequired;
   private List<Specification> specs;
   private List<Variable> variables;
-  private Condition condition; // filter is applies to the specs, spec values that pass the condition
-                            // are used for evaluating the expression.
+  private Condition condition; // filter is applies to the specs, spec values that pass the
+                               // condition
+  // are used for evaluating the expression.
   private Map<String, String> constants;
   private String value;
   private String valueOf;
@@ -223,7 +225,8 @@ public class ExpressionAttributes {
   @Override
   public String toString() {
     if (this.toString == null) {
-      this.toString = ReflectionToStringBuilder.toString(this);
+      this.toString = ReflectionToStringBuilder.toString(this, ToStringStyle.NO_CLASS_NAME_STYLE,
+          false, false, true, null);
     }
 
     return this.toString;

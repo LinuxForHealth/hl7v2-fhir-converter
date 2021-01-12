@@ -21,6 +21,7 @@ import org.hl7.fhir.r4.model.DiagnosticReport.DiagnosticReportStatus;
 import org.hl7.fhir.r4.model.Enumerations.AdministrativeGender;
 import org.hl7.fhir.r4.model.Observation.ObservationStatus;
 import org.hl7.fhir.r4.model.codesystems.ConditionCategory;
+import org.hl7.fhir.r5.model.Immunization.ImmunizationStatusCodes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import io.github.linuxforhealth.api.ResourceValue;
@@ -140,7 +141,17 @@ public class SimpleDataValueResolver {
         }
       };
 
+  public static final ValueExtractor<Object, String> IMMUNIZATION_STATUS_CODES = (Object value) -> {
 
+    String val = Hl7DataHandlerUtil.getStringValue(value);
+    String code = getFHIRCode(val, ImmunizationStatusCodes.class);
+    if (code != null) {
+      return code;
+    } else {
+      return null;
+    }
+
+  };
 
   public static final ValueExtractor<Object, Boolean> BOOLEAN = (Object value) -> {
     String val = Hl7DataHandlerUtil.getStringValue(value);
@@ -292,7 +303,8 @@ public class SimpleDataValueResolver {
       try {
         return UUID.fromString(value);
       } catch (IllegalArgumentException e) {
-        LOGGER.warn("Value not valid UUID, value: {}", value, e);
+        LOGGER.warn("Value not valid UUID, value: {}  failure reason {}", value, e.getMessage());
+        LOGGER.debug("Value not valid UUID, value: {}", value, e);
         return null;
       }
     } else {
@@ -306,7 +318,8 @@ public class SimpleDataValueResolver {
       UUID.fromString(val);
       return true;
     } catch (IllegalArgumentException e) {
-      LOGGER.warn("Not a valid UUID ", e);
+      LOGGER.warn("Not a valid UUID reason {} ", e.getMessage());
+      LOGGER.debug("Not a valid UUID ", e);
       return false;
     }
 

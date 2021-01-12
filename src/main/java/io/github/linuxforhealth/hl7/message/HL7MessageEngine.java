@@ -83,7 +83,8 @@ public class HL7MessageEngine implements MessageEngine {
    *      java.lang.Iterable, java.util.Map)
    */
   @Override
-  public Bundle transform(final InputDataExtractor dataInput, final Iterable<FHIRResourceTemplate> resources,
+  public Bundle transform(final InputDataExtractor dataInput,
+      final Iterable<FHIRResourceTemplate> resources,
       final Map<String, EvaluationResult> contextValues) {
     Preconditions.checkArgument(dataInput != null, "dataInput cannot be null");
     Preconditions.checkArgument(contextValues != null, "contextValues cannot be null");
@@ -92,32 +93,21 @@ public class HL7MessageEngine implements MessageEngine {
     HL7MessageData hl7DataInput = (HL7MessageData) dataInput;
     Bundle bundle = initBundle(dataInput);
     Map<String, EvaluationResult> localContextValues = new HashMap<>(contextValues);
-    for (FHIRResourceTemplate res : resources) {
-      HL7FHIRResourceTemplate template = (HL7FHIRResourceTemplate) res;
-      ResourceModel rs = res.getResource();
+    for (FHIRResourceTemplate genericTemplate : resources) {
+      HL7FHIRResourceTemplate hl7ResourceTemplate = (HL7FHIRResourceTemplate) genericTemplate;
+      ResourceModel rs = genericTemplate.getResource();
       List<ResourceResult> resourceResults = new ArrayList<>();
       try {
         MDC.put("Resource", rs.getName());
-
-        if (res.isRepeats()) {
-          List<ResourceResult> results =
-              generateMultiple(hl7DataInput, template, localContextValues, bundle);
-          if (results != null) {
-            resourceResults.addAll(results);
-          }
-
-
-        } else {
-          ResourceResult resourceValue =
-              generateSingle(hl7DataInput, template, localContextValues, bundle);
-          if (resourceValue != null) {
-          resourceResults.add(resourceValue);
-          }
+        List<ResourceResult> results =
+            generateResources(hl7DataInput, hl7ResourceTemplate, localContextValues, bundle);
+        if (results != null) {
+          resourceResults.addAll(results);
         }
 
         resourceResults.removeIf(isEmpty());
         Map<String, EvaluationResult> newContextValues =
-            getContextValuesFromResource(res, resourceResults);
+            getContextValuesFromResource(hl7ResourceTemplate, resourceResults);
         localContextValues.putAll(newContextValues);
       } catch (IllegalArgumentException | IllegalStateException e) {
         LOGGER.error("Exception during  resource {} generation", rs.getName(), e);
@@ -130,6 +120,33 @@ public class HL7MessageEngine implements MessageEngine {
 
     }
     return bundle;
+  }
+
+  private List<ResourceResult> generateResources(HL7MessageData hl7DataInput,
+      HL7FHIRResourceTemplate template, Map<String, EvaluationResult> contextValues,
+      Bundle bundle) {
+
+    ResourceModel resourceModel = template.getResource();
+    List<String> segmentGroup = template.getAttributes().getSegment().getGroup();
+    String segment = template.getAttributes().getSegment().getSegment();
+    List<ResourceResult> resourceResults = null;
+    List<SegmentGroup> multipleSegments =
+        getMultipleSegments(hl7DataInput, template, segmentGroup, segment);
+    if (!multipleSegments.isEmpty()) {
+
+      resourceResults = generateMultipleResources(hl7DataInput, resourceModel, contextValues,
+          multipleSegments, template.isGenerateMultiple());
+
+    }
+
+    if (resourceResults != null && !resourceResults.isEmpty()) {
+      for (ResourceResult resReult : resourceResults) {
+        addToBundle(bundle, Lists.newArrayList(resReult.getValue()));
+        addToBundle(bundle, resReult.getAdditionalResources());
+      }
+    }
+
+    return resourceResults;
   }
 
   private static Predicate<ResourceResult> isEmpty() {
@@ -146,7 +163,7 @@ public class HL7MessageEngine implements MessageEngine {
     if (resourceResults.isEmpty() || !resTemplate.isReferenced()) {
       return localContextValues;
     }
-    if (!resTemplate.isRepeats()) {
+    if (!resTemplate.isGenerateMultiple()) {
       localContextValues.put(resTemplate.getResourceName(), EvaluationResultFactory
           .getEvaluationResult(resourceResults.get(0).getValue().getResource()));
 
@@ -186,46 +203,6 @@ public class HL7MessageEngine implements MessageEngine {
 
 
 
-  private ResourceResult generateSingle(final HL7MessageData hl7DataInput,
-      final HL7FHIRResourceTemplate template, final Map<String, EvaluationResult> contextValues,
-      final Bundle bundle) {
-
-    ResourceModel rs = template.getResource();
-    List<String> groups = template.getSegment().getGroup();
-    String segment = template.getSegment().getSegment();
-    SegmentGroup segmentGroup;
-    if (groups == null || groups.isEmpty()) {
-      segmentGroup = SegmentExtractorUtil.extractSegmentGroup(segment,
-          template.getAdditionalSegments(), hl7DataInput.getHL7DataParser());
-    } else {
-      segmentGroup = SegmentExtractorUtil.extractSegmentGroup(groups, segment,
-          template.getAdditionalSegments(), hl7DataInput.getHL7DataParser(), template.getGroup());
-    }
-
-    if (segmentGroup != null) {
-      Map<String, EvaluationResult> localContextValues = new HashMap<>(contextValues);
-      localContextValues.put(Constants.GROUP_ID,
-          EvaluationResultFactory.getEvaluationResult(segmentGroup.getGroupId()));
-      localContextValues.putAll(getContextMap(segmentGroup));
-
-      ResourceResult evaluatedValue =
-          rs.evaluate(hl7DataInput, ImmutableMap.copyOf(localContextValues),
-              EvaluationResultFactory.getEvaluationResult(segmentGroup.getSegment()));
-
-      if (evaluatedValue != null && !evaluatedValue.isEmpty()
-          && evaluatedValue.getValue().getResource() != null
-          && !evaluatedValue.getValue().getResource().isEmpty()) {
-
-        addEntry(template.getResourceName(), evaluatedValue.getValue(), bundle);
-
-        List<ResourceValue> additionalResourceObjects = evaluatedValue.getAdditionalResources();
-        addToBundle(bundle, additionalResourceObjects);
-        return evaluatedValue;
-      }
-    }
-    return null;
-  }
-
   private static Map<String, EvaluationResult> getContextMap(SegmentGroup segmentGroup) {
     // populate local context with additional segment details
     Map<String, EvaluationResult> localContextValues = new HashMap<>();
@@ -240,45 +217,18 @@ public class HL7MessageEngine implements MessageEngine {
 
 
 
-  private List<ResourceResult> generateMultiple(final HL7MessageData hl7DataInput,
-      final HL7FHIRResourceTemplate template, final Map<String, EvaluationResult> contextValues,
-      final Bundle bundle) {
-
-
-    ResourceModel rs = template.getResource();
-    List<String> groups = template.getSegment().getGroup();
-    String segment = template.getSegment().getSegment();
-    List<ResourceResult> resourceResults = null;
-    List<SegmentGroup> multipleSegments =
-        getMultipleSegments(hl7DataInput, template, groups, segment);
-    if (!multipleSegments.isEmpty()) {
-      resourceResults =
-          generateMultipleResources(hl7DataInput, rs, contextValues, multipleSegments);
-
-    }
-
-    if (resourceResults != null && !resourceResults.isEmpty()) {
-      for (ResourceResult resReult : resourceResults) {
-        addToBundle(bundle, Lists.newArrayList(resReult.getValue()));
-        addToBundle(bundle, resReult.getAdditionalResources());
-      }
-    }
-
-    return resourceResults;
-  }
-
-
   private static List<SegmentGroup> getMultipleSegments(final HL7MessageData hl7DataInput,
-      final HL7FHIRResourceTemplate template, List<String> groups, String segment) {
+      final HL7FHIRResourceTemplate template, List<String> segmentGroup, String segment) {
     List<SegmentGroup> multipleSegments;
-    if (groups != null && !groups.isEmpty()) {
-      multipleSegments = SegmentExtractorUtil.extractSegmentGroups(groups, segment,
-          template.getAdditionalSegments(), hl7DataInput.getHL7DataParser(), template.getGroup());
+    if (segmentGroup != null && !segmentGroup.isEmpty()) {
+      multipleSegments = SegmentExtractorUtil.extractSegmentGroups(segmentGroup, segment,
+          template.getAttributes().getAdditionalSegments(), hl7DataInput.getHL7DataParser(),
+          template.getAttributes().getGroup());
 
 
     } else {
-      multipleSegments = SegmentExtractorUtil.extractSegmentGroups(segment,
-          template.getAdditionalSegments(), hl7DataInput.getHL7DataParser());
+      multipleSegments = SegmentExtractorUtil.extractSegmentNonGroups(segment,
+          template.getAttributes().getAdditionalSegments(), hl7DataInput.getHL7DataParser());
 
     }
     return multipleSegments;
@@ -286,18 +236,20 @@ public class HL7MessageEngine implements MessageEngine {
 
   private static List<ResourceResult> generateMultipleResources(final HL7MessageData hl7DataInput,
       final ResourceModel rs, final Map<String, EvaluationResult> contextValues,
-      final List<SegmentGroup> multipleSegments) {
+      final List<SegmentGroup> multipleSegments, boolean generateMultiple) {
     List<ResourceResult> resourceResults = new ArrayList<>();
-    for (SegmentGroup segGroup : multipleSegments) {
+    for (SegmentGroup currentGroup : multipleSegments) {
 
-      List<EvaluationResult> baseValues = new ArrayList<>();
+
       Map<String, EvaluationResult> localContextValues = new HashMap<>(contextValues);
       localContextValues.put(Constants.GROUP_ID,
-          EvaluationResultFactory.getEvaluationResult(segGroup.getGroupId()));
-      segGroup.getSegments()
+          EvaluationResultFactory.getEvaluationResult(currentGroup.getGroupId()));
+      // Resource needs to be generated for each base value in the group
+      List<EvaluationResult> baseValues = new ArrayList<>();
+      currentGroup.getSegments()
           .forEach(struct -> baseValues.add(EvaluationResultFactory.getEvaluationResult(struct)));
 
-      localContextValues.putAll(getContextMap(segGroup));
+      localContextValues.putAll(getContextMap(currentGroup));
 
       for (EvaluationResult baseValue : baseValues) {
         try {
@@ -305,8 +257,14 @@ public class HL7MessageEngine implements MessageEngine {
               rs.evaluate(hl7DataInput, ImmutableMap.copyOf(localContextValues), baseValue);
           if (result != null && result.getValue() != null) {
             resourceResults.add(result);
+            if (!generateMultiple) {
+              // If only single resource needs to be generated then return.
+              return resourceResults;
+            }
 
           }
+
+
         } catch (RequiredConstraintFailureException | IllegalArgumentException
             | IllegalStateException e) {
           LOGGER.warn("Exception encountered", e);

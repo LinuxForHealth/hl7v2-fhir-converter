@@ -44,7 +44,7 @@ public abstract class AbstractFHIRResourceTemplate implements FHIRResourceTempla
 
 
   @Override
-  public boolean isRepeats() {
+  public boolean isGenerateMultiple() {
     return repeats;
   }
 

@@ -1,0 +1,26 @@
+#
+# (C) Copyright IBM Corp. 2020
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+function_v1:
+   condition: $orderingProvide NOT_NULL
+   valueOf: datatype/CodeableConcept_var
+   expressionType: resource
+   constants:
+    code: OP
+    text: Ordering Provider
+
+function_v2:
+   condition: $orderingProvide NULL && $administeringProvide NOT_NULL
+   valueOf: datatype/CodeableConcept_var
+   expressionType: resource
+   constants:
+    code: AP
+    text: Administering Provide
+actor:
+   valueOf: resource/Practitioner
+   expressionType: reference
+   generateList: true
+   specs: $orderingProvide | $administeringProvide
+   required: true

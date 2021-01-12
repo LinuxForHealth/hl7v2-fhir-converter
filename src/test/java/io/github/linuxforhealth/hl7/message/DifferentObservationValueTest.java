@@ -7,7 +7,6 @@ package io.github.linuxforhealth.hl7.message;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.hl7.fhir.instance.model.api.IBaseResource;
@@ -38,8 +37,14 @@ public class DifferentObservationValueTest {
 
   private ResourceModel rsm =
       ResourceReader.getInstance().generateResourceModel("resource/Observation");
-  private HL7FHIRResourceTemplate observation =
-      new HL7FHIRResourceTemplate("Observation", "OBX", rsm, false, true, new ArrayList<>());
+
+  HL7FHIRResourceTemplateAttributes attributes = new HL7FHIRResourceTemplateAttributes.Builder()
+      .withResourceName("Observation").withResourceModel(rsm).withSegment("OBX")
+      .withIsReferenced(false).withRepeats(true).build();
+
+  HL7FHIRResourceTemplate observation = new HL7FHIRResourceTemplate(attributes);
+
+
 
   private HL7MessageModel message = new HL7MessageModel("ADT", Lists.newArrayList(observation));
 

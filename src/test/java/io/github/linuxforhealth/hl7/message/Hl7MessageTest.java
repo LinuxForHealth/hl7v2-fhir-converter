@@ -7,7 +7,6 @@ package io.github.linuxforhealth.hl7.message;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.hl7.fhir.instance.model.api.IBaseResource;
@@ -35,8 +34,15 @@ public class Hl7MessageTest {
   public void test_patient() throws IOException {
 
     ResourceModel rsm = ResourceReader.getInstance().generateResourceModel("resource/Patient");
-    HL7FHIRResourceTemplate patient =
-        new HL7FHIRResourceTemplate("Patient", "PID", rsm, false, false, new ArrayList<>());
+
+    HL7FHIRResourceTemplateAttributes attributes = new HL7FHIRResourceTemplateAttributes.Builder()
+        .withResourceName("Patient").withResourceModel(rsm).withSegment("PID")
+        .withIsReferenced(false).withRepeats(false).build();
+
+    HL7FHIRResourceTemplate patient = new HL7FHIRResourceTemplate(attributes);
+
+
+
     HL7MessageModel message = new HL7MessageModel("ADT", Lists.newArrayList(patient));
     String hl7message = "MSH|^~\\&|hl7Integration|hl7Integration|||||ADT^A01|||2.3|\r"
         + "EVN|A01|20130617154644\r"
@@ -63,12 +69,21 @@ public class Hl7MessageTest {
   public void test_patient_encounter() throws IOException {
 
     ResourceModel rsm = ResourceReader.getInstance().generateResourceModel("resource/Patient");
-    HL7FHIRResourceTemplate patient =
-        new HL7FHIRResourceTemplate("Patient", "PID", rsm, true, false, new ArrayList<>());
+    HL7FHIRResourceTemplateAttributes attributes = new HL7FHIRResourceTemplateAttributes.Builder()
+        .withResourceName("Patient").withResourceModel(rsm).withSegment("PID")
+        .withIsReferenced(true).withRepeats(false).build();
+
+    HL7FHIRResourceTemplate patient = new HL7FHIRResourceTemplate(attributes);
+
+
     ResourceModel encounter =
         ResourceReader.getInstance().generateResourceModel("resource/Encounter");
-    HL7FHIRResourceTemplate encounterFH = new HL7FHIRResourceTemplate("Encounter", "PV1", encounter,
-        false, false, Lists.newArrayList("PV2"));
+    HL7FHIRResourceTemplateAttributes attributesEncounter =
+        new HL7FHIRResourceTemplateAttributes.Builder().withResourceName("Encounter")
+            .withResourceModel(encounter).withSegment("PV1").withIsReferenced(true)
+            .withRepeats(false).withAdditionalSegments(Lists.newArrayList("PV2")).build();
+
+    HL7FHIRResourceTemplate encounterFH = new HL7FHIRResourceTemplate(attributesEncounter);
 
 
 
@@ -107,11 +122,14 @@ public class Hl7MessageTest {
   @Test
   public void test_patient_encounter_only() throws IOException {
 
-
     ResourceModel encounter =
         ResourceReader.getInstance().generateResourceModel("resource/Encounter");
-    HL7FHIRResourceTemplate encounterFH = new HL7FHIRResourceTemplate("Encounter", "PV1", encounter,
-        true, false, Lists.newArrayList("PV2"));
+    HL7FHIRResourceTemplateAttributes attributesEncounter =
+        new HL7FHIRResourceTemplateAttributes.Builder().withResourceName("Encounter")
+            .withResourceModel(encounter).withSegment("PV1").withIsReferenced(false)
+            .withRepeats(false).withAdditionalSegments(Lists.newArrayList("PV2")).build();
+
+    HL7FHIRResourceTemplate encounterFH = new HL7FHIRResourceTemplate(attributesEncounter);
 
 
 
@@ -139,10 +157,14 @@ public class Hl7MessageTest {
 
   @Test
   public void test_observation() throws IOException {
-
     ResourceModel rsm = ResourceReader.getInstance().generateResourceModel("resource/Observation");
-    HL7FHIRResourceTemplate observation =
-        new HL7FHIRResourceTemplate("Observation", "OBX", rsm, true, false, new ArrayList<>());
+
+    HL7FHIRResourceTemplateAttributes attributes = new HL7FHIRResourceTemplateAttributes.Builder()
+        .withResourceName("Observation").withResourceModel(rsm).withSegment("OBX")
+        .withIsReferenced(true).withRepeats(false).build();
+
+    HL7FHIRResourceTemplate observation = new HL7FHIRResourceTemplate(attributes);
+
     HL7MessageModel message = new HL7MessageModel("ADT", Lists.newArrayList(observation));
     String hl7message = "MSH|^~\\&|hl7Integration|hl7Integration|||||ADT^A01|||2.3|\r"
         + "EVN|A01|20130617154644\r"
@@ -173,9 +195,16 @@ public class Hl7MessageTest {
   @Test
   public void test_observation_multiple() throws IOException {
 
+
     ResourceModel rsm = ResourceReader.getInstance().generateResourceModel("resource/Observation");
-    HL7FHIRResourceTemplate observation =
-        new HL7FHIRResourceTemplate("Observation", "OBX", rsm, true, true, new ArrayList<>());
+
+    HL7FHIRResourceTemplateAttributes attributes = new HL7FHIRResourceTemplateAttributes.Builder()
+        .withResourceName("Observation").withResourceModel(rsm).withSegment("OBX")
+        .withIsReferenced(true).withRepeats(true).build();
+
+    HL7FHIRResourceTemplate observation = new HL7FHIRResourceTemplate(attributes);
+
+
     HL7MessageModel message = new HL7MessageModel("ADT", Lists.newArrayList(observation));
     String hl7message = "MSH|^~\\&|hl7Integration|hl7Integration|||||ADT^A01|||2.3|\r"
         + "EVN|A01|20130617154644\r"
@@ -206,8 +235,14 @@ public class Hl7MessageTest {
   public void test_observation_NM_result() throws IOException {
 
     ResourceModel rsm = ResourceReader.getInstance().generateResourceModel("resource/Observation");
-    HL7FHIRResourceTemplate observation =
-        new HL7FHIRResourceTemplate("Observation", "OBX", rsm, true, true, new ArrayList<>());
+
+    HL7FHIRResourceTemplateAttributes attributes = new HL7FHIRResourceTemplateAttributes.Builder()
+        .withResourceName("Observation").withResourceModel(rsm).withSegment("OBX")
+        .withIsReferenced(true).withRepeats(false).build();
+
+    HL7FHIRResourceTemplate observation = new HL7FHIRResourceTemplate(attributes);
+
+
     HL7MessageModel message = new HL7MessageModel("ADT", Lists.newArrayList(observation));
     String hl7message = "MSH|^~\\&|hl7Integration|hl7Integration|||||ADT^A01|||2.3|\r"
         + "EVN|A01|20130617154644\r"
@@ -235,9 +270,14 @@ public class Hl7MessageTest {
 
     ResourceModel rsm =
         ResourceReader.getInstance().generateResourceModel("resource/AllergyIntolerance");
-    HL7FHIRResourceTemplate observation = new HL7FHIRResourceTemplate("AllergyIntolerance", "AL1",
-        rsm, true, false, new ArrayList<>());
-    HL7MessageModel message = new HL7MessageModel("ADT", Lists.newArrayList(observation));
+
+    HL7FHIRResourceTemplateAttributes attributes = new HL7FHIRResourceTemplateAttributes.Builder()
+        .withResourceName("AllergyIntolerance").withResourceModel(rsm).withSegment("AL1")
+        .withIsReferenced(true).withRepeats(false).build();
+
+    HL7FHIRResourceTemplate allergyTemplate = new HL7FHIRResourceTemplate(attributes);
+    HL7MessageModel message = new HL7MessageModel("ADT", Lists.newArrayList(allergyTemplate));
+
     String hl7message = "MSH|^~\\&|hl7Integration|hl7Integration|||||ADT^A01|||2.3|\r"
         + "EVN|A01|20130617154644\r"
         + "PID|1|465 306 5961|000010016^^^MR~000010017^^^MR~000010018^^^MR|407623|Wood^Patrick^^Sr^MR||19700101|female|||High Street^^Oxford^^Ox1 4DP~George St^^Oxford^^Ox1 5AP|||||||\r"
@@ -270,9 +310,16 @@ public class Hl7MessageTest {
 
     ResourceModel rsm =
         ResourceReader.getInstance().generateResourceModel("resource/AllergyIntolerance");
-    HL7FHIRResourceTemplate observation = new HL7FHIRResourceTemplate("AllergyIntolerance", "AL1",
-        rsm, true, true, new ArrayList<>());
-    HL7MessageModel message = new HL7MessageModel("ADT", Lists.newArrayList(observation));
+
+    HL7FHIRResourceTemplateAttributes attributes = new HL7FHIRResourceTemplateAttributes.Builder()
+        .withResourceName("AllergyIntolerance").withResourceModel(rsm).withSegment("AL1")
+        .withIsReferenced(true).withRepeats(true).build();
+
+    HL7FHIRResourceTemplate allergyTemplate = new HL7FHIRResourceTemplate(attributes);
+    HL7MessageModel message = new HL7MessageModel("ADT", Lists.newArrayList(allergyTemplate));
+
+
+
     String hl7message = "MSH|^~\\&|hl7Integration|hl7Integration|||||ADT^A01|||2.3|\r"
         + "EVN|A01|20130617154644\r"
         + "PID|1|465 306 5961|000010016^^^MR~000010017^^^MR~000010018^^^MR|407623|Wood^Patrick^^Sr^MR||19700101|female|||High Street^^Oxford^^Ox1 4DP~George St^^Oxford^^Ox1 5AP|||||||\r"
@@ -297,9 +344,16 @@ public class Hl7MessageTest {
   public void test_condition() throws IOException {
 
     ResourceModel rsm = ResourceReader.getInstance().generateResourceModel("resource/Condition");
-    HL7FHIRResourceTemplate observation =
-        new HL7FHIRResourceTemplate("Condition", "PRB", rsm, true, true, new ArrayList<>());
-    HL7MessageModel message = new HL7MessageModel("ADT", Lists.newArrayList(observation));
+
+    HL7FHIRResourceTemplateAttributes attributes = new HL7FHIRResourceTemplateAttributes.Builder()
+        .withResourceName("Condition").withResourceModel(rsm).withSegment("PRB")
+        .withIsReferenced(true).withRepeats(false).build();
+
+    HL7FHIRResourceTemplate conditionTemplate = new HL7FHIRResourceTemplate(attributes);
+    HL7MessageModel message = new HL7MessageModel("ADT", Lists.newArrayList(conditionTemplate));
+
+
+
     String hl7message = "MSH|^~\\&|hl7Integration|hl7Integration|||||ADT^A01|||2.3|\r"
         + "EVN|A01|20130617154644\r"
         + "PID|1|465 306 5961|000010016^^^MR~000010017^^^MR~000010018^^^MR|407623|Wood^Patrick^^Sr^MR||19700101|female|||High Street^^Oxford^^Ox1 4DP~George St^^Oxford^^Ox1 5AP|||||||\r"
@@ -324,19 +378,32 @@ public class Hl7MessageTest {
   @Test
   public void test_observation_condition() throws IOException {
 
+
+
     ResourceModel obsModel =
         ResourceReader.getInstance().generateResourceModel("resource/Observation");
-    HL7FHIRResourceTemplate observation = new HL7FHIRResourceTemplate("Observation",
-        "PROBLEM.PROBLEM_OBSERVATION.OBX", obsModel, true, true, new ArrayList<>(), "PROBLEM");
+    HL7FHIRResourceTemplateAttributes attributesObs =
+        new HL7FHIRResourceTemplateAttributes.Builder().withResourceName("Observation")
+            .withResourceModel(obsModel).withSegment(".PROBLEM_OBSERVATION.OBX")
+            .withIsReferenced(true).withRepeats(true).withGroup("PROBLEM").build();
+
+    HL7FHIRResourceTemplate obsTemplate = new HL7FHIRResourceTemplate(attributesObs);
+
+
+
     ResourceModel condModel =
         ResourceReader.getInstance().generateResourceModel("resource/Condition");
-    HL7FHIRResourceTemplate condition = new HL7FHIRResourceTemplate("Condition", "PROBLEM.PRB",
-        condModel, false, true, Lists.newArrayList(), "PROBLEM");
 
+    HL7FHIRResourceTemplateAttributes attributesCond =
+        new HL7FHIRResourceTemplateAttributes.Builder().withResourceName("Condition")
+            .withResourceModel(condModel).withSegment(".PRB").withIsReferenced(false)
+            .withRepeats(true).withGroup("PROBLEM").build();
+
+    HL7FHIRResourceTemplate conditionTemplate = new HL7FHIRResourceTemplate(attributesCond);
 
 
     HL7MessageModel message =
-        new HL7MessageModel("ADT", Lists.newArrayList(observation, condition));
+        new HL7MessageModel("ADT", Lists.newArrayList(obsTemplate, conditionTemplate));
     String hl7message =
         "MSH|^~\\&|SendTest1|Sendfac1|Receiveapp1|Receivefac1|200603081747|security|PPR^PC1^PPR_PC1|1|P^I|2.6||||||ASCII||\r"
             + "PID|||555444222111^^^MPI&GenHosp&L^MR||james^anderson||19600614|M||C|99 Oakland #106^^qwerty^OH^44889||^^^^^626^5641111|^^^^^626^5647654|||||343132266|||N\r"

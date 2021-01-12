@@ -18,7 +18,7 @@ package io.github.linuxforhealth.api;
  *
  * @author pbhallam
  */
-public interface  FHIRResourceTemplate {
+public interface FHIRResourceTemplate {
 
 
   /**
@@ -40,22 +40,14 @@ public interface  FHIRResourceTemplate {
    * 
    * @return True/False
    */
-  default boolean isRepeats() {
-    return false;
-  }
+  boolean isGenerateMultiple();
 
   /**
    * If this resource is referenced by other resources
    * 
    * @return True/False
    */
-  default boolean isReferenced() {
-    return false;
-  }
-
-
-
-
+  boolean isReferenced();
 
 
 

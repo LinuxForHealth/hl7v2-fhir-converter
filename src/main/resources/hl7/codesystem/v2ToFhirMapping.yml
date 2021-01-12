@@ -40,4 +40,11 @@ DiagnosticReportStatus:
    S: unknown
    X: cancelled
    Y: unknown
-   Z: unknownn
+   Z: unknown
+   
+ImmunizationStatusCodes:  
+  CP: completed
+  NA: not-done
+  PA: not-done
+  RE: not-done
+   

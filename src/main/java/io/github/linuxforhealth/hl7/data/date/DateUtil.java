@@ -81,7 +81,8 @@ public class DateUtil {
       returnValue = ldt.format(format);
       return returnValue;
     } catch (DateTimeParseException e) {
-      LOGGER.warn("Date parsing exception for {}", input, e);
+      LOGGER.warn("Date parsing failure for value \'{}\'   reason {}", input, e.getMessage());
+      LOGGER.debug("Date parsing exception for value {}", input, e);
       return null;
     }
   }
