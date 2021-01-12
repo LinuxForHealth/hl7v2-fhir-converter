@@ -59,7 +59,7 @@ public class HL7DataBasedResourceDeserializer extends JsonDeserializer<HL7DataBa
       Entry<String, JsonNode> entry = iter.next();
 
       Expression e;
-      LOGGER.info("deserealizing {}", entry);
+      LOGGER.debug("deserealizing {}", entry);
       ExpressionAttributes expAttr =
           MAPPER.convertValue(entry.getValue(), ExpressionAttributes.class);
 
@@ -80,7 +80,7 @@ public class HL7DataBasedResourceDeserializer extends JsonDeserializer<HL7DataBa
           expressions.put(entry.getKey(), e);
         }
 
-        LOGGER.info("deserialized {} expression type {}", entry, e);
+        LOGGER.debug("deserialized {} expression type {}", entry, e);
 
       }
 

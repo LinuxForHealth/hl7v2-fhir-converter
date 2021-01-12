@@ -22,7 +22,7 @@ resources:
       repeats: false
       additionalSegments:
              - .PV2
-             - .EVN
+
       
     - resourceName: Immunization
       segment: .RXA

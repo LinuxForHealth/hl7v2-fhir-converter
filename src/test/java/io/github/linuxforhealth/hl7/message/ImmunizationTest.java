@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
+import org.hl7.fhir.r4.model.Immunization;
 import org.hl7.fhir.r4.model.Resource;
 import org.hl7.fhir.r4.model.ResourceType;
 import org.junit.Test;
@@ -49,6 +50,7 @@ public class ImmunizationTest {
             + "OBX|3|TS|29768-9^VIS Publication Date^LN|2|19981216||||||F|||20130531\r"
             + "OBX|4|TS|59785-6^VIS Presentation Date^LN|2|20130531||||||F|||20130531\r";
     String json = message.convert(hl7VUXmessageRep, engine);
+
     IBaseResource bundleResource = context.getParser().parseResource(json);
     assertThat(bundleResource).isNotNull();
     Bundle b = (Bundle) bundleResource;
@@ -57,10 +59,40 @@ public class ImmunizationTest {
         e.stream().filter(v -> ResourceType.Immunization == v.getResource().getResourceType())
             .map(BundleEntryComponent::getResource).collect(Collectors.toList());
     assertThat(immu).hasSize(1);
+    Immunization resource = getResource(immu.get(0));
+    assertThat(resource).isNotNull();
 
+    assertThat(resource.getStatus().getDisplay()).isEqualTo("completed");
+    assertThat(resource.getIdentifier().get(0).getValue()).isEqualTo("197027");
+    assertThat(resource.getVaccineCode().getCoding().get(0).getSystem()).isEqualTo("CVX");
+    assertThat(resource.getVaccineCode().getCoding().get(0).getCode()).isEqualTo("48");
+    assertThat(resource.getVaccineCode().getText()).isEqualTo("HIB PRP-T");
+    assertThat(resource.getOccurrence().toString()).isEqualTo("DateTimeType[2013-05-31]");
+
+    assertThat(resource.getReportOrigin().getCoding().get(0).getSystem()).isEqualTo("NIP001");
+    assertThat(resource.getReportOrigin().getCoding().get(0).getCode()).isEqualTo("00");
+    assertThat(resource.getReportOrigin().getText()).isEqualTo("new immunization record");
+    assertThat(resource.getManufacturer().isEmpty()).isFalse();
+
+    assertThat(resource.getLotNumber()).isEqualTo("33k2a");
+    assertThat(resource.getExpirationDate()).isEqualTo("2013-12-10");
+
+
+    assertThat(resource.getPerformer().get(0).getFunction().getCoding().get(0).getCode())
+        .isEqualTo("OP");
+    assertThat(resource.getPerformer().get(0).getFunction().getText())
+        .isEqualTo("Ordering Provider");
+    assertThat(resource.getPerformer().get(0).getActor().isEmpty()).isFalse();
+
+    assertThat(resource.getManufacturer().isEmpty()).isFalse();
 
   }
 
+  private static Immunization getResource(Resource resource) {
+    String s = context.getParser().encodeResourceToString(resource);
+    Class<? extends IBaseResource> klass = Immunization.class;
+    return (Immunization) context.getParser().parseResource(klass, s);
+  }
 
 
 }

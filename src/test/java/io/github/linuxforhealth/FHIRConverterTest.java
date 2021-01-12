@@ -108,6 +108,7 @@ public class FHIRConverterTest {
   }
 
 
+
   @Test
   public void test_invalid_message_throws_error() throws IOException {
     String hl7message = "some text";
@@ -127,6 +128,64 @@ public class FHIRConverterTest {
     HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
     exceptionRule.expect(IllegalArgumentException.class);
     ftv.convert(hl7message);
+
+  }
+
+
+
+  @Test
+  public void test_VXU_V04_message() {
+    String hl7VUXmessageRep =
+        "MSH|^~\\&|MYEHR2.5|RI88140101|KIDSNET_IFL|RIHEALTH|20130531||VXU^V04^VXU_V04|20130531RI881401010105|P|2.5.1|||NE|AL||||||RI543763\r"
+            + "PID|1||432155^^^^MR||Patient^Johnny^New^^^^L|Smith^Sally|20130414|M||2106-3^White^HL70005|123 Any St^^Somewhere^WI^54000^^M\r"
+            + "NK1|1|Patient^Sally|MTH^mother^HL70063|123 Any St^^Somewhere^WI^54000^^M|^PRN^PH^^^608^5551212|||||||||||19820517||||eng^English^ISO639\r"
+            + "PV1|1|ff|yyy|EL|ABC||200^ATTEND_DOC_FAMILY_TEST^ATTEND_DOC_GIVEN_TEST|201^REFER_DOC_FAMILY_TEST^REFER_DOC_GIVEN_TEST|202^CONSULTING_DOC_FAMILY_TEST^CONSULTING_DOC_GIVEN_TEST|MED|||||B6|E|272^ADMITTING_DOC_FAMILY_TEST^ADMITTING_DOC_GIVEN_TEST||48390|||||||||||||||||||||||||201409122200|20150206031726\r"
+
+            + "ORC|RE||197027|||||||^Clerk^Myron||MD67895^Pediatric^MARY^^^^MD^^RIA|||||RI2050\r"
+            + "RXA|0|1|20130531|20130531|48^HIB PRP-T^CVX|0.5|ML^^ISO+||00^new immunization record^NIP001|^Sticker^Nurse|^^^RI2050||||33k2a|20131210|PMC^sanofi^MVX|||CP|A\r"
+            + "RXR|C28161^IM^NCIT^IM^INTRAMUSCULAR^HL70162|RT^right thigh^HL70163\r"
+            + "OBX|1|CE|64994-7^vaccine fund pgm elig cat^LN|1|V02^VFC eligible Medicaid/MedicaidManaged Care^HL70064||||||F|||20130531|||VXC40^per imm^CDCPHINVS\r"
+            + "OBX|2|CE|30956-7^Vaccine Type^LN|2|48^HIB PRP-T^CVX||||||F|||20130531\r"
+            + "OBX|3|TS|29768-9^VIS Publication Date^LN|2|19981216||||||F|||20130531\r"
+            + "OBX|4|TS|59785-6^VIS Presentation Date^LN|2|20130531||||||F|||20130531\r";
+
+
+    HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
+
+    String json = ftv.convert(hl7VUXmessageRep, true, BundleType.TRANSACTION);
+    FHIRContext context = new FHIRContext();
+    IBaseResource bundleResource = context.getParser().parseResource(json);
+    assertThat(bundleResource).isNotNull();
+    Bundle b = (Bundle) bundleResource;
+    assertThat(b.getType()).isEqualTo(BundleType.TRANSACTION);
+    assertThat(b.getId()).isNotNull();
+    assertThat(b.getMeta().getLastUpdated()).isNotNull();
+    assertThat(b.getMeta().getSource())
+        .contains("Message: VXU_V04, Message Control Id: 20130531RI881401010105");
+    List<BundleEntryComponent> e = b.getEntry();
+    List<Resource> patientResource =
+        e.stream().filter(v -> ResourceType.Patient == v.getResource().getResourceType())
+            .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+    assertThat(patientResource).hasSize(1);
+
+    List<Resource> encounterResource =
+        e.stream().filter(v -> ResourceType.Encounter == v.getResource().getResourceType())
+            .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+    assertThat(encounterResource).hasSize(1);
+    List<Resource> obsResource =
+        e.stream().filter(v -> ResourceType.Immunization == v.getResource().getResourceType())
+            .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+    assertThat(obsResource).hasSize(1);
+    List<Resource> pracResource =
+        e.stream().filter(v -> ResourceType.Practitioner == v.getResource().getResourceType())
+            .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+    assertThat(pracResource).hasSize(1);
+
+    List<Resource> organizationRes =
+        e.stream().filter(v -> ResourceType.Organization == v.getResource().getResourceType())
+            .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+    assertThat(organizationRes).hasSize(1);
+
 
   }
 
@@ -163,6 +222,7 @@ public class FHIRConverterTest {
             .map(BundleEntryComponent::getResource).collect(Collectors.toList());
     assertThat(allergyResources).hasSize(2);
   }
+
 
 
 }

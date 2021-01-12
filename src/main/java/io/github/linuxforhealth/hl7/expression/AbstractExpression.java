@@ -93,7 +93,7 @@ public abstract class AbstractExpression implements Expression {
     EvaluationResult result;
     try {
       setLoggingContext();
-      LOGGER.info("Started Evaluating expression {} with baseValue {} ", this, baseValue);
+      LOGGER.info("Started Evaluating  with baseValue {} expression {} ", baseValue, this);
 
       Map<String, EvaluationResult> localContextValues = new HashMap<>(contextValues);
       if (!baseValue.isEmpty()) {
@@ -103,7 +103,8 @@ public abstract class AbstractExpression implements Expression {
       result = evaluateValueOfExpression(dataSource, localContextValues, baseValue);
 
 
-      LOGGER.info("Completed Evaluating the expression {} returned value ---- {}", this, result);
+      LOGGER.info("Completed Evaluating returned value  {} ----  for  expression {} ", result,
+          this);
       if (this.isRequired() && (result == null || result.isEmpty())) {
         String stringRep = this.toString();
         throw new RequiredConstraintFailureException(
@@ -156,13 +157,13 @@ public abstract class AbstractExpression implements Expression {
     List<Object> result = new ArrayList<>();
     List<ResourceValue> additionalresourcesresult = new ArrayList<>();
     List<Object> baseSpecvalues =
-        getSpecValues(dataSource, contextValues, baseinputValue, this.getspecs());
+        getSpecValues(dataSource, localContextValues, baseinputValue, this.getspecs());
     LOGGER.debug("Base values evaluated {} -----  values {} ", this, baseSpecvalues);
 
 
     if (!baseSpecvalues.isEmpty()) {
       for (Object o : baseSpecvalues) {
-        EvaluationResult gen = generateValue(dataSource, contextValues,
+        EvaluationResult gen = generateValue(dataSource, localContextValues,
             EvaluationResultFactory.getEvaluationResult(o));
 
         if (gen != null && gen.getValue() != null && !gen.isEmpty()) {
@@ -180,7 +181,7 @@ public abstract class AbstractExpression implements Expression {
 
       }
     } else {
-      EvaluationResult gen = generateValue(dataSource, contextValues, baseinputValue);
+      EvaluationResult gen = generateValue(dataSource, localContextValues, baseinputValue);
       if (gen != null && gen.getValue() != null && !gen.isEmpty()) {
         if (gen.getValue() instanceof List) {
           result.addAll(gen.getValue());
