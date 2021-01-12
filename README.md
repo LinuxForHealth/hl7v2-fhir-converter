@@ -29,6 +29,11 @@ In order to convert a Hl7 message to FHIR resource, create a new instance of the
     HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
     String output= ftv.convert(hl7message); // generated a FHIR output
 ```
+### Supported HL7 Message types
+  * ADT_A01 
+  * ORU_R01
+  * PPR_PC1
+  * VXU_V04
 
 ### Checkout
 
