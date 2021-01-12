@@ -1,0 +1,24 @@
+#
+# (C) Copyright IBM Corp. 2020
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+resourceType: Organization
+id:
+   type: STRING
+   valueOf: UUID.randomUUID()
+   expressionType: JEXL
+identifier:
+   valueOf: datatype/IdentifierGen
+   generateList: true
+   expressionType: resource
+   vars:
+      id: CWE.1
+name:
+   type: STRING
+   valueOf: CWE.2
+   expressionType: HL7Spec
+alias:
+   type: STRING
+   valueOf: CWE.5
+   expressionType: HL7Spec

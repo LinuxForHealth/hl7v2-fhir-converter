@@ -15,8 +15,8 @@ import io.github.linuxforhealth.core.expression.EvaluationResultFactory;
 
 
 /**
- * Represents HL7 data specification. It defines segment, field, component and subcomponent
- * names/identifiers that can be used for extracting data.
+ * Represents simple specification, where value has to be extracted using the variable name from the
+ * context map
  * 
  *
  * @author pbhallam
@@ -28,9 +28,8 @@ public class SimpleSpecification implements Specification {
   private boolean isExtractMultiple;
   private boolean useGroup;
   private InputDataExtractor primaryDataSource = new ContextMapData();
-  
-  public SimpleSpecification(String variableName,
-      boolean isMultiple, boolean useGroup) {
+
+  public SimpleSpecification(String variableName, boolean isMultiple, boolean useGroup) {
     this.variableName = variableName;
     this.isExtractMultiple = isMultiple;
     this.useGroup = useGroup;
@@ -50,10 +49,6 @@ public class SimpleSpecification implements Specification {
   }
 
 
-
-  public Class<? extends InputDataExtractor> getSourceInputDataClass() {
-    return this.primaryDataSource.getClass();
-  }
 
   @Override
   public EvaluationResult extractValueForSpec(InputDataExtractor dataSource,

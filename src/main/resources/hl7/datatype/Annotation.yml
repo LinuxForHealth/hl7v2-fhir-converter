@@ -1,0 +1,27 @@
+#
+# (C) Copyright IBM Corp. 2020
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+authorString:
+   condition: $performer NULL
+   type: STRING
+   valueOf: NTE.2
+   expressionType: HL7Spec
+   vars:
+      performer: NTE.5
+authorReference:
+   condition: $performer NOT_NULL
+   valueOf: resource/Practitioner
+   expressionType: reference
+   specs: NTE.5
+   vars:
+      performer: NTE.5
+time:
+   type: DATE_TIME
+   valueOf: NTE.6 | NTE.7
+   expressionType: HL7Spec
+text:
+   type: STRING
+   valueOf: NTE.3
+   expressionType: HL7Spec

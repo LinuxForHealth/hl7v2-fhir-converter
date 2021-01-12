@@ -1,0 +1,123 @@
+#
+# (C) Copyright IBM Corp. 2020
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+resourceType: Immunization
+id:
+   type: STRING
+   valueOf: UUID.randomUUID()
+   expressionType: JEXL
+identifier:
+   valueOf: datatype/Identifier
+   generateList: true
+   expressionType: resource
+   specs: ORC.3
+status:
+   type: IMMUNIZATION_STATUS_CODES
+   valueOf: RXA.20
+   expressionType: HL7Spec
+statusReason:
+   valueOf: datatype/CodeableConcept
+   expressionType: resource
+   specs: RXA.18
+   vars:
+      code: RXA.18
+vaccineCode:
+   valueOf: datatype/CodeableConcept
+   expressionType: resource
+   specs: RXA.5
+   vars:
+      code: RXA.5
+patient:
+   valueOf: datatype/Reference
+   expressionType: resource
+   specs: $Patient
+encounter:
+   valueOf: datatype/Reference
+   expressionType: resource
+   specs: $Encounter
+occurrenceDateTime:
+   type: DATE_TIME
+   valueOf: RXA.3
+   expressionType: HL7Spec
+primarySource:
+   value: true
+   condition: $rxa9 NOT_NULL
+   vars:
+      rxa9: RXA.9
+reportOrigin:
+   valueOf: datatype/CodeableConcept
+   expressionType: resource
+   specs: RXA.9
+manufacturer:
+   valueOf: resource/Organization
+   expressionType: reference
+   specs: RXA.17
+lotNumber:
+   type: STRING
+   valueOf: RXA.15
+   expressionType: HL7Spec
+expirationDate:
+   type: DATE_TIME
+   valueOf: RXA.16
+   expressionType: HL7Spec
+site:
+   valueOf: datatype/CodeableConcept
+   expressionType: resource
+   specs: RXR.2
+route:
+   valueOf: datatype/CodeableConcept
+   expressionType: resource
+   specs: RXR.1
+doseQuantity:
+   valueOf: datatype/Quantity
+   expressionType: resource
+   specs: RXA.6| RXA.7
+performer:
+   valueOf: secondary/Performer
+   expressionType: resource
+   vars:
+      orderingProvide: ORC.12
+      administeringProvide: RXA.10
+note:
+   valueOf: datatype/Annotation
+   expressionType: resource
+   condition: $obx3 EQUALS '48767-8'
+   specs: OBX.5
+   vars:
+      obx3: OBX.3.1
+reasonCode:
+   valueOf: datatype/CodeableConcept
+   expressionType: resource
+   generateList: true
+   condition: $obx3 EQUALS '59785-6'
+   specs: OBX.5
+   vars:
+      obx3: OBX.3.1
+reasonReference:
+   valueOf: datatype/Reference
+   expressionType: resource
+   generateList: true
+   specs: $Observation
+   useGroup: true
+isSubpotent:
+   value: true
+   condition: $rxa20 EQUALS 'PA'
+   vars:
+      rxa20: RXA.20
+programEligibility:
+   valueOf: datatype/CodeableConcept
+   expressionType: resource
+   condition: $obx3 EQUALS '64994-7'
+   specs: OBX.5
+   vars:
+      obx3: OBX.3.1
+fundingSource:
+   valueOf: datatype/CodeableConcept
+   expressionType: resource
+   generateList: true
+   condition: $obx3 EQUALS '30963-3'
+   specs: OBX.5
+   vars:
+      obx3: OBX.3.1

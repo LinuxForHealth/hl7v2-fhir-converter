@@ -13,6 +13,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import io.github.linuxforhealth.api.EvaluationResult;
@@ -35,6 +36,7 @@ public abstract class AbstractExpression implements Expression {
 
 
   private ExpressionAttributes attr;
+  private String originalContext;
 
   public AbstractExpression(ExpressionAttributes attr) {
     this.attr = attr;
@@ -90,7 +92,9 @@ public abstract class AbstractExpression implements Expression {
     Preconditions.checkArgument(baseValue != null, "baseValue cannot be null");
     EvaluationResult result;
     try {
-      LOGGER.debug("Started Evaluating expression {} ", this);
+      setLoggingContext();
+      LOGGER.info("Started Evaluating expression {} with baseValue {} ", this, baseValue);
+
       Map<String, EvaluationResult> localContextValues = new HashMap<>(contextValues);
       if (!baseValue.isEmpty()) {
         localContextValues.put(baseValue.getIdentifier(), baseValue);
@@ -99,21 +103,32 @@ public abstract class AbstractExpression implements Expression {
       result = evaluateValueOfExpression(dataSource, localContextValues, baseValue);
 
 
-      LOGGER.debug("Completed Evaluating the expression {} returned result {}", this, result);
+      LOGGER.info("Completed Evaluating the expression {} returned value ---- {}", this, result);
       if (this.isRequired() && (result == null || result.isEmpty())) {
         String stringRep = this.toString();
-        RuntimeException e = new RequiredConstraintFailureException(
-            "Failure in Evaluating expression   :" + stringRep);
-        LOGGER.warn("Failure encountered during evaluation of expression {} , exception {}", this,
-            e.getMessage());
-        throw e;
+        throw new RequiredConstraintFailureException(
+            "Resource Constraint condition not satisfied for expression   :" + stringRep);
+
       } else {
         return result;
       }
     } catch (DataExtractionException | IllegalArgumentException e) {
       LOGGER.warn("Failure encountered during evaluation of expression {} , exception {}", this, e);
       return null;
+    } finally {
+      resetLoggingContext();
     }
+  }
+
+
+
+  private void setLoggingContext() {
+    originalContext = MDC.get("Resource");
+    MDC.put("Resource", originalContext + "-> [" + this.getExpressionAttr().getValueOf() + "]");
+  }
+
+  private void resetLoggingContext() {
+    MDC.put("Resource", originalContext);
   }
 
 
@@ -142,7 +157,7 @@ public abstract class AbstractExpression implements Expression {
     List<ResourceValue> additionalresourcesresult = new ArrayList<>();
     List<Object> baseSpecvalues =
         getSpecValues(dataSource, contextValues, baseinputValue, this.getspecs());
-    LOGGER.debug("Base values evaluated {} values {} ", this, baseSpecvalues);
+    LOGGER.debug("Base values evaluated {} -----  values {} ", this, baseSpecvalues);
 
 
     if (!baseSpecvalues.isEmpty()) {
@@ -262,7 +277,7 @@ public abstract class AbstractExpression implements Expression {
               new EmptyEvaluationResult());
         }
       } catch (DataExtractionException e) {
-        LOGGER.error("cannot extract value for variable {} ", var.getVariableName(), e);
+        LOGGER.error("Cannot extract value for variable {} ", var.getVariableName(), e);
       }
     }
     return localVariables;
@@ -301,7 +316,7 @@ public abstract class AbstractExpression implements Expression {
 
   @Override
   public String toString() {
-    ToStringBuilder.setDefaultStyle(ToStringStyle.JSON_STYLE);
+    ToStringBuilder.setDefaultStyle(ToStringStyle.SIMPLE_STYLE);
     return new ToStringBuilder(this).append("Expression Attributes", this.attr).build();
   }
 

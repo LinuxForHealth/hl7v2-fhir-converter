@@ -27,7 +27,7 @@ public class HL7Segment {
   private List<String> group;
   private String segment;
   private boolean fromGroup;
-  
+
 
   public HL7Segment(String group, String segment) {
     Preconditions.checkArgument(StringUtils.isNotEmpty(segment), SEGMENT_CANNOT_BE_NULL_OR_EMPTY);
@@ -55,6 +55,18 @@ public class HL7Segment {
     this.fromGroup = fromGroup;
   }
 
+
+  public HL7Segment(List<String> group, String segment, boolean fromGroup) {
+    Preconditions.checkArgument(StringUtils.isNotEmpty(segment), SEGMENT_CANNOT_BE_NULL_OR_EMPTY);
+    this.segment = segment;
+    this.group = new ArrayList<>();
+    if (group != null) {
+      this.group.addAll(group);
+
+    }
+    this.fromGroup = fromGroup;
+  }
+
   public HL7Segment(String segment) {
     this(DEFAULT_GROUP, segment);
 
@@ -70,13 +82,52 @@ public class HL7Segment {
     return ImmutableList.copyOf(group);
   }
 
-
-
   public static HL7Segment parse(String rawSegment) {
+    return parse(rawSegment, null);
+
+  }
+
+  public static HL7Segment parse(String rawSegment, String rawGroup) {
+
     if (StringUtils.startsWith(rawSegment, ".")) {
       String segment = StringUtils.removeStart(rawSegment, ".");
-      return new HL7Segment(segment, true);
+      return createHL7Segment(segment, rawGroup);
+
     } else {
+      return createHL7Segment(rawSegment);
+    }
+
+  }
+
+
+  private static HL7Segment createHL7Segment(String rawSegment, String rawGroup) {
+    List<String> group = parseGroup(rawGroup);
+    StringTokenizer tokSegment = new StringTokenizer(rawSegment, ".");
+    String segment = null;
+    List<String> tokensSegment = tokSegment.getTokenList();
+
+    if (tokensSegment.size() > 1) {
+      group.addAll(tokensSegment.subList(0, tokensSegment.size() - 1));
+      segment = tokensSegment.get(tokensSegment.size() - 1);
+    } else if (tokensSegment.size() == 1) {
+      segment = tokensSegment.get(0);
+    } else {
+      throw new IllegalArgumentException("rawSegment cannot be parsed:" + rawSegment);
+    }
+
+    return new HL7Segment(group, segment, true);
+  }
+
+  public static List<String> parseGroup(String rawGroup) {
+    List<String> group = new ArrayList<>();
+    if (rawGroup != null) {
+      StringTokenizer tokGroup = new StringTokenizer(rawGroup, ".");
+      group.addAll(tokGroup.getTokenList());
+    }
+    return group;
+  }
+
+  private static HL7Segment createHL7Segment(String rawSegment) {
     StringTokenizer stk = new StringTokenizer(rawSegment, ".");
     String segment = null;
     List<String> group = new ArrayList<>();
@@ -91,18 +142,12 @@ public class HL7Segment {
       throw new IllegalArgumentException("rawSegment cannot be parsed:" + rawSegment);
     }
 
-
-
-    return new HL7Segment(group, segment);
-    }
-
+    return new HL7Segment(group, segment, false);
   }
 
   public boolean isFromGroup() {
     return fromGroup;
   }
-
-
 
 
 

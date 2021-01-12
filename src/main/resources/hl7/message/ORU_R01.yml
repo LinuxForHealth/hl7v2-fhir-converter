@@ -24,8 +24,8 @@ resources:
              - EVN
       
     - resourceName: Observation
-      segment: PATIENT_RESULT.ORDER_OBSERVATION.OBSERVATION.OBX
-      group: ORDER_OBSERVATION
+      segment: .OBSERVATION.OBX
+      group: PATIENT_RESULT.ORDER_OBSERVATION
       resourcePath: resource/Observation
       repeats: true
       isReferenced: true
@@ -33,8 +33,8 @@ resources:
       
             
     - resourceName: DiagnosticReport
-      segment: PATIENT_RESULT.ORDER_OBSERVATION.OBR
-      group: ORDER_OBSERVATION
+      segment: .OBR
+      group: PATIENT_RESULT.ORDER_OBSERVATION
       resourcePath: resource/DiagnosticReport
       repeats: true
       additionalSegments:

@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,11 +19,16 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.InjectableValues;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.base.Preconditions;
 import io.github.linuxforhealth.api.ResourceModel;
 import io.github.linuxforhealth.core.Constants;
 import io.github.linuxforhealth.core.ObjectMapperUtil;
 import io.github.linuxforhealth.core.config.ConverterConfiguration;
+import io.github.linuxforhealth.hl7.message.HL7FHIRResourceTemplate;
+import io.github.linuxforhealth.hl7.message.HL7FHIRResourceTemplateAttributes;
 import io.github.linuxforhealth.hl7.message.HL7MessageModel;
 
 /**
@@ -110,10 +116,23 @@ public class ResourceReader {
     if (StringUtils.isNotBlank(templateFileContent)) {
       try {
 
-        HL7MessageModel rm = ObjectMapperUtil.getYAMLInstance().readValue(templateFileContent,
-            HL7MessageModel.class);
-        rm.setMessageName(templateName);
-        return rm;
+        JsonNode parent = ObjectMapperUtil.getYAMLInstance().readTree(templateFileContent);
+        Preconditions.checkState(parent != null, "Parent node from template file cannot be null");
+
+        JsonNode resourceNodes = parent.get("resources");
+        Preconditions.checkState(resourceNodes != null && !resourceNodes.isEmpty(),
+            "List of resources from Parent node from template file cannot be null or empty");
+        List<HL7FHIRResourceTemplateAttributes> templateAttributes =
+            ObjectMapperUtil.getYAMLInstance().convertValue(resourceNodes,
+                new TypeReference<List<HL7FHIRResourceTemplateAttributes>>() {});
+
+        List<HL7FHIRResourceTemplate> templates = new ArrayList<>();
+
+        templateAttributes.forEach(t -> templates.add(new HL7FHIRResourceTemplate(t)));
+        Preconditions.checkState(templateAttributes != null && !templateAttributes.isEmpty(),
+            "TemplateAttributes generated from template file cannot be null or empty");
+        return new HL7MessageModel(templateName, templates);
+
       } catch (IOException e) {
         throw new IllegalArgumentException(
             "Error encountered in processing the template" + templateName, e);
@@ -129,13 +148,10 @@ public class ResourceReader {
     String templateFileContent = getResourceInHl7Folder(path + ".yml");
 
     try {
-      HL7DataBasedResourceModel rm = ObjectMapperUtil.getYAMLInstance()
+      InjectableValues injValues = new InjectableValues.Std().addValue("resourceName", path);
+      return ObjectMapperUtil.getYAMLInstance().setInjectableValues(injValues)
           .readValue(templateFileContent, HL7DataBasedResourceModel.class);
-      if (StringUtils.isBlank(rm.getName())
-          || StringUtils.equalsIgnoreCase(rm.getName(), "unknown")) {
-        rm.setName(path);
-      }
-      return rm;
+
     } catch (IOException e) {
       throw new IllegalArgumentException("Error encountered in processing the template" + path, e);
     }

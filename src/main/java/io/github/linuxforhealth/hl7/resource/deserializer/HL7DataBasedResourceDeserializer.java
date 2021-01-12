@@ -41,6 +41,7 @@ public class HL7DataBasedResourceDeserializer extends JsonDeserializer<HL7DataBa
   @Override
   public HL7DataBasedResourceModel deserialize(JsonParser jsonParser, DeserializationContext ctxt)
       throws IOException {
+
     ObjectNode node = jsonParser.getCodec().readTree(jsonParser);
     JsonNode hl7PrefixNode = node.get(TemplateFieldNames.SPEC);
     String hl7Prefix = null;
@@ -85,7 +86,7 @@ public class HL7DataBasedResourceDeserializer extends JsonDeserializer<HL7DataBa
 
     }
     JsonNode namenode = node.get(RESOURCE_TYPE_FIELD_NAME);
-    String name = "unknown";
+    String name = String.valueOf(ctxt.findInjectableValue("resourceName", null, null));
     if (namenode != null) {
       name = namenode.textValue();
     }

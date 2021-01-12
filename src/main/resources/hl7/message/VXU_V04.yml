@@ -3,7 +3,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 #
-# FHIR Resources to extract from ADT_A01 message
+# FHIR Resources to extract from VXU_V04 message
 ---
 resources:
     - resourceName: Patient
@@ -16,30 +16,24 @@ resources:
       
     - resourceName: Encounter
       segment: .PV1
-      group: PATIENT_VISIT
       resourcePath: resource/Encounter
       isReferenced: true
+      group: PATIENT
       repeats: false
       additionalSegments:
              - .PV2
              - .EVN
       
-    - resourceName: Observation
-      segment: .PROBLEM_OBSERVATION.OBX
-      group: PROBLEM
-      resourcePath: resource/Observation
+    - resourceName: Immunization
+      segment: .RXA
+      group: ORDER
+      resourcePath: resource/Immunization
       repeats: true
-      isReferenced: true
+      isReferenced: false
       additionalSegments:
+              - .ORC
+              - .RXR
+              - .OBSERVATION.OBX
       
-            
-    - resourceName: Condition
-      segment: .PRB
-      group: PROBLEM
-      resourcePath: resource/Condition
-      repeats: true
-      additionalSegments:
-      
-
       
   

@@ -49,23 +49,22 @@ public class HL7DataBasedResourceModel implements ResourceModel {
   private String spec;
 
   private String name;
-  private String group;
+
+  /**
+   * 
+   * @param name
+   * @param expressions
+   * @param hl7spec
+   */
 
   public HL7DataBasedResourceModel(String name, Map<String, Expression> expressions,
       String hl7spec) {
-    this(name, expressions, hl7spec, null);
-
-
-  }
-
-  public HL7DataBasedResourceModel(String name, Map<String, Expression> expressions, String hl7spec,
-      String group) {
     this.expressions = new HashMap<>();
     this.expressions.putAll(expressions);
     this.spec = hl7spec;
 
     this.name = name;
-    this.group = group;
+
 
   }
 
@@ -160,8 +159,10 @@ public class HL7DataBasedResourceModel implements ResourceModel {
 
 
     } catch (RequiredConstraintFailureException e) {
-      LOGGER.warn("RequiredConstraintFailureException during  resource {} evaluation  reason: {}",
-          this.name, e.getMessage());
+      LOGGER.warn("Resource Constraint condition not satisfied for  {} , exception {}", this.name,
+          e.getMessage());
+      LOGGER.debug("Resource Constraint condition not satisfied for  {} , exception {}", this.name,
+          e);
       return null;
 
     } catch (IllegalArgumentException | IllegalStateException | DataExtractionException e) {
@@ -263,10 +264,6 @@ public class HL7DataBasedResourceModel implements ResourceModel {
     return spec;
   }
 
-
-  public void setName(String name) {
-    this.name = name;
-  }
 
   @Override
   public String getName() {

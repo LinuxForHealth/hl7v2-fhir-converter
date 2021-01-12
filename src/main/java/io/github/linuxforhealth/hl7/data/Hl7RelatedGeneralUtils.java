@@ -98,17 +98,18 @@ public class Hl7RelatedGeneralUtils {
    */
 
   public static Long diffDateMin(Object start, Object end) {
-    LOGGER.info("Generating time diff in min  from var1{}, var2 {}", start, end);
+    LOGGER.info("Generating time diff in min  from var1 {}, var2 {}", start, end);
     try {
       Temporal date1 = DateUtil.getTemporal(Hl7DataHandlerUtil.getStringValue(start));
       Temporal date2 = DateUtil.getTemporal(Hl7DataHandlerUtil.getStringValue(end));
+      LOGGER.info("temporal dates start: {} , end: {} ", date1, date2);
       if (date1 != null && date2 != null) {
-
         return ChronoUnit.MINUTES.between(date1, date2);
-
       }
     } catch (UnsupportedTemporalTypeException e) {
-      LOGGER.warn("Cannot evaluate time difference for {} {} ", start, end, e);
+      LOGGER.warn("Cannot evaluate time difference for start: {} , end: {} reason {} ", start, end,
+          e.getMessage());
+      LOGGER.debug("Cannot evaluate time difference for start: {} , end: {} ", start, end, e);
       return null;
     }
     return null;
@@ -118,9 +119,9 @@ public class Hl7RelatedGeneralUtils {
     String stringRepVal = Hl7DataHandlerUtil.getStringValue(input);
     if (StringUtils.isNotBlank(stringRepVal)) {
       StringTokenizer stk = new StringTokenizer(stringRepVal, delimitter);
-     if(stk.getTokenList().size()> index) {
-      return stk.getTokenList().get(index);
-     }
+      if (stk.getTokenList().size() > index) {
+        return stk.getTokenList().get(index);
+      }
 
     }
     return null;
