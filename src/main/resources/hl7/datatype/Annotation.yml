@@ -23,5 +23,6 @@ time:
    expressionType: HL7Spec
 text:
    type: STRING
-   valueOf: NTE.3
+   valueOf: NTE.3 |$text
+   required: true
    expressionType: HL7Spec
