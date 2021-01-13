@@ -10,7 +10,7 @@ Maven dependency
 <dependency>
   <groupId>io.github.linuxforhealth</groupId>
   <artifactId>hl7v2-fhir-converter</artifactId>
-  <version>1.0.0</version>
+  <version>1.0.4</version>
 </dependency>
 ```
 Also add following repo to your build file to fetch requiired dependency:
