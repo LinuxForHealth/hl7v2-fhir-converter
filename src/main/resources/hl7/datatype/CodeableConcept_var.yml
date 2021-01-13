@@ -6,7 +6,7 @@
 # 
 ---
 # coding requires code,display and system defined as variables from the resource that calls this resource
-
+# Uses values of variables passed: $code, $text, $system, $version
 coding:
     generateList: true
     valueOf: datatype/Coding

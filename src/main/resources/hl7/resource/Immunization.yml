@@ -83,18 +83,23 @@ performer:
 note:
    valueOf: datatype/Annotation
    expressionType: resource
-   condition: $obx3 EQUALS '48767-8'
-   specs: OBX.5
+   condition: $obx3 EQUALS 48767-8
+   specs: OBX
    vars:
-      obx3: OBX.3.1
+      obx3: STRING, OBX.3.1
+      text: STRING, OBX.5
 reasonCode:
-   valueOf: datatype/CodeableConcept
+   valueOf: datatype/CodeableConcept_var
    expressionType: resource
    generateList: true
-   condition: $obx3 EQUALS '59785-6'
-   specs: OBX.5
+   condition: $obx3 EQUALS 59785-6
+   specs: OBX
    vars:
-      obx3: OBX.3.1
+      obx3: STRING, OBX.3.1
+      code: STRING, OBX.5.1
+      text: STRING, OBX.5.2
+      system: STRING, OBX.5.3
+      
 reasonReference:
    valueOf: datatype/Reference
    expressionType: resource
@@ -107,17 +112,24 @@ isSubpotent:
    vars:
       rxa20: RXA.20
 programEligibility:
-   valueOf: datatype/CodeableConcept
-   expressionType: resource
-   condition: $obx3 EQUALS '64994-7'
-   specs: OBX.5
-   vars:
-      obx3: OBX.3.1
-fundingSource:
-   valueOf: datatype/CodeableConcept
+   valueOf: datatype/CodeableConcept_var
    expressionType: resource
    generateList: true
-   condition: $obx3 EQUALS '30963-3'
-   specs: OBX.5
+   condition: $obx3 EQUALS 64994-7
+   specs: OBX
+   vars:    
+      obx3: STRING, OBX.3.1
+      code: STRING, OBX.5.1
+      text: STRING, OBX.5.2
+      system: STRING, OBX.5.3
+fundingSource:
+   valueOf: datatype/CodeableConcept_var
+   expressionType: resource
+   generateList: true
+   condition: $obx3 EQUALS 30963-3
+   specs: OBX
    vars:
-      obx3: OBX.3.1
+      obx3: STRING, OBX.3.1
+      code: STRING, OBX.5.1
+      text: STRING, OBX.5.2
+      system: STRING, OBX.5.3
