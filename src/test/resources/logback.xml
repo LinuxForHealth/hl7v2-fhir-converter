@@ -12,7 +12,7 @@
         </encoder>
     </appender>
 
-<logger name="io.github.linuxforhealth" level="warn" />
+<logger name="io.github.linuxforhealth" level="info" />
     <root level="error">
         <appender-ref ref="Console"/>
     </root>

@@ -12,6 +12,8 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.Temporal;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.regex.Pattern;
 import org.slf4j.Logger;
@@ -40,7 +42,7 @@ public class DateUtil {
       LocalDate ldt = LocalDate.parse(input, DateFormats.getFormatterInstance());
       return ldt.format(format);
     } catch (DateTimeParseException e) {
-      LOGGER.warn("Date parsing exception for {}", input, e);
+      LOGGER.warn("Input value cannot be formatted to LocalDate {}", input, e);
       return null;
     }
   }
@@ -81,8 +83,9 @@ public class DateUtil {
       returnValue = ldt.format(format);
       return returnValue;
     } catch (DateTimeParseException e) {
-      LOGGER.warn("Date parsing failure for value \'{}\'   reason {}", input, e.getMessage());
-      LOGGER.debug("Date parsing exception for value {}", input, e);
+      LOGGER.warn("Input value cannot be formatted to LocalDateTime \'{}\'   reason {}", input,
+          e.getMessage());
+      LOGGER.debug("Input value cannot be formatted to LocalDateTime {}", input, e);
       return null;
     }
   }
@@ -104,8 +107,9 @@ public class DateUtil {
         LocalDate ldt = LocalDate.parse(input, DateFormats.getFormatterInstance());
         return ldt.atStartOfDay().format(format);
       } catch (DateTimeParseException e) {
-        LOGGER.warn("Date parsing exception for {} reason: {}", input, e.getMessage());
-        LOGGER.debug("Date parsing exception for {} ", input, e);
+        LOGGER.warn("Input value cannot be formatted to LocalDate {} reason: {}", input,
+            e.getMessage());
+        LOGGER.debug("Input value cannot be formatted to LocalDate {} ", input, e);
         return null;
       }
     }
@@ -128,8 +132,9 @@ public class DateUtil {
         ZonedDateTime zdt = ZonedDateTime.parse(input, DateFormats.getFormatterInstance());
         return zdt.format(format);
       } catch (DateTimeParseException e) {
-        LOGGER.warn("Date parsing exception for {} reason: {}", input, e.getMessage());
-        LOGGER.debug("Date parsing exception for {} ", input, e);
+        LOGGER.warn("Input value cannot be parsed to ZonedDateTime {} reason: {}", input,
+            e.getMessage());
+        LOGGER.debug("Input value cannot be parsed to ZonedDateTime {} ", input, e);
         return null;
       }
     }
@@ -139,7 +144,7 @@ public class DateUtil {
 
 
   public static Temporal getTemporal(String dateString) {
-
+    Map<String, DateTimeParseException> warnings = new HashMap<>();
     if (dateString == null) {
       return null;
     }
@@ -148,8 +153,7 @@ public class DateUtil {
       temporal = Instant.parse(dateString);
       LOGGER.info("Date parsed for instant {}", dateString);
     } catch (DateTimeParseException e) {
-      LOGGER.debug("Date parsing error for instant {}", dateString, e);
-      LOGGER.warn("Date parsing error for instant {} reason {}", dateString, e.getMessage());
+      warnings.put("Input value cannot be parsed to  instant " + dateString, e);
 
     }
     if (temporal == null) {
@@ -157,9 +161,8 @@ public class DateUtil {
         temporal = ZonedDateTime.parse(dateString, DateTimeFormatter.ISO_ZONED_DATE_TIME);
         LOGGER.info("Date parsed for ZonedDateTime {}", dateString);
       } catch (DateTimeParseException e) {
-        LOGGER.warn("Date parsing error for ZonedDateTime {} reason {} ", dateString,
-            e.getMessage());
-        LOGGER.debug("Date parsing error for ZonedDateTime {}", dateString, e);
+        warnings.put("Input value cannot be parsed to ZonedDateTime " + dateString, e);
+
       }
 
     }
@@ -168,9 +171,7 @@ public class DateUtil {
         temporal = LocalDateTime.parse(dateString, DateTimeFormatter.ISO_LOCAL_DATE_TIME);
         LOGGER.info("Date parsed for LocalDateTime {}", dateString);
       } catch (DateTimeParseException e) {
-        LOGGER.warn("Date parsing error for LocalDateTime {} reason {}", dateString,
-            e.getMessage());
-        LOGGER.debug("Date parsing error for LocalDateTime {}", dateString, e);
+        warnings.put("Input value cannot be parsed to LocalDateTime " + dateString, e);
       }
     }
     if (temporal == null) {
@@ -179,9 +180,20 @@ public class DateUtil {
         temporal = LocalDate.parse(dateString, DateTimeFormatter.ISO_LOCAL_DATE);
         LOGGER.info("Date parsed for LocalDate {}", dateString);
       } catch (DateTimeParseException e) {
-        LOGGER.warn("Date parsing error for LocalDate {} reason {}", dateString, e.getMessage());
-        LOGGER.debug("Date parsing error for LocalDate {}", dateString, e);
+        warnings.put("Input value cannot be parsed to LocalDate " + dateString, e);
+
+
       }
+    }
+
+    if (temporal == null && !warnings.isEmpty()) {
+      LOGGER.warn("Attempt to parse input value {} to temporal failed ", dateString);
+      for (Entry<String, DateTimeParseException> entry : warnings.entrySet()) {
+        LOGGER.warn("{} reason {}", entry.getKey(), entry.getValue().getMessage());
+        LOGGER.debug("{} reason {}", entry.getKey(), entry.getValue());
+
+      }
+
     }
     return temporal;
 
