@@ -38,8 +38,7 @@ public class SystemUrlLookup {
       return ObjectMapperUtil.getYAMLInstance().readValue(content, typeRef);
 
     } catch (IOException e) {
-      throw new IllegalArgumentException(
-          "Cannot read codesystem/CodingSystemMapping.yml", e);
+      throw new IllegalArgumentException("Cannot read codesystem/CodingSystemMapping.yml", e);
     }
   }
 
@@ -51,7 +50,7 @@ public class SystemUrlLookup {
    * @return String
    * 
    */
-  public static String getSystemUrl(String value) {
+  protected static String getSystemUrl(String value) {
     if (systemURLLookupInstance == null) {
       systemURLLookupInstance = new SystemUrlLookup();
     }
@@ -64,12 +63,18 @@ public class SystemUrlLookup {
 
 
 
-
-  public static String getSystemV2Url(String value) {
+  protected static String getSystemV2Url(String value) {
     if (value != null) {
       return Constants.HL7V2_SYSTEM_PREFIX + value;
     } else {
       return null;
     }
+  }
+
+  public static void initSystemUrlLookup() {
+    if (systemURLLookupInstance == null) {
+      systemURLLookupInstance = new SystemUrlLookup();
+    }
+
   }
 }

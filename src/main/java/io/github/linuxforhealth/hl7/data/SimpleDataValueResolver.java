@@ -24,10 +24,9 @@ import org.hl7.fhir.r4.model.codesystems.ConditionCategory;
 import org.hl7.fhir.r5.model.Immunization.ImmunizationStatusCodes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.ibm.fhir.model.type.Uri;
 import io.github.linuxforhealth.api.ResourceValue;
-import io.github.linuxforhealth.core.terminology.Hl7v2Mapping;
 import io.github.linuxforhealth.core.terminology.SimpleCode;
-import io.github.linuxforhealth.core.terminology.SystemUrlLookup;
 import io.github.linuxforhealth.core.terminology.TerminologyLookup;
 import io.github.linuxforhealth.hl7.data.date.DateUtil;
 
@@ -124,7 +123,7 @@ public class SimpleDataValueResolver {
         String code = getFHIRCode(val, ObservationStatus.class);
         if (code != null) {
           ObservationStatus status = ObservationStatus.fromCode(code);
-          return new SimpleCode(code, status.getSystem(), status.getDisplay());
+          return new SimpleCode(code, status.getSystem(), status.getDisplay(), null);
         } else {
           return null;
         }
@@ -135,7 +134,7 @@ public class SimpleDataValueResolver {
         String val = Hl7DataHandlerUtil.getStringValue(value);
         if (val != null) {
           ConditionCategory status = ConditionCategory.fromCode(val);
-          return new SimpleCode(val, status.getSystem(), status.getDisplay());
+          return new SimpleCode(val, status.getSystem(), status.getDisplay(), null);
         } else {
           return null;
         }
@@ -208,7 +207,7 @@ public class SimpleDataValueResolver {
     if (table != null && val != null) {
       return TerminologyLookup.lookup(table, val);
     } else if (val != null) {
-      return new SimpleCode(val, null, null);
+      return new SimpleCode(val, null, null, null);
     } else {
       return null;
     }
@@ -243,9 +242,9 @@ public class SimpleDataValueResolver {
   public static final ValueExtractor<Object, String> SYSTEM_URL = (Object value) -> {
 
     String val = Hl7DataHandlerUtil.getStringValue(value);
-    String systemUrl = SystemUrlLookup.getSystemUrl(val);
+    Uri systemUrl = TerminologyLookup.getSystemUrl(val);
     if (systemUrl != null) {
-      return systemUrl;
+      return systemUrl.toString();
     } else {
       return val;
     }
@@ -329,7 +328,8 @@ public class SimpleDataValueResolver {
 
   private static String getFHIRCode(String hl7Value, Class<?> fhirConceptClassName) {
     if (hl7Value != null) {
-      Map<String, String> mapping = Hl7v2Mapping.getMapping(fhirConceptClassName.getSimpleName());
+      Map<String, String> mapping =
+          TerminologyLookup.getMapping(fhirConceptClassName.getSimpleName());
       if (mapping != null && !mapping.isEmpty()) {
         return mapping.get(StringUtils.upperCase(hl7Value, Locale.ENGLISH));
       } else {

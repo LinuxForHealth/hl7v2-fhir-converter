@@ -9,6 +9,8 @@ system:
      type: SYSTEM_URL
      valueOf: CWE.3 |CE.3 |CNE.3
      expressionType: HL7Spec
+     vars:
+       systemTable: $v2Table
 version:
      type: STRING
      valueOf: CWE.7 |CNE.7

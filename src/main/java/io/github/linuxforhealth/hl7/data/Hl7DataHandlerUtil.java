@@ -68,6 +68,7 @@ public class Hl7DataHandlerUtil {
       IS id = (IS) obj;
       return StringUtils.leftPad(String.valueOf(id.getTable()), 4, '0');
     }
+
     return null;
   }
 
@@ -110,14 +111,14 @@ public class Hl7DataHandlerUtil {
 
   private static String getValueFromComposite(Composite com) {
 
-      Type[] types = com.getComponents();
-      StringBuilder sb = new StringBuilder();
-      for (Type t : types) {
+    Type[] types = com.getComponents();
+    StringBuilder sb = new StringBuilder();
+    for (Type t : types) {
       String text = t.toString();
       if (StringUtils.isNotBlank(text)) {
         sb.append(t.toString()).append(", ");
       }
-      }
+    }
     return StringUtils.stripEnd(sb.toString(), ", ");
 
 

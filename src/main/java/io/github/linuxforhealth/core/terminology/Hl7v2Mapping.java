@@ -21,6 +21,7 @@ import io.github.linuxforhealth.hl7.resource.ResourceReader;
 public class Hl7v2Mapping {
   private Map<String, Map<String, String>> mapping;
   private static Hl7v2Mapping hl7Mapping;
+
   private Hl7v2Mapping() {
     try {
       mapping = loadV2Mappings();
@@ -35,16 +36,23 @@ public class Hl7v2Mapping {
         new TypeReference<Map<String, Map<String, String>>>() {};
     String content =
         ResourceReader.getInstance().getResourceInHl7Folder(Constants.V2_TO_FHIR_MAPPING_PATH);
-    return ObjectMapperUtil.getYAMLInstance()
-        .readValue(content, typeRef);
+    return ObjectMapperUtil.getYAMLInstance().readValue(content, typeRef);
   }
 
 
-  public static Map<String, String> getMapping(String fhirConceptName) {
+  protected static Map<String, String> getMapping(String fhirConceptName) {
     if (hl7Mapping == null) {
       hl7Mapping = new Hl7v2Mapping();
     }
     return hl7Mapping.mapping.get(fhirConceptName);
+  }
+
+
+  public static void initMapping() {
+    if (hl7Mapping == null) {
+      hl7Mapping = new Hl7v2Mapping();
+    }
+
   }
 
 }
