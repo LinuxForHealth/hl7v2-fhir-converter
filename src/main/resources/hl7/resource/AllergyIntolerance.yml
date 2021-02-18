@@ -10,6 +10,25 @@ id:
   valueOf: 'UUID.randomUUID()'
   expressionType: JEXL
 
+clinicalStatus:
+   valueOf: datatype/CodeableConcept_var
+   generateList: true
+   expressionType: resource
+   constants:
+      system: 'http://terminology.hl7.org/CodeSystem/allergyintolerance-clinical'
+      code: 'active'
+      display: 'Active'
+    
+verificationStatus: 
+   valueOf: datatype/CodeableConcept_var
+   generateList: true
+   expressionType: resource
+   constants:
+      system: 'http://terminology.hl7.org/CodeSystem/allergyintolerance-verification'
+      code: 'confirmed'
+      display: 'Confirmed'
+
+
 category:
     type: ALLERGY_INTOLERANCE_CATEGORY
     generateList: true

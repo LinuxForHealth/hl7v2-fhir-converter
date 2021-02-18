@@ -30,6 +30,7 @@ code:
    valueOf: datatype/CodeableConcept
    expressionType: resource
    specs: OBR.4
+   required: true
    vars:
       code: OBR.4
 encounter:

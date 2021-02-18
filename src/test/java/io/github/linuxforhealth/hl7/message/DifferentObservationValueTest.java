@@ -77,7 +77,7 @@ public class DifferentObservationValueTest {
   public void test_observation_TX_result() throws IOException {
 
     String hl7message = baseMessage
-        + "OBX|1|TX|||Fourth Line: HYPERDYNAMIC LV SYSTOLIC FUNCTION, VISUAL EF 80%||||||F||||Alex||";
+        + "OBX|1|TX|^Type of protein feed^L||Fourth Line: HYPERDYNAMIC LV SYSTOLIC FUNCTION, VISUAL EF 80%||||||F||||Alex||";
     String json = message.convert(hl7message, engine);
 
     IBaseResource bundleResource = context.getParser().parseResource(json);
@@ -102,7 +102,7 @@ public class DifferentObservationValueTest {
   public void test_observation_TX_multiple_parts_result() throws IOException {
 
     String hl7message = baseMessage
-        + "OBX|1|TX|||HYPERDYNAMIC LV SYSTOLIC FUNCTION, VISUAL EF 80%~Fifth line, as part of a repeated field||||||F||";
+        + "OBX|1|TX|^Type of protein feed^L||HYPERDYNAMIC LV SYSTOLIC FUNCTION, VISUAL EF 80%~Fifth line, as part of a repeated field||||||F||";
     String json = message.convert(hl7message, engine);
     IBaseResource bundleResource = context.getParser().parseResource(json);
     assertThat(bundleResource).isNotNull();
@@ -122,7 +122,7 @@ public class DifferentObservationValueTest {
   }
 
   @Test
-  public void test_observation_CE_result() throws IOException {
+  public void test_observation_CE_result_unknown_system() throws IOException {
 
     String hl7message =
         baseMessage + "OBX|1|CE|93000&CMP^LIN^CPT4|11|1305^No significant change was found^MEIECG";
@@ -142,7 +142,38 @@ public class DifferentObservationValueTest {
     CodeableConcept cc = obs.getValueCodeableConcept();
     assertThat(cc.getCoding()).isNotNull();
     assertThat(cc.getCoding().get(0)).isNotNull();
-    assertThat(cc.getCoding().get(0).getSystem()).isEqualTo("MEIECG");
+    assertThat(cc.getCoding().get(0).getSystem()).isNull();
+    assertThat(cc.getCoding().get(0).getCode()).isEqualTo("1305");
+    assertThat(cc.getCoding().get(0).getDisplay()).isEqualTo("No significant change was found");
+
+    assertThat(cc.getText()).isEqualTo("No significant change was found");
+
+
+  }
+
+
+  @Test
+  public void test_observation_CE_result_known_system() throws IOException {
+
+    String hl7message =
+        baseMessage + "OBX|1|CE|93000&CMP^LIN^CPT4|11|1305^No significant change was found^LN";
+    String json = message.convert(hl7message, engine);
+
+    IBaseResource bundleResource = context.getParser().parseResource(json);
+    assertThat(bundleResource).isNotNull();
+    Bundle b = (Bundle) bundleResource;
+    List<BundleEntryComponent> e = b.getEntry();
+    List<Resource> obsResource =
+        e.stream().filter(v -> ResourceType.Observation == v.getResource().getResourceType())
+            .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+    assertThat(obsResource).hasSize(1);
+    Observation obs = (Observation) obsResource.get(0);
+    assertThat(obs.getValueCodeableConcept()).isNotNull();
+    assertThat(obs.getStatus()).isNotNull();
+    CodeableConcept cc = obs.getValueCodeableConcept();
+    assertThat(cc.getCoding()).isNotNull();
+    assertThat(cc.getCoding().get(0)).isNotNull();
+    assertThat(cc.getCoding().get(0).getSystem()).isEqualTo("http://loinc.org");
     assertThat(cc.getCoding().get(0).getCode()).isEqualTo("1305");
     assertThat(cc.getCoding().get(0).getDisplay()).isEqualTo("No significant change was found");
 

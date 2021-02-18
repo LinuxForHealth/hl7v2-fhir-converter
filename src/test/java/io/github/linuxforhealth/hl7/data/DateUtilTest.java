@@ -84,7 +84,7 @@ public class DateUtilTest {
   @Test
   public void simple_datetime_month_day_hour() {
     String ld = DateUtil.formatToDateTime("2008092609");
-    assertThat(ld).isEqualTo("2008-09-26T09:00:00");
+    assertThat(ld).isEqualTo("2008-09-26T09:00:00+08:00");
 
   }
 

@@ -63,10 +63,10 @@ public class Hl7DataHandlerUtil {
 
     if (obj instanceof ID) {
       ID id = (ID) obj;
-      return StringUtils.leftPad(String.valueOf(id.getTable()), 4, '0');
+      return "v2-" + StringUtils.leftPad(String.valueOf(id.getTable()), 4, '0');
     } else if (obj instanceof IS) {
       IS id = (IS) obj;
-      return StringUtils.leftPad(String.valueOf(id.getTable()), 4, '0');
+      return "v2-" + StringUtils.leftPad(String.valueOf(id.getTable()), 4, '0');
     }
     return null;
   }

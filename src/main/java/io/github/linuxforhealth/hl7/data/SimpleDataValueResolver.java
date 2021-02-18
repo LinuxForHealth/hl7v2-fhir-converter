@@ -19,9 +19,9 @@ import org.hl7.fhir.r4.model.AllergyIntolerance.AllergyIntoleranceCategory;
 import org.hl7.fhir.r4.model.AllergyIntolerance.AllergyIntoleranceCriticality;
 import org.hl7.fhir.r4.model.DiagnosticReport.DiagnosticReportStatus;
 import org.hl7.fhir.r4.model.Enumerations.AdministrativeGender;
+import org.hl7.fhir.r4.model.Immunization.ImmunizationStatus;
 import org.hl7.fhir.r4.model.Observation.ObservationStatus;
 import org.hl7.fhir.r4.model.codesystems.ConditionCategory;
-import org.hl7.fhir.r5.model.Immunization.ImmunizationStatusCodes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import io.github.linuxforhealth.api.ResourceValue;
@@ -40,6 +40,7 @@ public class SimpleDataValueResolver {
     if (val != null) {
       return DateUtil.formatToDate(val);
     }
+
     return null;
   };
 
@@ -144,7 +145,7 @@ public class SimpleDataValueResolver {
   public static final ValueExtractor<Object, String> IMMUNIZATION_STATUS_CODES = (Object value) -> {
 
     String val = Hl7DataHandlerUtil.getStringValue(value);
-    String code = getFHIRCode(val, ImmunizationStatusCodes.class);
+    String code = getFHIRCode(val, ImmunizationStatus.class);
     if (code != null) {
       return code;
     } else {
@@ -243,12 +244,9 @@ public class SimpleDataValueResolver {
   public static final ValueExtractor<Object, String> SYSTEM_URL = (Object value) -> {
 
     String val = Hl7DataHandlerUtil.getStringValue(value);
-    String systemUrl = SystemUrlLookup.getSystemUrl(val);
-    if (systemUrl != null) {
-      return systemUrl;
-    } else {
-      return val;
-    }
+    return SystemUrlLookup.getSystemUrl(val);
+
+
   };
 
   public static final ValueExtractor<Object, List<?>> ARRAY = (Object value) -> {

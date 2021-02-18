@@ -51,7 +51,6 @@ public class ResourceExpressionTest {
     Map<String, Object> result = (Map<String, Object>) value.getValue();
     assertThat(result.get("use")).isEqualTo(null);
     assertThat(result.get("value")).isEqualTo("000010016");
-    assertThat(result.get("system")).isEqualTo("SY1");
 
 
 
@@ -119,7 +118,7 @@ public class ResourceExpressionTest {
     Map<String, Object> result = (Map<String, Object>) value.getValue();
     assertThat(result.get("use")).isEqualTo(null);
     assertThat(result.get("value")).isEqualTo("000010017");
-    assertThat(result.get("system")).isEqualTo("MR");
+    assertThat(result.get("type")).isNull();
 
 
 
@@ -160,7 +159,8 @@ public class ResourceExpressionTest {
     Map<String, Object> result = (Map<String, Object>) results.get(0);
     assertThat(result.get("use")).isEqualTo(null);
     assertThat(result.get("value")).isEqualTo("000010016");
-    assertThat(result.get("system")).isEqualTo("SY1");
+    assertThat(result.get("system")).isNull();
+    assertThat(result.get("type")).isNotNull();
 
 
 
@@ -209,7 +209,7 @@ public class ResourceExpressionTest {
         + "PID|1|465 306 5961|000010016^^^MR~000010017^^^MR~000010018^^^MR|407623|Wood^Patrick^^^MR||19700101|female|||High Street^^Oxford^^Ox1 4DP~George St^^Oxford^^Ox1 5AP|||||||\r"
         + "NK1|1|Wood^John^^^MR|Father||999-9999\r" + "NK1|2|Jones^Georgie^^^MSS|MOTHER||999-9999\r"
         + "PV1|1||Location||||||||||||||||261938_6_201306171546|||||||||||||||||||||||||20130617134644|||||||||\r"
-        + "OBX|1|TX|1234^some text^SCTCT||First line: ECHOCARDIOGRAPHIC REPORT||||||F||\r";
+        + "OBX|1|TX|1234^some text^SCT||First line: ECHOCARDIOGRAPHIC REPORT||||||F||\r";
 
 
     Message hl7message = getMessage(message);
@@ -236,7 +236,7 @@ public class ResourceExpressionTest {
     List<Object> list = (List) type.get("coding");
     Map<String, String> sp = (Map<String, String>) list.get(0);
     assertThat(sp.get("code")).isEqualTo("1234");
-    assertThat(sp.get("system")).isEqualTo("SCTCT");
+    assertThat(sp.get("system")).isEqualTo("http://snomed.info/sct");
 
 
   }

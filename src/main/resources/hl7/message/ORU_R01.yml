@@ -29,7 +29,8 @@ resources:
       resourcePath: resource/Observation
       repeats: true
       isReferenced: true
-      additionalSegments:
+      additionalSegments: 
+          - .OBR
       
             
     - resourceName: DiagnosticReport
