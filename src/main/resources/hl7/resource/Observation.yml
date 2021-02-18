@@ -13,10 +13,13 @@ id:
   expressionType: JEXL
 
 identifier:
-    valueOf: datatype/Identifier
+    valueOf: datatype/IdentifierGen
     generateList: true
     expressionType: resource
-    specs: OBX.3 |  OBX.21 
+    vars:
+      id: OBX.3.1 + $joinChar +OBR.3.1
+    constants:
+      joinChar: '_'
 
 status:
    type: OBSERVATION_STATUS
@@ -28,8 +31,9 @@ code:
    valueOf: datatype/CodeableConcept
    expressionType: resource
    specs: OBX.3
+   required: true
 
-     
+
 subject:
     valueOf: datatype/Reference
     expressionType: resource
@@ -48,12 +52,11 @@ effectiveDateTime:
 
 
 issued:
-     type: INSTANT
+     type: DATE_TIME
      valueOf: OBR.22 | MSH.7| OBX.19
      expressionType: HL7Spec
 
 
-      
 valueString:
     condition: $obx2 EQUALS TX || $obx2 EQUALS ST
     type: STRING_ALL
@@ -71,7 +74,7 @@ valueQuantity:
       unit: OBX.6
       obx2: STRING, OBX.2
 
-  
+
 valueCodeableConcept:
      condition:  $obx2 EQUALS  CF || $obx2 EQUALS CNE || $obx2 EQUALS CWE || $obx2 EQUALS CE
      valueOf: datatype/CodeableConcept
@@ -145,7 +148,7 @@ referenceRange:
      text: OBX.7
      type: OBX.10
      unit: OBX.6
-     
+
 performer: 
    valueOf: resource/Practitioner
    generateList: true

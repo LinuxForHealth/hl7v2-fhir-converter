@@ -232,7 +232,10 @@ public class SegmentExtractorUtil {
         values.addAll(getStructures(par, seg.getSegment(), dataExtractor));
       }
     } else if (CollectionUtils.containsAll(primaryGroups, groups)) {
-      values = getStructures(primaryStruct.getParent(), seg.getSegment(), dataExtractor);
+      String commonParentGroup = getCommonParent(groups, primaryGroups);
+      Structure commonParent = getParentGroup(primaryStruct, commonParentGroup);
+
+      values = getStructures(commonParent, seg.getSegment(), dataExtractor);
     } else if (getCommonParent(groups, primaryGroups) != null) {
 
       String commonParentGroup = getCommonParent(groups, primaryGroups);

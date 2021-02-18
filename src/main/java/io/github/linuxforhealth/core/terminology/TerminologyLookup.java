@@ -16,8 +16,10 @@ public class TerminologyLookup {
 
   private static final FHIRRegistry REGISTRY = FHIRRegistry.getInstance();
   private static final FHIRTermService TERMINOLOGY_SEVICE = FHIRTermService.getInstance();
-
-  private TerminologyLookup() {}
+  private static TerminologyLookup termInstance;
+  private TerminologyLookup() {
+    SystemUrlLookup.init();
+  }
 
 
   public static SimpleCode lookup(String system, String value) {
@@ -36,17 +38,23 @@ public class TerminologyLookup {
 
   private static Uri getSystemUrl(String value) {
 
-    String hl7v2 = SystemUrlLookup.getSystemV2Url(value);
+    String sys = SystemUrlLookup.getSystemUrl(value);
     CodeSystem s = null;
-
-    s = REGISTRY.getResource(hl7v2, CodeSystem.class);
-    if (s != null && s.getUrl() != null) {
-      return s.getUrl();
+    if (sys != null) {
+      s = REGISTRY.getResource(sys, CodeSystem.class);
+      if (s != null && s.getUrl() != null) {
+        return s.getUrl();
+      }
     }
+
     return null;
   }
 
-
+  public static void init() {
+    if (termInstance == null) {
+      termInstance = new TerminologyLookup();
+    }
+  }
 
 
 }

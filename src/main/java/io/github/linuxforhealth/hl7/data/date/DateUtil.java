@@ -8,6 +8,7 @@ package io.github.linuxforhealth.hl7.data.date;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -16,6 +17,7 @@ import java.util.Map.Entry;
 import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import io.github.linuxforhealth.core.config.ConverterConfiguration;
 
 
 public class DateUtil {
@@ -55,11 +57,36 @@ public class DateUtil {
     }
 
     if (returnValue == null) {
-      returnValue = getLocalDateTime(input);
+      returnValue = getLocalDateTimeWithDefaultZone(input);
 
     }
 
     return returnValue;
+  }
+
+
+
+  private static String getLocalDateTimeWithDefaultZone(String input) {
+    String returnValue;
+
+    try {
+      LocalDateTime ldt = LocalDateTime.parse(input, DateFormats.getFormatterInstance());
+      ZoneId zone = ConverterConfiguration.getInstance().getZoneId();
+      if (zone != null) {
+      returnValue =
+            ldt.atZone(zone).format(DateFormats.FHIR_ZONE_DATE_TIME_FORMAT);
+      return returnValue;
+      } else {
+        LOGGER.warn("No default zone set, cannot convert LocalDateTime to ZonedDateTime, input {} ",
+            input);
+        return null;
+      }
+
+    } catch (DateTimeParseException e) {
+      LOGGER.warn("Date parsing failure for value \'{}\'   reason {}", input, e.getMessage());
+      LOGGER.debug("Date parsing exception for value {}", input, e);
+      return null;
+    }
   }
 
 

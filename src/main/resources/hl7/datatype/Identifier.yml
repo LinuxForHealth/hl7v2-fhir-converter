@@ -7,10 +7,10 @@
 type: 
    valueOf: datatype/CodeableConcept
    expressionType: resource
-   specs: CX.5 | CWE.5|EI.4
+   specs: CX.5 | $type
 
 system: 
-     type: STRING
+     type: SYSTEM_URL
      valueOf: CX.4 | CWE.4 |EI.2
      expressionType: HL7Spec
     
@@ -26,6 +26,12 @@ period:
     vars: 
        start: CX.7 | CWE.7
        end: CX.8 | CWE.8
-  
 
-
+assigner:
+   valueOf: resource/Organization_Simple
+   expressionType: reference
+   vars:
+     name: $assigningAuth
+     id: CX.4
+   constants:
+      assigningAuth: 'Assigning Authority'

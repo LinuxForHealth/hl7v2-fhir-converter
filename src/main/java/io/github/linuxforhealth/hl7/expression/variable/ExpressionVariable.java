@@ -31,7 +31,7 @@ public class ExpressionVariable extends SimpleVariable {
    */
   public ExpressionVariable(String name, String expression, List<String> spec,
       boolean extractMultiple) {
-    super(name, spec, extractMultiple);
+    super(name, spec, extractMultiple, false);
     this.expression = expression;
   }
 

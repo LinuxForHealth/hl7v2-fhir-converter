@@ -42,7 +42,7 @@ DiagnosticReportStatus:
    Y: unknown
    Z: unknown
    
-ImmunizationStatusCodes:  
+ImmunizationStatus:  
   CP: completed
   NA: not-done
   PA: not-done

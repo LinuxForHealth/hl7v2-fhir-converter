@@ -6,7 +6,7 @@
 ---
 
 system: 
-     type: STRING
+     type: SYSTEM_URL
      valueOf: $system
     
 value: 
@@ -20,6 +20,10 @@ period:
     vars: 
        start: $start
        end: $end
-  
-
+assigner:
+   valueOf: resource/Organization_Simple
+   expressionType: reference
+   vars:
+     name: 'Assigning Authority'
+     id: $assigner
 

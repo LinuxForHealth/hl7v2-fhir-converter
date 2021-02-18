@@ -19,21 +19,26 @@ import org.hl7.fhir.r4.model.Resource;
 import org.hl7.fhir.r4.model.ResourceType;
 import org.junit.Test;
 import io.github.linuxforhealth.fhir.FHIRContext;
+import io.github.linuxforhealth.hl7.ConverterOptions;
+import io.github.linuxforhealth.hl7.ConverterOptions.Builder;
 import io.github.linuxforhealth.hl7.HL7ToFHIRConverter;
 
 public class Hl7ORUMessageTest {
   private static FHIRContext context = new FHIRContext();
+  private static final ConverterOptions OPTIONS = new Builder().withValidateResource().build();
+
 
   @Test
   public void test_oru() throws IOException {
     String hl7message =
         "MSH|^~\\\\&|SendTest1|Sendfac1|Receiveapp1|Receivefac1|200603081747|security|ORU^R01|MSGID000005|T|2.6\r"
             + "PID||45483|45483||SMITH^SUZIE^||20160813|M|||123 MAIN STREET^^SCHENECTADY^NY^12345||(123)456-7890|||||^^^T||||||||||||\r"
-            + "OBR|1||986^IA PHIMS Stage^2.16.840.1.114222.4.3.3.5.1.2^ISO|112^Final Echocardiogram Report|||20151009173644|||||||||||||002|||||F|||2740^Tsadok^Janetary~2913^Merrit^Darren^F~3065^Mahoney^Paul^J~4723^Loh^Robert^L~9052^Winter^Oscar^||||3065^Mahoney^Paul^J|\r"
-            + "OBX|1|TX|||obs report||||||F\r" + "OBX|2|TX|||ECHOCARDIOGRAPHIC REPORT||||||F\r";
+            + "OBR|1||986^IA PHIMS Stage^2.16.840.1.114222.4.3.3.5.1.2^ISO|1051-2^New Born Screening^LN|||20151009173644|||||||||||||002|||||F|||2740^Tsadok^Janetary~2913^Merrit^Darren^F~3065^Mahoney^Paul^J~4723^Loh^Robert^L~9052^Winter^Oscar^||||3065^Mahoney^Paul^J|\r"
+            + "OBX|1|TX|TS-F-01-002^Endocrine Disorders^L||obs report||||||F\r"
+            + "OBX|2|TX|GA-F-01-024^Galactosemia^L||ECHOCARDIOGRAPHIC REPORT||||||F\r";
 
     HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
-    String json = ftv.convert(hl7message, true, BundleType.COLLECTION);
+    String json = ftv.convert(hl7message, OPTIONS);
     assertThat(json).isNotBlank();
     System.out.println(json);
     IBaseResource bundleResource = context.getParser().parseResource(json);
@@ -69,7 +74,8 @@ public class Hl7ORUMessageTest {
     assertThat(obsRef.isEmpty()).isFalse();
     assertThat(obsRef).hasSize(2);
     assertThat(obsRef.get(0).isEmpty()).isFalse();
-    assertThat(diag.getEffectiveDateTimeType().asStringValue()).isEqualTo("2015-10-09T17:36:44");
+    assertThat(diag.getEffectiveDateTimeType().asStringValue())
+        .isEqualTo("2015-10-09T17:36:44+08:00");
     assertThat(diag.getStatus().toCode()).isEqualTo("final");
     List<Reference> performerRef = diag.getResultsInterpreter();
     assertThat(performerRef.get(0).isEmpty()).isFalse();
@@ -83,10 +89,11 @@ public class Hl7ORUMessageTest {
         "MSH|^~\\\\&|SendTest1|Sendfac1|Receiveapp1|Receivefac1|200603081747|security|ORU^R01|MSGID000005|T|2.6\r"
             + "PID||45483|45483||SMITH^SUZIE^||20160813|M|||123 MAIN STREET^^SCHENECTADY^NY^12345||(123)456-7890|||||^^^T||||||||||||\r"
             + "OBR|1||986^IA PHIMS Stage^2.16.840.1.114222.4.3.3.5.1.2^ISO|112^Final Echocardiogram Report|||20151009173644|||||||||||||002|||||F|||2740^Tsadok^Janetary~2913^Merrit^Darren^F~3065^Mahoney^Paul^J~4723^Loh^Robert^L~9052^Winter^Oscar^||||3068^JOHN^Paul^J|\r"
-            + "OBX|1|TX|||obs report||||||F\r" + "OBX|2|TX|||ECHOCARDIOGRAPHIC REPORT||||||F\r"
+            + "OBX|1|TX|TS-F-01-007^Endocrine Disorders 7^L||obs report||||||F\r"
+            + "OBX|2|TX|TS-F-01-008^Endocrine Disorders 8^L||ECHOCARDIOGRAPHIC REPORT||||||F\r"
             + "OBR|1||98^IA PHIMS Stage^2.16.840.1.114222.4.3.3.5.1.2^ISO|113^Echocardiogram Report|||20151009173644|||||||||||||002|||||F|||2740^Tsadok^Janetary~2913^Merrit^Darren^F~3065^Mahoney^Paul^J~4723^Loh^Robert^L~9052^Winter^Oscar^||||3065^Mahoney^Paul^J|\r"
             + "OBX|1|CWE|625-4^Bacteria identified in Stool by Culture^LN^^^^2.33^^result1|1|27268008^Salmonella^SCT^^^^20090731^^Salmonella species|||A^A^HL70078^^^^2.5|||P|||20120301|||^^^^^^^^Bacterial Culture||201203140957||||State Hygienic Laboratory^L^^^^IA Public HealthLab&2.16.840.1.114222.4.1.10411&ISO^FI^^^16D0648109|State Hygienic Laboratory^UI Research Park -Coralville^Iowa City^IA^52242-5002^USA^B^^19103|^Atchison^Christopher^^^^^^^L\r"
-            + "OBX|2|TX|||ECHOCARDIOGRAPHIC REPORT Grroup 2||||||F\r";
+            + "OBX|2|TX|TS-F-01-002^Endocrine Disorders^L||ECHOCARDIOGRAPHIC REPORT Grroup 2||||||F\r";
 
     HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
     String json = ftv.convert(hl7message);

@@ -91,7 +91,7 @@ public class HL7MessageEngine implements MessageEngine {
     Preconditions.checkArgument(resources != null, "resources cannot be null");
 
     HL7MessageData hl7DataInput = (HL7MessageData) dataInput;
-    Bundle bundle = initBundle(dataInput);
+    Bundle bundle = initBundle();
     Map<String, EvaluationResult> localContextValues = new HashMap<>(contextValues);
     for (FHIRResourceTemplate genericTemplate : resources) {
       HL7FHIRResourceTemplate hl7ResourceTemplate = (HL7FHIRResourceTemplate) genericTemplate;
@@ -119,6 +119,9 @@ public class HL7MessageEngine implements MessageEngine {
 
 
     }
+    LOGGER.info(
+        "Successfully converted Message: {} , Message Control Id: {} to FHIR bundle resource with id {}",
+        dataInput.getName(), dataInput.getId(), bundle.getId());
     return bundle;
   }
 
@@ -189,14 +192,12 @@ public class HL7MessageEngine implements MessageEngine {
     }
   }
 
-  private Bundle initBundle(final InputDataExtractor dataInput) {
+  private Bundle initBundle() {
     Bundle bundle = new Bundle();
     bundle.setType(this.bundleType);
     bundle.setId(UUID.randomUUID().toString());
     Meta m = new Meta();
-    m.setSource("Message: " + dataInput.getName() + ", Message Control Id: " + dataInput.getId());
     m.setLastUpdated(LocalDateTime.now().toDate());
-
     bundle.setMeta(m);
     return bundle;
   }
@@ -297,7 +298,7 @@ public class HL7MessageEngine implements MessageEngine {
           org.hl7.fhir.r4.model.Resource parsed = context.getParser()
               .parseResource(FHIRResourceMapper.getResourceClass(resourceClass), json);
 
-          bundle.addEntry().setResource(parsed);
+          bundle.addEntry().setResource(parsed).setFullUrl("urn:uuid:" + parsed.getId());
         }
       }
     } catch (JsonProcessingException e) {

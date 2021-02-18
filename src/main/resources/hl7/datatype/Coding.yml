@@ -12,7 +12,7 @@ system:
 version:
      type: STRING
      valueOf: $version
-     expressionType: HL7Spec
+
 code: 
      type: STRING
      valueOf: $code

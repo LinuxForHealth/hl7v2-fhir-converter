@@ -22,7 +22,7 @@ import io.github.linuxforhealth.fhir.FHIRContext;
 import io.github.linuxforhealth.hl7.resource.ResourceReader;
 
 public class ImmunizationTest {
-  private static FHIRContext context = new FHIRContext(true);
+  private static FHIRContext context = new FHIRContext(true, false);
   private static HL7MessageEngine engine = new HL7MessageEngine(context);
 
 
@@ -65,12 +65,13 @@ public class ImmunizationTest {
 
     assertThat(resource.getStatus().getDisplay()).isEqualTo("completed");
     assertThat(resource.getIdentifier().get(0).getValue()).isEqualTo("197027");
-    assertThat(resource.getVaccineCode().getCoding().get(0).getSystem()).isEqualTo("CVX");
+    assertThat(resource.getVaccineCode().getCoding().get(0).getSystem())
+        .isEqualTo("http://hl7.org/fhir/sid/cvx");
     assertThat(resource.getVaccineCode().getCoding().get(0).getCode()).isEqualTo("48");
     assertThat(resource.getVaccineCode().getText()).isEqualTo("HIB PRP-T");
     assertThat(resource.getOccurrence().toString()).isEqualTo("DateTimeType[2013-05-31]");
 
-    assertThat(resource.getReportOrigin().getCoding().get(0).getSystem()).isEqualTo("NIP001");
+    assertThat(resource.getReportOrigin().getCoding().get(0).getSystem()).isNull();
     assertThat(resource.getReportOrigin().getCoding().get(0).getCode()).isEqualTo("00");
     assertThat(resource.getReportOrigin().getText()).isEqualTo("new immunization record");
     assertThat(resource.getManufacturer().isEmpty()).isFalse();

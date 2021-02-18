@@ -26,7 +26,8 @@ public class DateFormats {
   private static final Pattern PATTERN3 = Pattern.compile("^\\d{4}\\d{2}\\d{2}$");
   private static final Pattern PATTERN2 = Pattern.compile("^\\d{4}\\d{2}$");
   private static final Pattern PATTERN1 = Pattern.compile("^\\d{4}$");
-
+  static DateTimeFormatter FHIR_ZONE_DATE_TIME_FORMAT =
+      DateTimeFormatter.ISO_OFFSET_DATE_TIME;
 
   private static final DateFormats dateFormats = new DateFormats();
 
@@ -89,8 +90,8 @@ public class DateFormats {
   private static Map<Pattern, DateTimeFormatter> getDateTimeWithZonePatterns() {
     Map<Pattern, DateTimeFormatter> patterns = new HashMap<>();
 
-    patterns.put(PATTERN8, DateTimeFormatter.ISO_ZONED_DATE_TIME);
-    patterns.put(PATTERN7, DateTimeFormatter.ISO_ZONED_DATE_TIME);
+    patterns.put(PATTERN8, FHIR_ZONE_DATE_TIME_FORMAT);
+    patterns.put(PATTERN7, FHIR_ZONE_DATE_TIME_FORMAT);
     return patterns;
   }
 

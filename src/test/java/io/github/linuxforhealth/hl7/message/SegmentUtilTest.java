@@ -310,6 +310,36 @@ public class SegmentUtilTest {
   }
 
 
+  @Test
+  public void test_child_segment_with_additional_parent_segment() throws HL7Exception {
+    String message =
+        "MSH|^~\\\\&|SendTest1|Sendfac1|Receiveapp1|Receivefac1|200603081747|security|ORU^R01|MSGID000005|T|2.6\r"
+            + "PID||45483|45483||SMITH^SUZIE^||20160813|M|||123 MAIN STREET^^SCHENECTADY^NY^12345||(123)456-7890|||||^^^T||||||||||||\r"
+            + "OBR|1||986^IA PHIMS Stage^2.16.840.1.114222.4.3.3.5.1.2^ISO|112^Final Echocardiogram Report|||20151009173644|||||||||||||002|||||F|||2740^Tsadok^Janetary~2913^Merrit^Darren^F~3065^Mahoney^Paul^J~4723^Loh^Robert^L~9052^Winter^Oscar^||||3065^Mahoney^Paul^J|\r"
+            + "OBX|1|TX|TS-F-01-002^Endocrine Disorders^L||obs report||||||F\r"
+            + "OBX|2|TX|GA-F-01-024^Galactosemia^L||ECHOCARDIOGRAPHIC REPORT||||||F\r";
+
+    List<String> ORDER_GROUP_LIST =
+        Lists.newArrayList("PATIENT_RESULT", "ORDER_OBSERVATION", "OBSERVATION");
+    Message hl7message = getMessage(message);
+    HL7DataExtractor hl7DTE = new HL7DataExtractor(hl7message);
+    List<SegmentGroup> segmentGroups = SegmentExtractorUtil.extractSegmentGroups(ORDER_GROUP_LIST,
+        "OBX",
+        Lists.newArrayList(
+            new HL7Segment(Lists.newArrayList("PATIENT_RESULT", "ORDER_OBSERVATION"), "OBR", true)),
+        hl7DTE,
+        Lists.newArrayList("PATIENT_RESULT", "ORDER_OBSERVATION"));
+
+    assertThat(segmentGroups).isNotNull();
+    assertThat(segmentGroups).hasSize(2);
+
+    Segment obr = (Segment) segmentGroups.get(0).getAdditionalSegments().get("OBR").get(0);
+    assertThat(obr.isEmpty()).isFalse();
+    assertThat(obr.getName()).isEqualTo("OBR");
+
+  }
+
+
 
   @Test
   public void test_VUX_no_rep() throws HL7Exception {

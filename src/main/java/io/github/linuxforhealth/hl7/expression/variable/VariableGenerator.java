@@ -47,13 +47,22 @@ public class VariableGenerator {
       }
       throw new IllegalArgumentException("rawVariable not in correct format ");
     } else {
+      boolean combineValues = false;
+      if (StringUtils.contains(rawVariable, "+")) {
+        combineValues = true;
+      }
       List<String> specs = getTokens(rawVariable);
-      return new SimpleVariable(varName, specs, extractMultiple);
+      return new SimpleVariable(varName, specs, extractMultiple, combineValues);
     }
   }
 
 
   private static List<String> getTokens(String value) {
+    if (StringUtils.contains(value, "+")) {
+      StringTokenizer st = new StringTokenizer(value, "+").setIgnoreEmptyTokens(true)
+          .setTrimmerMatcher(StringMatcherFactory.INSTANCE.spaceMatcher());
+      return st.getTokenList();
+    }
     if (StringUtils.isNotBlank(value)) {
       StringTokenizer st = new StringTokenizer(value, "|").setIgnoreEmptyTokens(true)
           .setTrimmerMatcher(StringMatcherFactory.INSTANCE.spaceMatcher());

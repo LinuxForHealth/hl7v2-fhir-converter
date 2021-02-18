@@ -8,14 +8,16 @@ function_v1:
    valueOf: datatype/CodeableConcept_var
    expressionType: resource
    constants:
-    code: OP
-    text: Ordering Provider
+    system: 'http://terminology.hl7.org/CodeSystem/v2-0443'
+    code: 'OP'
+    text: 'Ordering Provider'
 
 function_v2:
    condition: $orderingProvide NULL && $administeringProvide NOT_NULL
    valueOf: datatype/CodeableConcept_var
    expressionType: resource
    constants:
+    system: 'http://terminology.hl7.org/CodeSystem/v2-0443'
     code: AP
     text: Administering Provide
 actor:

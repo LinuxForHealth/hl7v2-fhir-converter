@@ -212,8 +212,8 @@ public class Hl7MessageTest {
         + "NK1|1|Wood^John^^^MR|Father||999-9999\r" + "NK1|2|Jones^Georgie^^^MSS|MOTHER||999-9999\r"
         + "PV1|1||Location||||||||||||||||261938_6_201306171546|||||||||||||||||||||||||20130617134644|||||||||\r"
         + "OBX|1|TX|1234||First line: ECHOCARDIOGRAPHIC REPORT||||||F|||||2740^Tsadok^Janetary~2913^Merrit^Darren^F~3065^Mahoney^Paul^J~4723^Loh^Robert^L~9052^Winter^Oscar^|\r"
-        + "OBX|2|TX|||Second Line: NORMAL LV CHAMBER SIZE WITH MILD CONCENTRIC LVH\\.br\\Third Line in the same field, after the escape character for line break.||||||F||\r"
-        + "OBX|3|TX|||Fourth Line: HYPERDYNAMIC LV SYSTOLIC FUNCTION, VISUAL EF 80%~Fifth line, as part of a repeated field||||||F||";
+        + "OBX|2|TX|TS-F-01-005^Endocrine Disorders new^L||Second Line: NORMAL LV CHAMBER SIZE WITH MILD CONCENTRIC LVH\\.br\\Third Line in the same field, after the escape character for line break.||||||F||\r"
+        + "OBX|3|TX|TS-F-01-002^Endocrine Disorders^L||Fourth Line: HYPERDYNAMIC LV SYSTOLIC FUNCTION, VISUAL EF 80%~Fifth line, as part of a repeated field||||||F||";
     String json = message.convert(hl7message, engine);
 
     IBaseResource bundleResource = context.getParser().parseResource(json);
@@ -410,8 +410,8 @@ public class Hl7MessageTest {
             + "PV1||I|6N^1234^A^GENHOS||||0100^ANDERSON^CARL|0148^ADDISON^JAMES||SUR|||||||0148^ANDERSON^CARL|S|1400|A|||||||||||||||||||SF|K||||199501102300\r"
             + "PRB|AD|200603150625|aortic stenosis|53692||2||200603150625\r"
             + "NTE|1|P|Problem Comments\r" + "VAR|varid1|200603150610\r"
-            + "OBX|1|TX|||ECHOCARDIOGRAPHIC REPORT||||||F|||20150930164100|||\r"
-            + "OBX|2|TX|||NORMAL LV CHAMBER SIZE WITH MILD CONCENTRIC LVH||||||F|||20150930164100|||";
+            + "OBX|1|TX|TS-FR-01-002^Some report^L||ECHOCARDIOGRAPHIC REPORT||||||F|||20150930164100|||\r"
+            + "OBX|2|TX|TS-F-01-002^Endocrine Disorders^L||NORMAL LV CHAMBER SIZE WITH MILD CONCENTRIC LVH||||||F|||20150930164100|||";
     String json = message.convert(hl7message, engine);
     assertThat(json).isNotBlank();
 

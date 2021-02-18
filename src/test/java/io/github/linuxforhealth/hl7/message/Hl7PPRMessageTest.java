@@ -17,10 +17,13 @@ import org.hl7.fhir.r4.model.Resource;
 import org.hl7.fhir.r4.model.ResourceType;
 import org.junit.Test;
 import io.github.linuxforhealth.fhir.FHIRContext;
+import io.github.linuxforhealth.hl7.ConverterOptions;
+import io.github.linuxforhealth.hl7.ConverterOptions.Builder;
 import io.github.linuxforhealth.hl7.HL7ToFHIRConverter;
 
 public class Hl7PPRMessageTest {
   private static FHIRContext context = new FHIRContext();
+  private static final ConverterOptions OPTIONS = new Builder().withValidateResource().build();
 
   @Test
   public void test_patient() throws IOException {
@@ -30,11 +33,11 @@ public class Hl7PPRMessageTest {
             + "PV1||I|6N^1234^A^GENHOS||||0100^ANDERSON^CARL|0148^ADDISON^JAMES||SUR|||||||0148^ANDERSON^CARL|S|1400|A|||||||||||||||||||SF|K||||199501102300\r"
             + "PRB|AD|200603150625|aortic stenosis|53692||2||200603150625\r"
             + "NTE|1|P|Problem Comments\r" + "VAR|varid1|200603150610\r"
-            + "OBX|1|TX|||ECHOCARDIOGRAPHIC REPORT||||||F|||20150930164100|||\r"
-            + "OBX|2|TX|||NORMAL LV CHAMBER SIZE WITH MILD CONCENTRIC LVH||||||F|||20150930165100|||";
+            + "OBX|1|TX|^Type of protein feed^L||ECHOCARDIOGRAPHIC REPORT||||||F|||20150930164100|||\r"
+            + "OBX|2|TX|^SOMEd^L||NORMAL LV CHAMBER SIZE WITH MILD CONCENTRIC LVH||||||F|||20150930165100|||";
 
     HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
-    String json = ftv.convert(hl7message, true, BundleType.COLLECTION);
+    String json = ftv.convert(hl7message, OPTIONS);
 
     assertThat(json).isNotBlank();
     IBaseResource bundleResource = context.getParser().parseResource(json);

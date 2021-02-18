@@ -14,7 +14,9 @@ import io.github.linuxforhealth.api.EvaluationResult;
 import io.github.linuxforhealth.api.InputDataExtractor;
 import io.github.linuxforhealth.api.Specification;
 import io.github.linuxforhealth.api.Variable;
+import io.github.linuxforhealth.core.expression.EvaluationResultFactory;
 import io.github.linuxforhealth.core.expression.VariableUtils;
+import io.github.linuxforhealth.hl7.data.SimpleDataTypeMapper;
 import io.github.linuxforhealth.hl7.expression.specification.SpecificationParser;
 
 
@@ -30,24 +32,29 @@ public class SimpleVariable implements Variable {
   private String name;
   private List<String> spec;
   private boolean extractMultiple;
+  private boolean combineMultiple;
 
   public SimpleVariable(String name, List<String> spec) {
-    this(name, spec, false);
+    this(name, spec, false, false);
   }
 
-  public SimpleVariable(String name, List<String> spec, boolean extractMultiple) {
+  public SimpleVariable(String name, List<String> spec, boolean extractMultiple,
+      boolean combineMultiple) {
     this.name = name;
     this.spec = new ArrayList<>();
     if (spec != null && !spec.isEmpty()) {
       this.spec.addAll(spec);
     }
     this.extractMultiple = extractMultiple;
+    this.combineMultiple = combineMultiple;
   }
 
+  @Override
   public List<String> getSpec() {
     return new ArrayList<>(spec);
   }
 
+  @Override
   public String getType() {
     return OBJECT_TYPE;
   }
@@ -63,11 +70,20 @@ public class SimpleVariable implements Variable {
 
   // resolve variable value
 
+  @Override
   public EvaluationResult extractVariableValue(Map<String, EvaluationResult> contextValues,
       InputDataExtractor dataSource) {
     EvaluationResult result;
     if (!this.spec.isEmpty()) {
-      result = getValueFromSpecs(contextValues, dataSource);
+      List<EvaluationResult> values =
+          getValuesFromSpecs(contextValues, dataSource, combineMultiple);
+      if (values.isEmpty()) {
+        result = null;
+      } else if (values.size() == 1) {
+        result = values.get(0);
+      } else {
+        result = generateCombinedValue(values);
+      }
     } else {
       result = null;
     }
@@ -77,10 +93,31 @@ public class SimpleVariable implements Variable {
   }
 
 
+  private static EvaluationResult generateCombinedValue(List<EvaluationResult> values) {
+    StringBuilder sb = new StringBuilder();
+    for (EvaluationResult value : values) {
+      if (value.getValue() != null) {
+        sb.append(SimpleDataTypeMapper.getValueResolver("STRING").apply(value.getValue()));
+      }
+    }
+    return EvaluationResultFactory.getEvaluationResult(sb.toString());
+  }
+
   protected EvaluationResult getValueFromSpecs(Map<String, EvaluationResult> contextValues,
       InputDataExtractor dataSource) {
-    EvaluationResult fetchedValue = null;
+    List<EvaluationResult> values = getValuesFromSpecs(contextValues, dataSource, false);
+    if (values.isEmpty()) {
+      return null;
+    } else {
+      return values.get(0);
+    }
+  }
+
+  protected List<EvaluationResult> getValuesFromSpecs(Map<String, EvaluationResult> contextValues,
+      InputDataExtractor dataSource, boolean fetchAll) {
+    List<EvaluationResult> combineValue = new ArrayList<>();
     for (String specValue : this.spec) {
+      EvaluationResult fetchedValue = null;
       if (VariableUtils.isVar(specValue)) {
         fetchedValue =
             getVariableValueFromVariableContextMap(specValue, ImmutableMap.copyOf(contextValues));
@@ -96,11 +133,14 @@ public class SimpleVariable implements Variable {
     }
       // break the loop and return
       if (fetchedValue != null) {
-        return fetchedValue;
+        combineValue.add(fetchedValue);
+        if (!fetchAll) {
+          return combineValue;
+        }
       }
 
   }
-    return fetchedValue;
+    return combineValue;
   }
 
 
