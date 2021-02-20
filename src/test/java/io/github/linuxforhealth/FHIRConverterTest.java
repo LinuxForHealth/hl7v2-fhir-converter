@@ -30,10 +30,13 @@ public class FHIRConverterTest {
   private static final String HL7_FILE_WIN_NEWLINE = "src/test/resources/sample_win.hl7";
   private static final String HL7_FILE_WIN_NEWLINE_BATCH =
       "src/test/resources/sample_win_batch.hl7";
-  private static final ConverterOptions OPTIONS = new Builder().withValidateResource().build();
+  private static final ConverterOptions OPTIONS =
+      new Builder().withValidateResource().withPrettyPrint().build();
 
   @Rule
   public ExpectedException exceptionRule = ExpectedException.none();
+
+
 
   @Test
   public void test_patient_encounter() throws IOException {

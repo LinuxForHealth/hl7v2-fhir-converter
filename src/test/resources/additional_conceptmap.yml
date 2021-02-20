@@ -1,0 +1,4 @@
+- id: "LN"
+  description: "Logical Observation Identifier Names and Codes (LOINC)"
+  url: "http://loinc-additional.org"
+  oid: "urn:oid:2.16.840.1.113883.6.1"

@@ -5,7 +5,9 @@
  */
 package io.github.linuxforhealth.core.terminology;
 
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -13,12 +15,11 @@ import org.apache.commons.lang3.StringUtils;
 import com.fasterxml.jackson.core.type.TypeReference;
 import io.github.linuxforhealth.core.Constants;
 import io.github.linuxforhealth.core.ObjectMapperUtil;
+import io.github.linuxforhealth.core.config.ConverterConfiguration;
 import io.github.linuxforhealth.hl7.resource.ResourceReader;
 
 /**
- * Utility class for mapping HL7 codes from table 0396 ( https://www.hl7.org/fhir/v2/0396/index.html
- * ) to respective coding system urls.
- * 
+ * Utility class for mapping HL7 codes from tables
  *
  * @author pbhallam
  */
@@ -29,9 +30,11 @@ public class SystemUrlLookup {
 
   private SystemUrlLookup() {
     systemUrls = loadFromFile();
+    systemUrls.putAll(loadAdditionalFromFile());
 
   }
 
+  // ConverterConfiguration
   private static Map<String, CodingSystem> loadFromFile() {
     TypeReference<List<CodingSystem>> typeRef = new TypeReference<List<CodingSystem>>() {};
     try {
@@ -45,6 +48,24 @@ public class SystemUrlLookup {
       throw new IllegalArgumentException(
           "Cannot read codesystem/CodingSystemMapping.yml", e);
     }
+  }
+
+
+  private static Map<String, CodingSystem> loadAdditionalFromFile() {
+    TypeReference<List<CodingSystem>> typeRef = new TypeReference<List<CodingSystem>>() {};
+    String filePath = ConverterConfiguration.getInstance().getAdditionalConceptmapFile();
+    if (StringUtils.isNotBlank(filePath)) {
+      try {
+        FileInputStream fis = new FileInputStream(filePath);
+        List<CodingSystem> systems = ObjectMapperUtil.getYAMLInstance().readValue(fis, typeRef);
+      return systems.stream()
+          .collect(Collectors.toMap(CodingSystem::getId, codeSystem -> codeSystem));
+
+    } catch (IOException e) {
+        throw new IllegalArgumentException(filePath, e);
+    }
+  }
+    return new HashMap<>();
   }
 
 
@@ -82,8 +103,15 @@ public class SystemUrlLookup {
     if (systemURLLookupInstance == null) {
       systemURLLookupInstance = new SystemUrlLookup();
     }
+  }
+  
+  /**
+   * Reloads the coding system details
+   * 
+   */
+  public static void reinit() {
 
-
+    systemURLLookupInstance = new SystemUrlLookup();
   }
 
 
