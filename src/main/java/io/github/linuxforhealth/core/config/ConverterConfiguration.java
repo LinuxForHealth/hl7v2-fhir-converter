@@ -9,6 +9,7 @@ import java.time.DateTimeException;
 import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.configuration2.FileBasedConfiguration;
 import org.apache.commons.configuration2.PropertiesConfiguration;
@@ -30,13 +31,15 @@ public class ConverterConfiguration {
   private static final String BASE_PATH_RESOURCE = "base.path.resource";
   private static final String DEFAULT_ZONE_ID = "default.zoneid";
   private static final String CONFIG_PROPERTIES = "config.properties";
+  private static final String ADDITIONAL_CONCEPT_MAPS_FILE = "additional.conceptmap.file";
 
   private static ConverterConfiguration configuration;
 
   private String resourceFolder;
   private boolean resourcefromClassPath;
-  private List<Object> supportedMessageTemplates;
+  private List<String> supportedMessageTemplates;
   private ZoneId zoneId;
+  private String additionalConceptmapFile;
   private ConverterConfiguration() {
     try {
       
@@ -56,7 +59,7 @@ public class ConverterConfiguration {
                   .setListDelimiterHandler(new DefaultListDelimiterHandler(',')));
       Configuration config = builder.getConfiguration();
 
-      String resourceLoc = config.getString(BASE_PATH_RESOURCE);
+      String resourceLoc = config.getString(BASE_PATH_RESOURCE, null);
       if (StringUtils.isNotBlank(resourceLoc)) {
         resourceFolder = resourceLoc;
       } else {
@@ -64,17 +67,31 @@ public class ConverterConfiguration {
         resourcefromClassPath = true;
       }
 
+      // get list of supported messages
+      List<Object> values = config.getList(SUPPORTED_HL7_MESSAGES);
 
-      supportedMessageTemplates = config.getList(SUPPORTED_HL7_MESSAGES);
-      String zoneText = config.getString(DEFAULT_ZONE_ID);
+      supportedMessageTemplates =
+          values.stream().filter(v -> v != null && StringUtils.isNotBlank(v.toString()))
+              .map(v -> v.toString()).collect(Collectors.toList());
+
+
+      // get default zone
+      String zoneText = config.getString(DEFAULT_ZONE_ID, null);
       if (StringUtils.isNotBlank(zoneText)) {
         getZoneId(zoneText);
       }
+
+      // get additional concept map
+      additionalConceptmapFile = config.getString(ADDITIONAL_CONCEPT_MAPS_FILE, null);
 
     } catch (ConfigurationException e) {
       throw new IllegalStateException("Cannot read configuration for resource location", e);
     }
   }
+
+
+
+
 
 
   private void getZoneId(String zoneText) {
@@ -95,6 +112,12 @@ public class ConverterConfiguration {
   }
 
 
+
+  public static void reset() {
+    configuration = null;
+  }
+
+
   public String getResourceFolder() {
     return resourceFolder;
   }
@@ -110,7 +133,7 @@ public class ConverterConfiguration {
   }
 
 
-  public List<Object> getSupportedMessageTemplates() {
+  public List<String> getSupportedMessageTemplates() {
     return supportedMessageTemplates;
   }
 
@@ -120,7 +143,9 @@ public class ConverterConfiguration {
   }
 
 
-
+  public String getAdditionalConceptmapFile() {
+    return additionalConceptmapFile;
+  }
 
 
 }

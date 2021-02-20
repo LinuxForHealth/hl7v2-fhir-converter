@@ -97,9 +97,9 @@ public class ResourceReader {
 
   public Map<String, HL7MessageModel> getMessageTemplates() throws IOException {
     Map<String, HL7MessageModel> messagetemplates = new HashMap<>();
-    List<Object> supportedMessageTemplates =
+    List<String> supportedMessageTemplates =
         ConverterConfiguration.getInstance().getSupportedMessageTemplates();
-    for (Object template : supportedMessageTemplates) {
+    for (String template : supportedMessageTemplates) {
       HL7MessageModel rm = getMessageModel(template.toString());
       messagetemplates.put(com.google.common.io.Files.getNameWithoutExtension(template.toString()),
           rm);

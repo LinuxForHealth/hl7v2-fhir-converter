@@ -56,6 +56,8 @@ gradle build
 Converter supports following configuration options using the config.properties file.
 * base.path.resource=
 * supported.hl7.messages=ADT\_A01, ORU\_R01, PPR_PC1
+* default.zoneid=+08:00  //ZoneOffset. This consists of 'Z' and IDs starting with '+' or '-'. If default zone offset is provided then if HL7 dates do not contain zone details but FHIR conversion requires zone information then default zone provided here will be used. If no default zone is set, then such date value will be ignored during conversion.
+* additional.conceptmap.file=/absolute/path/to/additionalconceptmap\_yaml_file (to import additional concept map details)
 
 If the base.path.resource is empty then the resources (templates) then default resources(templates) are used during the conversion.<br>
 supported.hl7.messages lists the messages that are currently supported for conversion.
@@ -403,16 +405,16 @@ text:
 ```json
 {
   "resourceType": "Bundle",
-  "id": "cf56324b-e43a-4cc7-8768-eaba5eb61214",
+  "id": "32744a5d-8c36-4cd1-93bf-7da16a1bedde",
   "meta": {
-    "lastUpdated": "2020-10-24T15:59:07.418+08:00",
-    "source": "Message: ADT_A01, Message Control Id: 102"
+    "lastUpdated": "2021-02-20T10:02:45.547+08:00"
   },
   "type": "collection",
   "entry": [ {
+    "fullUrl": "urn:uuid:Patient/7425c8c2-50e7-433f-a804-79c0eab69a59",
     "resource": {
       "resourceType": "Patient",
-      "id": "0f61c0c7-1d9e-46de-9bba-2ee908582804",
+      "id": "7425c8c2-50e7-433f-a804-79c0eab69a59",
       "identifier": [ {
         "type": {
           "coding": [ {
@@ -422,8 +424,10 @@ text:
           } ],
           "text": "MR"
         },
-        "system": "A",
-        "value": "PID1234"
+        "value": "PID1234",
+        "assigner": {
+          "reference": "Organization/A"
+        }
       }, {
         "type": {
           "coding": [ {
@@ -433,8 +437,10 @@ text:
           } ],
           "text": "SS"
         },
-        "system": "USA",
-        "value": "1234568965"
+        "value": "1234568965",
+        "assigner": {
+          "reference": "Organization/USA"
+        }
       } ],
       "name": [ {
         "family": "DOE",
@@ -444,13 +450,31 @@ text:
       "birthDate": "1980-02-02"
     }
   }, {
+    "fullUrl": "urn:uuid:Organization/A",
+    "resource": {
+      "resourceType": "Organization",
+      "id": "A",
+      "name": "Assigning Authority"
+    }
+  }, {
+    "fullUrl": "urn:uuid:Organization/USA",
+    "resource": {
+      "resourceType": "Organization",
+      "id": "USA",
+      "name": "Assigning Authority"
+    }
+  }, {
+    "fullUrl": "urn:uuid:Encounter/f333437c-9a9e-4981-855c-5d31f4f579a4",
     "resource": {
       "resourceType": "Encounter",
-      "id": "0c2ff935-39e5-43e9-a4c3-6df4e281cc47",
+      "id": "f333437c-9a9e-4981-855c-5d31f4f579a4",
       "identifier": [ {
         "value": "48390"
       } ],
       "status": "finished",
+      "class": {
+        "code": "ff"
+      },
       "type": [ {
         "text": "EL"
       } ],
@@ -463,11 +487,11 @@ text:
         "text": "MED"
       },
       "subject": {
-        "reference": "Patient/0f61c0c7-1d9e-46de-9bba-2ee908582804"
+        "reference": "Patient/7425c8c2-50e7-433f-a804-79c0eab69a59"
       },
       "period": {
-        "start": "2014-09-12T22:00:00",
-        "end": "2015-02-06T03:17:26"
+        "start": "2014-09-12T22:00:00+08:00",
+        "end": "2015-02-06T03:17:26+08:00"
       },
       "length": {
         "value": 210557,
@@ -491,16 +515,12 @@ text:
       }
     }
   }, {
+    "fullUrl": "urn:uuid:Observation/6be3985b-ade4-47f4-b3b0-3e4e8de355c0",
     "resource": {
       "resourceType": "Observation",
-      "id": "e56b6d84-5418-4fc6-b172-48de133c364e",
+      "id": "6be3985b-ade4-47f4-b3b0-3e4e8de355c0",
       "identifier": [ {
-        "type": {
-          "coding": [ {
-            "code": "1234"
-          } ]
-        },
-        "value": "1234"
+        "value": "1234_"
       } ],
       "status": "final",
       "code": {
@@ -509,27 +529,28 @@ text:
         } ]
       },
       "subject": {
-        "reference": "Patient/0f61c0c7-1d9e-46de-9bba-2ee908582804"
+        "reference": "Patient/7425c8c2-50e7-433f-a804-79c0eab69a59"
       },
       "encounter": {
-        "reference": "Encounter/0c2ff935-39e5-43e9-a4c3-6df4e281cc47"
+        "reference": "Encounter/f333437c-9a9e-4981-855c-5d31f4f579a4"
       },
-      "issued": "2012-09-12T01:12:30",
+      "issued": "2012-09-12T01:12:30+08:00",
       "performer": [ {
-        "reference": "Practitioner/05dae019-4686-4140-a001-07f7f2ca9260"
+        "reference": "Practitioner/1fbe4699-7821-4176-92cf-648fe799b4f2"
       }, {
-        "reference": "Practitioner/86be217b-7cdf-4044-80e6-b8469a5660fa"
+        "reference": "Practitioner/191b914f-4eb8-4190-b620-b6bde27141e8"
       }, {
-        "reference": "Practitioner/3cc53aeb-ccd1-494d-a44d-6017942b616e"
+        "reference": "Practitioner/dd9db2fd-ae96-4ca1-8db0-d873568b901a"
       }, {
-        "reference": "Practitioner/28bb5b0d-4ab3-4157-8ca2-007cb6bda84c"
+        "reference": "Practitioner/8a630e35-52c2-43b5-aca3-1485ba986412"
       } ],
       "valueString": "ECHOCARDIOGRAPHIC REPORT"
     }
   }, {
+    "fullUrl": "urn:uuid:Practitioner/1fbe4699-7821-4176-92cf-648fe799b4f2",
     "resource": {
       "resourceType": "Practitioner",
-      "id": "05dae019-4686-4140-a001-07f7f2ca9260",
+      "id": "1fbe4699-7821-4176-92cf-648fe799b4f2",
       "identifier": [ {
         "value": "2740"
       } ],
@@ -540,9 +561,10 @@ text:
       } ]
     }
   }, {
+    "fullUrl": "urn:uuid:Practitioner/191b914f-4eb8-4190-b620-b6bde27141e8",
     "resource": {
       "resourceType": "Practitioner",
-      "id": "86be217b-7cdf-4044-80e6-b8469a5660fa",
+      "id": "191b914f-4eb8-4190-b620-b6bde27141e8",
       "identifier": [ {
         "value": "2913"
       } ],
@@ -553,9 +575,10 @@ text:
       } ]
     }
   }, {
+    "fullUrl": "urn:uuid:Practitioner/dd9db2fd-ae96-4ca1-8db0-d873568b901a",
     "resource": {
       "resourceType": "Practitioner",
-      "id": "3cc53aeb-ccd1-494d-a44d-6017942b616e",
+      "id": "dd9db2fd-ae96-4ca1-8db0-d873568b901a",
       "identifier": [ {
         "value": "3065"
       } ],
@@ -566,9 +589,10 @@ text:
       } ]
     }
   }, {
+    "fullUrl": "urn:uuid:Practitioner/8a630e35-52c2-43b5-aca3-1485ba986412",
     "resource": {
       "resourceType": "Practitioner",
-      "id": "28bb5b0d-4ab3-4157-8ca2-007cb6bda84c",
+      "id": "8a630e35-52c2-43b5-aca3-1485ba986412",
       "identifier": [ {
         "value": "4723"
       } ],
@@ -579,9 +603,25 @@ text:
       } ]
     }
   }, {
+    "fullUrl": "urn:uuid:AllergyIntolerance/44ef3e65-650b-4eff-b662-2057112f49f9",
     "resource": {
       "resourceType": "AllergyIntolerance",
-      "id": "9765d5ab-a8f0-406d-8798-ea6102e9bba5",
+      "id": "44ef3e65-650b-4eff-b662-2057112f49f9",
+      "clinicalStatus": {
+        "coding": [ {
+          "system": "http://terminology.hl7.org/CodeSystem/allergyintolerance-clinical",
+          "code": "active",
+          "display": "Active"
+        } ]
+      },
+      "verificationStatus": {
+        "coding": [ {
+          "system": "http://terminology.hl7.org/CodeSystem/allergyintolerance-verification",
+          "code": "confirmed",
+          "display": "Confirmed"
+        } ]
+      },
+      "criticality": "unable-to-assess",
       "code": {
         "coding": [ {
           "code": "00000741",
@@ -590,7 +630,7 @@ text:
         "text": "OXYCODONE"
       },
       "patient": {
-        "reference": "Patient/0f61c0c7-1d9e-46de-9bba-2ee908582804"
+        "reference": "Patient/7425c8c2-50e7-433f-a804-79c0eab69a59"
       },
       "reaction": [ {
         "manifestation": [ {
@@ -599,9 +639,25 @@ text:
       } ]
     }
   }, {
+    "fullUrl": "urn:uuid:AllergyIntolerance/38e4e23f-593c-406b-bd4d-36b51d580006",
     "resource": {
       "resourceType": "AllergyIntolerance",
-      "id": "5cf3b829-556f-4d25-a674-86b57a6f5a85",
+      "id": "38e4e23f-593c-406b-bd4d-36b51d580006",
+      "clinicalStatus": {
+        "coding": [ {
+          "system": "http://terminology.hl7.org/CodeSystem/allergyintolerance-clinical",
+          "code": "active",
+          "display": "Active"
+        } ]
+      },
+      "verificationStatus": {
+        "coding": [ {
+          "system": "http://terminology.hl7.org/CodeSystem/allergyintolerance-verification",
+          "code": "confirmed",
+          "display": "Confirmed"
+        } ]
+      },
+      "criticality": "unable-to-assess",
       "code": {
         "coding": [ {
           "code": "00001433",
@@ -610,7 +666,7 @@ text:
         "text": "TRAMADOL"
       },
       "patient": {
-        "reference": "Patient/0f61c0c7-1d9e-46de-9bba-2ee908582804"
+        "reference": "Patient/7425c8c2-50e7-433f-a804-79c0eab69a59"
       },
       "reaction": [ {
         "manifestation": [ {
