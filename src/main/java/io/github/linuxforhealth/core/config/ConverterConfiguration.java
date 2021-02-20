@@ -59,7 +59,7 @@ public class ConverterConfiguration {
                   .setListDelimiterHandler(new DefaultListDelimiterHandler(',')));
       Configuration config = builder.getConfiguration();
 
-      String resourceLoc = config.getString(BASE_PATH_RESOURCE);
+      String resourceLoc = config.getString(BASE_PATH_RESOURCE, null);
       if (StringUtils.isNotBlank(resourceLoc)) {
         resourceFolder = resourceLoc;
       } else {
@@ -84,11 +84,14 @@ public class ConverterConfiguration {
       // get additional concept map
       additionalConceptmapFile = config.getString(ADDITIONAL_CONCEPT_MAPS_FILE, null);
 
-
     } catch (ConfigurationException e) {
       throw new IllegalStateException("Cannot read configuration for resource location", e);
     }
   }
+
+
+
+
 
 
   private void getZoneId(String zoneText) {
@@ -109,8 +112,9 @@ public class ConverterConfiguration {
   }
 
 
+
   public static void reset() {
-    configuration = new ConverterConfiguration();
+    configuration = null;
   }
 
 
