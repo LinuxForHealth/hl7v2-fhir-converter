@@ -36,6 +36,12 @@ public interface MessageEngine {
    */
   FHIRContext getFHIRContext();
 
+  /**
+   * Returns IDResolver that will help resolve/generate new id for the resource
+   * @return {@link IdResolver}
+   */
+   IdResolver getIdResolver() ;
 
-  }
+
+}
 

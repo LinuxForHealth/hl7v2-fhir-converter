@@ -28,6 +28,7 @@ import com.google.common.collect.Lists;
 import ca.uhn.hl7v2.model.Structure;
 import io.github.linuxforhealth.api.EvaluationResult;
 import io.github.linuxforhealth.api.FHIRResourceTemplate;
+import io.github.linuxforhealth.api.IdResolver;
 import io.github.linuxforhealth.api.InputDataExtractor;
 import io.github.linuxforhealth.api.MessageEngine;
 import io.github.linuxforhealth.api.ResourceModel;
@@ -37,6 +38,7 @@ import io.github.linuxforhealth.core.ObjectMapperUtil;
 import io.github.linuxforhealth.core.exception.RequiredConstraintFailureException;
 import io.github.linuxforhealth.core.expression.EvaluationResultFactory;
 import io.github.linuxforhealth.core.resource.ResourceResult;
+import io.github.linuxforhealth.fhir.BasicFHIRResourceIdResolver;
 import io.github.linuxforhealth.fhir.FHIRContext;
 import io.github.linuxforhealth.fhir.FHIRResourceMapper;
 import io.github.linuxforhealth.hl7.message.util.SegmentExtractorUtil;
@@ -54,8 +56,11 @@ public class HL7MessageEngine implements MessageEngine {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(HL7MessageEngine.class);
   private static final ObjectMapper OBJ_MAPPER = ObjectMapperUtil.getJSONInstance();
+  private static final IdResolver DEFAULT_ID_RESOLVER =
+      new BasicFHIRResourceIdResolver();
   private FHIRContext context;
   private BundleType bundleType;
+  private IdResolver idResolver;
 
   /**
    * 
@@ -71,8 +76,19 @@ public class HL7MessageEngine implements MessageEngine {
    * @param bundleType
    */
   public HL7MessageEngine(FHIRContext context, BundleType bundleType) {
+    this(context, bundleType, DEFAULT_ID_RESOLVER);
+  }
+
+  /**
+   * 
+   * @param context
+   * @param bundleType
+   * @param idResolver
+   */
+  public HL7MessageEngine(FHIRContext context, BundleType bundleType, IdResolver idResolver) {
     this.context = context;
     this.bundleType = bundleType;
+    this.idResolver = idResolver;
   }
 
 
@@ -297,7 +313,9 @@ public class HL7MessageEngine implements MessageEngine {
         if (json != null) {
           org.hl7.fhir.r4.model.Resource parsed = context.getParser()
               .parseResource(FHIRResourceMapper.getResourceClass(resourceClass), json);
-
+          String resolurceId=getIdResolver().getId(parsed);
+          LOGGER.debug("Resource id evaluated as {} for resource {}", resolurceId, json);
+          parsed.setId(resolurceId);
           bundle.addEntry().setResource(parsed).setFullUrl("urn:uuid:" + parsed.getId());
         }
       }
@@ -312,6 +330,11 @@ public class HL7MessageEngine implements MessageEngine {
   public FHIRContext getFHIRContext() {
     return context;
   }
+
+  public IdResolver getIdResolver() {
+    return idResolver;
+  }
+
 
 
 }
