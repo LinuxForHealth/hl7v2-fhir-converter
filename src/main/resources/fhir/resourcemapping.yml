@@ -13,3 +13,4 @@ Practitioner: org.hl7.fhir.r4.model.Practitioner
 DiagnosticReport: org.hl7.fhir.r4.model.DiagnosticReport
 Immunization: org.hl7.fhir.r4.model.Immunization
 Organization: org.hl7.fhir.r4.model.Organization
+MessageHeader: org.hl7.fhir.r4.model.MessageHeader

@@ -6,6 +6,13 @@
 # FHIR Resources to extract from VXU_V04 message
 ---
 resources:
+    - resourceName: MessageHeader
+      segment: MSH
+      resourcePath: resource/MessageHeader
+      repeats: false
+      isReferenced: false
+      additionalSegments:
+                   - EVN
     - resourceName: Patient
       segment: PID
       resourcePath: resource/Patient

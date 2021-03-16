@@ -6,6 +6,15 @@
 # FHIR Resources to extract from ORU_R01 message
 ---
 resources:
+    - resourceName: MessageHeader
+      segment: MSH
+      resourcePath: resource/MessageHeader
+      repeats: false
+      isReferenced: false
+      additionalSegments:
+              - EVN
+   
+
     - resourceName: Patient
       segment: PATIENT_RESULT.PATIENT.PID
       resourcePath: resource/Patient
