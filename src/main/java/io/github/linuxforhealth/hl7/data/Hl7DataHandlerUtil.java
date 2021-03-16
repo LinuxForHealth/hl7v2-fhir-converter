@@ -73,6 +73,10 @@ public class Hl7DataHandlerUtil {
 
 
   private static String toStringValue(Object local, boolean allComponents) {
+
+    if (local == null) {
+      return null;
+    }
     String returnvalue;
     if (local instanceof Variable) {
       returnvalue = convertVariesDataTypeToString(local, allComponents);

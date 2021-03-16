@@ -182,6 +182,25 @@ public class DifferentObservationValueTest {
 
   }
 
+  @Test
+  public void test_observation_ST_null_result() throws IOException {
 
+    String hl7message = baseMessage
+        + "OBX|1|ST|14151-5^HCO3 BldCo-sCnc^LN|TEST|||||||F|||20210311122016|||||20210311122153||||";
+    String json = message.convert(hl7message, engine);
+
+    IBaseResource bundleResource = context.getParser().parseResource(json);
+    assertThat(bundleResource).isNotNull();
+    Bundle b = (Bundle) bundleResource;
+    List<BundleEntryComponent> e = b.getEntry();
+    List<Resource> obsResource =
+        e.stream().filter(v -> ResourceType.Observation == v.getResource().getResourceType())
+            .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+    assertThat(obsResource).hasSize(1);
+    Observation obs = (Observation) obsResource.get(0);
+    assertThat(obs.getValueStringType()).isNotNull();
+    StringType q = obs.getValueStringType();
+    assertThat(q.asStringValue()).isEqualTo(null);
+  }
 
 }
