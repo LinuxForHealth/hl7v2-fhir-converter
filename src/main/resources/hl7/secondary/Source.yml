@@ -1,0 +1,16 @@
+#
+# (C) Copyright IBM Corp. 2020
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+---
+name:
+  type: STRING
+  valueOf: MSH.3
+  expressionType: HL7Spec
+
+endpoint:
+  type: URL
+  valueOf: MSH.24.2
+  required: true
+  expressionType: HL7Spec

@@ -26,8 +26,13 @@ coding_2:
     expressionType: HL7Spec
     vars:
        code: ID |IS |TX
-
        
+coding_3: 
+    valueOf: $coding
+    condition: $coding NOT_NULL
+    generateList: true
+
+
 text:  
      type: STRING
      valueOf: CWE.2 |CWE.9 |CE.2 |CNE.2| ST |TX |ID |IS

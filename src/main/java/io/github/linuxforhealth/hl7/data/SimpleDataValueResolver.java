@@ -22,6 +22,7 @@ import org.hl7.fhir.r4.model.Enumerations.AdministrativeGender;
 import org.hl7.fhir.r4.model.Immunization.ImmunizationStatus;
 import org.hl7.fhir.r4.model.Observation.ObservationStatus;
 import org.hl7.fhir.r4.model.codesystems.ConditionCategory;
+import org.hl7.fhir.r4.model.codesystems.MessageReasonEncounter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import io.github.linuxforhealth.api.ResourceValue;
@@ -293,6 +294,32 @@ public class SimpleDataValueResolver {
         }
 
       };
+
+
+  public static final ValueExtractor<Object, UUID> NAMED_UUID = (Object value) -> {
+    String val = Hl7DataHandlerUtil.getStringValue(value);
+    if (StringUtils.isNotBlank(val)) {
+    return UUID.nameUUIDFromBytes(val.getBytes());
+    }
+    return null;
+
+  };
+
+  public static final ValueExtractor<Object, Object> MESSAGE_REASON_ENCOUNTER =
+      (Object value) -> {
+
+    String val = Hl7DataHandlerUtil.getStringValue(value);
+    String code = getFHIRCode(val, MessageReasonEncounter.class);
+    if (code != null) {
+          MessageReasonEncounter en = MessageReasonEncounter.fromCode(code);
+          return new SimpleCode(code, en.getSystem(), en.getDisplay());
+    } else {
+      return null;
+    }
+
+  };
+
+
 
   private SimpleDataValueResolver() {}
 

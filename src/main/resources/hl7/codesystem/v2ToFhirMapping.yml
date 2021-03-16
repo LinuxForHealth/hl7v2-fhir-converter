@@ -42,9 +42,22 @@ DiagnosticReportStatus:
    Y: unknown
    Z: unknown
    
-ImmunizationStatus:  
+ImmunizationStatus:
   CP: completed
   NA: not-done
   PA: not-done
   RE: not-done
+  
+MessageReasonEncounter:
+   A01: admit
+   A03: discharge
+   A21: absent
+   A22: return
+   A02: moved
+   A06: moved
+   A07: moved
+   A08: edit
+   A28: edit
+   A31: edit
+
    

@@ -29,6 +29,7 @@ public enum SimpleDataTypeMapper {
   UNSIGNEDINT(SimpleDataValueResolver.INTEGER), //
   POSITIVEINT(SimpleDataValueResolver.INTEGER), //
   UUID(SimpleDataValueResolver.UUID_VAL), //
+  NAMED_UUID(SimpleDataValueResolver.NAMED_UUID), //
   OBJECT(SimpleDataValueResolver.OBJECT), //
   CODING_SYSTEM_V2(SimpleDataValueResolver.CODING_SYSTEM_V2), //
   SYSTEM_URL(SimpleDataValueResolver.SYSTEM_URL), //
@@ -42,7 +43,9 @@ public enum SimpleDataTypeMapper {
   ARRAY(SimpleDataValueResolver.ARRAY), //
   OBSERVATION_STATUS(SimpleDataValueResolver.OBSERVATION_STATUS_CODE_FHIR), //
   RELATIVE_REFERENCE(SimpleDataValueResolver.RELATIVE_REFERENCE), //
-  IMMUNIZATION_STATUS_CODES(SimpleDataValueResolver.IMMUNIZATION_STATUS_CODES); //
+  IMMUNIZATION_STATUS_CODES(
+      SimpleDataValueResolver.IMMUNIZATION_STATUS_CODES), //
+  MESSAGE_REASON_ENCOUNTER(SimpleDataValueResolver.MESSAGE_REASON_ENCOUNTER); //
 
 
   private ValueExtractor<Object, ?> valueResolver;

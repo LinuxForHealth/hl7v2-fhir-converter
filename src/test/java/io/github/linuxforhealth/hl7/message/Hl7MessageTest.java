@@ -16,6 +16,7 @@ import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
 import org.hl7.fhir.r4.model.Condition;
 import org.hl7.fhir.r4.model.Condition.ConditionEvidenceComponent;
 import org.hl7.fhir.r4.model.Encounter;
+import org.hl7.fhir.r4.model.MessageHeader;
 import org.hl7.fhir.r4.model.Observation;
 import org.hl7.fhir.r4.model.Reference;
 import org.hl7.fhir.r4.model.Resource;
@@ -27,7 +28,7 @@ import io.github.linuxforhealth.fhir.FHIRContext;
 import io.github.linuxforhealth.hl7.resource.ResourceReader;
 
 public class Hl7MessageTest {
-  private static FHIRContext context = new FHIRContext();
+  private static FHIRContext context = new FHIRContext(true, false);
   private static HL7MessageEngine engine = new HL7MessageEngine(context);
 
   @Test
@@ -440,6 +441,134 @@ public class Hl7MessageTest {
     assertThat(evidences.get(0).getDetail().get(0).getReference())
         .isNotEqualTo(evidences.get(1).getDetail().get(0).getReference());
   }
+
+
+
+  @Test
+  public void test_messageHeader_with_ADT() throws IOException {
+
+    ResourceModel rsm =
+        ResourceReader.getInstance().generateResourceModel("resource/MessageHeader");
+
+    HL7FHIRResourceTemplateAttributes attributes = new HL7FHIRResourceTemplateAttributes.Builder()
+        .withResourceName("MessageHeader").withResourceModel(rsm).withSegment("MSH")
+        .withIsReferenced(false).withRepeats(false).build();
+
+    HL7FHIRResourceTemplate messageHeaderTemplate = new HL7FHIRResourceTemplate(attributes);
+
+
+
+    HL7MessageModel message = new HL7MessageModel("ADT", Lists.newArrayList(messageHeaderTemplate));
+    String hl7message =
+        "MSH|^~\\&|Amalga HIS|BUM|New Tester|MS|20111121103141||ADT^A01|2847970-201111211031|P|2.6|||AL|NE|764|||||||^4086::132:2A57:3C28^IPv6\r"
+            + "EVN|A01|20130617154644\r"
+            + "PID|1|465 306 5961|000010016^^^MR~000010017^^^MR~000010018^^^MR|407623|Wood^Patrick^^Sr^MR||19700101|female|||High Street^^Oxford^^Ox1 4DP~George St^^Oxford^^Ox1 5AP|||||||\r"
+            + "NK1|1|Wood^John^^^MR|Father||999-9999\r"
+            + "NK1|2|Jones^Georgie^^^MSS|MOTHER||999-9999\r"
+            + "PV1|1||Location||||||||||||||||261938_6_201306171546|||||||||||||||||||||||||20130617134644|||||||||";
+    String json = message.convert(hl7message, engine);
+    assertThat(json).isNotBlank();
+
+    IBaseResource bundleResource = context.getParser().parseResource(json);
+    assertThat(bundleResource).isNotNull();
+    Bundle b = (Bundle) bundleResource;
+    List<BundleEntryComponent> e = b.getEntry();
+    List<Resource> messageHeader =
+        e.stream().filter(v -> ResourceType.MessageHeader == v.getResource().getResourceType())
+            .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+    assertThat(messageHeader).hasSize(1);
+
+    MessageHeader msgH = getResourceMessageHeader(messageHeader.get(0));
+
+    assertThat(msgH.getId()).isNotNull();
+    assertThat(msgH.getEventCoding()).isNotNull();
+    assertThat(msgH.getEventCoding().getSystem())
+        .isEqualTo("http://terminology.hl7.org/CodeSystem/v2-0003");
+    assertThat(msgH.getEventCoding().getCode()).isEqualTo("A01");
+    assertThat(msgH.getEventCoding().getDisplay())
+        .isEqualTo("ADT/ACK - Admit/visit notification");
+    assertThat(msgH.getDestination()).hasSize(1);
+    assertThat(msgH.getDestinationFirstRep().getName()).isEqualTo("New Tester");
+    assertThat(msgH.getDestinationFirstRep().getEndpoint()).isEqualTo("MS");
+
+    assertThat(msgH.getSource()).isNotNull();
+    assertThat(msgH.getSource().getName()).isEqualTo("Amalga HIS");
+
+    assertThat(msgH.getReason()).isNotNull();
+    assertThat(msgH.getReason().getCoding().get(0).getSystem())
+        .isEqualTo("http://terminology.hl7.org/CodeSystem/message-reasons-encounter");
+    assertThat(msgH.getReason().getCoding().get(0).getCode()).isEqualTo("admit");
+    assertThat(msgH.getReason().getCoding().get(0).getDisplay()).isEqualTo("Admit");
+
+
+
+  }
+
+
+
+  @Test
+  public void test_messageHeader_with_ORU() throws IOException {
+
+    ResourceModel rsm =
+        ResourceReader.getInstance().generateResourceModel("resource/MessageHeader");
+
+    HL7FHIRResourceTemplateAttributes attributes = new HL7FHIRResourceTemplateAttributes.Builder()
+        .withResourceName("MessageHeader").withResourceModel(rsm).withSegment("MSH")
+        .withAdditionalSegments(Lists.newArrayList("EVN"))
+        .withIsReferenced(false).withRepeats(false).build();
+
+    HL7FHIRResourceTemplate messageHeaderTemplate = new HL7FHIRResourceTemplate(attributes);
+
+
+    HL7MessageModel message = new HL7MessageModel("ORU", Lists.newArrayList(messageHeaderTemplate));
+    String hl7message =
+        "MSH|^~\\&|Amalga HIS|BUM|New Tester|MS|20111121103141||ORU^R01|2847970-201111211031|P|2.6|||AL|NE|764|ASCII||||||^4086::132:2A57:3C28^IPv6\r"
+            + "EVN|A01|20130617154644||01\r"
+        + "PID|1|465 306 5961|000010016^^^MR~000010017^^^MR~000010018^^^MR|407623|Wood^Patrick^^Sr^MR||19700101|female|||High Street^^Oxford^^Ox1 4DP~George St^^Oxford^^Ox1 5AP|||||||\r"
+        + "NK1|1|Wood^John^^^MR|Father||999-9999\r" + "NK1|2|Jones^Georgie^^^MSS|MOTHER||999-9999\r"
+        + "PV1|1||Location||||||||||||||||261938_6_201306171546|||||||||||||||||||||||||20130617134644|||||||||";
+    String json = message.convert(hl7message, engine);
+    assertThat(json).isNotBlank();
+
+    IBaseResource bundleResource = context.getParser().parseResource(json);
+    assertThat(bundleResource).isNotNull();
+    Bundle b = (Bundle) bundleResource;
+    List<BundleEntryComponent> e = b.getEntry();
+    List<Resource> messageHeader =
+        e.stream().filter(v -> ResourceType.MessageHeader == v.getResource().getResourceType())
+            .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+    assertThat(messageHeader).hasSize(1);
+
+    MessageHeader msgH = getResourceMessageHeader(messageHeader.get(0));
+
+    assertThat(msgH.getId()).isNotNull();
+    assertThat(msgH.getEventCoding()).isNotNull();
+    assertThat(msgH.getEventCoding().getSystem())
+        .isEqualTo("http://terminology.hl7.org/CodeSystem/v2-0003");
+    assertThat(msgH.getEventCoding().getCode()).isEqualTo("R01");
+    assertThat(msgH.getEventCoding().getDisplay())
+        .isEqualTo("ORU/ACK - Unsolicited transmission of an observation message");
+    assertThat(msgH.getDestination()).hasSize(1);
+    assertThat(msgH.getDestinationFirstRep().getName()).isEqualTo("New Tester");
+    assertThat(msgH.getDestinationFirstRep().getEndpoint()).isEqualTo("MS");
+
+    assertThat(msgH.getSource()).isNotNull();
+    assertThat(msgH.getSource().getName()).isEqualTo("Amalga HIS");
+
+    assertThat(msgH.getReason()).isNotNull();
+    assertThat(msgH.getReason().getCoding().get(0).getSystem())
+        .isEqualTo("http://terminology.hl7.org/CodeSystem/v2-0062");
+    assertThat(msgH.getReason().getCoding().get(0).getCode()).isEqualTo("01");
+    assertThat(msgH.getReason().getCoding().get(0).getDisplay()).isEqualTo("Patient request");
+
+  }
+
+  private MessageHeader getResourceMessageHeader(Resource resource) {
+    String s = context.getParser().encodeResourceToString(resource);
+    Class<? extends IBaseResource> klass = MessageHeader.class;
+    return (MessageHeader) context.getParser().parseResource(klass, s);
+  }
+
 
 
   private Condition getResourceCondition(Resource resource) {
