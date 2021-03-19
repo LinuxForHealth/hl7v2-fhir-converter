@@ -10,6 +10,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.UUID;
 import org.hl7.fhir.r4.model.Observation.ObservationStatus;
+import org.hl7.fhir.r4.model.Specimen.SpecimenStatus;
 import org.junit.Test;
 import ca.uhn.hl7v2.model.DataTypeException;
 import ca.uhn.hl7v2.model.v26.datatype.TX;
@@ -146,6 +147,19 @@ public class SimpleDataValueResolverTest {
     assertThat(SimpleDataValueResolver.OBSERVATION_STATUS_CODE_FHIR.apply(gen)).isNull();
   }
 
+
+  @Test
+  public void get_specimen_status_value_valid() {
+    String gen = "Y";
+    assertThat(SimpleDataValueResolver.SPECIMEN_STATUS_CODE_FHIR.apply(gen))
+        .isEqualTo(SpecimenStatus.AVAILABLE.toCode());
+  }
+
+  @Test
+  public void get_specimen_status_value_invalid() {
+    String gen = "x";
+    assertThat(SimpleDataValueResolver.SPECIMEN_STATUS_CODE_FHIR.apply(gen)).isNull();
+  }
 
   @Test
   public void get_URI_value_valid() throws URISyntaxException {

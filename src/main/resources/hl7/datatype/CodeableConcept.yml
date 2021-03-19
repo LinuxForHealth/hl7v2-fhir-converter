@@ -16,7 +16,7 @@ coding_1 :
       code: CWE.1 |CE.1 |CNE.1
       system: CWE.3 |CE.3 |CNE.3
       display: CWE.2 |CE.2 |CNE.2
-      version: CWE.7 |CE.6 |CNE.7 
+      version: CWE.7 |CE.6 |CNE.7
       
 coding_2: 
     condition: $code NOT_NULL
@@ -32,9 +32,20 @@ coding_3:
     condition: $coding NOT_NULL
     generateList: true
 
-
+coding_4: 
+     valueOf: datatype/Coding
+     generateList: true
+     expressionType: resource
+     condition: $code NOT_NULL
+     specs: CWE
+     vars:
+       code: CWE.4
+       system: CWE.6
+       display: CWE.5
+       version: CWE.8
+       
 text:  
      type: STRING
-     valueOf: CWE.2 |CWE.9 |CE.2 |CNE.2| ST |TX |ID |IS
+     valueOf: CWE.2 |CWE.9 |CE.2 |CNE.2| ST |TX |ID |IS | CWE.5
      expressionType: HL7Spec
 

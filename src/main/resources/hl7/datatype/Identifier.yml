@@ -32,6 +32,6 @@ assigner:
    expressionType: reference
    vars:
      name: $assigningAuth
-     id: CX.4
+     id: CX.4| CWE.4
    constants:
       assigningAuth: 'Assigning Authority'

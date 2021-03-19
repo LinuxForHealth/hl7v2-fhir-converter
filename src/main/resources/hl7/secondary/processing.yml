@@ -1,0 +1,9 @@
+#
+# (C) Copyright Mubashir Kazia. 2021
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+additive:
+   valueOf: datatype/CodeableConcept
+   expressionType: resource
+   specs: SPM.6

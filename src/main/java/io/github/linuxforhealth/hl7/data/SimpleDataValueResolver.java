@@ -21,6 +21,7 @@ import org.hl7.fhir.r4.model.DiagnosticReport.DiagnosticReportStatus;
 import org.hl7.fhir.r4.model.Enumerations.AdministrativeGender;
 import org.hl7.fhir.r4.model.Immunization.ImmunizationStatus;
 import org.hl7.fhir.r4.model.Observation.ObservationStatus;
+import org.hl7.fhir.r4.model.Specimen.SpecimenStatus;
 import org.hl7.fhir.r4.model.codesystems.ConditionCategory;
 import org.hl7.fhir.r4.model.codesystems.MessageReasonEncounter;
 import org.slf4j.Logger;
@@ -153,6 +154,17 @@ public class SimpleDataValueResolver {
       return null;
     }
 
+  };
+
+  public static final ValueExtractor<Object, String> SPECIMEN_STATUS_CODE_FHIR =
+      (Object value) -> {
+        String val = Hl7DataHandlerUtil.getStringValue(value);
+        String code = getFHIRCode(val, SpecimenStatus.class);
+        if (code != null) {
+          return code;
+        } else {
+          return null;
+        }
   };
 
   public static final ValueExtractor<Object, Boolean> BOOLEAN = (Object value) -> {

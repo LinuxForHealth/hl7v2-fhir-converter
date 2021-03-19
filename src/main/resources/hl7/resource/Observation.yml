@@ -125,6 +125,20 @@ interpretation:
    expressionType: resource
    specs: OBX.8
 
+note_1:
+   valueOf: datatype/Annotation
+   expressionType: resource
+   condition: $obx3 EQUALS 48767-8
+   specs: OBX
+   vars:
+      obx3: STRING, OBX.3.1
+      text: STRING, OBX.5
+
+note_2:
+   valueOf: datatype/Annotation
+   generateList: true
+   expressionType: resource
+   specs: NTE
 
 bodySite:
    valueOf: datatype/CodeableConcept
