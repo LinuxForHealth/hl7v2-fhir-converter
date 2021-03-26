@@ -1,6 +1,6 @@
 # LinuxForHealth HL7 to FHIR Converter
 
-The LinuxForHealth HL7 to FHIR converter is a Java based library that enables converting [HL7v2](https://www.hl7.org/implement/standards/product_section.cfm?section=13) messages to [FHIR](https://hl7.org/FHIR/) resources.
+The LinuxForHealth HL7 to FHIR converter is a Java based library that enables converting [HL7v2](https://www.hl7.org/implement/standards/product_section.cfm?section=13) messages to [FHIR](https://hl7.org/FHIR/) resources in a declarative and configuration based manner.
 
 Message parsing and modeling is supported using the "HAPI" libraries for [HL7](https://hapifhir.github.io/hapi-hl7v2/) and [FHIR](https://hapifhir.io/) respectively.
 
@@ -11,7 +11,6 @@ The converter supports the following message types/events:
 * VXU_V04 - Vaccination: Update Vaccination Record
 
 If you need another message type/event . . .  contributions are welcome! We welcome [Pull Requests](https://github.com/LinuxForHealth/hl7v2-fhir-converter/pulls)!
-
 
 ## Development Quickstart
 
@@ -37,7 +36,7 @@ Library Coordinates
 ```
 groupId = io.github.linuxforhealth
 artifactId = hl7v2-fhir-converter
-version = 1.0.4 # please check for current version
+version = 1.0.5
 ```
 
 Maven dependency
@@ -45,7 +44,7 @@ Maven dependency
 <dependency>
   <groupId>io.github.linuxforhealth</groupId>
   <artifactId>hl7v2-fhir-converter</artifactId>
-  <version>1.0.4</version>
+  <version>1.0.5</version>
 </dependency>
 ```
 
@@ -55,8 +54,7 @@ jcenter()
     maven {
      url "https://dl.bintray.com/ibm-watson-health/ibm-fhir-server-releases"
      }
-     
-    implementation 'io.github.linuxforhealth:jackson-datatype-jsr310:2.10.1'
+    implementation 'io.github.linuxforhealth:hl7v2-fhir-converter:1.0.5'
 ```     
 
 Instantiate and execute the converter
@@ -85,4 +83,3 @@ The config.properties file location is set using the System property, `config.ho
 ## Additional Documentation
 * [Templating Configuration](./TEMPLATING.md)
 * [Development Guide](./DEVELOPMENT.md)
-
