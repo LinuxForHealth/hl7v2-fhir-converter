@@ -45,12 +45,7 @@ form:
 #  specs: RXA.18
 #  vars:
 #    code: RXA.18
-#code:
-#  valueOf: datatype/CodeableConcept
-#  expressionType: resource
-#  specs: RXA.5
-#  vars:
-#    code: RXA.5
+
 #patient:
 #  valueOf: datatype/Reference
 #  expressionType: resource
