@@ -11,3 +11,4 @@ resources:
     resourcePath: resource/MessageHeader
     repeats: false
     isReferenced: false
+    additionalSegments:
