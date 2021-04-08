@@ -8,6 +8,7 @@ package io.github.linuxforhealth.hl7.data;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -196,6 +197,12 @@ public class SimpleDataValueResolver {
   public static final ValueExtractor<Object, UUID> UUID_VAL = (Object value) -> {
     String val = Hl7DataHandlerUtil.getStringValue(value);
     return getUUID(val);
+
+  };
+
+  public static final ValueExtractor<Object, String> BASE64_BINARY = (Object value) -> {
+    String val = Hl7DataHandlerUtil.getStringValue(value);
+    return Base64.getEncoder().encodeToString(val.getBytes());
 
   };
 
