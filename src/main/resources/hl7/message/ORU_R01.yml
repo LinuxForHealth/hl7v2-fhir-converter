@@ -42,10 +42,10 @@ resources:
              - .OBR
       
     - resourceName: DiagnosticReport
-      segment: .OBSERVATION.OBX
+      segment: .OBR
       group: PATIENT_RESULT.ORDER_OBSERVATION
       resourcePath: resource/DiagnosticReport
       repeats: true
       additionalSegments:
-             - .OBR
+             - .OBSERVATION.OBX
              - .ORC
