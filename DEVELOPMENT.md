@@ -6,9 +6,9 @@ Implementation Steps include:
 
 * Create or obtain a sample HL7 v2 message/triggering event file for the use-case
 * Review the official HL7 documentation for the target FHIR Resource.
-* Create new FHIR resource templates if necessary. 
+* Create new FHIR resource templates if necessary.
 * Create the HL7 message template to support the message/trigger event to resource mapping.
-* Implement a test case to validate mapping results 
+* Implement a test case to validate mapping results
 
 
 ## Sample HL7 v2 Message
@@ -64,6 +64,7 @@ Review the existing FHIR resource templates in `src/main/resources/hl7/resource`
 ## Create the HL7 Message Template
 
 Create a new HL7 Message Mapping template in `/src/main/resources/hl7/message` to support the mapping.
+Add the new message type to [src/main/resources/config.properties](src/main/resources/config.properties).
 
 ## Implement a Test Case
 
