@@ -9,7 +9,10 @@ contentType:
     type: STRING
     valueOf: $mime
 
-# language:
+language:
+    type: STRING
+    valueOf: $language
+
 # code
 
 data:
