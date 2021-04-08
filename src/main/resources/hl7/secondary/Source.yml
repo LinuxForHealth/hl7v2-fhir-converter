@@ -12,5 +12,5 @@ name:
 endpoint:
   type: URL
   valueOf: MSH.24.2
-  required: true
+  required: false
   expressionType: HL7Spec
