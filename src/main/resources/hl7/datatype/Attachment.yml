@@ -1,0 +1,34 @@
+#
+# (C) Copyright IBM Corp. 2020
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+# Represents attachment
+---
+#contentType:
+#    type
+# code mime
+
+# language:
+# code
+
+data:
+    type: BASE64_BINARY
+    valueOf: $data
+
+#url:
+#    type: URI
+
+#size: 
+#    type: INTEGER
+
+#hash: 
+    #type: BASE64_BINARY
+
+title:
+    type: STRING
+    valueOf: $title
+  
+creation:
+    type: DATE_TIME
+    valueOf: $date
