@@ -41,8 +41,7 @@ resources:
       additionalSegments: 
           - .OBR
           - .OBSERVATION.NTE
-      
-            
+        
     - resourceName: Specimen
       segment: .SPECIMEN.SPM
       group: PATIENT_RESULT.ORDER_OBSERVATION
@@ -54,12 +53,11 @@ resources:
           - .OBSERVATION.NTE
       
     - resourceName: DiagnosticReport
-      segment: .OBR
+      segment: .OBSERVATION.OBX
       group: PATIENT_RESULT.ORDER_OBSERVATION
       resourcePath: resource/DiagnosticReport
       repeats: true
       additionalSegments:
           - .ORC
           - .NTE
-      
-  
+          - .OBR
