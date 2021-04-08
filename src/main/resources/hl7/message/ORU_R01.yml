@@ -53,11 +53,11 @@ resources:
           - .OBSERVATION.NTE
       
     - resourceName: DiagnosticReport
-      segment: .OBSERVATION.OBX
+      segment: .OBR
       group: PATIENT_RESULT.ORDER_OBSERVATION
       resourcePath: resource/DiagnosticReport
       repeats: true
       additionalSegments:
           - .ORC
           - .NTE
-          - .OBR
+          - .OBSERVATION.OBX
