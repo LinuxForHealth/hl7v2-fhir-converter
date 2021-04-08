@@ -5,9 +5,9 @@
 #
 # Represents attachment
 ---
-#contentType:
-#    type
-# code mime
+contentType:
+    type: STRING
+    valueOf: $mime
 
 # language:
 # code
