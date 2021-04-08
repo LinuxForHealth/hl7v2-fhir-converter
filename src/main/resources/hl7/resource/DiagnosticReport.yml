@@ -76,12 +76,16 @@ presentedForm:
       title: OBR.4.2 + OBX.5 *
       date: OBX.14
       mime: $code
+      language: $code2
       obx2: STRING, OBX.2
       obx3: STRING, OBX.3
    constants:
       system: 'http://terminology.hl7.org/CodeSystem/v2-0834'
       code: 'text'
       display: 'Text data'
+      system2: 'http://hl7.org/fhir/ValueSet/all-languages'
+      code2: 'en'
+      display2: 'English'
 
 #   condition: OBX.2 EQUALS TX && OBX.3 NULL
 #   specs: $Attachment

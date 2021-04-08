@@ -4464,3 +4464,8 @@
   description: "United States National Provider Identifier"
   url: "http://hl7.org/fhir/sid/us-npi"
   oid: "urn:oid:2.16.840.1.113883.4.6"
+
+- id: "AllLanguages"
+  description: "languages"
+  url: "http://hl7.org/fhir/ValueSet/all-languages"
+  oid: "urn:oid:2.16.840.1.113883.4.642.3.21"
