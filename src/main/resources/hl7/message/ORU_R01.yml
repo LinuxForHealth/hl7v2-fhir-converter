@@ -39,17 +39,13 @@ resources:
       repeats: true
       isReferenced: true
       additionalSegments: 
-          - .OBR
+             - .OBR
       
-            
     - resourceName: DiagnosticReport
-      segment: .OBR
+      segment: .OBSERVATION.OBX
       group: PATIENT_RESULT.ORDER_OBSERVATION
       resourcePath: resource/DiagnosticReport
       repeats: true
       additionalSegments:
-                - .ORC
-      
-
-      
-  
+             - .OBR
+             - .ORC

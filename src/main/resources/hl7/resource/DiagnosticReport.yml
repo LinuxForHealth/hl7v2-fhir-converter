@@ -19,6 +19,7 @@ status:
    type: DIAGNOSTIC_REPORT_STATUS
    valueOf: OBR.25
    expressionType: HL7Spec
+
 category:
    valueOf: datatype/CodeableConcept
    generateList: true
@@ -65,3 +66,13 @@ result:
    expressionType: resource
    specs: $Observation
    useGroup: true
+
+presentedForm:
+   valueOf: datatype/Attachment
+   expressionType: resource
+   vars: 
+      data: OBX.5
+      title: OBR.4.2 + OBX.5
+      date: OBX.14
+#   condition: OBX.2 EQUALS TX && OBX.3 NULL
+#   specs: $Attachment
