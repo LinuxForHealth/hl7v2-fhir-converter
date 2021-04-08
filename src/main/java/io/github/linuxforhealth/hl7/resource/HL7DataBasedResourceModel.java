@@ -197,14 +197,23 @@ public class HL7DataBasedResourceModel implements ResourceModel {
       LOGGER.debug("Extracted object from reference resource  {} {} reference {}  value {}",
           exp.getType(), entry.getKey(), exp.getReference(), obj);
       if (obj != null && !obj.isEmpty()) {
-        resolveValues.put(getKeyName(entry.getKey()), obj.getValue());
+        // Check if the key already exist in the HashMap, if found append, do not replace
+        if(!resolveValues.containsKey(getKeyName(entry.getKey()))) {
+          resolveValues.put(getKeyName(entry.getKey()), obj.getValue());
+        } else {
+          Object existing = resolveValues.get(getKeyName(entry.getKey()));
+          if (existing instanceof List) {
+            if (obj.getValue() instanceof List) {
+              ((List<Object>)existing).addAll(obj.getValue());
+            } else {
+              ((List<Object>)existing).add(obj.getValue());
+            }
+          }
+        }
         if (obj.getAdditionalResources() != null && !obj.getAdditionalResources().isEmpty()) {
           additionalResolveValues.addAll(obj.getAdditionalResources());
         }
       }
-
-
-
     }
   }
 
@@ -224,16 +233,24 @@ public class HL7DataBasedResourceModel implements ResourceModel {
       LOGGER.debug("Extracted object from reference resource  {} {} reference {}  value {}",
           exp.getType(), entry.getKey(), exp.getResource(), obj);
       if (obj != null && !obj.isEmpty()) {
-        resolveValues.put(getKeyName(entry.getKey()), obj.getValue());
+        // Check if the key already exist in the HashMap, if found append, do not replace
+        if(!resolveValues.containsKey(getKeyName(entry.getKey()))) {
+          resolveValues.put(getKeyName(entry.getKey()), obj.getValue());
+        } else {
+          Object existing = resolveValues.get(getKeyName(entry.getKey()));
+          if (existing instanceof List) {
+            if (obj.getValue() instanceof List) {
+              ((List<Object>)existing).addAll(obj.getValue());
+            } else {
+              ((List<Object>)existing).add(obj.getValue());
+            }
+          }
+        }
         if (obj.getAdditionalResources() != null && !obj.getAdditionalResources().isEmpty()) {
           additionalResolveValues.addAll(obj.getAdditionalResources());
         }
       }
-
-
-
     }
-
   }
 
   private static String getKeyName(String key) {
@@ -252,10 +269,20 @@ public class HL7DataBasedResourceModel implements ResourceModel {
 
       if (obj != null && !obj.isEmpty()) {
 
-        resolveValues.put(getKeyName(entry.getKey()), obj.getValue());
+        // Check if the key already exist in the HashMap, if found append, do not replace
+        if(!resolveValues.containsKey(getKeyName(entry.getKey()))) {
+          resolveValues.put(getKeyName(entry.getKey()), obj.getValue());
+        } else {
+          Object existing = resolveValues.get(getKeyName(entry.getKey()));
+          if (existing instanceof List) {
+            if (obj.getValue() instanceof List) {
+              ((List<Object>)existing).addAll(obj.getValue());
+            } else {
+              ((List<Object>)existing).add(obj.getValue());
+            }
+          }
+        }
       }
-
-
     }
   }
 

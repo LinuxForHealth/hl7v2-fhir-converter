@@ -59,6 +59,13 @@ resultsInterpreter:
    expressionType: reference
    specs: OBR.32
 
+specimen:
+   valueOf: datatype/Reference
+   generateList: true
+   expressionType: resource
+   specs: $Specimen
+   useGroup: true
+
 result:
    valueOf: datatype/Reference
    generateList: true
