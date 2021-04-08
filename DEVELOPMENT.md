@@ -69,3 +69,4 @@ Add the new message type to [src/main/resources/config.properties](src/main/reso
 ## Implement a Test Case
 
 Implement a test case to validate the HL7 Message to FHIR Resource mapping. End-to-end test cases are found in `src/main/test/java/io/github/linuxforhealth/FhirConverterTest.java`
+
