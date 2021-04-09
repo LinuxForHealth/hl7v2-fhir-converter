@@ -21,8 +21,7 @@ import io.github.linuxforhealth.hl7.expression.specification.SpecificationParser
 
 
 /**
- * Defines Variable object that can be used during the expression evaluation.
- * 
+ * Defines Variable object that can be used during the expression evaluation. 
  *
  * @author pbhallam
  */
@@ -33,13 +32,16 @@ public class SimpleVariable implements Variable {
   private List<String> spec;
   private boolean extractMultiple;
   private boolean combineMultiple;
+  private boolean retainEmpty;
 
   public SimpleVariable(String name, List<String> spec) {
-    this(name, spec, false, false);
+    this(name, spec, false, false, false);
   }
 
-  public SimpleVariable(String name, List<String> spec, boolean extractMultiple,
-      boolean combineMultiple) {
+  public SimpleVariable(String name, List<String> spec, boolean extractMultiple, boolean combineMultiple) {
+	this(name, spec, extractMultiple, combineMultiple, false);
+  }
+  public SimpleVariable(String name, List<String> spec, boolean extractMultiple, boolean combineMultiple, boolean retainEmpty) {
     this.name = name;
     this.spec = new ArrayList<>();
     if (spec != null && !spec.isEmpty()) {
@@ -47,6 +49,7 @@ public class SimpleVariable implements Variable {
     }
     this.extractMultiple = extractMultiple;
     this.combineMultiple = combineMultiple;
+    this.retainEmpty = retainEmpty;
   }
 
   @Override
@@ -59,13 +62,9 @@ public class SimpleVariable implements Variable {
     return OBJECT_TYPE;
   }
 
-
   public String getName() {
     return name;
   }
-
-
-
 
 
   // resolve variable value
@@ -87,9 +86,7 @@ public class SimpleVariable implements Variable {
     } else {
       result = null;
     }
-
     return result;
-
   }
 
 
@@ -123,7 +120,7 @@ public class SimpleVariable implements Variable {
             getVariableValueFromVariableContextMap(specValue, ImmutableMap.copyOf(contextValues));
       } else {
         EvaluationResult gen;
-        Specification hl7spec = SpecificationParser.parse(specValue, this.extractMultiple, false);
+        Specification hl7spec = SpecificationParser.parse(specValue, this.extractMultiple, false, this.retainEmpty);
 
         gen = hl7spec.extractValueForSpec(dataSource, contextValues);
 
@@ -157,8 +154,6 @@ public class SimpleVariable implements Variable {
   }
 
 
-
-
   @Override
   public String getVariableName() {
     return VariableUtils.getVarName(this.name);
@@ -173,5 +168,8 @@ public class SimpleVariable implements Variable {
     return this.extractMultiple;
   }
 
+  public boolean retainEmpty() {
+	return this.retainEmpty;
+  }
 
 }

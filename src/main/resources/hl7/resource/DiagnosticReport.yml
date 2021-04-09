@@ -77,9 +77,11 @@ result:
 presentedForm:
    valueOf: datatype/Attachment
    expressionType: resource
+   # This merges all the OBX lines together when there is no id (obx3) and the type is TX (obx2)
    condition: $obx2 EQUALS TX && $obx3 NULL
    vars:
-      data: OBX.5 *, GeneralUtils.concatenateWithChar(data, '~')
+      # This concatenates all OBX-5 lines together (the asterisk) and preserves blank lines (the ampersand).  Multiple lines are concatenated with a tilde.
+      data: OBX.5 *&, GeneralUtils.concatenateWithChar(data, '~')
       title: OBR.4.2
       date: OBX.14
       mime: $code

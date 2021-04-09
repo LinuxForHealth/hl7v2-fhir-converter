@@ -35,6 +35,11 @@ public class ExpressionVariable extends SimpleVariable {
     this.expression = expression;
   }
 
+  public ExpressionVariable(String name, String expression, List<String> spec,
+	  boolean extractMultiple, boolean retainEmpty) {
+	super(name, spec, extractMultiple, false, retainEmpty);
+	this.expression = expression;
+  }
 
 
 

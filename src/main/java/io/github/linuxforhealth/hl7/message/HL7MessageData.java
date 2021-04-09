@@ -61,7 +61,6 @@ public class HL7MessageData implements InputDataExtractor {
     Object hl7object = null;
     if (valuefromVariables != null) {
       hl7object = valuefromVariables.getValue();
-
     }
 
     if (hl7object instanceof List) {
@@ -72,11 +71,9 @@ public class HL7MessageData implements InputDataExtractor {
           extractedValues.addAll((List) result);
         } else if (result != null) {
           extractedValues.add(result);
-        } else if (result==null && spec.toString().equals("[OBX.5]")) {
-        	// In this case, we have a report and we need to preserve blank lines, 
-        	// so we add an empty string to the result array.  
-        	// Restricting to OBX.5, but this should be controlled by configuration 
-        	// rather than specific code here.
+        } else if (result==null && hl7spec.getRetainEmptyFields() ) {
+        	// In this case, we need to preserve empty / blank fields.  This is specified by '&' in the config. 
+        	// so add an empty string to the result array to achieve this.  
         	extractedValues.add("");
         }
       }
@@ -85,10 +82,7 @@ public class HL7MessageData implements InputDataExtractor {
     } else {
       return EvaluationResultFactory.getEvaluationResult(extractValue(hl7spec, hl7object));
     }
-
-
   }
-
 
 
   private Object extractValue(HL7Specification hl7spec, Object obj) {
@@ -96,12 +90,10 @@ public class HL7MessageData implements InputDataExtractor {
     try {
       if (obj instanceof Segment) {
         res = extractSpecValuesFromSegment(obj, hl7spec);
-
       } else if (obj instanceof Type) {
         res = extractSpecValuesFromField(obj, hl7spec);
       } else if (obj == null) {
         res = extractSpecValues(hl7spec);
-
       }
     } catch (DataExtractionException e) {
       LOGGER.warn("cannot extract value for variable {} ", hl7spec, e);
@@ -111,7 +103,6 @@ public class HL7MessageData implements InputDataExtractor {
     } else {
       return null;
     }
-
   }
 
 
@@ -146,7 +137,6 @@ public class HL7MessageData implements InputDataExtractor {
       } else {
         return null;
       }
-
     } else {
       return EvaluationResultFactory.getEvaluationResult(obj);
     }
@@ -154,7 +144,6 @@ public class HL7MessageData implements InputDataExtractor {
 
 
   private EvaluationResult extractSpecValuesFromField(Object obj, HL7Specification hl7spec) {
-
     if (hl7spec.getComponent() >= 0) {
       ParsingResult<?> res;
       if (hl7spec.getSubComponent() >= 0) {
@@ -171,9 +160,6 @@ public class HL7MessageData implements InputDataExtractor {
     } else {
       return EvaluationResultFactory.getEvaluationResult(obj);
     }
-
-
-
   }
 
 
@@ -193,7 +179,6 @@ public class HL7MessageData implements InputDataExtractor {
     resolvedVariables.forEach((key, value) -> localContext.put(key, value.getValue()));
     Object obj = JEXL.evaluate(trimedJexlExp, localContext);
     return EvaluationResultFactory.getEvaluationResult(obj);
-
   }
 
 
@@ -209,7 +194,6 @@ public class HL7MessageData implements InputDataExtractor {
   }
 
 
-
   @Override
   public EvaluationResult extractValueForSpec(Specification spec,
       Map<String, EvaluationResult> contextValues) {
@@ -219,9 +203,9 @@ public class HL7MessageData implements InputDataExtractor {
     } else {
       return new EmptyEvaluationResult();
     }
-
   }
 
+  
   private static Object getSingleValue(Object object) {
     if (object instanceof List) {
       List value = (List) object;
@@ -230,11 +214,9 @@ public class HL7MessageData implements InputDataExtractor {
       } else {
         return value.get(0);
       }
-
     }
     return object;
   }
-
 
 
 }
