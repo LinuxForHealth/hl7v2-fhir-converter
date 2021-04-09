@@ -64,8 +64,12 @@ Review the existing FHIR resource templates in `src/main/resources/hl7/resource`
 ## Create the HL7 Message Template
 
 Create a new HL7 Message Mapping template in `/src/main/resources/hl7/message` to support the mapping.
-Add the new message type to [src/main/resources/config.properties](src/main/resources/config.properties).
+Add the new message type to the `supported.hl7.messages` property in [src/main/resources/config.properties](src/main/resources/config.properties).
+
+## Create new FHIR Datatype Template
+
+If a new FHIR datatype is required, add a yaml file to [src/main/resources/datatype](src/main/resources/datatype).
 
 ## Implement a Test Case
 
-Implement a test case to validate the HL7 Message to FHIR Resource mapping. End-to-end test cases are found in `src/main/test/java/io/github/linuxforhealth/FhirConverterTest.java`
+Implement a test case to validate the HL7 Message to FHIR Resource mapping. End-to-end test cases are found in `src/main/test/java/io/github/linuxforhealth/FhirConverterTest.java`. Create a new test class for new HL7 messages that are added.
