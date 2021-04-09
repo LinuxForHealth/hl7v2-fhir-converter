@@ -62,7 +62,10 @@ public class ExpressionVariable extends SimpleVariable {
 
   }
 
-
-
-
+  /**
+   *  @return String representation of expression
+   */
+  public String getExpression() {
+	  return expression;
+  }
 }
