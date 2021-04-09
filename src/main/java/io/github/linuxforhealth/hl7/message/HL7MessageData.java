@@ -72,6 +72,12 @@ public class HL7MessageData implements InputDataExtractor {
           extractedValues.addAll((List) result);
         } else if (result != null) {
           extractedValues.add(result);
+        } else if (result==null && spec.toString().equals("[OBX.5]")) {
+        	// In this case, we have a report and we need to preserve blank lines, 
+        	// so we add an empty string to the result array.  
+        	// Restricting to OBX.5, but this should be controlled by configuration 
+        	// rather than specific code here.
+        	extractedValues.add("");
         }
       }
       return EvaluationResultFactory.getEvaluationResult(extractedValues);
