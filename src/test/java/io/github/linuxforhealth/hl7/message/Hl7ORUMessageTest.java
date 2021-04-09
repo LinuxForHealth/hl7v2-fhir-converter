@@ -133,6 +133,36 @@ public class Hl7ORUMessageTest {
 
   }
 
+  @Test
+  public void test_oru_spm() throws IOException {
+    String hl7message =
+        "MSH|^~\\\\&|SendTest1|Sendfac1|Receiveapp1|Receivefac1|200603081747|security|ORU^R01|MSGID000005|T|2.6\r"
+            + "PID||45483|45483||SMITH^SUZIE^||20160813|M|||123 MAIN STREET^^SCHENECTADY^NY^12345||(123)456-7890|||||^^^T||||||||||||\r"
+            + "OBR|1||986^IA PHIMS Stage^2.16.840.1.114222.4.3.3.5.1.2^ISO|1051-2^New Born Screening^LN|||20151009173644|||||||||||||002|||||F|||2740^Tsadok^Janetary~2913^Merrit^Darren^F~3065^Mahoney^Paul^J~4723^Loh^Robert^L~9052^Winter^Oscar^||||3065^Mahoney^Paul^J|\r"
+            + "OBX|1|TX|TS-F-01-002^Endocrine Disorders^L||obs report||||||F\r"
+            + "SPM|1|SpecimenID||BLD|||||||P||||||201410060535|201410060821||Y||||||1\r";
+
+    HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
+    String json = ftv.convert(hl7message, OPTIONS);
+    assertThat(json).isNotBlank();
+    System.out.println(json);
+    IBaseResource bundleResource = context.getParser().parseResource(json);
+    assertThat(bundleResource).isNotNull();
+    Bundle b = (Bundle) bundleResource;
+    List<BundleEntryComponent> e = b.getEntry();
+
+    List<Resource> diagnosticresource =
+        e.stream().filter(v -> ResourceType.DiagnosticReport == v.getResource().getResourceType())
+            .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+    assertThat(diagnosticresource).hasSize(1);
+
+    DiagnosticReport diag = getResource(diagnosticresource.get(0));
+    List<Reference> spmRef = diag.getSpecimen();
+    assertThat(spmRef.isEmpty()).isFalse();
+    assertThat(spmRef).hasSize(1);
+    assertThat(spmRef.get(0).isEmpty()).isFalse();
+  }
+
   private static DiagnosticReport getResource(Resource resource) {
     String s = context.getParser().encodeResourceToString(resource);
     Class<? extends IBaseResource> klass = DiagnosticReport.class;

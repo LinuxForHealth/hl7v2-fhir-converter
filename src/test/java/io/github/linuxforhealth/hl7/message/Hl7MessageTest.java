@@ -21,6 +21,7 @@ import org.hl7.fhir.r4.model.Observation;
 import org.hl7.fhir.r4.model.Reference;
 import org.hl7.fhir.r4.model.Resource;
 import org.hl7.fhir.r4.model.ResourceType;
+import org.hl7.fhir.r4.model.Specimen;
 import org.junit.Test;
 import com.google.common.collect.Lists;
 import io.github.linuxforhealth.api.ResourceModel;
@@ -560,6 +561,107 @@ public class Hl7MessageTest {
         .isEqualTo("http://terminology.hl7.org/CodeSystem/v2-0062");
     assertThat(msgH.getReason().getCoding().get(0).getCode()).isEqualTo("01");
     assertThat(msgH.getReason().getCoding().get(0).getDisplay()).isEqualTo("Patient request");
+
+  }
+
+  @Test
+  public void test_specimen() throws IOException {
+    ResourceModel rsm = ResourceReader.getInstance().generateResourceModel("resource/Specimen");
+
+    HL7FHIRResourceTemplateAttributes attributes = new HL7FHIRResourceTemplateAttributes.Builder()
+        .withResourceName("Specimen").withResourceModel(rsm).withSegment("SPM")
+        .withIsReferenced(true).withRepeats(false).build();
+
+    HL7FHIRResourceTemplate specimen = new HL7FHIRResourceTemplate(attributes);
+
+    HL7MessageModel message = new HL7MessageModel("ORU", Lists.newArrayList(specimen));
+
+    String hl7message = "MSH|^~\\&|Amalga HIS|BUM|New Tester|MS|20111121103141||ORU^R01|2847970-201111211031|P|2.6|||AL|NE|764|ASCII||||||^4086::132:2A57:3C28^IPv6\r"
+        + "EVN|A01|20130617154644\r"
+        + "PID|1|465 306 5961|000010016^^^MR~000010017^^^MR~000010018^^^MR|407623|Wood^Patrick^^Sr^MR||19700101|female|||High Street^^Oxford^^Ox1 4DP~George St^^Oxford^^Ox1 5AP|||||||\r"
+        + "NK1|1|Wood^John^^^MR|Father||999-9999\r" + "NK1|2|Jones^Georgie^^^MSS|MOTHER||999-9999\r"
+        + "PV1|1||Location||||||||||||||||261938_6_201306171546|||||||||||||||||||||||||20130617134644|||||||||\r"
+        + "OBX|1|TX|1234||First line: ECHOCARDIOGRAPHIC REPORT||||||F|||||2740^Tsadok^Janetary~2913^Merrit^Darren^F~3065^Mahoney^Paul^J~4723^Loh^Robert^L~9052^Winter^Oscar^|\r"
+        + "SPM|1|SpecimenID||BLOOD^Blood^^87612001^BLOOD^SCT^^||||Cord Art^Blood, Cord Arterial^^^^^^^|||P||||||201110060535|201110060821||Y||||||1";
+    String json = message.convert(hl7message, engine);
+
+    IBaseResource bundleResource = context.getParser().parseResource(json);
+    assertThat(bundleResource).isNotNull();
+    Bundle b = (Bundle) bundleResource;
+    List<BundleEntryComponent> e = b.getEntry();
+    List<Resource> spmResource =
+        e.stream().filter(v -> ResourceType.Specimen == v.getResource().getResourceType())
+            .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+    assertThat(spmResource).hasSize(1);
+  }
+
+
+  @Test
+  public void test_specimen_multiple() throws IOException {
+
+
+    ResourceModel rsm = ResourceReader.getInstance().generateResourceModel("resource/Specimen");
+
+    HL7FHIRResourceTemplateAttributes attributes = new HL7FHIRResourceTemplateAttributes.Builder()
+        .withResourceName("Specimen").withResourceModel(rsm).withSegment("SPM")
+        .withIsReferenced(true).withRepeats(true).build();
+
+    HL7FHIRResourceTemplate specimen = new HL7FHIRResourceTemplate(attributes);
+
+
+    HL7MessageModel message = new HL7MessageModel("ORU", Lists.newArrayList(specimen));
+    String hl7message = "MSH|^~\\&|Amalga HIS|BUM|New Tester|MS|20111121103141||ORU^R01|2847970-201111211031|P|2.6|||AL|NE|764|ASCII||||||^4086::132:2A57:3C28^IPv6\r"
+        + "EVN|A01|20130617154644\r"
+        + "PID|1|465 306 5961|000010016^^^MR~000010017^^^MR~000010018^^^MR|407623|Wood^Patrick^^Sr^MR||19700101|female|||High Street^^Oxford^^Ox1 4DP~George St^^Oxford^^Ox1 5AP|||||||\r"
+        + "NK1|1|Wood^John^^^MR|Father||999-9999\r" + "NK1|2|Jones^Georgie^^^MSS|MOTHER||999-9999\r"
+        + "PV1|1||Location||||||||||||||||261938_6_201306171546|||||||||||||||||||||||||20130617134644|||||||||\r"
+        + "OBX|1|TX|1234||First line: ECHOCARDIOGRAPHIC REPORT||||||F|||||2740^Tsadok^Janetary~2913^Merrit^Darren^F~3065^Mahoney^Paul^J~4723^Loh^Robert^L~9052^Winter^Oscar^|\r"
+        + "SPM|1|SpecimenID||BLOOD^Blood^^87612001^BLOOD^SCT^^||||Cord Art^Blood, Cord Arterial^^^^^^^|||P||||||201110060535|201110060821||Y||||||1\r"
+        + "SPM|2|SpecimenID||BLD|||||||P||||||201110060535|201110060821||Y||||||1";
+    String json = message.convert(hl7message, engine);
+
+    IBaseResource bundleResource = context.getParser().parseResource(json);
+    assertThat(bundleResource).isNotNull();
+    Bundle b = (Bundle) bundleResource;
+    List<BundleEntryComponent> e = b.getEntry();
+    List<Resource> spmResource =
+        e.stream().filter(v -> ResourceType.Specimen == v.getResource().getResourceType())
+            .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+    assertThat(spmResource).hasSize(2);
+  }
+
+
+  @Test
+  public void test_specimen_multiple_type_coding() throws IOException {
+
+    ResourceModel rsm = ResourceReader.getInstance().generateResourceModel("resource/Specimen");
+
+    HL7FHIRResourceTemplateAttributes attributes = new HL7FHIRResourceTemplateAttributes.Builder()
+        .withResourceName("Specimen").withResourceModel(rsm).withSegment("SPM")
+        .withIsReferenced(true).withRepeats(false).build();
+
+    HL7FHIRResourceTemplate observation = new HL7FHIRResourceTemplate(attributes);
+
+
+    HL7MessageModel message = new HL7MessageModel("ORU", Lists.newArrayList(observation));
+    String hl7message = "MSH|^~\\&|Amalga HIS|BUM|New Tester|MS|20111121103141||ORU^R01|2847970-201111211031|P|2.6|||AL|NE|764|ASCII||||||^4086::132:2A57:3C28^IPv6\r"
+        + "EVN|A01|20130617154644\r"
+        + "PID|1|465 306 5961|000010016^^^MR~000010017^^^MR~000010018^^^MR|407623|Wood^Patrick^^Sr^MR||19700101|female|||High Street^^Oxford^^Ox1 4DP~George St^^Oxford^^Ox1 5AP|||||||\r"
+        + "NK1|1|Wood^John^^^MR|Father||999-9999\r" + "NK1|2|Jones^Georgie^^^MSS|MOTHER||999-9999\r"
+        + "PV1|1||Location||||||||||||||||261938_6_201306171546|||||||||||||||||||||||||20130617134644|||||||||\r"
+        + "OBX|1|NM|0135–4^TotalProtein||7.3|gm/dl|5.9-8.4||||F\r"
+        + "SPM|1|SpecimenID||BLOOD^Blood^^87612001^BLOOD^SCT^^||||Cord Art^Blood, Cord Arterial^^^^^^^|||P||||||201110060535|201110060821||Y||||||1";
+    String json = message.convert(hl7message, engine);
+    IBaseResource bundleResource = context.getParser().parseResource(json);
+    assertThat(bundleResource).isNotNull();
+    Bundle b = (Bundle) bundleResource;
+    List<BundleEntryComponent> e = b.getEntry();
+    List<Resource> spmResource =
+        e.stream().filter(v -> ResourceType.Specimen == v.getResource().getResourceType())
+            .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+    assertThat(spmResource).hasSize(1);
+    Specimen spm = (Specimen) spmResource.get(0);
+    assertThat(spm.getType().getCoding()).hasSize(2);
 
   }
 

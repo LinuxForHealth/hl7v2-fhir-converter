@@ -60,4 +60,7 @@ MessageReasonEncounter:
    A28: edit
    A31: edit
 
+SpecimenStatus:
+  Y: available
+  N: unavailable
    
