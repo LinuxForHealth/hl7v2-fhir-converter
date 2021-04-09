@@ -9,6 +9,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.DateFormat;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.Base64;
 import java.util.Date;
 import java.util.List;
@@ -234,19 +237,17 @@ public class Hl7ORUMessageTest {
       //Verify attachment to diagnostic report
       Attachment a = attachments.get(0);
       Assert.assertTrue("Incorrect content type", a.getContentType().equalsIgnoreCase("text"));
-      Assert.assertTrue("Incorrect languague", a.getLanguage().equalsIgnoreCase("en"));
-      //TODO: Validate data by decoding
-      //System.out.println(Base64.getDecoder().decode((a.getData())));
-      System.out.println(Base64.getDecoder().decode("fltQSUldIEVtZXJnZW5jeSBEZXBhcnRtZW50fkVEIEVuY291bnRlciBBcnJpdmFsIERhdGU6IFtBRERSRVNTXSBbUEVSU09OQUxOQU1FXTp+"));
+      Assert.assertTrue("Incorrect language", a.getLanguage().equalsIgnoreCase("en"));
       
+      //TODO: Validate data by decoding
+      //Assert.assertTrue("Incorrect data", Base64.getDecoder().decode((a.getData())).equals("~[PII] Emergency Department~ED Encounter Arrival Date: [ADDRESS] [PERSONALNAME]:~"));
       //Base64.getEncoder().encodeToString(val.getBytes());
       
       Assert.assertTrue("Incorrect title", a.getTitle().equalsIgnoreCase("ECHO CARDIOGRAM COMPLETE"));
 
-      //TODO: Validate date
-      //System.out.println(a.getCreation());
-      //Assert.assertTrue("Incorrect creation data", a.getCreation().equals(new Date("2020-08-02T12.44:55+08.00")));
-      
+      //TODO: validate date 
+//      System.out.println(OffsetDateTime.of(2020, 8, 2, 12, 44, 55, 0, ZoneOffset.of("+08:00")));
+//      Assert.assertTrue("Incorrect creation date", a.getCreation().equals("2020-08-02T12.44:55+08.00"));
       
   }
    
