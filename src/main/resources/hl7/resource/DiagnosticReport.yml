@@ -72,7 +72,7 @@ presentedForm:
    expressionType: resource
    condition: $obx2 EQUALS TX  && $obx3 NULL
    vars:
-      data: OBX.5 *
+      data: OBX.5 *, GeneralUtils.concatenateWithChar(data, '~')
       title: OBR.4.2 + OBX.5 *
       date: OBX.14
       mime: $code

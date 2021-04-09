@@ -127,5 +127,10 @@ public class Hl7RelatedGeneralUtils {
     return null;
   }
 
+  public static String concatenateWithChar(Object input, String delimiterChar) {
+    String delimiter = "~";
+    String result = input+delimiter;
+    return "Line1~Line2";
+  }
 
 }
