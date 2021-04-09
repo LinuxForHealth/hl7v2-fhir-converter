@@ -10,7 +10,7 @@ itemCodeableConcept:
   specs: RXC.2 | RXO.1 | RXE.2
 
 strength_4:
-  condition: $denominator NOT_NULL
+  condition: $denominator NOT_NULL && $numerator NOT_NULL
   valueOf: datatype/Ratio
   expressionType: resource
   vars:
@@ -20,7 +20,7 @@ strength_4:
     denunit: RXE.11
 
 strength_3:
-  condition: $denominator NOT_NULL
+  condition: $denominator NOT_NULL && $numerator NOT_NULL
   valueOf: datatype/Ratio
   expressionType: resource
   vars:
@@ -30,7 +30,7 @@ strength_3:
     denunit: RXE.5
 
 strength_2:
-  condition: $denominator NOT_NULL
+  condition: $denominator NOT_NULL && $numerator NOT_NULL
   valueOf: datatype/Ratio
   expressionType: resource
   vars:
@@ -40,7 +40,7 @@ strength_2:
     denunit: RXO.12
 
 strength_1:
-  condition: $denominator NOT_NULL
+  condition: $denominator NOT_NULL && $numerator NOT_NULL
   valueOf: datatype/Ratio
   expressionType: resource
   vars:
