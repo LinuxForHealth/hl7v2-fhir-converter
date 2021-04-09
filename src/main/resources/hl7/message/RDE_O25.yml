@@ -11,8 +11,6 @@ resources:
     resourcePath: resource/MessageHeader
     repeats: false
     isReferenced: false
-<<<<<<< HEAD
-    additionalSegments:
 
   - resourceName: Patient
     segment: PATIENT.PID
@@ -40,6 +38,3 @@ resources:
       - .ORC
       - .ORDER_DETAIL.RXO
       - .RXC
-=======
-    additionalSegments:
->>>>>>> 94369cd8a02e94de876d490e18dfd4318b14220e
