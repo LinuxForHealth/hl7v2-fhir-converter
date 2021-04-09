@@ -77,10 +77,10 @@ result:
 presentedForm:
    valueOf: datatype/Attachment
    expressionType: resource
-   condition: $obx2 EQUALS TX  && $obx3 NULL
+   condition: $obx2 EQUALS TX && $obx3 NULL
    vars:
       data: OBX.5 *, GeneralUtils.concatenateWithChar(data, '~')
-      title: OBR.4.2 + OBX.5 *
+      title: OBR.4.2
       date: OBX.14
       mime: $code
       language: $code2
@@ -93,6 +93,3 @@ presentedForm:
       system2: 'http://hl7.org/fhir/ValueSet/all-languages'
       code2: 'en'
       display2: 'English'
-
-#   condition: OBX.2 EQUALS TX && OBX.3 NULL
-#   specs: $Attachment
