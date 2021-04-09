@@ -30,12 +30,11 @@ resources:
       - .PATIENT_VISIT.PV2
 
   - resourceName: Medication
-    segment: .RXE
+    segment: .RXO
     resourcePath: resource/Medication
     isReferenced: true
     group: ORDER
     repeats: true
     additionalSegments:
       - .ORC
-      - .ORDER_DETAIL.RXO
-      - .RXC
+      - .COMPONENT.RXC

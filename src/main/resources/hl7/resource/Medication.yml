@@ -19,7 +19,7 @@ code:
   valueOf: datatype/CodeableConcept
   generateList: true
   expressionType: resource
-  specs: RXO.1 | RXE.2
+  specs: RXO.1 | RXE.2 | RXC.2
 
 form:
   valueOf: datatype/CodeableConcept
@@ -27,126 +27,11 @@ form:
   expressionType: resource
   specs: RXO.5 | RXE.6
 
+ingredient:
+  valueOf: secondary/Ingredient
+  generateList: true
+  expressionType: resource
 
 
-#batch:
-#    valueOf: secondary/Batch
-#    expressionType: resource
-
-# Manufacterer no relevent source field found
 
 
-#status:
-#  type: IMMUNIZATION_STATUS_CODES
-#   expressionType: HL7Spec
-#statusReason:
-#  valueOf: datatype/CodeableConcept
-#  expressionType: resource
-#  specs: RXA.18
-#  vars:
-#    code: RXA.18
-
-#patient:
-#  valueOf: datatype/Reference
-#  expressionType: resource
-#  specs: $Patient
-#encounter:
-#  valueOf: datatype/Reference
-#  expressionType: resource
-#  specs: $Encounter
-#occurrenceDateTime:
-#  type: DATE_TIME
-#  valueOf: RXA.3
-#  expressionType: HL7Spec
-#primarySource:
-#  value: true
-#  condition: $rxa9 NOT_NULL
-#  vars:
-#    rxa9: RXA.9
-#reportOrigin:
-#  valueOf: datatype/CodeableConcept
-#  expressionType: resource
-#  specs: RXA.9
-#manufacturer:
-#  valueOf: resource/Organization
-#  expressionType: reference
-#  specs: RXA.17
-#lotNumber:
-#  type: STRING
-#  valueOf: RXA.15
-#  expressionType: HL7Spec
-#expirationDate:
-#  type: DATE_TIME
-#  valueOf: RXA.16
-#  expressionType: HL7Spec
-#site:
-#  valueOf: datatype/CodeableConcept
-#  expressionType: resource
-#  specs: RXR.2
-#route:
-#  valueOf: datatype/CodeableConcept
-#  expressionType: resource
-#  specs: RXR.1
-#doseQuantity:
-#  valueOf: datatype/Quantity
-#  expressionType: resource
-#  specs: RXA.6| RXA.7
-#performer:
-#  valueOf: secondary/Performer
-#  expressionType: resource
-#  vars:
-#    orderingProvide: ORC.12
-#    administeringProvide: RXA.10
-#note:
-#  valueOf: datatype/Annotation
-#  expressionType: resource
-#  condition: $obx3 EQUALS 48767-8
-#  specs: OBX
-#  vars:
-#    obx3: STRING, OBX.3.1
-#    text: STRING, OBX.5
-#reasonCode:
-#  valueOf: datatype/CodeableConcept_var
-#  expressionType: resource
-#  generateList: true
-#  condition: $obx3 EQUALS 59785-6
-#  specs: OBX
-#  vars:
-#    obx3: STRING, OBX.3.1
-#    code: STRING, OBX.5.1
-#    text: STRING, OBX.5.2
-#    system: STRING, OBX.5.3
-#
-#reasonReference:
-#  valueOf: datatype/Reference
-#  expressionType: resource
-#  generateList: true
-#  specs: $Observation
-#  useGroup: true
-#isSubpotent:
-#  value: true
-#  condition: $rxa20 EQUALS 'PA'
-#  vars:
-#    rxa20: RXA.20
-#programEligibility:
-#  valueOf: datatype/CodeableConcept_var
-#  expressionType: resource
-#  generateList: true
-#  condition: $obx3 EQUALS 64994-7
-#  specs: OBX
-#  vars:
-#    obx3: STRING, OBX.3.1
-#    code: STRING, OBX.5.1
-#    text: STRING, OBX.5.2
-#    system: STRING, OBX.5.3
-#fundingSource:
-#  valueOf: datatype/CodeableConcept_var
-#  expressionType: resource
-#  generateList: true
-#  condition: $obx3 EQUALS 30963-3
-#  specs: OBX
-#  vars:
-#    obx3: STRING, OBX.3.1
-#    code: STRING, OBX.5.1
-#    text: STRING, OBX.5.2
-#    system: STRING, OBX.5.3

@@ -1,0 +1,16 @@
+#
+# (C) Copyright IBM Corp. 2020
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+---
+
+strength:
+  valueOf: datatype/Ratio
+  expressionType: resource
+  vars:
+    numerator: RXC.3
+    numunit: RXC.4
+    denominator: RXO.2
+    denunit: RXO.4
+

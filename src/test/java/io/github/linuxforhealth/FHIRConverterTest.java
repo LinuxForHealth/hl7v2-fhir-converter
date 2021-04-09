@@ -10,6 +10,11 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import ca.uhn.hl7v2.DefaultHapiContext;
+import ca.uhn.hl7v2.HL7Exception;
+import ca.uhn.hl7v2.HapiContext;
+import ca.uhn.hl7v2.model.Message;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
@@ -141,6 +146,44 @@ public class FHIRConverterTest {
     HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
     exceptionRule.expect(IllegalArgumentException.class);
     ftv.convert(hl7message);
+
+  }
+
+  @Test
+  public void test_omp() throws IOException, HL7Exception {
+    String vmsg = "MSH|^~\\&|SendTest1|Sendfac1|Receiveapp1|Receivefac1|200603081747|security|OMP^O09^OMP_O09|1|P^I|2.6|\r" +
+            "PID|||555444222111^^^MPI&GenHosp^MR||smith^john||19600614|M||C|99 Oakland #106^^Toronto^ON^44889||||||||343132266|||N\r" +
+            "PD1|S|A|patientpfacisXON|primarycareXCN||||F|Y|duppatient|pubcode|Y|20060316|placeofworshipXON|DNR|A|20060101|20050101|USA||ACT\r" +
+            "NTE|1|P|comment after PD1\r" +
+            "PV1||I|6N^1234^A^GENHOS||||0100^ANDERSON,CARL|0148^ADDISON,JAMES||SUR|||||||0148^ANDERSON,CARL|S|1400|A|||||||||||||||||||SF|K||||199501102300\r" +
+            "PV2|priorpendingpoint|accomcode|admitreason|transferreason|patientvalu|patientvaluloc|PH|20060315|20060316|2|4|visit description|referral1~referral2|20050411|Y|P|20060415|FP|Y|1|F|Y|clinicorgname|AI|2|20060316|05|20060318|20060318|chargecode|RC|Y|20060315|Y|Y|Y|Y|P|K|AC|A|A|N|Y|DNR|20060101|20060401|200602140900|O\r" +
+            "IN1|1|insuranceplanA|insurancecoB\r" +
+            "IN2|Insuredempid|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||Y|N|Y\r" +
+            "GT1|6357||gname|gspousename|gaddress|||20060308|F|GT||111-22-3456|20060101|20060101|23|gempname|||||||||N||||||||M\r" +
+            "AL1|1|DA|allergydescription|SV|allergyreasonxx\r" +
+            "ORC|NW|1000^OE|9999999^RX|||E|40^QID^D10^^^R\r" +
+            "TQ1||||||30^M|199401060930|199401061000\r" +
+            "TQ2|1|S|relatedplacer|relatedfiller|placergroupnumber|EE|*|10^min|4|N\r" +
+            "RXO|RX2111^Polycillin 500 mg TAB|500||MG|reqdosgform|providerspharm~prpharm2|providersadmin1~providersadmin2||G||40|dispenseunits|2|orderDEAisXCN|pharmverifidXCN|Y|day|3|units|indication|rate|rateunits\r" +
+            "NTE|1|P|comment after RXO\r" +
+            "RXR|^PO|\r" +
+            "RXC|B|D5/.45NACL|1000|ML\r" +
+            "NTE|1|P|comment after RXC\r" +
+            "OBX|1|TX|^hunchback|1|Increasing||||||S\r" +
+            "NTE|1|P|comment after OBX\r" +
+            "FT1|1|||199805291115||CG|00378112001^VerapamilHydrochloride 120 mgTAB^NDC|||1|5&USD^TP\r" +
+            "BLG|D|CH|accountid|01";
+
+//    HapiContext ctx = new DefaultHapiContext();
+//    Message msg = ctx.getGenericParser().parse(vmsg);
+
+    HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
+
+    ConverterOptions OPTIONS2 =
+            new Builder().withPrettyPrint().build();
+    String json = ftv.convert(vmsg, OPTIONS2);
+
+    System.out.println(json);
 
   }
 

@@ -11,3 +11,31 @@ resources:
     resourcePath: resource/MessageHeader
     repeats: false
     isReferenced: false
+    additionalSegments:
+
+  - resourceName: Patient
+    segment: PATIENT.PID
+    resourcePath: resource/Patient
+    isReferenced: true
+    repeats: false
+    additionalSegments:
+
+  - resourceName: Encounter
+    segment: .PATIENT_VISIT.PV1
+    resourcePath: resource/Encounter
+    isReferenced: true
+    group: PATIENT
+    repeats: false
+    additionalSegments:
+      - .PATIENT_VISIT.PV2
+
+  - resourceName: Medication
+    segment: .RXE
+    resourcePath: resource/Medication
+    isReferenced: true
+    group: ORDER
+    repeats: true
+    additionalSegments:
+      - .ORC
+      - .ORDER_DETAIL.RXO
+      - .RXC

@@ -11,8 +11,8 @@
 	</appender>
 	
 
-	<logger name="io.github.linuxforhealth" level="error" />
-	<root level="error">
+	<logger name="io.github.linuxforhealth" level="debug" />
+	<root level="debug">
 		<appender-ref ref="Console" />
 	</root>
 
