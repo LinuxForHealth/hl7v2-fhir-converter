@@ -34,6 +34,10 @@ public class VariableGenerator {
     rawVariable = StringUtils.strip(rawVariable);
     if (StringUtils.contains(rawVariable, "GeneralUtils")) {
       String[] values = rawVariable.split(",", 2);
+      if (StringUtils.endsWith(values[0], "*")) {
+          extractMultiple = true;
+          values[0] = StringUtils.removeEnd(values[0], "*");
+      }
       if (values.length == COMPONENT_LENGTH_FOR_VAR_EXPRESSION) {
         List<String> specs = getTokens(values[0]);
         return new ExpressionVariable(varName, values[1], specs, extractMultiple);
