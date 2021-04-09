@@ -184,9 +184,9 @@ public class Hl7ORUMessageTest {
   	HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
       String json = ftv.convert(new File("../hl7v2-fhir-converter/src/test/resources/ORU-multiline-short.hl7"), OPTIONS_PRETTYPRINT);
       
-      System.out.println("----------------");
+      System.out.println("-----------------------------------------------------");
       System.out.println(json);
-      System.out.println("----------------");
+      System.out.println("-----------------------------------------------------");
       
       //Verify conversion
       FHIRContext context = new FHIRContext();
@@ -209,11 +209,10 @@ public class Hl7ORUMessageTest {
               .map(BundleEntryComponent::getResource).collect(Collectors.toList());
       assertThat(organizationResource).hasSize(1);
 
-      //TODO: figure out issue
-//      List<Resource> messageHeader = e.stream()
-//              .filter(v -> ResourceType.MessageHeader == v.getResource().getResourceType())
-//              .map(BundleEntryComponent::getResource).collect(Collectors.toList());
-//      assertThat(messageHeader).hasSize(1);   
+      List<Resource> messageHeader = e.stream()
+              .filter(v -> ResourceType.MessageHeader == v.getResource().getResourceType())
+              .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+      assertThat(messageHeader).hasSize(1);
       
       //Verify no observations are created
       List<Resource> obsResource = e.stream()
@@ -243,8 +242,10 @@ public class Hl7ORUMessageTest {
       //Base64.getEncoder().encodeToString(val.getBytes());
       
       Assert.assertTrue("Incorrect title", a.getTitle().equalsIgnoreCase("ECHO CARDIOGRAM COMPLETE"));
-      System.out.println(a.getCreation());
-      Assert.assertTrue("Incorrect creation data", a.getCreation().equals(new Date("2020-08-02T12.44:55+08.00")));
+
+      //TODO: Validate date
+      //System.out.println(a.getCreation());
+      //Assert.assertTrue("Incorrect creation data", a.getCreation().equals(new Date("2020-08-02T12.44:55+08.00")));
       
       
   }
