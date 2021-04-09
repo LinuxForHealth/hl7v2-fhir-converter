@@ -6,10 +6,17 @@
 package io.github.linuxforhealth.hl7.message;
 
 import static org.assertj.core.api.Assertions.assertThat;
+
+import java.io.File;
 import java.io.IOException;
+import java.util.Base64;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
+
+
 import org.hl7.fhir.instance.model.api.IBaseResource;
+import org.hl7.fhir.r4.model.Attachment;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
 import org.hl7.fhir.r4.model.Bundle.BundleType;
@@ -17,6 +24,7 @@ import org.hl7.fhir.r4.model.DiagnosticReport;
 import org.hl7.fhir.r4.model.Reference;
 import org.hl7.fhir.r4.model.Resource;
 import org.hl7.fhir.r4.model.ResourceType;
+import org.junit.Assert;
 import org.junit.Test;
 import io.github.linuxforhealth.fhir.FHIRContext;
 import io.github.linuxforhealth.hl7.ConverterOptions;
@@ -26,7 +34,11 @@ import io.github.linuxforhealth.hl7.HL7ToFHIRConverter;
 public class Hl7ORUMessageTest {
   private static FHIRContext context = new FHIRContext();
   private static final ConverterOptions OPTIONS = new Builder().withValidateResource().build();
-
+  private static final ConverterOptions OPTIONS_PRETTYPRINT = new Builder()
+          .withBundleType(BundleType.COLLECTION)
+          .withValidateResource()
+          .withPrettyPrint()
+          .build();
 
   @Test
   public void test_oru() throws IOException {
@@ -128,9 +140,6 @@ public class Hl7ORUMessageTest {
     DiagnosticReport enc = getResource(diagnosticresource.get(0));
     Reference ref = enc.getSubject();
     assertThat(ref.isEmpty()).isFalse();
-
-
-
   }
 
   @Test
@@ -163,12 +172,86 @@ public class Hl7ORUMessageTest {
     assertThat(spmRef.get(0).isEmpty()).isFalse();
   }
 
+  /**
+   * 
+   * ORU messages with an OBR and multiple OBX segments that do not have an id represent a report
+   * 
+   * The OBX segments should be grouped together and added the presentedForm as an attachment for the diagnostic report
+   * @throws IOException 
+   */
+  @Test
+  public void multipleOBXWithNoId() throws IOException {
+  	HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
+      String json = ftv.convert(new File("../hl7v2-fhir-converter/src/test/resources/ORU-multiline-short.hl7"), OPTIONS_PRETTYPRINT);
+      
+      System.out.println("----------------");
+      System.out.println(json);
+      System.out.println("----------------");
+      
+      //Verify conversion
+      FHIRContext context = new FHIRContext();
+      IBaseResource bundleResource = context.getParser().parseResource(json);
+      Bundle b = (Bundle) bundleResource;
+      
+      Assert.assertTrue("Bundle type not expected", b.getType() == BundleType.COLLECTION);
+      b.getId();
+      b.getMeta().getLastUpdated();
+
+      List<BundleEntryComponent> e = b.getEntry();
+     
+      List<Resource> patientResource = e.stream()
+              .filter(v -> ResourceType.Patient == v.getResource().getResourceType())
+              .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+      assertThat(patientResource).hasSize(1);
+     
+      List<Resource> organizationResource = e.stream()
+              .filter(v -> ResourceType.Organization == v.getResource().getResourceType())
+              .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+      assertThat(organizationResource).hasSize(1);
+
+      //TODO: figure out issue
+//      List<Resource> messageHeader = e.stream()
+//              .filter(v -> ResourceType.MessageHeader == v.getResource().getResourceType())
+//              .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+//      assertThat(messageHeader).hasSize(1);   
+      
+      //Verify no observations are created
+      List<Resource> obsResource = e.stream()
+              .filter(v -> ResourceType.Observation == v.getResource().getResourceType())
+              .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+      assertThat(obsResource).hasSize(0);
+      
+      //Verify Diagnostic Report is created as expected
+      List<Resource> reportResource = e.stream()
+              .filter(v -> ResourceType.DiagnosticReport == v.getResource().getResourceType())
+              .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+      assertThat(reportResource).hasSize(1);
+         
+      DiagnosticReport report = (DiagnosticReport) reportResource.get(0);
+      
+      List<Attachment> attachments = report.getPresentedForm();
+      Assert.assertTrue("Unexpected number of attachments", attachments.size() == 1);
+      
+      //Verify attachment to diagnostic report
+      Attachment a = attachments.get(0);
+      Assert.assertTrue("Incorrect content type", a.getContentType().equalsIgnoreCase("text"));
+      Assert.assertTrue("Incorrect languague", a.getLanguage().equalsIgnoreCase("en"));
+      //TODO: Validate data by decoding
+      //System.out.println(Base64.getDecoder().decode((a.getData())));
+      System.out.println(Base64.getDecoder().decode("fltQSUldIEVtZXJnZW5jeSBEZXBhcnRtZW50fkVEIEVuY291bnRlciBBcnJpdmFsIERhdGU6IFtBRERSRVNTXSBbUEVSU09OQUxOQU1FXTp+"));
+      
+      //Base64.getEncoder().encodeToString(val.getBytes());
+      
+      Assert.assertTrue("Incorrect title", a.getTitle().equalsIgnoreCase("ECHO CARDIOGRAM COMPLETE"));
+      System.out.println(a.getCreation());
+      Assert.assertTrue("Incorrect creation data", a.getCreation().equals(new Date("2020-08-02T12.44:55+08.00")));
+      
+      
+  }
+   
   private static DiagnosticReport getResource(Resource resource) {
     String s = context.getParser().encodeResourceToString(resource);
     Class<? extends IBaseResource> klass = DiagnosticReport.class;
     return (DiagnosticReport) context.getParser().parseResource(klass, s);
   }
-
-
-
 }
