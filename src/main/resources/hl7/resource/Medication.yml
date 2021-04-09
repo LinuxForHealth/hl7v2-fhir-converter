@@ -31,7 +31,3 @@ ingredient:
   valueOf: secondary/Ingredient
   generateList: true
   expressionType: resource
-
-
-
-

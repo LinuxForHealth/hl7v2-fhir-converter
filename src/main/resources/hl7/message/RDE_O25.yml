@@ -3,7 +3,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 #
-# FHIR Resources to extract from VXU_V04 message
+# FHIR Resources to extract from RDE_O25 message
 ---
 resources:
   - resourceName: MessageHeader
