@@ -34,6 +34,7 @@ public class VariableGenerator {
     rawVariable = StringUtils.strip(rawVariable);
     if (StringUtils.contains(rawVariable, "GeneralUtils")) {
       String[] values = rawVariable.split(",", 2);
+      // Handle asterisk in combination with GeneralUtils function
       if (StringUtils.endsWith(values[0], "*")) {
           extractMultiple = true;
           values[0] = StringUtils.removeEnd(values[0], "*");
