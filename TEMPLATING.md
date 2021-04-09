@@ -204,16 +204,16 @@ The extraction logic for each field can be defined by using expressions. This co
   Represents the class type for the final return value extracted for the field.
 * specs: DEFAULT - NONE<br>
   Represents the base value for a resource, if no spec is provided then parents base value would be used as base value for child resource.
-  Refer to the section on supported formats for [Specification](Specification).<br>
+  Refer to the section on supported formats for [Specification](#specification).<br>
 
 * default: DEFAULT - NULL<br>
   If extraction of the value fails, then the default value is used.
 * required : DEFAULT - false<br>
   If a field is required and cannot be extracted then the resource generation will fail even if other fields were extracted.
 * vars: DEFAULT - EMPTY<br>
-  List of variables and their value can be provided which may be used during the extraction process. Refer to the section on supported formats for [Variables](Variable).
+  List of variables and their value can be provided which may be used during the extraction process. Refer to the section on supported formats for [Variables](#variable).
 * condition: DEFAULT - true<br>
-  If a condition is provided, then the expression will be resolved only if the condition evaluates to true. Refer to the section on supported formats for [Condition](Condition).
+  If a condition is provided, then the expression will be resolved only if the condition evaluates to true. Refer to the section on supported formats for [Condition](#condition).
 * value: This represents a constant value for the expression value. This attribute is only valid for the SimpleExpression type.
 * valueOf: This represents an evaluated expression value. This evaluated value depends on the expression type.
 * expressionType: Based on the expression type a valueOf attribute will get evaluated.
@@ -261,9 +261,9 @@ The specification expression has the following format :
 
 #### Variable
 Variables can be used during expression evaluation.  This engine supports defining 3 types of variables:
-* SimpleVariable : These are variables where value is extracted from simple [Specification](Specification) or another variable from the context values. Example: ``var1: CWE.1 |CE.1 |CNE.1``
+* SimpleVariable : These are variables where value is extracted from simple [Specification](#specification) or another variable from the context values. Example: ``var1: CWE.1 |CE.1 |CNE.1``
 * ExpressionVariable : Value of a variable is extracted by evaluating a java function. Example:  `` low: OBX.7, GeneralUtils.split(low, "-", 0)``
-* DataTypeVariable: Value of a variable is extracted from [Specification](Specification) and this value is converted to a particular data type. Example: `` var1: STRING, OBX.2``
+* DataTypeVariable: Value of a variable is extracted from [Specification](#specification) and this value is converted to a particular data type. Example: `` var1: STRING, OBX.2``
 
 Note: BASE_VALUE is reserved for base value provided to an expression during evaluation. Do not use or name variable as BASE_VALUE.
 
@@ -277,7 +277,7 @@ Engine supports the following condition types:
 * Conditions with OR, example: ``condition: $obx2 EQUALS TX || $obx2 EQUALS ST``
 
 #### Different types of expressions
-* ResourceExpression : This type of expression is used when a field is a data type defined in one of the [data type templates](master/src/main/resources/hl7/datatype). These data type templates define different [FHIR data types](https://hl7.org/FHIR/datatypes.html).
+* ResourceExpression : This type of expression is used when a field is a data type defined in one of the [data type templates](../master/src/main/resources/hl7/datatype). These data type templates define different [FHIR data types](https://hl7.org/FHIR/datatypes.html).
   Example:
 
 ```yml
