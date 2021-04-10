@@ -26,48 +26,16 @@ public class VariableGenerator {
     Preconditions.checkArgument(StringUtils.isNotBlank(variableExpression),
         "rawVariable string cannot be null");
 
+    // Extract the modifiers such as '*' and '&' from the expression
     ExpressionAttributes.ExpressionModifiers exp = ExpressionAttributes.extractExpressionModifiers(variableExpression);
-    // Extract special chars:
-    // * indicates to extract fields from multiple entries
-    // & indicates to retain empty (null) fields
-//    boolean extractMultiple = false;
-//    boolean retainEmptyField = false;
-//    String rawVariable = variableExpression;
-//    if (StringUtils.endsWith(variableExpression, "*")) {
-//      extractMultiple = true;
-//      rawVariable = StringUtils.removeEnd(rawVariable, "*");
-//    }
-//    if (StringUtils.endsWith(variableExpression, "&")) {
-//        retainEmptyField = true;
-//        rawVariable = StringUtils.removeEnd(rawVariable, "&");
-//    }
-//    // Repeat check for asterisk to allow for different order of special chars
-//    if (StringUtils.endsWith(variableExpression, "*")) {
-//        extractMultiple = true;
-//        rawVariable = StringUtils.removeEnd(rawVariable, "*");
-//    }
-//    rawVariable = StringUtils.strip(rawVariable);
 
     String rawVariable = exp.expression;
     if (StringUtils.contains(rawVariable, "GeneralUtils")) {
       String[] values = rawVariable.split(",", 2);
-      // Handle asterisk in combination with GeneralUtils function
+      // Handle * in combination with GeneralUtils function
       exp = ExpressionAttributes.extractExpressionModifiers(values[0]);
-//      if (StringUtils.endsWith(values[0], "*")) {
-//          extractMultiple = true;
-//          values[0] = StringUtils.removeEnd(values[0], "*");
-//      }
-//      if (StringUtils.endsWith(values[0], "&")) {
-//    	  retainEmptyField = true;
-//          values[0] = StringUtils.removeEnd(values[0], "&");
-//      }
-//      // Repeat check for asterisk to allow for different order of special chars
-//      if (StringUtils.endsWith(values[0], "*")) {
-//          extractMultiple = true;
-//          values[0] = StringUtils.removeEnd(values[0], "*");
-//      }
       if (values.length == COMPONENT_LENGTH_FOR_VAR_EXPRESSION) {
-        List<String> specs = getTokens(values[0]);
+        List<String> specs = getTokens(exp.expression);
         return new ExpressionVariable(varName, values[1], specs, exp.extractMultiple, exp.retainEmpty);
       }
       throw new IllegalArgumentException("rawVariable not in correct format ");
