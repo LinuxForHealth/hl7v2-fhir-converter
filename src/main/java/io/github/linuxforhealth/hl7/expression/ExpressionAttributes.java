@@ -165,7 +165,7 @@ public class ExpressionAttributes {
    *      * indicates to extract fields from multiple entries
    *      & indicates to retain empty (null) fields
    * @param inputString
-   * @return
+   * @return ExpressionModifiers object with booleans indicating which modifiers were used and the expression after modifiers have been removed
    */
   public static final ExpressionModifiers extractExpressionModifiers(String inputString) {
 
@@ -343,7 +343,8 @@ public class ExpressionAttributes {
 
   }
 
-  // Class used when extracting modifiers from the expression, contains the expression and booleans for
+  // Class used when extracting modifiers from the expression, contains the expression after modifiers have been removed and
+  // booleans indicating which modifiers were in the expression.
   public static class ExpressionModifiers {
     public boolean extractMultiple = false;  // true when * is used in the expression
     public boolean retainEmpty = false;      // true when & is used in the expression
