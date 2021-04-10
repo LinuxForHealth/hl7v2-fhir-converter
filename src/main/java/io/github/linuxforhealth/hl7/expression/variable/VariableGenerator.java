@@ -7,6 +7,8 @@ package io.github.linuxforhealth.hl7.expression.variable;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import io.github.linuxforhealth.hl7.expression.ExpressionAttributes;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringTokenizer;
 import org.apache.commons.text.matcher.StringMatcherFactory;
@@ -23,53 +25,57 @@ public class VariableGenerator {
     Preconditions.checkArgument(StringUtils.isNotBlank(varName), "varName string cannot be null");
     Preconditions.checkArgument(StringUtils.isNotBlank(variableExpression),
         "rawVariable string cannot be null");
-    
+
+    ExpressionAttributes.ExpressionModifiers exp = ExpressionAttributes.extractExpressionModifiers(variableExpression);
     // Extract special chars:
     // * indicates to extract fields from multiple entries
     // & indicates to retain empty (null) fields
-    boolean extractMultiple = false;
-    boolean retainEmptyField = false;
-    String rawVariable = variableExpression;
-    if (StringUtils.endsWith(variableExpression, "*")) {
-      extractMultiple = true;
-      rawVariable = StringUtils.removeEnd(rawVariable, "*");
-    }
-    if (StringUtils.endsWith(variableExpression, "&")) {
-        retainEmptyField = true;
-        rawVariable = StringUtils.removeEnd(rawVariable, "&");
-    }
-    // Repeat check for asterisk to allow for different order of special chars
-    if (StringUtils.endsWith(variableExpression, "*")) {
-        extractMultiple = true;
-        rawVariable = StringUtils.removeEnd(rawVariable, "*");
-    }
-    rawVariable = StringUtils.strip(rawVariable);
+//    boolean extractMultiple = false;
+//    boolean retainEmptyField = false;
+//    String rawVariable = variableExpression;
+//    if (StringUtils.endsWith(variableExpression, "*")) {
+//      extractMultiple = true;
+//      rawVariable = StringUtils.removeEnd(rawVariable, "*");
+//    }
+//    if (StringUtils.endsWith(variableExpression, "&")) {
+//        retainEmptyField = true;
+//        rawVariable = StringUtils.removeEnd(rawVariable, "&");
+//    }
+//    // Repeat check for asterisk to allow for different order of special chars
+//    if (StringUtils.endsWith(variableExpression, "*")) {
+//        extractMultiple = true;
+//        rawVariable = StringUtils.removeEnd(rawVariable, "*");
+//    }
+//    rawVariable = StringUtils.strip(rawVariable);
+
+    String rawVariable = exp.expression;
     if (StringUtils.contains(rawVariable, "GeneralUtils")) {
       String[] values = rawVariable.split(",", 2);
       // Handle asterisk in combination with GeneralUtils function
-      if (StringUtils.endsWith(values[0], "*")) {
-          extractMultiple = true;
-          values[0] = StringUtils.removeEnd(values[0], "*");
-      }
-      if (StringUtils.endsWith(values[0], "&")) {
-    	  retainEmptyField = true;
-          values[0] = StringUtils.removeEnd(values[0], "&");
-      }
-      // Repeat check for asterisk to allow for different order of special chars
-      if (StringUtils.endsWith(values[0], "*")) {
-          extractMultiple = true;
-          values[0] = StringUtils.removeEnd(values[0], "*");
-      }
+      exp = ExpressionAttributes.extractExpressionModifiers(values[0]);
+//      if (StringUtils.endsWith(values[0], "*")) {
+//          extractMultiple = true;
+//          values[0] = StringUtils.removeEnd(values[0], "*");
+//      }
+//      if (StringUtils.endsWith(values[0], "&")) {
+//    	  retainEmptyField = true;
+//          values[0] = StringUtils.removeEnd(values[0], "&");
+//      }
+//      // Repeat check for asterisk to allow for different order of special chars
+//      if (StringUtils.endsWith(values[0], "*")) {
+//          extractMultiple = true;
+//          values[0] = StringUtils.removeEnd(values[0], "*");
+//      }
       if (values.length == COMPONENT_LENGTH_FOR_VAR_EXPRESSION) {
         List<String> specs = getTokens(values[0]);
-        return new ExpressionVariable(varName, values[1], specs, extractMultiple, retainEmptyField);
+        return new ExpressionVariable(varName, values[1], specs, exp.extractMultiple, exp.retainEmpty);
       }
       throw new IllegalArgumentException("rawVariable not in correct format ");
     } else if (StringUtils.contains(rawVariable, ",")) {
       String[] values = rawVariable.split(",", 2);
       if (values.length == COMPONENT_LENGTH_FOR_VAR_EXPRESSION) {
         List<String> specs = getTokens(values[1]);
-        return new DataTypeVariable(varName, values[0], specs, extractMultiple);
+        return new DataTypeVariable(varName, values[0], specs, exp.extractMultiple);
       }
       throw new IllegalArgumentException("rawVariable not in correct format ");
     } else {
@@ -78,7 +84,7 @@ public class VariableGenerator {
         combineValues = true;
       }
       List<String> specs = getTokens(rawVariable);
-      return new SimpleVariable(varName, specs, extractMultiple, combineValues, retainEmptyField);
+      return new SimpleVariable(varName, specs, exp.extractMultiple, combineValues, exp.retainEmpty);
     }
   }
 
