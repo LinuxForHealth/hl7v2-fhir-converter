@@ -14,10 +14,23 @@ identifier:
    expressionType: resource
    vars:
       id: CWE.1
-name:
+name_v1:
    type: STRING
+   condition: $id NULL
+   valueOf: CWE.2
+   required: true
+   expressionType: HL7Spec
+   vars:
+      name: CWE.2
+      id: CWE.1
+name_v2:
+   type: STRING
+   condition: $id NOT_NULL
    valueOf: CWE.2
    expressionType: HL7Spec
+   vars:
+      name: CWE.2
+      id: CWE.1
 alias:
    type: STRING
    valueOf: CWE.5

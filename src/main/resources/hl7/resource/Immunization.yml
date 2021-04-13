@@ -16,6 +16,7 @@ identifier:
 status:
    type: IMMUNIZATION_STATUS_CODES
    valueOf: RXA.20
+   required: true
    expressionType: HL7Spec
 statusReason:
    valueOf: datatype/CodeableConcept
@@ -25,12 +26,14 @@ statusReason:
       code: RXA.18
 vaccineCode:
    valueOf: datatype/CodeableConcept
+   required: true
    expressionType: resource
    specs: RXA.5
    vars:
       code: RXA.5
 patient:
    valueOf: datatype/Reference
+   required: true
    expressionType: resource
    specs: $Patient
 encounter:
@@ -38,6 +41,7 @@ encounter:
    expressionType: resource
    specs: $Encounter
 occurrenceDateTime:
+   required: true
    type: DATE_TIME
    valueOf: RXA.3
    expressionType: HL7Spec
