@@ -50,7 +50,7 @@ public class DateUtil {
   }
 
 
-  public static String formatToDateTime(String input) {
+  public static String formatToDateTimeWithZone(String input) {
 
 
     String returnValue = getLocalDate(input);
@@ -231,7 +231,7 @@ public class DateUtil {
   public static String formatToZonedDateTime(String input) {
     String zoned = getZonedDate(input);
     if (zoned == null) {
-      zoned = getLocalDateTime(input);
+      zoned = formatToDateTimeWithZone(input);
 
     }
     return zoned;

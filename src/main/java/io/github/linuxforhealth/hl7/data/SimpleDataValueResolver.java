@@ -50,7 +50,7 @@ public class SimpleDataValueResolver {
 
     String val = Hl7DataHandlerUtil.getStringValue(value);
     if (val != null) {
-      return DateUtil.formatToDateTime(val);
+      return DateUtil.formatToDateTimeWithZone(val);
     }
     return null;
   };
