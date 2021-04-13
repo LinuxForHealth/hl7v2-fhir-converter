@@ -19,6 +19,7 @@ identifier:
 status:
     type: STRING
     valueOf: 'GeneralUtils.getEncounterStatus(vars1,vars2,vars3)'
+    required: true
     expressionType: JEXL
     vars: 
       vars1: String, PV1.45
@@ -27,6 +28,7 @@ status:
 
 class:
     valueOf: datatype/Coding
+    required: true
     expressionType: resource
     vars:
        code: PV1.2

@@ -75,7 +75,7 @@ public class SimpleDataValueResolverTest {
   public void get_datetime_value_valid() {
     String gen = "20091130112038";
     assertThat(SimpleDataValueResolver.DATE_TIME.apply(gen))
-        .isEqualTo(DateUtil.formatToDateTime(gen));
+        .isEqualTo(DateUtil.formatToDateTimeWithZone(gen));
   }
 
   @Test
