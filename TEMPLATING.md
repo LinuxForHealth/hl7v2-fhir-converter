@@ -257,6 +257,9 @@ The specification expression has the following format :
   Example: ``OBX.1 |OBX.2|OBX.3`` , if OBX.1 is null then only OBX.2 will be extracted.
 * Multiple value extraction - In HL7 several fields can have repeated values, so extract all repetition for that field the spec string should end with *.<br>
   Example: ``PID.3 *`` , ``OBX.1 |OBX.2 |OBX.3 *``
+* Preserving white space / empty fields - Blank fields may be used to present new lines or white space in reports. The user may want to preserve this white space to keep the integrity of the original report. To preserve this white space, the spec string should end with an &. This can be combined and often will be with the multiple value extraction, either &* or *& is supported.<br> 
+  Example: ``OBX.5 *&`` , ``OBX.5 &*``
+  
 
 
 #### Variable
