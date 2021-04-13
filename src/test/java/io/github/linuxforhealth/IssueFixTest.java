@@ -83,7 +83,7 @@ public class IssueFixTest {
             .map(BundleEntryComponent::getResource).collect(Collectors.toList());
     assertThat(diagnosticReport).hasSize(1);
     DiagnosticReport diag = getDiagnosticReport(diagnosticReport.get(0));
-    assertThat(diag.getIssued()).isEqualTo("2018-09-24T15:29:00+08:00");
+    assertThat(diag.getIssued().toInstant().toString()).contains("2018-09-24T07:29:00Z");
   }
 
 
