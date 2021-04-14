@@ -127,24 +127,31 @@ public class HL7DataBasedResourceModel implements ResourceModel {
       // initialize the map and list to collect values
       List<ResourceValue> additionalResolveValues = new ArrayList<>();
       Map<String, Object> resolveValues = new HashMap<>();
-
-      LOGGER.info("Started Evaluating resource expressions for {}", this.name);
+      if (!resourceExp.isEmpty()) {
+        LOGGER.info("Started Evaluating resource expressions for {}", this.name);
+      }
       evaluateResourceExpression(dataSource, localContext, resourceExp, additionalResolveValues,
           resolveValues, baseValue);
-      LOGGER.info("Started Evaluating reference resource expression for {}", this.name);
+      if (!refResourceExp.isEmpty()) {
+        LOGGER.info("Started Evaluating reference resource expression for {}", this.name);
+      }
       evaluateReferenceExpression(dataSource, localContext, refResourceExp, additionalResolveValues,
           resolveValues, baseValue);
-
-      LOGGER.info("Started Evaluating HL7 expression for {}", this.name);
+      if (!hl7Exps.isEmpty()) {
+        LOGGER.info("Started Evaluating HL7 expression for {}", this.name);
+      }
       executeExpression(dataSource, localContext, resolveValues, hl7Exps, baseValue);
-
-      LOGGER.info("Started Evaluating value extraction expression for {}", this.name);
+      if (!valueExtractionExp.isEmpty()) {
+        LOGGER.info("Started Evaluating value extraction expression for {}", this.name);
+      }
       executeExpression(dataSource, localContext, resolveValues, valueExtractionExp, baseValue);
-
-      LOGGER.info("Started Evaluating Simple expression for {}", this.name);
+      if (!defaultExp.isEmpty()) {
+        LOGGER.info("Started Evaluating Simple expression for {}", this.name);
+      }
       executeExpression(dataSource, localContext, resolveValues, defaultExp, baseValue);
-
-      LOGGER.info("Started Evaluating JEXL expressions for {}", this.name);
+      if (!jexlExp.isEmpty()) {
+        LOGGER.info("Started Evaluating JEXL expressions for {}", this.name);
+      }
       executeExpression(dataSource, localContext, resolveValues, jexlExp, baseValue);
 
 

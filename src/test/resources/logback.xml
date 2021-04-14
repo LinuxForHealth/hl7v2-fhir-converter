@@ -5,8 +5,7 @@
 	<appender name="Console"
 		class="ch.qos.logback.core.ConsoleAppender">
 		<encoder>
-			<pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] [%-15X{Resource}]
-				%-5level [%-4line] %-30logger{0} - %msg%n</pattern>
+			<pattern> %d{yyyy-MM-dd HH:mm:ss.SSS} %green[%thread] %highlight([%-15X{Resource}]) %-5level [%-4line] %-30logger{0} - %msg%n</pattern>
 		</encoder>
 	</appender>
 	

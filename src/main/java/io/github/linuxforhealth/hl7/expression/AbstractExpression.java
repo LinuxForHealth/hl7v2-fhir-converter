@@ -32,6 +32,9 @@ import io.github.linuxforhealth.core.expression.VariableUtils;
 import io.github.linuxforhealth.hl7.expression.specification.SpecificationUtil;
 
 public abstract class AbstractExpression implements Expression {
+  private static final String RESOURCE = "Resource";
+
+
   private static final Logger LOGGER = LoggerFactory.getLogger(AbstractExpression.class);
 
 
@@ -93,7 +96,9 @@ public abstract class AbstractExpression implements Expression {
     EvaluationResult result;
     try {
       setLoggingContext();
+
       LOGGER.info("Started Evaluating  with baseValue {} expression {} ", baseValue, this);
+
 
       Map<String, EvaluationResult> localContextValues = new HashMap<>(contextValues);
       if (!baseValue.isEmpty()) {
@@ -102,10 +107,10 @@ public abstract class AbstractExpression implements Expression {
 
       result = evaluateValueOfExpression(dataSource, localContextValues, baseValue);
 
-
       LOGGER.info("Completed Evaluating returned value  {} ----  for  expression {} ", result,
           this);
       if (this.isRequired() && (result == null || result.isEmpty())) {
+
         String stringRep = this.toString();
         throw new RequiredConstraintFailureException(
             "Resource Constraint condition not satisfied for expression   :" + stringRep);
@@ -114,7 +119,8 @@ public abstract class AbstractExpression implements Expression {
         return result;
       }
     } catch (DataExtractionException | IllegalArgumentException e) {
-      LOGGER.warn("Failure encountered during evaluation of expression {} , exception {}", this, e);
+      LOGGER.warn("Failure encountered during evaluation of expression {} , exception {}", this,
+          this.attr.getName());
       return null;
     } finally {
       resetLoggingContext();
@@ -124,12 +130,12 @@ public abstract class AbstractExpression implements Expression {
 
 
   private void setLoggingContext() {
-    originalContext = MDC.get("Resource");
-    MDC.put("Resource", originalContext + "-> [" + this.getExpressionAttr().getValueOf() + "]");
+    originalContext = MDC.get(RESOURCE);
+    MDC.put(RESOURCE, originalContext + "-> Field:" + this.getExpressionAttr().getName());
   }
 
   private void resetLoggingContext() {
-    MDC.put("Resource", originalContext);
+    MDC.put(RESOURCE, originalContext);
   }
 
 

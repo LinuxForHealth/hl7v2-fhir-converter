@@ -64,7 +64,7 @@ public class HL7DataBasedResourceDeserializer extends JsonDeserializer<HL7DataBa
           MAPPER.convertValue(entry.getValue(), ExpressionAttributes.class);
 
       if (expAttr != null && expAttr.getExpressionType() != null) {
-
+        expAttr.setName(entry.getKey());
         try {
           Constructor<?> ctor =
               expAttr.getExpressionType().getEvaluator().getConstructor(ExpressionAttributes.class);
