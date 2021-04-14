@@ -30,7 +30,6 @@ resources:
       additionalSegments:
              - .PV2
 
-      
     - resourceName: Immunization
       segment: .RXA
       group: ORDER

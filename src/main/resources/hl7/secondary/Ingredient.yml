@@ -1,0 +1,50 @@
+#
+# (C) Copyright IBM Corp. 2020
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+---
+itemCodeableConcept:
+  valueOf: datatype/CodeableConcept
+  expressionType: resource
+  specs: RXC.2 | RXO.1 | RXE.2
+
+strength_4:
+  condition: $denominator NOT_NULL && $numerator NOT_NULL
+  valueOf: datatype/Ratio
+  expressionType: resource
+  vars:
+    numerator: RXC.3
+    numunit: RXC.4
+    denominator: RXE.10
+    denunit: RXE.11
+
+strength_3:
+  condition: $denominator NOT_NULL && $numerator NOT_NULL
+  valueOf: datatype/Ratio
+  expressionType: resource
+  vars:
+    numerator: RXC.3
+    numunit: RXC.4
+    denominator: RXE.3 | RXE.4
+    denunit: RXE.5
+
+strength_2:
+  condition: $denominator NOT_NULL && $numerator NOT_NULL
+  valueOf: datatype/Ratio
+  expressionType: resource
+  vars:
+    numerator: RXC.3
+    numunit: RXC.4
+    denominator: RXO.11
+    denunit: RXO.12
+
+strength_1:
+  condition: $denominator NOT_NULL && $numerator NOT_NULL
+  valueOf: datatype/Ratio
+  expressionType: resource
+  vars:
+    numerator: RXC.3
+    numunit: RXC.4
+    denominator: RXO.2 | RXO.3
+    denunit: RXO.4
