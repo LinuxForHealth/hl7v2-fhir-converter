@@ -133,7 +133,7 @@ public class IssueFixTest {
             + "PD1|||||||||||02|N|20170513|||A|20170513|20170513\n"
             + "NK1|1|cat^martha|MTH^Mother^HL70063|12345 testing ave^^Minneapolis^MN^55407^^^^MN053|^PRN^PH^^^555^5555555\n"
             + "ORC|RE||IZ-783278^NDA||||||||||||||MIIC^MIIC clinic^HL70362\n"
-            + "RXA|0|1|201501011|20150101|141^Influenza^CVX|1|mL||00^NEW IMMUNIZATION RECORD^NIP001||^^^MIICSHORTCODE||||ABC1234|20211201|SKB^GlaxoSmithKline^MVX|||CP|A\n"
+            + "RXA|0|1|201501011|20150101|141^Influenza^CVX|1|mL||00^NEW IMMUNIZATIONRECORD^NIP001||^^^MIICSHORTCODE||||ABC1234|20211201|SKB^GlaxoSmithKline^MVX|||CP|A\n"
             + "OBX|4|CE|31044-1^reaction^LN|4|VXC12^fever of >40.5C within 48 hrs.^CDCPHINVS||||||F\n"
             + "ORC|RE||IZ-783280^NDA|||||||||||||||MIIC^MIIC clinic^HL70362\n"
             + "RXA|0|1|20170512||998^No vaccine given^CVX|999||||||||||||||CP|\n"

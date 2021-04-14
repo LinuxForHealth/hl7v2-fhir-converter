@@ -10,27 +10,25 @@ id:
    expressionType: JEXL
 identifier:
    valueOf: datatype/IdentifierGen
-   generateList: true
+   generateList: true  
    expressionType: resource
    vars:
       id: CWE.1
-name_v1:
+name_v2:
    type: STRING
-   condition: $id NULL
+   condition: $idValue NULL
    valueOf: CWE.2
    required: true
    expressionType: HL7Spec
    vars:
-      name: CWE.2
-      id: CWE.1
-name_v2:
+      idValue: CWE.1
+name_v1:
    type: STRING
-   condition: $id NOT_NULL
+   condition: $idValue NOT_NULL
    valueOf: CWE.2
    expressionType: HL7Spec
    vars:
-      name: CWE.2
-      id: CWE.1
+      idValue: CWE.1
 alias:
    type: STRING
    valueOf: CWE.5

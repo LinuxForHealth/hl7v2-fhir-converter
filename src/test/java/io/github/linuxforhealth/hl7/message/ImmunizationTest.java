@@ -28,6 +28,15 @@ public class ImmunizationTest {
 
   @Test
   public void test_immunization() throws IOException {
+    ResourceModel rsmPatient =
+        ResourceReader.getInstance().generateResourceModel("resource/Patient");
+
+    HL7FHIRResourceTemplateAttributes attributesPatient =
+        new HL7FHIRResourceTemplateAttributes.Builder().withResourceName("Patient")
+            .withResourceModel(rsmPatient).withSegment("PID").withIsReferenced(true)
+            .withRepeats(false).build();
+
+    HL7FHIRResourceTemplate patient = new HL7FHIRResourceTemplate(attributesPatient);
 
     ResourceModel rsm = ResourceReader.getInstance().generateResourceModel("resource/Immunization");
 
@@ -37,7 +46,8 @@ public class ImmunizationTest {
         .withRepeats(true).build();
 
     HL7FHIRResourceTemplate immunization = new HL7FHIRResourceTemplate(attributes);
-    HL7MessageModel message = new HL7MessageModel("VXU_V04", Lists.newArrayList(immunization));
+    HL7MessageModel message =
+        new HL7MessageModel("VXU_V04", Lists.newArrayList(patient, immunization));
     String hl7VUXmessageRep =
         "MSH|^~\\&|MYEHR2.5|RI88140101|KIDSNET_IFL|RIHEALTH|20130531||VXU^V04^VXU_V04|20130531RI881401010105|P|2.5.1|||NE|AL||||||RI543763\r"
             + "PID|1||432155^^^^MR||Patient^Johnny^New^^^^L|Smith^Sally|20130414|M||2106-3^White^HL70005|123 Any St^^Somewhere^WI^54000^^M\r"
