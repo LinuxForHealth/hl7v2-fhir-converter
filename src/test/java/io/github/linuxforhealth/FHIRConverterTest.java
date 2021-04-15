@@ -10,6 +10,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
+
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
@@ -120,8 +121,6 @@ public class FHIRConverterTest {
 
   }
 
-
-
   @Test
   public void test_invalid_message_throws_error() throws IOException {
     String hl7message = "some text";
@@ -132,8 +131,6 @@ public class FHIRConverterTest {
 
   }
 
-
-
   @Test
   public void test_blank_message_throws_error() throws IOException {
     String hl7message = "";
@@ -143,8 +140,6 @@ public class FHIRConverterTest {
     ftv.convert(hl7message);
 
   }
-
-
 
   @Test
   public void test_VXU_V04_message() {
@@ -203,9 +198,8 @@ public class FHIRConverterTest {
         e.stream().filter(v -> ResourceType.Organization == v.getResource().getResourceType())
             .map(BundleEntryComponent::getResource).collect(Collectors.toList());
     assertThat(organizationRes).hasSize(2);
-
-
   }
+
   private void verifyResult(String json, BundleType expectedBundleType) {
     verifyResult(json, expectedBundleType, true);
   }
@@ -251,7 +245,5 @@ public class FHIRConverterTest {
       assertThat(messageHeader).hasSize(1);
     }
   }
-
-
 
 }

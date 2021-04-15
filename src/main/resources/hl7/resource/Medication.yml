@@ -1,0 +1,33 @@
+#
+# (C) Copyright IBM Corp. 2020
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+resourceType: Medication
+id:
+  type: STRING
+  valueOf: UUID.randomUUID()
+  expressionType: JEXL
+
+identifier:
+  valueOf: datatype/Identifier
+  generateList: true
+  expressionType: resource
+  specs: ORC.3
+
+code:
+  valueOf: datatype/CodeableConcept
+  generateList: true
+  expressionType: resource
+  specs: RXO.1 | RXE.2 | RXC.2
+
+form:
+  valueOf: datatype/CodeableConcept
+  generateList: true
+  expressionType: resource
+  specs: RXO.5 | RXE.6
+
+ingredient:
+  valueOf: secondary/Ingredient
+  generateList: true
+  expressionType: resource

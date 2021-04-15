@@ -37,6 +37,7 @@ public class ExpressionAttributes {
 
 
   // Basic properties of an expression
+  private String name;
   private String type;
   private String defaultValue;
   private boolean isRequired;
@@ -68,7 +69,7 @@ public class ExpressionAttributes {
     }
 
     this.defaultValue = exBuilder.defaultValue;
-
+    this.name = exBuilder.name;
 
     this.isRequired = exBuilder.isRequired;
     this.specs = getSpecList(exBuilder.rawSpecs, exBuilder.useGroup);
@@ -96,7 +97,6 @@ public class ExpressionAttributes {
     this.valueOf = exBuilder.valueOf;
     this.generateMultiple = exBuilder.generateList;
 
-    this.value = exBuilder.value;
     this.expressionType = exBuilder.expressionType;
     this.useGroup = exBuilder.useGroup;
 
@@ -181,6 +181,14 @@ public class ExpressionAttributes {
     return valueOf;
   }
 
+  public void setName(String name) {
+    this.name = name;
+
+  }
+
+  public String getName() {
+    return name;
+  }
 
   public static List<Specification> getSpecList(String inputString, boolean useGroup) {
     final boolean extractMultiple;
@@ -233,10 +241,15 @@ public class ExpressionAttributes {
   }
 
 
+
+
+
+
+
   public static class Builder {
 
 
-
+    private String name;
     private String type;
     private String defaultValue;
     private boolean isRequired;
@@ -262,7 +275,10 @@ public class ExpressionAttributes {
       return useGroup;
     }
 
-
+    public Builder withName(String name) {
+      this.name = name;
+      return this;
+    }
 
     public Builder withType(String type) {
       this.type = type;
@@ -341,5 +357,8 @@ public class ExpressionAttributes {
     }
 
   }
+
+
+
 }
 

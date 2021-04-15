@@ -54,7 +54,7 @@ The test case relies on the default validation provided by the `parse` method. I
 
 The Official FHIR documentation, provided by the HL7 organization, provides complete documentation for FHIR resources and the corresponding HL7 v2 mappings. The best place to start is by reviewing the [resource index](https://www.hl7.org/fhir/resourcelist.html).
 
-Each resource page contains field definitions [(Example: Medication Resource)](https://www.hl7.org/fhir/medication.html), and HL7 v2 mappings [(Example: Medication Resource)][https://www.hl7.org/fhir/medication-mappings.html].
+Each resource page contains field definitions [(Example: Medication Resource)](https://www.hl7.org/fhir/medication.html), and HL7 v2 mappings [(Example: Medication Resource)](https://www.hl7.org/fhir/medication-mappings.html).
 Review the documentation determine which FHIR resource fields to include. The FHIR specification supports numerous resources with a variety of fields. It is likely that a subset of fields are required for a given use-case.
 
 ## Create new FHIR Resource Templates

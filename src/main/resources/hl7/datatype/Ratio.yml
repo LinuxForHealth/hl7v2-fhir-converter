@@ -9,10 +9,13 @@ numerator:
     expressionType: resource
     vars: 
       value: $numerator
+      unit: $numunit
+
 
 denominator:
    valueOf: datatype/Quantity
    expressionType: resource
    vars: 
       value: $denominator
+      unit: $denunit
   
