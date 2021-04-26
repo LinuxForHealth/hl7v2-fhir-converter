@@ -77,7 +77,8 @@ result:
 presentedForm:
    valueOf: datatype/Attachment
    expressionType: resource
-   # This merges all the OBX lines together when there is no id (obx3) and the type is TX (obx2)
+   # This merges all the OBX lines together when there is no id (obx3) and the message has only type 'TX' (obx2). 
+   # Messages with mixed types of OBX segments will not have a presentedForm attachment created.
    condition: $obx2 EQUALS TX && $obx3 NULL
    vars:
       # This concatenates all OBX-5 lines together (the asterisk) and preserves blank lines (the ampersand).  Multiple lines are concatenated with a tilde.
