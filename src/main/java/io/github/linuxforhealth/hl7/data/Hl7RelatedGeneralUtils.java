@@ -130,7 +130,7 @@ public class Hl7RelatedGeneralUtils {
   }
 
   public static String concatenateWithChar(Object input, String delimiterChar) {
-	  String result = Hl7DataHandlerUtil.getStringValue(input, true, "~");
+	  String result = Hl7DataHandlerUtil.getStringValue(input, true, delimiterChar);
 	  return result;
   }
 
