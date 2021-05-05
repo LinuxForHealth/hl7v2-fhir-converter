@@ -10,7 +10,7 @@ import com.ibm.fhir.model.type.Code;
 import com.ibm.fhir.model.type.Uri;
 import com.ibm.fhir.registry.FHIRRegistry;
 import com.ibm.fhir.term.service.FHIRTermService;
-import com.ibm.fhir.term.spi.LookupOutcome;
+import com.ibm.fhir.term.service.LookupOutcome;
 
 public class TerminologyLookup {
 
