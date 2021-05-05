@@ -40,7 +40,7 @@ public abstract class AbstractExpression implements Expression {
 
   private ExpressionAttributes attr;
   private String originalContext;
-
+  private boolean conditionSatisfiedState;
   public AbstractExpression(ExpressionAttributes attr) {
     this.attr = attr;
   }
@@ -100,7 +100,9 @@ public abstract class AbstractExpression implements Expression {
       LOGGER.info("Started Evaluating  with baseValue {} expression {} ", baseValue, this);
 
 
-      Map<String, EvaluationResult> localContextValues = new HashMap<>(contextValues);
+      Map<String, EvaluationResult> localContextValues =
+          new HashMap<>(ImmutableMap.copyOf(contextValues));
+
       if (!baseValue.isEmpty()) {
         localContextValues.put(baseValue.getIdentifier(), baseValue);
       }
@@ -109,7 +111,9 @@ public abstract class AbstractExpression implements Expression {
 
       LOGGER.info("Completed Evaluating returned value  {} ----  for  expression {} ", result,
           this);
-      if (this.isRequired() && (result == null || result.isEmpty())) {
+
+      if (this.conditionSatisfiedState && this.isRequired()
+          && (result == null || result.isEmpty())) {
 
         String stringRep = this.toString();
         throw new RequiredConstraintFailureException(
@@ -257,6 +261,7 @@ public abstract class AbstractExpression implements Expression {
         resolveVariables(this.getVariables(), ImmutableMap.copyOf(localContextValues), dataSource));
 
     if (this.isConditionSatisfied(localContextValues)) {
+      conditionSatisfiedState = true;
       return evaluateExpression(dataSource, ImmutableMap.copyOf(localContextValues), baseValue);
 
     }
