@@ -9,12 +9,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.File;
 import java.io.IOException;
-import java.text.DateFormat;
-import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
+import java.time.ZoneId;
 import java.util.Base64;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 import java.util.stream.Collectors;
 
 
@@ -187,10 +187,6 @@ public class Hl7ORUMessageTest {
   	HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
       String json = ftv.convert(new File("../hl7v2-fhir-converter/src/test/resources/ORU-multiline-short.hl7"), OPTIONS_PRETTYPRINT);
       
-      System.out.println("-----------------------------------------------------");
-      System.out.println(json);
-      System.out.println("-----------------------------------------------------");
-      
       //Verify conversion
       FHIRContext context = new FHIRContext();
       IBaseResource bundleResource = context.getParser().parseResource(json);
@@ -239,18 +235,79 @@ public class Hl7ORUMessageTest {
       Assert.assertTrue("Incorrect content type", a.getContentType().equalsIgnoreCase("text"));
       Assert.assertTrue("Incorrect language", a.getLanguage().equalsIgnoreCase("en"));
       
-      //TODO: Validate data by decoding
-      //Assert.assertTrue("Incorrect data", Base64.getDecoder().decode((a.getData())).equals("~[PII] Emergency Department~ED Encounter Arrival Date: [ADDRESS] [PERSONALNAME]:~"));
-      //Base64.getEncoder().encodeToString(val.getBytes());
-      
+      //Verify data attachment after decoding
+      String decoded = new String(Base64.getDecoder().decode(a.getDataElement().getValueAsString()));
+      Assert.assertTrue("Incorrect data", decoded.equals("~[PII] Emergency Department~ED Encounter Arrival Date: [ADDRESS] [PERSONALNAME]:~"));
+
       Assert.assertTrue("Incorrect title", a.getTitle().equalsIgnoreCase("ECHO CARDIOGRAM COMPLETE"));
 
-      //TODO: validate date 
-//      System.out.println(OffsetDateTime.of(2020, 8, 2, 12, 44, 55, 0, ZoneOffset.of("+08:00")));
-//      Assert.assertTrue("Incorrect creation date", a.getCreation().equals("2020-08-02T12.44:55+08.00"));
+      //Verify creation data is persisted correctly - 2020-08-02T12:44:55+08:00
+      Calendar c = Calendar.getInstance();
+      c.clear();  // needed to completely clear out calendar object
+      c.set(2020, 7, 2, 12, 44, 55);
+      c.setTimeZone(TimeZone.getTimeZone(ZoneId.of("+08:00")));
+      
+      Date d = c.getTime();
+      Assert.assertTrue("Incorrect creation date", a.getCreation().equals(d));
       
   }
    
+  /**
+   * 
+   * Verifies ORU messages with mixed OBX types 
+   * 
+   * @throws IOException 
+   */
+  @Test
+  public void multipleOBXWithMixedType() throws IOException {
+  	HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
+      String json = ftv.convert(new File("../hl7v2-fhir-converter/src/test/resources/ORU-multiline-short-mixed.hl7"), OPTIONS_PRETTYPRINT);
+      
+      //Verify conversion
+      FHIRContext context = new FHIRContext();
+      IBaseResource bundleResource = context.getParser().parseResource(json);
+      Bundle b = (Bundle) bundleResource;
+      
+      Assert.assertTrue("Bundle type not expected", b.getType() == BundleType.COLLECTION);
+      b.getId();
+      b.getMeta().getLastUpdated();
+
+      List<BundleEntryComponent> e = b.getEntry();
+     
+      List<Resource> patientResource = e.stream()
+              .filter(v -> ResourceType.Patient == v.getResource().getResourceType())
+              .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+      assertThat(patientResource).hasSize(1);
+     
+      List<Resource> organizationResource = e.stream()
+              .filter(v -> ResourceType.Organization == v.getResource().getResourceType())
+              .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+      assertThat(organizationResource).hasSize(1);
+
+      List<Resource> messageHeader = e.stream()
+              .filter(v -> ResourceType.MessageHeader == v.getResource().getResourceType())
+              .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+      assertThat(messageHeader).hasSize(1);
+      
+      //Verify one observations is created
+      List<Resource> obsResource = e.stream()
+              .filter(v -> ResourceType.Observation == v.getResource().getResourceType())
+              .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+      assertThat(obsResource).hasSize(1);
+      
+      //Verify Diagnostic Report is created as expected
+      List<Resource> reportResource = e.stream()
+              .filter(v -> ResourceType.DiagnosticReport == v.getResource().getResourceType())
+              .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+      assertThat(reportResource).hasSize(1);
+         
+      DiagnosticReport report = (DiagnosticReport) reportResource.get(0);
+      
+      //No attachment created since OBX with TX and no id is not first
+      List<Attachment> attachments = report.getPresentedForm();
+      Assert.assertTrue("Unexpected number of attachments", attachments.size() == 0);
+  }
+  
   private static DiagnosticReport getResource(Resource resource) {
     String s = context.getParser().encodeResourceToString(resource);
     Class<? extends IBaseResource> klass = DiagnosticReport.class;
