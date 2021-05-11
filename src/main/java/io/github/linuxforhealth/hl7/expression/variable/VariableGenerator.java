@@ -7,6 +7,8 @@ package io.github.linuxforhealth.hl7.expression.variable;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import io.github.linuxforhealth.hl7.expression.ExpressionAttributes;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringTokenizer;
 import org.apache.commons.text.matcher.StringMatcherFactory;
@@ -17,33 +19,31 @@ public class VariableGenerator {
 
   private static final int COMPONENT_LENGTH_FOR_VAR_EXPRESSION = 2;
 
-
   private VariableGenerator() {}
-
-
 
   public static Variable parse(String varName, String variableExpression) {
     Preconditions.checkArgument(StringUtils.isNotBlank(varName), "varName string cannot be null");
     Preconditions.checkArgument(StringUtils.isNotBlank(variableExpression),
         "rawVariable string cannot be null");
-    boolean extractMultiple = false;
-    if (StringUtils.endsWith(variableExpression, "*")) {
-      extractMultiple = true;
-    }
-    String rawVariable = StringUtils.removeEnd(variableExpression, "*");
-    rawVariable = StringUtils.strip(rawVariable);
+
+    // Extract the modifiers such as '*' and '&' from the expression
+    ExpressionAttributes.ExpressionModifiers exp = ExpressionAttributes.extractExpressionModifiers(variableExpression);
+
+    String rawVariable = exp.expression;
     if (StringUtils.contains(rawVariable, "GeneralUtils")) {
       String[] values = rawVariable.split(",", 2);
+      // Handle * in combination with GeneralUtils function
+      exp = ExpressionAttributes.extractExpressionModifiers(values[0]);
       if (values.length == COMPONENT_LENGTH_FOR_VAR_EXPRESSION) {
-        List<String> specs = getTokens(values[0]);
-        return new ExpressionVariable(varName, values[1], specs, extractMultiple);
+        List<String> specs = getTokens(exp.expression);
+        return new ExpressionVariable(varName, values[1], specs, exp.extractMultiple, exp.retainEmpty);
       }
       throw new IllegalArgumentException("rawVariable not in correct format ");
     } else if (StringUtils.contains(rawVariable, ",")) {
       String[] values = rawVariable.split(",", 2);
       if (values.length == COMPONENT_LENGTH_FOR_VAR_EXPRESSION) {
         List<String> specs = getTokens(values[1]);
-        return new DataTypeVariable(varName, values[0], specs, extractMultiple);
+        return new DataTypeVariable(varName, values[0], specs, exp.extractMultiple);
       }
       throw new IllegalArgumentException("rawVariable not in correct format ");
     } else {
@@ -52,7 +52,7 @@ public class VariableGenerator {
         combineValues = true;
       }
       List<String> specs = getTokens(rawVariable);
-      return new SimpleVariable(varName, specs, extractMultiple, combineValues);
+      return new SimpleVariable(varName, specs, exp.extractMultiple, combineValues, exp.retainEmpty);
     }
   }
 

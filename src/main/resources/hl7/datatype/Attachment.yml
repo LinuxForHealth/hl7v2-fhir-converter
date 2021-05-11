@@ -1,0 +1,48 @@
+#
+# (C) Copyright IBM Corp. 2020
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+# Represents attachment
+# Relevant spec: http://hl7.org/fhir/datatypes.html#Attachment
+---
+# From the spec: The contentType element SHALL always be populated when an Attachment contains data.  Identifies the type of the data in the attachment,
+# as a mime type.  Common mime types are available at https://terminology.hl7.org/2.1.0/CodeSystem-v2-0834.html
+contentType:
+    type: STRING
+    valueOf: $mime
+
+# From the spec: The human language of the content. The value can be any valid value according to BCP 47.
+language:
+    type: STRING
+    valueOf: $language
+
+# From the spec: The actual data of the attachment - a sequence of bytes, base64 encoded.
+data:
+    type: BASE64_BINARY
+    valueOf: $data
+
+# The hl7v2-fhir-converter will not set the url field.  Since the converter is returning only json (not creating any files)
+# and putting information in the data field, the uri field will not be set.  If desired, the user could set the url field
+# to link to a file in the resulting json.
+#url:
+
+# The hl7v2-fhir-converter will not set the size field, since it isn't relevant without the url field.
+# See the spec at  http://hl7.org/fhir/datatypes-definitions.html#Attachment.size which says: The number of bytes is
+# redundant if the data is provided as a base64binary, but is useful if the data is provided as a url reference.
+#size:
+
+# The hl7v2-fhir-converter will not set the hash field, since it isn't relevant without the url field.
+# See the spec at http://hl7.org/fhir/datatypes.html#Attachment which says: The hash is included so that applications
+# can verify that the content returned by the URL has not changed.
+#hash:
+
+# From the spec: A label or set of text to display in place of the data.
+title:
+    type: STRING
+    valueOf: $title
+
+# From the spec: The date that the attachment was first created.
+creation:
+    type: DATE_TIME
+    valueOf: $date

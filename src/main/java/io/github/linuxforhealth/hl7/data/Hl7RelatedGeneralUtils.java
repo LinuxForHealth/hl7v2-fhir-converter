@@ -8,11 +8,13 @@ package io.github.linuxforhealth.hl7.data;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.Temporal;
 import java.time.temporal.UnsupportedTemporalTypeException;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringTokenizer;
 import org.hl7.fhir.r4.model.codesystems.EncounterStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import io.github.linuxforhealth.hl7.data.date.DateUtil;
 
 
@@ -125,6 +127,11 @@ public class Hl7RelatedGeneralUtils {
 
     }
     return null;
+  }
+
+  public static String concatenateWithChar(Object input, String delimiterChar) {
+	  String result = Hl7DataHandlerUtil.getStringValue(input, true, delimiterChar);
+	  return result;
   }
 
 

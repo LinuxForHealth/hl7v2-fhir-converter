@@ -41,8 +41,7 @@ resources:
       additionalSegments: 
           - .OBR
           - .OBSERVATION.NTE
-      
-            
+        
     - resourceName: Specimen
       segment: .SPECIMEN.SPM
       group: PATIENT_RESULT.ORDER_OBSERVATION
@@ -61,5 +60,4 @@ resources:
       additionalSegments:
           - .ORC
           - .NTE
-      
-  
+          - .OBSERVATION.OBX

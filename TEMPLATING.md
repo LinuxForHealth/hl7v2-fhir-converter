@@ -257,6 +257,9 @@ The specification expression has the following format :
   Example: ``OBX.1 |OBX.2|OBX.3`` , if OBX.1 is null then only OBX.2 will be extracted.
 * Multiple value extraction - In HL7 several fields can have repeated values, so extract all repetition for that field the spec string should end with *.<br>
   Example: ``PID.3 *`` , ``OBX.1 |OBX.2 |OBX.3 *``
+* Preserving white space / empty fields - Blank fields may be used to represent new lines or white space in reports. The user may want to preserve this white space to keep the integrity of the original report. To preserve this white space, the spec string should end with an &. Note that this can be combined (and often will be combined) with the multiple value extraction, either &* or *& is supported.<br> 
+  Example: ``OBX.5 *&`` , ``OBX.5 &*``, ``OBX.5 & ``
+  
 
 
 #### Variable
@@ -279,7 +282,7 @@ Engine supports the following condition types:
 Conditions can be used to choose between multiple sources of data when mapping to a FHIR type. For example, see how `coding` is set in [CodeableConcept.yml](src/main/resources/hl7/datatype/CodeableConcept.yml). `coding` is set by the either coding_1, coding_2, or coding_3 based on the conditions. The last condition that evaluates to true in the list will create the value.
 
 #### Different types of expressions
-* ResourceExpression : This type of expression is used when a field is a data type defined in one of the [data type templates](src/main/resources/hl7/datatype). These data type templates define different [FHIR data types](https://hl7.org/FHIR/datatypes.html).
+* ResourceExpression : This type of expression is used when a field is a data type defined in one of the [data type templates](../master/src/main/resources/hl7/datatype). These data type templates define different [FHIR data types](https://hl7.org/FHIR/datatypes.html).
   Example:
 
 ```yml

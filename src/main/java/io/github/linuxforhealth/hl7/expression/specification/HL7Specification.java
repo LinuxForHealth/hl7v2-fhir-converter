@@ -16,7 +16,6 @@ import io.github.linuxforhealth.hl7.message.HL7MessageData;
  * Represents HL7 data specification. It defines segment, field, component and subcomponent
  * names/identifiers that can be used for extracting data.
  * 
- *
  * @author pbhallam
  */
 
@@ -27,23 +26,26 @@ public class HL7Specification implements Specification {
   private int component;
   private int subComponent;
   private boolean isExtractMultiple;
+  private boolean retainEmpty;
   private String stringRep;
   private Class<? extends InputDataExtractor> sourceInputDataClass = HL7MessageData.class;
   
-  public HL7Specification(String segment, String field, int component, int subComponent,
-      boolean isMultiple) {
+  public HL7Specification(String segment, String field, int component, int subComponent, boolean isMultiple, boolean retainEmpty) {
     this.segment = segment;
     this.field = field;
     this.component = component;
     this.subComponent = subComponent;
     this.isExtractMultiple = isMultiple;
+    this.retainEmpty = retainEmpty;
     this.stringRep = getToStringRep();
   }
 
+  public HL7Specification(String segment, String field, int component, int subComponent, boolean isMultiple) {
+	  this(segment, field, component, subComponent, false, false);
+  }
 
   public HL7Specification(String segment, String field, int component, int subComponent) {
-    this(segment, field, component, subComponent, false);
-
+    this(segment, field, component, subComponent, false, false);
   }
 
   public String getSegment() {
@@ -62,14 +64,9 @@ public class HL7Specification implements Specification {
     return subComponent;
   }
 
-
-
-
   @Override
   public String toString() {
     return this.stringRep;
-
-
   }
 
   private String getToStringRep() {
@@ -90,13 +87,15 @@ public class HL7Specification implements Specification {
     }
 
     return sb.append("]").toString();
-
-
   }
 
 
   public boolean isExtractMultiple() {
     return isExtractMultiple;
+  }
+
+  public boolean getRetainEmptyFields() {
+	    return retainEmpty;
   }
 
 
@@ -121,7 +120,6 @@ public class HL7Specification implements Specification {
       Map<String, EvaluationResult> contextValues) {
     return dataSource.extractMultipleValuesForSpec(this, contextValues);
   }
-
 
 
 }

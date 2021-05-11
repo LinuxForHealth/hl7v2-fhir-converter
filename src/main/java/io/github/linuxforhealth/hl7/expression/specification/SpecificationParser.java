@@ -10,16 +10,19 @@ import io.github.linuxforhealth.hl7.message.util.SupportedSegments;
 public class SpecificationParser {
   private SpecificationParser() {}
 
-
   public static Specification parse(String rawSpec, boolean extractMultiple, boolean useGroup) {
-    if (StringUtils.startsWith(rawSpec, "$")) {
+	  return parse(rawSpec, extractMultiple, useGroup, false);
+  }
+  
+  public static Specification parse(String rawSpec, boolean extractMultiple, boolean useGroup, boolean retainEmpty) {
+	if (StringUtils.startsWith(rawSpec, "$")) {
       return new SimpleSpecification(rawSpec, extractMultiple, useGroup);
     } else {
-      return getHL7Spec(rawSpec, extractMultiple);
+      return getHL7Spec(rawSpec, extractMultiple, retainEmpty);
     }
   }
 
-  private static Specification getHL7Spec(String rawSpec, boolean extractMultiple) {
+  private static Specification getHL7Spec(String rawSpec, boolean extractMultiple, boolean retainEmpty) {
     StringTokenizer stk = new StringTokenizer(rawSpec, ".");
     String segment = null;
     String field = null;
@@ -35,8 +38,6 @@ public class SpecificationParser {
         if (stk.hasNext()) {
           component = NumberUtils.toInt(stk.nextToken());
         }
-
-
       } else {
         field = tok;
         if (stk.hasNext()) {
@@ -48,10 +49,7 @@ public class SpecificationParser {
       }
     }
 
-
-    return new HL7Specification(segment, field, component, subComponent, extractMultiple);
+    return new HL7Specification(segment, field, component, subComponent, extractMultiple, retainEmpty);
   }
-
-
 
 }

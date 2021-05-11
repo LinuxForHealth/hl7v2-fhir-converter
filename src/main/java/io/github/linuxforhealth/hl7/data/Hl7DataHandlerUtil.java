@@ -30,6 +30,10 @@ public class Hl7DataHandlerUtil {
   }
 
   public static String getStringValue(Object obj, boolean allComponents) {
+	  return getStringValue(obj,allComponents,". ");
+  }
+  
+  public static String getStringValue(Object obj, boolean allComponents, String separatorString) {
     if (obj == null) {
       return null;
     }
@@ -43,20 +47,17 @@ public class Hl7DataHandlerUtil {
         returnValue = toStringValue(list.get(0), allComponents);
       } else if (!list.isEmpty()) {
         StringBuilder sb = new StringBuilder();
-        list.forEach(e -> sb.append(toStringValue(e, allComponents)).append(". "));
+        list.forEach(e -> sb.append(toStringValue(e, allComponents)).append(separatorString));
         returnValue = StringUtils.strip(sb.toString());
-
       } else {
         returnValue = null;
       }
-
 
     } else {
       returnValue = toStringValue(local, allComponents);
     }
 
     return returnValue;
-
   }
 
   public static String getTableNumber(Object obj) {
@@ -103,7 +104,6 @@ public class Hl7DataHandlerUtil {
   }
 
 
-
   private static String convertVariesDataTypeToString(Object obj, boolean allComponents) {
     if (obj instanceof Variable) {
       Variable v = (Variable) obj;
@@ -124,9 +124,7 @@ public class Hl7DataHandlerUtil {
       }
     return StringUtils.stripEnd(sb.toString(), ", ");
 
-
   }
-
 
 
 }

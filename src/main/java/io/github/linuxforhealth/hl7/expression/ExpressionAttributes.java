@@ -35,7 +35,6 @@ import io.github.linuxforhealth.hl7.expression.variable.VariableGenerator;
 public class ExpressionAttributes {
   private static final String OBJECT_TYPE = Object.class.getSimpleName();
 
-
   // Basic properties of an expression
   private String name;
   private String type;
@@ -56,8 +55,6 @@ public class ExpressionAttributes {
   // if valueof attribute ends with * then list of values will be generated
   private boolean generateMultiple;
 
-
-
   // Property specific to ValueExtractionGeneralExpression
   private ImmutablePair<String, String> fetch;
 
@@ -77,21 +74,17 @@ public class ExpressionAttributes {
       this.condition = ConditionUtil.createCondition(exBuilder.rawCondition);
     }
 
-
     this.constants = new HashMap<>();
     if (exBuilder.constants != null && !exBuilder.constants.isEmpty()) {
       this.constants.putAll(exBuilder.constants);
     }
-
 
     this.variables = new ArrayList<>();
     if (exBuilder.rawVariables != null) {
       for (Entry<String, String> e : exBuilder.rawVariables.entrySet()) {
         this.variables.add(VariableGenerator.parse(e.getKey(), e.getValue()));
       }
-
     }
-
 
     this.value = exBuilder.value;
     this.valueOf = exBuilder.valueOf;
@@ -104,78 +97,55 @@ public class ExpressionAttributes {
       this.expressionType = ExpressionType.HL7SPEC;
     }
 
-
   }
 
   public boolean isUseGroup() {
     return useGroup;
   }
 
-
   public String getType() {
     return type;
   }
-
-
 
   public String getDefaultValue() {
     return defaultValue;
   }
 
-
-
   public boolean isRequired() {
     return isRequired;
   }
-
-
 
   public List<Specification> getSpecs() {
     return ImmutableList.copyOf(specs);
   }
 
-
-
   public List<Variable> getVariables() {
     return ImmutableList.copyOf(variables);
   }
-
-
 
   public Condition getFilter() {
     return condition;
   }
 
-
-
   public Map<String, String> getConstants() {
     return ImmutableMap.copyOf(constants);
   }
-
-
 
   public boolean isGenerateMultiple() {
     return generateMultiple;
   }
 
-
-
   public String getValue() {
     return value;
   }
-
-
 
   public ImmutablePair<String, String> getFetch() {
     return fetch;
   }
 
-
-
   public ExpressionType getExpressionType() {
     return expressionType;
   }
-
 
   public String getValueOf() {
     return valueOf;
@@ -190,23 +160,47 @@ public class ExpressionAttributes {
     return name;
   }
 
-  public static List<Specification> getSpecList(String inputString, boolean useGroup) {
-    final boolean extractMultiple;
-    String hl7SpecExpression = inputString;
-    if (StringUtils.endsWith(inputString, "*")) {
-      hl7SpecExpression = StringUtils.removeEnd(inputString, "*");
-      extractMultiple = true;
-    } else {
-      extractMultiple = false;
-    }
+  /**
+   * Extract special chars:
+   *      * indicates to extract fields from multiple entries
+   *      & indicates to retain empty (null) fields
+   * @param inputString
+   * @return ExpressionModifiers object with booleans indicating which modifiers were used and the expression after modifiers have been removed
+   */
+  public static final ExpressionModifiers extractExpressionModifiers(String inputString) {
 
-    hl7SpecExpression = StringUtils.strip(hl7SpecExpression);
+    boolean extractMultiple = false;
+    boolean retainEmpty = false;
+    String expression = inputString;
+
+    if (StringUtils.endsWith(expression, "*")) {
+      expression = StringUtils.removeEnd(expression, "*");
+      extractMultiple = true;
+    }
+    if (StringUtils.endsWith(expression, "&")) {
+      expression = StringUtils.removeEnd(expression, "&");
+      retainEmpty = true;
+    }
+    // Repeat check for asterisk to allow for different order of special chars
+    if (StringUtils.endsWith(expression, "*")) {
+      expression = StringUtils.removeEnd(expression, "*");
+      extractMultiple = true;
+    }
+    expression = StringUtils.strip(expression);
+
+    return new ExpressionModifiers(extractMultiple, retainEmpty, expression);
+  }
+
+  public static List<Specification> getSpecList(String inputString, boolean useGroup) {
+
+    ExpressionModifiers exp = extractExpressionModifiers(inputString);
+
     List<Specification> specs = new ArrayList<>();
-    if (StringUtils.isNotBlank(hl7SpecExpression)) {
-      StringTokenizer st = new StringTokenizer(hl7SpecExpression, "|").setIgnoreEmptyTokens(true)
+    if (StringUtils.isNotBlank(exp.expression)) {
+      StringTokenizer st = new StringTokenizer(exp.expression, "|").setIgnoreEmptyTokens(true)
           .setTrimmerMatcher(StringMatcherFactory.INSTANCE.spaceMatcher());
       st.getTokenList()
-          .forEach(s -> specs.add(SpecificationParser.parse(s, extractMultiple, useGroup)));
+          .forEach(s -> specs.add(SpecificationParser.parse(s, exp.extractMultiple, useGroup, exp.retainEmpty)));
     }
 
     return specs;
@@ -227,7 +221,6 @@ public class ExpressionAttributes {
     } else {
       return null;
     }
-
   }
 
   @Override
@@ -236,7 +229,6 @@ public class ExpressionAttributes {
       this.toString = ReflectionToStringBuilder.toString(this, ToStringStyle.NO_CLASS_NAME_STYLE,
           false, false, true, null);
     }
-
     return this.toString;
   }
 
@@ -247,6 +239,7 @@ public class ExpressionAttributes {
 
 
   public static class Builder {
+
 
 
     private String name;
@@ -310,12 +303,10 @@ public class ExpressionAttributes {
       return this;
     }
 
-
     public Builder withVars(Map<String, String> rawVariables) {
       this.rawVariables = rawVariables;
       return this;
     }
-
 
     public Builder withConstants(Map<String, String> constants) {
       this.constants = constants;
@@ -323,21 +314,17 @@ public class ExpressionAttributes {
     }
 
     public Builder withValueOf(String valueOf) {
-
       this.valueOf = StringUtils.trim(valueOf);
       if (this.expressionType == null) {
         this.expressionType = ExpressionType.SIMPLE;
       }
       return this;
-
     }
 
     public Builder withExpressionType(String expressionType) {
       this.expressionType = EnumUtils.getEnumIgnoreCase(ExpressionType.class, expressionType);
       return this;
     }
-
-
 
     public Builder withValue(String value) {
       this.value = value;
@@ -350,15 +337,24 @@ public class ExpressionAttributes {
       return this;
     }
 
-
-
     public ExpressionAttributes build() {
       return new ExpressionAttributes(this);
     }
 
   }
 
+  // Class used when extracting modifiers from the expression, contains the expression after modifiers have been removed and
+  // booleans indicating which modifiers were in the expression.
+  public static class ExpressionModifiers {
+    public boolean extractMultiple = false;  // true when * is used in the expression
+    public boolean retainEmpty = false;      // true when & is used in the expression
+    public String expression = "";           // resulting expression after the modifiers have been removed
 
-
+    ExpressionModifiers(boolean theExtractMultiple, boolean theRetainEmpty, String theExpression) {
+      extractMultiple = theExtractMultiple;
+      retainEmpty = theRetainEmpty;
+      expression = theExpression;
+    }
+  }
 }
 
