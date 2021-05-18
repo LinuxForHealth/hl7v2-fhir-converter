@@ -185,7 +185,7 @@ public class Hl7ORUMessageTest {
   @Test
   public void multipleOBXWithNoId() throws IOException {
   	HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
-      String json = ftv.convert(new File("../hl7v2-fhir-converter/src/test/resources/ORU-multiline-short.hl7"), OPTIONS_PRETTYPRINT);
+      String json = ftv.convert(new File("src/test/resources/ORU-multiline-short.hl7"), OPTIONS_PRETTYPRINT);
       
       //Verify conversion
       FHIRContext context = new FHIRContext();
@@ -261,7 +261,7 @@ public class Hl7ORUMessageTest {
   @Test
   public void multipleOBXWithMixedType() throws IOException {
   	HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
-      String json = ftv.convert(new File("../hl7v2-fhir-converter/src/test/resources/ORU-multiline-short-mixed.hl7"), OPTIONS_PRETTYPRINT);
+      String json = ftv.convert(new File("src/test/resources/ORU-multiline-short-mixed.hl7"), OPTIONS_PRETTYPRINT);
       
       //Verify conversion
       FHIRContext context = new FHIRContext();
