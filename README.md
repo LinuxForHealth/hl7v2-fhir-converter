@@ -50,11 +50,7 @@ Maven dependency
 
 Gradle dependency:
 ```
-jcenter()
-    maven {
-     url "https://dl.bintray.com/ibm-watson-health/ibm-fhir-server-releases"
-     }
-    implementation 'io.github.linuxforhealth:hl7v2-fhir-converter:1.0.5'
+    implementation 'io.github.linuxforhealth:hl7v2-fhir-converter:1.0.7'
 ```     
 
 Instantiate and execute the converter
