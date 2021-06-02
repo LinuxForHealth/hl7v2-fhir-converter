@@ -310,10 +310,10 @@ Conditions can be used to choose between multiple sources of data when mapping t
     valueOf: 'GeneralUtils.generateName( prefix, given,family, suffix)'
     expressionType: JEXL
     var:
-      prefix: STRING, XPN.4
+      prefix: STRING, XPN.5
       given: STRING, XPN.2
       family: STRING, XPN.1
-      suffix: STRING, XPN.5
+      suffix: STRING, XPN.4
 ```
 
 
