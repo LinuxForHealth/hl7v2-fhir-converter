@@ -11,26 +11,26 @@ text:
     valueOf: 'GeneralUtils.generateName( prefix, given,family, suffix)'
     expressionType: JEXL
     vars:
-      prefix: STRING XPN.5 |XCN.6 |CNN.6
-      given: STRING XPN.2 |XCN.3 |CNN.3
-      family: STRING XPN.1 |XCN.2 |CNN.2
-      suffix: STRING XPN.4 |XCN.5 |CNN.5
+      prefix: STRING XPN.5 |XCN.6 |CNN.6 |NDL.6
+      given: STRING XPN.2 |XCN.3 |CNN.3 |NDL.3
+      family: STRING XPN.1 |XCN.2 |CNN.2 |NDL.2
+      suffix: STRING XPN.4 |XCN.5 |CNN.5 |NDL.5
 family:
      type: STRING
-     valueOf: XPN.1 |XCN.2 |CNN.2
+     valueOf: XPN.1 |XCN.2 |CNN.2 |NDL.2
      expressionType: HL7Spec
 given: 
      type: STRING
-     valueOf: XPN.2 |XCN.3 |CNN.3
+     valueOf: XPN.2 |XCN.3 |CNN.3 |NDL.3
      expressionType: HL7Spec
 prefix:
      type: STRING
-     valueOf: XPN.5 |XCN.6 |CNN.6
+     valueOf: XPN.5 |XCN.6 |CNN.6 |NDL.6
      expressionType: HL7Spec
 
 suffix: 
      type: STRING
-     valueOf: XPN.4 |XCN.5 |CNN.5
+     valueOf: XPN.4 |XCN.5 |CNN.5 |NDL.5
      expressionType: HL7Spec
      
 period:

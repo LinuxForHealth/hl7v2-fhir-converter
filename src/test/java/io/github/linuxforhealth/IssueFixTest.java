@@ -178,14 +178,6 @@ public class IssueFixTest {
     String hl7message =
         "MSH|^~\\&|MIICEHRApplication|MIIC|MIIC|MIIC|201705130822||VXU^V04^VXU_V04|test1100|P|2.5.1|||AL|AL|||||Z22^CDCPHINVS|^^^^^MIIC^SR^^^MIIC|MIIC\n"
             + "PID|1||12345678^^^^MR||Mouse^Mickey^J^III^Mr^^|cat^martha|20060504|M||2106-3^White^ HL70005|12345 testing ave^^Minneapolis^MN^55407^^^^MN053||^PRN^^^PH^555^5555555|||||||||2186-5^not Hispanic or Latino^CDCREC||N||||||N\n"
-            + "PD1|||||||||||02|N|20170513|||A|20170513|20170513\n"
-            + "NK1|1|cat^martha|MTH^Mother^HL70063|12345 testing ave^^Minneapolis^MN^55407^^^^MN053|^PRN^PH^^^555^5555555\n"
-            + "ORC|RE||IZ-783278^NDA||||||||||||||MIIC^MIIC clinic^HL70362\n"
-            + "RXA|0|1|201501011|20150101|141^Influenza^CVX|1|mL||00^NEW IMMUNIZATIONRECORD^NIP001||^^^MIICSHORTCODE||||ABC1234|20211201|SKB^GlaxoSmithKline^MVX|||CP|A\n"
-            + "OBX|4|CE|31044-1^reaction^LN|4|VXC12^fever of >40.5C within 48 hrs.^CDCPHINVS||||||F\n"
-            + "ORC|RE||IZ-783280^NDA|||||||||||||||MIIC^MIIC clinic^HL70362\n"
-            + "RXA|0|1|20170512||998^No vaccine given^CVX|999||||||||||||||CP|\n"
-            + "OBX|1|CE|30945-0^contraindication^LN|1|M4^Medical exemption: Influenza^NIP||||||F|||20120916  \n"
     ;
 
 
@@ -202,8 +194,7 @@ public class IssueFixTest {
     List<Resource> patients =
         e.stream().filter(v -> ResourceType.Patient == v.getResource().getResourceType())
             .map(BundleEntryComponent::getResource).collect(Collectors.toList());
-    // Since "RXA|0|1|201501011| " RXA.3 has incorrect date, no immunization resource is generated
-    // as occurrenceDateTime is required field and is extracted from RXA.3
+
     assertThat(patients).hasSize(1);
     Patient patient = getPatientFromResource(patients.get(0));
     HumanName name = patient.getNameFirstRep();
