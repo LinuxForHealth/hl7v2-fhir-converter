@@ -13,8 +13,11 @@ import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
 import org.hl7.fhir.r4.model.DiagnosticReport;
+import org.hl7.fhir.r4.model.HumanName;
+import org.hl7.fhir.r4.model.Patient;
 import org.hl7.fhir.r4.model.Resource;
 import org.hl7.fhir.r4.model.ResourceType;
+import org.hl7.fhir.r4.model.StringType;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -163,12 +166,59 @@ public class IssueFixTest {
 
   }
 
-
-
   private static DiagnosticReport getDiagnosticReport(Resource resource) {
     String s = context.getParser().encodeResourceToString(resource);
     Class<? extends IBaseResource> klass = DiagnosticReport.class;
     return (DiagnosticReport) context.getParser().parseResource(klass, s);
+  }
+
+
+  @Test
+  public void name_issue_92() {
+    String hl7message =
+        "MSH|^~\\&|MIICEHRApplication|MIIC|MIIC|MIIC|201705130822||VXU^V04^VXU_V04|test1100|P|2.5.1|||AL|AL|||||Z22^CDCPHINVS|^^^^^MIIC^SR^^^MIIC|MIIC\n"
+            + "PID|1||12345678^^^^MR||Mouse^Mickey^J^III^Mr^^|cat^martha|20060504|M||2106-3^White^ HL70005|12345 testing ave^^Minneapolis^MN^55407^^^^MN053||^PRN^^^PH^555^5555555|||||||||2186-5^not Hispanic or Latino^CDCREC||N||||||N\n"
+    ;
+
+
+    HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
+    String json = ftv.convert(hl7message, OPTIONS);
+
+    assertThat(json).isNotBlank();
+    FHIRContext context = new FHIRContext();
+    IBaseResource bundleResource = context.getParser().parseResource(json);
+    assertThat(bundleResource).isNotNull();
+    Bundle b = (Bundle) bundleResource;
+
+    List<BundleEntryComponent> e = b.getEntry();
+    List<Resource> patients =
+        e.stream().filter(v -> ResourceType.Patient == v.getResource().getResourceType())
+            .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+
+    assertThat(patients).hasSize(1);
+    Patient patient = getPatientFromResource(patients.get(0));
+    HumanName name = patient.getNameFirstRep();
+    
+    // Check prefix
+    assertThat(name.hasPrefix()).isTrue();
+    List<StringType> prefixes = name.getPrefix();
+    assertThat(prefixes).hasSize(1);;
+    String prefix = prefixes.get(0).getValueNotNull();
+    assertThat(prefix).isEqualTo("Mr");
+
+    // Check suffix
+    assertThat(name.hasSuffix()).isTrue();
+    List<StringType> suffixes = name.getSuffix();
+    assertThat(suffixes).hasSize(1);;
+    String suffix = suffixes.get(0).getValueNotNull();
+    assertThat(suffix).isEqualTo("III");
+
+  }
+
+  private static Patient getPatientFromResource(Resource resource) {
+    String s = context.getParser().encodeResourceToString(resource);
+    Class<? extends IBaseResource> klass = Patient.class;
+    return (Patient) context.getParser().parseResource(klass, s);
   }
 
 }
