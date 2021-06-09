@@ -43,130 +43,130 @@ public class Hl7PatientFHIRConversionTest {
   @Test
   public void patient_deceased_conversion_test() {
 
-    String patientDeceasedEmpty =
+    String patientMsgDeceasedEmpty =
     "MSH|^~\\&|MIICEHRApplication|MIIC|MIIC|MIIC|201705130822||VXU^V04^VXU_V04|test1100|P|2.5.1|||AL|AL|||||Z22^CDCPHINVS|^^^^^MIIC^SR^^^MIIC|MIIC\n"
     + "PID|1||12345678^^^^MR|ALTID|Mouse^Mickey^J^III^^^|Mother^Micky|20060504|M|Alias^Alias|2106-3^White^ HL70005|12345 testing ave^^Minneapolis^MN^55407^^^^MN053|USAA|^PRN^^^PH^555^5555555|^PRN^^^PH^555^666666|english|married|bhuddist|1234567_account|111-22-3333|||2186-5^not Hispanic or Latino^CDCREC|Born in USA|Y|2|USA||||\n"
     ;
-    String patientNotDeadBooleanN =
+    String patientMsgNotDeadBooleanN =
     "MSH|^~\\&|MIICEHRApplication|MIIC|MIIC|MIIC|201705130822||VXU^V04^VXU_V04|test1100|P|2.5.1|||AL|AL|||||Z22^CDCPHINVS|^^^^^MIIC^SR^^^MIIC|MIIC\n"
     + "PID|1||12345678^^^^MR|ALTID|Mouse^Mickey^J^III^^^|Mother^Micky|20060504|M|Alias^Alias|2106-3^White^ HL70005|12345 testing ave^^Minneapolis^MN^55407^^^^MN053|USAA|^PRN^^^PH^555^5555555|^PRN^^^PH^555^666666|english|married|bhuddist|1234567_account|111-22-3333|||2186-5^not Hispanic or Latino^CDCREC|Born in USA|Y|2|USA||||N\n"
     ;
-    String patientDeceasedDateOnlyYYYY =
+    String patientMsgDeceasedDateOnlyYYYY =
     "MSH|^~\\&|MIICEHRApplication|MIIC|MIIC|MIIC|201705130822||VXU^V04^VXU_V04|test1100|P|2.5.1|||AL|AL|||||Z22^CDCPHINVS|^^^^^MIIC^SR^^^MIIC|MIIC\n"
     + "PID|1||12345678^^^^MR|ALTID|Mouse^Mickey^J^III^^^|Mother^Micky|20060504|M|Alias^Alias|2106-3^White^ HL70005|12345 testing ave^^Minneapolis^MN^55407^^^^MN053|USAA|^PRN^^^PH^555^5555555|^PRN^^^PH^555^666666|english|married|bhuddist|1234567_account|111-22-3333|||2186-5^not Hispanic or Latino^CDCREC|Born in USA|Y|2|USA|||2006|\n"
     ;
-    String patientDeceasedDateOnlyYYYYMM =
+    String patientMsgDeceasedDateOnlyYYYYMM =
     "MSH|^~\\&|MIICEHRApplication|MIIC|MIIC|MIIC|201705130822||VXU^V04^VXU_V04|test1100|P|2.5.1|||AL|AL|||||Z22^CDCPHINVS|^^^^^MIIC^SR^^^MIIC|MIIC\n"
     + "PID|1||12345678^^^^MR|ALTID|Mouse^Mickey^J^III^^^|Mother^Micky|20060504|M|Alias^Alias|2106-3^White^ HL70005|12345 testing ave^^Minneapolis^MN^55407^^^^MN053|USAA|^PRN^^^PH^555^5555555|^PRN^^^PH^555^666666|english|married|bhuddist|1234567_account|111-22-3333|||2186-5^not Hispanic or Latino^CDCREC|Born in USA|Y|2|USA|||200611|\n"
     ;
-    String patientDeceasedDateOnlyYYYYMMDDHHMMSSZZZZ =
+    String patientMsgDeceasedDateOnlyYYYYMMDDHHMMSSZZZZ =
     "MSH|^~\\&|MIICEHRApplication|MIIC|MIIC|MIIC|201705130822||VXU^V04^VXU_V04|test1100|P|2.5.1|||AL|AL|||||Z22^CDCPHINVS|^^^^^MIIC^SR^^^MIIC|MIIC\n"
     + "PID|1||12345678^^^^MR|ALTID|Mouse^Mickey^J^III^^^|Mother^Micky|20060504|M|Alias^Alias|2106-3^White^ HL70005|12345 testing ave^^Minneapolis^MN^55407^^^^MN053|USAA|^PRN^^^PH^555^5555555|^PRN^^^PH^555^666666|english|married|bhuddist|1234567_account|111-22-3333|||2186-5^not Hispanic or Latino^CDCREC|Born in USA|Y|2|USA|||20061120115930+0100|\n"
     ;
 
-    String patientDeceasedBooleanYOnly =
+    String patientMsgDeceasedBooleanYOnly =
     "MSH|^~\\&|MIICEHRApplication|MIIC|MIIC|MIIC|201705130822||VXU^V04^VXU_V04|test1100|P|2.5.1|||AL|AL|||||Z22^CDCPHINVS|^^^^^MIIC^SR^^^MIIC|MIIC\n"
     + "PID|1||12345678^^^^MR|ALTID|Mouse^Mickey^J^III^^^|Mother^Micky|20060504|M|Alias^Alias|2106-3^White^ HL70005|12345 testing ave^^Minneapolis^MN^55407^^^^MN053|USAA|^PRN^^^PH^555^5555555|^PRN^^^PH^555^666666|english|married|bhuddist|1234567_account|111-22-3333|||2186-5^not Hispanic or Latino^CDCREC|Born in USA|Y|2|USA||||Y\n"
     ;
-    String patientDeceasedDateAndBooleanY =
+    String patientMsgDeceasedDateAndBooleanY =
     "MSH|^~\\&|MIICEHRApplication|MIIC|MIIC|MIIC|201705130822||VXU^V04^VXU_V04|test1100|P|2.5.1|||AL|AL|||||Z22^CDCPHINVS|^^^^^MIIC^SR^^^MIIC|MIIC\n"
     + "PID|1||12345678^^^^MR|ALTID|Mouse^Mickey^J^III^^^|Mother^Micky|20060504|M|Alias^Alias|2106-3^White^ HL70005|12345 testing ave^^Minneapolis^MN^55407^^^^MN053|USAA|^PRN^^^PH^555^5555555|^PRN^^^PH^555^666666|english|married|bhuddist|1234567_account|111-22-3333|||2186-5^not Hispanic or Latino^CDCREC|Born in USA|Y|2|USA|||20061120|Y\n"
     ;
 
-    Patient patientAliveUnknown = createPatientFromHl7Segment(patientDeceasedEmpty);
-    assertThat(patientAliveUnknown.hasDeceased()).isFalse();   
-    assertThat(patientAliveUnknown.hasDeceasedBooleanType()).isFalse(); 
-    assertThat(patientAliveUnknown.hasDeceasedDateTimeType()).isFalse(); 
+    Patient patientObjDeceasedEmpty = createPatientFromHl7Segment(patientMsgDeceasedEmpty);
+    assertThat(patientObjDeceasedEmpty.hasDeceased()).isFalse();   
+    assertThat(patientObjDeceasedEmpty.hasDeceasedBooleanType()).isFalse(); 
+    assertThat(patientObjDeceasedEmpty.hasDeceasedDateTimeType()).isFalse(); 
 
-    Patient patientNotDead = createPatientFromHl7Segment(patientNotDeadBooleanN);
-    assertThat(patientNotDead.hasDeceased()).isTrue();   
-    assertThat(patientNotDead.hasDeceasedBooleanType()).isTrue(); 
-    assertThat(patientNotDead.getDeceasedBooleanType().booleanValue()).isFalse();   
+    Patient patientObjNotDeadBooleanN = createPatientFromHl7Segment(patientMsgNotDeadBooleanN);
+    assertThat(patientObjNotDeadBooleanN.hasDeceased()).isTrue();   
+    assertThat(patientObjNotDeadBooleanN.hasDeceasedBooleanType()).isTrue(); 
+    assertThat(patientObjNotDeadBooleanN.getDeceasedBooleanType().booleanValue()).isFalse();   
 
-    Patient patientBool = createPatientFromHl7Segment(patientDeceasedBooleanYOnly);
-    assertThat(patientBool.hasDeceased()).isTrue();   
-    assertThat(patientBool.hasDeceasedDateTimeType()).isFalse(); 
-    assertThat(patientBool.hasDeceasedBooleanType()).isTrue(); 
-    assertThat(patientBool.getDeceasedBooleanType().booleanValue()).isTrue();  
+    Patient patientObjDeceasedBooleanYOnly = createPatientFromHl7Segment(patientMsgDeceasedBooleanYOnly);
+    assertThat(patientObjDeceasedBooleanYOnly.hasDeceased()).isTrue();   
+    assertThat(patientObjDeceasedBooleanYOnly.hasDeceasedDateTimeType()).isFalse(); 
+    assertThat(patientObjDeceasedBooleanYOnly.hasDeceasedBooleanType()).isTrue(); 
+    assertThat(patientObjDeceasedBooleanYOnly.getDeceasedBooleanType().booleanValue()).isTrue();  
 
-    Patient patientDateYYYY = createPatientFromHl7Segment(patientDeceasedDateOnlyYYYY);
-    assertThat(patientDateYYYY.hasDeceased()).isTrue();   
-    assertThat(patientDateYYYY.hasDeceasedDateTimeType()).isTrue(); 
-    assertThat(patientDateYYYY.hasDeceasedBooleanType()).isFalse(); 
-    assertThat(patientDateYYYY.getDeceasedDateTimeType().asStringValue()).isEqualTo("2006"); 
+    Patient patientObjDeceasedDateOnlyYYYY = createPatientFromHl7Segment(patientMsgDeceasedDateOnlyYYYY);
+    assertThat(patientObjDeceasedDateOnlyYYYY.hasDeceased()).isTrue();   
+    assertThat(patientObjDeceasedDateOnlyYYYY.hasDeceasedDateTimeType()).isTrue(); 
+    assertThat(patientObjDeceasedDateOnlyYYYY.hasDeceasedBooleanType()).isFalse(); 
+    assertThat(patientObjDeceasedDateOnlyYYYY.getDeceasedDateTimeType().asStringValue()).isEqualTo("2006"); 
     
-    Patient patientDateYYYYMM = createPatientFromHl7Segment(patientDeceasedDateOnlyYYYYMM);
-    assertThat(patientDateYYYYMM.hasDeceased()).isTrue();   
-    assertThat(patientDateYYYYMM.hasDeceasedDateTimeType()).isTrue(); 
-    assertThat(patientDateYYYYMM.hasDeceasedBooleanType()).isFalse(); 
-    assertThat(patientDateYYYYMM.getDeceasedDateTimeType().asStringValue()).isEqualTo("2006-11");  
+    Patient patientObjDeceasedDateOnlyYYYYMM = createPatientFromHl7Segment(patientMsgDeceasedDateOnlyYYYYMM);
+    assertThat(patientObjDeceasedDateOnlyYYYYMM.hasDeceased()).isTrue();   
+    assertThat(patientObjDeceasedDateOnlyYYYYMM.hasDeceasedDateTimeType()).isTrue(); 
+    assertThat(patientObjDeceasedDateOnlyYYYYMM.hasDeceasedBooleanType()).isFalse(); 
+    assertThat(patientObjDeceasedDateOnlyYYYYMM.getDeceasedDateTimeType().asStringValue()).isEqualTo("2006-11");  
 
-    Patient patientDateYYYYMMDDHHMMSSZZZZ = createPatientFromHl7Segment(patientDeceasedDateOnlyYYYYMMDDHHMMSSZZZZ);
-    assertThat(patientDateYYYYMMDDHHMMSSZZZZ.hasDeceased()).isTrue();   
-    assertThat(patientDateYYYYMMDDHHMMSSZZZZ.hasDeceasedDateTimeType()).isTrue(); 
-    assertThat(patientDateYYYYMMDDHHMMSSZZZZ.hasDeceasedBooleanType()).isFalse(); 
-    assertThat(patientDateYYYYMMDDHHMMSSZZZZ.getDeceasedDateTimeType().asStringValue()).isEqualTo("2006-11-20T11:59:30+01:00");
+    Patient patientObjDeceasedDateOnlyYYYYMMDDHHMMSSZZZZ = createPatientFromHl7Segment(patientMsgDeceasedDateOnlyYYYYMMDDHHMMSSZZZZ);
+    assertThat(patientObjDeceasedDateOnlyYYYYMMDDHHMMSSZZZZ.hasDeceased()).isTrue();   
+    assertThat(patientObjDeceasedDateOnlyYYYYMMDDHHMMSSZZZZ.hasDeceasedDateTimeType()).isTrue(); 
+    assertThat(patientObjDeceasedDateOnlyYYYYMMDDHHMMSSZZZZ.hasDeceasedBooleanType()).isFalse(); 
+    assertThat(patientObjDeceasedDateOnlyYYYYMMDDHHMMSSZZZZ.getDeceasedDateTimeType().asStringValue()).isEqualTo("2006-11-20T11:59:30+01:00");
 
-    Patient patientDateBool = createPatientFromHl7Segment(patientDeceasedDateAndBooleanY);
-    assertThat(patientDateBool.hasDeceased()).isTrue();   
-    assertThat(patientDateBool.hasDeceasedDateTimeType()).isTrue(); 
-    assertThat(patientDateBool.hasDeceasedBooleanType()).isFalse(); 
-    assertThat(patientDateBool.getDeceasedDateTimeType().asStringValue()).isEqualTo("2006-11-20");  //DateUtil.formatToDate
+    Patient patientObjDeceasedDateAndBooleanY = createPatientFromHl7Segment(patientMsgDeceasedDateAndBooleanY);
+    assertThat(patientObjDeceasedDateAndBooleanY.hasDeceased()).isTrue();   
+    assertThat(patientObjDeceasedDateAndBooleanY.hasDeceasedDateTimeType()).isTrue(); 
+    assertThat(patientObjDeceasedDateAndBooleanY.hasDeceasedBooleanType()).isFalse(); 
+    assertThat(patientObjDeceasedDateAndBooleanY.getDeceasedDateTimeType().asStringValue()).isEqualTo("2006-11-20");  //DateUtil.formatToDate
   }
 
   @Test
   public void patient_multiple_conversion_test() {
 
-    String patientEmptyMultiple =
+    String patientMsgEmptyMultiple =
     "MSH|^~\\&|MIICEHRApplication|MIIC|MIIC|MIIC|201705130822||VXU^V04^VXU_V04|test1100|P|2.5.1|||AL|AL|||||Z22^CDCPHINVS|^^^^^MIIC^SR^^^MIIC|MIIC\n"
     + "PID|1||12345678^^^^MR|ALTID|Mouse^Mickey^J^III^^^|Mother^Micky|20060504|M|Alias^Alias|2106-3^White^ HL70005|12345 testing ave^^Minneapolis^MN^55407^^^^MN053|USAA|^PRN^^^PH^555^5555555|^PRN^^^PH^555^666666|english|married|bhuddist|1234567_account|111-22-3333|||2186-5^not Hispanic or Latino^CDCREC|Born in USA|||USA||||\n"
     ;
-    String patientMultipleN =
+    String patientMsgMultipleN =
     "MSH|^~\\&|MIICEHRApplication|MIIC|MIIC|MIIC|201705130822||VXU^V04^VXU_V04|test1100|P|2.5.1|||AL|AL|||||Z22^CDCPHINVS|^^^^^MIIC^SR^^^MIIC|MIIC\n"
     + "PID|1||12345678^^^^MR|ALTID|Mouse^Mickey^J^III^^^|Mother^Micky|20060504|M|Alias^Alias|2106-3^White^ HL70005|12345 testing ave^^Minneapolis^MN^55407^^^^MN053|USAA|^PRN^^^PH^555^5555555|^PRN^^^PH^555^666666|english|married|bhuddist|1234567_account|111-22-3333|||2186-5^not Hispanic or Latino^CDCREC|Born in USA|N||USA||||\n"
     ;
-    String patientMultipleNumberOnly =
+    String patientMsgMultipleNumberOnly =
     "MSH|^~\\&|MIICEHRApplication|MIIC|MIIC|MIIC|201705130822||VXU^V04^VXU_V04|test1100|P|2.5.1|||AL|AL|||||Z22^CDCPHINVS|^^^^^MIIC^SR^^^MIIC|MIIC\n"
     + "PID|1||12345678^^^^MR|ALTID|Mouse^Mickey^J^III^^^|Mother^Micky|20060504|M|Alias^Alias|2106-3^White^ HL70005|12345 testing ave^^Minneapolis^MN^55407^^^^MN053|USAA|^PRN^^^PH^555^5555555|^PRN^^^PH^555^666666|english|married|bhuddist|1234567_account|111-22-3333|||2186-5^not Hispanic or Latino^CDCREC|Born in USA||2|USA||||\n"
     ;
-    String patientMultipleBooleanYOnly =
+    String patientMsgMultipleBooleanYOnly =
     "MSH|^~\\&|MIICEHRApplication|MIIC|MIIC|MIIC|201705130822||VXU^V04^VXU_V04|test1100|P|2.5.1|||AL|AL|||||Z22^CDCPHINVS|^^^^^MIIC^SR^^^MIIC|MIIC\n"
     + "PID|1||12345678^^^^MR|ALTID|Mouse^Mickey^J^III^^^|Mother^Micky|20060504|M|Alias^Alias|2106-3^White^ HL70005|12345 testing ave^^Minneapolis^MN^55407^^^^MN053|USAA|^PRN^^^PH^555^5555555|^PRN^^^PH^555^666666|english|married|bhuddist|1234567_account|111-22-3333|||2186-5^not Hispanic or Latino^CDCREC|Born in USA|Y||USA||||\n"
     ;
-    String patientMultipleNumberAndBooleanY =
+    String patientMsgMultipleNumberAndBooleanY =
     "MSH|^~\\&|MIICEHRApplication|MIIC|MIIC|MIIC|201705130822||VXU^V04^VXU_V04|test1100|P|2.5.1|||AL|AL|||||Z22^CDCPHINVS|^^^^^MIIC^SR^^^MIIC|MIIC\n"
     + "PID|1||12345678^^^^MR|ALTID|Mouse^Mickey^J^III^^^|Mother^Micky|20060504|M|Alias^Alias|2106-3^White^ HL70005|12345 testing ave^^Minneapolis^MN^55407^^^^MN053|USAA|^PRN^^^PH^555^5555555|^PRN^^^PH^555^666666|english|married|bhuddist|1234567_account|111-22-3333|||2186-5^not Hispanic or Latino^CDCREC|Born in USA|Y|3|USA||||\n"
     ;
 
-    Patient patientBirthMultEmpty = createPatientFromHl7Segment(patientEmptyMultiple);
-    assertThat(patientBirthMultEmpty.hasMultipleBirth()).isFalse();   
-    assertThat(patientBirthMultEmpty.hasMultipleBirthIntegerType()).isFalse(); 
-    assertThat(patientBirthMultEmpty.hasMultipleBirthBooleanType()).isFalse(); 
+    Patient patientObjEmptyMultiple = createPatientFromHl7Segment(patientMsgEmptyMultiple);
+    assertThat(patientObjEmptyMultiple.hasMultipleBirth()).isFalse();   
+    assertThat(patientObjEmptyMultiple.hasMultipleBirthIntegerType()).isFalse(); 
+    assertThat(patientObjEmptyMultiple.hasMultipleBirthBooleanType()).isFalse(); 
 
-    Patient patientBirthMultN= createPatientFromHl7Segment(patientMultipleN);
-    assertThat(patientBirthMultN.hasMultipleBirth()).isTrue();   
-    assertThat(patientBirthMultN.hasMultipleBirthIntegerType()).isFalse(); 
-    assertThat(patientBirthMultN.hasMultipleBirthBooleanType()).isTrue(); 
-    assertThat(patientBirthMultN.getMultipleBirthBooleanType().booleanValue()).isFalse();   
+    Patient patientObjMultipleN = createPatientFromHl7Segment(patientMsgMultipleN);
+    assertThat(patientObjMultipleN.hasMultipleBirth()).isTrue();   
+    assertThat(patientObjMultipleN.hasMultipleBirthIntegerType()).isFalse(); 
+    assertThat(patientObjMultipleN.hasMultipleBirthBooleanType()).isTrue(); 
+    assertThat(patientObjMultipleN.getMultipleBirthBooleanType().booleanValue()).isFalse();   
 
-    Patient patientBirthMultY = createPatientFromHl7Segment(patientMultipleBooleanYOnly);
-    assertThat(patientBirthMultY.hasMultipleBirth()).isTrue();   
-    assertThat(patientBirthMultY.hasMultipleBirthIntegerType()).isFalse(); 
-    assertThat(patientBirthMultY.hasMultipleBirthBooleanType()).isTrue(); 
-    assertThat(patientBirthMultY.getMultipleBirthBooleanType().booleanValue()).isTrue();  
+    Patient patientObjMultipleBooleanYOnly = createPatientFromHl7Segment(patientMsgMultipleBooleanYOnly);
+    assertThat(patientObjMultipleBooleanYOnly.hasMultipleBirth()).isTrue();   
+    assertThat(patientObjMultipleBooleanYOnly.hasMultipleBirthIntegerType()).isFalse(); 
+    assertThat(patientObjMultipleBooleanYOnly.hasMultipleBirthBooleanType()).isTrue(); 
+    assertThat(patientObjMultipleBooleanYOnly.getMultipleBirthBooleanType().booleanValue()).isTrue();  
 
     // A number supercedes any boolean value, and multiple births are assumed true 
-    Patient patientBirthNumber = createPatientFromHl7Segment(patientMultipleNumberOnly);
-    assertThat(patientBirthNumber.hasMultipleBirth()).isTrue();   
-    assertThat(patientBirthNumber.hasMultipleBirthIntegerType()).isTrue(); 
-    assertThat(patientBirthNumber.hasMultipleBirthBooleanType()).isFalse(); 
-    assertThat(patientBirthNumber.getMultipleBirthIntegerType().asStringValue()).isEqualTo("2"); 
+    Patient patientObjMultipleNumberOnly = createPatientFromHl7Segment(patientMsgMultipleNumberOnly);
+    assertThat(patientObjMultipleNumberOnly.hasMultipleBirth()).isTrue();   
+    assertThat(patientObjMultipleNumberOnly.hasMultipleBirthIntegerType()).isTrue(); 
+    assertThat(patientObjMultipleNumberOnly.hasMultipleBirthBooleanType()).isFalse(); 
+    assertThat(patientObjMultipleNumberOnly.getMultipleBirthIntegerType().asStringValue()).isEqualTo("2"); 
 
-    Patient patientBirthNumberBool = createPatientFromHl7Segment(patientMultipleNumberAndBooleanY);
-    assertThat(patientBirthNumberBool.hasMultipleBirth()).isTrue();   
-    assertThat(patientBirthNumberBool.hasMultipleBirthIntegerType()).isTrue(); 
-    assertThat(patientBirthNumberBool.hasMultipleBirthBooleanType()).isFalse(); 
-    assertThat(patientBirthNumberBool.getMultipleBirthIntegerType().asStringValue()).isEqualTo("3");  //DateUtil.formatToDate
+    Patient patientObjMultipleNumberAndBooleanY = createPatientFromHl7Segment(patientMsgMultipleNumberAndBooleanY);
+    assertThat(patientObjMultipleNumberAndBooleanY.hasMultipleBirth()).isTrue();   
+    assertThat(patientObjMultipleNumberAndBooleanY.hasMultipleBirthIntegerType()).isTrue(); 
+    assertThat(patientObjMultipleNumberAndBooleanY.hasMultipleBirthBooleanType()).isFalse(); 
+    assertThat(patientObjMultipleNumberAndBooleanY.getMultipleBirthIntegerType().asStringValue()).isEqualTo("3");  //DateUtil.formatToDate
   }
 
   private static Patient createPatientFromHl7Segment(String inputSegment){
