@@ -222,7 +222,7 @@ public class FHIRConverterTest {
   }
 
   private void verifyResult(String json, BundleType expectedBundleType, String expectedStatus ){
-
+//Discuss Logic
     FHIRContext context = new FHIRContext();
     IBaseResource bundleResource = context.getParser().parseResource(json);
     assertThat(bundleResource).isNotNull();
