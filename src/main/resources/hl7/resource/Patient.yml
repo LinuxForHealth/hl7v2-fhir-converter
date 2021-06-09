@@ -48,7 +48,6 @@ multipleBirthInteger:
      valueOf: PID.25
      expressionType: HL7Spec  
      vars:
-          multBool: PID.24
           multInt: PID.25      
 
 deceasedBoolean:
@@ -66,6 +65,5 @@ deceasedDateTime:
      valueOf: PID.29
      expressionType: HL7Spec  
      vars:
-          deceasedBool: PID.30
           deceasedDateTime: PID.29      
     
