@@ -15,6 +15,7 @@ import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
 import org.hl7.fhir.r4.model.Bundle.BundleType;
+import org.hl7.fhir.r4.model.DiagnosticReport;
 import org.hl7.fhir.r4.model.Resource;
 import org.hl7.fhir.r4.model.ResourceType;
 import org.junit.Rule;
@@ -123,8 +124,9 @@ public class FHIRConverterTest {
 
   @Test
   public void test_ORU_r01_without_status() throws IOException {
+    // in the following line: "PID|1||PATID5421^^^NIST MPI^MR" we will close the space  between  NIST and MPI until issue #65 (white space bug) is resolved
     String ORU_r01 = "MSH|^~\\&|NIST Test Lab APP|NIST Lab Facility||NIST EHR Facility|20150926140551||ORU^R01|NIST-LOI_5.0_1.1-NG|T|2.5.1|||AL|AL|||||\r" +
-            "PID|1||PATID5421^^^NIST MPI^MR||Wilson^Patrice^Natasha^^^^L||19820304|F||2106-3^White^HL70005|144 East 12th Street^^Los Angeles^CA^90012^^H||^PRN^PH^^^203^2290210|||||||||N^Not Hispanic or Latino^HL70189\r" +
+            "PID|1||PATID5421^^^NISTMPI^MR||Wilson^Patrice^Natasha^^^^L||19820304|F||2106-3^White^HL70005|144 East 12th Street^^Los Angeles^CA^90012^^H||^PRN^PH^^^203^2290210|||||||||N^Not Hispanic or Latino^HL70189\r" +
             "ORC|NW|ORD448811^NIST EHR|R-511^NIST Lab Filler||||||20120628070100|||5742200012^Radon^Nicholas^^^^^^NPI^L^^^NPI\r" +
             "OBR|1|ORD448811^NIST EHR|R-511^NIST Lab Filler|1000^Hepatitis A B C Panel^99USL|||20120628070100|||||||||5742200012^Radon^Nicholas^^^^^^NPI^L^^^NPI\r" +
             "OBX|1|CWE|22314-9^Hepatitis A virus IgM Ab [Presence] in Serum^LN^HAVM^Hepatitis A IgM antibodies (IgM anti-HAV)^L^2.52||260385009^Negative (qualifier value)^SCT^NEG^NEGATIVE^L^201509USEd^^Negative (qualifier value)||Negative|N|||F|||20150925|||||201509261400\r" +
@@ -133,9 +135,8 @@ public class FHIRConverterTest {
 
     HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
     String json = ftv.convert(ORU_r01, OPTIONS);
-    String expectedStatus = "unknown";
-    verifyResult(json, Constants.DEFAULT_BUNDLE_TYPE, expectedStatus);
-//opened a pr on my local branch to discuss this unit test
+    DiagnosticReport expectStatusUnknown = verifyResult(json);
+    assertThat(expectStatusUnknown.hasStatusElement());
   }
 
   @Test
@@ -221,8 +222,7 @@ public class FHIRConverterTest {
     verifyResult(json, expectedBundleType, true);
   }
 
-  private void verifyResult(String json, BundleType expectedBundleType, String expectedStatus ){
-//Discuss Logic
+  private DiagnosticReport verifyResult(String json ){
     FHIRContext context = new FHIRContext();
     IBaseResource bundleResource = context.getParser().parseResource(json);
     assertThat(bundleResource).isNotNull();
@@ -232,6 +232,9 @@ public class FHIRConverterTest {
             e.stream().filter(v -> ResourceType.DiagnosticReport == v.getResource().getResourceType())
                     .map(BundleEntryComponent::getResource).collect(Collectors.toList());
     assertThat(diagnosticReport).hasSize(1);
+    String s = context.getParser().encodeResourceToString(diagnosticReport.get(0));
+    Class<? extends IBaseResource> klass = DiagnosticReport.class;
+    return (DiagnosticReport) context.getParser().parseResource(klass, s);
   }
 
 
