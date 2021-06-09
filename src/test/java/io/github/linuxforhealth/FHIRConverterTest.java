@@ -124,7 +124,6 @@ public class FHIRConverterTest {
 
   @Test
   public void test_ORU_r01_without_status() throws IOException {
-    // in the following line: "PID|1||PATID5421^^^NIST MPI^MR" we will close the space  between  NIST and MPI until issue #65 (white space bug) is resolved
     String ORU_r01 = "MSH|^~\\&|NIST Test Lab APP|NIST Lab Facility||NIST EHR Facility|20150926140551||ORU^R01|NIST-LOI_5.0_1.1-NG|T|2.5.1|||AL|AL|||||\r" +
             "PID|1||PATID5421^^^NISTMPI^MR||Wilson^Patrice^Natasha^^^^L||19820304|F||2106-3^White^HL70005|144 East 12th Street^^Los Angeles^CA^90012^^H||^PRN^PH^^^203^2290210|||||||||N^Not Hispanic or Latino^HL70189\r" +
             "ORC|NW|ORD448811^NIST EHR|R-511^NIST Lab Filler||||||20120628070100|||5742200012^Radon^Nicholas^^^^^^NPI^L^^^NPI\r" +
@@ -135,7 +134,20 @@ public class FHIRConverterTest {
 
     HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
     String json = ftv.convert(ORU_r01, OPTIONS);
-    DiagnosticReport expectStatusUnknown = verifyResult(json);
+
+    FHIRContext context = new FHIRContext();
+    IBaseResource bundleResource = context.getParser().parseResource(json);
+    assertThat(bundleResource).isNotNull();
+    Bundle b = (Bundle) bundleResource;
+    List<BundleEntryComponent> e = b.getEntry();
+    List<Resource> diagnosticReport =
+            e.stream().filter(v -> ResourceType.DiagnosticReport == v.getResource().getResourceType())
+                    .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+    assertThat(diagnosticReport).hasSize(1);
+
+    String s = context.getParser().encodeResourceToString(diagnosticReport.get(0));
+    Class<? extends IBaseResource> klass = DiagnosticReport.class;
+    DiagnosticReport expectStatusUnknown = (DiagnosticReport) context.getParser().parseResource(klass, s);
     assertThat(expectStatusUnknown.hasStatusElement());
   }
 
@@ -221,22 +233,6 @@ public class FHIRConverterTest {
   private void verifyResult(String json, BundleType expectedBundleType) {
     verifyResult(json, expectedBundleType, true);
   }
-
-  private DiagnosticReport verifyResult(String json ){
-    FHIRContext context = new FHIRContext();
-    IBaseResource bundleResource = context.getParser().parseResource(json);
-    assertThat(bundleResource).isNotNull();
-    Bundle b = (Bundle) bundleResource;
-    List<BundleEntryComponent> e = b.getEntry();
-    List<Resource> diagnosticReport =
-            e.stream().filter(v -> ResourceType.DiagnosticReport == v.getResource().getResourceType())
-                    .map(BundleEntryComponent::getResource).collect(Collectors.toList());
-    assertThat(diagnosticReport).hasSize(1);
-    String s = context.getParser().encodeResourceToString(diagnosticReport.get(0));
-    Class<? extends IBaseResource> klass = DiagnosticReport.class;
-    return (DiagnosticReport) context.getParser().parseResource(klass, s);
-  }
-
 
   private void verifyResult(String json, BundleType expectedBundleType,
       boolean messageHeaderExpected) {
