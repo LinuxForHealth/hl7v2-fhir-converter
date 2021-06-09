@@ -115,7 +115,7 @@ public class Hl7PatientFHIRConversionTest {
   }
 
   @Test
-  public void patient_multiple_conversion_test() {
+  public void patient_multiple_birth_conversion_test() {
 
     String patientMsgEmptyMultiple =
     "MSH|^~\\&|MIICEHRApplication|MIIC|MIIC|MIIC|201705130822||VXU^V04^VXU_V04|test1100|P|2.5.1|||AL|AL|||||Z22^CDCPHINVS|^^^^^MIIC^SR^^^MIIC|MIIC\n"
