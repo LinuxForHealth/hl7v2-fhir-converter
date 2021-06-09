@@ -309,7 +309,7 @@ public class SimpleDataValueResolver {
         if (code != null) {
           return code;
         } else {
-          return "unknown";
+          return DiagnosticReportStatus.UNKNOWN.toCode();
         }
 
       };
