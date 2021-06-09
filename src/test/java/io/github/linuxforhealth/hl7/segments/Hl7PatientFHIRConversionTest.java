@@ -172,7 +172,6 @@ public class Hl7PatientFHIRConversionTest {
   private static Patient createPatientFromHl7Segment(String inputSegment){
     HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
     String json = ftv.convert(inputSegment, OPTIONS);
-    System.out.println(json.toString());
 
     assertThat(json).isNotBlank();
     FHIRContext context = new FHIRContext();
