@@ -32,3 +32,38 @@ birthDate:
      type: DATE
      valueOf: PID.7
      expressionType: HL7Spec
+
+multipleBirthBoolean:
+     condition: $multBool NOT_NULL && $multInt NULL
+     type: BOOLEAN
+     valueOf: PID.24
+     expressionType: HL7Spec  
+     vars:
+          multBool: PID.24
+          multInt: PID.25      
+
+multipleBirthInteger:
+     condition: $multInt NOT_NULL
+     type: INTEGER
+     valueOf: PID.25
+     expressionType: HL7Spec  
+     vars:
+          multInt: PID.25      
+
+deceasedBoolean:
+     condition: $deceasedBool NOT_NULL && $deceasedDateTime NULL
+     type: BOOLEAN
+     valueOf: PID.30
+     expressionType: HL7Spec  
+     vars:
+          deceasedBool: PID.30
+          deceasedDateTime: PID.29       
+
+deceasedDateTime:
+     condition: $deceasedDateTime NOT_NULL
+     type: DATE_TIME
+     valueOf: PID.29
+     expressionType: HL7Spec  
+     vars:
+          deceasedDateTime: PID.29      
+    
