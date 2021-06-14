@@ -13,6 +13,10 @@ import org.hl7.fhir.r4.model.StringType;
 import org.hl7.fhir.r4.model.Patient;
 import org.hl7.fhir.r4.model.Address;
 import org.hl7.fhir.r4.model.Period;
+
+import java.util.Calendar;
+import java.util.Date;
+
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -40,7 +44,7 @@ public class Hl7AddressFHIRConversionTest {
 
     String patientAddress =
     "MSH|^~\\&|MIICEHRApplication|MIIC|MIIC|MIIC|201705130822||VXU^V04^VXU_V04|test1100|P|2.5.1|||AL|AL|||||Z22^CDCPHINVS|^^^^^MIIC^SR^^^MIIC|MIIC\n"
-    + "PID|1||12345678^^^^MR|ALTID|Moose^Mickey^J^III^^^|Mother^Micky|20060504|M|Alias^Alias|2106-3^White^ HL70005|111 1st Street^Suite #1^Minneapolis^MN^11111^USA^H^^AdrC^^^20011120&20081120^^^^Y^Z^V^c/o Pluto19|PatC|^PRN^^^PH^555^5555555|^PRN^^^PH^555^666666|english|married|bhuddist|1234567_account|111-22-3333|||2186-5^not Hispanic or Latino^CDCREC|Born in USA|||USA||||\n"
+    + "PID|1||12345678^^^^MR|ALTID|Moose^Mickey^J^III^^^|Mother^Micky|20060504|M|Alias^Alias|2106-3^White^ HL70005|111 1st Street^Suite #1^Minneapolis^MN^11111^USA^H^^AdrC^^^20010101&20081231^^^^Y^Z^V^c/o Pluto19|PatC|^PRN^^^PH^555^5555555|^PRN^^^PH^555^666666|english|married|bhuddist|1234567_account|111-22-3333|||2186-5^not Hispanic or Latino^CDCREC|Born in USA|||USA||||\n"
     ;
 
     // If address county, ignore patient county
@@ -71,8 +75,19 @@ public class Hl7AddressFHIRConversionTest {
     assertThat(period.hasStart()).isTrue();
     assertThat(period.hasEnd()).isTrue(); 
     
-    assertThat(period.getStartElement().getValue().toString()).isEqualTo("Tue Nov 20 00:00:00 MST 2001");
-    assertThat(period.getEndElement().getValue().toString()).isEqualTo("Thu Nov 20 00:00:00 MST 2008");
+    Date startDate = period.getStart();
+    Calendar startCalendar = Calendar.getInstance();
+    startCalendar.setTime(startDate);
+    assertThat(startCalendar.get(Calendar.YEAR)).isEqualTo(2001);
+    assertThat(startCalendar.get(Calendar.MONTH)).isZero(); // Zero based; January is 0
+    assertThat(startCalendar.get(Calendar.DAY_OF_MONTH)).isEqualTo(1);
+
+    Date endDate = period.getEnd();
+    Calendar endCalendar = Calendar.getInstance();
+    endCalendar.setTime(endDate);
+    assertThat(endCalendar.get(Calendar.YEAR)).isEqualTo(2008);
+    assertThat(endCalendar.get(Calendar.MONTH)).isEqualTo(11); // Zero based; December is 11
+    assertThat(endCalendar.get(Calendar.DAY_OF_MONTH)).isEqualTo(31);
    
   }
 
