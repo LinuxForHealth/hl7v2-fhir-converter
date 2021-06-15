@@ -1,20 +1,11 @@
 #
-# (C) Copyright IBM Corp. 2021
+# (C) Copyright IBM Corp. 2020, 2021
 #
 # SPDX-License-Identifier: Apache-2.0
 #
 #Address derived from XAD - Extended Address
 ---
 
-# text: 
-#     type: STRING
-#     valueOf: 'GeneralUtils.generateName( prefix, given,family, suffix)'
-#     expressionType: JEXL
-#     vars:
-#       line: STRING XAD.3     
-#       city: STRING XAD.3
-#       state: STRING XAD.4
-#       postalCode: STRING XAD.5
 line:
      type: STRING
      valueOf: 'GeneralUtils.makeStringArray( street, suiteApt, addressee)'
@@ -29,6 +20,7 @@ city:
      type: STRING
      valueOf: XAD.3
      expressionType: HL7Spec
+     
 state:
      type: STRING
      valueOf: XAD.4
@@ -55,21 +47,22 @@ country:
 
 use: 
      type: STRING
-     valueOf: 'GeneralUtils.getAddressUse( xad7, xad16, xad17)'
+     valueOf: 'GeneralUtils.getAddressUse( xad7Type, xad16TempIndicator, xad17BadIndicator)'
      expressionType: JEXL
      vars:
-          xad7: String, XAD.7
-          xad16: String, XAD.16
-          xad17: String, XAD.17
+          xad7Type: String, XAD.7
+          xad16TempIndicator: String, XAD.16
+          xad17BadIndicator: String, XAD.17
 
 type: 
      type: STRING
-     valueOf: 'GeneralUtils.getAddressType( xad7, xad18)'
+     valueOf: 'GeneralUtils.getAddressType( xad7Type, xad18Usage)'
      expressionType: JEXL
      vars:
-          xad7: String, XAD.7
-          xad18: String, XAD.18
-        
+          xad7Type: String, XAD.7
+          xad18Usage: String, XAD.18
+
+# date range        
 period_1:
     valueOf: datatype/Period
     expressionType: resource
@@ -77,6 +70,7 @@ period_1:
        start: XAD.12.1 
        end: XAD.12.2
 
+# explicit date effective (start) and expiration (end)
 period_2:
     valueOf: datatype/Period
     expressionType: resource

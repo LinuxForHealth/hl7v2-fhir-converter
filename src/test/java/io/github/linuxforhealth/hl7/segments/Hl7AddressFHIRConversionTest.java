@@ -29,15 +29,6 @@ public class Hl7AddressFHIRConversionTest {
   public ExpectedException exceptionRule = ExpectedException.none();
 
 
-  /**
-   * In order to generate messageHeader resource, MSH should have MSH.24.2 as this is required
-   * attribute for source attribute, and source is required for MessageHeader resource.
-   * 
-   * @throws IOException
-   */
-
-
-
   @Test
 
   public void patient_address_extended_test() {
@@ -47,7 +38,6 @@ public class Hl7AddressFHIRConversionTest {
     + "PID|1||12345678^^^^MR|ALTID|Moose^Mickey^J^III^^^|Mother^Micky|20060504|M|Alias^Alias|2106-3^White^ HL70005|111 1st Street^Suite #1^Minneapolis^MN^11111^USA^H^^AdrC^^^20010101&20081231^^^^Y^Z^V^c/o Pluto19|PatC|^PRN^^^PH^555^5555555|^PRN^^^PH^555^666666|english|married|bhuddist|1234567_account|111-22-3333|||2186-5^not Hispanic or Latino^CDCREC|Born in USA|||USA||||\n"
     ;
 
-    // If address county, ignore patient county
     Patient patient = PatientUtils.createPatientFromHl7Segment(patientAddress);
     assertThat(patient.hasAddress()).isTrue();
     List<Address> addresses = patient.getAddress(); 
@@ -67,14 +57,36 @@ public class Hl7AddressFHIRConversionTest {
     assertThat(lines.get(2).toString()).isEqualTo("c/o Pluto19");
 
     assertThat(address.hasUse()).isTrue(); 
-
     assertThat(address.getUse().toString()).isEqualTo("TEMP");
     assertThat(address.getType().toString()).isEqualTo("PHYSICAL");
 
+  }
+
+  @Test
+  public void patient_address_date_ranges_test() {
+
+    String patientAddress =
+    "MSH|^~\\&|MIICEHRApplication|MIIC|MIIC|MIIC|201705130822||VXU^V04^VXU_V04|test1100|P|2.5.1|||AL|AL|||||Z22^CDCPHINVS|^^^^^MIIC^SR^^^MIIC|MIIC\n"
+    + "PID|1||12345678^^^^MR|ALTID|Moose^Mickey^J^III^^^|Mother^Micky|20060504|M|Alias^Alias|2106-3^White^ HL70005|111 1st Street^Suite #1^Minneapolis^MN^11111^USA^H^^AdrC^^^20010101&20081231^^^^Y^Z^V^c/o Pluto19|PatC|^PRN^^^PH^555^5555555|^PRN^^^PH^555^666666|english|married|bhuddist|1234567_account|111-22-3333|||2186-5^not Hispanic or Latino^CDCREC|Born in USA|||USA||||\n"
+    ;
+
+    String patientAddressExplicitEffectiveExpirationDates =
+    "MSH|^~\\&|MIICEHRApplication|MIIC|MIIC|MIIC|201705130822||VXU^V04^VXU_V04|test1100|P|2.5.1|||AL|AL|||||Z22^CDCPHINVS|^^^^^MIIC^SR^^^MIIC|MIIC\n"
+    + "PID|1||12345678^^^^MR|ALTID|Moose^Mickey^J^III^^^|Mother^Micky|20060504|M|Alias^Alias|2106-3^White^ HL70005|111 1st Street^Suite #1^Minneapolis^MN^11111^USA^H^^AdrC^^^20010101&20081231^19920101^19981231^^Y^Z^V^c/o Pluto19|PatC|^PRN^^^PH^555^5555555|^PRN^^^PH^555^666666|english|married|bhuddist|1234567_account|111-22-3333|||2186-5^not Hispanic or Latino^CDCREC|Born in USA|||USA||||\n"
+    ;
+
+    // If address county, ignore patient county
+    Patient patient = PatientUtils.createPatientFromHl7Segment(patientAddress);
+    assertThat(patient.hasAddress()).isTrue();
+    List<Address> addresses = patient.getAddress(); 
+    assertThat(addresses.size()).isEqualTo(1);
+    Address address = addresses.get(0); 
+
+      // Test date range
     Period period = address.getPeriod();
     assertThat(period.hasStart()).isTrue();
     assertThat(period.hasEnd()).isTrue(); 
-    
+
     Date startDate = period.getStart();
     Calendar startCalendar = Calendar.getInstance();
     startCalendar.setTime(startDate);
@@ -88,9 +100,33 @@ public class Hl7AddressFHIRConversionTest {
     assertThat(endCalendar.get(Calendar.YEAR)).isEqualTo(2008);
     assertThat(endCalendar.get(Calendar.MONTH)).isEqualTo(11); // Zero based; December is 11
     assertThat(endCalendar.get(Calendar.DAY_OF_MONTH)).isEqualTo(31);
+
+    // Test explicit date start (effective) and end (expiration)
+    patient = PatientUtils.createPatientFromHl7Segment(patientAddressExplicitEffectiveExpirationDates);
+    assertThat(patient.hasAddress()).isTrue();
+    addresses = patient.getAddress(); 
+    assertThat(addresses.size()).isEqualTo(1);
+    address = addresses.get(0); 
+
+    period = address.getPeriod();
+    assertThat(period.hasStart()).isTrue();
+    assertThat(period.hasEnd()).isTrue(); 
+
+    startDate = period.getStart();
+    startCalendar = Calendar.getInstance();
+    startCalendar.setTime(startDate);
+    assertThat(startCalendar.get(Calendar.YEAR)).isEqualTo(1992);
+    assertThat(startCalendar.get(Calendar.MONTH)).isZero(); // Zero based; January is 0
+    assertThat(startCalendar.get(Calendar.DAY_OF_MONTH)).isEqualTo(1);
+
+    endDate = period.getEnd();
+    endCalendar = Calendar.getInstance();
+    endCalendar.setTime(endDate);
+    assertThat(endCalendar.get(Calendar.YEAR)).isEqualTo(1998);
+∫    assertThat(endCalendar.get(Calendar.MONTH)).isEqualTo(11); // Zero based; December is 11
+    assertThat(endCalendar.get(Calendar.DAY_OF_MONTH)).isEqualTo(31);
    
   }
-
 
   @Test
   // District / County conversion testing is unique because it behaves differently when there are multiple addresses
