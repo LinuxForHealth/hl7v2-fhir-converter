@@ -123,7 +123,7 @@ public class Hl7AddressFHIRConversionTest {
     endCalendar = Calendar.getInstance();
     endCalendar.setTime(endDate);
     assertThat(endCalendar.get(Calendar.YEAR)).isEqualTo(1998);
-∫    assertThat(endCalendar.get(Calendar.MONTH)).isEqualTo(11); // Zero based; December is 11
+    assertThat(endCalendar.get(Calendar.MONTH)).isEqualTo(11); // Zero based; December is 11
     assertThat(endCalendar.get(Calendar.DAY_OF_MONTH)).isEqualTo(31);
    
   }
