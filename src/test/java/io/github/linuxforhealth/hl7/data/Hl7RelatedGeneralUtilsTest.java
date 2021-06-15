@@ -1,14 +1,18 @@
 /*
- * (C) Copyright IBM Corp. 2020
+ * (C) Copyright IBM Corp. 2020, 2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
 package io.github.linuxforhealth.hl7.data;
 
 import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.List;
+
 import org.hl7.fhir.r4.model.codesystems.EncounterStatus;
 import org.junit.Test;
-import io.github.linuxforhealth.hl7.data.Hl7RelatedGeneralUtils;
+
+
 
 public class Hl7RelatedGeneralUtilsTest {
 
@@ -110,4 +114,68 @@ public class Hl7RelatedGeneralUtilsTest {
     assertThat(val).isEqualTo("5.9");
   }
 
+
+  @Test
+  public void test_makeStringArray() {
+    // Test for 2
+    List<String> stringArray = Hl7RelatedGeneralUtils.makeStringArray("banana", "peach");
+    assertThat(stringArray.size()).isEqualTo(2);
+    assertThat(stringArray.get(0)).isEqualTo("banana");
+    // Test for 3
+    stringArray = Hl7RelatedGeneralUtils.makeStringArray("apple", "banana", "peach");
+    assertThat(stringArray.size()).isEqualTo(3);
+    assertThat(stringArray.get(0)).isEqualTo("apple");
+    // Test for 0; expect an empty array
+    stringArray = Hl7RelatedGeneralUtils.makeStringArray();
+    assertThat(stringArray.size()).isEqualTo(0);
+  }
+
+  @Test
+  public void test_getAddressUse() {
+    String ANYTHING = "anything";
+    // Inputs are XAD.7 Type, XAD.16 Temp Indicator, XAD.17 Bad address indicator
+    assertThat(Hl7RelatedGeneralUtils.getAddressUse("C","", ANYTHING)).isEqualTo("temp");
+    assertThat(Hl7RelatedGeneralUtils.getAddressUse(ANYTHING,"Y", ANYTHING)).isEqualTo("temp");
+    assertThat(Hl7RelatedGeneralUtils.getAddressUse("C",ANYTHING, ANYTHING)).isEqualTo("");
+    assertThat(Hl7RelatedGeneralUtils.getAddressUse("BA",ANYTHING, "")).isEqualTo("old");
+    assertThat(Hl7RelatedGeneralUtils.getAddressUse(ANYTHING,ANYTHING, "Y")).isEqualTo("old");
+    assertThat(Hl7RelatedGeneralUtils.getAddressUse("BA",ANYTHING, ANYTHING)).isEqualTo("");
+    assertThat(Hl7RelatedGeneralUtils.getAddressUse("H",ANYTHING, ANYTHING)).isEqualTo("home");
+    assertThat(Hl7RelatedGeneralUtils.getAddressUse("B",ANYTHING, ANYTHING)).isEqualTo("work");
+    assertThat(Hl7RelatedGeneralUtils.getAddressUse("O",ANYTHING, ANYTHING)).isEqualTo("work");
+    assertThat(Hl7RelatedGeneralUtils.getAddressUse("BI",ANYTHING, ANYTHING)).isEqualTo("billing");
+    assertThat(Hl7RelatedGeneralUtils.getAddressUse(ANYTHING,ANYTHING, ANYTHING)).isEqualTo("");
+
+  }
+
+  @Test
+  public void test_getAddressType() {
+    String ANYTHING = "anything";
+    // Inputs are XAD.7 Type, XAD.18 Type 
+    assertThat(Hl7RelatedGeneralUtils.getAddressType(ANYTHING, "M")).isEqualTo("postal");
+    assertThat(Hl7RelatedGeneralUtils.getAddressType("M","")).isEqualTo("postal");
+    assertThat(Hl7RelatedGeneralUtils.getAddressType("M",ANYTHING)).isEqualTo("");
+    assertThat(Hl7RelatedGeneralUtils.getAddressType(ANYTHING, "V")).isEqualTo("physical");
+    assertThat(Hl7RelatedGeneralUtils.getAddressType("SH","")).isEqualTo("physical");
+    assertThat(Hl7RelatedGeneralUtils.getAddressType("SH",ANYTHING)).isEqualTo("");
+    assertThat(Hl7RelatedGeneralUtils.getAddressType(ANYTHING,ANYTHING)).isEqualTo("");
+  }
+
+  @Test
+  public void test_getAddressDistrict() {
+    String ANYTHING = "anything";
+    
+    // Inputs are XAD.7 Type, XAD.18 Type 
+    assertThat(Hl7RelatedGeneralUtils.getAddressType(ANYTHING, "M")).isEqualTo("postal");
+    assertThat(Hl7RelatedGeneralUtils.getAddressType("M","")).isEqualTo("postal");
+    assertThat(Hl7RelatedGeneralUtils.getAddressType("M",ANYTHING)).isEqualTo("");
+    assertThat(Hl7RelatedGeneralUtils.getAddressType(ANYTHING, "V")).isEqualTo("physical");
+    assertThat(Hl7RelatedGeneralUtils.getAddressType("SH","")).isEqualTo("physical");
+    assertThat(Hl7RelatedGeneralUtils.getAddressType("SH",ANYTHING)).isEqualTo("");
+    assertThat(Hl7RelatedGeneralUtils.getAddressType(ANYTHING,ANYTHING)).isEqualTo("");
+  }
+
+  // Note: Utility  Hl7RelatedGeneralUtils.getAddressDistrict is more effectively tested as part of Patient Address testing
+
 }
+

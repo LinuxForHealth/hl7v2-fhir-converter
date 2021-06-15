@@ -1,5 +1,5 @@
 #
-# (C) Copyright IBM Corp. 2020
+# (C) Copyright IBM Corp. 2020, 2021
 #
 # SPDX-License-Identifier: Apache-2.0
 #
@@ -27,6 +27,12 @@ gender:
      type: ADMINISTRATIVE_GENDER
      valueOf: PID.8
      expressionType: HL7Spec
+
+address:
+    valueOf: datatype/Address
+    generateList: true
+    expressionType: resource
+    specs: PID.11
 
 birthDate:
      type: DATE
@@ -65,5 +71,7 @@ deceasedDateTime:
      valueOf: PID.29
      expressionType: HL7Spec  
      vars:
-          deceasedDateTime: PID.29      
+          deceasedDateTime: PID.29  
+          
+      
     
