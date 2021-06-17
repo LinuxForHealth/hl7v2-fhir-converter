@@ -1,0 +1,32 @@
+#
+# (C) Copyright IBM Corp. 2020, 2021
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+---
+
+# This datatype differs from Identifier and IdentifierGen
+# by requiring a system for completeness.
+
+system: 
+     type: SYSTEM_URL
+     valueOf: $system
+    
+value: 
+     type: STRING
+     valueOf: $id
+     required: true
+
+period:  
+    valueOf: datatype/Period
+    expressionType: resource
+    vars: 
+       start: $start
+       end: $end
+assigner:
+   valueOf: resource/Organization_Simple
+   expressionType: reference
+   vars:
+     name: 'Assigning Authority'
+     id: $assigner
+
