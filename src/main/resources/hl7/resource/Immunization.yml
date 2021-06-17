@@ -78,6 +78,9 @@ doseQuantity:
    valueOf: datatype/Quantity
    expressionType: resource
    specs: RXA.6| RXA.7
+   vars:
+      value: RXA.6
+      unit: RXA.7
 performer:
    valueOf: secondary/Performer
    expressionType: resource
