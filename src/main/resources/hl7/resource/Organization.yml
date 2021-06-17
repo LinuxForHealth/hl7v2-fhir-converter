@@ -9,7 +9,7 @@ id:
    valueOf: UUID.randomUUID()
    expressionType: JEXL
 identifier:
-   valueOf: datatype/IdentifierSystem
+   valueOf: datatype/IdentifierGen
    generateList: true  
    expressionType: resource
    vars:
