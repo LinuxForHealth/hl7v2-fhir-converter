@@ -4465,12 +4465,10 @@
   description: "United States Social Security Number"
   url: "http://hl7.org/fhir/sid/us-ssn"
   oid: "urn:oid:2.16.840.1.113883.4.1"
-  
 - id: "MCD"
   description: "United States Medicare Number"
   url: "http://hl7.org/fhir/sid/us-medicare"
   oid: "urn:oid:2.16.840.1.113883.4.572"
-  
 - id: "MCR"
   description: "United States Medicare Number"
   url: "http://hl7.org/fhir/sid/us-medicare"
@@ -4486,12 +4484,10 @@
   description: "United States National Provider Identifier"
   url: "http://hl7.org/fhir/sid/us-npi"
   oid: "urn:oid:2.16.840.1.113883.4.6"
-
 - id: "AllLanguages"
   description: "languages"
   url: "http://hl7.org/fhir/ValueSet/all-languages"
   oid: "urn:oid:2.16.840.1.113883.4.642.3.21"
-
 - id: "HL70064"
   description: "Financial Class (HL7)"
   url: "https://phinvads.cdc.gov/vads/ViewCodeSystem.action?id=2.16.840.1.113883.12.64#"
