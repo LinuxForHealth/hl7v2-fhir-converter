@@ -180,7 +180,6 @@ String hl7message =
     Quantity dosage = expectDoseQuantity.getDoseQuantity();
     BigDecimal value = dosage.getValue();
     String  unit = dosage.getUnit();
-    assertThat(expectDoseQuantity.hasDoseQuantity()).isTrue();
     assertThat(value).isEqualTo(BigDecimal.valueOf(.5));
     assertThat(unit).isEqualTo("mL");
   }
