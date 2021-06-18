@@ -255,8 +255,8 @@ public class FHIRConverterTest {
     Immunization immunization = (Immunization) obsResource.get(0);
 
     // Check that organization identifier (MVX) has a system
-    Organization r = (Organization) immunization.getManufacturer().getResource();
-    List<Identifier> li = r.getIdentifier();
+    Organization org = (Organization) immunization.getManufacturer().getResource();
+    List<Identifier> li = org.getIdentifier();
     Identifier ident = li.get(0);
     assertThat(ident.hasSystem()).isTrue();
     assertThat(ident.getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/MVX");
