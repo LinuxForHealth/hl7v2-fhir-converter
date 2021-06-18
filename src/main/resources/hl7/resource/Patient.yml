@@ -71,7 +71,10 @@ deceasedDateTime:
      valueOf: PID.29
      expressionType: HL7Spec  
      vars:
-          deceasedDateTime: PID.29  
-          
-      
-    
+          deceasedDateTime: PID.29
+
+martialStatus:
+  valueOf: datatype/CodeableConcept
+  generateList: true
+  expressionType: resource
+  specs: PID.16

@@ -63,4 +63,21 @@ MessageReasonEncounter:
 SpecimenStatus:
   Y: available
   N: unavailable
-   
+
+MaritalStatus:
+  A: L
+  B: U
+  C: U
+  D: D
+  E: L
+  G: U
+  I: I
+  M: M
+  N: A
+  O: UNK
+  P: T
+  R: T
+  S: S
+  T: S
+  U: UNK
+  W: W
