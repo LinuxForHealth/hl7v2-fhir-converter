@@ -8,11 +8,12 @@ package io.github.linuxforhealth;
 import static org.assertj.core.api.Assertions.assertThat;
 import java.io.File;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.hl7.fhir.instance.model.api.IBaseResource;
-import org.hl7.fhir.r4.model.Bundle;
+import org.hl7.fhir.r4.model.*;
 import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
 import org.hl7.fhir.r4.model.Bundle.BundleType;
 import org.hl7.fhir.r4.model.Coding;
@@ -141,6 +142,38 @@ public class FHIRConverterTest {
 
     assertThat(expectStatusUnknown.hasStatus());
     assertThat(status).isEqualTo(DiagnosticReport.DiagnosticReportStatus.UNKNOWN);
+  }
+
+  @Test
+  public void test_dosage_output() throws  IOException {
+String hl7message =
+                "MSH|^~\\&|MyEMR|DE-000001| |CAIRLO|20160701123030-0700||VXU^V04^VXU_V04|CA0001|P|2.6|||ER|AL|||||Z22^CDCPHINVS|DE-000001\r" +
+                "PID|1||PA123456^^^MYEMR^MR||JONES^GEORGE^M^JR^^^L|MILLER^MARTHA^G^^^^M|20140227|M||2106-3^WHITE^CDCREC|1234 W FIRST ST^^BEVERLY HILLS^CA^90210^^H||^PRN^PH^^^555^5555555||ENG^English^HL70296|||||||2186-5^ not Hispanic or Latino^CDCREC||Y|2\r" +
+                "ORC|RE||197023^CMC|||||||^Clark^Dave||1234567890^Smith^Janet^^^^^^NPPES^L^^^NPI^^^^^^^^MD\r" +
+                "RXA|0|1|20140730||08^HEPB-PEDIATRIC/ADOLESCENT^CVX|.5|mL^mL^UCUM||00^NEW IMMUNIZATION RECORD^NIP001|1234567890^Smith^Janet^^^^^^NPPES^^^^NPI^^^^^^^^MD |^^^DE-000001||||0039F|20200531|MSD^MERCK^MVX|||CP|A";
+
+    HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
+    String json = ftv.convert(hl7message, OPTIONS);
+
+    FHIRContext context = new FHIRContext();
+    IBaseResource bundleResource = context.getParser().parseResource(json);
+    assertThat(bundleResource).isNotNull();
+    Bundle b = (Bundle) bundleResource;
+    List<BundleEntryComponent> e = b.getEntry();
+    List<Resource> immunization =
+            e.stream().filter(v -> ResourceType.Immunization == v.getResource().getResourceType())
+                    .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+    assertThat(immunization).hasSize(1);
+
+    String s = context.getParser().encodeResourceToString(immunization.get(0));
+    Class<? extends IBaseResource> klass = Immunization.class;
+    Immunization expectDoseQuantity = (Immunization) context.getParser().parseResource(klass, s);
+    assertThat(expectDoseQuantity.hasDoseQuantity()).isTrue();
+    Quantity dosage = expectDoseQuantity.getDoseQuantity();
+    BigDecimal value = dosage.getValue();
+    String  unit = dosage.getUnit();
+    assertThat(value).isEqualTo(BigDecimal.valueOf(.5));
+    assertThat(unit).isEqualTo("mL");
   }
 
   @Test
