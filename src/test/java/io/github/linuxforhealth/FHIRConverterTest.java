@@ -199,7 +199,7 @@ String hl7message =
   public void patient_marital_status_test(){
     String marriedPatient =
             "MSH|^~\\&|MyEMR|DE-000001| |CAIRLO|20160701123030-0700||VXU^V04^VXU_V04|CA0001|P|2.6|||ER|AL|||||Z22^CDCPHINVS|DE-000001\r" +
-                    "PID|1||000054321^^^MRN||COOPER^SHELDON^ANDREW||19820512|M||2106-3|765 SOMESTREET RD UNIT 3A^^PASADENA^LA^558846^United States of America||4652141486^Home^^shelly@gmail.com||EN^English|S|CAT|78654||||N\r";
+                    "PID|1||000054321^^^MRN||COOPER^SHELDON^ANDREW||19820512|M||2106-3|765 SOMESTREET RD UNIT 3A^^PASADENA^LA^558846^United States of America||4652141486^Home^^shelly@gmail.com||EN^English|O|CAT|78654||||N\r";
 
 
     HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();

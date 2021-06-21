@@ -175,6 +175,22 @@ public class Hl7RelatedGeneralUtilsTest {
     assertThat(Hl7RelatedGeneralUtils.getAddressType(ANYTHING,ANYTHING)).isEqualTo("");
   }
 
+  @Test
+  public void test_getMaritaStatus() {
+
+    assertThat(Hl7RelatedGeneralUtils.getMaritalStatusCode("A")).isEqualTo("Annulled");
+    assertThat(Hl7RelatedGeneralUtils.getMaritalStatusCode("D")).isEqualTo("Divorced");
+    assertThat(Hl7RelatedGeneralUtils.getMaritalStatusCode("I")).isEqualTo("Interlocutory");
+    assertThat(Hl7RelatedGeneralUtils.getMaritalStatusCode("L")).isEqualTo("Legally Separated");
+    assertThat(Hl7RelatedGeneralUtils.getMaritalStatusCode("M")).isEqualTo("Married");
+    assertThat(Hl7RelatedGeneralUtils.getMaritalStatusCode("P")).isEqualTo("Polygamous");
+    assertThat(Hl7RelatedGeneralUtils.getMaritalStatusCode("S")).isEqualTo("Never Married");
+    assertThat(Hl7RelatedGeneralUtils.getMaritalStatusCode("T")).isEqualTo("Domestic partner");
+    assertThat(Hl7RelatedGeneralUtils.getMaritalStatusCode("U")).isEqualTo("unmarried");
+    assertThat(Hl7RelatedGeneralUtils.getMaritalStatusCode("W")).isEqualTo("Widowed");
+
+  }
+
   // Note: Utility  Hl7RelatedGeneralUtils.getAddressDistrict is more effectively tested as part of Patient Address testing
 
 }
