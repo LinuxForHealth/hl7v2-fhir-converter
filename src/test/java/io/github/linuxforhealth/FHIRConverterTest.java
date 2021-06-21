@@ -145,6 +145,18 @@ public class FHIRConverterTest {
   }
 
   @Test
+  public void test_patient_name() {
+    String hl7message =
+            "MSH|^~\\&|MyEMR|DE-000001| |CAIRLO|20160701123030-0700||VXU^V04^VXU_V04|CA0001|P|2.6|||ER|AL|||||Z22^CDCPHINVS|DE-000001\r" +
+                    "PID|1||PA123456^^^MYEMR^MR||JONES^GEORGE^D^JR^^^L|MILLER^MARTHA^G^^^^M|20140227|M||2106-3^WHITE^CDCREC|1234 W FIRST ST^^BEVERLY HILLS^CA^90210^^H||^PRN^PH^^^555^5555555||ENG^English^HL70296|||||||2186-5^ not Hispanic or Latino^CDCREC||Y|2\r";
+
+    HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
+    String json = ftv.convert(hl7message, OPTIONS);
+
+    System.out.println(json);
+
+  }
+  @Test
   public void test_dosage_output() throws  IOException {
 String hl7message =
                 "MSH|^~\\&|MyEMR|DE-000001| |CAIRLO|20160701123030-0700||VXU^V04^VXU_V04|CA0001|P|2.6|||ER|AL|||||Z22^CDCPHINVS|DE-000001\r" +

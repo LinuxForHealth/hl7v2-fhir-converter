@@ -149,7 +149,29 @@ public class Hl7RelatedGeneralUtils {
 
 	  return result;
   }
+  public static String getNameUse(String nameCode) {
+    LOGGER.info("Calculating nameUse Use from nameCode {}", nameCode);
 
+    String nameUse = "";
+
+    if (nameCode.equalsIgnoreCase("D") ) {
+      nameUse = "usual";
+    } else if (nameCode.equalsIgnoreCase("L") ) {
+      nameUse = "official";
+    } else if (nameCode.equalsIgnoreCase("TEMP")) {
+      nameUse = "temp";
+    } else if (nameCode.equalsIgnoreCase("N")) {
+      nameUse = "nickname";
+    } else if (nameCode.equalsIgnoreCase("S")) {
+      nameUse = "anonymous";
+    } else if (nameCode.equalsIgnoreCase("NOUSE") || nameCode.equalsIgnoreCase("BAD") ) {
+      nameUse = "old";
+    } else if (nameCode.equalsIgnoreCase("M")) {
+      nameUse = "maiden";
+    }
+    return nameUse;
+
+  }
 
   public static String getAddressUse(String xad7Type, String xad16Temp, String xad17Bad) {
     LOGGER.info("Calculating address Use from XAD.7 {}, XAD.16 {}, XAD.17 {}", xad7Type,

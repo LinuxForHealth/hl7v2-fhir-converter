@@ -129,6 +129,19 @@ public class Hl7RelatedGeneralUtilsTest {
     stringArray = Hl7RelatedGeneralUtils.makeStringArray();
     assertThat(stringArray.size()).isEqualTo(0);
   }
+  @Test
+  public void test_getNameUse() {
+
+    assertThat(Hl7RelatedGeneralUtils.getNameUse("D")).isEqualTo("usual");
+    assertThat(Hl7RelatedGeneralUtils.getNameUse("L")).isEqualTo("official");
+    assertThat(Hl7RelatedGeneralUtils.getNameUse("TEMP")).isEqualTo("temp");
+    assertThat(Hl7RelatedGeneralUtils.getNameUse("N")).isEqualTo("nickname");
+    assertThat(Hl7RelatedGeneralUtils.getNameUse("S")).isEqualTo("anonymous");
+    assertThat(Hl7RelatedGeneralUtils.getNameUse("NOUSE")).isEqualTo("old");
+    assertThat(Hl7RelatedGeneralUtils.getNameUse("BAD")).isEqualTo("old");
+    assertThat(Hl7RelatedGeneralUtils.getNameUse("M")).isEqualTo("maiden");
+
+  }
 
   @Test
   public void test_getAddressUse() {
