@@ -145,32 +145,6 @@ public class FHIRConverterTest {
   }
 
   @Test
-  public void test_patient_name() {
-    String hl7message =
-            "MSH|^~\\&|MyEMR|DE-000001| |CAIRLO|20160701123030-0700||VXU^V04^VXU_V04|CA0001|P|2.6|||ER|AL|||||Z22^CDCPHINVS|DE-000001\r" +
-                    "PID|1||PA123456^^^MYEMR^MR||JONES^GEORGE^NOUSE^JR^^^L|MILLER^MARTHA^G^^^^M|20140227|M||2106-3^WHITE^CDCREC|1234 W FIRST ST^^BEVERLY HILLS^CA^90210^^H||^PRN^PH^^^555^5555555||ENG^English^HL70296|||||||2186-5^ not Hispanic or Latino^CDCREC||Y|2\r";
-
-    HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
-    String json = ftv.convert(hl7message, OPTIONS);
-
-    FHIRContext context = new FHIRContext();
-    IBaseResource bundleResource = context.getParser().parseResource(json);
-    assertThat(bundleResource).isNotNull();
-    Bundle b = (Bundle) bundleResource;
-    List<BundleEntryComponent> e = b.getEntry();
-    List<Resource> patient = e.stream()
-            .filter(v -> ResourceType.Patient == v.getResource().getResourceType())
-            .map(BundleEntryComponent::getResource).collect(Collectors.toList());
-
-    String s = context.getParser().encodeResourceToString(patient.get(0));
-    Class<? extends IBaseResource> klass = Patient.class;
-    Patient expectNameUseBAD= (Patient) context.getParser().parseResource(klass, s);
-    java.util.List<org.hl7.fhir.r4.model.HumanName> name = expectNameUseBAD.getName();
-    HumanName.NameUse useName =  name.get(0).getUse();
-    assertThat(useName).isEqualTo(HumanName.NameUse.OLD);
-
-  }
-  @Test
   public void test_dosage_output() throws  IOException {
 String hl7message =
                 "MSH|^~\\&|MyEMR|DE-000001| |CAIRLO|20160701123030-0700||VXU^V04^VXU_V04|CA0001|P|2.6|||ER|AL|||||Z22^CDCPHINVS|DE-000001\r" +
