@@ -25,6 +25,7 @@ import org.hl7.fhir.r4.model.Observation.ObservationStatus;
 import org.hl7.fhir.r4.model.Specimen.SpecimenStatus;
 import org.hl7.fhir.r4.model.codesystems.ConditionCategory;
 import org.hl7.fhir.r4.model.codesystems.MessageReasonEncounter;
+import org.hl7.fhir.r4.model.codesystems.NameUse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import io.github.linuxforhealth.api.ResourceValue;
@@ -167,6 +168,17 @@ public class SimpleDataValueResolver {
           return null;
         }
   };
+
+  public static final ValueExtractor<Object, String> NAME_USE_CODE_FHIR =
+          (Object value) -> {
+            String val = Hl7DataHandlerUtil.getStringValue(value);
+            String code = getFHIRCode(val, NameUse.class);
+            if (code != null) {
+              return code;
+            } else {
+              return null;
+            }
+          };
 
   public static final ValueExtractor<Object, Boolean> BOOLEAN = (Object value) -> {
     String val = Hl7DataHandlerUtil.getStringValue(value);

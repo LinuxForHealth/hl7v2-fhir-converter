@@ -28,11 +28,9 @@ prefix:
      valueOf: XPN.5 |XCN.6 |CNN.6 |NDL.6
      expressionType: HL7Spec
 use:
-  type: STRING
-  valueOf: 'GeneralUtils.getNameUse(use)'
-  expressionType: JEXL
-  vars:
-    use: String, XPN.3 |XCN.4 |CNN.4 |NDL.4
+  type: NAME_USE
+  valueOf: XPN.3 |XCN.4 |CNN.4 |NDL.4
+  expressionType: HL7Spec
 
 suffix: 
      type: STRING
