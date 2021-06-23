@@ -21,7 +21,7 @@ family:
      expressionType: HL7Spec
 given: 
      type: STRING
-     valueOf: XPN.2 |XCN.3 |CNN.3 |NDL.3
+     valueOf: XPN.2 |XPN.3 |XCN.3 |CNN.3 |NDL.3
      expressionType: HL7Spec
 prefix:
      type: STRING
