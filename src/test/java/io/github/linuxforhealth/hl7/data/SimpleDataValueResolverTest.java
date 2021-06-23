@@ -9,6 +9,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.UUID;
+
+import org.hl7.fhir.r4.model.CodeableConcept;
+import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.Observation.ObservationStatus;
 import org.hl7.fhir.r4.model.Specimen.SpecimenStatus;
 import org.junit.Test;
@@ -16,6 +19,8 @@ import ca.uhn.hl7v2.model.DataTypeException;
 import ca.uhn.hl7v2.model.v26.datatype.TX;
 import ca.uhn.hl7v2.model.v26.message.ORU_R01;
 import io.github.linuxforhealth.hl7.data.date.DateUtil;
+
+import org.hl7.fhir.r4.model.codesystems.V3ReligiousAffiliation;
 
 public class SimpleDataValueResolverTest {
 
@@ -29,20 +34,16 @@ public class SimpleDataValueResolverTest {
     assertThat(SimpleDataValueResolver.STRING.apply(tx)).isEqualTo("some value");
   }
 
-
   @Test
   public void get_adm_gender_value() {
     String gen = "F";
-    assertThat(SimpleDataValueResolver.ADMINISTRATIVE_GENDER_CODE_FHIR.apply(gen))
-        .isEqualTo("female");
+    assertThat(SimpleDataValueResolver.ADMINISTRATIVE_GENDER_CODE_FHIR.apply(gen)).isEqualTo("female");
   }
-
 
   @Test
   public void get_adm_gender_value_unknow() {
     String gen = "ABC";
-    assertThat(SimpleDataValueResolver.ADMINISTRATIVE_GENDER_CODE_FHIR.apply(gen))
-        .isEqualTo("unknown");
+    assertThat(SimpleDataValueResolver.ADMINISTRATIVE_GENDER_CODE_FHIR.apply(gen)).isEqualTo("unknown");
   }
 
   @Test
@@ -57,7 +58,6 @@ public class SimpleDataValueResolverTest {
     assertThat(SimpleDataValueResolver.BOOLEAN.apply(gen)).isTrue();
   }
 
-
   @Test
   public void get_date_value_valid() {
     String gen = "20091130";
@@ -70,12 +70,10 @@ public class SimpleDataValueResolverTest {
     assertThat(SimpleDataValueResolver.DATE.apply(null)).isNull();
   }
 
-
   @Test
   public void get_datetime_value_valid() {
     String gen = "20091130112038";
-    assertThat(SimpleDataValueResolver.DATE_TIME.apply(gen))
-        .isEqualTo(DateUtil.formatToDateTimeWithZone(gen));
+    assertThat(SimpleDataValueResolver.DATE_TIME.apply(gen)).isEqualTo(DateUtil.formatToDateTimeWithZone(gen));
   }
 
   @Test
@@ -83,12 +81,10 @@ public class SimpleDataValueResolverTest {
     assertThat(SimpleDataValueResolver.INSTANT.apply(null)).isNull();
   }
 
-
   @Test
   public void get_instant_value_valid() {
     String gen = "20091130112038";
-    assertThat(SimpleDataValueResolver.INSTANT.apply(gen))
-        .isEqualTo(DateUtil.formatToZonedDateTime(gen));
+    assertThat(SimpleDataValueResolver.INSTANT.apply(gen)).isEqualTo(DateUtil.formatToZonedDateTime(gen));
   }
 
   @Test
@@ -102,7 +98,6 @@ public class SimpleDataValueResolverTest {
     assertThat(SimpleDataValueResolver.FLOAT.apply(gen)).isEqualTo(123.0F);
   }
 
-
   @Test
   public void get_float_value_null() {
     assertThat(SimpleDataValueResolver.FLOAT.apply(null)).isNull();
@@ -114,14 +109,11 @@ public class SimpleDataValueResolverTest {
     assertThat(SimpleDataValueResolver.FLOAT.apply(gen)).isNull();
   }
 
-
-
   @Test
   public void get_integer_value_invalid() {
     String gen = "abc";
     assertThat(SimpleDataValueResolver.INTEGER.apply(gen)).isNull();
   }
-
 
   @Test
   public void get_integer_value_valid() {
@@ -142,11 +134,29 @@ public class SimpleDataValueResolverTest {
   }
 
   @Test
+  public void get_religious_affiliation_value_valid() {
+    String gen = "LUT";
+    CodeableConcept codeableConcept = SimpleDataValueResolver.RELIGIOUS_AFFILIATION_FHIR_CC.apply(gen);
+    Coding coding = codeableConcept.getCodingFirstRep();
+    assertThat(codeableConcept.getText()).isEqualTo(V3ReligiousAffiliation._1028.getDisplay());
+    assertThat(codeableConcept.hasCoding()).isTrue();
+    assertThat(codeableConcept.getText()).isEqualTo(V3ReligiousAffiliation._1028.getDisplay());
+    assertThat(coding.getDisplay()).isEqualTo(V3ReligiousAffiliation._1028.getDisplay());
+    assertThat(coding.getSystem()).isEqualTo(V3ReligiousAffiliation._1028.getSystem());
+  }
+
+  @Test
+  public void get_religious_affiliation_value_nonvalid() {
+    String gen = "ZZZ";
+    CodeableConcept codeableConcept = SimpleDataValueResolver.RELIGIOUS_AFFILIATION_FHIR_CC.apply(gen);
+    assertThat(codeableConcept).isNull();
+  }
+
+  @Test
   public void get_observation_status_value_invalid() {
     String gen = "ddx";
     assertThat(SimpleDataValueResolver.OBSERVATION_STATUS_CODE_FHIR.apply(gen)).isNull();
   }
-
 
   @Test
   public void get_specimen_status_value_valid() {
@@ -164,8 +174,7 @@ public class SimpleDataValueResolverTest {
   @Test
   public void get_URI_value_valid() throws URISyntaxException {
     String gen = VALID_UUID;
-    assertThat(SimpleDataValueResolver.URI_VAL.apply(gen))
-        .isEqualTo(new URI("urn", "uuid", VALID_UUID));
+    assertThat(SimpleDataValueResolver.URI_VAL.apply(gen)).isEqualTo(new URI("urn", "uuid", VALID_UUID));
   }
 
   @Test
@@ -187,6 +196,5 @@ public class SimpleDataValueResolverTest {
     String gen = VALID_UUID;
     assertThat(SimpleDataValueResolver.UUID_VAL.apply(gen)).isEqualTo(UUID.fromString(VALID_UUID));
   }
-
 
 }

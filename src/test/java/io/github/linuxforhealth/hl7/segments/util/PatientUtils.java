@@ -27,11 +27,12 @@ public class PatientUtils  {
   private static FHIRContext context = new FHIRContext();
   private static final ConverterOptions OPTIONS =
     new Builder().withValidateResource().withPrettyPrint().build();
+    // new Builder().withPrettyPrint().build();
 
   public static Patient createPatientFromHl7Segment(String inputSegment){
     HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
     String json = ftv.convert(inputSegment, OPTIONS);
-
+    System.out.println(json);
     assertThat(json).isNotBlank();
     FHIRContext context = new FHIRContext();
     IBaseResource bundleResource = context.getParser().parseResource(json);

@@ -3,64 +3,241 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 #
+# Mapping set named the same as the FHIR simplified class name (last segment)
 AllergyIntoleranceCategory:
-   AA: environment
-   DA: medication
-   EA: environment
-   FA: food
-   LA: environment
-   PA: environment
+  AA: environment
+  DA: medication
+  EA: environment
+  FA: food
+  LA: environment
+  PA: environment
+
 AllergyIntoleranceCriticality:
-   MI: low
-   MO: low
-   SV: high
-   U: unable-to-assess
+  MI: low
+  MO: low
+  SV: high
+  U: unable-to-assess
+
 ObservationStatus:
-   C: corrected
-   D: cancelled
-   F: final
-   I: registered
-   P: preliminary
-   W: entered-in-error
+  C: corrected
+  D: cancelled
+  F: final
+  I: registered
+  P: preliminary
+  W: entered-in-error
+
 AdministrativeGender:
-   A: other
-   F: female
-   M: male
-   N: unknown
-   O: other
-   U: unknown
+  A: other
+  F: female
+  M: male
+  N: unknown
+  O: other
+  U: unknown
+  
 DiagnosticReportStatus:
-   A: partial
-   C: corrected
-   F: final
-   I: unknown
-   O: unknown
-   P: preliminary
-   R: registered
-   S: unknown
-   X: cancelled
-   Y: unknown
-   Z: unknown
-   
+  A: partial
+  C: corrected
+  F: final
+  I: unknown
+  O: unknown
+  P: preliminary
+  R: registered
+  S: unknown
+  X: cancelled
+  Y: unknown
+  Z: unknown
+
 ImmunizationStatus:
   CP: completed
   NA: not-done
   PA: not-done
   RE: not-done
-  
+
 MessageReasonEncounter:
-   A01: admit
-   A03: discharge
-   A21: absent
-   A22: return
-   A02: moved
-   A06: moved
-   A07: moved
-   A08: edit
-   A28: edit
-   A31: edit
+  A01: admit
+  A03: discharge
+  A21: absent
+  A22: return
+  A02: moved
+  A06: moved
+  A07: moved
+  A08: edit
+  A28: edit
+  A31: edit
 
 SpecimenStatus:
   Y: available
   N: unavailable
-   
+
+V3ReligiousAffiliation:
+  # Not all V2.6 religions mapped exactly to FHIR codings.  ** indicates a best approximation or generalization
+  # Agnostic -> Agnosticism
+  AGN: 1004
+  # Atheist -> Athiesm
+  ATH: 1007
+  # Baha'i -> Babi & Baha'I faiths
+  BAH: 1008
+  # Brethren -> Brethren
+  BRE: 1062
+  # Buddhist -> Zen Buddhism
+  BUD: 1059
+  # Buddhist - Mahayana -> Mahayana
+  BMA: 1029
+  # Buddhist - Theravada -> Theravada
+  BTH: 1051
+  # Buddhist - Tantrayana	-> Zen Buddhism **
+  BTA: 1059
+  # Buddhist - Other -> Zen Buddhism **
+  BOT: 1059
+  # Chinese Folk Religionist
+  # CFR:   NO REASONABLE MATCH
+  # Christian	-> Christian (non-Catholic, non-specific)
+  CHR: 1013
+  # Christian - American Baptist Church -> Baptist **
+  ABC: 1009
+  # Christian - African Methodist Episcopal -> Episcopalian
+  AMT: 1069
+  # Christian - African Methodist Episcopal Zion-> Episcopalian
+  AME: 1069
+  # Christian - Anglican -> Anglican
+  ANG: 1005
+  # Christian - Assembly of God -> Assembly of God
+  AOG: 1061
+  # Christian - Baptist -> Baptist
+  BAP: 1009
+  # Christian - Christian Reformed -> Reformed **
+  CRR: 1079
+  # Christian - Christian Science	-> Christian Scientist
+  CHS: 1063
+  # Christian - Christian Missionary Alliance	-> Christian (non-Catholic, non-specific) **
+  CMA: 1013
+  # Christian - Church of Christ	-> Church of Christ
+  COC: 1064
+  # Christian - Church of God	-> Church of God
+  COG: 1065
+  # Christian - Church of God in Christ -> Christian (non-Catholic, non-specific)	**
+  COI: 1013
+  # Christian - Community	-> Christian (non-Catholic, non-specific)
+  COM: 1013
+  # Christian - Congregational -> Congregational
+  COL: 1066
+  # Christian - Eastern Orthodox -> Eastern Orthodox
+  EOT: 1068
+  # Christian - Evangelical Church -> Evangelical Covenant **
+  EVC: 1070
+  # Christian - Episcopalian -> Episcopalian
+  EPI: 1069
+  # Christian - Free Will Baptist	-> Baptist **
+  FWB: 1009
+  # Christian - Friends -> Friends
+  FRQ: 1071
+  # Christian - Full Gospel -> Friends
+  FUL: 1072
+  # Christian - Greek Orthodox -> Eastern Orthodox **
+  GRE: 1068
+  # Christian - Jehovah's Witness	-> Jehovah's Witnesses
+  JWN: 1025
+  # Christian - Latter-day Saints	-> Latter Day Saints
+  MOM: 1027
+  # Christian - Lutheran -> Lutheran
+  LUT: 1028
+  # Christian - Lutheran Missouri Synod -> Lutheran **
+  LMS: 1028
+  # Christian - Mennonite	-> Christian (non-Catholic, non-specific)	**
+  MEN: 1013
+  # Christian - Methodist	-> Methodist
+  MET: 1073
+  # Christian - Church of the Nazarene -> Nazarene
+  NAZ: 1075
+  # Christian - Orthodox -> Orthodox
+  ORT: 1036
+  # Christian - Pentecostal -> Pentecostal
+  PEN: 1038
+  # Christian - Other Pentecostal	-> Pentecostal **
+  COP: 1038
+  # Christian - Presbyterian -> Presbyterian
+  PRE: 1076
+  # Christian - Protestant -> Protestant
+  PRO: 1077
+  # Christian - Other Protestant -> Protestant, No Denomination
+  PRC: 1078
+  # Christian - Reformed Church -> Reformed
+  REC: 1079
+  # Christian - Reorganized Church of Jesus Christ-LDS -> Christian (non-Catholic, non-specific) **
+  REO: 1013
+  # Christian - Roman Catholic -> Roman Catholic Church
+  CAT: 1041
+  # Christian - Salvation Army -> Salvation Army
+  SAA: 1080
+  # Christian - Seventh Day Adventist	-> Adventist
+  SEV: 1001
+  # Christian - Southern Baptist-> Baptist **
+  SOU: 1009
+  # Christian - United Church of Christ -> United Church of Christ
+  UCC: 1082
+  # Christian - United Methodist -> Methodist **
+  UMD: 1073
+  # Christian - Unitarian	-> Unitarian-Universalism
+  UNI: 1052
+  # Christian - Unitarian Universalist -> Unitarian Universalist
+  UNU: 1081
+  # Christian - Wesleyan -> Christian (non-Catholic, non-specific) **
+  WES: 1013
+  # Christian - Wesleyan Methodist -> Methodist **
+  WMC: 1073
+  # Christian - Other	-> Christian (non-Catholic, non-specific)	**
+  COT: 1013
+  # Confucian	-> Confucianism
+  CNF: 1014
+  # Disciples of Christ -> Disciples of Christ
+  DOC: 1067
+  # Ethnic Religionist
+  # ERL:   NO REASONABLE MATCH
+  # Hindu	-> Hinduism
+  HIN: 1020
+  # Hindu - Shaivites	-> Hinduism **
+  HSH: 1020
+  # Hindu - Vaishnavites -> Hinduism **
+  HVA: 1020
+  # Hindu - Other -> Hinduism **
+  HOT: 1020
+  # Jain -> Jainism
+  JAI: 1024
+  # Jewish -> Judaism
+  JEW: 1026
+  # Jewish - Conservative	-> Judaism **
+  JCO: 1026
+  # Jewish - Orthodox	-> Judaism **
+  JOR: 1026
+  # Jewish - Reconstructionist-> Judaism **
+  JRC: 1026
+  # Jewish - Reform	-> Judaism **
+  JRF: 1026
+  # Jewish - Renewal	-> Judaism **
+  JRN: 1026
+  # Jewish - Other	-> Judaism **
+  JOT: 1026
+  # Muslim -> Isalm
+  MOS: 1023
+  # Muslim - Shiite -> Shiite (Islam)
+  MSH: 1045
+  # Muslim - Sunni -> Sunni (Islam)
+  MSU: 1049
+  # Muslim - Other -> Isalm
+  MOT: 1023
+  # Native American	-> Native American
+  NAM: 1074
+  # New Religionist	-> New Age **
+  NRL: 1033
+  # Nonreligious -> Agnosticism
+  NOE: 1004
+  # Shintoist	-> Shinto
+  SHN: 1046
+  # Sikh -> Sikism
+  SIK: 1047
+  # Spiritist	-> Spiritualism
+  SPI: 1048
+  # Other
+  # OTH:   NO REASONABLE MATCH
+  # Unknown
+  # VAR:   NO REASONABLE MATCH
