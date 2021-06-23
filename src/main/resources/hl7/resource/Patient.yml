@@ -73,8 +73,9 @@ deceasedDateTime:
      vars:
           deceasedDateTime: PID.29
 
-martialStatus:
-  valueOf: datatype/CodeableConcept
-  generateList: true
-  expressionType: resource
-  specs: PID.16
+maritalStatus:
+    valueOf: datatype/CodeableConcept
+    generateList: true
+    expressionType: resource
+    vars:
+         code: MARITAL_STATUS, PID.16

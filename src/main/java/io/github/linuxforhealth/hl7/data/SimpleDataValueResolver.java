@@ -18,6 +18,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.hl7.fhir.r4.model.AllergyIntolerance.AllergyIntoleranceCategory;
 import org.hl7.fhir.r4.model.AllergyIntolerance.AllergyIntoleranceCriticality;
+import org.hl7.fhir.r4.model.CodeableConcept;
+import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.DiagnosticReport.DiagnosticReportStatus;
 import org.hl7.fhir.r4.model.Enumerations.AdministrativeGender;
 import org.hl7.fhir.r4.model.Immunization.ImmunizationStatus;
@@ -169,12 +171,16 @@ public class SimpleDataValueResolver {
         }
   };
 
-  public static final ValueExtractor<Object, String> MARITAL_STATUS_CODE_FHIR =
+  public static final ValueExtractor<Object, CodeableConcept> MARITAL_STATUS_CODE_FHIR =
       (Object value) -> {
         String val = Hl7DataHandlerUtil.getStringValue(value);
         String code = getFHIRCode(val, V3MaritalStatus.class);
         if(code != null){
-          return code;
+            V3MaritalStatus mar = V3MaritalStatus.fromCode(code);
+            CodeableConcept codeableConcept = new CodeableConcept( );
+            codeableConcept.addCoding(new Coding( mar.getSystem(), code, mar.getDisplay() ));
+            codeableConcept.setText(mar.getDisplay());
+          return codeableConcept;
         } else {
           return null;
         }

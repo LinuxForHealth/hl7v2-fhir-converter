@@ -187,36 +187,6 @@ public class Hl7RelatedGeneralUtils {
 
   }
 
-  public static String getMaritalStatusCode(String status) {
-    LOGGER.info("mapping status code to display name", status);
-
-    String statusCode = "";
-
-    if (status.equalsIgnoreCase("A")) {
-      statusCode= "Annulled";
-    } else if (status.equalsIgnoreCase("D")) {
-      statusCode = "Divorced";
-    } else if (status.equalsIgnoreCase("I")) {
-      statusCode = "Interlocutory";
-    } else if (status.equalsIgnoreCase("L")) {
-      statusCode = "Legally Separated";
-    } else if (status.equalsIgnoreCase("M")) {
-      statusCode = "Married";
-    } else if (status.equalsIgnoreCase("P")) {
-      statusCode = "Polygamous";
-    } else if (status.equalsIgnoreCase("S")) {
-      statusCode = "Never Married";
-    } else if (status.equalsIgnoreCase("T")) {
-      statusCode = "Domestic partner";
-    } else if (status.equalsIgnoreCase("U")) {
-      statusCode = "unmarried";
-    } else if (status.equalsIgnoreCase("W")) {
-      statusCode = "Widowed";
-    }
-    return statusCode;
-
-  }
-
   /**
    * Special rules for FHIR Address District.  From 18.173.1 build.fhir.org Segment PID to Patient Map.
    * If the address has a County/Parish code, use it.
