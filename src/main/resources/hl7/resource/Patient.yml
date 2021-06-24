@@ -23,10 +23,13 @@ name:
     generateList: true
     expressionType: resource
     specs: PID.5
-gender: 
+gender:
+     condition: $gen NOT_NULL
      type: ADMINISTRATIVE_GENDER
      valueOf: PID.8
      expressionType: HL7Spec
+     vars:
+       gen: PID.8
 
 address:
     valueOf: datatype/Address
