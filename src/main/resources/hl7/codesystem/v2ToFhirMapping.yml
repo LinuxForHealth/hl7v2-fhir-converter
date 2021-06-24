@@ -65,11 +65,16 @@ SpecimenStatus:
   N: unavailable
    
 NameUse:
+  A: anonymous
+  B: official
+  C: official
   D: usual
+  I: official
+  K: usual
   L: official
-  TEMP: temp
-  N: nickname
-  S: anonymous
-  NOUSE: old
-  BAD: old
   M: maiden
+  N: nickname
+  P: anonymous
+  S: anonymous
+  T: usual
+  U: old #ahh not to sure about this one its unspecified but fhir doesn't have a mapping for that?

@@ -7,8 +7,8 @@ package io.github.linuxforhealth.hl7.segments;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import java.io.IOException;
+import java.util.List;
 
-import com.ibm.fhir.model.resource.List;
 import org.hl7.fhir.r4.model.HumanName;
 import org.hl7.fhir.r4.model.Patient;
 import org.junit.Rule;
@@ -162,13 +162,27 @@ public class Hl7PatientFHIRConversionTest {
   public void patient_use_name_conversion_test() {
     String patientUseName =
             "MSH|^~\\&|MyEMR|DE-000001| |CAIRLO|20160701123030-0700||VXU^V04^VXU_V04|CA0001|P|2.6|||ER|AL|||||Z22^CDCPHINVS|DE-000001\r" +
-                    "PID|1||PA123456^^^MYEMR^MR||JONES^GEORGE^NOUSE^JR^^^L|MILLER^MARTHA^G^^^^M|20140227|M||2106-3^WHITE^CDCREC|1234 W FIRST ST^^BEVERLY HILLS^CA^90210^^H||^PRN^PH^^^555^5555555||ENG^English^HL70296|||||||2186-5^ not Hispanic or Latino^CDCREC||Y|2\r";
+                    "PID|1||PA123456^^^MYEMR^MR||JONES^GEORGE^M^JR^^^B|MILLER^MARTHA^G^^^^M|20140227|M||2106-3^WHITE^CDCREC|1234 W FIRST ST^^BEVERLY HILLS^CA^90210^^H||^PRN^PH^^^555^5555555||ENG^English^HL70296|||||||2186-5^ not Hispanic or Latino^CDCREC||Y|2\r";
 
     Patient patientObjUsualName = PatientUtils.createPatientFromHl7Segment(patientUseName);
 
     java.util.List<org.hl7.fhir.r4.model.HumanName> name = patientObjUsualName.getName();
     HumanName.NameUse useName =  name.get(0).getUse();
-    assertThat(useName).isEqualTo(HumanName.NameUse.OLD);
+    assertThat(useName).isEqualTo(HumanName.NameUse.OFFICIAL);
+
+  }
+
+  @Test
+  public void patient_given_name_test() {
+    String patientHasMiddleName =
+            "MSH|^~\\&|MyEMR|DE-000001| |CAIRLO|20160701123030-0700||VXU^V04^VXU_V04|CA0001|P|2.6|||ER|AL|||||Z22^CDCPHINVS|DE-000001\r" +
+                    "PID|1||PA123456^^^MYEMR^MR||JONES^GEORGE^M^JR^^^B|MILLER^MARTHA^G^^^^M|20140227|M||2106-3^WHITE^CDCREC|1234 W FIRST ST^^BEVERLY HILLS^CA^90210^^H||^PRN^PH^^^555^5555555||ENG^English^HL70296|||||||2186-5^ not Hispanic or Latino^CDCREC||Y|2\r";
+
+    Patient patientObjUsualName = PatientUtils.createPatientFromHl7Segment(patientHasMiddleName);
+
+    java.util.List<org.hl7.fhir.r4.model.HumanName> name = patientObjUsualName.getName();
+    List  givenName =  name.get(0).getGiven();
+    assertThat(givenName.get(1).toString()).isEqualTo("M");
 
   }
 
