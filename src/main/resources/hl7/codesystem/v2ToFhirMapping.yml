@@ -75,14 +75,13 @@ NameUse:
   C: official
   D: usual
   I: official
-  K: usual
   L: official
   M: maiden
   N: nickname
-  P: anonymous
   S: anonymous
-  T: usual
-  U: old #ahh not to sure about this one its unspecified but fhir doesn't have a mapping for that?
+  TEMP: temp
+  NOUSE: old
+  BAD: old
 
 V3ReligiousAffiliation:
   # Not all V2.6 religions mapped exactly to FHIR codings.  ** indicates a best approximation or generalization
