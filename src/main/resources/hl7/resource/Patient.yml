@@ -19,24 +19,6 @@ identifier:
   expressionType: resource
   specs: PID.3
 
-extension_1:
-  condition: $valString NOT_NULL
-  valueOf: extension/Extension
-  generateList: true
-  expressionType: resource
-  vars:
-    url: String, GeneralUtils.getExtensionUrl("mothersMaidenName")
-    valString: String, PID.6.1
-
-extension_2:
-  condition: $valCodeableConcept NOT_NULL
-  valueOf: extension/Extension_CodeableConcept
-  generateList: true
-  expressionType: resource
-  vars:
-    url: String, GeneralUtils.getExtensionUrl("religion")
-    valCodeableConcept: RELIGIOUS_AFFILIATION_CC, PID.17
-
 name:
   valueOf: datatype/HumanName
   generateList: true
@@ -92,3 +74,21 @@ deceasedDateTime:
   expressionType: HL7Spec
   vars:
     deceasedDateTime: PID.29
+
+extension_1:
+  condition: $valString NOT_NULL
+  valueOf: extension/Extension
+  generateList: true
+  expressionType: resource
+  vars:
+    url: String, GeneralUtils.getExtensionUrl("mothersMaidenName")
+    valString: String, PID.6.1
+
+extension_2:
+  condition: $valCodeableConcept NOT_NULL
+  valueOf: extension/Extension_CodeableConcept
+  generateList: true
+  expressionType: resource
+  vars:
+    url: String, GeneralUtils.getExtensionUrl("religion")
+    valCodeableConcept: RELIGIOUS_AFFILIATION_CC, PID.17

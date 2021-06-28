@@ -27,7 +27,6 @@ public class PatientUtils  {
   private static FHIRContext context = new FHIRContext();
   private static final ConverterOptions OPTIONS =
     new Builder().withValidateResource().withPrettyPrint().build();
-    // new Builder().withPrettyPrint().build();
 
   public static Patient createPatientFromHl7Segment(String inputSegment){
     HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();

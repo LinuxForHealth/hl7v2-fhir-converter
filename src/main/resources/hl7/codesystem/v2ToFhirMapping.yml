@@ -71,6 +71,7 @@ SpecimenStatus:
 
 V3ReligiousAffiliation:
   # Not all V2.6 religions mapped exactly to FHIR codings.  ** indicates a best approximation or generalization
+  # All V2.6 religions are left as commented placeholders for future evaluation.
   # Agnostic -> Agnosticism
   AGN: 1004
   # Atheist -> Athiesm
@@ -79,26 +80,26 @@ V3ReligiousAffiliation:
   BAH: 1008
   # Brethren -> Brethren
   BRE: 1062
-  # Buddhist -> Zen Buddhism
-  BUD: 1059
+  # Buddhist -> ??
+  # BUD: NO REASONABLE MATCH, no generalized Buddhist
   # Buddhist - Mahayana -> Mahayana
   BMA: 1029
   # Buddhist - Theravada -> Theravada
   BTH: 1051
-  # Buddhist - Tantrayana	-> Zen Buddhism **
-  BTA: 1059
-  # Buddhist - Other -> Zen Buddhism **
-  BOT: 1059
+  # Buddhist - Tantrayana	-> ??
+  # BTA: NO REASONABLE MATCH
+  # Buddhist - Other -> ??
+  # BOT:  NO REASONABLE MATCH, Does not match Zen Buddhism
   # Chinese Folk Religionist
   # CFR:   NO REASONABLE MATCH
   # Christian	-> Christian (non-Catholic, non-specific)
   CHR: 1013
-  # Christian - American Baptist Church -> Baptist **
-  ABC: 1009
+  # Christian - American Baptist Church -> ??
+  # ABC: NO GOOD MATCH
   # Christian - African Methodist Episcopal -> Episcopalian
-  AMT: 1069
+  # AMT:  NO GOOD MATCH
   # Christian - African Methodist Episcopal Zion-> Episcopalian
-  AME: 1069
+  # AME:  NO GOOD MATCH
   # Christian - Anglican -> Anglican
   ANG: 1005
   # Christian - Assembly of God -> Assembly of God
@@ -109,16 +110,16 @@ V3ReligiousAffiliation:
   CRR: 1079
   # Christian - Christian Science	-> Christian Scientist
   CHS: 1063
-  # Christian - Christian Missionary Alliance	-> Christian (non-Catholic, non-specific) **
-  CMA: 1013
+  # Christian - Christian Missionary Alliance	-> ??
+  # CMA: NO GOOD MATCH
   # Christian - Church of Christ	-> Church of Christ
   COC: 1064
   # Christian - Church of God	-> Church of God
   COG: 1065
-  # Christian - Church of God in Christ -> Christian (non-Catholic, non-specific)	**
-  COI: 1013
-  # Christian - Community	-> Christian (non-Catholic, non-specific)
-  COM: 1013
+  # Christian - Church of God in Christ -> ??
+  # COI: NO CLEAR MAPPING
+  # Christian - Community	-> ??
+  # COM: NO CLEAR MAPPING
   # Christian - Congregational -> Congregational
   COL: 1066
   # Christian - Eastern Orthodox -> Eastern Orthodox
@@ -127,24 +128,24 @@ V3ReligiousAffiliation:
   EVC: 1070
   # Christian - Episcopalian -> Episcopalian
   EPI: 1069
-  # Christian - Free Will Baptist	-> Baptist **
-  FWB: 1009
+  # Christian - Free Will Baptist	-> ??
+  # FWB: NO CLEAR MAPPING
   # Christian - Friends -> Friends
   FRQ: 1071
-  # Christian - Full Gospel -> Friends
-  FUL: 1072
-  # Christian - Greek Orthodox -> Eastern Orthodox **
-  GRE: 1068
+  # Christian - Full Gospel -> ??
+  # FUL: NO CLEAR MAPPING
+  # Christian - Greek Orthodox -> ??
+  # GRE: NO CLEAR MAPPING
   # Christian - Jehovah's Witness	-> Jehovah's Witnesses
   JWN: 1025
   # Christian - Latter-day Saints	-> Latter Day Saints
   MOM: 1027
   # Christian - Lutheran -> Lutheran
   LUT: 1028
-  # Christian - Lutheran Missouri Synod -> Lutheran **
-  LMS: 1028
-  # Christian - Mennonite	-> Christian (non-Catholic, non-specific)	**
-  MEN: 1013
+  # Christian - Lutheran Missouri Synod -> ??
+  # LMS: NO CLEAR MAPPING
+  # Christian - Mennonite	-> ??
+  # MEN: NO CLEAR MAPPING
   # Christian - Methodist	-> Methodist
   MET: 1073
   # Christian - Church of the Nazarene -> Nazarene
@@ -163,16 +164,16 @@ V3ReligiousAffiliation:
   PRC: 1078
   # Christian - Reformed Church -> Reformed
   REC: 1079
-  # Christian - Reorganized Church of Jesus Christ-LDS -> Christian (non-Catholic, non-specific) **
-  REO: 1013
+  # Christian - Reorganized Church of Jesus Christ-LDS -> ??
+  # REO: NO CLEAR MAPPING
   # Christian - Roman Catholic -> Roman Catholic Church
   CAT: 1041
   # Christian - Salvation Army -> Salvation Army
   SAA: 1080
   # Christian - Seventh Day Adventist	-> Adventist
   SEV: 1001
-  # Christian - Southern Baptist-> Baptist **
-  SOU: 1009
+  # Christian - Southern Baptist-> ??
+  # SOU: NO CLEAR MAPPING
   # Christian - United Church of Christ -> United Church of Christ
   UCC: 1082
   # Christian - United Methodist -> Methodist **
@@ -181,10 +182,10 @@ V3ReligiousAffiliation:
   UNI: 1052
   # Christian - Unitarian Universalist -> Unitarian Universalist
   UNU: 1081
-  # Christian - Wesleyan -> Christian (non-Catholic, non-specific) **
-  WES: 1013
-  # Christian - Wesleyan Methodist -> Methodist **
-  WMC: 1073
+  # Christian - Wesleyan -> ??
+  # WES: NO CLEAR MAPPING
+  # Christian - Wesleyan Methodist -> ??
+  # WMC: NO CLEAR MAPPING
   # Christian - Other	-> Christian (non-Catholic, non-specific)	**
   COT: 1013
   # Confucian	-> Confucianism
@@ -195,28 +196,28 @@ V3ReligiousAffiliation:
   # ERL:   NO REASONABLE MATCH
   # Hindu	-> Hinduism
   HIN: 1020
-  # Hindu - Shaivites	-> Hinduism **
-  HSH: 1020
-  # Hindu - Vaishnavites -> Hinduism **
-  HVA: 1020
-  # Hindu - Other -> Hinduism **
-  HOT: 1020
+  # Hindu - Shaivites	-> ??
+  # HSH: 1020 NO CLEAR MAPPING
+  # Hindu - Vaishnavites -> ??
+  # HVA: 1020 NO CLEAR MAPPING
+  # Hindu - Other -> ??
+  # HOT: 1020 NO CLEAR MAPPING
   # Jain -> Jainism
   JAI: 1024
   # Jewish -> Judaism
   JEW: 1026
-  # Jewish - Conservative	-> Judaism **
-  JCO: 1026
-  # Jewish - Orthodox	-> Judaism **
-  JOR: 1026
-  # Jewish - Reconstructionist-> Judaism **
-  JRC: 1026
-  # Jewish - Reform	-> Judaism **
-  JRF: 1026
-  # Jewish - Renewal	-> Judaism **
-  JRN: 1026
-  # Jewish - Other	-> Judaism **
-  JOT: 1026
+  # Jewish - Conservative	-> ??
+  # JCO: NO CLEAR MAPPING
+  # Jewish - Orthodox	-> ??
+  # JOR: NO CLEAR MAPPING
+  # Jewish - Reconstructionist-> ??
+  # JRC: NO CLEAR MAPPING
+  # Jewish - Reform	-> ??
+  # JRF: NO CLEAR MAPPING
+  # Jewish - Renewal	-> ??
+  # JRN: NO CLEAR MAPPING
+  # Jewish - Other	-> ??
+  # JOT: NO CLEAR MAPPING
   # Muslim -> Isalm
   MOS: 1023
   # Muslim - Shiite -> Shiite (Islam)
@@ -228,9 +229,9 @@ V3ReligiousAffiliation:
   # Native American	-> Native American
   NAM: 1074
   # New Religionist	-> New Age **
-  NRL: 1033
+  # NRL: NO CLEAR MAPPING
   # Nonreligious -> Agnosticism
-  NOE: 1004
+  # NOE: NO CLEAR MAPPING
   # Shintoist	-> Shinto
   SHN: 1046
   # Sikh -> Sikism

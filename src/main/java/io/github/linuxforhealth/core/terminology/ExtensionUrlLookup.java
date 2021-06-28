@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2020
+ * (C) Copyright IBM Corp. 2020, 2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -44,7 +44,7 @@ public class ExtensionUrlLookup {
             return systems.stream().collect(Collectors.toMap(CodingSystem::getId, codeSystem -> codeSystem));
 
         } catch (IOException e) {
-            throw new IllegalArgumentException("Cannot read codesystem/CodingSystemMapping.yml", e);
+            throw new IllegalArgumentException("Cannot read extension/ExtensionUrlMapping.yml", e);
         }
     }
 
