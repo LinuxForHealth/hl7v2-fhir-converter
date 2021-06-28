@@ -1,0 +1,19 @@
+#
+# (C) Copyright IBM Corp. 2021
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+---
+# mother's maiden name https://www.hl7.org/fhir/extension-patient-mothersmaidenname.html
+- id: "mothersMaidenName"
+  url: "http://hl7.org/fhir/StructureDefinition/patient-mothersMaidenName"
+# birthPlace
+- id: "birthPlace"
+  url: "http://hl7.org/fhir/StructureDefinition/patient-birthPlace"
+# birthTime
+- id: "birthTime"
+  url: "http://hl7.org/fhir/StructureDefinition/patient-birthTime"
+# religion
+- id: "religion"
+  url: "http://hl7.org/fhir/StructureDefinition/patient-religion"
