@@ -16,21 +16,20 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import io.github.linuxforhealth.core.terminology.SystemUrlLookup;
+import io.github.linuxforhealth.core.terminology.ExtensionUrlLookup;
 
 public class ConverterConfigurationTest {
 
   @Rule
   public TemporaryFolder folder = new TemporaryFolder();
 
-
   @After
   public void reset() {
     System.clearProperty("config.home");
     ConverterConfiguration.reset();
     SystemUrlLookup.reinit();
+    ExtensionUrlLookup.reinit();
   }
-
-
 
   @Test
   public void test_that_additional_conceptmap_values_are_loaded() throws IOException {
@@ -41,6 +40,9 @@ public class ConverterConfigurationTest {
     SystemUrlLookup.reinit();
     String url = SystemUrlLookup.getSystemUrl("LN");
     assertThat(url).isEqualTo("http://loinc-additional.org");
+    ExtensionUrlLookup.reinit();
+    url = ExtensionUrlLookup.getExtensionUrl("mothersMaidenName");
+    assertThat(url).isEqualTo("http://hl7.org/fhir/StructureDefinition/patient-mothersMaidenName");
   }
 
   private void writeProperties(File configFile) throws FileNotFoundException, IOException {
@@ -56,6 +58,10 @@ public class ConverterConfigurationTest {
     SystemUrlLookup.reinit();
     String url = SystemUrlLookup.getSystemUrl("LN");
     assertThat(url).isEqualTo("http://loinc.org");
+
+    ExtensionUrlLookup.reinit();
+    url = ExtensionUrlLookup.getExtensionUrl("mothersMaidenName");
+    assertThat(url).isEqualTo("http://hl7.org/fhir/StructureDefinition/patient-mothersMaidenName");
   }
 
 }

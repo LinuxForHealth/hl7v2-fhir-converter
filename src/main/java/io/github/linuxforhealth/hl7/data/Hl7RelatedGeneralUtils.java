@@ -14,6 +14,7 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringTokenizer;
 import org.hl7.fhir.r4.model.codesystems.EncounterStatus;
+import org.hl7.fhir.r4.model.CodeableConcept;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,7 +24,7 @@ import ca.uhn.hl7v2.model.Type;
 import ca.uhn.hl7v2.HL7Exception;
 
 import io.github.linuxforhealth.hl7.data.date.DateUtil;
-
+import io.github.linuxforhealth.core.terminology.ExtensionUrlLookup;
 
 public class Hl7RelatedGeneralUtils {
   private static final Logger LOGGER = LoggerFactory.getLogger(Hl7RelatedGeneralUtils.class);
@@ -126,6 +127,10 @@ public class Hl7RelatedGeneralUtils {
     return null;
   }
 
+  public static String getExtensionUrl(String in) {
+    return ExtensionUrlLookup.getExtensionUrl(in);
+  }
+
   public static String split(Object input, String delimitter, int index) {
     String stringRepVal = Hl7DataHandlerUtil.getStringValue(input);
     if (StringUtils.isNotBlank(stringRepVal)) {
@@ -214,6 +219,21 @@ public class Hl7RelatedGeneralUtils {
     }
 
     return returnDistrict;
+  }
+
+  public static String getCodeableConceptCode(CodeableConcept codeableConcept) {
+    if (codeableConcept == null) return null;
+    return codeableConcept.getCodingFirstRep().getCode();
+  }
+
+  public static String getCodeableConceptSystem(CodeableConcept codeableConcept) {
+    if (codeableConcept == null) return null;
+    return codeableConcept.getCodingFirstRep().getSystem();
+  }
+
+  public static String getCodeableConceptDisplay(CodeableConcept codeableConcept) {
+    if (codeableConcept == null) return null;
+    return codeableConcept.getCodingFirstRep().getDisplay();
   }
 
 }
