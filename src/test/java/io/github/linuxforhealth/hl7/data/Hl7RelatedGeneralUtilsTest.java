@@ -17,6 +17,22 @@ import org.junit.Test;
 public class Hl7RelatedGeneralUtilsTest {
 
   @Test
+  public void test_generate_name() {
+    String name = Hl7RelatedGeneralUtils.generateName("prefix", "first", "M","family", "suffix");
+    assertThat(name).isEqualTo("prefix given family suffix");
+    System.out.println(name);
+  }
+
+
+  @Test
+  public void test_generate_name_prefix_suffix_missing() {
+    String name = Hl7RelatedGeneralUtils.generateName(null,  "first", "M","family", null);
+    assertThat(name).isEqualTo("given family");
+  }
+
+
+
+  @Test
   public void test_get_encounter_var1() {
     // if var1 is not null then EncounterStatus.FINISHED
     String name = Hl7RelatedGeneralUtils.getEncounterStatus("var1", "var2", "var3");

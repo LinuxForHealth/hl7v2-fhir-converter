@@ -10,45 +10,45 @@ import org.apache.commons.lang3.EnumUtils;
 
 public enum SimpleDataTypeMapper {
 
-  BOOLEAN(SimpleDataValueResolver.BOOLEAN), //
-  INTEGER(SimpleDataValueResolver.INTEGER), //
-  STRING(SimpleDataValueResolver.STRING), //
-  STRING_ALL(SimpleDataValueResolver.STRING_ALL), //
-  FLOAT(SimpleDataValueResolver.FLOAT), //
+  BOOLEAN(SimpleDataValueResolver.BOOLEAN),
+  INTEGER(SimpleDataValueResolver.INTEGER),
+  STRING(SimpleDataValueResolver.STRING),
+  STRING_ALL(SimpleDataValueResolver.STRING_ALL),
+  FLOAT(SimpleDataValueResolver.FLOAT),
   BASE64_BINARY(SimpleDataValueResolver.BASE64_BINARY),
-  
-  URI(SimpleDataValueResolver.URI_VAL), //
-  URL(SimpleDataValueResolver.STRING), //
-  INSTANT(SimpleDataValueResolver.INSTANT), //
 
-  DATE(SimpleDataValueResolver.DATE), //
+  URI(SimpleDataValueResolver.URI_VAL),
+  URL(SimpleDataValueResolver.STRING),
+  INSTANT(SimpleDataValueResolver.INSTANT),
 
-  DATE_TIME(SimpleDataValueResolver.DATE_TIME), //
-  // TIME(SimpleDataValueResolver.TIME_TYPE),
-  ID(SimpleDataValueResolver.STRING), //
-  // MARKDOWN(SimpleDataValueResolver.STRING),
-  UNSIGNEDINT(SimpleDataValueResolver.INTEGER), //
-  POSITIVEINT(SimpleDataValueResolver.INTEGER), //
-  UUID(SimpleDataValueResolver.UUID_VAL), //
-  NAMED_UUID(SimpleDataValueResolver.NAMED_UUID), //
-  OBJECT(SimpleDataValueResolver.OBJECT), //
-  CODING_SYSTEM_V2(SimpleDataValueResolver.CODING_SYSTEM_V2), //
-  SYSTEM_URL(SimpleDataValueResolver.SYSTEM_URL), //
+  DATE(SimpleDataValueResolver.DATE),
 
-  ALLERGY_INTOLERANCE_CATEGORY(SimpleDataValueResolver.ALLERGY_INTOLERANCE_CATEGORY_CODE_FHIR), //
+  DATE_TIME(SimpleDataValueResolver.DATE_TIME),
+  //TIME(SimpleDataValueResolver.TIME_TYPE),
+  ID(SimpleDataValueResolver.STRING),
+  //MARKDOWN(SimpleDataValueResolver.STRING),
+  UNSIGNEDINT(SimpleDataValueResolver.INTEGER),
+  POSITIVEINT(SimpleDataValueResolver.INTEGER),
+  UUID(SimpleDataValueResolver.UUID_VAL),
+  NAMED_UUID(SimpleDataValueResolver.NAMED_UUID),
+  OBJECT(SimpleDataValueResolver.OBJECT),
+  CODING_SYSTEM_V2(SimpleDataValueResolver.CODING_SYSTEM_V2),
+  SYSTEM_URL(SimpleDataValueResolver.SYSTEM_URL),
+
+  ALLERGY_INTOLERANCE_CATEGORY(SimpleDataValueResolver.ALLERGY_INTOLERANCE_CATEGORY_CODE_FHIR),
   ALLERGY_INTOLERANCE_CRITICALITY(
-      SimpleDataValueResolver.ALLERGY_INTOLERANCE_CRITICALITY_CODE_FHIR), //
-  ADMINISTRATIVE_GENDER(SimpleDataValueResolver.ADMINISTRATIVE_GENDER_CODE_FHIR), //
-  CONDITION_CATEGORY_CODES(SimpleDataValueResolver.CONDITION_CATEGORY_CODES), //
-  DIAGNOSTIC_REPORT_STATUS(SimpleDataValueResolver.DIAGNOSTIC_REPORT_STATUS_CODES), //
-  ARRAY(SimpleDataValueResolver.ARRAY), //
-  OBSERVATION_STATUS(SimpleDataValueResolver.OBSERVATION_STATUS_CODE_FHIR), //
-  RELATIVE_REFERENCE(SimpleDataValueResolver.RELATIVE_REFERENCE), //
+      SimpleDataValueResolver.ALLERGY_INTOLERANCE_CRITICALITY_CODE_FHIR),
+  ADMINISTRATIVE_GENDER(SimpleDataValueResolver.ADMINISTRATIVE_GENDER_CODE_FHIR),
+  CONDITION_CATEGORY_CODES(SimpleDataValueResolver.CONDITION_CATEGORY_CODES),
+  DIAGNOSTIC_REPORT_STATUS(SimpleDataValueResolver.DIAGNOSTIC_REPORT_STATUS_CODES),
+  ARRAY(SimpleDataValueResolver.ARRAY), 
+  OBSERVATION_STATUS(SimpleDataValueResolver.OBSERVATION_STATUS_CODE_FHIR), 
+  RELATIVE_REFERENCE(SimpleDataValueResolver.RELATIVE_REFERENCE), 
   IMMUNIZATION_STATUS_CODES(
-      SimpleDataValueResolver.IMMUNIZATION_STATUS_CODES), //
-  MESSAGE_REASON_ENCOUNTER(SimpleDataValueResolver.MESSAGE_REASON_ENCOUNTER), //
-  SPECIMEN_STATUS(SimpleDataValueResolver.SPECIMEN_STATUS_CODE_FHIR), //
-  NAME_USE(SimpleDataValueResolver.NAME_USE_CODE_FHIR); //
+      SimpleDataValueResolver.IMMUNIZATION_STATUS_CODES), 
+  MESSAGE_REASON_ENCOUNTER(SimpleDataValueResolver.MESSAGE_REASON_ENCOUNTER), 
+  SPECIMEN_STATUS(SimpleDataValueResolver.SPECIMEN_STATUS_CODE_FHIR), 
+  NAME_USE(SimpleDataValueResolver.NAME_USE_CODE_FHIR); 
 
 
   private ValueExtractor<Object, ?> valueResolver;

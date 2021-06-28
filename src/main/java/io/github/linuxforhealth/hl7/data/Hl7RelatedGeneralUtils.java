@@ -65,6 +65,41 @@ public class Hl7RelatedGeneralUtils {
     return status.toCode();
   }
 
+  public static String generateName(Object prefix, Object first, Object middle, Object family, Object suffix) {
+    LOGGER.info("Generating name from  from prefix {}, first {}, family {} ,suffix {}", prefix,
+            first, middle, family, suffix);
+    StringBuilder sb = new StringBuilder();
+    String valprefix = Hl7DataHandlerUtil.getStringValue(prefix);
+    String valfirst = Hl7DataHandlerUtil.getStringValue(first);
+    String valmiddle = Hl7DataHandlerUtil.getStringValue(middle);
+    String valfamily = Hl7DataHandlerUtil.getStringValue(family);
+    String valsuffix = Hl7DataHandlerUtil.getStringValue(suffix);
+
+    if (valprefix != null) {
+
+      sb.append(valprefix).append(" ");
+    }
+    if (valfirst != null) {
+      sb.append(valfirst).append(" ");
+    }
+    if (valmiddle != null) {
+      sb.append(valmiddle).append(" ");
+    }
+    if (valfamily != null) {
+      sb.append(valfamily).append(" ");
+    }
+    if (valsuffix != null) {
+      sb.append(valsuffix).append(" ");
+    }
+    String name = sb.toString();
+    if (StringUtils.isNotBlank(name)) {
+      return name.trim();
+    } else {
+      return null;
+    }
+
+  }
+
   /**
    * Returns difference between time2 - time1 in minutes
    * 
