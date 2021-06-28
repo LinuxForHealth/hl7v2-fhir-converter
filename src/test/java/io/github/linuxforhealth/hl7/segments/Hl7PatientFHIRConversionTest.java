@@ -158,7 +158,7 @@ public class Hl7PatientFHIRConversionTest {
   }
 
   @Test
-  public void patient_empty_gender_field_test() {
+  public void patient_gender_test() {
     String patientEmptyGenderField =
             "MSH|^~\\&|MyEMR|DE-000001| |CAIRLO|20160701123030-0700||VXU^V04^VXU_V04|CA0001|P|2.6|||ER|AL|||||Z22^CDCPHINVS|DE-000001\r" +
                     "PID|0010||PID1234^5^M11^A^MR^HOSP~1234568965^^^USA^SS||DOE^JOHN^A^||19800202|||W|111 TEST_STREET_NAME^^TEST_CITY^NY^111-1111^USA||(905)111-1111|||S|ZZ|12^^^124|34-13-312||||TEST_BIRTH_PLACE\r";
@@ -174,6 +174,6 @@ public class Hl7PatientFHIRConversionTest {
     Patient patientObjGender = PatientUtils.createPatientFromHl7Segment(patientWithGenderField);
     Enumerations.AdministrativeGender gen = patientObjGender.getGender();
     assertThat(gen).isNotNull();
-
+    assertThat(gen).isEqualTo(Enumerations.AdministrativeGender.MALE);
   }
 }
