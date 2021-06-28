@@ -10,7 +10,7 @@
 resourceType: Patient
 id:
   type: STRING
-  valueOf: 'UUID.randomUUID()'
+  valueOf: "UUID.randomUUID()"
   expressionType: JEXL
   
 identifier:
@@ -74,7 +74,22 @@ deceasedDateTime:
      valueOf: PID.29
      expressionType: HL7Spec  
      vars:
-          deceasedDateTime: PID.29  
-          
-      
-    
+          deceasedDateTime: PID.29
+
+extension_1:
+  condition: $valString NOT_NULL
+  valueOf: extension/Extension
+  generateList: true
+  expressionType: resource
+  vars:
+    url: String, GeneralUtils.getExtensionUrl("mothersMaidenName")
+    valString: String, PID.6.1
+
+extension_2:
+  condition: $valCodeableConcept NOT_NULL
+  valueOf: extension/Extension_CodeableConcept
+  generateList: true
+  expressionType: resource
+  vars:
+    url: String, GeneralUtils.getExtensionUrl("religion")
+    valCodeableConcept: RELIGIOUS_AFFILIATION_CC, PID.17
