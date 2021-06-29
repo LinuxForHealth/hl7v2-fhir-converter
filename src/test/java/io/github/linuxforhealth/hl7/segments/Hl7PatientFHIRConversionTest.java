@@ -194,6 +194,7 @@ public class Hl7PatientFHIRConversionTest {
 
   }
 
+  @Test
   public void patient_gender_test() {
     String patientEmptyGenderField =
             "MSH|^~\\&|MyEMR|DE-000001| |CAIRLO|20160701123030-0700||VXU^V04^VXU_V04|CA0001|P|2.6|||ER|AL|||||Z22^CDCPHINVS|DE-000001\r" +
