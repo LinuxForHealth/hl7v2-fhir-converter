@@ -12,18 +12,18 @@ id:
   type: STRING
   valueOf: 'UUID.randomUUID()'
   expressionType: JEXL
-  
+
 identifier:
     valueOf: datatype/Identifier
     generateList: true
     expressionType: resource
     specs: PID.3
-name: 
+name:
     valueOf: datatype/HumanName
     generateList: true
     expressionType: resource
     specs: PID.5
-gender: 
+gender:
      type: ADMINISTRATIVE_GENDER
      valueOf: PID.8
      expressionType: HL7Spec
@@ -43,27 +43,27 @@ multipleBirthBoolean:
      condition: $multBool NOT_NULL && $multInt NULL
      type: BOOLEAN
      valueOf: PID.24
-     expressionType: HL7Spec  
+     expressionType: HL7Spec
      vars:
           multBool: PID.24
-          multInt: PID.25      
+          multInt: PID.25
 
 multipleBirthInteger:
      condition: $multInt NOT_NULL
      type: INTEGER
      valueOf: PID.25
-     expressionType: HL7Spec  
+     expressionType: HL7Spec
      vars:
-          multInt: PID.25      
+          multInt: PID.25
 
 deceasedBoolean:
      condition: $deceasedBool NOT_NULL && $deceasedDateTime NULL
      type: BOOLEAN
      valueOf: PID.30
-     expressionType: HL7Spec  
+     expressionType: HL7Spec
      vars:
           deceasedBool: PID.30
-          deceasedDateTime: PID.29       
+          deceasedDateTime: PID.29
 
 deceasedDateTime:
      condition: $deceasedDateTime NOT_NULL
@@ -74,8 +74,26 @@ deceasedDateTime:
           deceasedDateTime: PID.29
 
 maritalStatus:
-    valueOf: datatype/CodeableConcept
-    generateList: true
-    expressionType: resource
-    vars:
-         code: MARITAL_STATUS, PID.16
+  valueOf: datatype/CodeableConcept
+  generateList: true
+  expressionType: resource
+  vars:
+    code: MARITAL_STATUS, PID.16
+
+extension_1:
+  condition: $valString NOT_NULL
+  valueOf: extension/Extension
+  generateList: true
+  expressionType: resource
+  vars:
+    url: String, GeneralUtils.getExtensionUrl("mothersMaidenName")
+    valString: String, PID.6.1
+
+extension_2:
+  condition: $valCodeableConcept NOT_NULL
+  valueOf: extension/Extension_CodeableConcept
+  generateList: true
+  expressionType: resource
+  vars:
+    url: String, GeneralUtils.getExtensionUrl("religion")
+    valCodeableConcept: RELIGIOUS_AFFILIATION_CC, PID.17

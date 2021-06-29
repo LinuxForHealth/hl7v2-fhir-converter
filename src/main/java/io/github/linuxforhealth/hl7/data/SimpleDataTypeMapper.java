@@ -48,7 +48,8 @@ public enum SimpleDataTypeMapper {
       SimpleDataValueResolver.IMMUNIZATION_STATUS_CODES), //
   MESSAGE_REASON_ENCOUNTER(SimpleDataValueResolver.MESSAGE_REASON_ENCOUNTER), //
   SPECIMEN_STATUS(SimpleDataValueResolver.SPECIMEN_STATUS_CODE_FHIR), //
-  MARITAL_STATUS(SimpleDataValueResolver.MARITAL_STATUS_CODE_FHIR); //
+  MARITAL_STATUS(SimpleDataValueResolver.MARITAL_STATUS_CODE_FHIR), //
+  RELIGIOUS_AFFILIATION_CC(SimpleDataValueResolver.RELIGIOUS_AFFILIATION_FHIR_CC);
 
 
   private ValueExtractor<Object, ?> valueResolver;

@@ -18,6 +18,7 @@ public class Constants {
   public static final String USE_GROUP = "useGroup";
 
   //
+  public static final String EXTENSION_URL_MAPPING_PATH = "extension/ExtensionUrlMapping.yml";
   public static final String CODING_SYSTEM_MAPPING_PATH = "codesystem/CodingSystemMapping.yml";
   public static final String V2_TO_FHIR_MAPPING_PATH = "codesystem/v2ToFhirMapping.yml";
   public static final String RESOURCE_MAPPING_PATH = "fhir/resourcemapping.yml";

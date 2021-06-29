@@ -28,6 +28,7 @@ import org.hl7.fhir.r4.model.Specimen.SpecimenStatus;
 import org.hl7.fhir.r4.model.codesystems.V3MaritalStatus;
 import org.hl7.fhir.r4.model.codesystems.ConditionCategory;
 import org.hl7.fhir.r4.model.codesystems.MessageReasonEncounter;
+import org.hl7.fhir.r4.model.codesystems.V3ReligiousAffiliation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import io.github.linuxforhealth.api.ResourceValue;
@@ -147,6 +148,23 @@ public class SimpleDataValueResolver {
           return null;
         }
       };
+      
+  public static final ValueExtractor<Object, CodeableConcept> RELIGIOUS_AFFILIATION_FHIR_CC =
+      (Object value) -> {
+        String val = Hl7DataHandlerUtil.getStringValue(value);
+        String code = getFHIRCode(val, V3ReligiousAffiliation.class);
+
+        if (code != null) {
+          V3ReligiousAffiliation rel = V3ReligiousAffiliation.fromCode(code);
+          CodeableConcept codeableConcept = new CodeableConcept( );
+          codeableConcept.addCoding(new Coding(rel.getSystem(), code, rel.getDisplay() ));
+          codeableConcept.setText(rel.getDisplay());
+          return codeableConcept;
+        } else {
+          return null;
+        }
+      };    
+
 
   public static final ValueExtractor<Object, String> IMMUNIZATION_STATUS_CODES = (Object value) -> {
 
