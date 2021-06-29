@@ -68,6 +68,20 @@ MessageReasonEncounter:
 SpecimenStatus:
   Y: available
   N: unavailable
+   
+NameUse:
+  A: anonymous
+  B: official
+  C: official
+  D: usual
+  I: official
+  L: official
+  M: maiden
+  N: nickname
+  S: anonymous
+  TEMP: temp
+  NOUSE: old
+  BAD: old
 
 V3ReligiousAffiliation:
   # Not all V2.6 religions mapped exactly to FHIR codings.  ** indicates a best approximation or generalization

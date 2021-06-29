@@ -8,25 +8,34 @@
 
 text: 
     type: STRING
-    valueOf: 'GeneralUtils.generateName( prefix, given,family, suffix)'
+    valueOf: 'GeneralUtils.generateName( prefix, first, middle, family, suffix)'
     expressionType: JEXL
     vars:
-      prefix: STRING XPN.5 |XCN.6 |CNN.6 |NDL.6
-      given: STRING XPN.2 |XCN.3 |CNN.3 |NDL.3
-      family: STRING XPN.1 |XCN.2 |CNN.2 |NDL.2
-      suffix: STRING XPN.4 |XCN.5 |CNN.5 |NDL.5
+      prefix: String, XPN.5 |XCN.6 |CNN.6 |NDL.6
+      first: String, XPN.2 |XCN.3 |CNN.3 |NDL.3
+      middle: String, XPN.3 |XCN.4 |CNN.4 |NDL.4
+      family: String, XPN.1 |XCN.2 |CNN.2 |NDL.2
+      suffix: String, XPN.4 |XCN.5 |CNN.5 |NDL.5
 family:
      type: STRING
      valueOf: XPN.1 |XCN.2 |CNN.2 |NDL.2
      expressionType: HL7Spec
-given: 
-     type: STRING
-     valueOf: XPN.2 |XCN.3 |CNN.3 |NDL.3
-     expressionType: HL7Spec
+given:
+    type: STRING
+    valueOf: 'GeneralUtils.makeStringArray( first, middle)'
+    generateList: true
+    expressionType: JEXL
+    vars:
+      first: String, XPN.2 |XCN.3 |CNN.3 |NDL.3
+      middle: String, XPN.3 |XCN.4 |CNN.4 |NDL.4
 prefix:
      type: STRING
      valueOf: XPN.5 |XCN.6 |CNN.6 |NDL.6
      expressionType: HL7Spec
+use:
+    type: NAME_USE
+    valueOf: XPN.7
+    expressionType: HL7Spec
 
 suffix: 
      type: STRING

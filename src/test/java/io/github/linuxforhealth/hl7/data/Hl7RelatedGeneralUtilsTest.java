@@ -18,15 +18,16 @@ public class Hl7RelatedGeneralUtilsTest {
 
   @Test
   public void test_generate_name() {
-    String name = Hl7RelatedGeneralUtils.generateName("prefix", "given", "family", "suffix");
-    assertThat(name).isEqualTo("prefix given family suffix");
+    String name = Hl7RelatedGeneralUtils.generateName("prefix", "first", "M", "family", "suffix");
+    assertThat(name).isEqualTo("prefix first M family suffix");
+    System.out.println(name);
   }
 
 
   @Test
   public void test_generate_name_prefix_suffix_missing() {
-    String name = Hl7RelatedGeneralUtils.generateName(null, "given", "family", null);
-    assertThat(name).isEqualTo("given family");
+    String name = Hl7RelatedGeneralUtils.generateName(null, "first", "M", "family", null);
+    assertThat(name).isEqualTo("first M family");
   }
 
 

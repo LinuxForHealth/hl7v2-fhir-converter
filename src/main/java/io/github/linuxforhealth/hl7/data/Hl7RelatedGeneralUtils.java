@@ -66,14 +66,13 @@ public class Hl7RelatedGeneralUtils {
     return status.toCode();
   }
 
-
-
-  public static String generateName(Object prefix, Object given, Object family, Object suffix) {
-    LOGGER.info("Generating name from  from prefix {}, given {}, family {} ,suffix {}", prefix,
-        given, family, suffix);
+  public static String generateName(Object prefix, Object first, Object middle, Object family, Object suffix) {
+    LOGGER.info("Generating name from  from prefix {}, first {}, family {} ,suffix {}", prefix,
+            first, middle, family, suffix);
     StringBuilder sb = new StringBuilder();
     String valprefix = Hl7DataHandlerUtil.getStringValue(prefix);
-    String valgiven = Hl7DataHandlerUtil.getStringValue(given);
+    String valfirst = Hl7DataHandlerUtil.getStringValue(first);
+    String valmiddle = Hl7DataHandlerUtil.getStringValue(middle);
     String valfamily = Hl7DataHandlerUtil.getStringValue(family);
     String valsuffix = Hl7DataHandlerUtil.getStringValue(suffix);
 
@@ -81,8 +80,11 @@ public class Hl7RelatedGeneralUtils {
 
       sb.append(valprefix).append(" ");
     }
-    if (valgiven != null) {
-      sb.append(valgiven).append(" ");
+    if (valfirst != null) {
+      sb.append(valfirst).append(" ");
+    }
+    if (valmiddle != null) {
+      sb.append(valmiddle).append(" ");
     }
     if (valfamily != null) {
       sb.append(valfamily).append(" ");
@@ -154,7 +156,6 @@ public class Hl7RelatedGeneralUtils {
 
 	  return result;
   }
-
 
   public static String getAddressUse(String xad7Type, String xad16Temp, String xad17Bad) {
     LOGGER.info("Calculating address Use from XAD.7 {}, XAD.16 {}, XAD.17 {}", xad7Type,
