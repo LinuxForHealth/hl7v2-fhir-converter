@@ -7,9 +7,14 @@ package io.github.linuxforhealth.hl7.segments;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import java.io.IOException;
+import java.util.List;
 
+
+import org.hl7.fhir.r4.model.HumanName;
+import org.hl7.fhir.r4.model.Enumerations;
 import org.hl7.fhir.r4.model.Patient;
 import org.hl7.fhir.r4.model.codesystems.V3MaritalStatus;
+import org.hl7.fhir.r4.model.StringType;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -157,6 +162,58 @@ public class Hl7PatientFHIRConversionTest {
     assertThat(patientObjMultipleNumberAndBooleanY.getMultipleBirthIntegerType().asStringValue()).isEqualTo("3");  //DateUtil.formatToDate
   }
 
+  @Test
+  public void patient_use_name_conversion_test() {
+    String patientUseName =
+            "MSH|^~\\&|MyEMR|DE-000001| |CAIRLO|20160701123030-0700||VXU^V04^VXU_V04|CA0001|P|2.6|||ER|AL|||||Z22^CDCPHINVS|DE-000001\r" +
+                    "PID|1||PA123456^^^MYEMR^MR||JONES^GEORGE^M^JR^^^B|MILLER^MARTHA^G^^^^M|20140227|M||2106-3^WHITE^CDCREC|1234 W FIRST ST^^BEVERLY HILLS^CA^90210^^H||^PRN^PH^^^555^5555555||ENG^English^HL70296|||||||2186-5^ not Hispanic or Latino^CDCREC||Y|2\r";
+
+    Patient patientObjUsualName = PatientUtils.createPatientFromHl7Segment(patientUseName);
+
+    java.util.List<org.hl7.fhir.r4.model.HumanName> name = patientObjUsualName.getName();
+    HumanName.NameUse useName =  name.get(0).getUse();
+    assertThat(useName).isEqualTo(HumanName.NameUse.OFFICIAL);
+
+  }
+
+  @Test
+  public void patient_name_test() {
+    String patientHasMiddleName =
+            "MSH|^~\\&|MyEMR|DE-000001| |CAIRLO|20160701123030-0700||VXU^V04^VXU_V04|CA0001|P|2.6|||ER|AL|||||Z22^CDCPHINVS|DE-000001\r" +
+                    "PID|1||PA123456^^^MYEMR^MR||JONES^GEORGE^M^JR^^^B|MILLER^MARTHA^G^^^^M|20140227|M||2106-3^WHITE^CDCREC|1234 W FIRST ST^^BEVERLY HILLS^CA^90210^^H||^PRN^PH^^^555^5555555||ENG^English^HL70296|||||||2186-5^ not Hispanic or Latino^CDCREC||Y|2\r";
+
+    Patient patientObjUsualName = PatientUtils.createPatientFromHl7Segment(patientHasMiddleName);
+
+    java.util.List<org.hl7.fhir.r4.model.HumanName> name = patientObjUsualName.getName();
+    List  givenName =  name.get(0).getGiven();
+    List<StringType> suffix = name.get(0).getSuffix();
+    String fullName = name.get(0).getText();
+    assertThat(givenName.get(0).toString()).isEqualTo("GEORGE");
+    assertThat(givenName.get(1).toString()).isEqualTo("M");
+    assertThat(suffix.get(0).toString()).isEqualTo("JR");
+    assertThat(fullName).isEqualTo("GEORGE M JONES JR");
+
+  }
+
+  @Test
+  public void patient_gender_test() {
+    String patientEmptyGenderField =
+            "MSH|^~\\&|MyEMR|DE-000001| |CAIRLO|20160701123030-0700||VXU^V04^VXU_V04|CA0001|P|2.6|||ER|AL|||||Z22^CDCPHINVS|DE-000001\r" +
+                    "PID|0010||PID1234^5^M11^A^MR^HOSP~1234568965^^^USA^SS||DOE^JOHN^A^||19800202|||W|111 TEST_STREET_NAME^^TEST_CITY^NY^111-1111^USA||(905)111-1111|||S|ZZ|12^^^124|34-13-312||||TEST_BIRTH_PLACE\r";
+
+    String patientWithGenderField =
+            "MSH|^~\\&|MyEMR|DE-000001| |CAIRLO|20160701123030-0700||VXU^V04^VXU_V04|CA0001|P|2.6|||ER|AL|||||Z22^CDCPHINVS|DE-000001\r" +
+                    "PID|0010||PID1234^5^M11^A^MR^HOSP~1234568965^^^USA^SS||DOE^JOHN^A^||19800202|M||W|111 TEST_STREET_NAME^^TEST_CITY^NY^111-1111^USA||(905)111-1111|||S|ZZ|12^^^124|34-13-312||||TEST_BIRTH_PLACE\r";
+
+    Patient patientObjNoGender = PatientUtils.createPatientFromHl7Segment(patientEmptyGenderField);
+    Enumerations.AdministrativeGender gender = patientObjNoGender.getGender();
+    assertThat(gender).isNull();
+
+    Patient patientObjGender = PatientUtils.createPatientFromHl7Segment(patientWithGenderField);
+    Enumerations.AdministrativeGender gen = patientObjGender.getGender();
+    assertThat(gen).isNotNull();
+    assertThat(gen).isEqualTo(Enumerations.AdministrativeGender.MALE);
+  }
   @Test
   public void patient_marital_status_test(){
     String marriedPatient =

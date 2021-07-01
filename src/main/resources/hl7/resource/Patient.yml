@@ -10,7 +10,7 @@
 resourceType: Patient
 id:
   type: STRING
-  valueOf: 'UUID.randomUUID()'
+  valueOf: "UUID.randomUUID()"
   expressionType: JEXL
 
 identifier:
@@ -69,7 +69,7 @@ deceasedDateTime:
      condition: $deceasedDateTime NOT_NULL
      type: DATE_TIME
      valueOf: PID.29
-     expressionType: HL7Spec  
+     expressionType: HL7Spec
      vars:
           deceasedDateTime: PID.29
 

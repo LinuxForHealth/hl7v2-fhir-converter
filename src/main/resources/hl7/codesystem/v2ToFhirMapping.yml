@@ -64,6 +64,20 @@ MessageReasonEncounter:
 SpecimenStatus:
   Y: available
   N: unavailable
+   
+NameUse:
+  A: anonymous
+  B: official
+  C: official
+  D: usual
+  I: official
+  L: official
+  M: maiden
+  N: nickname
+  S: anonymous
+  TEMP: temp
+  NOUSE: old
+  BAD: old
 
 V3MaritalStatus:
   A: A
