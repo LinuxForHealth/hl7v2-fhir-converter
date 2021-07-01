@@ -107,7 +107,7 @@ public class SimpleDataValueResolver {
         if (code != null) {
           return code;
         } else if (val == null) {
-          return AdministrativeGender.NULL.toCode();
+          return null;
         } else {
           return AdministrativeGender.UNKNOWN.toCode();
         }
