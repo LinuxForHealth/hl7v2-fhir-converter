@@ -74,11 +74,10 @@ deceasedDateTime:
           deceasedDateTime: PID.29
 
 maritalStatus:
-  valueOf: datatype/CodeableConcept
-  generateList: true
+  valueOf: datatype/CodeableConcept_object
   expressionType: resource
   vars:
-    code: MARITAL_STATUS, PID.16
+    valCodeableConcept: MARITAL_STATUS, PID.16
 
 extension_1:
   condition: $valString NOT_NULL

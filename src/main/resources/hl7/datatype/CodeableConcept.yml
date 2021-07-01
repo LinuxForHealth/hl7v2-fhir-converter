@@ -44,16 +44,6 @@ coding_4:
        display: CWE.5
        version: CWE.8
 
-coding_5:
-  generateList: true
-  valueOf: datatype/CodeableConcept_var
-  expressionType: resource
-  vars:
-    system: String, GeneralUtils.getCodeableConceptSystem(code)
-    code: String, GeneralUtils.getCodeableConceptCode(code)
-    display: String, GeneralUtils.getCodeableConceptDisplay(code)
-    text: String, GeneralUtils.getCodeableConceptDisplay(code)
-       
 text:  
      type: STRING
      valueOf: CWE.2 |CWE.9 |CE.2 |CNE.2| ST |TX |ID |IS | CWE.5

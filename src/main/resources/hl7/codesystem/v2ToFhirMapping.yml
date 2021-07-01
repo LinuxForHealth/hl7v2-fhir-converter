@@ -65,22 +65,17 @@ SpecimenStatus:
   Y: available
   N: unavailable
 
-MaritalStatus:
-  A: L
-  B: U
-  C: U
+V3MaritalStatus:
+  A: A
+  C: C
   D: D
-  E: L
-  G: U
   I: I
+  L: L
   M: M
-  N: A
-  O: UNK
-  P: T
-  R: T
-  S: B
-  T: S
-  U: UNK
+  P: P
+  S: S
+  T: T
+  U: U
   W: W
 
 V3ReligiousAffiliation:
