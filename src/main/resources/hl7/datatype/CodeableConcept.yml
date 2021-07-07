@@ -43,7 +43,7 @@ coding_4:
        system: CWE.6
        display: CWE.5
        version: CWE.8
-       
+
 text:  
      type: STRING
      valueOf: CWE.2 |CWE.9 |CE.2 |CNE.2| ST |TX |ID |IS | CWE.5

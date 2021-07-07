@@ -14,6 +14,7 @@ import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.Observation.ObservationStatus;
 import org.hl7.fhir.r4.model.Specimen.SpecimenStatus;
+import org.hl7.fhir.r4.model.codesystems.V3MaritalStatus;
 import org.junit.Test;
 import ca.uhn.hl7v2.model.DataTypeException;
 import ca.uhn.hl7v2.model.v26.datatype.TX;
@@ -150,6 +151,17 @@ public class SimpleDataValueResolverTest {
     String gen = "ZZZ";
     CodeableConcept codeableConcept = SimpleDataValueResolver.RELIGIOUS_AFFILIATION_FHIR_CC.apply(gen);
     assertThat(codeableConcept).isNull();
+  }
+
+  @Test
+  public void get_marital_status_value_valid() {
+    String gen = "A";
+    CodeableConcept codeableConcept = SimpleDataValueResolver.MARITAL_STATUS_CODE_FHIR.apply(gen);
+    Coding coding = codeableConcept.getCodingFirstRep();
+    assertThat(codeableConcept.getText()).isEqualTo(V3MaritalStatus.A.getDisplay());
+    assertThat(codeableConcept.hasCoding()).isTrue();
+    assertThat(coding.getDisplay()).isEqualTo(V3MaritalStatus.A.getDisplay());
+    assertThat(coding.getSystem()).isEqualTo(V3MaritalStatus.A.getSystem());
   }
 
   @Test

@@ -175,7 +175,6 @@ public class Hl7RelatedGeneralUtilsTest {
     assertThat(Hl7RelatedGeneralUtils.getAddressType("SH",ANYTHING)).isEqualTo("");
     assertThat(Hl7RelatedGeneralUtils.getAddressType(ANYTHING,ANYTHING)).isEqualTo("");
   }
-
   // Note: Utility  Hl7RelatedGeneralUtils.getAddressDistrict is more effectively tested as part of Patient Address testing
 
 }
