@@ -1,0 +1,17 @@
+#
+# (C) Copyright IBM Corp. 2021
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+---
+language:
+  type:
+  valueOf: datatype/CodeableConcept
+  expressionType: resource
+  specs: PID.15
+
+preferred:
+  valueOf: BOOLEAN
+  expressionType: resource
+  specs: PID.15
+
