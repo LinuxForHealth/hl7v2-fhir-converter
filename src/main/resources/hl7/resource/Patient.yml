@@ -34,6 +34,26 @@ address:
     expressionType: resource
     specs: PID.11
 
+  
+telecom_1:
+    valueOf: datatype/Telecom
+    generateList: true
+    expressionType: resource
+    specs: PID.14
+    constants: 
+       use: "work"
+
+# The yaml is processed in reverse order, 
+# Put the PID.13 last in yaml so it is first to be processed 
+# and therefore gets the rank of 1.          
+telecom_2:
+    valueOf: datatype/Telecom
+    generateList: true
+    expressionType: resource
+    specs: PID.13
+    constants: 
+       use: "home"
+
 birthDate:
      type: DATE
      valueOf: PID.7

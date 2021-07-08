@@ -1,0 +1,48 @@
+#
+# (C) Copyright IBM Corp. 2021
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+---
+
+system:
+     type: STRING
+     valueOf: $contactSystem
+     constants: 
+          contactSystem: "phone"
+
+value:
+     type: STRING
+     valueOf: 'GeneralUtils.getFormattedTelecomNumberValue( xtn1Old, xtn5Country, xtn6Area, xtn7Local, xtn8Extension, xtn12Unformatted )'
+     expressionType: JEXL
+     vars:
+          xtn1Old: String, XTN.1
+          xtn5Country: String, XTN.5
+          xtn6Area: String, XTN.6
+          xtn7Local: String, XTN.7
+          xtn8Extension: String, XTN.8
+          xtn12Unformatted: String, XTN.12
+
+# Default use to "home" or "work", whatever is passed in
+use_1:
+     type: STRING
+     valueOf: $use
+     expressionType: HL7Spec
+
+# But if CP, then change use to "mobile"
+use_2:
+     condition: $equipmentType EQUALS CP
+     type: STRING
+     valueOf: $mobile
+     expressionType: HL7Spec
+     vars:
+         equipmentType: String, XTN.3
+     constants:
+         mobile: "mobile"      
+
+rank: 
+     type: STRING
+     valueOf: XTN.18
+     expressionType: HL7Spec
+
+          

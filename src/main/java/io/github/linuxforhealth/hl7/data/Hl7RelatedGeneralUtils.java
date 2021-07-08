@@ -239,4 +239,39 @@ public class Hl7RelatedGeneralUtils {
         return codeableConcept.getCodingFirstRep().getDisplay();
     }
 
+    // Takes all the pieces of telecom number from XTN, formats to a user friendly Telecom number based on rules documented in the steps
+    public static String getFormattedTelecomNumberValue(String xtn1Old, String xtn5Country, String xtn6Area, String xtn7Local, String xtn8Extension, String xtn12Unformatted) {
+        String returnValue = "";
+
+        // If the local number exists, concatenate country, area, local.
+        if (xtn7Local != null && xtn7Local.length() > 0) {
+            if (xtn5Country != null && xtn5Country.length() > 0) {
+                // If there is a country code, format +22 123 456 7890
+                returnValue = "+" + xtn5Country + " " + xtn6Area + " " + formatLocalNumber(xtn7Local);
+            } else {
+                // If there is a NOT a country code, format (123) 456 7890
+                returnValue = "(" + xtn6Area + ") " + formatLocalNumber(xtn7Local);
+            }
+            // If an exrention exists, append a space and the extension 
+            if (xtn8Extension != null && xtn8Extension.length() > 0) {
+                returnValue = returnValue + " " + xtn8Extension;
+            }
+        // otherwise if the unformatted number exists, use it
+        } else if (xtn12Unformatted != null && xtn12Unformatted.length() > 0) {
+            returnValue = xtn12Unformatted;
+       // otherwise if the string number exists, use it    
+        } else if (xtn1Old != null && xtn1Old.length() > 0) {
+            returnValue = xtn1Old;
+        }
+        return returnValue;
+    }
+
+    // Private method to split and format the 7 digit local telecom number
+    private static String formatLocalNumber(String localNumber) {
+        // Split after the 3rd digit, add a space, add the rest of the number
+        // Seven digit number will format:  123 4567
+        return localNumber.substring(0, 3) + " " + localNumber.substring(3);
+    }
+
+
 }

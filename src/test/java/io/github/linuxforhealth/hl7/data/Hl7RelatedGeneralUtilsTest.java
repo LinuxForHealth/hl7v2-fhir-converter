@@ -177,5 +177,35 @@ public class Hl7RelatedGeneralUtilsTest {
   }
   // Note: Utility  Hl7RelatedGeneralUtils.getAddressDistrict is more effectively tested as part of Patient Address testing
 
+  @Test
+  public void getFormattedTelecomNumberValue() {  
+    // Empty values return nothing
+    assertThat(Hl7RelatedGeneralUtils.getFormattedTelecomNumberValue("","","","","","")).isEmpty();
+    // Everything empty except XTN1 returns XTN1.
+    assertThat(Hl7RelatedGeneralUtils.getFormattedTelecomNumberValue("111","","","","","")).isEqualTo("111");
+    // Everything empty except XTN12 returns XTN12.
+    assertThat(Hl7RelatedGeneralUtils.getFormattedTelecomNumberValue("","","","","","112")).isEqualTo("112");
+    // XTN12 takes priority over XTN1
+    assertThat(Hl7RelatedGeneralUtils.getFormattedTelecomNumberValue("111","","","","","112")).isEqualTo("112");
+    // Country, Area, and Extension are ignored if there is no Local number
+    assertThat(Hl7RelatedGeneralUtils.getFormattedTelecomNumberValue("","22","333","","x555","")).isEmpty();
+    // XTN12 and XTN1 will be used if no local number
+    assertThat(Hl7RelatedGeneralUtils.getFormattedTelecomNumberValue("111","22","333","","x555","")).isEqualTo("111");
+    assertThat(Hl7RelatedGeneralUtils.getFormattedTelecomNumberValue("","22","333","","x555","112")).isEqualTo("112");
+    // Country, Area, and Extension are used if there is a Local number, and XTN1 and XTN12 are ignored  
+    assertThat(Hl7RelatedGeneralUtils.getFormattedTelecomNumberValue("111","22","333","4444444","x555","112")).isNotEmpty();
+    assertThat(Hl7RelatedGeneralUtils.getFormattedTelecomNumberValue("111","22","333","4444444","x555","112")).contains("+22");
+    assertThat(Hl7RelatedGeneralUtils.getFormattedTelecomNumberValue("111","22","333","4444444","x555","112")).contains("333");
+    assertThat(Hl7RelatedGeneralUtils.getFormattedTelecomNumberValue("111","22","333","4444444","x555","112")).contains("4444");
+    assertThat(Hl7RelatedGeneralUtils.getFormattedTelecomNumberValue("111","22","333","4444444","x555","112")).contains("x555");
+    assertThat(Hl7RelatedGeneralUtils.getFormattedTelecomNumberValue("111","22","333","4444444","x555","112")).isEqualTo("+22 333 444 4444 x555");
+        // Country, Area, and Extension are used if there is a Local number, and XTN1 and XTN12 are ignored  
+    assertThat(Hl7RelatedGeneralUtils.getFormattedTelecomNumberValue("111","","333","4444444","x555","112")).isNotEmpty();
+    assertThat(Hl7RelatedGeneralUtils.getFormattedTelecomNumberValue("111","","333","4444444","x555","112")).contains("333");
+    assertThat(Hl7RelatedGeneralUtils.getFormattedTelecomNumberValue("111","","333","4444444","x555","112")).contains("4444");
+    assertThat(Hl7RelatedGeneralUtils.getFormattedTelecomNumberValue("111","","333","4444444","x555","112")).contains("x555");
+    assertThat(Hl7RelatedGeneralUtils.getFormattedTelecomNumberValue("111","","333","4444444","x555","112")).isEqualTo("(333) 444 4444 x555");
+  }
+
 }
 
