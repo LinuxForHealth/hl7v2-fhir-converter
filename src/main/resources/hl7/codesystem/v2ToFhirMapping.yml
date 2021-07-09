@@ -5,65 +5,61 @@
 #
 # Mapping set named the same as the FHIR simplified class name (last segment)
 AllergyIntoleranceCategory:
-  AA: environment
-  DA: medication
-  EA: environment
-  FA: food
-  LA: environment
-  PA: environment
-
+   AA: environment
+   DA: medication
+   EA: environment
+   FA: food
+   LA: environment
+   PA: environment
 AllergyIntoleranceCriticality:
-  MI: low
-  MO: low
-  SV: high
-  U: unable-to-assess
-
+   MI: low
+   MO: low
+   SV: high
+   U: unable-to-assess
 ObservationStatus:
-  C: corrected
-  D: cancelled
-  F: final
-  I: registered
-  P: preliminary
-  W: entered-in-error
-
+   C: corrected
+   D: cancelled
+   F: final
+   I: registered
+   P: preliminary
+   W: entered-in-error
 AdministrativeGender:
-  A: other
-  F: female
-  M: male
-  N: unknown
-  O: other
-  U: unknown
-  
+   A: other
+   F: female
+   M: male
+   N: unknown
+   O: other
+   U: unknown
 DiagnosticReportStatus:
-  A: partial
-  C: corrected
-  F: final
-  I: unknown
-  O: unknown
-  P: preliminary
-  R: registered
-  S: unknown
-  X: cancelled
-  Y: unknown
-  Z: unknown
-
+   A: partial
+   C: corrected
+   F: final
+   I: unknown
+   O: unknown
+   P: preliminary
+   R: registered
+   S: unknown
+   X: cancelled
+   Y: unknown
+   Z: unknown
+   
 ImmunizationStatus:
   CP: completed
   NA: not-done
   PA: not-done
   RE: not-done
-
+  
 MessageReasonEncounter:
-  A01: admit
-  A03: discharge
-  A21: absent
-  A22: return
-  A02: moved
-  A06: moved
-  A07: moved
-  A08: edit
-  A28: edit
-  A31: edit
+   A01: admit
+   A03: discharge
+   A21: absent
+   A22: return
+   A02: moved
+   A06: moved
+   A07: moved
+   A08: edit
+   A28: edit
+   A31: edit
 
 SpecimenStatus:
   Y: available
@@ -82,6 +78,19 @@ NameUse:
   TEMP: temp
   NOUSE: old
   BAD: old
+
+V3MaritalStatus:
+  A: A
+  C: C
+  D: D
+  I: I
+  L: L
+  M: M
+  P: P
+  S: S
+  T: T
+  U: U
+  W: W
 
 V3ReligiousAffiliation:
   # Not all V2.6 religions mapped exactly to FHIR codings.  ** indicates a best approximation or generalization

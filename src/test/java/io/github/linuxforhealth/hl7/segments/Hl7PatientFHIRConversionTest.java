@@ -13,6 +13,7 @@ import java.util.List;
 import org.hl7.fhir.r4.model.HumanName;
 import org.hl7.fhir.r4.model.Enumerations;
 import org.hl7.fhir.r4.model.Patient;
+import org.hl7.fhir.r4.model.codesystems.V3MaritalStatus;
 import org.hl7.fhir.r4.model.StringType;
 import org.junit.Rule;
 import org.junit.Test;
@@ -212,6 +213,20 @@ public class Hl7PatientFHIRConversionTest {
     Enumerations.AdministrativeGender gen = patientObjGender.getGender();
     assertThat(gen).isNotNull();
     assertThat(gen).isEqualTo(Enumerations.AdministrativeGender.MALE);
+  }
+  @Test
+  public void patient_marital_status_test(){
+    String marriedPatient =
+            "MSH|^~\\&|MyEMR|DE-000001| |CAIRLO|20160701123030-0700||VXU^V04^VXU_V04|CA0001|P|2.6|||ER|AL|||||Z22^CDCPHINVS|DE-000001\r" +
+                    "PID|1||000054321^^^MRN||COOPER^SHELDON^ANDREW||19820512|M||2106-3|765 SOMESTREET RD UNIT 3A^^PASADENA^LA^558846^United States of America||4652141486^Home^^shelly@gmail.com||EN^English|M|CAT|78654||||N\r";
+
+
+    Patient patientObjMarried = PatientUtils.createPatientFromHl7Segment(marriedPatient);
+    assertThat(patientObjMarried.hasMaritalStatus()).isTrue();
+    assertThat(patientObjMarried.getMaritalStatus().getText()).isEqualTo(V3MaritalStatus.M.getDisplay());
+    assertThat(patientObjMarried.getMaritalStatus().getCodingFirstRep().getDisplay()).isEqualTo(V3MaritalStatus.M.getDisplay());
+    assertThat(patientObjMarried.getMaritalStatus().getCodingFirstRep().getSystem()).isEqualTo(V3MaritalStatus.M.getSystem());
+
   }
 
   @Test
