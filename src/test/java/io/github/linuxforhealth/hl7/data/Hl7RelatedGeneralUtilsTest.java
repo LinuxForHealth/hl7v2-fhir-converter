@@ -10,6 +10,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.List;
 
 import org.hl7.fhir.r4.model.codesystems.EncounterStatus;
+import org.junit.Ignore;
 import org.junit.Test;
 
 
@@ -81,7 +82,7 @@ public class Hl7RelatedGeneralUtilsTest {
   }
 
 
-  @Test
+ @Ignore @Test
   public void test_date_diff_valid_values_no_min() {
 
     Long diff = Hl7RelatedGeneralUtils.diffDateMin("2007-11-05",
@@ -175,7 +176,6 @@ public class Hl7RelatedGeneralUtilsTest {
     assertThat(Hl7RelatedGeneralUtils.getAddressType("SH",ANYTHING)).isEqualTo("");
     assertThat(Hl7RelatedGeneralUtils.getAddressType(ANYTHING,ANYTHING)).isEqualTo("");
   }
-
   // Note: Utility  Hl7RelatedGeneralUtils.getAddressDistrict is more effectively tested as part of Patient Address testing
 
 }
