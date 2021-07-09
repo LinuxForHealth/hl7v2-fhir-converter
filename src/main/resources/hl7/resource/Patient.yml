@@ -43,9 +43,9 @@ telecom_1:
     constants: 
        use: "work"
 
-# The yaml is processed in reverse order, 
-# Put the PID.13 last in yaml so it is first to be processed 
-# and therefore gets the rank of 1.          
+# The yaml is processed in reverse order, therefore
+# put the PID.13 last in yaml so it is first to be processed 
+       
 telecom_2:
     valueOf: datatype/Telecom
     generateList: true

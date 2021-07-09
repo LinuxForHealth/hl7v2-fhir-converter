@@ -243,18 +243,12 @@ public class Hl7RelatedGeneralUtils {
     public static String getFormattedTelecomNumberValue(String xtn1Old, String xtn5Country, String xtn6Area, String xtn7Local, String xtn8Extension, String xtn12Unformatted) {
         String returnValue = "";
 
-        // If the local number exists, concatenate country, area, local.
+        // If the local number exists...
         if (xtn7Local != null && xtn7Local.length() > 0) {
-            if (xtn5Country != null && xtn5Country.length() > 0) {
-                // If there is a country code, format +22 123 456 7890
-                returnValue = "+" + xtn5Country + " " + xtn6Area + " " + formatLocalNumber(xtn7Local);
-            } else {
-                // If there is a NOT a country code, format (123) 456 7890
-                returnValue = "(" + xtn6Area + ") " + formatLocalNumber(xtn7Local);
-            }
-            // If an exrention exists, append a space and the extension 
+            returnValue = formatCountryAndArea(xtn5Country, xtn6Area) + formatLocalNumber(xtn7Local);
+             // If an extention exists with any form of local number, append a space the extension abbreviation
             if (xtn8Extension != null && xtn8Extension.length() > 0) {
-                returnValue = returnValue + " " + xtn8Extension;
+                returnValue = returnValue + " ext. " + xtn8Extension;
             }
         // otherwise if the unformatted number exists, use it
         } else if (xtn12Unformatted != null && xtn12Unformatted.length() > 0) {
@@ -273,5 +267,20 @@ public class Hl7RelatedGeneralUtils {
         return localNumber.substring(0, 3) + " " + localNumber.substring(3);
     }
 
+    // Private method to format the country and area code
+    private static String formatCountryAndArea(String country, String area) {
+        String returnValue = "";
+        // Only process formatting if there is an area code
+        if (area != null && area.length() > 0) {
+            if (country != null && country.length() > 0) {
+                // If there is a country code, format +22 123 456 7890
+                returnValue = "+" + country + " " + area + " ";
+            } else {
+                // If there is a NOT a country code, format (123) 456 7890
+                returnValue = "(" + area + ") ";
+            }
+        }
+        return returnValue;
+     }
 
 }
