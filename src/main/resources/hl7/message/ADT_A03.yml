@@ -1,9 +1,9 @@
 #
-# (C) Copyright IBM Corp. 2020
+# (C) Copyright IBM Corp. 2021
 #
 # SPDX-License-Identifier: Apache-2.0
 #
-# FHIR Resources to extract from ADT_A01 message
+# FHIR Resources to extract from ADT_A03 message
 ---
 resources:
     - resourceName: MessageHeader
@@ -22,15 +22,6 @@ resources:
       additionalSegments:
              - PD1
       
-    - resourceName: Encounter
-      segment: PV1
-      resourcePath: resource/Encounter
-      repeats: false
-      isReferenced: true
-      additionalSegments:
-             - PV2
-             - EVN
-
     - resourceName: Observation
       segment: OBX
       resourcePath: resource/Observation

@@ -1,9 +1,9 @@
 #
-# (C) Copyright IBM Corp. 2020
+# (C) Copyright IBM Corp. 2021
 #
 # SPDX-License-Identifier: Apache-2.0
 #
-# FHIR Resources to extract from VXU_V04 message
+# FHIR Resources to extract from MDM_T04 message
 ---
 resources:
     - resourceName: MessageHeader
@@ -11,32 +11,27 @@ resources:
       resourcePath: resource/MessageHeader
       repeats: false
       isReferenced: false
-      additionalSegments:
-
+      additionalSegments: 
+             - EVN
+   
     - resourceName: Patient
       segment: PID
       resourcePath: resource/Patient
-      isReferenced: true
       repeats: false
+      isReferenced: true
       additionalSegments:
-             - PD1
       
     - resourceName: Encounter
-      segment: .PV1
+      segment: PV1
       resourcePath: resource/Encounter
-      isReferenced: true
-      group: PATIENT
       repeats: false
+      isReferenced: true
       additionalSegments:
-             - .PV2
+             - EVN
 
-    - resourceName: Immunization
-      segment: .RXA
-      group: ORDER
-      resourcePath: resource/Immunization
+    - resourceName: Observation
+      segment: OBX
+      resourcePath: resource/Observation
       repeats: true
-      isReferenced: false
+      isReferenced: true
       additionalSegments:
-              - .ORC
-              - .RXR
-              - .OBSERVATION.OBX

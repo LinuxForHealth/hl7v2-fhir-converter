@@ -19,6 +19,7 @@ resources:
     isReferenced: true
     repeats: false
     additionalSegments:
+      - .PD1
 
   - resourceName: Encounter
     segment: .PATIENT_VISIT.PV1
@@ -38,3 +39,9 @@ resources:
     additionalSegments:
       - .ORC
       - .COMPONENT.RXC
+
+  - resourceName: AllergyIntolerance
+    segment: AL1
+    resourcePath: resource/AllergyIntolerance
+    repeats: true
+    additionalSegments:
