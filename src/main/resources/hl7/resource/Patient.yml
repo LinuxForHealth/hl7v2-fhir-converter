@@ -36,21 +36,27 @@ address:
 
   
 telecom_1:
+    condition: $pid14 NOT_NULL
     valueOf: datatype/Telecom
     generateList: true
     expressionType: resource
     specs: PID.14
+    vars:
+       pid14: PID.14
     constants: 
        use: "work"
 
 # The yaml is processed in reverse order, therefore
-# put the PID.13 last in yaml so it is first to be processed 
+# Put the PID.13 last in yaml so it is first to be processed 
        
 telecom_2:
+    condition: $pid13 NOT_NULL
     valueOf: datatype/Telecom
     generateList: true
     expressionType: resource
     specs: PID.13
+    vars:
+       pid13: PID.13
     constants: 
        use: "home"
 

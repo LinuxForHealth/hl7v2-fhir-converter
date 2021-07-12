@@ -61,5 +61,19 @@ public class Hl7TelecomFHIRConversionTest {
 
   }
 
+  @Test
+
+  public void patient_no_telcom_test() {
+
+    String patientNoPhone =
+    "MSH|^~\\&|MIICEHRApplication|MIIC|MIIC|MIIC|201705130822||VXU^V04^VXU_V04|test1100|P|2.5.1|||AL|AL|||||Z22^CDCPHINVS|^^^^^MIIC^SR^^^MIIC|MIIC\n"
+    + "PID|1||12345678^^^^MR|ALTID|Moose^Mickey^J^III^^^||20060504|M||||||||||||||||||||||\n"
+    ;
   
+    Patient patient = PatientUtils.createPatientFromHl7Segment(patientNoPhone);
+    assertThat(patient.hasTelecom()).isFalse();
+
+  }
+
+
 }
