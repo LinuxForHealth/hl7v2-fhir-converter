@@ -13,7 +13,6 @@ AllergyIntoleranceCategory:
    PA: environment
 AllergyIntoleranceCriticality:
    MI: low
-   MO: low
    SV: high
    U: unable-to-assess
 ObservationStatus:
