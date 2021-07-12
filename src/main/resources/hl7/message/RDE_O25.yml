@@ -18,7 +18,7 @@ resources:
     isReferenced: true
     repeats: false
     additionalSegments:
-      - .PID
+      - .PD1
 
   - resourceName: Encounter
     segment: .PATIENT_VISIT.PV1
