@@ -273,8 +273,8 @@ Note: BASE_VALUE is reserved for base value provided to an expression during eva
 #### Condition
 Conditions evaluate to true or false.<br>
 Engine supports the following condition types:
-* Null check,  example: ``condition:$var1 NULL``
-* Not null check, example: ``condition:$var1 NOT_NULL``
+* Null check,  example: ``condition: $var1 NULL``
+* Not null check, example: ``condition: $var1 NOT_NULL``
 * Simple condition,  example: ``condition: $obx2 EQUALS DR``
 * Conditions with AND,   example: ``condition: $obx2 EQUALS SN && $obx5.3 EQUALS ':'``
 * Conditions with OR, example: ``condition: $obx2 EQUALS TX || $obx2 EQUALS ST``
@@ -622,3 +622,5 @@ text:
 }
 
 ```
+
+More techniques and coding examples are found in [Techniques](TECHNIQUES.md)
