@@ -4492,7 +4492,3 @@
   description: "Financial Class (HL7)"
   url: "https://phinvads.cdc.gov/vads/ViewCodeSystem.action?id=2.16.840.1.113883.12.64#"
   oid: "urn:oid:2.16.840.1.113883.12.64"
-- id: "	CommonLanguages"
-  description: "Common Languages"
-  url: "http://hl7.org/fhir/ValueSet/languages"
-  oid: "urn:oid:2.16.840.1.113883.4.642.3.20"

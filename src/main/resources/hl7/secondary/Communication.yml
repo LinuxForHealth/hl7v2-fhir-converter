@@ -11,6 +11,8 @@ language:
 
 preferred:
   type: BOOLEAN
-  valueOf: PID.15
+  valueOf: $boolTrue
   expressionType: HL7Spec
+  constants:
+    boolTrue: "true"
 

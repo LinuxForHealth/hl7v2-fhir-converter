@@ -98,7 +98,6 @@ extension_2:
     valCodeableConcept: RELIGIOUS_AFFILIATION_CC, PID.17
 
 communication:
-  condition: $communication NOT_NULL
   valueOf: secondary/Communication
   generateList: true
   expressionType: resource

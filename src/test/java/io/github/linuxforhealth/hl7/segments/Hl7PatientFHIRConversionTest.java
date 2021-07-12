@@ -237,5 +237,8 @@ public class Hl7PatientFHIRConversionTest {
                     "PID|1||PA123456^^^MYEMR^MR||JONES^GEORGE^M^JR^^^L|MILLER^MARTHA^G^^^^M|20140227|M||2106-3^WHITE^CDCREC|1234 W FIRST ST^^BEVERLY HILLS^CA^90210^^H||^PRN^PH^^^555^5555555||ENG^English^HL70296|||||||2186-5^ not Hispanic or Latino^CDCREC||Y|2\r";
 
     Patient patientObjEnglish = PatientUtils.createPatientFromHl7Segment(patientSpeaksEnglish);
+    assertThat(patientObjEnglish.hasCommunication()).isTrue();
+    assertThat(patientObjEnglish.getCommunication().get(0).getLanguage().getText()).isEqualTo("English");
+    assertThat(patientObjEnglish.getCommunication().get(0).getPreferred()).isTrue();
   }
 }
