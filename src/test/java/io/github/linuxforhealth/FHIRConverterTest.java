@@ -145,33 +145,6 @@ public class FHIRConverterTest {
   }
 
   @Test
-  public void test_allergy_Criticality(){
-    String hl7message = "MSH|^~\\&|SE050|050|PACS|050|20120912011230||ADT^A01|102|T|2.6|||AL|NE\r"
-            + "PID|0010||PID1234^5^M11^A^MR^HOSP~1234568965^^^USA^SS||DOE^JOHN^A^||19800202|F||W|111 TEST_STREET_NAME^^TEST_CITY^NY^111-1111^USA||(905)111-1111|||S|ZZ|12^^^124|34-13-312||||TEST_BIRTH_PLACE\r"
-            + "AL1|1|DRUG|00000741^OXYCODONE||HYPOTENSION\r";
-    HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
-    String json = ftv.convert(hl7message, OPTIONS);
-    System.out.println(json);
-
-    FHIRContext context = new FHIRContext();
-    IBaseResource bundleResource = context.getParser().parseResource(json);
-    assertThat(bundleResource).isNotNull();
-    Bundle b = (Bundle) bundleResource;
-    List<BundleEntryComponent> e = b.getEntry();
-    List<Resource> allergy = e.stream()
-            .filter(v -> ResourceType.AllergyIntolerance == v.getResource().getResourceType())
-            .map(BundleEntryComponent::getResource).collect(Collectors.toList());
-    assertThat(allergy).hasSize(1);
-
-    String s = context.getParser().encodeResourceToString(allergy.get(0));
-    Class<? extends IBaseResource> klass = AllergyIntolerance.class;
-    AllergyIntolerance resource = (AllergyIntolerance) context.getParser().parseResource(klass, s);
-
-
-    assertThat(resource.hasCriticality()).isFalse();
-
-  }
-  @Test
   public void test_dosage_output() throws  IOException {
 String hl7message =
                 "MSH|^~\\&|MyEMR|DE-000001| |CAIRLO|20160701123030-0700||VXU^V04^VXU_V04|CA0001|P|2.6|||ER|AL|||||Z22^CDCPHINVS|DE-000001\r" +
