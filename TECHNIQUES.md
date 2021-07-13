@@ -103,8 +103,9 @@ Hints about the ways syntax and references work in the YAML files
 
 ### Condition test variables, not templates
 
-Instead of testing the template field directly in the condition:
+Testing the segment fields directly in conditions doesn't work. Instead you must create a var for the template field and test the var.
 
+Not this:
 ```yaml
 telecom_1:
     condition: PID.14 NOT_NULL    
@@ -116,8 +117,7 @@ telecom_1:
        use: "work"
 ```
 
-Do this -- create a var for the template field and test the var
-
+Do this:
 ```yaml
 telecom_1:
     condition: $pid14 NOT_NULL    
