@@ -285,8 +285,8 @@ public class Hl7MessageTest {
         + "PID|1|465 306 5961|000010016^^^MR~000010017^^^MR~000010018^^^MR|407623|Wood^Patrick^^Sr^MR||19700101|female|||High Street^^Oxford^^Ox1 4DP~George St^^Oxford^^Ox1 5AP|||||||\r"
         + "NK1|1|Wood^John^^^MR|Father||999-9999\r" + "NK1|2|Jones^Georgie^^^MSS|MOTHER||999-9999\r"
         + "PV1|1||Location||||||||||||||||261938_6_201306171546|||||||||||||||||||||||||20130617134644|||||||||\r"
-        + "AL1|1|DA|^PENICILLIN|MO|PRODUCES HIVES~RASH|MO\r" //
-        + "AL1|2|AA|^CAT DANDER|SV";
+        + "AL1|1|DA|^PENICILLIN|MI|PRODUCES HIVES~RASH|MI\r" //
+        + "AL1|2|AA|^CAT DANDER|MI";
     String json = message.convert(hl7message, engine);
     IBaseResource bundleResource = context.getParser().parseResource(json);
     assertThat(bundleResource).isNotNull();
@@ -327,7 +327,7 @@ public class Hl7MessageTest {
         + "PID|1|465 306 5961|000010016^^^MR~000010017^^^MR~000010018^^^MR|407623|Wood^Patrick^^Sr^MR||19700101|female|||High Street^^Oxford^^Ox1 4DP~George St^^Oxford^^Ox1 5AP|||||||\r"
         + "NK1|1|Wood^John^^^MR|Father||999-9999\r" + "NK1|2|Jones^Georgie^^^MSS|MOTHER||999-9999\r"
         + "PV1|1||Location||||||||||||||||261938_6_201306171546|||||||||||||||||||||||||20130617134644|||||||||\r"
-        + "AL1|1|DA|^PENICILLIN|MO|PRODUCES HIVES~RASH|MO\r" //
+        + "AL1|1|DA|^PENICILLIN|MI|PRODUCES HIVES~RASH|MI\r" //
         + "AL1|2|AA|^CAT DANDER|SV";
     String json = message.convert(hl7message, engine);
     IBaseResource bundleResource = context.getParser().parseResource(json);

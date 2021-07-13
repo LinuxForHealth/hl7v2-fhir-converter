@@ -86,6 +86,7 @@ public class Hl7RelatedGeneralUtilsTest {
 
     Long diff = Hl7RelatedGeneralUtils.diffDateMin("2007-11-05",
         "2007-11-04T01:33:06.345+09:00");
+    System.out.println(diff);
     assertThat(diff).isNull();
   }
 
@@ -216,4 +217,3 @@ public class Hl7RelatedGeneralUtilsTest {
   }
 
 }
-
