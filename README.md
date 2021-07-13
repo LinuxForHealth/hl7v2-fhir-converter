@@ -30,7 +30,7 @@ cd hl7v2-fhir-converter
 
 ## Using The Converter In A Java Application
 
-The HL7 to FHIR converter library is available as a bintray dependency. 
+The HL7 to FHIR converter library is available as a maven dependency. 
 
 Library Coordinates
 ```
