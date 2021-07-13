@@ -260,7 +260,7 @@ public class SimpleDataValueResolver {
         if (code != null) {
             return code;
         } else {
-            return AllergyIntoleranceCriticality.UNABLETOASSESS.toCode();
+            return null;
         }
     };
 
