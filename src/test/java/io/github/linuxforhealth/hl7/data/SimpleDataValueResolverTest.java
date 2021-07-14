@@ -158,7 +158,6 @@ public class SimpleDataValueResolverTest {
     String gen = "A";
     CodeableConcept codeableConcept = SimpleDataValueResolver.MARITAL_STATUS_CODE_FHIR.apply(gen);
     Coding coding = codeableConcept.getCodingFirstRep();
-    assertThat(codeableConcept.getText()).isEqualTo(V3MaritalStatus.A.getDisplay());
     assertThat(codeableConcept.hasCoding()).isTrue();
     assertThat(coding.getDisplay()).isEqualTo(V3MaritalStatus.A.getDisplay());
     assertThat(coding.getSystem()).isEqualTo(V3MaritalStatus.A.getSystem());
