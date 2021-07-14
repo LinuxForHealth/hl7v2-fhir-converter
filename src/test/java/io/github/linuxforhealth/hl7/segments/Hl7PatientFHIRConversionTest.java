@@ -223,7 +223,6 @@ public class Hl7PatientFHIRConversionTest {
 
     Patient patientObjMarried = PatientUtils.createPatientFromHl7Segment(marriedPatient);
     assertThat(patientObjMarried.hasMaritalStatus()).isTrue();
-    assertThat(patientObjMarried.getMaritalStatus().getText()).isEqualTo(V3MaritalStatus.M.getDisplay());
     assertThat(patientObjMarried.getMaritalStatus().getCodingFirstRep().getDisplay()).isEqualTo(V3MaritalStatus.M.getDisplay());
     assertThat(patientObjMarried.getMaritalStatus().getCodingFirstRep().getSystem()).isEqualTo(V3MaritalStatus.M.getSystem());
 
