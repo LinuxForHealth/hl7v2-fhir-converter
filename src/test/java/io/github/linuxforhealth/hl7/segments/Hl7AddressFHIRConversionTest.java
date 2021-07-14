@@ -6,7 +6,6 @@
 package io.github.linuxforhealth.hl7.segments;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import java.io.IOException;
 import java.util.List;
 
 import org.hl7.fhir.r4.model.StringType;
@@ -52,13 +51,13 @@ public class Hl7AddressFHIRConversionTest {
     
     List<StringType> lines = address.getLine();
     assertThat(lines.size()).isEqualTo(3);
-    assertThat(lines.get(0).toString()).isEqualTo("111 1st Street");
-    assertThat(lines.get(1).toString()).isEqualTo("Suite #1");
-    assertThat(lines.get(2).toString()).isEqualTo("c/o Pluto19");
+    assertThat(lines.get(0).toString()).hasToString("111 1st Street");
+    assertThat(lines.get(1).toString()).hasToString("Suite #1");
+    assertThat(lines.get(2).toString()).hasToString("c/o Pluto19");
 
     assertThat(address.hasUse()).isTrue(); 
-    assertThat(address.getUse().toString()).isEqualTo("TEMP");
-    assertThat(address.getType().toString()).isEqualTo("PHYSICAL");
+    assertThat(address.getUse()).isEqualTo(Address.AddressUse.TEMP);
+    assertThat(address.getType()).isEqualTo(Address.AddressType.PHYSICAL);
 
   }
 
@@ -215,5 +214,24 @@ public class Hl7AddressFHIRConversionTest {
     assertThat(address.getPostalCode()).isEqualTo("22222");
   }
 
+  @Test
+  public void patient_postal_mail_test() {
+
+    String patientAddressWithPostalMail =
+    "MSH|^~\\&|MYEHR2.5|RI88140101|KIDSNET_IFL|RIHEALTH|20130531||VXU^V04^VXU_V04|20130531RI881401010105|P|2.6|||NE|AL||||||RI543763\n"
+    // "M" is postal mail
+    + "PID|1||432155^^^^MR||Patient^Johnny^New^^^^L|Smith^Sally|20130414|M||2106-3^White^HL70005|123 Any St^^Somewhere^WI^54000^^M"
+    ;
+    
+    // If address county, ignore patient county
+    Patient patient = PatientUtils.createPatientFromHl7Segment(patientAddressWithPostalMail);
+    assertThat(patient.hasAddress()).isTrue();
+    List<Address> addresses = patient.getAddress(); 
+    assertThat(addresses.size()).isEqualTo(1);
+
+    Address address = addresses.get(0); 
+    assertThat(address.getType()).isEqualTo(Address.AddressType.POSTAL); 
+
+  }
   
 }

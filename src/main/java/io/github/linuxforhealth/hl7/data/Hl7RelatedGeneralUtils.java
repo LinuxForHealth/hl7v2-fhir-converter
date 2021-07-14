@@ -65,8 +65,8 @@ public class Hl7RelatedGeneralUtils {
     }
 
     public static String generateName(Object prefix, Object first, Object middle, Object family, Object suffix) {
-        LOGGER.info("Generating name from  from prefix {}, first {}, family {} ,suffix {}", prefix,
-                first, middle, family, suffix);
+        LOGGER.info("Generating name from  from prefix {}, first {}, family {} ,suffix {}", prefix, first, middle,
+                family, suffix);
         StringBuilder sb = new StringBuilder();
         String valprefix = Hl7DataHandlerUtil.getStringValue(prefix);
         String valfirst = Hl7DataHandlerUtil.getStringValue(first);
@@ -103,7 +103,7 @@ public class Hl7RelatedGeneralUtils {
      * Returns difference between time2 - time1 in minutes
      * 
      * @param start DateTime
-     * @param end DateTime
+     * @param end   DateTime
      * @return Minutes in Long
      */
 
@@ -142,8 +142,7 @@ public class Hl7RelatedGeneralUtils {
     }
 
     public static String concatenateWithChar(Object input, String delimiterChar) {
-        String result = Hl7DataHandlerUtil.getStringValue(input, true, delimiterChar);
-        return result;
+        return Hl7DataHandlerUtil.getStringValue(input, true, delimiterChar);
     }
 
     public static List<String> makeStringArray(String... strs) {
@@ -157,46 +156,49 @@ public class Hl7RelatedGeneralUtils {
     }
 
     public static String getAddressUse(String xad7Type, String xad16Temp, String xad17Bad) {
-        LOGGER.info("Calculating address Use from XAD.7 {}, XAD.16 {}, XAD.17 {}", xad7Type,
-                xad16Temp, xad17Bad);
+        LOGGER.info("Calculating address Use from XAD.7 {}, XAD.16 {}, XAD.17 {}", xad7Type, xad16Temp, xad17Bad);
 
         String addressUse = "";
-
-        if (xad16Temp.equalsIgnoreCase("Y") || (xad16Temp.equals("") && xad7Type.equalsIgnoreCase("C"))) {
+        if (xad16Temp != null && xad16Temp.equalsIgnoreCase("Y") 
+            || ((xad16Temp == null || xad16Temp.isEmpty()) 
+                && xad7Type != null && xad7Type.equalsIgnoreCase("C"))) {
             addressUse = "temp";
-        } else if (xad17Bad.equalsIgnoreCase("Y") || (xad17Bad.equals("") && xad7Type.equalsIgnoreCase("BA"))) {
+        } else if (xad17Bad != null && xad17Bad.equalsIgnoreCase("Y") 
+            || ((xad17Bad == null || xad17Bad.isEmpty()) 
+                && xad7Type != null && xad7Type.equalsIgnoreCase("BA"))) {
             addressUse = "old";
-        } else if (xad7Type.equalsIgnoreCase("H")) {
+        } else if (xad7Type != null && xad7Type.equalsIgnoreCase("H")) {
             addressUse = "home";
-        } else if (xad7Type.equalsIgnoreCase("B") || xad7Type.equalsIgnoreCase("O")) {
+        } else if (xad7Type != null && (xad7Type.equalsIgnoreCase("B") || xad7Type.equalsIgnoreCase("O"))) {
             addressUse = "work";
-        } else if (xad7Type.equalsIgnoreCase("BI")) {
+        } else if (xad7Type != null && xad7Type.equalsIgnoreCase("BI")) {
             addressUse = "billing";
         }
         return addressUse;
-
     }
 
     public static String getAddressType(String xad7Type, String xad18Type) {
-        LOGGER.info("Calculating address Type from XAD.7 {}, XAD.18 {}", xad7Type,
-                xad18Type);
+        LOGGER.info("Calculating address Type from XAD.7 {}, XAD.18 {}", xad7Type, xad18Type);
 
         String addressType = "";
-
-        if (xad18Type.equalsIgnoreCase("M") || (xad18Type.equals("") && xad7Type.equalsIgnoreCase("M"))) {
+        if (xad18Type != null && xad18Type.equalsIgnoreCase("M") 
+            || (xad18Type == null || xad18Type.isEmpty())
+                && (xad7Type != null && xad7Type.equalsIgnoreCase("M"))) {
             addressType = "postal";
-        } else if (xad18Type.equalsIgnoreCase("V") || (xad18Type.equals("") && xad7Type.equalsIgnoreCase("SH"))) {
+        } else if (xad18Type != null && xad18Type.equalsIgnoreCase("V")     
+            || (xad18Type == null || xad18Type.isEmpty())
+                && (xad7Type != null && xad7Type.equalsIgnoreCase("SH"))) {
             addressType = "physical";
         }
         return addressType;
-
     }
 
     /**
-     * Special rules for FHIR Address District. From 18.173.1 build.fhir.org Segment PID to Patient Map.
-     * If the address has a County/Parish code, use it.
-     * However, if it is empty, and there is exactly one address (repeated) use the PID county.
-     * PID-12 maps to patient.address.District "IF PID-11 LST.COUNT EQUALS 1 AND PID-11.9 IS NOT VALUED"
+     * Special rules for FHIR Address District. From 18.173.1 build.fhir.org Segment
+     * PID to Patient Map. If the address has a County/Parish code, use it. However,
+     * if it is empty, and there is exactly one address (repeated) use the PID
+     * county. PID-12 maps to patient.address.District "IF PID-11 LST.COUNT EQUALS 1
+     * AND PID-11.9 IS NOT VALUED"
      */
     public static String getAddressDistrict(String patientCountyPid12, String addressCountyParishPid119,
             Object patient) {
@@ -212,7 +214,7 @@ public class Hl7RelatedGeneralUtils {
                 }
 
             } catch (HL7Exception e) {
-                // Do nothing.  Just eat the error.
+                // Do nothing. Just eat the error.
                 // Let the initial value stand
             }
 
@@ -239,21 +241,24 @@ public class Hl7RelatedGeneralUtils {
         return codeableConcept.getCodingFirstRep().getDisplay();
     }
 
-    // Takes all the pieces of telecom number from XTN, formats to a user friendly Telecom number based on rules documented in the steps
-    public static String getFormattedTelecomNumberValue(String xtn1Old, String xtn5Country, String xtn6Area, String xtn7Local, String xtn8Extension, String xtn12Unformatted) {
+    // Takes all the pieces of telecom number from XTN, formats to a user friendly
+    // Telecom number based on rules documented in the steps
+    public static String getFormattedTelecomNumberValue(String xtn1Old, String xtn5Country, String xtn6Area,
+            String xtn7Local, String xtn8Extension, String xtn12Unformatted) {
         String returnValue = "";
 
         // If the local number exists...
         if (xtn7Local != null && xtn7Local.length() > 0) {
             returnValue = formatCountryAndArea(xtn5Country, xtn6Area) + formatLocalNumber(xtn7Local);
-             // If an extention exists with any form of local number, append a space the extension abbreviation
+            // If an extention exists with any form of local number, append a space the
+            // extension abbreviation
             if (xtn8Extension != null && xtn8Extension.length() > 0) {
                 returnValue = returnValue + " ext. " + xtn8Extension;
             }
-        // otherwise if the unformatted number exists, use it
+            // otherwise if the unformatted number exists, use it
         } else if (xtn12Unformatted != null && xtn12Unformatted.length() > 0) {
             returnValue = xtn12Unformatted;
-       // otherwise if the string number exists, use it    
+            // otherwise if the string number exists, use it
         } else if (xtn1Old != null && xtn1Old.length() > 0) {
             returnValue = xtn1Old;
         }
@@ -263,7 +268,7 @@ public class Hl7RelatedGeneralUtils {
     // Private method to split and format the 7 digit local telecom number
     private static String formatLocalNumber(String localNumber) {
         // Split after the 3rd digit, add a space, add the rest of the number
-        // Seven digit number will format:  123 4567
+        // Seven digit number will format: 123 4567
         return localNumber.substring(0, 3) + " " + localNumber.substring(3);
     }
 
@@ -281,6 +286,6 @@ public class Hl7RelatedGeneralUtils {
             }
         }
         return returnValue;
-     }
+    }
 
 }
