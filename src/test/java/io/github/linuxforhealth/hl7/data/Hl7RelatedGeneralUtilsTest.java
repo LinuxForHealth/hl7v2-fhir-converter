@@ -136,16 +136,46 @@ public class Hl7RelatedGeneralUtilsTest {
     String ANYTHING = "anything";
     // Inputs are XAD.7 Type, XAD.16 Temp Indicator, XAD.17 Bad address indicator
     assertThat(Hl7RelatedGeneralUtils.getAddressUse("C","", ANYTHING)).isEqualTo("temp");
+    assertThat(Hl7RelatedGeneralUtils.getAddressUse("C","", null)).isEqualTo("temp");
+    assertThat(Hl7RelatedGeneralUtils.getAddressUse("C",null, ANYTHING)).isEqualTo("temp");
+    assertThat(Hl7RelatedGeneralUtils.getAddressUse("C",null, null)).isEqualTo("temp");
     assertThat(Hl7RelatedGeneralUtils.getAddressUse(ANYTHING,"Y", ANYTHING)).isEqualTo("temp");
+    assertThat(Hl7RelatedGeneralUtils.getAddressUse(ANYTHING,"Y", null)).isEqualTo("temp");
+    assertThat(Hl7RelatedGeneralUtils.getAddressUse(null,"Y", ANYTHING)).isEqualTo("temp");
+    assertThat(Hl7RelatedGeneralUtils.getAddressUse(null,"Y", null)).isEqualTo("temp");
     assertThat(Hl7RelatedGeneralUtils.getAddressUse("C",ANYTHING, ANYTHING)).isEqualTo("");
+    assertThat(Hl7RelatedGeneralUtils.getAddressUse("C",ANYTHING, null)).isEqualTo("");
     assertThat(Hl7RelatedGeneralUtils.getAddressUse("BA",ANYTHING, "")).isEqualTo("old");
+    assertThat(Hl7RelatedGeneralUtils.getAddressUse("BA",ANYTHING, null)).isEqualTo("old");
+    assertThat(Hl7RelatedGeneralUtils.getAddressUse("BA",null, "")).isEqualTo("old");
+    assertThat(Hl7RelatedGeneralUtils.getAddressUse("BA",null, null)).isEqualTo("old");
     assertThat(Hl7RelatedGeneralUtils.getAddressUse(ANYTHING,ANYTHING, "Y")).isEqualTo("old");
+    assertThat(Hl7RelatedGeneralUtils.getAddressUse(null,ANYTHING, "Y")).isEqualTo("old");
+    assertThat(Hl7RelatedGeneralUtils.getAddressUse(ANYTHING,null, "Y")).isEqualTo("old");
+    assertThat(Hl7RelatedGeneralUtils.getAddressUse(null,null, "Y")).isEqualTo("old");
     assertThat(Hl7RelatedGeneralUtils.getAddressUse("BA",ANYTHING, ANYTHING)).isEqualTo("");
+    assertThat(Hl7RelatedGeneralUtils.getAddressUse("BA",null, ANYTHING)).isEqualTo("");
     assertThat(Hl7RelatedGeneralUtils.getAddressUse("H",ANYTHING, ANYTHING)).isEqualTo("home");
+    assertThat(Hl7RelatedGeneralUtils.getAddressUse("H",null, ANYTHING)).isEqualTo("home");
+    assertThat(Hl7RelatedGeneralUtils.getAddressUse("H",ANYTHING, null)).isEqualTo("home");
+    assertThat(Hl7RelatedGeneralUtils.getAddressUse("H",null, null)).isEqualTo("home");
     assertThat(Hl7RelatedGeneralUtils.getAddressUse("B",ANYTHING, ANYTHING)).isEqualTo("work");
+    assertThat(Hl7RelatedGeneralUtils.getAddressUse("B",ANYTHING, null)).isEqualTo("work");
+    assertThat(Hl7RelatedGeneralUtils.getAddressUse("B",null, ANYTHING)).isEqualTo("work");
+    assertThat(Hl7RelatedGeneralUtils.getAddressUse("B",null, null)).isEqualTo("work");
     assertThat(Hl7RelatedGeneralUtils.getAddressUse("O",ANYTHING, ANYTHING)).isEqualTo("work");
+    assertThat(Hl7RelatedGeneralUtils.getAddressUse("O",ANYTHING, null)).isEqualTo("work");
+    assertThat(Hl7RelatedGeneralUtils.getAddressUse("O",null, ANYTHING)).isEqualTo("work");
+    assertThat(Hl7RelatedGeneralUtils.getAddressUse("O",null, null)).isEqualTo("work");
     assertThat(Hl7RelatedGeneralUtils.getAddressUse("BI",ANYTHING, ANYTHING)).isEqualTo("billing");
+    assertThat(Hl7RelatedGeneralUtils.getAddressUse("BI",null, ANYTHING)).isEqualTo("billing");
+    assertThat(Hl7RelatedGeneralUtils.getAddressUse("BI",ANYTHING, null)).isEqualTo("billing");
+    assertThat(Hl7RelatedGeneralUtils.getAddressUse("BI",null, null)).isEqualTo("billing");
     assertThat(Hl7RelatedGeneralUtils.getAddressUse(ANYTHING,ANYTHING, ANYTHING)).isEqualTo("");
+    assertThat(Hl7RelatedGeneralUtils.getAddressUse(null,ANYTHING, ANYTHING)).isEqualTo("");
+    assertThat(Hl7RelatedGeneralUtils.getAddressUse(ANYTHING,null, ANYTHING)).isEqualTo("");
+    assertThat(Hl7RelatedGeneralUtils.getAddressUse(ANYTHING,ANYTHING, null)).isEqualTo("");
+    assertThat(Hl7RelatedGeneralUtils.getAddressUse(null,null, null)).isEqualTo("");
 
   }
 
@@ -154,12 +184,21 @@ public class Hl7RelatedGeneralUtilsTest {
     String ANYTHING = "anything";
     // Inputs are XAD.7 Type, XAD.18 Type 
     assertThat(Hl7RelatedGeneralUtils.getAddressType(ANYTHING, "M")).isEqualTo("postal");
+    assertThat(Hl7RelatedGeneralUtils.getAddressType(null, "M")).isEqualTo("postal");
     assertThat(Hl7RelatedGeneralUtils.getAddressType("M","")).isEqualTo("postal");
+    assertThat(Hl7RelatedGeneralUtils.getAddressType("M",null)).isEqualTo("postal");
     assertThat(Hl7RelatedGeneralUtils.getAddressType("M",ANYTHING)).isEqualTo("");
     assertThat(Hl7RelatedGeneralUtils.getAddressType(ANYTHING, "V")).isEqualTo("physical");
+    assertThat(Hl7RelatedGeneralUtils.getAddressType(null, "V")).isEqualTo("physical");
     assertThat(Hl7RelatedGeneralUtils.getAddressType("SH","")).isEqualTo("physical");
+    assertThat(Hl7RelatedGeneralUtils.getAddressType("SH",null)).isEqualTo("physical");
     assertThat(Hl7RelatedGeneralUtils.getAddressType("SH",ANYTHING)).isEqualTo("");
     assertThat(Hl7RelatedGeneralUtils.getAddressType(ANYTHING,ANYTHING)).isEqualTo("");
+    assertThat(Hl7RelatedGeneralUtils.getAddressType(ANYTHING,null)).isEqualTo("");
+    assertThat(Hl7RelatedGeneralUtils.getAddressType(null,ANYTHING)).isEqualTo("");
+    assertThat(Hl7RelatedGeneralUtils.getAddressType(null,null)).isEqualTo("");
+
+
   }
 
   @Test
