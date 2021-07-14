@@ -16,4 +16,4 @@ text:
      type: STRING
      valueOf: $mytext
      vars:
-          mytext: String, GeneralUtils.getCodeableConceptDisplay(valCodeableConcept)
+          mytext: String, GeneralUtils.getCodeableConceptText(valCodeableConcept)
