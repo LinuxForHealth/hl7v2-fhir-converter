@@ -9,10 +9,3 @@ manifestation:
    generateList: true
    expressionType: resource
    specs: AL1.5  
-
-
-onset:
-   type: DATE_TIME
-   valueOf: AL1.6
-   expressionType: HL7Spec
-   
