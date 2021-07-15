@@ -244,7 +244,7 @@ public class Hl7RelatedGeneralUtils {
     // Takes all the pieces of telecom number from XTN, formats to a user friendly
     // Telecom number based on rules documented in the steps
     public static String getFormattedTelecomNumberValue(String xtn1Old, String xtn5Country, String xtn6Area,
-            String xtn7Local, String xtn8Extension, String xtn12Unformatted) {
+                                                        String xtn7Local, String xtn8Extension, String xtn12Unformatted) {
         String returnValue = "";
 
         // If the local number exists...

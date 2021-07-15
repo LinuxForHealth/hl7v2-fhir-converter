@@ -186,7 +186,6 @@ public class SimpleDataValueResolver {
             V3MaritalStatus mar = V3MaritalStatus.fromCode(code);
             CodeableConcept codeableConcept = new CodeableConcept( );
             codeableConcept.addCoding(new Coding( mar.getSystem(), code, mar.getDisplay() ));
-            codeableConcept.setText(mar.getDisplay());
           return codeableConcept;
         } else {
           return null;
