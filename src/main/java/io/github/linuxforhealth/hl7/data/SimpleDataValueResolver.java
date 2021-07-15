@@ -278,6 +278,11 @@ public class SimpleDataValueResolver {
         return UrlLookup.getSystemUrl(val);
     };
 
+    public static final ValueExtractor<Object, String> SYSTEM_ID = (Object value) -> {
+        String val = Hl7DataHandlerUtil.getStringValue(value);
+        return "urn:id:" + val;
+    };
+
     public static final ValueExtractor<Object, List<?>> ARRAY = (Object value) -> {
         if (value != null) {
             List list = new ArrayList<>();
