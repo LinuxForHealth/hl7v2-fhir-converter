@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2020
+ * (C) Copyright IBM Corp. 2020, 2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -206,6 +206,8 @@ public class Hl7ORUMessageTest {
       List<Resource> organizationResource = e.stream()
               .filter(v -> ResourceType.Organization == v.getResource().getResourceType())
               .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+      // Patient organizations use a system urn:id reference for the organization, 
+      // so we expect no organization resources to be generated.      
       assertThat(organizationResource).isEmpty();
 
       List<Resource> messageHeader = e.stream()
@@ -282,6 +284,8 @@ public class Hl7ORUMessageTest {
       List<Resource> organizationResource = e.stream()
               .filter(v -> ResourceType.Organization == v.getResource().getResourceType())
               .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+      // Patient organizations use a system urn:id reference for the organization, 
+      // so we expect no organization resources to be generated. 
       assertThat(organizationResource).isEmpty(); 
 
       List<Resource> messageHeader = e.stream()

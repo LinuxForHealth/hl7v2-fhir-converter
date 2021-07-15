@@ -246,6 +246,8 @@ String hl7message =
     List<Resource> organizationRes = e.stream()
         .filter(v -> ResourceType.Organization == v.getResource().getResourceType())
         .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+    // Patient organizations use a system urn:id reference for the organization, 
+    // so we only expect the manufacturer to have an organization.    
     assertThat(organizationRes).hasSize(1);
   }
 

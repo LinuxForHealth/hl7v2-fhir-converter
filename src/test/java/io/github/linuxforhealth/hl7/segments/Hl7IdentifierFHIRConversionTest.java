@@ -12,7 +12,6 @@ import org.hl7.fhir.r4.model.Patient;
 import org.hl7.fhir.r4.model.Identifier;
 import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Coding;
-
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -23,9 +22,7 @@ public class Hl7IdentifierFHIRConversionTest {
   @Rule
   public ExpectedException exceptionRule = ExpectedException.none();
 
-
   @Test
-
   public void patient_identifiers_test() {
 
     String patientIdentifiers =
@@ -64,12 +61,15 @@ public class Hl7IdentifierFHIRConversionTest {
     assertThat(cc.getText()).hasToString("SS");
     assertThat(cc.hasCoding()).isTrue(); 
 
-    // Third identifier (Driver's license) shallow check
+    // Third identifier (Driver's license) medium check
     identifier = identifiers.get(2);
     assertThat(identifier.hasSystem()).isTrue();
     assertThat(identifier.getSystem()).hasToString("urn:id:MNDOT");
     assertThat(identifier.getValue()).hasToString("MN1234567");
-    assertThat(identifier.hasType()).isTrue(); 
+    assertThat(identifier.hasType()).isTrue();
+    cc = identifier.getType();
+    assertThat(cc.getText()).hasToString("DL");
+    assertThat(cc.hasCoding()).isTrue();  
 
     // Deep check for fourth identifier, which is assembled from PID.19 SSN
     identifier = identifiers.get(3);
