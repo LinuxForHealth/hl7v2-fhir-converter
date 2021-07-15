@@ -13,19 +13,26 @@ import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r4.model.AllergyIntolerance;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
+import org.hl7.fhir.r4.model.Bundle.BundleType;
 import org.hl7.fhir.r4.model.Condition;
 import org.hl7.fhir.r4.model.Condition.ConditionEvidenceComponent;
 import org.hl7.fhir.r4.model.Encounter;
 import org.hl7.fhir.r4.model.MessageHeader;
 import org.hl7.fhir.r4.model.Observation;
+import org.hl7.fhir.r4.model.Patient;
+import org.hl7.fhir.r4.model.Practitioner;
 import org.hl7.fhir.r4.model.Reference;
 import org.hl7.fhir.r4.model.Resource;
 import org.hl7.fhir.r4.model.ResourceType;
 import org.hl7.fhir.r4.model.Specimen;
 import org.junit.Test;
 import com.google.common.collect.Lists;
+
 import io.github.linuxforhealth.api.ResourceModel;
 import io.github.linuxforhealth.fhir.FHIRContext;
+import io.github.linuxforhealth.hl7.ConverterOptions;
+import io.github.linuxforhealth.hl7.HL7ToFHIRConverter;
+import io.github.linuxforhealth.hl7.ConverterOptions.Builder;
 import io.github.linuxforhealth.hl7.resource.ResourceReader;
 
 public class Hl7MessageTest {
@@ -54,7 +61,6 @@ public class Hl7MessageTest {
     String json = message.convert(hl7message, engine);
     assertThat(json).isNotBlank();
 
-
     IBaseResource bundleResource = context.getParser().parseResource(json);
     assertThat(bundleResource).isNotNull();
     Bundle b = (Bundle) bundleResource;
@@ -63,10 +69,8 @@ public class Hl7MessageTest {
         e.stream().filter(v -> ResourceType.Patient == v.getResource().getResourceType())
             .map(BundleEntryComponent::getResource).collect(Collectors.toList());
     assertThat(patientResource).hasSize(1);
-
   }
-
-
+ 
   @Test
   public void test_patient_encounter() throws IOException {
 
@@ -113,7 +117,7 @@ public class Hl7MessageTest {
         e.stream().filter(v -> ResourceType.Encounter == v.getResource().getResourceType())
             .map(BundleEntryComponent::getResource).collect(Collectors.toList());
     assertThat(encounterResource).hasSize(1);
-    Encounter enc = getResource(encounterResource.get(0));
+    Encounter enc = getResourceEncounter(encounterResource.get(0));
     Reference ref = enc.getSubject();
     assertThat(ref.isEmpty()).isFalse();
 
@@ -670,21 +674,17 @@ public class Hl7MessageTest {
     Class<? extends IBaseResource> klass = MessageHeader.class;
     return (MessageHeader) context.getParser().parseResource(klass, s);
   }
-
-
-
+  
   private Condition getResourceCondition(Resource resource) {
     String s = context.getParser().encodeResourceToString(resource);
     Class<? extends IBaseResource> klass = Condition.class;
     return (Condition) context.getParser().parseResource(klass, s);
   }
 
-
-  private static Encounter getResource(Resource resource) {
-    String s = context.getParser().encodeResourceToString(resource);
+  private static Encounter getResourceEncounter(Resource resource) {
+	String s = context.getParser().encodeResourceToString(resource);
     Class<? extends IBaseResource> klass = Encounter.class;
     return (Encounter) context.getParser().parseResource(klass, s);
   }
-
 
 }
