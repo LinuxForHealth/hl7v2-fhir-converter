@@ -38,11 +38,6 @@ import io.github.linuxforhealth.hl7.resource.ResourceReader;
 public class Hl7MessageTest {
   private static FHIRContext context = new FHIRContext(true, false);
   private static HL7MessageEngine engine = new HL7MessageEngine(context);
-  private static final ConverterOptions OPTIONS_PRETTYPRINT = new Builder()
-          .withBundleType(BundleType.COLLECTION)
-          .withValidateResource()
-          .withPrettyPrint()
-          .build();
 
   @Test
   public void test_patient() throws IOException {
@@ -75,39 +70,7 @@ public class Hl7MessageTest {
             .map(BundleEntryComponent::getResource).collect(Collectors.toList());
     assertThat(patientResource).hasSize(1);
   }
-  
-  @Test
-  public void test_patient_additional_demographics() throws IOException {
-    String hl7message = "MSH|^~\\&|hl7Integration|hl7Integration|||||ADT^A01|||2.6|\r"
-    		+ "PID|1||1234^^^AssigningAuthority^MR||TEST^PATIENT|\r"
-    		+ "PD1|||Sample Family Practice^^2222|1111^LastName^ClinicianFirstName^^^^Title||||||||||||A|";
-    
-    HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
-	String json = ftv.convert(hl7message , OPTIONS_PRETTYPRINT);
-    assertThat(json).isNotBlank();
-
-    IBaseResource bundleResource = context.getParser().parseResource(json);
-    assertThat(bundleResource).isNotNull();
-    Bundle b = (Bundle) bundleResource;
-    List<BundleEntryComponent> e = b.getEntry();
-    
-    List<Resource> patientResource =
-        e.stream().filter(v -> ResourceType.Patient == v.getResource().getResourceType())
-            .map(BundleEntryComponent::getResource).collect(Collectors.toList());
-    assertThat(patientResource).hasSize(1);
-    Patient patient = getResourcePatient(patientResource.get(0));
-    List<Reference> refs = patient.getGeneralPractitioner();
-    assertThat(refs.size() > 0);
-        
-    List<Resource> practitionerResource =
-        e.stream().filter(v -> ResourceType.Practitioner == v.getResource().getResourceType())
-            .map(BundleEntryComponent::getResource).collect(Collectors.toList());
-    assertThat(practitionerResource).hasSize(1);
-    Practitioner doc = getResourcePractitioner(practitionerResource.get(0));
-    String lastName = doc.getName().get(0).getFamily();
-    assertThat(lastName.equals("LastName"));
-  }
-
+ 
   @Test
   public void test_patient_encounter() throws IOException {
 
@@ -711,12 +674,6 @@ public class Hl7MessageTest {
     Class<? extends IBaseResource> klass = MessageHeader.class;
     return (MessageHeader) context.getParser().parseResource(klass, s);
   }
-
-  private Patient getResourcePatient(Resource resource) {
-	    String s = context.getParser().encodeResourceToString(resource);
-	    Class<? extends IBaseResource> klass = Patient.class;
-	    return (Patient) context.getParser().parseResource(klass, s);
-  }
   
   private Condition getResourceCondition(Resource resource) {
     String s = context.getParser().encodeResourceToString(resource);
@@ -729,13 +686,5 @@ public class Hl7MessageTest {
     Class<? extends IBaseResource> klass = Encounter.class;
     return (Encounter) context.getParser().parseResource(klass, s);
   }
-
-  private static Practitioner getResourcePractitioner(Resource resource) {
-	String s = context.getParser().encodeResourceToString(resource);
-	Class<? extends IBaseResource> klass = Practitioner.class;
-	return (Practitioner) context.getParser().parseResource(klass, s);
-  }
-
-  
 
 }

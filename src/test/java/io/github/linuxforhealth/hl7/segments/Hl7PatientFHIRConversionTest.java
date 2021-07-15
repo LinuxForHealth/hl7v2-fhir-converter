@@ -8,31 +8,74 @@ package io.github.linuxforhealth.hl7.segments;
 import static org.assertj.core.api.Assertions.assertThat;
 import java.io.IOException;
 import java.util.List;
-
+import java.util.stream.Collectors;
 
 import org.hl7.fhir.r4.model.HumanName;
+import org.hl7.fhir.instance.model.api.IBaseResource;
+import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Enumerations;
 import org.hl7.fhir.r4.model.Patient;
+import org.hl7.fhir.r4.model.Practitioner;
+import org.hl7.fhir.r4.model.Reference;
+import org.hl7.fhir.r4.model.Resource;
+import org.hl7.fhir.r4.model.ResourceType;
 import org.hl7.fhir.r4.model.codesystems.V3MaritalStatus;
 import org.hl7.fhir.r4.model.StringType;
+import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+
+import io.github.linuxforhealth.fhir.FHIRContext;
+import io.github.linuxforhealth.hl7.HL7ToFHIRConverter;
 import io.github.linuxforhealth.hl7.segments.util.PatientUtils;
 
 public class Hl7PatientFHIRConversionTest {
 
   @Rule
   public ExpectedException exceptionRule = ExpectedException.none();
+  
+  private static FHIRContext context = new FHIRContext(true, false);
 
+  @Test
+  public void test_patient_additional_demographics() throws IOException {
+    String hl7message = "MSH|^~\\&|hl7Integration|hl7Integration|||||ADT^A01|||2.6|\n"
+    		+ "PID|1||1234^^^AssigningAuthority^MR||TEST^PATIENT|\n"
+    		+ "PD1|||Sample Family Practice^^2222|1111^LastName^ClinicianFirstName^^^^Title||||||||||||A|";
+    
+    HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
+	String json = ftv.convert(hl7message , PatientUtils.OPTIONS);
+    assertThat(json).isNotBlank();
 
+    IBaseResource bundleResource = context.getParser().parseResource(json);
+    assertThat(bundleResource).isNotNull();
+    Bundle b = (Bundle) bundleResource;
+    List<BundleEntryComponent> e = b.getEntry();
+    
+    List<Resource> patientResource =
+        e.stream().filter(v -> ResourceType.Patient == v.getResource().getResourceType())
+            .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+    assertThat(patientResource).hasSize(1);
+    Patient patient = getResourcePatient(patientResource.get(0));
+    List<Reference> refs = patient.getGeneralPractitioner();
+    assertThat(refs.size() > 0);
+        
+    List<Resource> practitionerResource =
+        e.stream().filter(v -> ResourceType.Practitioner == v.getResource().getResourceType())
+            .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+    assertThat(practitionerResource).hasSize(1);
+    Practitioner doc = getResourcePractitioner(practitionerResource.get(0));
+    String lastName = doc.getName().get(0).getFamily();
+    assertThat(lastName.equals("LastName"));
+  }
+  
+  
   /**
    * In order to generate messageHeader resource, MSH should have MSH.24.2 as this is required
    * attribute for source attribute, and source is required for MessageHeader resource.
    * 
    * @throws IOException
    */
-
   @Test
   public void patient_deceased_conversion_test() {
 
@@ -185,7 +228,7 @@ public class Hl7PatientFHIRConversionTest {
     Patient patientObjUsualName = PatientUtils.createPatientFromHl7Segment(patientHasMiddleName);
 
     java.util.List<org.hl7.fhir.r4.model.HumanName> name = patientObjUsualName.getName();
-    List  givenName =  name.get(0).getGiven();
+    List<StringType>  givenName =  name.get(0).getGiven();
     List<StringType> suffix = name.get(0).getSuffix();
     String fullName = name.get(0).getText();
     assertThat(givenName.get(0).toString()).isEqualTo("GEORGE");
@@ -228,4 +271,17 @@ public class Hl7PatientFHIRConversionTest {
     assertThat(patientObjMarried.getMaritalStatus().getCodingFirstRep().getSystem()).isEqualTo(V3MaritalStatus.M.getSystem());
 
   }
+  
+  private Patient getResourcePatient(Resource resource) {
+	    String s = context.getParser().encodeResourceToString(resource);
+	    Class<? extends IBaseResource> klass = Patient.class;
+	    return (Patient) context.getParser().parseResource(klass, s);
+  }
+  
+  private static Practitioner getResourcePractitioner(Resource resource) {
+	String s = context.getParser().encodeResourceToString(resource);
+	Class<? extends IBaseResource> klass = Practitioner.class;
+	return (Practitioner) context.getParser().parseResource(klass, s);
+  }
+
 }

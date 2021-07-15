@@ -26,9 +26,12 @@ The converter supports the following message segments:
 * PRB - Problem Details
 * PV1 - Patient Visit
 * PV2 - Patient Visit - Additional Information
+* RXA - Pharmacy/Treatment Administration
 * RXC - Pharmacy/Treatment Component Order
 * RXE - Pharmacy/Treatment Encoded Order
 * RXO - Pharmacy/Treatment Order
+* RXR - Pharmacy/Treatment Route
+* SPM - Specimen
 
 If you need another message type/event . . .  contributions are welcome! We welcome [Pull Requests](https://github.com/LinuxForHealth/hl7v2-fhir-converter/pulls)!
 
