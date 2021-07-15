@@ -25,7 +25,7 @@ import io.github.linuxforhealth.hl7.HL7ToFHIRConverter;
 public class PatientUtils  {
 
   private static FHIRContext context = new FHIRContext();
-  private static final ConverterOptions OPTIONS =
+  public static final ConverterOptions OPTIONS =
     new Builder().withValidateResource().withPrettyPrint().build();
 
   public static Patient createPatientFromHl7Segment(String inputSegment){
