@@ -13,11 +13,29 @@ id:
   valueOf: "UUID.randomUUID()"
   expressionType: JEXL
 
-identifier:
-    valueOf: datatype/Identifier
+identifier_1:
+    valueOf: datatype/IdentifierPatient
     generateList: true
     expressionType: resource
     specs: PID.3
+    vars: 
+       assignerSystem: String, PID.3.4
+
+identifier_2: 
+#     condition: $valueIn NOT_NULL
+    valueOf: datatype/Identifier_var
+    generateList: true
+    expressionType: resource
+    vars:
+      valueIn: String, PID.19
+    constants:
+      system: "http://terminology.hl7.org/CodeSystem/v2-0203"
+      code: "SS"
+      display: "Social Security number"
+      text: "Sample text"
+
+
+
 name:
     valueOf: datatype/HumanName
     generateList: true

@@ -34,6 +34,7 @@ public enum SimpleDataTypeMapper {
   OBJECT(SimpleDataValueResolver.OBJECT),
   CODING_SYSTEM_V2(SimpleDataValueResolver.CODING_SYSTEM_V2),
   SYSTEM_URL(SimpleDataValueResolver.SYSTEM_URL),
+  SYSTEM_ID(SimpleDataValueResolver.SYSTEM_ID),
 
   ALLERGY_INTOLERANCE_CATEGORY(SimpleDataValueResolver.ALLERGY_INTOLERANCE_CATEGORY_CODE_FHIR),
   ALLERGY_INTOLERANCE_CRITICALITY(

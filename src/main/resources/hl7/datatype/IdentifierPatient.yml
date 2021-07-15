@@ -1,0 +1,37 @@
+#
+# (C) Copyright IBM Corp. 2020
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+---
+type: 
+   valueOf: datatype/CodeableConcept
+   expressionType: resource
+   specs: CX.5 | $type
+
+system: 
+     type: SYSTEM_ID
+     valueOf: CX.4 | CWE.4 |EI.2
+     expressionType: HL7Spec
+    
+value: 
+     type: STRING
+     valueOf: CX.1 | CWE.1 |EI.1
+     expressionType: HL7Spec
+     required: true
+
+period:  
+    valueOf: datatype/Period
+    expressionType: resource
+    vars: 
+       start: CX.7 | CWE.7
+       end: CX.8 | CWE.8
+
+# assigner:
+#    valueOf: resource/Organization_Simple
+#    expressionType: reference
+#    vars:
+#      name: $assigningAuth
+#      id: CX.4| CWE.4
+#    constants:
+#       assigningAuth: 'Assigning Authority'

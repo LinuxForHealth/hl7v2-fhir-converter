@@ -1,0 +1,22 @@
+#
+# (C) Copyright IBM Corp. 2020
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+---
+type: 
+   valueOf: datatype/CodeableConcept_var
+   generateList: true
+   expressionType: resource
+    
+value: 
+   type: STRING
+   valueOf: $valueIn
+
+system:
+   type: STRING
+   valueOf: $assignerSystem  
+   # #   expressionType: resource
+   # #   required: true
+   #   vars: 
+   #     theValue: $valueIn
