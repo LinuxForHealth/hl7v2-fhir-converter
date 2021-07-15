@@ -122,6 +122,14 @@ extension_1:
     valString: String, PID.6.1
 
 extension_2:
+  valueOf: extension/Extension
+  generateList: true
+  expressionType: resource
+  vars:
+    url: String, GeneralUtils.getExtensionUrl("birthTime")
+    valDateTime: DATE_TIME, PID.7.1
+
+extension_3:
   condition: $valCodeableConcept NOT_NULL
   valueOf: extension/Extension_CodeableConcept
   generateList: true

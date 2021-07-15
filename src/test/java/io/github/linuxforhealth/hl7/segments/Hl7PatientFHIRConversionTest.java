@@ -261,7 +261,7 @@ public class Hl7PatientFHIRConversionTest {
   public void patient_marital_status_test(){
     String marriedPatient =
             "MSH|^~\\&|MyEMR|DE-000001| |CAIRLO|20160701123030-0700||VXU^V04^VXU_V04|CA0001|P|2.6|||ER|AL|||||Z22^CDCPHINVS|DE-000001\r" +
-                    "PID|1||000054321^^^MRN||COOPER^SHELDON^ANDREW||19820512|M||2106-3|765 SOMESTREET RD UNIT 3A^^PASADENA^LA^558846^United States of America||4652141486^Home^^shelly@gmail.com||EN^English|M^Married|CAT|78654||||N\r";
+                    "PID|1||000054321^^^MRN||COOPER^SHELDON^ANDREW|BAXTER|19961001115600|M||2106-3|765 SOMESTREET RD UNIT 3A^^PASADENA^LA^558846^United States of America||4652141486^Home^^shelly@gmail.com||EN^English|M^Married|CAT|78654||||N\r";
     String AltTextField =
             "MSH|^~\\&|MyEMR|DE-000001| |CAIRLO|20160701123030-0700||VXU^V04^VXU_V04|CA0001|P|2.6|||ER|AL|||||Z22^CDCPHINVS|DE-000001\r" +
                     "PID|1||000054321^^^MRN||COOPER^SHELDON^ANDREW||19820512|M||2106-3|765 SOMESTREET RD UNIT 3A^^PASADENA^LA^558846^United States of America||4652141486^Home^^shelly@gmail.com||EN^English|S^^^^^^^^Single|CAT|78654||||N\r";
@@ -276,6 +276,17 @@ public class Hl7PatientFHIRConversionTest {
     assertThat(patientObjMarriedAltText.getMaritalStatus().getText()).isEqualTo("Single");
     assertThat(patientObjMarriedAltText.getMaritalStatus().getCodingFirstRep().getDisplay()).isEqualTo(V3MaritalStatus.S.getDisplay());
     assertThat(patientObjMarriedAltText.getMaritalStatus().getCodingFirstRep().getSystem()).isEqualTo(V3MaritalStatus.S.getSystem());
+
+  }
+
+  @Test
+  public void patient_Birth_time_test(){
+    String PatientBirthTime =
+            "MSH|^~\\&|MyEMR|DE-000001| |CAIRLO|20160701123030-0700||VXU^V04^VXU_V04|CA0001|P|2.6|||ER|AL|||||Z22^CDCPHINVS|DE-000001\r" +
+                    "PID|1||000054321^^^MRN||COOPER^SHELDON^ANDREW|BAXTER|19961001115600|M||2106-3|765 SOMESTREET RD UNIT 3A^^PASADENA^LA^558846^United States of America||4652141486^Home^^shelly@gmail.com||EN^English|M^Married|CAT|78654||||N\r";
+
+    //just checking the bundle output for now
+    Patient patientObjMarried = PatientUtils.createPatientFromHl7Segment(PatientBirthTime);
 
   }
   
