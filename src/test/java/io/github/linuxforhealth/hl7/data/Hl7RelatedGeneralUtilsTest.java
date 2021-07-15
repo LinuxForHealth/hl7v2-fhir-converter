@@ -255,4 +255,3 @@ public class Hl7RelatedGeneralUtilsTest {
   }
 
 }
-

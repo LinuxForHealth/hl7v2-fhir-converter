@@ -106,6 +106,12 @@ maritalStatus:
     valCodeableConcept: MARITAL_STATUS, PID.16
     text: String, PID.16.2 | PID.16.9
 
+generalPractitioner: 
+   valueOf: resource/Practitioner
+   generateList: true
+   expressionType: reference
+   specs: PD1.4
+
 extension_1:
   condition: $valString NOT_NULL
   valueOf: extension/Extension

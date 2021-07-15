@@ -13,19 +13,26 @@ import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r4.model.AllergyIntolerance;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
+import org.hl7.fhir.r4.model.Bundle.BundleType;
 import org.hl7.fhir.r4.model.Condition;
 import org.hl7.fhir.r4.model.Condition.ConditionEvidenceComponent;
 import org.hl7.fhir.r4.model.Encounter;
 import org.hl7.fhir.r4.model.MessageHeader;
 import org.hl7.fhir.r4.model.Observation;
+import org.hl7.fhir.r4.model.Patient;
+import org.hl7.fhir.r4.model.Practitioner;
 import org.hl7.fhir.r4.model.Reference;
 import org.hl7.fhir.r4.model.Resource;
 import org.hl7.fhir.r4.model.ResourceType;
 import org.hl7.fhir.r4.model.Specimen;
 import org.junit.Test;
 import com.google.common.collect.Lists;
+
 import io.github.linuxforhealth.api.ResourceModel;
 import io.github.linuxforhealth.fhir.FHIRContext;
+import io.github.linuxforhealth.hl7.ConverterOptions;
+import io.github.linuxforhealth.hl7.HL7ToFHIRConverter;
+import io.github.linuxforhealth.hl7.ConverterOptions.Builder;
 import io.github.linuxforhealth.hl7.resource.ResourceReader;
 
 public class Hl7MessageTest {
@@ -54,7 +61,6 @@ public class Hl7MessageTest {
     String json = message.convert(hl7message, engine);
     assertThat(json).isNotBlank();
 
-
     IBaseResource bundleResource = context.getParser().parseResource(json);
     assertThat(bundleResource).isNotNull();
     Bundle b = (Bundle) bundleResource;
@@ -63,10 +69,8 @@ public class Hl7MessageTest {
         e.stream().filter(v -> ResourceType.Patient == v.getResource().getResourceType())
             .map(BundleEntryComponent::getResource).collect(Collectors.toList());
     assertThat(patientResource).hasSize(1);
-
   }
-
-
+ 
   @Test
   public void test_patient_encounter() throws IOException {
 
@@ -113,7 +117,7 @@ public class Hl7MessageTest {
         e.stream().filter(v -> ResourceType.Encounter == v.getResource().getResourceType())
             .map(BundleEntryComponent::getResource).collect(Collectors.toList());
     assertThat(encounterResource).hasSize(1);
-    Encounter enc = getResource(encounterResource.get(0));
+    Encounter enc = getResourceEncounter(encounterResource.get(0));
     Reference ref = enc.getSubject();
     assertThat(ref.isEmpty()).isFalse();
 
@@ -263,82 +267,6 @@ public class Hl7MessageTest {
     assertThat(obsResource).hasSize(1);
     Observation obs = (Observation) obsResource.get(0);
     assertThat(obs.getValueQuantity()).isNotNull();
-
-  }
-
-
-  @Test
-  public void test_allergy_single() throws IOException {
-
-    ResourceModel rsm =
-        ResourceReader.getInstance().generateResourceModel("resource/AllergyIntolerance");
-
-    HL7FHIRResourceTemplateAttributes attributes = new HL7FHIRResourceTemplateAttributes.Builder()
-        .withResourceName("AllergyIntolerance").withResourceModel(rsm).withSegment("AL1")
-        .withIsReferenced(true).withRepeats(false).build();
-
-    HL7FHIRResourceTemplate allergyTemplate = new HL7FHIRResourceTemplate(attributes);
-    HL7MessageModel message = new HL7MessageModel("ADT", Lists.newArrayList(allergyTemplate));
-
-    String hl7message = "MSH|^~\\&|hl7Integration|hl7Integration|||||ADT^A01|||2.3|\r"
-        + "EVN|A01|20130617154644\r"
-        + "PID|1|465 306 5961|000010016^^^MR~000010017^^^MR~000010018^^^MR|407623|Wood^Patrick^^Sr^MR||19700101|female|||High Street^^Oxford^^Ox1 4DP~George St^^Oxford^^Ox1 5AP|||||||\r"
-        + "NK1|1|Wood^John^^^MR|Father||999-9999\r" + "NK1|2|Jones^Georgie^^^MSS|MOTHER||999-9999\r"
-        + "PV1|1||Location||||||||||||||||261938_6_201306171546|||||||||||||||||||||||||20130617134644|||||||||\r"
-        + "AL1|1|DA|^PENICILLIN|MO|PRODUCES HIVES~RASH|MO\r" //
-        + "AL1|2|AA|^CAT DANDER|SV";
-    String json = message.convert(hl7message, engine);
-    IBaseResource bundleResource = context.getParser().parseResource(json);
-    assertThat(bundleResource).isNotNull();
-    Bundle b = (Bundle) bundleResource;
-    List<BundleEntryComponent> e = b.getEntry();
-    List<Resource> allergyRes =
-        e.stream().filter(v -> ResourceType.AllergyIntolerance == v.getResource().getResourceType())
-            .map(BundleEntryComponent::getResource).collect(Collectors.toList());
-    assertThat(allergyRes).hasSize(1);
-    AllergyIntolerance allergy = (AllergyIntolerance) allergyRes.get(0);
-    assertThat(allergy.getCriticality().toCode()).isEqualTo("low");
-    assertThat(allergy.getCategory().get(0).getCode()).isEqualTo("medication");
-    assertThat(allergy.getCode().getText()).isEqualTo("PENICILLIN");
-    assertThat(allergy.getReaction().get(0).getManifestation()).extracting(m -> m.getText())
-        .containsExactlyInAnyOrder("PRODUCES HIVES", "RASH");
-
-  }
-
-
-
-  @Test
-  public void test_allergy_multiple() throws IOException {
-
-    ResourceModel rsm =
-        ResourceReader.getInstance().generateResourceModel("resource/AllergyIntolerance");
-
-    HL7FHIRResourceTemplateAttributes attributes = new HL7FHIRResourceTemplateAttributes.Builder()
-        .withResourceName("AllergyIntolerance").withResourceModel(rsm).withSegment("AL1")
-        .withIsReferenced(true).withRepeats(true).build();
-
-    HL7FHIRResourceTemplate allergyTemplate = new HL7FHIRResourceTemplate(attributes);
-    HL7MessageModel message = new HL7MessageModel("ADT", Lists.newArrayList(allergyTemplate));
-
-
-
-    String hl7message = "MSH|^~\\&|hl7Integration|hl7Integration|||||ADT^A01|||2.3|\r"
-        + "EVN|A01|20130617154644\r"
-        + "PID|1|465 306 5961|000010016^^^MR~000010017^^^MR~000010018^^^MR|407623|Wood^Patrick^^Sr^MR||19700101|female|||High Street^^Oxford^^Ox1 4DP~George St^^Oxford^^Ox1 5AP|||||||\r"
-        + "NK1|1|Wood^John^^^MR|Father||999-9999\r" + "NK1|2|Jones^Georgie^^^MSS|MOTHER||999-9999\r"
-        + "PV1|1||Location||||||||||||||||261938_6_201306171546|||||||||||||||||||||||||20130617134644|||||||||\r"
-        + "AL1|1|DA|^PENICILLIN|MO|PRODUCES HIVES~RASH|MO\r" //
-        + "AL1|2|AA|^CAT DANDER|SV";
-    String json = message.convert(hl7message, engine);
-    IBaseResource bundleResource = context.getParser().parseResource(json);
-    assertThat(bundleResource).isNotNull();
-    Bundle b = (Bundle) bundleResource;
-    List<BundleEntryComponent> e = b.getEntry();
-    List<Resource> obsResource =
-        e.stream().filter(v -> ResourceType.AllergyIntolerance == v.getResource().getResourceType())
-            .map(BundleEntryComponent::getResource).collect(Collectors.toList());
-    assertThat(obsResource).hasSize(2);
-
 
   }
 
@@ -670,21 +598,17 @@ public class Hl7MessageTest {
     Class<? extends IBaseResource> klass = MessageHeader.class;
     return (MessageHeader) context.getParser().parseResource(klass, s);
   }
-
-
-
+  
   private Condition getResourceCondition(Resource resource) {
     String s = context.getParser().encodeResourceToString(resource);
     Class<? extends IBaseResource> klass = Condition.class;
     return (Condition) context.getParser().parseResource(klass, s);
   }
 
-
-  private static Encounter getResource(Resource resource) {
-    String s = context.getParser().encodeResourceToString(resource);
+  private static Encounter getResourceEncounter(Resource resource) {
+	String s = context.getParser().encodeResourceToString(resource);
     Class<? extends IBaseResource> klass = Encounter.class;
     return (Encounter) context.getParser().parseResource(klass, s);
   }
-
 
 }
