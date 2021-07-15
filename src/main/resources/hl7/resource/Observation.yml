@@ -13,7 +13,7 @@ id:
   expressionType: JEXL
 
 identifier:
-    valueOf: datatype/IdentifierGen
+    valueOf: datatype/Identifier_Gen
     generateList: true
     expressionType: resource
     vars:

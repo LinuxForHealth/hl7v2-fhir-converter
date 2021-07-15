@@ -206,7 +206,7 @@ public class Hl7ORUMessageTest {
       List<Resource> organizationResource = e.stream()
               .filter(v -> ResourceType.Organization == v.getResource().getResourceType())
               .map(BundleEntryComponent::getResource).collect(Collectors.toList());
-      assertThat(organizationResource).hasSize(1);
+      assertThat(organizationResource).isEmpty();
 
       List<Resource> messageHeader = e.stream()
               .filter(v -> ResourceType.MessageHeader == v.getResource().getResourceType())
@@ -282,7 +282,7 @@ public class Hl7ORUMessageTest {
       List<Resource> organizationResource = e.stream()
               .filter(v -> ResourceType.Organization == v.getResource().getResourceType())
               .map(BundleEntryComponent::getResource).collect(Collectors.toList());
-      assertThat(organizationResource).hasSize(1);
+      assertThat(organizationResource).isEmpty(); 
 
       List<Resource> messageHeader = e.stream()
               .filter(v -> ResourceType.MessageHeader == v.getResource().getResourceType())

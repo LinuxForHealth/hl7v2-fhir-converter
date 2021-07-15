@@ -3,6 +3,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 #
+# Creates an identifier with an assigner + reference + referenced object.
 ---
 type: 
    valueOf: datatype/CodeableConcept

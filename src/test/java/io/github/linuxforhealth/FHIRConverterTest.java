@@ -246,7 +246,7 @@ String hl7message =
     List<Resource> organizationRes = e.stream()
         .filter(v -> ResourceType.Organization == v.getResource().getResourceType())
         .map(BundleEntryComponent::getResource).collect(Collectors.toList());
-    assertThat(organizationRes).hasSize(2);
+    assertThat(organizationRes).hasSize(1);
   }
 
   @Test
