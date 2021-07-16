@@ -4,14 +4,25 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 ---
-
-system:
+# system is phone or email depeding on a value in email address (XTN.4)
+system_1:
+     condition: $emailValue NULL
+     type: STRING
+     valueOf: "phone"
+     vars: 
+          emailValue: XTN.4
+ 
+system_2:
+     condition: $emailValue NOT_NULL
      type: STRING
      valueOf: $contactSystem
-     constants: 
-          contactSystem: "phone"
+     valueOf: "email"
+     vars: 
+          emailValue: XTN.4
 
-value:
+# value is phone number or email addresss depeding on a value in email address (XTN.4)
+value_1:
+     condition: $emailValue NULL
      type: STRING
      valueOf: 'GeneralUtils.getFormattedTelecomNumberValue( xtn1Old, xtn5Country, xtn6Area, xtn7Local, xtn8Extension, xtn12Unformatted )'
      expressionType: JEXL
@@ -22,6 +33,14 @@ value:
           xtn7Local: String, XTN.7
           xtn8Extension: String, XTN.8
           xtn12Unformatted: String, XTN.12
+          emailValue: XTN.4
+
+value_2:    
+     condition: $emailValue NOT_NULL
+     type: STRING
+     valueOf: $emailValue
+     vars: 
+          emailValue: XTN.4       
 
 # Default use to "home" or "work", whatever is passed in
 use_1:
@@ -44,5 +63,3 @@ rank:
      type: STRING
      valueOf: XTN.18
      expressionType: HL7Spec
-
-          
