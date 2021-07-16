@@ -44,7 +44,7 @@ public class Hl7IdentifierFHIRConversionTest {
     assertThat(identifier.getValue()).hasToString("MRN12345678");
     assertThat(identifier.hasType()).isTrue(); 
     CodeableConcept cc = identifier.getType();
-    assertThat(cc.getText()).hasToString("MR");
+    assertThat(cc.hasText()).isFalse();
     assertThat(cc.hasCoding()).isTrue(); 
     Coding coding = cc.getCodingFirstRep();
     assertThat(coding.getSystem()).hasToString("http://terminology.hl7.org/CodeSystem/v2-0203"); 
@@ -58,7 +58,7 @@ public class Hl7IdentifierFHIRConversionTest {
     assertThat(identifier.getValue()).hasToString("111223333");
     assertThat(identifier.hasType()).isTrue(); 
     cc = identifier.getType();
-    assertThat(cc.getText()).hasToString("SS");
+    assertThat(cc.hasText()).isFalse();
     assertThat(cc.hasCoding()).isTrue(); 
 
     // Third identifier (Driver's license) medium check
@@ -68,7 +68,7 @@ public class Hl7IdentifierFHIRConversionTest {
     assertThat(identifier.getValue()).hasToString("MN1234567");
     assertThat(identifier.hasType()).isTrue();
     cc = identifier.getType();
-    assertThat(cc.getText()).hasToString("DL");
+    assertThat(cc.hasText()).isFalse();
     assertThat(cc.hasCoding()).isTrue();  
 
     // Deep check for fourth identifier, which is assembled from PID.19 SSN
@@ -79,7 +79,7 @@ public class Hl7IdentifierFHIRConversionTest {
     assertThat(identifier.getValue()).hasToString("444556666"); 
     assertThat(identifier.hasType()).isTrue(); 
     cc = identifier.getType();
-    assertThat(cc.getText()).hasToString("SS");
+    assertThat(cc.hasText()).isFalse();
     assertThat(cc.hasCoding()).isTrue();
     coding = cc.getCodingFirstRep();
     assertThat(coding.getSystem()).hasToString("http://terminology.hl7.org/CodeSystem/v2-0203"); 
@@ -99,7 +99,6 @@ public class Hl7IdentifierFHIRConversionTest {
 
     Patient patient = PatientUtils.createPatientFromHl7Segment(patientIdentifiersSpecialCases);
     assertThat(patient.hasIdentifier()).isTrue();
-
     List<Identifier> identifiers = patient.getIdentifier();
     assertThat(identifiers.size()).isEqualTo(2);
 
@@ -111,7 +110,7 @@ public class Hl7IdentifierFHIRConversionTest {
     assertThat(identifier.getValue()).hasToString("MRN12345678");
     assertThat(identifier.hasType()).isTrue(); 
     CodeableConcept cc = identifier.getType();
-    assertThat(cc.getText()).hasToString("MR");
+    assertThat(cc.hasText()).isFalse();
     assertThat(cc.hasCoding()).isTrue(); 
     Coding coding = cc.getCodingFirstRep();
     assertThat(coding.getSystem()).hasToString("http://terminology.hl7.org/CodeSystem/v2-0203"); 
@@ -125,7 +124,7 @@ public class Hl7IdentifierFHIRConversionTest {
     assertThat(identifier.getValue()).hasToString("111223333"); 
     assertThat(identifier.hasType()).isTrue(); 
     cc = identifier.getType();
-    assertThat(cc.getText()).hasToString("SS");
+    assertThat(cc.hasText()).isFalse();
     assertThat(cc.hasCoding()).isTrue();
     coding = cc.getCodingFirstRep();
     assertThat(coding.getSystem()).hasToString("http://terminology.hl7.org/CodeSystem/v2-0203"); 

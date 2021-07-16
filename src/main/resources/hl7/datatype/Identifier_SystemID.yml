@@ -9,6 +9,9 @@ type:
    valueOf: datatype/CodeableConcept
    expressionType: resource
    specs: CX.5 | $type
+   constants: 
+      # Because calculated system id's don't have text, force the calculated text from code to be hidden
+      hideText: 'HIDE'
 
 system: 
      condition: $systemExists NOT_NULL
