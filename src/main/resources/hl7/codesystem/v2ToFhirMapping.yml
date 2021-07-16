@@ -13,7 +13,6 @@ AllergyIntoleranceCategory:
    PA: environment
 AllergyIntoleranceCriticality:
    MI: low
-   MO: low
    SV: high
    U: unable-to-assess
 ObservationStatus:
@@ -81,7 +80,7 @@ NameUse:
 
 V3MaritalStatus:
   A: A
-  C: C
+  C: T
   D: D
   I: I
   L: L

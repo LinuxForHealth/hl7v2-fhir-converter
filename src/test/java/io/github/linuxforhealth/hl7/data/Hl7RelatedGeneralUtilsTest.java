@@ -137,16 +137,46 @@ public class Hl7RelatedGeneralUtilsTest {
     String ANYTHING = "anything";
     // Inputs are XAD.7 Type, XAD.16 Temp Indicator, XAD.17 Bad address indicator
     assertThat(Hl7RelatedGeneralUtils.getAddressUse("C","", ANYTHING)).isEqualTo("temp");
+    assertThat(Hl7RelatedGeneralUtils.getAddressUse("C","", null)).isEqualTo("temp");
+    assertThat(Hl7RelatedGeneralUtils.getAddressUse("C",null, ANYTHING)).isEqualTo("temp");
+    assertThat(Hl7RelatedGeneralUtils.getAddressUse("C",null, null)).isEqualTo("temp");
     assertThat(Hl7RelatedGeneralUtils.getAddressUse(ANYTHING,"Y", ANYTHING)).isEqualTo("temp");
+    assertThat(Hl7RelatedGeneralUtils.getAddressUse(ANYTHING,"Y", null)).isEqualTo("temp");
+    assertThat(Hl7RelatedGeneralUtils.getAddressUse(null,"Y", ANYTHING)).isEqualTo("temp");
+    assertThat(Hl7RelatedGeneralUtils.getAddressUse(null,"Y", null)).isEqualTo("temp");
     assertThat(Hl7RelatedGeneralUtils.getAddressUse("C",ANYTHING, ANYTHING)).isEqualTo("");
+    assertThat(Hl7RelatedGeneralUtils.getAddressUse("C",ANYTHING, null)).isEqualTo("");
     assertThat(Hl7RelatedGeneralUtils.getAddressUse("BA",ANYTHING, "")).isEqualTo("old");
+    assertThat(Hl7RelatedGeneralUtils.getAddressUse("BA",ANYTHING, null)).isEqualTo("old");
+    assertThat(Hl7RelatedGeneralUtils.getAddressUse("BA",null, "")).isEqualTo("old");
+    assertThat(Hl7RelatedGeneralUtils.getAddressUse("BA",null, null)).isEqualTo("old");
     assertThat(Hl7RelatedGeneralUtils.getAddressUse(ANYTHING,ANYTHING, "Y")).isEqualTo("old");
+    assertThat(Hl7RelatedGeneralUtils.getAddressUse(null,ANYTHING, "Y")).isEqualTo("old");
+    assertThat(Hl7RelatedGeneralUtils.getAddressUse(ANYTHING,null, "Y")).isEqualTo("old");
+    assertThat(Hl7RelatedGeneralUtils.getAddressUse(null,null, "Y")).isEqualTo("old");
     assertThat(Hl7RelatedGeneralUtils.getAddressUse("BA",ANYTHING, ANYTHING)).isEqualTo("");
+    assertThat(Hl7RelatedGeneralUtils.getAddressUse("BA",null, ANYTHING)).isEqualTo("");
     assertThat(Hl7RelatedGeneralUtils.getAddressUse("H",ANYTHING, ANYTHING)).isEqualTo("home");
+    assertThat(Hl7RelatedGeneralUtils.getAddressUse("H",null, ANYTHING)).isEqualTo("home");
+    assertThat(Hl7RelatedGeneralUtils.getAddressUse("H",ANYTHING, null)).isEqualTo("home");
+    assertThat(Hl7RelatedGeneralUtils.getAddressUse("H",null, null)).isEqualTo("home");
     assertThat(Hl7RelatedGeneralUtils.getAddressUse("B",ANYTHING, ANYTHING)).isEqualTo("work");
+    assertThat(Hl7RelatedGeneralUtils.getAddressUse("B",ANYTHING, null)).isEqualTo("work");
+    assertThat(Hl7RelatedGeneralUtils.getAddressUse("B",null, ANYTHING)).isEqualTo("work");
+    assertThat(Hl7RelatedGeneralUtils.getAddressUse("B",null, null)).isEqualTo("work");
     assertThat(Hl7RelatedGeneralUtils.getAddressUse("O",ANYTHING, ANYTHING)).isEqualTo("work");
+    assertThat(Hl7RelatedGeneralUtils.getAddressUse("O",ANYTHING, null)).isEqualTo("work");
+    assertThat(Hl7RelatedGeneralUtils.getAddressUse("O",null, ANYTHING)).isEqualTo("work");
+    assertThat(Hl7RelatedGeneralUtils.getAddressUse("O",null, null)).isEqualTo("work");
     assertThat(Hl7RelatedGeneralUtils.getAddressUse("BI",ANYTHING, ANYTHING)).isEqualTo("billing");
+    assertThat(Hl7RelatedGeneralUtils.getAddressUse("BI",null, ANYTHING)).isEqualTo("billing");
+    assertThat(Hl7RelatedGeneralUtils.getAddressUse("BI",ANYTHING, null)).isEqualTo("billing");
+    assertThat(Hl7RelatedGeneralUtils.getAddressUse("BI",null, null)).isEqualTo("billing");
     assertThat(Hl7RelatedGeneralUtils.getAddressUse(ANYTHING,ANYTHING, ANYTHING)).isEqualTo("");
+    assertThat(Hl7RelatedGeneralUtils.getAddressUse(null,ANYTHING, ANYTHING)).isEqualTo("");
+    assertThat(Hl7RelatedGeneralUtils.getAddressUse(ANYTHING,null, ANYTHING)).isEqualTo("");
+    assertThat(Hl7RelatedGeneralUtils.getAddressUse(ANYTHING,ANYTHING, null)).isEqualTo("");
+    assertThat(Hl7RelatedGeneralUtils.getAddressUse(null,null, null)).isEqualTo("");
 
   }
 
@@ -155,12 +185,21 @@ public class Hl7RelatedGeneralUtilsTest {
     String ANYTHING = "anything";
     // Inputs are XAD.7 Type, XAD.18 Type 
     assertThat(Hl7RelatedGeneralUtils.getAddressType(ANYTHING, "M")).isEqualTo("postal");
+    assertThat(Hl7RelatedGeneralUtils.getAddressType(null, "M")).isEqualTo("postal");
     assertThat(Hl7RelatedGeneralUtils.getAddressType("M","")).isEqualTo("postal");
+    assertThat(Hl7RelatedGeneralUtils.getAddressType("M",null)).isEqualTo("postal");
     assertThat(Hl7RelatedGeneralUtils.getAddressType("M",ANYTHING)).isEqualTo("");
     assertThat(Hl7RelatedGeneralUtils.getAddressType(ANYTHING, "V")).isEqualTo("physical");
+    assertThat(Hl7RelatedGeneralUtils.getAddressType(null, "V")).isEqualTo("physical");
     assertThat(Hl7RelatedGeneralUtils.getAddressType("SH","")).isEqualTo("physical");
+    assertThat(Hl7RelatedGeneralUtils.getAddressType("SH",null)).isEqualTo("physical");
     assertThat(Hl7RelatedGeneralUtils.getAddressType("SH",ANYTHING)).isEqualTo("");
     assertThat(Hl7RelatedGeneralUtils.getAddressType(ANYTHING,ANYTHING)).isEqualTo("");
+    assertThat(Hl7RelatedGeneralUtils.getAddressType(ANYTHING,null)).isEqualTo("");
+    assertThat(Hl7RelatedGeneralUtils.getAddressType(null,ANYTHING)).isEqualTo("");
+    assertThat(Hl7RelatedGeneralUtils.getAddressType(null,null)).isEqualTo("");
+
+
   }
 
   @Test
@@ -178,5 +217,42 @@ public class Hl7RelatedGeneralUtilsTest {
   }
   // Note: Utility  Hl7RelatedGeneralUtils.getAddressDistrict is more effectively tested as part of Patient Address testing
 
-}
+  @Test
+  public void getFormattedTelecomNumberValue() {  
+    // Empty values return nothing
+    assertThat(Hl7RelatedGeneralUtils.getFormattedTelecomNumberValue("","","","","","")).isEmpty();
+    // Everything empty except XTN1 returns XTN1.
+    assertThat(Hl7RelatedGeneralUtils.getFormattedTelecomNumberValue("111","","","","","")).isEqualTo("111");
+    // Everything empty except XTN12 returns XTN12.
+    assertThat(Hl7RelatedGeneralUtils.getFormattedTelecomNumberValue("","","","","","112")).isEqualTo("112");
+    // XTN12 takes priority over XTN1
+    assertThat(Hl7RelatedGeneralUtils.getFormattedTelecomNumberValue("111","","","","","112")).isEqualTo("112");
+    // Country, Area, and Extension are ignored if there is no Local number
+    assertThat(Hl7RelatedGeneralUtils.getFormattedTelecomNumberValue("","22","333","","555","")).isEmpty();
+    // XTN12 and XTN1 will be used if no local number
+    assertThat(Hl7RelatedGeneralUtils.getFormattedTelecomNumberValue("111","22","333","","555","")).isEqualTo("111");
+    assertThat(Hl7RelatedGeneralUtils.getFormattedTelecomNumberValue("","22","333","","555","112")).isEqualTo("112");
+    // Country, Area, and Extension are used if there is a Local number and they exist, and XTN1 and XTN12 are ignored  
+    assertThat(Hl7RelatedGeneralUtils.getFormattedTelecomNumberValue("111","22","333","4444444","555","112")).isNotEmpty();
+    assertThat(Hl7RelatedGeneralUtils.getFormattedTelecomNumberValue("111","22","333","4444444","555","112")).contains("+22");
+    assertThat(Hl7RelatedGeneralUtils.getFormattedTelecomNumberValue("111","22","333","4444444","555","112")).contains("333");
+    assertThat(Hl7RelatedGeneralUtils.getFormattedTelecomNumberValue("111","22","333","4444444","555","112")).contains("4444");
+    assertThat(Hl7RelatedGeneralUtils.getFormattedTelecomNumberValue("111","22","333","4444444","555","112")).contains("ext. 555");
+    assertThat(Hl7RelatedGeneralUtils.getFormattedTelecomNumberValue("111","22","333","4444444","555","112")).isEqualTo("+22 333 444 4444 ext. 555");
+    assertThat(Hl7RelatedGeneralUtils.getFormattedTelecomNumberValue("111","22","333","4444444","","112")).isEqualTo("+22 333 444 4444");  // Same rule without extension
+    // Area, and Extension are used if there is a Local number, and XTN1 and XTN12 are ignored  
+    assertThat(Hl7RelatedGeneralUtils.getFormattedTelecomNumberValue("111","","333","4444444","555","112")).isNotEmpty();
+    assertThat(Hl7RelatedGeneralUtils.getFormattedTelecomNumberValue("111","","333","4444444","555","112")).contains("333");
+    assertThat(Hl7RelatedGeneralUtils.getFormattedTelecomNumberValue("111","","333","4444444","555","112")).contains("4444");
+    assertThat(Hl7RelatedGeneralUtils.getFormattedTelecomNumberValue("111","","333","4444444","555","112")).contains("ext. 555");
+    assertThat(Hl7RelatedGeneralUtils.getFormattedTelecomNumberValue("111","","333","4444444","555","112")).isEqualTo("(333) 444 4444 ext. 555");
+    assertThat(Hl7RelatedGeneralUtils.getFormattedTelecomNumberValue("111","","333","4444444","","112")).isEqualTo("(333) 444 4444");  // Same rule without extension
+    // If local and country but no area, country is not prepended,only local is returned; XTN1 and XTN12 are ignored  
+    assertThat(Hl7RelatedGeneralUtils.getFormattedTelecomNumberValue("111","","","4444444","555","112")).isNotEmpty();
+    assertThat(Hl7RelatedGeneralUtils.getFormattedTelecomNumberValue("111","","","4444444","555","112")).contains("4444");
+    assertThat(Hl7RelatedGeneralUtils.getFormattedTelecomNumberValue("111","","","4444444","555","112")).contains("ext. 555");
+    assertThat(Hl7RelatedGeneralUtils.getFormattedTelecomNumberValue("111","","","4444444","555","112")).isEqualTo("444 4444 ext. 555");
+    assertThat(Hl7RelatedGeneralUtils.getFormattedTelecomNumberValue("111","","","4444444","","112")).isEqualTo("444 4444");  // Same rule without extension
+  }
 
+}

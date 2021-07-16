@@ -13,11 +13,29 @@ id:
   valueOf: "UUID.randomUUID()"
   expressionType: JEXL
 
-identifier:
-    valueOf: datatype/Identifier
+identifier_1:
+    valueOf: datatype/Identifier_SystemID
     generateList: true
     expressionType: resource
     specs: PID.3
+    vars: 
+       assignerSystem: String, PID.3.4
+
+# Gets the SSN from PID.19 and formats and adds it as an ID
+identifier_2: 
+    condition: $valueIn NOT_NULL
+    valueOf: datatype/Identifier_var
+    generateList: true
+    expressionType: resource
+    vars:
+      valueIn: String, PID.19
+    constants:
+      system: "http://terminology.hl7.org/CodeSystem/v2-0203"
+      code: "SS"
+      display: "Social Security number"
+      text: "SS"
+      systemId: "urn:id:USA"
+
 name:
     valueOf: datatype/HumanName
     generateList: true
@@ -33,6 +51,32 @@ address:
     generateList: true
     expressionType: resource
     specs: PID.11
+
+  
+telecom_1:
+    condition: $pid14 NOT_NULL
+    valueOf: datatype/Telecom
+    generateList: true
+    expressionType: resource
+    specs: PID.14
+    vars:
+       pid14: PID.14
+    constants: 
+       use: "work"
+
+# The yaml is processed in reverse order, therefore
+# Put the PID.13 last in yaml so it is first to be processed 
+       
+telecom_2:
+    condition: $pid13 NOT_NULL
+    valueOf: datatype/Telecom
+    generateList: true
+    expressionType: resource
+    specs: PID.13
+    vars:
+       pid13: PID.13
+    constants: 
+       use: "home"
 
 birthDate:
      type: DATE
@@ -78,6 +122,13 @@ maritalStatus:
   expressionType: resource
   vars:
     valCodeableConcept: MARITAL_STATUS, PID.16
+    text: String, PID.16.2 | PID.16.9
+
+generalPractitioner: 
+   valueOf: resource/Practitioner
+   generateList: true
+   expressionType: reference
+   specs: PD1.4
 
 extension_1:
   condition: $valString NOT_NULL

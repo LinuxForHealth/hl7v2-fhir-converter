@@ -8,22 +8,66 @@ package io.github.linuxforhealth.hl7.segments;
 import static org.assertj.core.api.Assertions.assertThat;
 import java.io.IOException;
 import java.util.List;
-
+import java.util.stream.Collectors;
 
 import org.hl7.fhir.r4.model.HumanName;
+import org.hl7.fhir.instance.model.api.IBaseResource;
+import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Enumerations;
 import org.hl7.fhir.r4.model.Patient;
+import org.hl7.fhir.r4.model.Practitioner;
+import org.hl7.fhir.r4.model.Reference;
+import org.hl7.fhir.r4.model.Resource;
+import org.hl7.fhir.r4.model.ResourceType;
 import org.hl7.fhir.r4.model.codesystems.V3MaritalStatus;
 import org.hl7.fhir.r4.model.StringType;
+import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+
+import io.github.linuxforhealth.fhir.FHIRContext;
+import io.github.linuxforhealth.hl7.HL7ToFHIRConverter;
 import io.github.linuxforhealth.hl7.segments.util.PatientUtils;
 
 public class Hl7PatientFHIRConversionTest {
 
   @Rule
   public ExpectedException exceptionRule = ExpectedException.none();
+
+  private static FHIRContext context = new FHIRContext(true, false);
+
+  @Test
+  public void test_patient_additional_demographics() throws IOException {
+    String hl7message = "MSH|^~\\&|hl7Integration|hl7Integration|||||ADT^A01|||2.6|\n"
+    		+ "PID|1||1234^^^AssigningAuthority^MR||TEST^PATIENT|\n"
+    		+ "PD1|||Sample Family Practice^^2222|1111^LastName^ClinicianFirstName^^^^Title||||||||||||A|";
+
+    HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
+	String json = ftv.convert(hl7message , PatientUtils.OPTIONS);
+    assertThat(json).isNotBlank();
+
+    IBaseResource bundleResource = context.getParser().parseResource(json);
+    assertThat(bundleResource).isNotNull();
+    Bundle b = (Bundle) bundleResource;
+    List<BundleEntryComponent> e = b.getEntry();
+
+    List<Resource> patientResource =
+        e.stream().filter(v -> ResourceType.Patient == v.getResource().getResourceType())
+            .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+    assertThat(patientResource).hasSize(1);
+    Patient patient = getResourcePatient(patientResource.get(0));
+    List<Reference> refs = patient.getGeneralPractitioner();
+    assertThat(refs.size() > 0);
+
+    List<Resource> practitionerResource =
+        e.stream().filter(v -> ResourceType.Practitioner == v.getResource().getResourceType())
+            .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+    assertThat(practitionerResource).hasSize(1);
+    Practitioner doc = getResourcePractitioner(practitionerResource.get(0));
+    String lastName = doc.getName().get(0).getFamily();
+    assertThat(lastName.equals("LastName"));
+  }
 
 
   /**
@@ -218,14 +262,21 @@ public class Hl7PatientFHIRConversionTest {
   public void patient_marital_status_test(){
     String marriedPatient =
             "MSH|^~\\&|MyEMR|DE-000001| |CAIRLO|20160701123030-0700||VXU^V04^VXU_V04|CA0001|P|2.6|||ER|AL|||||Z22^CDCPHINVS|DE-000001\r" +
-                    "PID|1||000054321^^^MRN||COOPER^SHELDON^ANDREW||19820512|M||2106-3|765 SOMESTREET RD UNIT 3A^^PASADENA^LA^558846^United States of America||4652141486^Home^^shelly@gmail.com||EN^English|M|CAT|78654||||N\r";
-
-
+                    "PID|1||000054321^^^MRN||COOPER^SHELDON^ANDREW||19820512|M||2106-3|765 SOMESTREET RD UNIT 3A^^PASADENA^LA^558846^United States of America||4652141486^Home^^shelly@gmail.com||EN^English|M^Married|CAT|78654||||N\r";
+    String AltTextField =
+            "MSH|^~\\&|MyEMR|DE-000001| |CAIRLO|20160701123030-0700||VXU^V04^VXU_V04|CA0001|P|2.6|||ER|AL|||||Z22^CDCPHINVS|DE-000001\r" +
+                    "PID|1||000054321^^^MRN||COOPER^SHELDON^ANDREW||19820512|M||2106-3|765 SOMESTREET RD UNIT 3A^^PASADENA^LA^558846^United States of America||4652141486^Home^^shelly@gmail.com||EN^English|S^^^^^^^^Single|CAT|78654||||N\r";
     Patient patientObjMarried = PatientUtils.createPatientFromHl7Segment(marriedPatient);
     assertThat(patientObjMarried.hasMaritalStatus()).isTrue();
-    assertThat(patientObjMarried.getMaritalStatus().getText()).isEqualTo(V3MaritalStatus.M.getDisplay());
+    assertThat(patientObjMarried.getMaritalStatus().getText()).isEqualTo("Married");
     assertThat(patientObjMarried.getMaritalStatus().getCodingFirstRep().getDisplay()).isEqualTo(V3MaritalStatus.M.getDisplay());
     assertThat(patientObjMarried.getMaritalStatus().getCodingFirstRep().getSystem()).isEqualTo(V3MaritalStatus.M.getSystem());
+
+    Patient patientObjMarriedAltText = PatientUtils.createPatientFromHl7Segment(AltTextField);
+    assertThat(patientObjMarriedAltText.hasMaritalStatus()).isTrue();
+    assertThat(patientObjMarriedAltText.getMaritalStatus().getText()).isEqualTo("Single");
+    assertThat(patientObjMarriedAltText.getMaritalStatus().getCodingFirstRep().getDisplay()).isEqualTo(V3MaritalStatus.S.getDisplay());
+    assertThat(patientObjMarriedAltText.getMaritalStatus().getCodingFirstRep().getSystem()).isEqualTo(V3MaritalStatus.S.getSystem());
 
   }
 
@@ -233,7 +284,7 @@ public class Hl7PatientFHIRConversionTest {
   public void patient_communication_language(){
 
     String patientSpeaksEnglish =
-                    "MSH|^~\\&|MyEMR|DE-000001| |CAIRLO|20160701123030-0700||VXU^V04^VXU_V04|CA0001|P|2.6|||ER|AL|||||Z22^CDCPHINVS|DE-000001\r" +
+            "MSH|^~\\&|MyEMR|DE-000001| |CAIRLO|20160701123030-0700||VXU^V04^VXU_V04|CA0001|P|2.6|||ER|AL|||||Z22^CDCPHINVS|DE-000001\r" +
                     "PID|1||PA123456^^^MYEMR^MR||JONES^GEORGE^M^JR^^^L|MILLER^MARTHA^G^^^^M|20140227|M||2106-3^WHITE^CDCREC|1234 W FIRST ST^^BEVERLY HILLS^CA^90210^^H||^PRN^PH^^^555^5555555||ENG^English^HL70296|||||||2186-5^ not Hispanic or Latino^CDCREC||Y|2\r";
 
     Patient patientObjEnglish = PatientUtils.createPatientFromHl7Segment(patientSpeaksEnglish);
@@ -241,4 +292,17 @@ public class Hl7PatientFHIRConversionTest {
     assertThat(patientObjEnglish.getCommunication().get(0).getLanguage().getText()).isEqualTo("English");
     assertThat(patientObjEnglish.getCommunication().get(0).getPreferred()).isTrue();
   }
+
+  private Patient getResourcePatient(Resource resource) {
+	    String s = context.getParser().encodeResourceToString(resource);
+	    Class<? extends IBaseResource> klass = Patient.class;
+	    return (Patient) context.getParser().parseResource(klass, s);
+  }
+
+  private static Practitioner getResourcePractitioner(Resource resource) {
+	String s = context.getParser().encodeResourceToString(resource);
+	Class<? extends IBaseResource> klass = Practitioner.class;
+	return (Practitioner) context.getParser().parseResource(klass, s);
+  }
+
 }

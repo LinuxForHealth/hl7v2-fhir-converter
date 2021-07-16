@@ -5,30 +5,26 @@
  */
 package io.github.linuxforhealth.hl7.segments.util;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import java.util.List;
-import java.util.stream.Collectors;
-
-import org.hl7.fhir.instance.model.api.IBaseResource;
-import org.hl7.fhir.r4.model.Bundle;
-import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
-import org.hl7.fhir.r4.model.Resource;
-import org.hl7.fhir.r4.model.ResourceType;
-import org.hl7.fhir.r4.model.Patient;
-
 import io.github.linuxforhealth.fhir.FHIRContext;
 import io.github.linuxforhealth.hl7.ConverterOptions;
 import io.github.linuxforhealth.hl7.ConverterOptions.Builder;
 import io.github.linuxforhealth.hl7.HL7ToFHIRConverter;
+import org.hl7.fhir.instance.model.api.IBaseResource;
+import org.hl7.fhir.r4.model.*;
+import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
 
-public class PatientUtils  {
+import java.util.List;
+import java.util.stream.Collectors;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+public class AllergyUtils {
 
   private static FHIRContext context = new FHIRContext();
-  public static final ConverterOptions OPTIONS =
+  private static final ConverterOptions OPTIONS =
     new Builder().withValidateResource().withPrettyPrint().build();
 
-  public static Patient createPatientFromHl7Segment(String inputSegment){
+  public static AllergyIntolerance createAllergyFromHl7Segment(String inputSegment){
     HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
     String json = ftv.convert(inputSegment, OPTIONS);
     System.out.println(json);
@@ -39,17 +35,17 @@ public class PatientUtils  {
     Bundle b = (Bundle) bundleResource;
 
     List<BundleEntryComponent> e = b.getEntry();
-    List<Resource> patients =
-        e.stream().filter(v -> ResourceType.Patient == v.getResource().getResourceType())
+    List<Resource> allergy =
+        e.stream().filter(v -> ResourceType.AllergyIntolerance == v.getResource().getResourceType())
             .map(BundleEntryComponent::getResource).collect(Collectors.toList());
-    assertThat(patients).hasSize(1);
-    return getPatientFromResource(patients.get(0));
+
+    return getAllergyFromResource(allergy.get(0));
   }  
 
-  private static Patient getPatientFromResource(Resource resource) {
+  private static AllergyIntolerance getAllergyFromResource(Resource resource) {
     String s = context.getParser().encodeResourceToString(resource);
-    Class<? extends IBaseResource> klass = Patient.class;
-    return (Patient) context.getParser().parseResource(klass, s);
+    Class<? extends IBaseResource> klass = AllergyIntolerance.class;
+    return (AllergyIntolerance) context.getParser().parseResource(klass, s);
   }
 
 

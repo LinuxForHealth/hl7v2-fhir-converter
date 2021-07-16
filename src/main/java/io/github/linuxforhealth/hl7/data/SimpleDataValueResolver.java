@@ -186,7 +186,6 @@ public class SimpleDataValueResolver {
             V3MaritalStatus mar = V3MaritalStatus.fromCode(code);
             CodeableConcept codeableConcept = new CodeableConcept( );
             codeableConcept.addCoding(new Coding( mar.getSystem(), code, mar.getDisplay() ));
-            codeableConcept.setText(mar.getDisplay());
           return codeableConcept;
         } else {
           return null;
@@ -260,7 +259,7 @@ public class SimpleDataValueResolver {
         if (code != null) {
             return code;
         } else {
-            return AllergyIntoleranceCriticality.UNABLETOASSESS.toCode();
+            return null;
         }
     };
 
@@ -277,6 +276,11 @@ public class SimpleDataValueResolver {
     public static final ValueExtractor<Object, String> SYSTEM_URL = (Object value) -> {
         String val = Hl7DataHandlerUtil.getStringValue(value);
         return UrlLookup.getSystemUrl(val);
+    };
+
+    public static final ValueExtractor<Object, String> SYSTEM_ID = (Object value) -> {
+        String val = Hl7DataHandlerUtil.getStringValue(value);
+        return "urn:id:" + val;
     };
 
     public static final ValueExtractor<Object, List<?>> ARRAY = (Object value) -> {

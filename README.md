@@ -6,9 +6,32 @@ Message parsing and modeling is supported using the "HAPI" libraries for [HL7](h
 
 The converter supports the following message types/events:
 * ADT_A01 - Patient Administration: Admit/Visit Notification
+* OMP_O09 - Pharmacy/Treatment Order
 * ORU_R01 - Observation Reporting: Observation and Result Transmission (Laboratory)
 * PPR_PC1 - Patient Problem: Add Problem
+* RDE_O11 - Pharmacy/Treatment Encoded Order
+* RDE_O25 - Pharmacy/Treatment Refill Authorization Request
 * VXU_V04 - Vaccination: Update Vaccination Record
+
+The converter supports the following message segments:
+* AL1 - Patient Allergy Information
+* EVN - Event Type
+* MSH - Message Header
+* NTE - Notes and Comments
+* OBR - Observation Request
+* OBX - Observation/Result
+* ORC - Common Order
+* PD1 - Patient Additional Demographic
+* PID - Patient Identification
+* PRB - Problem Details
+* PV1 - Patient Visit
+* PV2 - Patient Visit - Additional Information
+* RXA - Pharmacy/Treatment Administration
+* RXC - Pharmacy/Treatment Component Order
+* RXE - Pharmacy/Treatment Encoded Order
+* RXO - Pharmacy/Treatment Order
+* RXR - Pharmacy/Treatment Route
+* SPM - Specimen
 
 If you need another message type/event . . .  contributions are welcome! We welcome [Pull Requests](https://github.com/LinuxForHealth/hl7v2-fhir-converter/pulls)!
 
@@ -30,7 +53,7 @@ cd hl7v2-fhir-converter
 
 ## Using The Converter In A Java Application
 
-The HL7 to FHIR converter library is available as a bintray dependency. 
+The HL7 to FHIR converter library is available as a maven dependency. 
 
 Library Coordinates
 ```

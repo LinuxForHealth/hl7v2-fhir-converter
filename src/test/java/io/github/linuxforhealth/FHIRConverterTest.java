@@ -102,7 +102,7 @@ public class FHIRConverterTest {
         + "PID|0010||PID1234^5^M11^A^MR^HOSP~1234568965^^^USA^SS||DOE^JOHN^A^||19800202|F||W|111 TEST_STREET_NAME^^TEST_CITY^NY^111-1111^USA||(905)111-1111|||S|ZZ|12^^^124|34-13-312||||TEST_BIRTH_PLACE\r"
         + "PV1|1|ff|yyy|EL|ABC||200^ATTEND_DOC_FAMILY_TEST^ATTEND_DOC_GIVEN_TEST|201^REFER_DOC_FAMILY_TEST^REFER_DOC_GIVEN_TEST|202^CONSULTING_DOC_FAMILY_TEST^CONSULTING_DOC_GIVEN_TEST|MED|||||B6|E|272^ADMITTING_DOC_FAMILY_TEST^ADMITTING_DOC_GIVEN_TEST||48390|||||||||||||||||||||||||201409122200|20150206031726\r"
         + "OBX|1|TX|1234||ECHOCARDIOGRAPHIC REPORT||||||F|||||2740^TRDSE^Janetary~2913^MRTTE^Darren^F~3065^MGHOBT^Paul^J~4723^LOTHDEW^Robert^L|\r"
-        + "AL1|1|DRUG|00000741^OXYCODONE||HYPOTENSION\r" 
+        + "AL1|1|DRUG|00000741^OXYCODONE||HYPOTENSION\r"
         + "AL1|2|DRUG|00001433^TRAMADOL||SEIZURES~VOMITING\r"
         + "PRB|AD|200603150625|aortic stenosis|53692||2||200603150625";
 
@@ -246,7 +246,9 @@ String hl7message =
     List<Resource> organizationRes = e.stream()
         .filter(v -> ResourceType.Organization == v.getResource().getResourceType())
         .map(BundleEntryComponent::getResource).collect(Collectors.toList());
-    assertThat(organizationRes).hasSize(2);
+    // Patient organizations use a system urn:id reference for the organization, 
+    // so we only expect the manufacturer to have an organization.    
+    assertThat(organizationRes).hasSize(1);
   }
 
   @Test
