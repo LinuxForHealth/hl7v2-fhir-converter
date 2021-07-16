@@ -34,7 +34,7 @@ identifier_2:
       code: "SS"
       display: "Social Security number"
       text: "SS"
-      systemId: "urn:id:USA"
+      # There is no default authority for PID.19
 
 name:
     valueOf: datatype/HumanName

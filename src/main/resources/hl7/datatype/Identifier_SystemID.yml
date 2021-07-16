@@ -11,9 +11,12 @@ type:
    specs: CX.5 | $type
 
 system: 
+     condition: $systemExists NOT_NULL
      type: SYSTEM_ID
      valueOf: CX.4 | CWE.4 |EI.2
      expressionType: HL7Spec
+     vars:
+          systemExists: CX.4 | CWE.4 | EI.2
     
 value: 
      type: STRING
