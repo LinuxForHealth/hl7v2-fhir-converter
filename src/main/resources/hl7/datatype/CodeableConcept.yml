@@ -1,5 +1,5 @@
 #
-# (C) Copyright IBM Corp. 2020
+# (C) Copyright IBM Corp. 2020, 2021
 #
 # SPDX-License-Identifier: Apache-2.0
 #
@@ -15,7 +15,6 @@ coding_1 :
     vars:
       code: CWE.1 |CE.1 |CNE.1
       system: CWE.3 |CE.3 |CNE.3
-      display: CWE.2 |CE.2 |CNE.2
       version: CWE.7 |CE.6 |CNE.7
       
 coding_2: 
