@@ -7,7 +7,11 @@
 language:
   valueOf: datatype/CodeableConcept
   expressionType: resource
-  specs: PID.15
+  vars:
+    code: PID.15.1
+    display: PID.15.2
+  constants:
+    system: "urn:ietf:bcp:47"
 
 preferred:
   type: BOOLEAN

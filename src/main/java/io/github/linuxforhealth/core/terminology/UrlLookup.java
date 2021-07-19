@@ -55,7 +55,7 @@ public class UrlLookup {
      */
     public static String getUrl(String urlType, String value) {
         Map<String, CodingSystem> urlMap = getUrlMap(urlType);
-        if (StringUtils.startsWith(value, "http://") || StringUtils.startsWith(value, "https://")) {
+        if (StringUtils.startsWith(value, "http://") || StringUtils.startsWith(value, "https://") || StringUtils.startsWith(value, "urn")) {
             return value;
         } else if (value != null) {
             CodingSystem system = urlMap.get(StringUtils.upperCase(value));
