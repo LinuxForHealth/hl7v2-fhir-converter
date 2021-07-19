@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2020
+ * (C) Copyright IBM Corp. 2020, 2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -206,6 +206,14 @@ public class SimpleDataValueResolverTest {
   public void get_UUID_value_valid() {
     String gen = VALID_UUID;
     assertThat(SimpleDataValueResolver.UUID_VAL.apply(gen)).isEqualTo(UUID.fromString(VALID_UUID));
+  }
+
+  @Test
+  public void get_system_id_value_valid() {
+    assertThat(SimpleDataValueResolver.SYSTEM_ID.apply("ABC")).isEqualTo("urn:id:ABC");
+    assertThat(SimpleDataValueResolver.SYSTEM_ID.apply("A B C")).isEqualTo("urn:id:A_B_C");
+    assertThat(SimpleDataValueResolver.SYSTEM_ID.apply("")).isNull();
+    assertThat(SimpleDataValueResolver.SYSTEM_ID.apply(null)).isNull();
   }
 
 }
