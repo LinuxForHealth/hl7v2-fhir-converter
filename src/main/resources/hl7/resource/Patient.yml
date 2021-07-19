@@ -101,7 +101,16 @@ multipleBirthBoolean_2:
           multBool: String, PID.24
           multInt: PID.25          
 
-multipleBirthInteger:
+multipleBirthInteger_1:
+     condition: $multBool NULL && $multInt NOT_NULL
+     type: INTEGER
+     valueOf: PID.25
+     expressionType: HL7Spec
+     vars:
+          multBool: String, PID.24
+          multInt: PID.25
+
+multipleBirthInteger_2:
      condition: $multBool EQUALS Y && $multInt NOT_NULL
      type: INTEGER
      valueOf: PID.25

@@ -153,6 +153,18 @@ public class Hl7PatientFHIRConversionTest {
   @Test
   public void patient_multiple_birth_conversion_test() {
 
+    /** 
+     * Simplified logic for multiple birth  
+     * 
+     * Y + number = number
+     * N + number = N
+     * Y + blank = Y
+     * N + blank = N
+     * blank + number = number
+     * blank + blank = nothing. 
+     * 
+     */
+
     String patientMsgEmptyMultiple =
     "MSH|^~\\&|MIICEHRApplication|MIIC|MIIC|MIIC|201705130822||VXU^V04^VXU_V04|test1100|P|2.5.1|||AL|AL|||||Z22^CDCPHINVS|^^^^^MIIC^SR^^^MIIC|MIIC\n"
     + "PID|1||12345678^^^^MR|ALTID|Mouse^Mickey^J^III^^^||||||||||||||||||Born in USA|||USA||||\n"
@@ -176,9 +188,12 @@ public class Hl7PatientFHIRConversionTest {
     "MSH|^~\\&|MIICEHRApplication|MIIC|MIIC|MIIC|201705130822||VXU^V04^VXU_V04|test1100|P|2.5.1|||AL|AL|||||Z22^CDCPHINVS|^^^^^MIIC^SR^^^MIIC|MIIC\n"
     + "PID|1||12345678^^^^MR|ALTID|Mouse^Mickey^J^III^^^||||||||||||||||||Born in USA||2|USA||||\n"
     ;
-    // A number is ignored if there is no boolean and multiple birth is not even created
+    // A number when the boolean is missing presumes the number has meaning.  An integer is created.
     Patient patientObjMultipleNumberOnly = PatientUtils.createPatientFromHl7Segment(patientMsgMultipleNumberOnly);
-    assertThat(patientObjMultipleNumberOnly.hasMultipleBirth()).isFalse();   
+    assertThat(patientObjMultipleNumberOnly.hasMultipleBirth()).isTrue();   
+    assertThat(patientObjMultipleNumberOnly.hasMultipleBirthIntegerType()).isTrue(); 
+    assertThat(patientObjMultipleNumberOnly.hasMultipleBirthBooleanType()).isFalse(); 
+    assertThat(patientObjMultipleNumberOnly.getMultipleBirthIntegerType().asStringValue()).isEqualTo("2"); 
 
     String patientMsgMultipleBooleanYOnly =
     "MSH|^~\\&|MIICEHRApplication|MIIC|MIIC|MIIC|201705130822||VXU^V04^VXU_V04|test1100|P|2.5.1|||AL|AL|||||Z22^CDCPHINVS|^^^^^MIIC^SR^^^MIIC|MIIC\n"
