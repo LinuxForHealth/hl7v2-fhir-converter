@@ -21,7 +21,7 @@ identifier_1:
     vars: 
        assignerSystem: String, PID.3.4
 
-# Gets the SSN from PID.19 and formats and adds it as an ID
+# Gets the SSN from PID.19, formats and adds it as an ID
 identifier_2: 
     condition: $valueIn NOT_NULL
     valueOf: datatype/Identifier_var
@@ -35,6 +35,21 @@ identifier_2:
       display: "Social Security number"
       # There is no text for PID.19
       # There is no authority for PID.19
+
+# Gets the Driver's license from PID.20, formats and adds it as an ID
+identifier_3: 
+    condition: $valueIn NOT_NULL
+    valueOf: datatype/Identifier_var
+    generateList: true
+    expressionType: resource
+    vars:
+      valueIn: String, PID.20
+    constants:
+      system: "http://terminology.hl7.org/CodeSystem/v2-0203"
+      code: "DL"
+      display: "Driver's license number"
+      # There is no text for PID.20
+      # There is no authority for PID.20     
 
 name:
     valueOf: datatype/HumanName
