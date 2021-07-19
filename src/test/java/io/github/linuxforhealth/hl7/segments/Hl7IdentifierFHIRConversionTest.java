@@ -28,14 +28,14 @@ public class Hl7IdentifierFHIRConversionTest {
     String patientIdentifiers =
     "MSH|^~\\&|MIICEHRApplication|MIIC|MIIC|MIIC|201705130822||VXU^V04^VXU_V04|test1100|P|2.5.1|||AL|AL|||||Z22^CDCPHINVS|^^^^^MIIC^SR^^^MIIC|MIIC\n"
     // Three ID's for testing, plus a SSN in field 19.
-    + "PID|1||MRN12345678^^^ID-XYZ^MR~111223333^^^USA^SS~MN1234567^^^MNDOT^DL|ALTID|Moose^Mickey^J^III^^^||20060504|M|||||||||||444556666|||||||||||\n"
+    + "PID|1||MRN12345678^^^ID-XYZ^MR~111223333^^^USA^SS~MN1234567^^^MNDOT^DL|ALTID|Moose^Mickey^J^III^^^||20060504|M|||||||||||444556666|D-12445889-Z||||||||||\n"
     ;
 
     Patient patient = PatientUtils.createPatientFromHl7Segment(patientIdentifiers);
     assertThat(patient.hasIdentifier()).isTrue();
 
     List<Identifier> identifiers = patient.getIdentifier();
-    assertThat(identifiers.size()).isEqualTo(4);
+    assertThat(identifiers.size()).isEqualTo(5);
 
     // First identifier (Medical Record) deep check
     Identifier identifier = identifiers.get(0);
@@ -86,6 +86,21 @@ public class Hl7IdentifierFHIRConversionTest {
     assertThat(coding.getCode()).hasToString("SS");
     assertThat(coding.getDisplay()).hasToString("Social Security number");
     
+    // Deep check for fifth identifier, which is assembled from PID.20 DL
+    identifier = identifiers.get(4);
+    assertThat(identifier.hasSystem()).isFalse();
+    // PID.20 has no authority value and therefore no system id
+    // Using different DL than ID#2 to confirm coming from PID.20
+    assertThat(identifier.getValue()).hasToString("D-12445889-Z"); 
+    assertThat(identifier.hasType()).isTrue(); 
+    cc = identifier.getType();
+    assertThat(cc.hasText()).isFalse();
+    assertThat(cc.hasCoding()).isTrue();
+    coding = cc.getCodingFirstRep();
+    assertThat(coding.getSystem()).hasToString("http://terminology.hl7.org/CodeSystem/v2-0203"); 
+    assertThat(coding.getCode()).hasToString("DL");
+    assertThat(coding.getDisplay()).hasToString("Driver's license number");    
+
   }
 
   @Test
