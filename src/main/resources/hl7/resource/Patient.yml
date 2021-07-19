@@ -43,7 +43,7 @@ identifier_3:
     generateList: true
     expressionType: resource
     vars:
-      valueIn: String, PID.20
+      valueIn: String, PID.20.1
     constants:
       system: "http://terminology.hl7.org/CodeSystem/v2-0203"
       code: "DL"
