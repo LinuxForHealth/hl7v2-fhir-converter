@@ -5,7 +5,7 @@
 #
 ---
 language:
-  valueOf: datatype/CodeableConcept
+  valueOf: datatype/CodeableConcept_var
   expressionType: resource
   vars:
     code: PID.15.1

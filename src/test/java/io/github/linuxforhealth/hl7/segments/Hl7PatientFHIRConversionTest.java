@@ -289,7 +289,7 @@ public class Hl7PatientFHIRConversionTest {
 
     Patient patientObjEnglish = PatientUtils.createPatientFromHl7Segment(patientSpeaksEnglish);
     assertThat(patientObjEnglish.hasCommunication()).isTrue();
-    assertThat(patientObjEnglish.getCommunication().get(0).getLanguage().getText()).isEqualTo("English");
+    assertThat(patientObjEnglish.getCommunication().get(0).getLanguage().getCodingFirstRep().getDisplay()).isEqualTo("English");
     assertThat(patientObjEnglish.getCommunication().get(0).getPreferred()).isTrue();
   }
 
