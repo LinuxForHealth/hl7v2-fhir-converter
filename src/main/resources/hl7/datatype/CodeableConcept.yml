@@ -6,7 +6,7 @@
 # Represents codeable concept that can be derived from CE/CNE/CWE 
 ---
 # coding requires code,display and system defined as variables from the resource that calls this resource
-coding_1 : 
+coding_1: 
     valueOf: datatype/Coding
     generateList: true
     expressionType: resource

@@ -117,28 +117,12 @@ deceasedDateTime:
      vars:
           deceasedDateTime: PID.29
 
-maritalStatus_1:
-    condition: $system NOT_NULL || $display NOT_NULL|| $version NOT_NULL
-    type: MARITAL_STATUS
-    valueOf: datatype/CodeableConcept
-    expressionType: resource
-    specs: PID.16
-    vars:
-      code: PID.16.1
-      system: PID.16.3
-      display: PID.16.2
-      version: PID.16.7
-
-maritalStatus_2:
-    condition: $system NULL && $display NULL && $version NULL
-    valueOf: datatype/CodeableConcept_object
-    expressionType: resource
-    vars:
-      system: PID.16.3
-      display: PID.16.2
-      version: PID.16.7
-      valCodeableConcept: MARITAL_STATUS, PID.16
-      text: String, PID.16.2 | PID.16.9
+maritalStatus:
+   valueOf: datatype/CodeableConcept
+   expressionType: resource
+   condition: $coding NOT_NULL
+   vars:
+     coding: MARITAL_STATUS, PID.16
 
 generalPractitioner: 
    valueOf: resource/Practitioner
