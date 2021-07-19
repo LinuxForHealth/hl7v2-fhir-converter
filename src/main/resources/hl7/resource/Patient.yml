@@ -83,7 +83,7 @@ birthDate:
      valueOf: PID.7
      expressionType: HL7Spec
 
-multipleBirthBoolean:
+multipleBirthBoolean_1:
      condition: $multBool NOT_NULL && $multInt NULL
      type: BOOLEAN
      valueOf: PID.24
@@ -92,12 +92,31 @@ multipleBirthBoolean:
           multBool: PID.24
           multInt: PID.25
 
-multipleBirthInteger:
-     condition: $multInt NOT_NULL
+multipleBirthBoolean_2:
+     condition: $multBool EQUALS N
+     type: BOOLEAN
+     valueOf: PID.24
+     expressionType: HL7Spec
+     vars:
+          multBool: String, PID.24
+          multInt: PID.25          
+
+multipleBirthInteger_1:
+     condition: $multBool NULL && $multInt NOT_NULL
      type: INTEGER
      valueOf: PID.25
      expressionType: HL7Spec
      vars:
+          multBool: String, PID.24
+          multInt: PID.25
+
+multipleBirthInteger_2:
+     condition: $multBool EQUALS Y && $multInt NOT_NULL
+     type: INTEGER
+     valueOf: PID.25
+     expressionType: HL7Spec
+     vars:
+          multBool: String, PID.24
           multInt: PID.25
 
 deceasedBoolean:
