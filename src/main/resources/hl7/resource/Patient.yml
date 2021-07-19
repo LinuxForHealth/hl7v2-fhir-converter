@@ -151,7 +151,6 @@ extension_2:
 communication:
   condition: $language NOT_NULL
   valueOf: secondary/Communication
-  generateList: true
   expressionType: resource
   vars:
     language: PID.15

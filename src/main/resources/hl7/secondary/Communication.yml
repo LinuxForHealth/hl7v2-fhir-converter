@@ -9,9 +9,8 @@ language:
   expressionType: resource
   vars:
     code: PID.15.1
-    display: PID.15.2
   constants:
-    system: "urn:ietf:bcp:47"
+    system: "urn:ietf:bcp:47"  # hardcode this value as anything else fails FHIR validation
 
 preferred:
   type: BOOLEAN

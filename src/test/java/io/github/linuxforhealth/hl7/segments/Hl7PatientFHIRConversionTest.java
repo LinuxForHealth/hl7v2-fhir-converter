@@ -10,17 +10,9 @@ import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.hl7.fhir.r4.model.HumanName;
+import org.hl7.fhir.r4.model.*;
 import org.hl7.fhir.instance.model.api.IBaseResource;
-import org.hl7.fhir.r4.model.Bundle;
-import org.hl7.fhir.r4.model.Enumerations;
-import org.hl7.fhir.r4.model.Patient;
-import org.hl7.fhir.r4.model.Practitioner;
-import org.hl7.fhir.r4.model.Reference;
-import org.hl7.fhir.r4.model.Resource;
-import org.hl7.fhir.r4.model.ResourceType;
 import org.hl7.fhir.r4.model.codesystems.V3MaritalStatus;
-import org.hl7.fhir.r4.model.StringType;
 import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
 import org.junit.Rule;
 import org.junit.Test;
@@ -289,8 +281,17 @@ public class Hl7PatientFHIRConversionTest {
 
     Patient patientObjEnglish = PatientUtils.createPatientFromHl7Segment(patientSpeaksEnglish);
     assertThat(patientObjEnglish.hasCommunication()).isTrue();
-    assertThat(patientObjEnglish.getCommunication().get(0).getLanguage().getCodingFirstRep().getDisplay()).isEqualTo("English");
     assertThat(patientObjEnglish.getCommunication().get(0).getPreferred()).isTrue();
+    assertThat(patientObjEnglish.getCommunication()).hasSize(1);
+    Patient.PatientCommunicationComponent cc = patientObjEnglish.getCommunication().get(0);
+    assertThat(cc.getPreferred()).isTrue();
+    Coding code = cc.getLanguage().getCodingFirstRep();
+    assertThat(code.getCode().equals("ENG"));
+    // System is constant, regardless of what is in the HL7 msg -- other systems fail FHIR validation.
+    assertThat(code.getSystem().equals("urn:ietf:bcp:47"));
+    // Note that today the text is not set, though we would like it set to "English"
+    // assertThat(cc.getText().equals("English"));
+
   }
 
   private Patient getResourcePatient(Resource resource) {
