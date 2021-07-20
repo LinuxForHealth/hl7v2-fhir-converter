@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2020
+ * (C) Copyright IBM Corp. 2020, 2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -9,8 +9,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.Test;
 import io.github.linuxforhealth.core.expression.condition.CheckNotNull;
 import io.github.linuxforhealth.core.expression.condition.CheckNull;
-import io.github.linuxforhealth.core.expression.condition.CompountAndCondition;
-import io.github.linuxforhealth.core.expression.condition.CompountORCondition;
+import io.github.linuxforhealth.core.expression.condition.CompoundAndCondition;
+import io.github.linuxforhealth.core.expression.condition.CompoundORCondition;
 import io.github.linuxforhealth.core.expression.condition.ConditionUtil;
 import io.github.linuxforhealth.core.expression.condition.SimpleBiCondition;
 
@@ -47,8 +47,8 @@ public class ConditionUtilTest {
   @Test
   public void multiple_or_condition() {
     String condition = "$var1 EQUALS abc || $var1 EQUALS xyz";
-    CompountORCondition simplecondition =
-        (CompountORCondition) ConditionUtil.createCondition(condition);
+    CompoundORCondition simplecondition =
+        (CompoundORCondition) ConditionUtil.createCondition(condition);
     assertThat(simplecondition).isNotNull();
     assertThat(simplecondition.getConditions()).hasSize(2);
 
@@ -57,8 +57,8 @@ public class ConditionUtilTest {
   @Test
   public void multiple_and_condition() {
     String condition = "$var1 EQUALS abc && $var1 EQUALS xyz";
-    CompountAndCondition simplecondition =
-        (CompountAndCondition) ConditionUtil.createCondition(condition);
+    CompoundAndCondition simplecondition =
+        (CompoundAndCondition) ConditionUtil.createCondition(condition);
     assertThat(simplecondition).isNotNull();
     assertThat(simplecondition.getConditions()).hasSize(2);
 

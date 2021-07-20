@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2020
+ * (C) Copyright IBM Corp. 2020, 2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -61,20 +61,20 @@ public class ConditionUtil {
     }
   }
 
-  private static CompountAndCondition getListAndConditions(StringTokenizer ands) {
+  private static CompoundAndCondition getListAndConditions(StringTokenizer ands) {
     List<Condition> conditions = new ArrayList<>();
     for (String tok : ands.getTokenList()) {
       conditions.add(createSimpleCondition(tok));
     }
-    return new CompountAndCondition(conditions);
+    return new CompoundAndCondition(conditions);
   }
 
-  private static CompountORCondition getListOrConditions(StringTokenizer ors) {
+  private static CompoundORCondition getListOrConditions(StringTokenizer ors) {
     List<Condition> conditions = new ArrayList<>();
     for (String tok : ors.getTokenList()) {
       conditions.add(createSimpleCondition(tok));
     }
-    return new CompountORCondition(conditions);
+    return new CompoundORCondition(conditions);
   }
 
 }
