@@ -178,20 +178,18 @@ public class SimpleDataValueResolver {
         }
     };
 
-  public static final ValueExtractor<Object, CodeableConcept> MARITAL_STATUS_CODE_FHIR =
+  public static final ValueExtractor<Object, Object> MARITAL_STATUS =
       (Object value) -> {
         String val = Hl7DataHandlerUtil.getStringValue(value);
         String code = getFHIRCode(val, V3MaritalStatus.class);
         if(code != null){
             V3MaritalStatus mar = V3MaritalStatus.fromCode(code);
-            CodeableConcept codeableConcept = new CodeableConcept( );
-            codeableConcept.addCoding(new Coding( mar.getSystem(), code, mar.getDisplay() ));
-          return codeableConcept;
+            return new SimpleCode(code, mar.getSystem(), mar.getDisplay() );
         } else {
           return null;
         }
   };
-
+  
     public static final ValueExtractor<Object, Boolean> BOOLEAN = (Object value) -> {
         String val = Hl7DataHandlerUtil.getStringValue(value);
         if (null == val) {

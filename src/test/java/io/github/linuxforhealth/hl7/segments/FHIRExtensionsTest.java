@@ -41,7 +41,7 @@ public class FHIRExtensionsTest {
         ext = patient.getExtensionByUrl(UrlLookup.getExtensionUrl("religion"));
         assertThat(ext).isNotNull();
         CodeableConcept cc = (CodeableConcept) ext.getValue();
-        assertThat(cc.getText()).hasToString("Lutheran");
+        assertThat(cc.getText()).hasToString("Christian: Lutheran");
 
         patient = PatientUtils.createPatientFromHl7Segment(patientWithNoExtensionData);
         assertThat(patient.hasExtension()).isFalse();

@@ -37,7 +37,7 @@ identifier_2:
       # There is no authority for PID.19
 
 # Gets the Driver's license from PID.20, formats and adds it as an ID
-identifier_3: 
+identifier_3:
     condition: $valueIn NOT_NULL
     valueOf: datatype/Identifier_var
     generateList: true
@@ -49,7 +49,7 @@ identifier_3:
       code: "DL"
       display: "Driver's license number"
       # There is no text for PID.20
-      # There is no authority for PID.20     
+      # There is no authority for PID.20
 
 name:
     valueOf: datatype/HumanName
@@ -114,7 +114,7 @@ multipleBirthBoolean_2:
      expressionType: HL7Spec
      vars:
           multBool: String, PID.24
-          multInt: PID.25          
+          multInt: PID.25
 
 multipleBirthInteger_1:
      condition: $multBool NULL && $multInt NOT_NULL
@@ -152,11 +152,11 @@ deceasedDateTime:
           deceasedDateTime: PID.29
 
 maritalStatus:
-  valueOf: datatype/CodeableConcept_object
-  expressionType: resource
-  vars:
-    valCodeableConcept: MARITAL_STATUS, PID.16
-    text: String, PID.16.2 | PID.16.9
+   valueOf: datatype/CodeableConcept
+   expressionType: resource
+   condition: $coding NOT_NULL
+   vars:
+     coding: MARITAL_STATUS, PID.16
 
 generalPractitioner: 
    valueOf: resource/Practitioner
@@ -181,6 +181,7 @@ extension_2:
   vars:
     url: String, GeneralUtils.getExtensionUrl("religion")
     valCodeableConcept: RELIGIOUS_AFFILIATION_CC, PID.17
+    text: String, PID.17.2 | PID.17.9
 
 communication:
   condition: $language NOT_NULL

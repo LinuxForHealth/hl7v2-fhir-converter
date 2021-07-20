@@ -16,4 +16,4 @@ valueCodeableConcept:
     system: String, GeneralUtils.getCodeableConceptSystem(valCodeableConcept)
     code: String, GeneralUtils.getCodeableConceptCode(valCodeableConcept)
     display: String, GeneralUtils.getCodeableConceptDisplay(valCodeableConcept)
-    text: String, GeneralUtils.getCodeableConceptDisplay(valCodeableConcept)
+    text: $text
