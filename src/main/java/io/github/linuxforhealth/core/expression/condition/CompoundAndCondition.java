@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2020
+ * (C) Copyright IBM Corp. 2020, 2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -12,16 +12,15 @@ import com.google.common.base.Preconditions;
 import io.github.linuxforhealth.api.Condition;
 import io.github.linuxforhealth.api.EvaluationResult;
 
-public class CompountORCondition implements Condition {
+public class CompoundAndCondition implements Condition {
 
   private List<Condition> conditions;
 
 
-
-  public CompountORCondition(List<Condition> conditions) {
+  public CompoundAndCondition(List<Condition> conditions) {
     Preconditions.checkArgument(conditions != null && !conditions.isEmpty(),
-        "onditions cannot be null or empty");
-    this.conditions = new ArrayList<>(conditions);
+        "conditions cannot be null or empty");
+    this.conditions = conditions;
   }
 
 
@@ -29,11 +28,11 @@ public class CompountORCondition implements Condition {
   @Override
   public boolean test(Map<String, EvaluationResult> contextVariables) {
     for (Condition c : conditions) {
-      if (c.test(contextVariables)) {
-        return true;
+      if (!c.test(contextVariables)) {
+        return false;
       }
     }
-    return false;
+    return true;
   }
 
 
@@ -41,7 +40,6 @@ public class CompountORCondition implements Condition {
   public List<Condition> getConditions() {
     return new ArrayList<>(conditions);
   }
-
 
 
 

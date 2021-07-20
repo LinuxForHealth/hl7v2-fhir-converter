@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2020
+ * (C) Copyright IBM Corp. 2020, 2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -11,32 +11,30 @@ import java.util.Map;
 import org.junit.Test;
 import io.github.linuxforhealth.api.EvaluationResult;
 import io.github.linuxforhealth.core.expression.SimpleEvaluationResult;
-import io.github.linuxforhealth.core.expression.condition.CompountAndCondition;
+import io.github.linuxforhealth.core.expression.condition.CompoundORCondition;
 import io.github.linuxforhealth.core.expression.condition.ConditionUtil;
-
-public class CompountAndConditionTest {
+public class CompoundORConditionTest {
 
   @Test
-  public void compount_condition_evaluated_to_true() {
-    String condition = "$var1 EQUALS abc && $var2 EQUALS xyz";
-    CompountAndCondition simplecondition =
-        (CompountAndCondition) ConditionUtil.createCondition(condition);
+  public void compound_condition_evaluated_to_true() {
+    String condition = "$var1 EQUALS abc || $var1 EQUALS xyz";
+    CompoundORCondition simplecondition =
+        (CompoundORCondition) ConditionUtil.createCondition(condition);
 
     Map<String, EvaluationResult> contextVariables = new HashMap<>();
     contextVariables.put("var1", new SimpleEvaluationResult("abc"));
-    contextVariables.put("var2", new SimpleEvaluationResult("xyz"));
     assertThat(simplecondition.test(contextVariables)).isTrue();
   }
 
 
   @Test
-  public void compount_condition_evaluated_to_false() {
-    String condition = "$var1 EQUALS abc && $var2 EQUALS xyz";
-    CompountAndCondition simplecondition =
-        (CompountAndCondition) ConditionUtil.createCondition(condition);
+  public void compound_condition_evaluated_to_false() {
+    String condition = "$var1 EQUALS abc || $var1 EQUALS xyz";
+    CompoundORCondition simplecondition =
+        (CompoundORCondition) ConditionUtil.createCondition(condition);
 
     Map<String, EvaluationResult> contextVariables = new HashMap<>();
-    contextVariables.put("var1", new SimpleEvaluationResult("abc"));
+    contextVariables.put("var1", new SimpleEvaluationResult("tuv"));
     assertThat(simplecondition.test(contextVariables)).isFalse();
   }
 

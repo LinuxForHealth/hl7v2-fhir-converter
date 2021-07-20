@@ -44,3 +44,6 @@ bin/
 
 # Jetbrains IDEA
 .idea
+
+# Local History files
+.history
