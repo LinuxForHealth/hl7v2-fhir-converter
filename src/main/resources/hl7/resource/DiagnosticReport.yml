@@ -82,7 +82,7 @@ presentedForm:
    condition: $obx2 EQUALS TX && $obx3 NULL
    vars:
       # This concatenates all OBX-5 lines together (the asterisk) and preserves blank lines (the ampersand).  Multiple lines are concatenated with a tilde.
-      data: OBX.5 *&, GeneralUtils.concatenateWithChar(data, '~')
+      data: OBX.5 *&, GeneralUtils.concatenateWithChar(data, '\n')
       title: OBR.4.2
       date: OBX.14
       mime: $code
