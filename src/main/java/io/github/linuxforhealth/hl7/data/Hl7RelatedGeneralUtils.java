@@ -103,7 +103,7 @@ public class Hl7RelatedGeneralUtils {
      * Returns difference between time2 - time1 in minutes
      * 
      * @param start DateTime
-     * @param end   DateTime
+     * @param end DateTime
      * @return Minutes in Long
      */
 
@@ -142,7 +142,15 @@ public class Hl7RelatedGeneralUtils {
     }
 
     public static String concatenateWithChar(Object input, String delimiterChar) {
-        return Hl7DataHandlerUtil.getStringValue(input, true, delimiterChar);
+        // Engine converts the delimiter character to a String; need to fix escaped characters
+        // as they become 2 separate characters rather than 1. 
+        // Currently handling '\n' specifically, have not found a more general solution.
+        String delimiter = delimiterChar;
+        if (delimiterChar.equals("\\n")) {
+            delimiter = Character.toString('\n');
+        }
+
+        return Hl7DataHandlerUtil.getStringValue(input, true, delimiter, false);
     }
 
     public static List<String> makeStringArray(String... strs) {
@@ -159,13 +167,13 @@ public class Hl7RelatedGeneralUtils {
         LOGGER.info("Calculating address Use from XAD.7 {}, XAD.16 {}, XAD.17 {}", xad7Type, xad16Temp, xad17Bad);
 
         String addressUse = "";
-        if (xad16Temp != null && xad16Temp.equalsIgnoreCase("Y") 
-            || ((xad16Temp == null || xad16Temp.isEmpty()) 
-                && xad7Type != null && xad7Type.equalsIgnoreCase("C"))) {
+        if (xad16Temp != null && xad16Temp.equalsIgnoreCase("Y")
+                || ((xad16Temp == null || xad16Temp.isEmpty())
+                        && xad7Type != null && xad7Type.equalsIgnoreCase("C"))) {
             addressUse = "temp";
-        } else if (xad17Bad != null && xad17Bad.equalsIgnoreCase("Y") 
-            || ((xad17Bad == null || xad17Bad.isEmpty()) 
-                && xad7Type != null && xad7Type.equalsIgnoreCase("BA"))) {
+        } else if (xad17Bad != null && xad17Bad.equalsIgnoreCase("Y")
+                || ((xad17Bad == null || xad17Bad.isEmpty())
+                        && xad7Type != null && xad7Type.equalsIgnoreCase("BA"))) {
             addressUse = "old";
         } else if (xad7Type != null && xad7Type.equalsIgnoreCase("H")) {
             addressUse = "home";
@@ -181,13 +189,13 @@ public class Hl7RelatedGeneralUtils {
         LOGGER.info("Calculating address Type from XAD.7 {}, XAD.18 {}", xad7Type, xad18Type);
 
         String addressType = "";
-        if (xad18Type != null && xad18Type.equalsIgnoreCase("M") 
-            || (xad18Type == null || xad18Type.isEmpty())
-                && (xad7Type != null && xad7Type.equalsIgnoreCase("M"))) {
+        if (xad18Type != null && xad18Type.equalsIgnoreCase("M")
+                || (xad18Type == null || xad18Type.isEmpty())
+                        && (xad7Type != null && xad7Type.equalsIgnoreCase("M"))) {
             addressType = "postal";
-        } else if (xad18Type != null && xad18Type.equalsIgnoreCase("V")     
-            || (xad18Type == null || xad18Type.isEmpty())
-                && (xad7Type != null && xad7Type.equalsIgnoreCase("SH"))) {
+        } else if (xad18Type != null && xad18Type.equalsIgnoreCase("V")
+                || (xad18Type == null || xad18Type.isEmpty())
+                        && (xad7Type != null && xad7Type.equalsIgnoreCase("SH"))) {
             addressType = "physical";
         }
         return addressType;
@@ -244,7 +252,7 @@ public class Hl7RelatedGeneralUtils {
     // Takes all the pieces of telecom number from XTN, formats to a user friendly
     // Telecom number based on rules documented in the steps
     public static String getFormattedTelecomNumberValue(String xtn1Old, String xtn5Country, String xtn6Area,
-                                                        String xtn7Local, String xtn8Extension, String xtn12Unformatted) {
+            String xtn7Local, String xtn8Extension, String xtn12Unformatted) {
         String returnValue = "";
 
         // If the local number exists...
