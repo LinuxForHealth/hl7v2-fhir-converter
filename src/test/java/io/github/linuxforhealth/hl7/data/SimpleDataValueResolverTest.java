@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2020
+ * (C) Copyright IBM Corp. 2020, 2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -19,6 +19,7 @@ import org.junit.Test;
 import ca.uhn.hl7v2.model.DataTypeException;
 import ca.uhn.hl7v2.model.v26.datatype.TX;
 import ca.uhn.hl7v2.model.v26.message.ORU_R01;
+import io.github.linuxforhealth.core.terminology.SimpleCode;
 import io.github.linuxforhealth.hl7.data.date.DateUtil;
 
 import org.hl7.fhir.r4.model.codesystems.V3ReligiousAffiliation;
@@ -156,9 +157,7 @@ public class SimpleDataValueResolverTest {
   @Test
   public void get_marital_status_value_valid() {
     String gen = "A";
-    CodeableConcept codeableConcept = SimpleDataValueResolver.MARITAL_STATUS_CODE_FHIR.apply(gen);
-    Coding coding = codeableConcept.getCodingFirstRep();
-    assertThat(codeableConcept.hasCoding()).isTrue();
+    SimpleCode coding = (SimpleCode) SimpleDataValueResolver.MARITAL_STATUS.apply(gen);
     assertThat(coding.getDisplay()).isEqualTo(V3MaritalStatus.A.getDisplay());
     assertThat(coding.getSystem()).isEqualTo(V3MaritalStatus.A.getSystem());
   }
@@ -206,6 +205,14 @@ public class SimpleDataValueResolverTest {
   public void get_UUID_value_valid() {
     String gen = VALID_UUID;
     assertThat(SimpleDataValueResolver.UUID_VAL.apply(gen)).isEqualTo(UUID.fromString(VALID_UUID));
+  }
+
+  @Test
+  public void get_system_id_value_valid() {
+    assertThat(SimpleDataValueResolver.SYSTEM_ID.apply("ABC")).isEqualTo("urn:id:ABC");
+    assertThat(SimpleDataValueResolver.SYSTEM_ID.apply("A B C")).isEqualTo("urn:id:A_B_C");
+    assertThat(SimpleDataValueResolver.SYSTEM_ID.apply("")).isNull();
+    assertThat(SimpleDataValueResolver.SYSTEM_ID.apply(null)).isNull();
   }
 
 }

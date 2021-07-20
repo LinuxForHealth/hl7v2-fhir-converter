@@ -28,7 +28,6 @@ verificationStatus:
       code: 'confirmed'
       display: 'Confirmed'
 
-
 category:
     type: ALLERGY_INTOLERANCE_CATEGORY
     generateList: true
@@ -45,6 +44,11 @@ code:
    generateList: true
    expressionType: resource
    specs: AL1.3
+
+onsetDateTime:
+   type: DATE_TIME
+   valueOf: AL1.6
+   expressionType: HL7Spec
 
 patient:
     valueOf: datatype/Reference

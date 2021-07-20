@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2020
+ * (C) Copyright IBM Corp. 2020, 2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -178,20 +178,18 @@ public class SimpleDataValueResolver {
         }
     };
 
-  public static final ValueExtractor<Object, CodeableConcept> MARITAL_STATUS_CODE_FHIR =
+  public static final ValueExtractor<Object, Object> MARITAL_STATUS =
       (Object value) -> {
         String val = Hl7DataHandlerUtil.getStringValue(value);
         String code = getFHIRCode(val, V3MaritalStatus.class);
         if(code != null){
             V3MaritalStatus mar = V3MaritalStatus.fromCode(code);
-            CodeableConcept codeableConcept = new CodeableConcept( );
-            codeableConcept.addCoding(new Coding( mar.getSystem(), code, mar.getDisplay() ));
-          return codeableConcept;
+            return new SimpleCode(code, mar.getSystem(), mar.getDisplay() );
         } else {
           return null;
         }
   };
-
+  
     public static final ValueExtractor<Object, Boolean> BOOLEAN = (Object value) -> {
         String val = Hl7DataHandlerUtil.getStringValue(value);
         if (null == val) {
@@ -276,6 +274,18 @@ public class SimpleDataValueResolver {
     public static final ValueExtractor<Object, String> SYSTEM_URL = (Object value) -> {
         String val = Hl7DataHandlerUtil.getStringValue(value);
         return UrlLookup.getSystemUrl(val);
+    };
+
+    // Convert an authority string to a valid system value
+    // Prepend "urn:id:"; convert any spaces to underscores
+    public static final ValueExtractor<Object, String> SYSTEM_ID = (Object value) -> {
+        String val = Hl7DataHandlerUtil.getStringValue(value);
+        if (val != null && val.length() > 0) {
+            return "urn:id:" + val.replace(" ", "_");
+        } else {
+            return null;
+        }
+
     };
 
     public static final ValueExtractor<Object, List<?>> ARRAY = (Object value) -> {

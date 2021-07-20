@@ -1,19 +1,25 @@
 #
-# (C) Copyright IBM Corp. 2020
+# (C) Copyright IBM Corp. 2021
 #
 # SPDX-License-Identifier: Apache-2.0
 #
-# Creates an identifier with an assigner + reference + referenced object.
+# Creates an identifier with a System: uri:id  instead of an assigner + reference + referenced object.
 ---
 type: 
    valueOf: datatype/CodeableConcept
    expressionType: resource
    specs: CX.5 | $type
+   constants: 
+      # Because calculated system id's don't have text, force the calculated text from code to be hidden
+      hideText: 'HIDE'
 
 system: 
-     type: SYSTEM_URL
+     condition: $systemExists NOT_NULL
+     type: SYSTEM_ID
      valueOf: CX.4 | CWE.4 |EI.2
      expressionType: HL7Spec
+     vars:
+          systemExists: CX.4 | CWE.4 | EI.2
     
 value: 
      type: STRING
@@ -27,12 +33,3 @@ period:
     vars: 
        start: CX.7 | CWE.7
        end: CX.8 | CWE.8
-
-assigner:
-   valueOf: resource/Organization_Simple
-   expressionType: reference
-   vars:
-     name: $assigningAuth
-     id: CX.4| CWE.4
-   constants:
-      assigningAuth: 'Assigning Authority'
