@@ -9,6 +9,7 @@ language:
   expressionType: resource
   vars:
     code: PID.15.1
+    text: String, PID.15.2 | PID.15.9
   constants:
     system: "urn:ietf:bcp:47"  # hardcode this value as anything else fails FHIR validation
 

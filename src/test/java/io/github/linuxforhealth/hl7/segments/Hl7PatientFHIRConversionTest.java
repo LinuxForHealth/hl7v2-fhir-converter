@@ -283,14 +283,15 @@ public class Hl7PatientFHIRConversionTest {
     assertThat(patientObjEnglish.hasCommunication()).isTrue();
     assertThat(patientObjEnglish.getCommunication().get(0).getPreferred()).isTrue();
     assertThat(patientObjEnglish.getCommunication()).hasSize(1);
+    // Note that today the text is not set, though we would like it set to "English"
+    assertThat(patientObjEnglish.getText().equals("English"));
     Patient.PatientCommunicationComponent cc = patientObjEnglish.getCommunication().get(0);
     assertThat(cc.getPreferred()).isTrue();
     Coding code = cc.getLanguage().getCodingFirstRep();
     assertThat(code.getCode().equals("ENG"));
     // System is constant, regardless of what is in the HL7 msg -- other systems fail FHIR validation.
     assertThat(code.getSystem().equals("urn:ietf:bcp:47"));
-    // Note that today the text is not set, though we would like it set to "English"
-    // assertThat(cc.getText().equals("English"));
+
 
   }
 
