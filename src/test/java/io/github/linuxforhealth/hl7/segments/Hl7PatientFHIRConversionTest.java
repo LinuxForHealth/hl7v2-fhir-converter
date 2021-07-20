@@ -10,17 +10,9 @@ import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.hl7.fhir.r4.model.HumanName;
+import org.hl7.fhir.r4.model.*;
 import org.hl7.fhir.instance.model.api.IBaseResource;
-import org.hl7.fhir.r4.model.Bundle;
-import org.hl7.fhir.r4.model.Enumerations;
-import org.hl7.fhir.r4.model.Patient;
-import org.hl7.fhir.r4.model.Practitioner;
-import org.hl7.fhir.r4.model.Reference;
-import org.hl7.fhir.r4.model.Resource;
-import org.hl7.fhir.r4.model.ResourceType;
 import org.hl7.fhir.r4.model.codesystems.V3MaritalStatus;
-import org.hl7.fhir.r4.model.StringType;
 import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
 import org.junit.Rule;
 import org.junit.Test;
@@ -34,7 +26,7 @@ public class Hl7PatientFHIRConversionTest {
 
   @Rule
   public ExpectedException exceptionRule = ExpectedException.none();
-  
+
   private static FHIRContext context = new FHIRContext(true, false);
 
   @Test
@@ -42,7 +34,7 @@ public class Hl7PatientFHIRConversionTest {
     String hl7message = "MSH|^~\\&|hl7Integration|hl7Integration|||||ADT^A01|||2.6|\n"
     		+ "PID|1||1234^^^AssigningAuthority^MR||TEST^PATIENT|\n"
     		+ "PD1|||Sample Family Practice^^2222|1111^LastName^ClinicianFirstName^^^^Title||||||||||||A|";
-    
+
     HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
 	String json = ftv.convert(hl7message , PatientUtils.OPTIONS);
     assertThat(json).isNotBlank();
@@ -51,7 +43,7 @@ public class Hl7PatientFHIRConversionTest {
     assertThat(bundleResource).isNotNull();
     Bundle b = (Bundle) bundleResource;
     List<BundleEntryComponent> e = b.getEntry();
-    
+
     List<Resource> patientResource =
         e.stream().filter(v -> ResourceType.Patient == v.getResource().getResourceType())
             .map(BundleEntryComponent::getResource).collect(Collectors.toList());
@@ -59,7 +51,7 @@ public class Hl7PatientFHIRConversionTest {
     Patient patient = getResourcePatient(patientResource.get(0));
     List<Reference> refs = patient.getGeneralPractitioner();
     assertThat(refs.size() > 0);
-        
+
     List<Resource> practitionerResource =
         e.stream().filter(v -> ResourceType.Practitioner == v.getResource().getResourceType())
             .map(BundleEntryComponent::getResource).collect(Collectors.toList());
@@ -68,14 +60,15 @@ public class Hl7PatientFHIRConversionTest {
     String lastName = doc.getName().get(0).getFamily();
     assertThat(lastName.equals("LastName"));
   }
-  
-  
+
+
   /**
    * In order to generate messageHeader resource, MSH should have MSH.24.2 as this is required
    * attribute for source attribute, and source is required for MessageHeader resource.
    * 
    * @throws IOException
    */
+
   @Test
   public void patient_deceased_conversion_test() {
 
@@ -249,7 +242,7 @@ public class Hl7PatientFHIRConversionTest {
     Patient patientObjUsualName = PatientUtils.createPatientFromHl7Segment(patientHasMiddleName);
 
     java.util.List<org.hl7.fhir.r4.model.HumanName> name = patientObjUsualName.getName();
-    List<StringType>  givenName =  name.get(0).getGiven();
+    List  givenName =  name.get(0).getGiven();
     List<StringType> suffix = name.get(0).getSuffix();
     String fullName = name.get(0).getText();
     assertThat(givenName.get(0).toString()).isEqualTo("GEORGE");
@@ -299,13 +292,36 @@ public class Hl7PatientFHIRConversionTest {
     assertThat(patientObjMarriedAltText.getMaritalStatus().getCodingFirstRep().getSystem()).isEqualTo(V3MaritalStatus.S.getSystem());
 
   }
-  
+
+  @Test
+  public void patient_communication_language(){
+
+    String patientSpeaksEnglish =
+            "MSH|^~\\&|MyEMR|DE-000001| |CAIRLO|20160701123030-0700||VXU^V04^VXU_V04|CA0001|P|2.6|||ER|AL|||||Z22^CDCPHINVS|DE-000001\r" +
+                    "PID|1||PA123456^^^MYEMR^MR||JONES^GEORGE^M^JR^^^L|MILLER^MARTHA^G^^^^M|20140227|M||2106-3^WHITE^CDCREC|1234 W FIRST ST^^BEVERLY HILLS^CA^90210^^H||^PRN^PH^^^555^5555555||ENG^English^HL70296|||||||2186-5^ not Hispanic or Latino^CDCREC||Y|2\r";
+
+    Patient patientObjEnglish = PatientUtils.createPatientFromHl7Segment(patientSpeaksEnglish);
+    assertThat(patientObjEnglish.hasCommunication()).isTrue();
+    assertThat(patientObjEnglish.getCommunication().get(0).getPreferred()).isTrue();
+    assertThat(patientObjEnglish.getCommunication()).hasSize(1);
+    // Note that today the text is not set, though we would like it set to "English"
+    assertThat(patientObjEnglish.getText().equals("English"));
+    Patient.PatientCommunicationComponent cc = patientObjEnglish.getCommunication().get(0);
+    assertThat(cc.getPreferred()).isTrue();
+    Coding code = cc.getLanguage().getCodingFirstRep();
+    assertThat(code.getCode().equals("ENG"));
+    // System is constant, regardless of what is in the HL7 msg -- other systems fail FHIR validation.
+    assertThat(code.getSystem().equals("urn:ietf:bcp:47"));
+
+
+  }
+
   private Patient getResourcePatient(Resource resource) {
 	    String s = context.getParser().encodeResourceToString(resource);
 	    Class<? extends IBaseResource> klass = Patient.class;
 	    return (Patient) context.getParser().parseResource(klass, s);
   }
-  
+
   private static Practitioner getResourcePractitioner(Resource resource) {
 	String s = context.getParser().encodeResourceToString(resource);
 	Class<? extends IBaseResource> klass = Practitioner.class;

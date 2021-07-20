@@ -15,7 +15,6 @@ system_1:
 system_2:
      condition: $emailValue NOT_NULL
      type: STRING
-     valueOf: $contactSystem
      valueOf: "email"
      vars: 
           emailValue: XTN.4

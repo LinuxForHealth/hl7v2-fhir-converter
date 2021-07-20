@@ -23,12 +23,14 @@ extension_2:
 ```
 
 The mapping.
-```java
+```
+java
 RELIGIOUS_AFFILIATION_CC(SimpleDataValueResolver.RELIGIOUS_AFFILIATION_FHIR_CC),
 ```
 
 The resolver takes as input a value and returns a `CodeableConcept` object, which can be used in the template yaml.  In the example code, the input value is converted to a string and the HAPI FHIR `V3ReligiousAffiliation.class` is used to lookup the code.  With the code, the V3ReligiousAffiliation is found from the code and is used to create the CodeableConcept.
-```java
+```
+java
     public static final ValueExtractor<Object, CodeableConcept> RELIGIOUS_AFFILIATION_FHIR_CC = (Object value) -> {
         String val = Hl7DataHandlerUtil.getStringValue(value);
         String code = getFHIRCode(val, V3ReligiousAffiliation.class);
@@ -77,7 +79,8 @@ district:
 ```
 `Hl7RelatedGeneralUtils.getAddressDistrict` 
 
-```java
+```
+java
 public static String getAddressDistrict(String patientCountyPid12, String addressCountyParishPid119, Object patient) {
         LOGGER.info("getAddressCountyParish for {}", patient);
 

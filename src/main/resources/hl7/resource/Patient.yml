@@ -181,3 +181,10 @@ extension_2:
   vars:
     url: String, GeneralUtils.getExtensionUrl("religion")
     valCodeableConcept: RELIGIOUS_AFFILIATION_CC, PID.17
+
+communication:
+  condition: $language NOT_NULL
+  valueOf: secondary/Communication
+  expressionType: resource
+  vars:
+    language: PID.15
