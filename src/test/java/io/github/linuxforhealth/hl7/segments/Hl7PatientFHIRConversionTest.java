@@ -10,17 +10,9 @@ import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.hl7.fhir.r4.model.HumanName;
+import org.hl7.fhir.r4.model.*;
 import org.hl7.fhir.instance.model.api.IBaseResource;
-import org.hl7.fhir.r4.model.Bundle;
-import org.hl7.fhir.r4.model.Enumerations;
-import org.hl7.fhir.r4.model.Patient;
-import org.hl7.fhir.r4.model.Practitioner;
-import org.hl7.fhir.r4.model.Reference;
-import org.hl7.fhir.r4.model.Resource;
-import org.hl7.fhir.r4.model.ResourceType;
 import org.hl7.fhir.r4.model.codesystems.V3MaritalStatus;
-import org.hl7.fhir.r4.model.StringType;
 import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
 import org.junit.Rule;
 import org.junit.Test;
@@ -34,7 +26,7 @@ public class Hl7PatientFHIRConversionTest {
 
   @Rule
   public ExpectedException exceptionRule = ExpectedException.none();
-  
+
   private static FHIRContext context = new FHIRContext(true, false);
 
   @Test
@@ -42,7 +34,7 @@ public class Hl7PatientFHIRConversionTest {
     String hl7message = "MSH|^~\\&|hl7Integration|hl7Integration|||||ADT^A01|||2.6|\n"
     		+ "PID|1||1234^^^AssigningAuthority^MR||TEST^PATIENT|\n"
     		+ "PD1|||Sample Family Practice^^2222|1111^LastName^ClinicianFirstName^^^^Title||||||||||||A|";
-    
+
     HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
 	String json = ftv.convert(hl7message , PatientUtils.OPTIONS);
     assertThat(json).isNotBlank();
@@ -51,7 +43,7 @@ public class Hl7PatientFHIRConversionTest {
     assertThat(bundleResource).isNotNull();
     Bundle b = (Bundle) bundleResource;
     List<BundleEntryComponent> e = b.getEntry();
-    
+
     List<Resource> patientResource =
         e.stream().filter(v -> ResourceType.Patient == v.getResource().getResourceType())
             .map(BundleEntryComponent::getResource).collect(Collectors.toList());
@@ -59,7 +51,7 @@ public class Hl7PatientFHIRConversionTest {
     Patient patient = getResourcePatient(patientResource.get(0));
     List<Reference> refs = patient.getGeneralPractitioner();
     assertThat(refs.size() > 0);
-        
+
     List<Resource> practitionerResource =
         e.stream().filter(v -> ResourceType.Practitioner == v.getResource().getResourceType())
             .map(BundleEntryComponent::getResource).collect(Collectors.toList());
@@ -68,14 +60,15 @@ public class Hl7PatientFHIRConversionTest {
     String lastName = doc.getName().get(0).getFamily();
     assertThat(lastName.equals("LastName"));
   }
-  
-  
+
+
   /**
    * In order to generate messageHeader resource, MSH should have MSH.24.2 as this is required
    * attribute for source attribute, and source is required for MessageHeader resource.
    * 
    * @throws IOException
    */
+
   @Test
   public void patient_deceased_conversion_test() {
 
@@ -153,56 +146,77 @@ public class Hl7PatientFHIRConversionTest {
   @Test
   public void patient_multiple_birth_conversion_test() {
 
+    /** 
+     * Simplified logic for multiple birth  
+     * 
+     * Y + number = number
+     * N + number = N
+     * Y + blank = Y
+     * N + blank = N
+     * blank + number = number
+     * blank + blank = nothing. 
+     * 
+     */
+
     String patientMsgEmptyMultiple =
     "MSH|^~\\&|MIICEHRApplication|MIIC|MIIC|MIIC|201705130822||VXU^V04^VXU_V04|test1100|P|2.5.1|||AL|AL|||||Z22^CDCPHINVS|^^^^^MIIC^SR^^^MIIC|MIIC\n"
-    + "PID|1||12345678^^^^MR|ALTID|Mouse^Mickey^J^III^^^|Mother^Micky|20060504|M|Alias^Alias|2106-3^White^ HL70005|12345 testing ave^^Minneapolis^MN^55407^^^^MN053|USAA|^PRN^^^PH^555^5555555|^PRN^^^PH^555^666666|english|married|bhuddist|1234567_account|111-22-3333|||2186-5^not Hispanic or Latino^CDCREC|Born in USA|||USA||||\n"
+    + "PID|1||12345678^^^^MR|ALTID|Mouse^Mickey^J^III^^^||||||||||||||||||Born in USA|||USA||||\n"
     ;
-    String patientMsgMultipleN =
-    "MSH|^~\\&|MIICEHRApplication|MIIC|MIIC|MIIC|201705130822||VXU^V04^VXU_V04|test1100|P|2.5.1|||AL|AL|||||Z22^CDCPHINVS|^^^^^MIIC^SR^^^MIIC|MIIC\n"
-    + "PID|1||12345678^^^^MR|ALTID|Mouse^Mickey^J^III^^^|Mother^Micky|20060504|M|Alias^Alias|2106-3^White^ HL70005|12345 testing ave^^Minneapolis^MN^55407^^^^MN053|USAA|^PRN^^^PH^555^5555555|^PRN^^^PH^555^666666|english|married|bhuddist|1234567_account|111-22-3333|||2186-5^not Hispanic or Latino^CDCREC|Born in USA|N||USA||||\n"
-    ;
-    String patientMsgMultipleNumberOnly =
-    "MSH|^~\\&|MIICEHRApplication|MIIC|MIIC|MIIC|201705130822||VXU^V04^VXU_V04|test1100|P|2.5.1|||AL|AL|||||Z22^CDCPHINVS|^^^^^MIIC^SR^^^MIIC|MIIC\n"
-    + "PID|1||12345678^^^^MR|ALTID|Mouse^Mickey^J^III^^^|Mother^Micky|20060504|M|Alias^Alias|2106-3^White^ HL70005|12345 testing ave^^Minneapolis^MN^55407^^^^MN053|USAA|^PRN^^^PH^555^5555555|^PRN^^^PH^555^666666|english|married|bhuddist|1234567_account|111-22-3333|||2186-5^not Hispanic or Latino^CDCREC|Born in USA||2|USA||||\n"
-    ;
-    String patientMsgMultipleBooleanYOnly =
-    "MSH|^~\\&|MIICEHRApplication|MIIC|MIIC|MIIC|201705130822||VXU^V04^VXU_V04|test1100|P|2.5.1|||AL|AL|||||Z22^CDCPHINVS|^^^^^MIIC^SR^^^MIIC|MIIC\n"
-    + "PID|1||12345678^^^^MR|ALTID|Mouse^Mickey^J^III^^^|Mother^Micky|20060504|M|Alias^Alias|2106-3^White^ HL70005|12345 testing ave^^Minneapolis^MN^55407^^^^MN053|USAA|^PRN^^^PH^555^5555555|^PRN^^^PH^555^666666|english|married|bhuddist|1234567_account|111-22-3333|||2186-5^not Hispanic or Latino^CDCREC|Born in USA|Y||USA||||\n"
-    ;
-    String patientMsgMultipleNumberAndBooleanY =
-    "MSH|^~\\&|MIICEHRApplication|MIIC|MIIC|MIIC|201705130822||VXU^V04^VXU_V04|test1100|P|2.5.1|||AL|AL|||||Z22^CDCPHINVS|^^^^^MIIC^SR^^^MIIC|MIIC\n"
-    + "PID|1||12345678^^^^MR|ALTID|Mouse^Mickey^J^III^^^|Mother^Micky|20060504|M|Alias^Alias|2106-3^White^ HL70005|12345 testing ave^^Minneapolis^MN^55407^^^^MN053|USAA|^PRN^^^PH^555^5555555|^PRN^^^PH^555^666666|english|married|bhuddist|1234567_account|111-22-3333|||2186-5^not Hispanic or Latino^CDCREC|Born in USA|Y|3|USA||||\n"
-    ;
-
     Patient patientObjEmptyMultiple = PatientUtils.createPatientFromHl7Segment(patientMsgEmptyMultiple);
     assertThat(patientObjEmptyMultiple.hasMultipleBirth()).isFalse();   
     assertThat(patientObjEmptyMultiple.hasMultipleBirthIntegerType()).isFalse(); 
     assertThat(patientObjEmptyMultiple.hasMultipleBirthBooleanType()).isFalse(); 
 
+    String patientMsgMultipleN =
+    "MSH|^~\\&|MIICEHRApplication|MIIC|MIIC|MIIC|201705130822||VXU^V04^VXU_V04|test1100|P|2.5.1|||AL|AL|||||Z22^CDCPHINVS|^^^^^MIIC^SR^^^MIIC|MIIC\n"
+    + "PID|1||12345678^^^^MR|ALTID|Mouse^Mickey^J^III^^^||||||||||||||||||Born in USA|N||USA||||\n"
+    ;
     Patient patientObjMultipleN = PatientUtils.createPatientFromHl7Segment(patientMsgMultipleN);
     assertThat(patientObjMultipleN.hasMultipleBirth()).isTrue();   
     assertThat(patientObjMultipleN.hasMultipleBirthIntegerType()).isFalse(); 
     assertThat(patientObjMultipleN.hasMultipleBirthBooleanType()).isTrue(); 
-    assertThat(patientObjMultipleN.getMultipleBirthBooleanType().booleanValue()).isFalse();   
+    assertThat(patientObjMultipleN.getMultipleBirthBooleanType().booleanValue()).isFalse(); 
 
-    Patient patientObjMultipleBooleanYOnly = PatientUtils.createPatientFromHl7Segment(patientMsgMultipleBooleanYOnly);
-    assertThat(patientObjMultipleBooleanYOnly.hasMultipleBirth()).isTrue();   
-    assertThat(patientObjMultipleBooleanYOnly.hasMultipleBirthIntegerType()).isFalse(); 
-    assertThat(patientObjMultipleBooleanYOnly.hasMultipleBirthBooleanType()).isTrue(); 
-    assertThat(patientObjMultipleBooleanYOnly.getMultipleBirthBooleanType().booleanValue()).isTrue();  
-
-    // A number supercedes any boolean value, and multiple births are assumed true 
+    String patientMsgMultipleNumberOnly =
+    "MSH|^~\\&|MIICEHRApplication|MIIC|MIIC|MIIC|201705130822||VXU^V04^VXU_V04|test1100|P|2.5.1|||AL|AL|||||Z22^CDCPHINVS|^^^^^MIIC^SR^^^MIIC|MIIC\n"
+    + "PID|1||12345678^^^^MR|ALTID|Mouse^Mickey^J^III^^^||||||||||||||||||Born in USA||2|USA||||\n"
+    ;
+    // A number when the boolean is missing presumes the number has meaning.  An integer is created.
     Patient patientObjMultipleNumberOnly = PatientUtils.createPatientFromHl7Segment(patientMsgMultipleNumberOnly);
     assertThat(patientObjMultipleNumberOnly.hasMultipleBirth()).isTrue();   
     assertThat(patientObjMultipleNumberOnly.hasMultipleBirthIntegerType()).isTrue(); 
     assertThat(patientObjMultipleNumberOnly.hasMultipleBirthBooleanType()).isFalse(); 
     assertThat(patientObjMultipleNumberOnly.getMultipleBirthIntegerType().asStringValue()).isEqualTo("2"); 
 
+    String patientMsgMultipleBooleanYOnly =
+    "MSH|^~\\&|MIICEHRApplication|MIIC|MIIC|MIIC|201705130822||VXU^V04^VXU_V04|test1100|P|2.5.1|||AL|AL|||||Z22^CDCPHINVS|^^^^^MIIC^SR^^^MIIC|MIIC\n"
+    + "PID|1||12345678^^^^MR|ALTID|Mouse^Mickey^J^III^^^||||||||||||||||||Born in USA|Y||USA||||\n"
+    ;
+    Patient patientObjMultipleBooleanYOnly = PatientUtils.createPatientFromHl7Segment(patientMsgMultipleBooleanYOnly);
+    assertThat(patientObjMultipleBooleanYOnly.hasMultipleBirth()).isTrue();   
+    assertThat(patientObjMultipleBooleanYOnly.hasMultipleBirthIntegerType()).isFalse(); 
+    assertThat(patientObjMultipleBooleanYOnly.hasMultipleBirthBooleanType()).isTrue(); 
+    assertThat(patientObjMultipleBooleanYOnly.getMultipleBirthBooleanType().booleanValue()).isTrue(); 
+ 
+    String patientMsgMultipleNumberAndBooleanY =
+    "MSH|^~\\&|MIICEHRApplication|MIIC|MIIC|MIIC|201705130822||VXU^V04^VXU_V04|test1100|P|2.5.1|||AL|AL|||||Z22^CDCPHINVS|^^^^^MIIC^SR^^^MIIC|MIIC\n"
+    + "PID|1||12345678^^^^MR|ALTID|Mouse^Mickey^J^III^^^||||||||||||||||||Born in USA|Y|3|USA||||\n"
+    ;
     Patient patientObjMultipleNumberAndBooleanY = PatientUtils.createPatientFromHl7Segment(patientMsgMultipleNumberAndBooleanY);
     assertThat(patientObjMultipleNumberAndBooleanY.hasMultipleBirth()).isTrue();   
     assertThat(patientObjMultipleNumberAndBooleanY.hasMultipleBirthIntegerType()).isTrue(); 
     assertThat(patientObjMultipleNumberAndBooleanY.hasMultipleBirthBooleanType()).isFalse(); 
     assertThat(patientObjMultipleNumberAndBooleanY.getMultipleBirthIntegerType().asStringValue()).isEqualTo("3");  //DateUtil.formatToDate
+
+    String patientMsgMultipleN16 =
+    "MSH|^~\\&|MIICEHRApplication|MIIC|MIIC|MIIC|201705130822||VXU^V04^VXU_V04|test1100|P|2.5.1|||AL|AL|||||Z22^CDCPHINVS|^^^^^MIIC^SR^^^MIIC|MIIC\n"
+    + "PID|1||12345678^^^^MR|ALTID|Mouse^Mickey^J^III^^^||||||||||||||||||Born in USA|N|16|USA||||\n"
+    ;
+    Patient patientObjMultipleN16 = PatientUtils.createPatientFromHl7Segment(patientMsgMultipleN16);
+    assertThat(patientObjMultipleN16.hasMultipleBirth()).isTrue();   
+    assertThat(patientObjMultipleN16.hasMultipleBirthIntegerType()).isFalse(); 
+    assertThat(patientObjMultipleN16.hasMultipleBirthBooleanType()).isTrue(); 
+    assertThat(patientObjMultipleN16.getMultipleBirthBooleanType().booleanValue()).isFalse();  
   }
 
   @Test
@@ -228,7 +242,7 @@ public class Hl7PatientFHIRConversionTest {
     Patient patientObjUsualName = PatientUtils.createPatientFromHl7Segment(patientHasMiddleName);
 
     java.util.List<org.hl7.fhir.r4.model.HumanName> name = patientObjUsualName.getName();
-    List<StringType>  givenName =  name.get(0).getGiven();
+    List  givenName =  name.get(0).getGiven();
     List<StringType> suffix = name.get(0).getSuffix();
     String fullName = name.get(0).getText();
     assertThat(givenName.get(0).toString()).isEqualTo("GEORGE");
@@ -263,19 +277,51 @@ public class Hl7PatientFHIRConversionTest {
             "MSH|^~\\&|MyEMR|DE-000001| |CAIRLO|20160701123030-0700||VXU^V04^VXU_V04|CA0001|P|2.6|||ER|AL|||||Z22^CDCPHINVS|DE-000001\r" +
                     "PID|1||000054321^^^MRN||COOPER^SHELDON^ANDREW||19820512|M||2106-3|765 SOMESTREET RD UNIT 3A^^PASADENA^LA^558846^United States of America||4652141486^Home^^shelly@gmail.com||EN^English|M|CAT|78654||||N\r";
 
+    String AltTextField =
+            "MSH|^~\\&|MyEMR|DE-000001| |CAIRLO|20160701123030-0700||VXU^V04^VXU_V04|CA0001|P|2.6|||ER|AL|||||Z22^CDCPHINVS|DE-000001\r" +
+                    "PID|1||000054321^^^MRN||COOPER^SHELDON^ANDREW||19820512|M^Married||2106-3|765 SOMESTREET RD UNIT 3A^^PASADENA^LA^558846^United States of America||4652141486^Home^^shelly@gmail.com||EN^English|S|CAT|78654||||N\r";
+
     Patient patientObjMarried = PatientUtils.createPatientFromHl7Segment(marriedPatient);
     assertThat(patientObjMarried.hasMaritalStatus()).isTrue();
     assertThat(patientObjMarried.getMaritalStatus().getCodingFirstRep().getDisplay()).isEqualTo(V3MaritalStatus.M.getDisplay());
     assertThat(patientObjMarried.getMaritalStatus().getCodingFirstRep().getSystem()).isEqualTo(V3MaritalStatus.M.getSystem());
 
+    Patient patientObjMarriedAltText = PatientUtils.createPatientFromHl7Segment(AltTextField);
+    assertThat(patientObjMarriedAltText.hasMaritalStatus()).isTrue();
+    assertThat(patientObjMarriedAltText.getMaritalStatus().getText()).isNull(); // as of now Text  and Version will always return null.
+    assertThat(patientObjMarriedAltText.getMaritalStatus().getCodingFirstRep().getVersion()).isNull();
+
   }
-  
+
+  @Test
+  public void patient_communication_language(){
+
+    String patientSpeaksEnglish =
+            "MSH|^~\\&|MyEMR|DE-000001| |CAIRLO|20160701123030-0700||VXU^V04^VXU_V04|CA0001|P|2.6|||ER|AL|||||Z22^CDCPHINVS|DE-000001\r" +
+                    "PID|1||PA123456^^^MYEMR^MR||JONES^GEORGE^M^JR^^^L|MILLER^MARTHA^G^^^^M|20140227|M||2106-3^WHITE^CDCREC|1234 W FIRST ST^^BEVERLY HILLS^CA^90210^^H||^PRN^PH^^^555^5555555||ENG^English^HL70296|||||||2186-5^ not Hispanic or Latino^CDCREC||Y|2\r";
+
+    Patient patientObjEnglish = PatientUtils.createPatientFromHl7Segment(patientSpeaksEnglish);
+    assertThat(patientObjEnglish.hasCommunication()).isTrue();
+    assertThat(patientObjEnglish.getCommunication().get(0).getPreferred()).isTrue();
+    assertThat(patientObjEnglish.getCommunication()).hasSize(1);
+    // Note that today the text is not set, though we would like it set to "English"
+    assertThat(patientObjEnglish.getText().equals("English"));
+    Patient.PatientCommunicationComponent cc = patientObjEnglish.getCommunication().get(0);
+    assertThat(cc.getPreferred()).isTrue();
+    Coding code = cc.getLanguage().getCodingFirstRep();
+    assertThat(code.getCode().equals("ENG"));
+    // System is constant, regardless of what is in the HL7 msg -- other systems fail FHIR validation.
+    assertThat(code.getSystem().equals("urn:ietf:bcp:47"));
+
+
+  }
+
   private Patient getResourcePatient(Resource resource) {
 	    String s = context.getParser().encodeResourceToString(resource);
 	    Class<? extends IBaseResource> klass = Patient.class;
 	    return (Patient) context.getParser().parseResource(klass, s);
   }
-  
+
   private static Practitioner getResourcePractitioner(Resource resource) {
 	String s = context.getParser().encodeResourceToString(resource);
 	Class<? extends IBaseResource> klass = Practitioner.class;

@@ -9,11 +9,17 @@ type:
    valueOf: datatype/CodeableConcept
    expressionType: resource
    specs: CX.5 | $type
+   constants: 
+      # Because calculated system id's don't have text, force the calculated text from code to be hidden
+      hideText: 'HIDE'
 
 system: 
+     condition: $systemExists NOT_NULL
      type: SYSTEM_ID
      valueOf: CX.4 | CWE.4 |EI.2
      expressionType: HL7Spec
+     vars:
+          systemExists: CX.4 | CWE.4 | EI.2
     
 value: 
      type: STRING
