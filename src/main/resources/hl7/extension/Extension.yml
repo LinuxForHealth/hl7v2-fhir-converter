@@ -8,16 +8,6 @@ url:
   type: SYSTEM_URL
   valueOf: $url
 
-valueString:
-  type: STRING
-  valueOf: $valString
+value_KEY_NAME_SUFFIX:
+  valueOf: $value
 
-valueAddress:
-  condition: $valAddress NOT_NULL
-  valueOf: datatype/Address
-  expressionType: resource
-  specs: $valAddress
-
-valueDateTime:
-  type: DATE_TIME
-  valueOf: $valDateTime

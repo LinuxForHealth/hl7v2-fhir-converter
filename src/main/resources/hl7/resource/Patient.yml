@@ -164,25 +164,30 @@ generalPractitioner:
    expressionType: reference
    specs: PD1.4
 
-extension_1:
-  condition: $valString NOT_NULL
-  valueOf: extension/Extension
-  generateList: true
-  expressionType: resource
-  vars:
-    url: String, GeneralUtils.getExtensionUrl("mothersMaidenName")
-    valString: String, PID.6.1
-
-extension_2:
-  condition: $valCodeableConcept NOT_NULL
-  valueOf: extension/Extension_CodeableConcept
-  generateList: true
-  expressionType: resource
-  vars:
-    url: String, GeneralUtils.getExtensionUrl("religion")
-    valCodeableConcept: RELIGIOUS_AFFILIATION_CC, PID.17
-    text: String, PID.17.2 | PID.17.9
-
+extension:
+   generateList: true
+   expressionType: nested
+   expressions:
+      -
+         condition: $value NOT_NULL
+         valueOf: extension/Extension  
+         expressionType: resource
+         vars:
+            url: String, GeneralUtils.getExtensionUrl("mothersMaidenName")
+            value: String, PID.6.1
+         constants:
+            KEY_NAME_SUFFIX: 'String'
+            
+      -
+         condition: $value NOT_NULL
+         valueOf: extension/Extension  
+         expressionType: resource
+         vars:
+            url: String, GeneralUtils.getExtensionUrl("religion")
+            value:  RELIGIOUS_AFFILIATION_CC, PID.17
+         constants:
+            KEY_NAME_SUFFIX: 'CodeableConcept'
+            
 communication:
   condition: $language NOT_NULL
   valueOf: secondary/Communication
