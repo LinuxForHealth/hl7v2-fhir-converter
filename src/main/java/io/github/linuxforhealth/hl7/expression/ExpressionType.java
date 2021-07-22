@@ -13,6 +13,7 @@ public enum ExpressionType {
   RESOURCE(ResourceExpression.class), //
   REFERENCE(ReferenceExpression.class), //
   SIMPLE(SimpleExpression.class), //
+  NESTED(NestedExpression.class), //
   JEXL(JEXLExpression.class);
 
 

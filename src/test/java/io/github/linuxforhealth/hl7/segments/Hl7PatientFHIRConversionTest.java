@@ -9,13 +9,20 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import org.hl7.fhir.r4.model.*;
 import org.hl7.fhir.instance.model.api.IBaseResource;
-import org.hl7.fhir.r4.model.codesystems.V3MaritalStatus;
+import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
-import org.junit.jupiter.api.Test;
-
+import org.hl7.fhir.r4.model.Coding;
+import org.hl7.fhir.r4.model.Enumerations;
+import org.hl7.fhir.r4.model.HumanName;
+import org.hl7.fhir.r4.model.Patient;
+import org.hl7.fhir.r4.model.Practitioner;
+import org.hl7.fhir.r4.model.Reference;
+import org.hl7.fhir.r4.model.Resource;
+import org.hl7.fhir.r4.model.ResourceType;
+import org.hl7.fhir.r4.model.StringType;
+import org.hl7.fhir.r4.model.codesystems.V3MaritalStatus;
+import org.junit.Test;
 import io.github.linuxforhealth.fhir.FHIRContext;
 import io.github.linuxforhealth.hl7.HL7ToFHIRConverter;
 import io.github.linuxforhealth.hl7.segments.util.PatientUtils;
@@ -61,7 +68,7 @@ public class Hl7PatientFHIRConversionTest {
    * In order to generate messageHeader resource, MSH should have MSH.24.2 as this is required
    * attribute for source attribute, and source is required for MessageHeader resource.
    * 
-   * @throws IOException
+   * 
    */
 
   @Test

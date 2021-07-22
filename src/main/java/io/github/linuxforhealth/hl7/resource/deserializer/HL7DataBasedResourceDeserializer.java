@@ -23,6 +23,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.github.linuxforhealth.api.Expression;
 import io.github.linuxforhealth.core.ObjectMapperUtil;
 import io.github.linuxforhealth.hl7.expression.ExpressionAttributes;
+import io.github.linuxforhealth.hl7.expression.ExpressionType;
 import io.github.linuxforhealth.hl7.resource.HL7DataBasedResourceModel;
 
 
@@ -30,6 +31,9 @@ import io.github.linuxforhealth.hl7.resource.HL7DataBasedResourceModel;
 public class HL7DataBasedResourceDeserializer extends JsonDeserializer<HL7DataBasedResourceModel> {
 
   private static final String RESOURCE_TYPE_FIELD_NAME = "resourceType";
+  private static final String SPEC = "specs";
+
+
 
   private static final ObjectMapper MAPPER = ObjectMapperUtil.getYAMLInstance();
 
@@ -43,7 +47,7 @@ public class HL7DataBasedResourceDeserializer extends JsonDeserializer<HL7DataBa
       throws IOException {
 
     ObjectNode node = jsonParser.getCodec().readTree(jsonParser);
-    JsonNode hl7PrefixNode = node.get(TemplateFieldNames.SPEC);
+    JsonNode hl7PrefixNode = node.get(SPEC);
     String hl7Prefix = null;
     if (hl7PrefixNode != null) {
       hl7Prefix = hl7PrefixNode.toString();
@@ -66,12 +70,10 @@ public class HL7DataBasedResourceDeserializer extends JsonDeserializer<HL7DataBa
       if (expAttr != null && expAttr.getExpressionType() != null) {
         expAttr.setName(entry.getKey());
         try {
-          Constructor<?> ctor =
-              expAttr.getExpressionType().getEvaluator().getConstructor(ExpressionAttributes.class);
-          e = (Expression) ctor.newInstance(expAttr);
 
-        } catch (NoSuchMethodException | InstantiationException | IllegalAccessException
-            | IllegalArgumentException | InvocationTargetException | SecurityException e1) {
+          e = generateExpression(expAttr);
+
+        } catch (IllegalStateException e1) {
           LOGGER.error("deserialization failure {} expression type {}", entry,
               expAttr.getExpressionType(), e1);
           e = null;
@@ -92,5 +94,27 @@ public class HL7DataBasedResourceDeserializer extends JsonDeserializer<HL7DataBa
     }
     return new HL7DataBasedResourceModel(name, expressions, hl7Prefix);
   }
+
+  public static Expression generateExpression(ExpressionAttributes expAttr) {
+
+    if (expAttr != null && expAttr.getExpressionType() != null) {
+      if (expAttr.getExpressionType() == ExpressionType.NESTED) {
+        System.out.println(expAttr.getExpressionType());
+      }
+      try {
+        Constructor<?> ctor =
+            expAttr.getExpressionType().getEvaluator().getConstructor(ExpressionAttributes.class);
+        return (Expression) ctor.newInstance(expAttr);
+
+      } catch (NoSuchMethodException | InstantiationException | IllegalAccessException
+          | IllegalArgumentException | InvocationTargetException | SecurityException e1) {
+        throw new IllegalStateException("Error encountered while creating expression object.", e1);
+      }
+
+
+    }
+    return null;
+  }
+
 
 }
