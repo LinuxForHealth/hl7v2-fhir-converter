@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2020
+ * (C) Copyright IBM Corp. 2020, 2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -49,6 +49,11 @@ public class SimpleBiCondition implements Condition {
       ConditionPredicateEnum condEnum = ConditionPredicateEnum
           .getConditionPredicate(this.conditionOperator, variable1.getIdentifier());
       if (condEnum != null) {
+        // if var2 is a string and must be converted to an integer to test
+        if (var2Value.getClass().getTypeName().equalsIgnoreCase("java.lang.String") 
+            && condEnum.getKlassU().getTypeName().equalsIgnoreCase("java.lang.Integer")) {
+          var2Value = Integer.parseInt((String)var2Value);
+        }
         return condEnum.getPredicate().test(var1Value, var2Value);
       }
 

@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2020
+ * (C) Copyright IBM Corp. 2020, 2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -66,7 +66,8 @@ public enum ConditionPredicateEnum {
 
   public static ConditionPredicateEnum getConditionPredicate(String conditionOperator,
       String klassSimpleName) {
-    String enumName = conditionOperator + "_" + klassSimpleName;
+    // Append the predicate if not already present      
+    String enumName = conditionOperator.endsWith(klassSimpleName.toUpperCase()) ? conditionOperator : conditionOperator + "_" + klassSimpleName;
     return EnumUtils.getEnumIgnoreCase(ConditionPredicateEnum.class, enumName);
 
   }
