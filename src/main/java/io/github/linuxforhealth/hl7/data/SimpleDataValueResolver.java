@@ -13,27 +13,23 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
-
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.hl7.fhir.r4.model.AllergyIntolerance.AllergyIntoleranceCategory;
 import org.hl7.fhir.r4.model.AllergyIntolerance.AllergyIntoleranceCriticality;
-import org.hl7.fhir.r4.model.CodeableConcept;
-import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.DiagnosticReport.DiagnosticReportStatus;
 import org.hl7.fhir.r4.model.Enumerations.AdministrativeGender;
 import org.hl7.fhir.r4.model.Immunization.ImmunizationStatus;
 import org.hl7.fhir.r4.model.Observation.ObservationStatus;
 import org.hl7.fhir.r4.model.Specimen.SpecimenStatus;
-import org.hl7.fhir.r4.model.codesystems.V3MaritalStatus;
 import org.hl7.fhir.r4.model.codesystems.ConditionCategory;
 import org.hl7.fhir.r4.model.codesystems.MessageReasonEncounter;
 import org.hl7.fhir.r4.model.codesystems.NameUse;
+import org.hl7.fhir.r4.model.codesystems.V3MaritalStatus;
 import org.hl7.fhir.r4.model.codesystems.V3ReligiousAffiliation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import io.github.linuxforhealth.api.ResourceValue;
 import io.github.linuxforhealth.core.terminology.Hl7v2Mapping;
 import io.github.linuxforhealth.core.terminology.SimpleCode;
@@ -134,15 +130,15 @@ public class SimpleDataValueResolver {
         }
     };
 
-    public static final ValueExtractor<Object, CodeableConcept> RELIGIOUS_AFFILIATION_FHIR_CC = (Object value) -> {
+
+    public static final ValueExtractor<Object, SimpleCode> RELIGIOUS_AFFILIATION_FHIR_CC =
+        (Object value) -> {
         String val = Hl7DataHandlerUtil.getStringValue(value);
         String code = getFHIRCode(val, V3ReligiousAffiliation.class);
         if (code != null) {
-            V3ReligiousAffiliation rel = V3ReligiousAffiliation.fromCode(code);
-            CodeableConcept codeableConcept = new CodeableConcept();
-            codeableConcept.addCoding(new Coding(rel.getSystem(), code, rel.getDisplay()));
-            codeableConcept.setText(rel.getDisplay());
-            return codeableConcept;
+            V3ReligiousAffiliation status = V3ReligiousAffiliation.fromCode(code);
+            return new SimpleCode(code, status.getSystem(), status.getDisplay());
+
         } else {
             return null;
         }
@@ -273,8 +269,9 @@ public class SimpleDataValueResolver {
 
     public static final ValueExtractor<Object, String> SYSTEM_URL = (Object value) -> {
         String val = Hl7DataHandlerUtil.getStringValue(value);
-        return UrlLookup.getSystemUrl(val);
+      return UrlLookup.getAssociatedUrl(val);
     };
+
 
     // Convert an authority string to a valid system value
     // Prepend "urn:id:"; convert any spaces to underscores
@@ -343,6 +340,8 @@ public class SimpleDataValueResolver {
             return null;
         }
     };
+
+
 
     private SimpleDataValueResolver() {
     }

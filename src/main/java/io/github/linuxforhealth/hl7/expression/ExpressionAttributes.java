@@ -52,13 +52,12 @@ public class ExpressionAttributes {
   private ExpressionType expressionType;
   private String toString;
   private List<ExpressionAttributes> expressions;
+  private Map<String, ExpressionAttributes> expressionsMap;
+
+
 
   // if valueof attribute ends with * then list of values will be generated
   private boolean generateMultiple;
-
-  // Property specific to ValueExtractionGeneralExpression
-  private ImmutablePair<String, String> fetch;
-
 
 
   private ExpressionAttributes(Builder exBuilder) {
@@ -104,6 +103,14 @@ public class ExpressionAttributes {
       this.expressions = exBuilder.expressions;
     }
 
+    if (exBuilder.expressionsMap != null) {
+      this.expressionsMap = exBuilder.expressionsMap;
+    }
+
+  }
+
+  public Map<String, ExpressionAttributes> getExpressionsMap() {
+    return expressionsMap;
   }
 
   public boolean isUseGroup() {
@@ -146,9 +153,6 @@ public class ExpressionAttributes {
     return value;
   }
 
-  public ImmutablePair<String, String> getFetch() {
-    return fetch;
-  }
 
   public ExpressionType getExpressionType() {
     return expressionType;
@@ -269,6 +273,7 @@ public class ExpressionAttributes {
     private boolean generateList;
     private List<ExpressionAttributes> expressions;
 
+    private Map<String, ExpressionAttributes> expressionsMap;
 
     public Builder() {}
 
@@ -328,6 +333,11 @@ public class ExpressionAttributes {
 
     public Builder withExpressions(List<ExpressionAttributes> expressions) {
       this.expressions = expressions;
+      return this;
+    }
+
+    public Builder withExpressionsMap(Map<String, ExpressionAttributes> expressionsMap) {
+      this.expressionsMap = expressionsMap;
       return this;
     }
 

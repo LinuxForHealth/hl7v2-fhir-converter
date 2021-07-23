@@ -6,7 +6,7 @@
 ---
 url:
   type: SYSTEM_URL
-  valueOf: $url
+  valueOf: $urlValue
 
 value_KEY_NAME_SUFFIX:
   valueOf: $value

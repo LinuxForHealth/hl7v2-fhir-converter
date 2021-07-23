@@ -12,14 +12,18 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import io.github.linuxforhealth.api.EvaluationResult;
 import io.github.linuxforhealth.api.Expression;
 import io.github.linuxforhealth.api.InputDataExtractor;
 import io.github.linuxforhealth.api.ResourceValue;
+import io.github.linuxforhealth.core.ObjectMapperUtil;
 import io.github.linuxforhealth.core.exception.DataExtractionException;
 import io.github.linuxforhealth.core.exception.RequiredConstraintFailureException;
+import io.github.linuxforhealth.core.expression.EmptyEvaluationResult;
+import io.github.linuxforhealth.core.expression.EvaluationResultFactory;
 import io.github.linuxforhealth.hl7.resource.ResourceEvaluationResult;
 
 
@@ -129,6 +133,25 @@ public class ExpressionUtility {
       return null;
     }
     return res.getValue();
+  }
+
+
+  public static EvaluationResult extractComponent(ImmutablePair<String, String> fetch,
+      EvaluationResult resource) {
+    if (resource != null && resource.getValue() instanceof ResourceValue) {
+      ResourceValue rv = resource.getValue();
+      Map<String, Object> resourceMap = rv.getResource();
+      return EvaluationResultFactory.getEvaluationResult(resourceMap.get(fetch.getValue()));
+    } else if (resource != null && resource.getValue() instanceof Map) {
+      Map<String, Object> resourceMap = (Map<String, Object>) resource.getValue();
+      return EvaluationResultFactory.getEvaluationResult(resourceMap.get(fetch.getValue()));
+    } else if (resource != null) {
+      Map<String, Object> resourceMap =
+          ObjectMapperUtil.getJSONInstance().convertValue(resource.getValue(), Map.class);
+      return EvaluationResultFactory.getEvaluationResult(resourceMap.get(fetch.getValue()));
+    } else {
+      return new EmptyEvaluationResult();
+    }
   }
 
 

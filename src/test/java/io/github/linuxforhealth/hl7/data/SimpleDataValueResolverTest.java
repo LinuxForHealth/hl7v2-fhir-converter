@@ -9,20 +9,16 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.UUID;
-
-import org.hl7.fhir.r4.model.CodeableConcept;
-import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.Observation.ObservationStatus;
 import org.hl7.fhir.r4.model.Specimen.SpecimenStatus;
 import org.hl7.fhir.r4.model.codesystems.V3MaritalStatus;
 import org.junit.jupiter.api.Test;
+import org.hl7.fhir.r4.model.codesystems.V3ReligiousAffiliation;
 import ca.uhn.hl7v2.model.DataTypeException;
 import ca.uhn.hl7v2.model.v26.datatype.TX;
 import ca.uhn.hl7v2.model.v26.message.ORU_R01;
 import io.github.linuxforhealth.core.terminology.SimpleCode;
 import io.github.linuxforhealth.hl7.data.date.DateUtil;
-
-import org.hl7.fhir.r4.model.codesystems.V3ReligiousAffiliation;
 
 public class SimpleDataValueResolverTest {
 
@@ -135,23 +131,31 @@ public class SimpleDataValueResolverTest {
         .isEqualTo(ObservationStatus.CANCELLED.toCode());
   }
 
+
+
+
   @Test
   public void get_religious_affiliation_value_valid() {
     String gen = "LUT";
-    CodeableConcept codeableConcept = SimpleDataValueResolver.RELIGIOUS_AFFILIATION_FHIR_CC.apply(gen);
-    Coding coding = codeableConcept.getCodingFirstRep();
-    assertThat(codeableConcept.getText()).isEqualTo(V3ReligiousAffiliation._1028.getDisplay());
-    assertThat(codeableConcept.hasCoding()).isTrue();
-    assertThat(codeableConcept.getText()).isEqualTo(V3ReligiousAffiliation._1028.getDisplay());
-    assertThat(coding.getDisplay()).isEqualTo(V3ReligiousAffiliation._1028.getDisplay());
-    assertThat(coding.getSystem()).isEqualTo(V3ReligiousAffiliation._1028.getSystem());
+
+    SimpleCode code =
+        SimpleDataValueResolver.RELIGIOUS_AFFILIATION_FHIR_CC.apply(gen);
+
+    assertThat(code.getDisplay()).isEqualTo(V3ReligiousAffiliation._1028.getDisplay());
+
+    assertThat(code.getCode()).isEqualTo(V3ReligiousAffiliation._1028.toCode());
+    assertThat(code.getSystem()).isEqualTo(V3ReligiousAffiliation._1028.getSystem());
+
+
+
   }
 
   @Test
   public void get_religious_affiliation_value_nonvalid() {
     String gen = "ZZZ";
-    CodeableConcept codeableConcept = SimpleDataValueResolver.RELIGIOUS_AFFILIATION_FHIR_CC.apply(gen);
-    assertThat(codeableConcept).isNull();
+    SimpleCode code =
+        SimpleDataValueResolver.RELIGIOUS_AFFILIATION_FHIR_CC.apply(gen);
+    assertThat(code).isNull();
   }
 
   @Test

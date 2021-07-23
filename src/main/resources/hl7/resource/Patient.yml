@@ -3,194 +3,174 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 #
-
+resourceType: Patient
 # Represents data that needs to be extracted for a Patient Resource in FHIR
 # reference: https://www.hl7.org/fhir/patient.html
----
-resourceType: Patient
 id:
-  type: STRING
-  valueOf: "UUID.randomUUID()"
-  expressionType: JEXL
-
+   type: STRING
+   valueOf: UUID.randomUUID()
+   expressionType: JEXL
 identifier_1:
-    valueOf: datatype/Identifier_SystemID
-    generateList: true
-    expressionType: resource
-    specs: PID.3
-    vars: 
-       assignerSystem: String, PID.3.4
-
+   valueOf: datatype/Identifier_SystemID
+   generateList: true
+   expressionType: resource
+   specs: PID.3
+   vars:
+      assignerSystem: String, PID.3.4
 # Gets the SSN from PID.19, formats and adds it as an ID
-identifier_2: 
-    condition: $valueIn NOT_NULL
-    valueOf: datatype/Identifier_var
-    generateList: true
-    expressionType: resource
-    vars:
+identifier_2:
+   condition: $valueIn NOT_NULL
+   valueOf: datatype/Identifier_var
+   generateList: true
+   expressionType: resource
+   vars:
       valueIn: String, PID.19
-    constants:
-      system: "http://terminology.hl7.org/CodeSystem/v2-0203"
-      code: "SS"
-      display: "Social Security number"
-      # There is no text for PID.19
-      # There is no authority for PID.19
-
-# Gets the Driver's license from PID.20, formats and adds it as an ID
+   constants:
+      system: http://terminology.hl7.org/CodeSystem/v2-0203
+      code: SS
+      display: Social Security number
+# There is no text for PID.19
 identifier_3:
-    condition: $valueIn NOT_NULL
-    valueOf: datatype/Identifier_var
-    generateList: true
-    expressionType: resource
-    vars:
+   condition: $valueIn NOT_NULL
+   valueOf: datatype/Identifier_var
+   generateList: true
+# There is no authority for PID.19
+   expressionType: resource
+# Gets the Driver's license from PID.20, formats and adds it as an ID
+   vars:
       valueIn: String, PID.20.1
-    constants:
-      system: "http://terminology.hl7.org/CodeSystem/v2-0203"
-      code: "DL"
-      display: "Driver's license number"
-      # There is no text for PID.20
-      # There is no authority for PID.20
-
+   constants:
+      system: http://terminology.hl7.org/CodeSystem/v2-0203
+      code: DL
+      display: Driver's license number
+# There is no text for PID.20
 name:
-    valueOf: datatype/HumanName
-    generateList: true
-    expressionType: resource
-    specs: PID.5
+   valueOf: datatype/HumanName
+   generateList: true
+   expressionType: resource
+   specs: PID.5
+# There is no authority for PID.20
 gender:
-     type: ADMINISTRATIVE_GENDER
-     valueOf: PID.8
-     expressionType: HL7Spec
-
+   type: ADMINISTRATIVE_GENDER
+   valueOf: PID.8
+   expressionType: HL7Spec
 address:
-    valueOf: datatype/Address
-    generateList: true
-    expressionType: resource
-    specs: PID.11
-
-  
+   valueOf: datatype/Address
+   generateList: true
+   expressionType: resource
+   specs: PID.11
 telecom_1:
-    condition: $pid14 NOT_NULL
-    valueOf: datatype/Telecom
-    generateList: true
-    expressionType: resource
-    specs: PID.14
-    vars:
-       pid14: PID.14
-    constants: 
-       use: "work"
-
+   condition: $pid14 NOT_NULL
+   valueOf: datatype/Telecom
+   generateList: true
+   expressionType: resource
+   specs: PID.14
+   vars:
+      pid14: PID.14
+   constants:
+      use: work
 # The yaml is processed in reverse order, therefore
-# Put the PID.13 last in yaml so it is first to be processed 
-       
 telecom_2:
-    condition: $pid13 NOT_NULL
-    valueOf: datatype/Telecom
-    generateList: true
-    expressionType: resource
-    specs: PID.13
-    vars:
-       pid13: PID.13
-    constants: 
-       use: "home"
-
+   condition: $pid13 NOT_NULL
+   valueOf: datatype/Telecom
+   generateList: true
+   expressionType: resource
+   specs: PID.13
+   vars:
+      pid13: PID.13
+   constants:
+      use: home
+# Put the PID.13 last in yaml so it is first to be processed
 birthDate:
-     type: DATE
-     valueOf: PID.7
-     expressionType: HL7Spec
-
+   type: DATE
+   valueOf: PID.7
+   expressionType: HL7Spec
 multipleBirthBoolean_1:
-     condition: $multBool NOT_NULL && $multInt NULL
-     type: BOOLEAN
-     valueOf: PID.24
-     expressionType: HL7Spec
-     vars:
-          multBool: PID.24
-          multInt: PID.25
-
+   condition: $multBool NOT_NULL && $multInt NULL
+   type: BOOLEAN
+   valueOf: PID.24
+   expressionType: HL7Spec
+   vars:
+      multBool: PID.24
+      multInt: PID.25
 multipleBirthBoolean_2:
-     condition: $multBool EQUALS N
-     type: BOOLEAN
-     valueOf: PID.24
-     expressionType: HL7Spec
-     vars:
-          multBool: String, PID.24
-          multInt: PID.25
-
+   condition: $multBool EQUALS N
+   type: BOOLEAN
+   valueOf: PID.24
+   expressionType: HL7Spec
+   vars:
+      multBool: String, PID.24
+      multInt: PID.25
 multipleBirthInteger_1:
-     condition: $multBool NULL && $multInt NOT_NULL
-     type: INTEGER
-     valueOf: PID.25
-     expressionType: HL7Spec
-     vars:
-          multBool: String, PID.24
-          multInt: PID.25
-
+   condition: $multBool NULL && $multInt NOT_NULL
+   type: INTEGER
+   valueOf: PID.25
+   expressionType: HL7Spec
+   vars:
+      multBool: String, PID.24
+      multInt: PID.25
 multipleBirthInteger_2:
-     condition: $multBool EQUALS Y && $multInt NOT_NULL
-     type: INTEGER
-     valueOf: PID.25
-     expressionType: HL7Spec
-     vars:
-          multBool: String, PID.24
-          multInt: PID.25
-
+   condition: $multBool EQUALS Y && $multInt NOT_NULL
+   type: INTEGER
+   valueOf: PID.25
+   expressionType: HL7Spec
+   vars:
+      multBool: String, PID.24
+      multInt: PID.25
 deceasedBoolean:
-     condition: $deceasedBool NOT_NULL && $deceasedDateTime NULL
-     type: BOOLEAN
-     valueOf: PID.30
-     expressionType: HL7Spec
-     vars:
-          deceasedBool: PID.30
-          deceasedDateTime: PID.29
-
+   condition: $deceasedBool NOT_NULL && $deceasedDateTime NULL
+   type: BOOLEAN
+   valueOf: PID.30
+   expressionType: HL7Spec
+   vars:
+      deceasedBool: PID.30
+      deceasedDateTime: PID.29
 deceasedDateTime:
-     condition: $deceasedDateTime NOT_NULL
-     type: DATE_TIME
-     valueOf: PID.29
-     expressionType: HL7Spec
-     vars:
-          deceasedDateTime: PID.29
-
+   condition: $deceasedDateTime NOT_NULL
+   type: DATE_TIME
+   valueOf: PID.29
+   expressionType: HL7Spec
+   vars:
+      deceasedDateTime: PID.29
 maritalStatus:
    valueOf: datatype/CodeableConcept
    expressionType: resource
    condition: $coding NOT_NULL
    vars:
-     coding: MARITAL_STATUS, PID.16
-
-generalPractitioner: 
+      coding: MARITAL_STATUS, PID.16
+generalPractitioner:
    valueOf: resource/Practitioner
    generateList: true
    expressionType: reference
    specs: PD1.4
-
 extension:
    generateList: true
    expressionType: nested
    expressions:
-      -
-         condition: $value NOT_NULL
-         valueOf: extension/Extension  
-         expressionType: resource
-         vars:
-            url: String, GeneralUtils.getExtensionUrl("mothersMaidenName")
-            value: String, PID.6.1
-         constants:
-            KEY_NAME_SUFFIX: 'String'
-            
-      -
-         condition: $value NOT_NULL
-         valueOf: extension/Extension  
-         expressionType: resource
-         vars:
-            url: String, GeneralUtils.getExtensionUrl("religion")
-            value:  RELIGIOUS_AFFILIATION_CC, PID.17
-         constants:
-            KEY_NAME_SUFFIX: 'CodeableConcept'
-            
+   -  condition: $value NOT_NULL
+      valueOf: extension/Extension
+      expressionType: resource
+      vars:
+         value: String, PID.6.1
+      constants:
+         KEY_NAME_SUFFIX: String
+         urlValue: mothersMaidenName
+   -  expressionType: nested
+      expressionsMap:
+         url:
+            type: SYSTEM_URL
+            value: 'religion'
+         valueCodeableConcept:
+            valueOf: datatype/CodeableConcept
+            expressionType: resource
+            condition: $coding NOT_NULL
+            vars:
+               coding: RELIGIOUS_AFFILIATION_CC, PID.17
+               
 communication:
   condition: $language NOT_NULL
   valueOf: secondary/Communication
   expressionType: resource
   vars:
     language: PID.15
+

@@ -23,7 +23,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.github.linuxforhealth.api.Expression;
 import io.github.linuxforhealth.core.ObjectMapperUtil;
 import io.github.linuxforhealth.hl7.expression.ExpressionAttributes;
-import io.github.linuxforhealth.hl7.expression.ExpressionType;
 import io.github.linuxforhealth.hl7.resource.HL7DataBasedResourceModel;
 
 
@@ -98,9 +97,7 @@ public class HL7DataBasedResourceDeserializer extends JsonDeserializer<HL7DataBa
   public static Expression generateExpression(ExpressionAttributes expAttr) {
 
     if (expAttr != null && expAttr.getExpressionType() != null) {
-      if (expAttr.getExpressionType() == ExpressionType.NESTED) {
-        System.out.println(expAttr.getExpressionType());
-      }
+
       try {
         Constructor<?> ctor =
             expAttr.getExpressionType().getEvaluator().getConstructor(ExpressionAttributes.class);
