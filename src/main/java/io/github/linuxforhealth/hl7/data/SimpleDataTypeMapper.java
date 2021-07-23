@@ -50,6 +50,7 @@ public enum SimpleDataTypeMapper {
   SPECIMEN_STATUS(SimpleDataValueResolver.SPECIMEN_STATUS_CODE_FHIR),
   NAME_USE(SimpleDataValueResolver.NAME_USE_CODE_FHIR),
   RELIGIOUS_AFFILIATION_CC(SimpleDataValueResolver.RELIGIOUS_AFFILIATION_FHIR_CC),
+  RACE_CATEGORIES_CC(SimpleDataValueResolver.RACE_CATEGORIES_FHIR_CC),
   MARITAL_STATUS(SimpleDataValueResolver.MARITAL_STATUS);
 
 

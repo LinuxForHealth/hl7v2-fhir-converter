@@ -4,9 +4,16 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 ---
-url:
+url_1:
+  condition: $urlValue NOT_NULL
   type: SYSTEM_URL
   valueOf: $urlValue
+
+url_2:
+  condition: $urlString NOT_NULL
+  type: STRING
+  valueOf: $urlString
+
 
 value_KEY_NAME_SUFFIX:
   valueOf: $value

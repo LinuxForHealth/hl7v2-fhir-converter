@@ -91,6 +91,18 @@ V3MaritalStatus:
   U: U
   W: W
 
+V3Race:
+  # American Indian or Alaska Native	
+  1002-5: 1002-5
+  # Asian
+  2028-9: 2028-9
+  # Black or African American
+  2054-5: 2054-5
+  # Native Hawaiian or Other Pacific Islander
+  2076-8: 2076-8
+  # White
+  2106-3: 2106-3
+
 V3ReligiousAffiliation:
   # Not all V2.6 religions mapped exactly to FHIR codings.  ** indicates a best approximation or generalization
   # All V2.6 religions are left as commented placeholders for future evaluation.
