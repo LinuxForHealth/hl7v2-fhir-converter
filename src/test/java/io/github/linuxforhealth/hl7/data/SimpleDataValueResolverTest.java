@@ -12,6 +12,7 @@ import java.util.UUID;
 import org.hl7.fhir.r4.model.Observation.ObservationStatus;
 import org.hl7.fhir.r4.model.Specimen.SpecimenStatus;
 import org.hl7.fhir.r4.model.codesystems.V3MaritalStatus;
+import org.hl7.fhir.r4.model.codesystems.V3Race;
 import org.hl7.fhir.r4.model.codesystems.V3ReligiousAffiliation;
 import org.junit.jupiter.api.Test;
 import ca.uhn.hl7v2.model.DataTypeException;
@@ -145,9 +146,15 @@ public class SimpleDataValueResolverTest {
 
     assertThat(code.getCode()).isEqualTo(V3ReligiousAffiliation._1028.toCode());
     assertThat(code.getSystem()).isEqualTo(V3ReligiousAffiliation._1028.getSystem());
+  }
 
-
-
+  @Test
+  public void get_race_value_valid() {
+    String gen = "2028-9";
+    SimpleCode code = SimpleDataValueResolver.RACE_CATEGORIES_FHIR_CC.apply(gen);
+    assertThat(code.getDisplay()).isEqualTo(V3Race._20289.getDisplay());
+    assertThat(code.getCode()).isEqualTo(V3Race._20289.toCode());
+    assertThat(code.getSystem()).isEqualTo(V3Race._20289.getSystem());
   }
 
   @Test
