@@ -3,51 +3,50 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 #
-# Represents codeable concept that can be derived from CE/CNE/CWE 
----
+# Represents codeable concept that can be derived from CE/CNE/CWE
+coding_1:
 # coding requires code,display and system defined as variables from the resource that calls this resource
-coding_1: 
-    valueOf: datatype/Coding
-    generateList: true
-    expressionType: resource
-    condition: $code NOT_NULL
-    specs: CWE |CE |CNE
-    vars:
+   valueOf: datatype/Coding
+   generateList: true
+   expressionType: resource
+   condition: $code NOT_NULL
+   specs: CWE |CE |CNE
+   vars:
       code: CWE.1 |CE.1 |CNE.1
       system: CWE.3 |CE.3 |CNE.3
       version: CWE.7 |CE.6 |CNE.7
-      
-coding_2: 
-    condition: $code NOT_NULL
-    type: CODING_SYSTEM_V2
-    valueOf: ID |IS |TX
-    generateList: true
-    expressionType: HL7Spec
-    vars:
-       code: ID |IS |TX
-       
-coding_3: 
-    valueOf: $coding
-    condition: $coding NOT_NULL
-    generateList: true
-
-coding_4: 
-     valueOf: datatype/Coding
-     generateList: true
-     expressionType: resource
-     condition: $code NOT_NULL
-     specs: CWE
-     vars:
-       code: CWE.4
-       system: CWE.6
-       display: CWE.5
-       version: CWE.8
-
+coding_2:
+   condition: $code NOT_NULL
+   type: CODING_SYSTEM_V2
+   valueOf: ID |IS |TX
+   generateList: true
+   expressionType: HL7Spec
+   vars:
+      code: ID |IS |TX
+coding_3:
+   valueOf: $coding
+   condition: $coding NOT_NULL
+   generateList: true
+coding_4:
+   valueOf: datatype/Coding
+   generateList: true
+   expressionType: resource
+   condition: $code NOT_NULL
+   specs: CWE
+   vars:
+      code: CWE.4
+      system: CWE.6
+      display: CWE.5
+      version: CWE.8
 text:
-     # If hideText is not passed by parent, the value is NULL, making it backward compatible with all other uses of CodeableConcept
-     # Any value in hideText will cause the text to be hidden.  Used by Identifier_SystemID.
-     condition: $hideText NULL 
-     type: STRING
-     valueOf: CWE.2 |CWE.9 |CE.2 |CNE.2| ST |TX |ID |IS | CWE.5
-     expressionType: HL7Spec
+   condition: $hideText NULL  && $displayText NOT_NULL
+   type: STRING
+   valueOf: $displayText
+   vars:
+      displayText: CWE.2 |CWE.9 |CE.2 |CNE.2| ST |TX |ID |IS | CWE.5| $coding:display
 
+# ----------------
+# Orphan comments:
+# ----------------
+# Was at begin of line:56 :# If hideText is not passed by parent, the value is NULL, making it backward compatible with all other uses of CodeableConcept
+# Was at begin of line:57 :# Any value in hideText will cause the text to be hidden.  Used by Identifier_SystemID.

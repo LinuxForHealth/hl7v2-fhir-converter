@@ -11,11 +11,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
 import org.apache.commons.lang3.StringUtils;
-
 import com.fasterxml.jackson.core.type.TypeReference;
-
 import io.github.linuxforhealth.core.Constants;
 import io.github.linuxforhealth.core.ObjectMapperUtil;
 import io.github.linuxforhealth.core.config.ConverterConfiguration;
@@ -40,7 +37,7 @@ public class UrlLookup {
      * Get the extension URL
      */
     public static String getExtensionUrl(String value) {
-        return getUrl(Constants.EXTENSION_URL_MAPPING, value);
+      return getUrl(Constants.EXTENSION_URL_MAPPING, value);
     }
 
     /**
@@ -50,6 +47,17 @@ public class UrlLookup {
         return getUrl(Constants.CODING_SYSTEM_MAPPING, value);
     }
 
+
+    /**
+     * Get the system associated with the value for the coding system.
+     */
+    public static String getAssociatedUrl(String value) {
+      String url = getUrl(Constants.CODING_SYSTEM_MAPPING, value);
+      if (url == null) {
+        url = getUrl(Constants.EXTENSION_URL_MAPPING, value);
+      }
+      return url;
+    }
     /**
      * Get the system associated with the value for the URL set.
      */
