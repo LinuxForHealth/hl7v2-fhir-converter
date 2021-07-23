@@ -23,15 +23,6 @@ public enum ConditionPredicateEnum {
   LESS_THAN_OR_EQUAL_TO_INTEGER(ConditionBiPredicates.LESS_THAN_OR_EQUAL_TO, Integer.class,
       Integer.class), //
 
-  GREATER_THAN_FLOAT(ConditionBiPredicates.GREATER_THAN_FLOAT, Float.class, Float.class), //
-  LESS_THAN_FLOAT(ConditionBiPredicates.LESS_THAN_FLOAT, Float.class, Float.class), //
-  GREATER_THAN_OR_EQUAL_TO_FLOAT(ConditionBiPredicates.GREATER_THAN_OR_EQUAL_TO_FLOAT, Float.class,
-      Float.class), //
-  LESS_THAN_OR_EQUAL_TO_FLOAT(ConditionBiPredicates.LESS_THAN_OR_EQUAL_TO_FLOAT, Float.class,
-      Float.class), //
-
-
-
   CONTAINS_STRING(ConditionBiPredicates.CONTAINS, String.class, String.class), //
   NOT_CONTAINS_STRING(ConditionBiPredicates.NOT_CONTAINS, String.class, String.class), //
   EQUALS_STRING(ConditionBiPredicates.EQUALS_IC, String.class, String.class), //

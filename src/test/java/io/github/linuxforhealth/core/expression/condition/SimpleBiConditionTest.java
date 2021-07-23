@@ -324,4 +324,141 @@ public void simple_NOT_EQUALS_condition_with_two_variables_is_evaluated_false_wh
     assertThat(simplecondition.test(contextVariables)).isFalse();
   }
 
+
+  // LESS_THAN two vars test one true and one false
+
+  @Test
+  public void simple_LESS_THAN_condition_with_two_vars_is_evaluated_true() {
+    String condition = "$var1 LESS_THAN $var2";
+    SimpleBiCondition simplecondition =
+        (SimpleBiCondition) ConditionUtil.createCondition(condition);
+    Map<String, EvaluationResult> contextVariables = new HashMap<>();
+    contextVariables.put("var1", new SimpleEvaluationResult(3));
+    contextVariables.put("var2", new SimpleEvaluationResult(6));
+    assertThat(simplecondition.test(contextVariables)).isTrue();
+  }
+
+  @Test
+  public void simple_LESS_THAN_condition_with_two_vars_is_evaluated_false() {
+    String condition = "$var1 LESS_THAN $var2";
+    SimpleBiCondition simplecondition =
+        (SimpleBiCondition) ConditionUtil.createCondition(condition);
+    Map<String, EvaluationResult> contextVariables = new HashMap<>();
+    contextVariables.put("var1", new SimpleEvaluationResult(9));
+    contextVariables.put("var2", new SimpleEvaluationResult(3));
+    assertThat(simplecondition.test(contextVariables)).isFalse();
+  }
+
+  // LESS_THAN test one true and one false
+
+  @Test
+  public void simple_LESS_THAN_condition_of_integer_is_evaluated_true() {
+    String condition = "$var1 LESS_THAN 6";
+    SimpleBiCondition simplecondition =
+        (SimpleBiCondition) ConditionUtil.createCondition(condition);
+    Map<String, EvaluationResult> contextVariables = new HashMap<>();
+    contextVariables.put("var1", new SimpleEvaluationResult(3));
+    assertThat(simplecondition.test(contextVariables)).isTrue();
+  }
+
+  @Test
+  public void simple_LESS_THAN_condition_of_integer_is_evaluated_false() {
+    String condition = "$var1 LESS_THAN 12";
+    SimpleBiCondition simplecondition =
+        (SimpleBiCondition) ConditionUtil.createCondition(condition);
+    Map<String, EvaluationResult> contextVariables = new HashMap<>();
+    contextVariables.put("var1", new SimpleEvaluationResult(19));
+    assertThat(simplecondition.test(contextVariables)).isFalse();
+  }
+
+  // LESS_THAN_INTEGER test one true and one false
+
+  @Test
+  public void simple_LESS_THAN_INTEGER_condition_is_evaluated_true() {
+    String condition = "$var1 LESS_THAN_INTEGER 6";
+    SimpleBiCondition simplecondition =
+        (SimpleBiCondition) ConditionUtil.createCondition(condition);
+    Map<String, EvaluationResult> contextVariables = new HashMap<>();
+    contextVariables.put("var1", new SimpleEvaluationResult(3));
+    assertThat(simplecondition.test(contextVariables)).isTrue();
+  }
+
+  @Test
+  public void simple_LESS_THAN_INTEGER_condition_is_evaluated_false() {
+    String condition = "$var1 LESS_THAN_INTEGER 100";
+    SimpleBiCondition simplecondition =
+        (SimpleBiCondition) ConditionUtil.createCondition(condition);
+    Map<String, EvaluationResult> contextVariables = new HashMap<>();
+    contextVariables.put("var1", new SimpleEvaluationResult(101));
+    assertThat(simplecondition.test(contextVariables)).isFalse();
+  }
+
+  // EQUALS two var integers test one true and one false
+
+  @Test
+  public void simple_EQUALS_condition_with_two_integers_vars_is_evaluated_true() {
+    String condition = "$var1 EQUALS $var2";
+    SimpleBiCondition simplecondition =
+        (SimpleBiCondition) ConditionUtil.createCondition(condition);
+    Map<String, EvaluationResult> contextVariables = new HashMap<>();
+    contextVariables.put("var1", new SimpleEvaluationResult(6));
+    contextVariables.put("var2", new SimpleEvaluationResult(6));
+    assertThat(simplecondition.test(contextVariables)).isTrue();
+  }
+
+  @Test
+  public void simple_EQUALS_condition_with_two_vars_is_evaluated_false() {
+    String condition = "$var1 EQUALS $var2";
+    SimpleBiCondition simplecondition =
+        (SimpleBiCondition) ConditionUtil.createCondition(condition);
+    Map<String, EvaluationResult> contextVariables = new HashMap<>();
+    contextVariables.put("var1", new SimpleEvaluationResult(9));
+    contextVariables.put("var2", new SimpleEvaluationResult(3));
+    assertThat(simplecondition.test(contextVariables)).isFalse();
+  }
+
+  // EQUALS integers test one true and one false
+
+  @Test
+  public void simple_EQUALS_condition_of_integer_is_evaluated_true() {
+    String condition = "$var1 EQUALS 6";
+    SimpleBiCondition simplecondition =
+        (SimpleBiCondition) ConditionUtil.createCondition(condition);
+    Map<String, EvaluationResult> contextVariables = new HashMap<>();
+    contextVariables.put("var1", new SimpleEvaluationResult(6));
+    assertThat(simplecondition.test(contextVariables)).isTrue();
+  }
+
+  @Test
+  public void simple_EQUALS_condition_of_integer_is_evaluated_false() {
+    String condition = "$var1 EQUALS 12";
+    SimpleBiCondition simplecondition =
+        (SimpleBiCondition) ConditionUtil.createCondition(condition);
+    Map<String, EvaluationResult> contextVariables = new HashMap<>();
+    contextVariables.put("var1", new SimpleEvaluationResult(19));
+    assertThat(simplecondition.test(contextVariables)).isFalse();
+  }
+
+  // EQUALS_INTEGER test one true and one false
+
+  @Test
+  public void simple_EQUALS_INTEGER_condition_is_evaluated_true() {
+    String condition = "$var1 EQUALS_INTEGER 6";
+    SimpleBiCondition simplecondition =
+        (SimpleBiCondition) ConditionUtil.createCondition(condition);
+    Map<String, EvaluationResult> contextVariables = new HashMap<>();
+    contextVariables.put("var1", new SimpleEvaluationResult(6));
+    assertThat(simplecondition.test(contextVariables)).isTrue();
+  }
+
+  @Test
+  public void simple_EQUALS_INTEGER_condition_is_evaluated_false() {
+    String condition = "$var1 EQUALS_INTEGER 100";
+    SimpleBiCondition simplecondition =
+        (SimpleBiCondition) ConditionUtil.createCondition(condition);
+    Map<String, EvaluationResult> contextVariables = new HashMap<>();
+    contextVariables.put("var1", new SimpleEvaluationResult(101));
+    assertThat(simplecondition.test(contextVariables)).isFalse();
+  }
+
 }
