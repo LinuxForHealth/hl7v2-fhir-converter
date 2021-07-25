@@ -1,0 +1,47 @@
+#
+# (C) Copyright IBM Corp. 2021
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+url:
+   type: SYSTEM_URL
+   value: 'race'
+extension:
+  
+   generateList: true
+   specs: PID.10
+
+   expressionType: nested
+   vars:
+     raceCoding: RACE_CATEGORIES_CC, CWE
+   expressions:
+      - valueOf: extension/Extension
+        expressionType: resource
+        condition: $raceCoding NOT_NULL
+        required: true
+        vars:
+           value: $raceCoding:display
+        constants:
+           KEY_NAME_SUFFIX: String
+           urlString: text
+          
+           
+      - valueOf: extension/Extension
+        expressionType: resource
+        condition: $raceCoding NOT_NULL
+        vars:
+           value: $raceCoding
+        constants:
+           KEY_NAME_SUFFIX: Coding
+           urlString: ombCategory
+          
+   
+   
+
+
+
+
+
+
+
+
