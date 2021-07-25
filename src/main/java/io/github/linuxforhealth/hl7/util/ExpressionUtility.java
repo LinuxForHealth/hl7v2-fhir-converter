@@ -145,7 +145,7 @@ public class ExpressionUtility {
     } else if (resource != null && resource.getValue() instanceof Map) {
       Map<String, Object> resourceMap = (Map<String, Object>) resource.getValue();
       return EvaluationResultFactory.getEvaluationResult(resourceMap.get(fetch.getValue()));
-    } else if (resource != null) {
+    } else if (resource != null && !resource.isEmpty()) {
       Map<String, Object> resourceMap =
           ObjectMapperUtil.getJSONInstance().convertValue(resource.getValue(), Map.class);
       return EvaluationResultFactory.getEvaluationResult(resourceMap.get(fetch.getValue()));

@@ -166,42 +166,10 @@ extension:
             condition: $coding NOT_NULL
             vars:
                coding: RELIGIOUS_AFFILIATION_CC, PID.17
-   -  expressionType: nested
-      expressionsMap:
-        url:
-          type: SYSTEM_URL
-          value: 'race'
-        extension:
-          generateList: true
-          # If I put specs here, it duplicates all expressions
-          # specs: PID.10
-          expressionType: nested
-          expressions:
-          #  I just need one of these for the set     
-          - valueOf: extension/Extension
-            expressionType: resource
-            constants:
-               KEY_NAME_SUFFIX: String
-               urlString: 'text'
-               value: 'Mixed'
-          # I need this one to repeat for each CWE     
-          - expressionType: nested
-            specs: PID.10
-            #   Without generate list, I only get one entry
-            #   If I put generate list here, I get the Null Pointer exception. 
-            #   generateList: true  
-            expressionsMap:
-               url: 
-                    type: STRING
-                    value: 'ombCategory'
-               valueCoding:
-                    valueOf: $coding
-                    condition: $coding NOT_NULL
-                    vars:
-                         coding: RACE_CATEGORIES_CC, PID.10  
-            
-
-
+   -  expressionType: resource
+      valueOf: extension/ExtensionRace
+      
+      
 communication:
   condition: $language NOT_NULL
   valueOf: secondary/Communication
