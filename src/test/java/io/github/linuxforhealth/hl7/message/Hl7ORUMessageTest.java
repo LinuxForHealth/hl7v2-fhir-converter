@@ -26,8 +26,8 @@ import org.hl7.fhir.r4.model.DiagnosticReport;
 import org.hl7.fhir.r4.model.Reference;
 import org.hl7.fhir.r4.model.Resource;
 import org.hl7.fhir.r4.model.ResourceType;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import io.github.linuxforhealth.fhir.FHIRContext;
 import io.github.linuxforhealth.hl7.ConverterOptions;
@@ -185,7 +185,7 @@ public class Hl7ORUMessageTest {
         IBaseResource bundleResource = context.getParser().parseResource(json);
         Bundle b = (Bundle) bundleResource;
 
-        Assert.assertTrue("Bundle type not expected", b.getType() == BundleType.COLLECTION);
+        Assertions.assertTrue(b.getType() == BundleType.COLLECTION, "Bundle type not expected");
         b.getId();
         b.getMeta().getLastUpdated();
 
@@ -223,19 +223,18 @@ public class Hl7ORUMessageTest {
         DiagnosticReport report = (DiagnosticReport) reportResource.get(0);
 
         List<Attachment> attachments = report.getPresentedForm();
-        Assert.assertTrue("Unexpected number of attachments", attachments.size() == 1);
+        Assertions.assertTrue(attachments.size() == 1, "Unexpected number of attachments");
 
         //Verify attachment to diagnostic report
         Attachment a = attachments.get(0);
-        Assert.assertTrue("Incorrect content type", a.getContentType().equalsIgnoreCase("text"));
-        Assert.assertTrue("Incorrect language", a.getLanguage().equalsIgnoreCase("en"));
+        Assertions.assertTrue(a.getContentType().equalsIgnoreCase("text"), "Incorrect content type");
+        Assertions.assertTrue(a.getLanguage().equalsIgnoreCase("en"), "Incorrect language");
 
         //Verify data attachment after decoding
         String decoded = new String(Base64.getDecoder().decode(a.getDataElement().getValueAsString()));
-        Assert.assertTrue("Incorrect data",
-                decoded.equals("\n[PII] Emergency Department\nED Encounter Arrival Date: [ADDRESS] [PERSONALNAME]:\n"));
+        Assertions.assertTrue(decoded.equals("\n[PII] Emergency Department\nED Encounter Arrival Date: [ADDRESS] [PERSONALNAME]:\n"), "Incorrect data");
 
-        Assert.assertTrue("Incorrect title", a.getTitle().equalsIgnoreCase("ECHO CARDIOGRAM COMPLETE"));
+        Assertions.assertTrue(a.getTitle().equalsIgnoreCase("ECHO CARDIOGRAM COMPLETE"), "Incorrect title");
 
         //Verify creation data is persisted correctly - 2020-08-02T12:44:55+08:00
         Calendar c = Calendar.getInstance();
@@ -244,7 +243,7 @@ public class Hl7ORUMessageTest {
         c.setTimeZone(TimeZone.getTimeZone(ZoneId.of("+08:00")));
 
         Date d = c.getTime();
-        Assert.assertTrue("Incorrect creation date", a.getCreation().equals(d));
+        Assertions.assertTrue(a.getCreation().equals(d), "Incorrect creation date");
 
     }
 
@@ -264,7 +263,7 @@ public class Hl7ORUMessageTest {
         IBaseResource bundleResource = context.getParser().parseResource(json);
         Bundle b = (Bundle) bundleResource;
 
-        Assert.assertTrue("Bundle type not expected", b.getType() == BundleType.COLLECTION);
+        Assertions.assertTrue(b.getType() == BundleType.COLLECTION, "Bundle type not expected");
         b.getId();
         b.getMeta().getLastUpdated();
 
@@ -303,7 +302,7 @@ public class Hl7ORUMessageTest {
 
         //No attachment created since OBX with TX and no id is not first
         List<Attachment> attachments = report.getPresentedForm();
-        Assert.assertTrue("Unexpected number of attachments", attachments.size() == 0);
+        Assertions.assertTrue(attachments.size() == 0, "Unexpected number of attachments");
     }
 
     private static DiagnosticReport getResource(Resource resource) {

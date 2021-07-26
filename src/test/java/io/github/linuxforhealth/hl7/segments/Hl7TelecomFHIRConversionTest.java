@@ -10,17 +10,11 @@ import java.util.List;
 
 import org.hl7.fhir.r4.model.Patient;
 import org.hl7.fhir.r4.model.ContactPoint;
+import org.junit.jupiter.api.Test;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.Ignore;
-import org.junit.rules.ExpectedException;
 import io.github.linuxforhealth.hl7.segments.util.PatientUtils;
 
 public class Hl7TelecomFHIRConversionTest {
-
-  @Rule
-  public ExpectedException exceptionRule = ExpectedException.none();
 
   @Test
   public void patient_telcom_test() {

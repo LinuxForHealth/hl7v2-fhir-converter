@@ -16,20 +16,13 @@ import org.hl7.fhir.r4.model.Period;
 import java.util.Calendar;
 import java.util.Date;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.Test;
 
 import io.github.linuxforhealth.hl7.segments.util.PatientUtils;
 
 public class Hl7AddressFHIRConversionTest {
 
-  @Rule
-  public ExpectedException exceptionRule = ExpectedException.none();
-
-
   @Test
-
   public void patient_address_extended_test() {
 
     String patientAddress =
