@@ -10,6 +10,21 @@ id:
   valueOf: 'UUID.randomUUID()'
   expressionType: JEXL
 
+identifier_1:
+  valueOf: datatype/Identifier
+  generateList: true
+  expressionType: resource
+  specs: PV1.19 | PID.18 | MSH.10
+
+identifier_2:
+  valueOf: datatype/Identifier
+  generateList: true
+  expressionType: resource
+  vars:
+    system: SYSTEM_URL, $sys
+    value: DG1.1, GeneralUtils.concatenateWithHyphen(value)
+  constants:
+    sys: "urn:id:extID"
 
 category_x1:
    valueOf: datatype/CodeableConcept_var

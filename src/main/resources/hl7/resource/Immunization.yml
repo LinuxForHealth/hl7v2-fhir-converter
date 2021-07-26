@@ -12,7 +12,11 @@ identifier:
    valueOf: datatype/Identifier
    generateList: true
    expressionType: resource
-   specs: ORC.3
+   vars:
+      system: SYSTEM_URL, $sys
+      value: RXA.5, GeneralUtils.concatenateWithHyphen(value)
+   constants:
+      sys: "urn:id:extID"
 status:
    type: IMMUNIZATION_STATUS_CODES
    valueOf: RXA.20

@@ -10,6 +10,16 @@ id:
   valueOf: 'UUID.randomUUID()'
   expressionType: JEXL
 
+identifier:
+  valueOf: datatype/Identifier
+  generateList: true
+  expressionType: resource
+  vars:
+    system: SYSTEM_URL, $sys
+    value: AL1.3, GeneralUtils.concatenateWithHyphen(value)
+  constants:
+    sys: "urn:id:extID"
+
 clinicalStatus:
    valueOf: datatype/CodeableConcept_var
    generateList: true
