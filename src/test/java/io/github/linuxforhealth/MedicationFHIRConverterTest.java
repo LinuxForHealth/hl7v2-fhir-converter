@@ -16,10 +16,8 @@ import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
 import org.hl7.fhir.r4.model.Bundle.BundleType;
 import org.hl7.fhir.r4.model.Resource;
 import org.hl7.fhir.r4.model.ResourceType;
-import org.junit.Ignore;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -30,9 +28,6 @@ public class MedicationFHIRConverterTest {
 
   private static final ConverterOptions OPTIONS =
       new Builder().withValidateResource().withPrettyPrint().build();
-
-  @Rule
-  public ExpectedException exceptionRule = ExpectedException.none();
 
   @Test
   public void test_OMP_O09_message() {
@@ -115,7 +110,7 @@ public class MedicationFHIRConverterTest {
     verifyResult(json, Constants.DEFAULT_BUNDLE_TYPE, expectedMedicationResourceCount);
   }
 
-  @Ignore("Need to find test RDE_O25 message")
+  @Disabled("Need to find test RDE_O25 message")
   @Test
   public void test_RDE_O25_message() {
       String rde_msg = "TODO";

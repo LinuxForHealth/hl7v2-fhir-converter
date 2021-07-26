@@ -6,7 +6,7 @@
 package io.github.linuxforhealth.hl7.data;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import com.google.common.collect.Lists;
 import ca.uhn.hl7v2.model.DataTypeException;
 import ca.uhn.hl7v2.model.Varies;

@@ -9,17 +9,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.HashMap;
 import java.util.Map;
 import org.apache.commons.lang3.math.NumberUtils;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+
 import io.github.linuxforhealth.core.data.JexlEngineUtil;
 
 
 public class JexlEngineUtilTest {
-
-
-  @Rule
-  public ExpectedException exception = ExpectedException.none();
 
   @Test
   public void test() {
@@ -37,8 +33,9 @@ public class JexlEngineUtilTest {
   @Test
   public void blank_expression_throws_exception() {
     JexlEngineUtil wex = new JexlEngineUtil();
-    exception.expect(IllegalArgumentException.class);
-    wex.evaluate("", new HashMap<>());
+    Assertions.assertThrows(IllegalArgumentException.class, () -> {
+        wex.evaluate("", new HashMap<>());
+    });
   }
 
 
@@ -46,8 +43,9 @@ public class JexlEngineUtilTest {
   @Test
   public void non_supported_expression_throws_exception() {
     JexlEngineUtil wex = new JexlEngineUtil();
-    exception.expect(IllegalArgumentException.class);
-    wex.evaluate("System.currentTimeMillis()", new HashMap<>());
+    Assertions.assertThrows(IllegalArgumentException.class, () -> {
+        wex.evaluate("System.currentTimeMillis()", new HashMap<>());
+    });
   }
 
 
@@ -55,15 +53,17 @@ public class JexlEngineUtilTest {
   @Test
   public void non_supported_expression_combining_lines_throws_exception() {
     JexlEngineUtil wex = new JexlEngineUtil();
-    exception.expect(IllegalArgumentException.class);
-    wex.evaluate("String.toString();System.exit(1); ", new HashMap<>());
+    Assertions.assertThrows(IllegalArgumentException.class, () -> {
+    	wex.evaluate("String.toString();System.exit(1); ", new HashMap<>());
+    });
   }
 
   @Test
   public void non_supported_expression_throws_exception_2() {
     JexlEngineUtil wex = new JexlEngineUtil();
-    exception.expect(IllegalArgumentException.class);
-    wex.evaluate("String", new HashMap<>());
+    Assertions.assertThrows(IllegalArgumentException.class, () -> {
+    	wex.evaluate("String", new HashMap<>());
+    });
   }
 
 

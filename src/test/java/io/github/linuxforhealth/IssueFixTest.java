@@ -18,9 +18,8 @@ import org.hl7.fhir.r4.model.Patient;
 import org.hl7.fhir.r4.model.Resource;
 import org.hl7.fhir.r4.model.ResourceType;
 import org.hl7.fhir.r4.model.StringType;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.Test;
+
 import io.github.linuxforhealth.fhir.FHIRContext;
 import io.github.linuxforhealth.hl7.ConverterOptions;
 import io.github.linuxforhealth.hl7.ConverterOptions.Builder;
@@ -30,10 +29,6 @@ public class IssueFixTest {
   private static FHIRContext context = new FHIRContext();
   private static final ConverterOptions OPTIONS =
       new Builder().withValidateResource().withPrettyPrint().build();
-
-  @Rule
-  public ExpectedException exceptionRule = ExpectedException.none();
-
 
   @Test
   public void oru_issue_81() {

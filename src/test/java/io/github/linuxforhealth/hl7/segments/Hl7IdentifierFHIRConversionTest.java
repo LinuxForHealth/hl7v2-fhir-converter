@@ -12,17 +12,13 @@ import org.hl7.fhir.r4.model.Patient;
 import org.hl7.fhir.r4.model.Identifier;
 import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Coding;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.Test;
+
 import io.github.linuxforhealth.hl7.segments.util.PatientUtils;
 
 public class Hl7IdentifierFHIRConversionTest {
 
-  @Rule
-  public ExpectedException exceptionRule = ExpectedException.none();
-
-  @Test
+   @Test
   public void patient_identifiers_test() {
 
     String patientIdentifiers =

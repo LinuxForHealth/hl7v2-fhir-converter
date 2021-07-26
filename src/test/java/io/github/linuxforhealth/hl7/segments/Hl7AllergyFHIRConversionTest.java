@@ -6,8 +6,7 @@
 package io.github.linuxforhealth.hl7.segments;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import org.junit.jupiter.api.Assertions;
 
 import java.util.Date;
 import java.util.List;
@@ -15,16 +14,11 @@ import java.util.List;
 import org.hl7.fhir.r4.model.AllergyIntolerance;
 import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.DateTimeType;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.Test;
 
 import io.github.linuxforhealth.hl7.segments.util.AllergyUtils;
 
 public class Hl7AllergyFHIRConversionTest {
-
-    @Rule
-    public ExpectedException exceptionRule = ExpectedException.none();
 
     @Test
     public void test_allergy_single() {
@@ -52,10 +46,10 @@ public class Hl7AllergyFHIRConversionTest {
         assertThat(allergy.getCategory().get(0).getCode()).isEqualTo("medication");
         assertThat(allergy.getCode().getText()).isEqualTo("OXYCODONE");
         List<Coding> codings = allergy.getCode().getCoding();
-        assertEquals(codings.size(), 1);
+        Assertions.assertEquals(codings.size(), 1);
         Coding coding = codings.get(0);
-        assertEquals(coding.getCode(), "00000741");
-        assertNull(coding.getDisplay());
+        Assertions.assertEquals(coding.getCode(), "00000741");
+        Assertions.assertNull(coding.getDisplay());
         assertThat(allergy.getReaction().get(0).getManifestation()).extracting(m -> m.getText())
                 .containsExactly("HYPOTENSION");
     }
@@ -74,7 +68,7 @@ public class Hl7AllergyFHIRConversionTest {
         assertThat(allergy.getReaction().get(0).getManifestation()).extracting(m -> m.getText())
                 .containsExactly("HYPOTENSION");
         Date onsetReaction = allergy.getReaction().get(0).getOnset();
-        assertNull(onsetReaction);
+        Assertions.assertNull(onsetReaction);
         DateTimeType onsetAllergy = allergy.getOnsetDateTimeType();
         assertThat(onsetAllergy.getValueAsString().equals("20210101"));
     }
