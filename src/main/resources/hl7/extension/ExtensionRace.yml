@@ -6,7 +6,20 @@
 url:
    type: SYSTEM_URL
    value: 'race'
-extension:
+
+          
+extension_1:   
+   generateList: true
+   condition: $value NOT_NULL
+   valueOf: extension/Extension
+   expressionType: resource
+   vars:
+      value: RACE_TEXT_CC, PID.10*
+   constants:
+      KEY_NAME_SUFFIX: String
+      urlString: 'text'
+
+extension_2:
   
    generateList: true
    specs: PID.10
@@ -15,17 +28,7 @@ extension:
    vars:
      raceCoding: RACE_CATEGORIES_CC, CWE
    expressions:
-      - valueOf: extension/Extension
-        expressionType: resource
-        condition: $raceCoding NOT_NULL
-        required: true
-        vars:
-           value: $raceCoding:display
-        constants:
-           KEY_NAME_SUFFIX: String
-           urlString: text
-          
-           
+                    
       - valueOf: extension/Extension
         expressionType: resource
         condition: $raceCoding NOT_NULL
@@ -34,8 +37,7 @@ extension:
         constants:
            KEY_NAME_SUFFIX: Coding
            urlString: ombCategory
-          
-   
+
    
 
 

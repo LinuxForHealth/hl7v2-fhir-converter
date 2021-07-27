@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2020
+ * (C) Copyright IBM Corp. 2020, 2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -51,6 +51,7 @@ public enum SimpleDataTypeMapper {
   NAME_USE(SimpleDataValueResolver.NAME_USE_CODE_FHIR),
   RELIGIOUS_AFFILIATION_CC(SimpleDataValueResolver.RELIGIOUS_AFFILIATION_FHIR_CC),
   RACE_CATEGORIES_CC(SimpleDataValueResolver.RACE_CATEGORIES_FHIR_CC),
+  RACE_TEXT_CC(SimpleDataValueResolver.RACE_TEXT_FHIR_CC),
   MARITAL_STATUS(SimpleDataValueResolver.MARITAL_STATUS);
 
 

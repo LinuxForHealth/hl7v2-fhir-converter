@@ -8,16 +8,17 @@ package io.github.linuxforhealth.hl7.data;
 import static org.assertj.core.api.Assertions.assertThat;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.UUID;
 import org.hl7.fhir.r4.model.Observation.ObservationStatus;
 import org.hl7.fhir.r4.model.Specimen.SpecimenStatus;
 import org.hl7.fhir.r4.model.codesystems.V3MaritalStatus;
 import org.junit.jupiter.api.Test;
 import org.hl7.fhir.r4.model.codesystems.V3ReligiousAffiliation;
-import org.hl7.fhir.r4.model.codesystems.V3Race;
 import ca.uhn.hl7v2.model.DataTypeException;
 import ca.uhn.hl7v2.model.v26.datatype.TX;
 import ca.uhn.hl7v2.model.v26.message.ORU_R01;
+import ca.uhn.hl7v2.model.v26.datatype.CWE;
 import io.github.linuxforhealth.core.terminology.SimpleCode;
 import io.github.linuxforhealth.hl7.data.date.DateUtil;
 
@@ -132,9 +133,6 @@ public class SimpleDataValueResolverTest {
         .isEqualTo(ObservationStatus.CANCELLED.toCode());
   }
 
-
-
-
   @Test
   public void get_religious_affiliation_value_valid() {
     String gen = "LUT";
@@ -149,12 +147,38 @@ public class SimpleDataValueResolverTest {
   }
 
   @Test
-  public void get_race_value_valid() {
-    String gen = "2028-9";
-    SimpleCode code = SimpleDataValueResolver.RACE_CATEGORIES_FHIR_CC.apply(gen);
-    assertThat(code.getDisplay()).isEqualTo(V3Race._20289.getDisplay());
-    assertThat(code.getCode()).isEqualTo(V3Race._20289.toCode());
-    assertThat(code.getSystem()).isEqualTo(V3Race._20289.getSystem());
+  public void get_race_value_valid() throws DataTypeException {
+    ORU_R01 message = new ORU_R01();
+    CWE cwe = new CWE(message);
+    cwe.getIdentifier().setValue("2028-9");
+    cwe.getText().setValue("Asian");
+    cwe.getNameOfCodingSystem().setValue("HL70005");
+    SimpleCode coding = SimpleDataValueResolver.RACE_CATEGORIES_FHIR_CC.apply(cwe);
+    assertThat(coding.getDisplay()).isEqualTo("Asian");
+    assertThat(coding.getCode()).isEqualTo("2028-9");
+    assertThat(coding.getSystem()).isEqualTo("urn:oid:2.16.840.1.113883.6.238");
+  }
+
+  @Test
+  public void get_race_text_valid() throws DataTypeException {
+    ORU_R01 message = new ORU_R01();
+    CWE cwe = new CWE(message);
+    cwe.getIdentifier().setValue("2028-9");
+    cwe.getText().setValue("Asian");
+    cwe.getNameOfCodingSystem().setValue("HL70005");
+    ArrayList<CWE> cweList = new ArrayList<CWE>();
+    cweList.add(cwe);
+    // Test single element in list
+    String text = SimpleDataValueResolver.RACE_TEXT_FHIR_CC.apply(cweList);
+    assertThat(text).hasToString("Asian");
+
+    cwe.getIdentifier().setValue("2106-3");
+    cwe.getText().setValue("White");
+    cwe.getNameOfCodingSystem().setValue("HL70005");
+    cweList.add(cwe);
+    // Test multiple elements in list
+    text = SimpleDataValueResolver.RACE_TEXT_FHIR_CC.apply(cweList);
+    assertThat(text).hasToString("Mixed");
   }
 
   @Test

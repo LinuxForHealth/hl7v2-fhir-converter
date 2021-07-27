@@ -16,6 +16,8 @@ import java.util.UUID;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+
+import ca.uhn.hl7v2.model.v26.datatype.CWE;
 import org.hl7.fhir.r4.model.AllergyIntolerance.AllergyIntoleranceCategory;
 import org.hl7.fhir.r4.model.AllergyIntolerance.AllergyIntoleranceCriticality;
 import org.hl7.fhir.r4.model.DiagnosticReport.DiagnosticReportStatus;
@@ -131,7 +133,6 @@ public class SimpleDataValueResolver {
         }
     };
 
-
     public static final ValueExtractor<Object, SimpleCode> RELIGIOUS_AFFILIATION_FHIR_CC =
         (Object value) -> {
         String val = Hl7DataHandlerUtil.getStringValue(value);
@@ -145,17 +146,47 @@ public class SimpleDataValueResolver {
         }
     };
 
-
+    // Converts a Race CWE.  Uses system urn:oid:2.16.840.1.113883.6.238, not V3Race
+    // Takes the code and display values from CWE.1 and CWE.2 respectively
     public static final ValueExtractor<Object, SimpleCode> RACE_CATEGORIES_FHIR_CC =
         (Object value) -> {
-        String val = Hl7DataHandlerUtil.getStringValue(value);
-        String code = getFHIRCode(val, V3Race.class);
-        if (code != null) {
-            V3Race status = V3Race.fromCode(code);
-            return new SimpleCode(code, status.getSystem(), status.getDisplay());
+
+        CWE cwe = (CWE) value;    
+        String cwe1code  = Hl7DataHandlerUtil.getStringValue(cwe.getCwe1_Identifier());
+        String cwe2display  = Hl7DataHandlerUtil.getStringValue(cwe.getCwe2_Text());
+        if (cwe1code != null || cwe2display != null) {
+            return new SimpleCode(cwe1code, "urn:oid:2.16.840.1.113883.6.238", cwe2display);
         } else {
             return null;
         }
+    };
+
+    // Determines valueString text for race
+    // For a single race, uses best meaningful text found:  CWE.2, CWE.9, or CWE.1  
+    // For multiple races, uses "Mixed"
+    // Depends on .yml using PID.10*, so Object is a list of CWE's
+    public static final ValueExtractor<Object, String> RACE_TEXT_FHIR_CC =
+        (Object value) -> {
+         String retVal = null;
+ 
+        ArrayList<CWE> list = (ArrayList<CWE>)value;
+
+        if (list.size() == 1) {
+            CWE cwe = list.get(0);
+            String cwe2  = Hl7DataHandlerUtil.getStringValue(cwe.getCwe2_Text());
+            String cwe9  = Hl7DataHandlerUtil.getStringValue(cwe.getCwe9_OriginalText());
+            if (cwe2 != null && !cwe2.isEmpty()) {
+                retVal = cwe2;
+            } else if (cwe9 != null && !cwe9.isEmpty()) {
+                retVal = cwe9;
+            } else {
+                retVal = Hl7DataHandlerUtil.getStringValue(cwe.getCwe1_Identifier());
+            }
+
+        } else if (list.size() > 1) {
+            retVal = "Mixed";
+        }
+        return retVal;
     };
 
 
