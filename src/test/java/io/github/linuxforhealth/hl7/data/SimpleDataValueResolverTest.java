@@ -182,6 +182,19 @@ public class SimpleDataValueResolverTest {
   }
 
   @Test
+  public void get_race_text_text_only() throws DataTypeException {
+    ORU_R01 message = new ORU_R01();
+    CWE cwe = new CWE(message);
+    cwe.getIdentifier().setValue("OTH");
+    ArrayList<CWE> cweList = new ArrayList<CWE>();
+    cweList.add(cwe);
+    // Test single element of text only in list
+    String text = SimpleDataValueResolver.RACE_TEXT_FHIR_CC.apply(cweList);
+    assertThat(text).hasToString("OTH");
+  }
+
+
+  @Test
   public void get_religious_affiliation_value_nonvalid() {
     String gen = "ZZZ";
     SimpleCode code =

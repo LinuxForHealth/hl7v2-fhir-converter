@@ -121,6 +121,26 @@ public class FHIRExtensionsTest {
 
   }
 
+  @Test
+  public void test_that_race_extension_is_added_for_text_only_single_rep() {
+
+    String patientWithTextOnlyExtension = "MSH|^~\\&|MIICEHRApplication|MIIC|MIIC|MIIC|201705130822||VXU^V04^VXU_V04|test1100|P|2.5.1|||AL|AL|||||Z22^CDCPHINVS|^^^^^MIIC^SR^^^MIIC|MIIC\n"
+        // Test single race without coding - should result in a text only extension
+        + "PID|1||12345678^^^^MR|ALTID|Mouse^Mickey^J^III^^^|MotherMaiden^Mickette|20060504080400|M|Alias^Alias|OTH|12345 testing ave^^Minneapolis^MN^55407^^^^MN053|USAA|^PRN^^^PH^555^5555555|^PRN^^^PH^555^666666|english|married|LUT^Christian: Lutheran^|1234567_account|111-22-3333|DL00003333||2186-5^not Hispanic or Latino^CDCREC|Orlando Disney Hospital|Y|2|USA||||\n";
+
+    Patient patient = PatientUtils.createPatientFromHl7Segment(patientWithTextOnlyExtension);
+    assertThat(patient.hasExtension()).isTrue();
+    Extension ext = patient.getExtensionByUrl(UrlLookup.getExtensionUrl("race"));
+    assertThat(ext).isNotNull();
+    List<Extension> subExts = ext.getExtensionsByUrl("ombCategory");
+    assertThat(subExts).isEmpty();
+
+    subExts = ext.getExtensionsByUrl("text");
+    assertThat(subExts).isNotEmpty().hasSize(1);
+    String text = (String) subExts.get(0).getValue().toString();
+    assertThat(text).isEqualTo("OTH");
+  }
+
   private String getDisplay(Extension e) {
     Coding c = (Coding) e.getValue();
     return c.getDisplay();

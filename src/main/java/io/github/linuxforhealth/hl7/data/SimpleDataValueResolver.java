@@ -151,10 +151,18 @@ public class SimpleDataValueResolver {
     public static final ValueExtractor<Object, SimpleCode> RACE_CATEGORIES_FHIR_CC =
         (Object value) -> {
 
-        CWE cwe = (CWE) value;    
-        String cwe1code  = Hl7DataHandlerUtil.getStringValue(cwe.getCwe1_Identifier());
-        String cwe2display  = Hl7DataHandlerUtil.getStringValue(cwe.getCwe2_Text());
-        if (cwe1code != null || cwe2display != null) {
+        // No casting needed    
+        String vals = Hl7DataHandlerUtil.getStringValue(value, true, ",", true);
+        String[] list = vals.split(",");   
+        String cwe1code  = (list.length > 0) ? list[0].trim() : null;
+        String cwe2display  = (list.length > 1) ? list[1].trim() : null;
+        String cwe3system  = (list.length > 2) ? list[2].trim() : null;
+        // Casting needed
+        // CWE cwe = (CWE) value;    
+        // String cwe1code  = Hl7DataHandlerUtil.getStringValue(cwe.getCwe1_Identifier());
+        // String cwe2display  = Hl7DataHandlerUtil.getStringValue(cwe.getCwe2_Text());
+        // String cwe3system  = Hl7DataHandlerUtil.getStringValue(cwe.getCwe3_NameOfCodingSystem());
+        if (cwe1code != null && cwe2display != null && cwe3system != null && cwe3system.equals("HL70005")) {
             return new SimpleCode(cwe1code, "urn:oid:2.16.840.1.113883.6.238", cwe2display);
         } else {
             return null;
