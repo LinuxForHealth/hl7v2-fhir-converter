@@ -151,7 +151,7 @@ public class SimpleDataValueResolverTest {
   @Test
   public void get_race_value_valid() {
     String gen = "2028-9";
-    SimpleCode code = SimpleDataValueResolver.RACE_CATEGORIES_FHIR_CC.apply(gen);
+    SimpleCode code = SimpleDataValueResolver.CODING_SYSTEM_V2.apply(gen);
     assertThat(code.getDisplay()).isEqualTo(V3Race._20289.getDisplay());
     assertThat(code.getCode()).isEqualTo(V3Race._20289.toCode());
     assertThat(code.getSystem()).isEqualTo(V3Race._20289.getSystem());

@@ -7,11 +7,9 @@ package io.github.linuxforhealth.hl7.data;
 
 import java.util.Collection;
 import java.util.List;
-
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import ca.uhn.hl7v2.model.Composite;
 import ca.uhn.hl7v2.model.DataTypeException;
 import ca.uhn.hl7v2.model.Primitive;
@@ -19,6 +17,7 @@ import ca.uhn.hl7v2.model.Type;
 import ca.uhn.hl7v2.model.Variable;
 import ca.uhn.hl7v2.model.primitive.ID;
 import ca.uhn.hl7v2.model.primitive.IS;
+import ca.uhn.hl7v2.model.v26.datatype.CWE;
 
 public class Hl7DataHandlerUtil {
 
@@ -67,14 +66,29 @@ public class Hl7DataHandlerUtil {
 
     public static String getTableNumber(Object obj) {
 
-        if (obj instanceof ID) {
-            ID id = (ID) obj;
-            return "v2-" + StringUtils.leftPad(String.valueOf(id.getTable()), 4, '0');
-        } else if (obj instanceof IS) {
-            IS id = (IS) obj;
-            return "v2-" + StringUtils.leftPad(String.valueOf(id.getTable()), 4, '0');
+      if (obj instanceof ID) {
+        ID id = (ID) obj;
+        return "v2-" + StringUtils.leftPad(String.valueOf(id.getTable()), 4, '0');
+      } else if (obj instanceof IS) {
+        IS id = (IS) obj;
+        return "v2-" + StringUtils.leftPad(String.valueOf(id.getTable()), 4, '0');
+      } else if (obj instanceof CWE) {
+        CWE id = (CWE) obj;
+        return getAssociatedtable(id);
+
         }
-        return null;
+      return null;
+    }
+
+    private static String getAssociatedtable(CWE id) {
+      ID val = id.getCwe3_NameOfCodingSystem();
+      if (val != null && StringUtils.startsWith(val.getValue(), "HL7")) {
+        return "v2-" + StringUtils
+            .leftPad(String.valueOf(StringUtils.removeStart(val.getValue(), "HL7")), 4, '0');
+      } else if (val != null) {
+        return val.getValue();
+      }
+      return null;
     }
 
     private static String toStringValue(Object local, boolean allComponents) {

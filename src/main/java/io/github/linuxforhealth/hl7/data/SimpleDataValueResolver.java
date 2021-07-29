@@ -28,7 +28,6 @@ import org.hl7.fhir.r4.model.codesystems.MessageReasonEncounter;
 import org.hl7.fhir.r4.model.codesystems.NameUse;
 import org.hl7.fhir.r4.model.codesystems.V3MaritalStatus;
 import org.hl7.fhir.r4.model.codesystems.V3ReligiousAffiliation;
-import org.hl7.fhir.r4.model.codesystems.V3Race;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import io.github.linuxforhealth.api.ResourceValue;
@@ -146,18 +145,6 @@ public class SimpleDataValueResolver {
     };
 
 
-    public static final ValueExtractor<Object, SimpleCode> RACE_CATEGORIES_FHIR_CC =
-        (Object value) -> {
-        String val = Hl7DataHandlerUtil.getStringValue(value);
-        String code = getFHIRCode(val, V3Race.class);
-        if (code != null) {
-            V3Race status = V3Race.fromCode(code);
-            return new SimpleCode(code, status.getSystem(), status.getDisplay());
-        } else {
-            return null;
-        }
-    };
-
 
     public static final ValueExtractor<Object, String> IMMUNIZATION_STATUS_CODES = (Object value) -> {
         String val = Hl7DataHandlerUtil.getStringValue(value);
@@ -250,7 +237,7 @@ public class SimpleDataValueResolver {
         return value;
     };
 
-    public static final ValueExtractor<Object, Object> CODING_SYSTEM_V2 = (Object value) -> {
+    public static final ValueExtractor<Object, SimpleCode> CODING_SYSTEM_V2 = (Object value) -> {
         String table = Hl7DataHandlerUtil.getTableNumber(value);
         String val = Hl7DataHandlerUtil.getStringValue(value);
         if (table != null && val != null) {

@@ -25,6 +25,7 @@ import io.github.linuxforhealth.hl7.resource.ResourceReader;
  * Use Constants (EXTENSION_URL_MAPPING, CODING_SYSTEM_MAPPING) for urlType.
  */
 public class UrlLookup {
+
     static Map<String, Map<String, CodingSystem>> urlMaps = new HashMap<String, Map<String, CodingSystem>>(); // key is urlType
     static Map<String, String> urlMappingPaths; // key=urlType, value=resource mapping path
     static {
@@ -81,6 +82,12 @@ public class UrlLookup {
         urlMaps.clear();
         getUrlMap(Constants.CODING_SYSTEM_MAPPING);
         getUrlMap(Constants.EXTENSION_URL_MAPPING);
+    }
+
+
+    public static void init() {
+      getUrlMap(Constants.CODING_SYSTEM_MAPPING);
+      getUrlMap(Constants.EXTENSION_URL_MAPPING);
     }
 
     public static void reset(String urlType) {

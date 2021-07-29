@@ -12,15 +12,14 @@ extension:
    specs: PID.10
 
    expressionType: nested
-   vars:
-     raceCoding: RACE_CATEGORIES_CC, CWE
    expressions:
       - valueOf: extension/Extension
         expressionType: resource
-        condition: $raceCoding NOT_NULL
+        condition: $codingSystem NULL && $value NOT_NULL
         required: true
         vars:
-           value: $raceCoding:display
+           value: STRING, CWE.2 | CWE.1
+           codingSystem: CWE.3
         constants:
            KEY_NAME_SUFFIX: String
            urlString: text
@@ -28,9 +27,10 @@ extension:
            
       - valueOf: extension/Extension
         expressionType: resource
-        condition: $raceCoding NOT_NULL
+        condition: $value NOT_NULL && $codingSystem NOT_NULL
         vars:
-           value: $raceCoding
+           value: CODING_SYSTEM_V2, CWE
+           codingSystem: CWE.3
         constants:
            KEY_NAME_SUFFIX: Coding
            urlString: ombCategory
