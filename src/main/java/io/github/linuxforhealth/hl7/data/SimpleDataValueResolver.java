@@ -252,22 +252,13 @@ public class SimpleDataValueResolver {
         }
     };
 
-    public static final ValueExtractor<Object, String> JOIN_FILLER = (Object value) -> {
-        System.out.println(value);
-        // CWE newValue = ((CWE) value);
-        return "";
-    };
     public static final ValueExtractor<Object, String> BUILD_FROM_CWE = (Object value) -> {
-       System.out.println(value);
+        System.out.println(value);
 
-
-       CWE newValue = ((CWE) value);
-
-
+        CWE newValue = ((CWE) value);
         String dot1 = newValue.getCwe1_Identifier().toString();
         String dot2 = newValue.getCwe2_Text().toString();
         String dot3 = newValue.getCwe3_NameOfCodingSystem().toString();
-
         if (dot1 != null ) {
             if (dot3 != null) {
                 String join = dot1 + "-" + dot3;
@@ -278,7 +269,6 @@ public class SimpleDataValueResolver {
             }
         }
         else return dot2;
-
     };
 
     public static final ValueExtractor<Object, String> ALLERGY_INTOLERANCE_CRITICALITY_CODE_FHIR = (Object value) -> {

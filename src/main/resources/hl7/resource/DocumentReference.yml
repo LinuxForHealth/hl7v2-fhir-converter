@@ -1,0 +1,31 @@
+#
+# (C) Copyright IBM Corp. 2020
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+resourceType: DocumentReference
+id:
+   type: STRING
+   valueOf: 'UUID.randomUUID()'
+   expressionType: JEXL
+   
+identifier_1:
+   valueOf: datatype/Identifier
+   generateList: true
+   expressionType: resource
+   specs: ORC.3.1 | OBR.3.1
+
+identifier_2:
+   valueOf: datatype/Identifier
+   generateList: true
+   expressionType: resource
+   specs: ORC.2.1 | OBR.2.1
+
+identifier_3:
+   valueOf: datatype/Identifier
+   generateList: true
+   expressionType: resource
+   specs: MSH.7
+   constants:
+      system: "urn:id:extID"
+   

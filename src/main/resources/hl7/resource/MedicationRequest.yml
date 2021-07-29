@@ -1,0 +1,35 @@
+#
+# (C) Copyright IBM Corp. 2020
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+resourceType: MedicationRequest
+id:
+  type: STRING
+  valueOf: UUID.randomUUID()
+  expressionType: JEXL
+
+identifier_1:
+  valueOf: datatype/Identifier_var
+  generateList: true
+  expressionType: resource
+  vars:
+    valueIn: PV1.19 | PID.18 | MSH.10
+  constants:
+    system: "http://terminology.hl7.org/CodeSystem/v2-0203"
+    code: "VN"
+    display: "Visitor Number"
+
+identifier_2:
+  condition: DG1.1 NOT_NULL
+  type:
+  valueOf: datatype/Identifier
+  generateList: true
+  expressionType: resource
+  vars:
+    system: SYSTEM_URL, $sys
+    value: BUILD_FROM_CWE, RXO.1
+  constants:
+    sys: "urn:id:extID"
+
+
