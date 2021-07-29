@@ -10,11 +10,16 @@ id:
   valueOf: 'UUID.randomUUID()'
   expressionType: JEXL
 
-identifier:
-    valueOf: datatype/Identifier
-    generateList: true
-    expressionType: resource
-    specs: PV1.19
+identifier_1:
+  valueOf: datatype/Identifier_var
+  generateList: true
+  expressionType: resource
+  vars:
+    valueIn: PV1.19 | PID.18 | MSH.10
+  constants:
+    system: "http://terminology.hl7.org/CodeSystem/v2-0203"
+    code: "VN"
+    display: "Visitor Number"
 
 status:
     type: STRING

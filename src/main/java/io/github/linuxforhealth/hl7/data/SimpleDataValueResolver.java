@@ -14,6 +14,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 
+import ca.uhn.hl7v2.model.v26.datatype.CWE;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -249,6 +250,35 @@ public class SimpleDataValueResolver {
         } else {
             return null;
         }
+    };
+
+    public static final ValueExtractor<Object, String> JOIN_FILLER = (Object value) -> {
+        System.out.println(value);
+        // CWE newValue = ((CWE) value);
+        return "";
+    };
+    public static final ValueExtractor<Object, String> BUILD_FROM_CWE = (Object value) -> {
+       System.out.println(value);
+
+
+       CWE newValue = ((CWE) value);
+
+
+        String dot1 = newValue.getCwe1_Identifier().toString();
+        String dot2 = newValue.getCwe2_Text().toString();
+        String dot3 = newValue.getCwe3_NameOfCodingSystem().toString();
+
+        if (dot1 != null ) {
+            if (dot3 != null) {
+                String join = dot1 + "-" + dot3;
+                return join;
+            }
+            else {
+                return dot1;
+            }
+        }
+        else return dot2;
+
     };
 
     public static final ValueExtractor<Object, String> ALLERGY_INTOLERANCE_CRITICALITY_CODE_FHIR = (Object value) -> {

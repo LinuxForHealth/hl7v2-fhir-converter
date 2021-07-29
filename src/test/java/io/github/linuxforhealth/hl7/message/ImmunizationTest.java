@@ -74,7 +74,7 @@ public class ImmunizationTest {
     assertThat(resource).isNotNull();
 
     assertThat(resource.getStatus().getDisplay()).isEqualTo("completed");
-    assertThat(resource.getIdentifier().get(0).getValue()).isEqualTo("197027");
+    assertThat(resource.getIdentifier().get(0).getValue()).isEqualTo("48-CVX");
     assertThat(resource.getVaccineCode().getCoding().get(0).getSystem())
         .isEqualTo("http://hl7.org/fhir/sid/cvx");
     assertThat(resource.getVaccineCode().getCoding().get(0).getCode()).isEqualTo("48");

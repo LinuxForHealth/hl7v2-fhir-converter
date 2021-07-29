@@ -14,7 +14,7 @@ identifier:
    expressionType: resource
    vars:
       system: SYSTEM_URL, $sys
-      value: RXA.5, GeneralUtils.concatenateWithHyphen(value)
+      value: BUILD_FROM_CWE, RXA.5
    constants:
       sys: "urn:id:extID"
 status:

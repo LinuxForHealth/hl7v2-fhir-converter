@@ -20,6 +20,29 @@ identifier:
       id: OBX.3.1 + $joinChar +OBR.3.1
     constants:
       joinChar: '_'
+#identifier_1:
+#  type: JOIN_FILLER
+#  valueOf: datatype/Identifier
+#  generateList: true
+#  expressionType: resource
+#  vars:
+#    system: SYSTEM_URL, $sys
+#    obx3: BUILD_FROM_CWE, OBX.3
+#    fillpla: STRING, OBR.2 | ORC.3 | OBR.3 | ORC.2 | MSH.7
+#  constants:
+#      sys: "urn:id:extID"
+#      joinChar: '_'
+#identifier_2:
+#  condition: OBX.3 NOT_NULL
+#  type:
+#  valueOf: datatype/Identifier
+#  generateList: true
+#  expressionType: resource
+#  vars:
+#    system: SYSTEM_URL, $sys
+#    value: BUILD_FROM_CWE, OBX.3
+#  constants:
+#    sys: "urn:id:extID"
 
 status:
    type: OBSERVATION_STATUS

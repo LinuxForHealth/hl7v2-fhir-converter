@@ -153,18 +153,6 @@ public class Hl7RelatedGeneralUtils {
         return Hl7DataHandlerUtil.getStringValue(input, true, delimiter, false);
     }
 
-    public static String concatenateWithHyphen(Object input) {
-    String values = Hl7DataHandlerUtil.getStringValue(input, true, "^", false);
-    String[] value =  values.split(", ");
-
-    if (value.length == 3){
-        String join = value[0] + "-" + value[2];
-        System.out.println(join);
-        return join;
-    }
-    else return value[0];
-    }
-
     public static List<String> makeStringArray(String... strs) {
         List<String> result = new ArrayList<String>();
 

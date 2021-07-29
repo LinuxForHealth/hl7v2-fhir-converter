@@ -45,7 +45,7 @@ public class Hl7AllergyFHIRConversionTest {
     public void test_allergy_no_severity_no_coding_system() {
         String hl7message = "MSH|^~\\&|SE050|050|PACS|050|20120912011230||ADT^A01|102|T|2.6|||AL|NE\r"
                 + "PID|0010||PID1234^5^M11^A^MR^HOSP~1234568965^^^USA^SS||DOE^JOHN^A^||19800202|F||W|111 TEST_STREET_NAME^^TEST_CITY^NY^111-1111^USA||(905)111-1111|||S|ZZ|12^^^124|34-13-312||||TEST_BIRTH_PLACE\r"
-                + "AL1|1|DA|00000741^OXYCODONE^00000741||HYPOTENSION\r";
+                + "AL1|1|DA|00000741^OXYCODONE||HYPOTENSION\r";
 
         AllergyIntolerance allergy = AllergyUtils.createAllergyFromHl7Segment(hl7message);
         assertThat(allergy.hasCriticality()).isFalse();

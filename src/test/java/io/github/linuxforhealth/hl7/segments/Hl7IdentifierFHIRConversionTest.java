@@ -8,10 +8,8 @@ package io.github.linuxforhealth.hl7.segments;
 import static org.assertj.core.api.Assertions.assertThat;
 import java.util.List;
 
-import org.hl7.fhir.r4.model.Patient;
-import org.hl7.fhir.r4.model.Identifier;
-import org.hl7.fhir.r4.model.CodeableConcept;
-import org.hl7.fhir.r4.model.Coding;
+import io.github.linuxforhealth.hl7.segments.util.AllergyUtils;
+import org.hl7.fhir.r4.model.*;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -147,5 +145,49 @@ public class Hl7IdentifierFHIRConversionTest {
     assertThat(coding.getDisplay()).hasToString("Social Security number");
 
   }
-  
+
+  @Test
+  public void allergy_identifier_test() {
+
+    String joinedByHyphen = "MSH|^~\\&|SE050|050|PACS|050|20120912011230||ADT^A01|102|T|2.6|||AL|NE\r"
+            + "PID|0010||PID1234^5^M11^A^MR^HOSP~1234568965^^^USA^SS||DOE^JOHN^A^||19800202|F||W|111 TEST_STREET_NAME^^TEST_CITY^NY^111-1111^USA||(905)111-1111|||S|ZZ|12^^^124|34-13-312||||TEST_BIRTH_PLACE\r"
+            + "AL1|1|DA|00000741^OXYCODONE^LN||HYPOTENSION\r";
+    String justField1 = "MSH|^~\\&|SE050|050|PACS|050|20120912011230||ADT^A01|102|T|2.6|||AL|NE\r"
+            + "PID|0010||PID1234^5^M11^A^MR^HOSP~1234568965^^^USA^SS||DOE^JOHN^A^||19800202|F||W|111 TEST_STREET_NAME^^TEST_CITY^NY^111-1111^USA||(905)111-1111|||S|ZZ|12^^^124|34-13-312||||TEST_BIRTH_PLACE\r"
+            + "AL1|1|DA|00000741^OXYCODONE||HYPOTENSION\r";
+    String justField2 = "MSH|^~\\&|SE050|050|PACS|050|20120912011230||ADT^A01|102|T|2.6|||AL|NE\r"
+            + "PID|0010||PID1234^5^M11^A^MR^HOSP~1234568965^^^USA^SS||DOE^JOHN^A^||19800202|F||W|111 TEST_STREET_NAME^^TEST_CITY^NY^111-1111^USA||(905)111-1111|||S|ZZ|12^^^124|34-13-312||||TEST_BIRTH_PLACE\r"
+            + "AL1|1|DA|OXYCODONE||HYPOTENSION\r";
+
+    AllergyIntolerance joined = AllergyUtils.createAllergyFromHl7Segment(joinedByHyphen);
+
+    Identifier values = joined.getIdentifier().get(0);
+    String joinedValue = values.getValue();
+    String system = values.getSystem();
+
+    assertThat(joined.hasIdentifier()).isTrue();
+    assertThat(joinedValue).isEqualTo("00000741-LN");
+    assertThat(system).isEqualTo("urn:id:extID");
+
+    AllergyIntolerance field1 = AllergyUtils.createAllergyFromHl7Segment(justField1);
+
+    Identifier field1Values = field1.getIdentifier().get(0);
+    String field1Value = field1Values.getValue();
+    String field1System = field1Values.getSystem();
+
+    assertThat(field1.hasIdentifier()).isTrue();
+    assertThat(field1Value).isEqualTo("00000741");
+    assertThat(field1System).isEqualTo("urn:id:extID");
+
+    AllergyIntolerance field2 = AllergyUtils.createAllergyFromHl7Segment(justField2);
+
+    Identifier field2Values = field2.getIdentifier().get(0);
+    String field2Value = field2Values.getValue();
+    String field2System = field2Values.getSystem();
+
+    assertThat(field2.hasIdentifier()).isTrue();
+    assertThat(field2Value).isEqualTo("OXYCODONE");
+    assertThat(field2System).isEqualTo("urn:id:extID");
+
+  }
 }

@@ -16,7 +16,7 @@ identifier:
   expressionType: resource
   vars:
     system: SYSTEM_URL, $sys
-    value: AL1.3, GeneralUtils.concatenateWithHyphen(value)
+    value: BUILD_FROM_CWE, AL1.3
   constants:
     sys: "urn:id:extID"
 

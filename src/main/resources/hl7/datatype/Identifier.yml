@@ -17,7 +17,7 @@ system:
     
 value: 
      type: STRING
-     valueOf: $value
+     valueOf: CX.1 | CWE.1 |EI.1 | $value
      expressionType: HL7Spec
      required: true
 
