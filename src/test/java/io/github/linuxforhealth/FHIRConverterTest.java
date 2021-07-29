@@ -25,9 +25,9 @@ import org.hl7.fhir.r4.model.Organization;
 import org.hl7.fhir.r4.model.Resource;
 import org.hl7.fhir.r4.model.ResourceType;
 import org.hl7.fhir.exceptions.FHIRException;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+
 import io.github.linuxforhealth.core.Constants;
 import io.github.linuxforhealth.fhir.FHIRContext;
 import io.github.linuxforhealth.hl7.ConverterOptions;
@@ -39,9 +39,6 @@ public class FHIRConverterTest {
   private static final String HL7_FILE_WIN_NEWLINE = "src/test/resources/sample_win.hl7";
   private static final String HL7_FILE_WIN_NEWLINE_BATCH = "src/test/resources/sample_win_batch.hl7";
   private static final ConverterOptions OPTIONS = new Builder().withValidateResource().withPrettyPrint().build();
-
-  @Rule
-  public ExpectedException exceptionRule = ExpectedException.none();
 
   @Test
   public void test_patient_encounter() throws IOException {
@@ -107,9 +104,10 @@ public class FHIRConverterTest {
         + "PRB|AD|200603150625|aortic stenosis|53692||2||200603150625";
 
     HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
-    exceptionRule.expect(UnsupportedOperationException.class);
-    ftv.convert(hl7message);
 
+    Assertions.assertThrows(UnsupportedOperationException.class, () -> {
+        ftv.convert(hl7message);
+    });
   }
 
   @Test
@@ -181,9 +179,10 @@ String hl7message =
     String hl7message = "some text";
 
     HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
-    exceptionRule.expect(IllegalArgumentException.class);
-    ftv.convert(hl7message);
-
+   
+    Assertions.assertThrows(IllegalArgumentException.class, () -> {
+        ftv.convert(hl7message);
+    });
   }
 
   @Test
@@ -191,9 +190,10 @@ String hl7message =
     String hl7message = "";
 
     HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
-    exceptionRule.expect(IllegalArgumentException.class);
-    ftv.convert(hl7message);
 
+    Assertions.assertThrows(IllegalArgumentException.class, () -> {
+        ftv.convert(hl7message);
+    });
   }
 
   @Test

@@ -10,17 +10,13 @@ import java.util.List;
 
 import io.github.linuxforhealth.hl7.segments.util.AllergyUtils;
 import org.hl7.fhir.r4.model.*;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.Test;
+
 import io.github.linuxforhealth.hl7.segments.util.PatientUtils;
 
 public class Hl7IdentifierFHIRConversionTest {
 
-  @Rule
-  public ExpectedException exceptionRule = ExpectedException.none();
-
-  @Test
+   @Test
   public void patient_identifiers_test() {
 
     String patientIdentifiers =

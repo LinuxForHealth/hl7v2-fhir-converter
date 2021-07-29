@@ -14,18 +14,13 @@ import org.hl7.fhir.r4.model.*;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r4.model.codesystems.V3MaritalStatus;
 import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.Test;
 
 import io.github.linuxforhealth.fhir.FHIRContext;
 import io.github.linuxforhealth.hl7.HL7ToFHIRConverter;
 import io.github.linuxforhealth.hl7.segments.util.PatientUtils;
 
 public class Hl7PatientFHIRConversionTest {
-
-  @Rule
-  public ExpectedException exceptionRule = ExpectedException.none();
 
   private static FHIRContext context = new FHIRContext(true, false);
 

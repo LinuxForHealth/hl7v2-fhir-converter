@@ -13,20 +13,19 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Properties;
 
-import org.junit.After;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 import io.github.linuxforhealth.core.Constants;
 import io.github.linuxforhealth.core.terminology.UrlLookup;
 
 public class ConverterConfigurationTest {
 
-    @Rule
-    public TemporaryFolder folder = new TemporaryFolder();
+    @TempDir
+    static File folder;
 
-    @After
+    @AfterEach
     public void reset() {
         System.clearProperty("config.home");
         ConverterConfiguration.reset();
@@ -35,7 +34,7 @@ public class ConverterConfigurationTest {
 
     @Test
     public void test_that_additional_conceptmap_values_are_loaded() throws IOException {
-        File configFile = folder.newFile("config.properties");
+    	File configFile = new File(folder, "config.properties");
         writeProperties(configFile);
         System.setProperty("config.home", configFile.getParent());
         ConverterConfiguration.reset();
@@ -55,6 +54,7 @@ public class ConverterConfigurationTest {
         prop.store(new FileOutputStream(configFile), null);
     }
 
+    /** Test will run 2nd due to alphabetical order, this order is important **/
     @Test
     public void test_that_config_reset_reloads_configuration() throws IOException {
         UrlLookup.reset(Constants.CODING_SYSTEM_MAPPING);

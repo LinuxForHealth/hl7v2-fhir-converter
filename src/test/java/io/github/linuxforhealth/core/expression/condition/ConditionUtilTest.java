@@ -6,7 +6,7 @@
 package io.github.linuxforhealth.core.expression.condition;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import io.github.linuxforhealth.core.expression.condition.CheckNotNull;
 import io.github.linuxforhealth.core.expression.condition.CheckNull;
 import io.github.linuxforhealth.core.expression.condition.CompoundAndCondition;
