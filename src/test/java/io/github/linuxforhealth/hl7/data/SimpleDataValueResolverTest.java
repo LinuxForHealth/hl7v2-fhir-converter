@@ -16,6 +16,7 @@ import org.hl7.fhir.r4.model.codesystems.V3Race;
 import org.hl7.fhir.r4.model.codesystems.V3ReligiousAffiliation;
 import org.junit.jupiter.api.Test;
 import ca.uhn.hl7v2.model.DataTypeException;
+import ca.uhn.hl7v2.model.v26.datatype.CWE;
 import ca.uhn.hl7v2.model.v26.datatype.TX;
 import ca.uhn.hl7v2.model.v26.message.ORU_R01;
 import io.github.linuxforhealth.core.terminology.SimpleCode;
@@ -149,9 +150,13 @@ public class SimpleDataValueResolverTest {
   }
 
   @Test
-  public void get_race_value_valid() {
-    String gen = "2028-9";
-    SimpleCode code = SimpleDataValueResolver.CODING_SYSTEM_V2.apply(gen);
+  public void get_race_value_valid() throws DataTypeException {
+    CWE cwe = new CWE(null);
+    cwe.getCwe3_NameOfCodingSystem().setValue("HL70005");
+    cwe.getCwe1_Identifier().setValue("2028-9");
+    cwe.getCwe2_Text().setValue("Asian");
+
+    SimpleCode code = SimpleDataValueResolver.CODING_SYSTEM_V2.apply(cwe);
     assertThat(code.getDisplay()).isEqualTo(V3Race._20289.getDisplay());
     assertThat(code.getCode()).isEqualTo(V3Race._20289.toCode());
     assertThat(code.getSystem()).isEqualTo(V3Race._20289.getSystem());
