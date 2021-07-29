@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2020
+ * (C) Copyright IBM Corp. 2020, 2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -22,15 +22,6 @@ public enum ConditionPredicateEnum {
       Integer.class), //
   LESS_THAN_OR_EQUAL_TO_INTEGER(ConditionBiPredicates.LESS_THAN_OR_EQUAL_TO, Integer.class,
       Integer.class), //
-
-  GREATER_THAN_FLOAT(ConditionBiPredicates.GREATER_THAN_FLOAT, Float.class, Float.class), //
-  LESS_THAN_FLOAT(ConditionBiPredicates.LESS_THAN_FLOAT, Float.class, Float.class), //
-  GREATER_THAN_OR_EQUAL_TO_FLOAT(ConditionBiPredicates.GREATER_THAN_OR_EQUAL_TO_FLOAT, Float.class,
-      Float.class), //
-  LESS_THAN_OR_EQUAL_TO_FLOAT(ConditionBiPredicates.LESS_THAN_OR_EQUAL_TO_FLOAT, Float.class,
-      Float.class), //
-
-
 
   CONTAINS_STRING(ConditionBiPredicates.CONTAINS, String.class, String.class), //
   NOT_CONTAINS_STRING(ConditionBiPredicates.NOT_CONTAINS, String.class, String.class), //
@@ -66,7 +57,8 @@ public enum ConditionPredicateEnum {
 
   public static ConditionPredicateEnum getConditionPredicate(String conditionOperator,
       String klassSimpleName) {
-    String enumName = conditionOperator + "_" + klassSimpleName;
+    // Append the predicate if not already present      
+    String enumName = conditionOperator.endsWith(klassSimpleName.toUpperCase()) ? conditionOperator : conditionOperator + "_" + klassSimpleName;
     return EnumUtils.getEnumIgnoreCase(ConditionPredicateEnum.class, enumName);
 
   }
