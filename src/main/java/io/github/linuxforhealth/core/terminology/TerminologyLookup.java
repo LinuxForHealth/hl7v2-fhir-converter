@@ -6,6 +6,7 @@
 package io.github.linuxforhealth.core.terminology;
 
 import java.util.Map;
+import com.google.common.collect.ImmutableMap;
 import com.ibm.fhir.model.resource.CodeSystem;
 import com.ibm.fhir.model.type.Code;
 import com.ibm.fhir.model.type.Uri;
@@ -18,7 +19,8 @@ public class TerminologyLookup {
     private static final FHIRRegistry REGISTRY = FHIRRegistry.getInstance();
     private static final FHIRTermService TERMINOLOGY_SEVICE = FHIRTermService.getInstance();
     private static TerminologyLookup termInstance;
-    static Map<String, String> alternativeCodingSystemMapping = Map.of("v2-0005", "v3-Race");
+    static Map<String, String> alternativeCodingSystemMapping =
+        ImmutableMap.of("v2-0005", "v3-Race");
     private TerminologyLookup() {
     }
 
