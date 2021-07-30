@@ -17,6 +17,7 @@ public enum ConditionPredicateEnum {
 
   GREATER_THAN_INTEGER(ConditionBiPredicates.GREATER_THAN, Integer.class, Integer.class), //
   EQUALS_INTEGER(ConditionBiPredicates.EQUAL_TO, Integer.class, Integer.class), //
+  NOT_EQUALS_INTEGER(ConditionBiPredicates.NOT_EQUAL_TO, Integer.class, Integer.class), //
   LESS_THAN_INTEGER(ConditionBiPredicates.LESS_THAN, Integer.class, Integer.class), //
   GREATER_THAN_OR_EQUAL_TO_INTEGER(ConditionBiPredicates.GREATER_THAN_OR_EQUAL_TO, Integer.class,
       Integer.class), //
