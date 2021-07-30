@@ -281,10 +281,38 @@ Engine supports the following condition types:
 
 Conditions can be used to choose between multiple sources of data when mapping to a FHIR type. For example, see how `coding` is set in [CodeableConcept.yml](src/main/resources/hl7/datatype/CodeableConcept.yml). `coding` is set by the either coding_1, coding_2, or coding_3 based on the conditions. The last condition that evaluates to true in the list will create the value.
 
+#### Concatenation
+* There are a number of instances  where  we need to take strings from  different fields and concatenate them together to form a unique identifier.
+* In order to  do this we need to pass the two fields as variables into a custom Identifier type that will  join the two fields together
+* The  resource yaml would like:
+```yml
+identifier_1:
+  valueOf: datatype/Identifier_Observation
+  generateList: true
+  expressionType: resource
+  vars:
+    obx3: BUILD_FROM_CWE, OBX.3
+    fillpla: STRING, OBR.2.1 | ORC.3.1 | OBR.3.1 | ORC.2.1 | MSH.7
+  constants:
+      sys: "urn:id:extID"
+      joinChar: '-'
+```
+*  In the Indetifier_Observation we take the values and add them together in the `value  HL7Spec`
+```yml
+value: 
+     type: STRING
+     valueOf: $join
+     expressionType: HL7Spec
+     required: true
+     vars:
+       join: $fillpla + $joinChar + $obx3
+```
+
+
 #### Different types of expressions
 * ResourceExpression : This type of expression is used when a field is a data type defined in one of the [data type templates](../master/src/main/resources/hl7/datatype). These data type templates define different [FHIR data types](https://hl7.org/FHIR/datatypes.html).
   Example:
-
+  
 ```yml
   identifier:   
     valueOf: datatype/IdentifierCX

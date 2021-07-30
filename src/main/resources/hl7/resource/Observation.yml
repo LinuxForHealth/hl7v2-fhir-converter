@@ -12,37 +12,16 @@ id:
   valueOf: 'UUID.randomUUID()'
   expressionType: JEXL
 
-identifier:
-    valueOf: datatype/Identifier_Gen
-    generateList: true
-    expressionType: resource
-    vars:
-      id: OBX.3.1 + $joinChar +OBR.3.1
-    constants:
-      joinChar: '_'
-#identifier_1:
-#  type: JOIN_FILLER
-#  valueOf: datatype/Identifier
-#  generateList: true
-#  expressionType: resource
-#  vars:
-#    system: SYSTEM_URL, $sys
-#    obx3: BUILD_FROM_CWE, OBX.3
-#    fillpla: STRING, OBR.2 | ORC.3 | OBR.3 | ORC.2 | MSH.7
-#  constants:
-#      sys: "urn:id:extID"
-#      joinChar: '_'
-#identifier_2:
-#  condition: OBX.3 NOT_NULL
-#  type:
-#  valueOf: datatype/Identifier
-#  generateList: true
-#  expressionType: resource
-#  vars:
-#    system: SYSTEM_URL, $sys
-#    value: BUILD_FROM_CWE, OBX.3
-#  constants:
-#    sys: "urn:id:extID"
+identifier_1:
+  valueOf: datatype/Identifier_Observation
+  generateList: true
+  expressionType: resource
+  vars:
+    obx3: BUILD_FROM_CWE, OBX.3
+    fillpla: STRING, OBR.2.1 | ORC.3.1 | OBR.3.1 | ORC.2.1 | MSH.7
+  constants:
+      sys: "urn:id:extID"
+      joinChar: '-'
 
 status:
    type: OBSERVATION_STATUS

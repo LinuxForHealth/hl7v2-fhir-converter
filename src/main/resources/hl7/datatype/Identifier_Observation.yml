@@ -1,0 +1,21 @@
+#
+# (C) Copyright IBM Corp. 2020
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+# Creates an identifier for observation which concatenates value strings
+---
+system: 
+     type: SYSTEM_URL
+     valueOf: CX.4 | CWE.4 |EI.2 | $sys
+     expressionType: HL7Spec
+    
+value: 
+     type: STRING
+     valueOf: $join
+     expressionType: HL7Spec
+     required: true
+     vars:
+       join: $fillpla + $joinChar + $obx3
+
+
