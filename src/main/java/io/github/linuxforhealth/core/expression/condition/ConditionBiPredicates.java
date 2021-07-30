@@ -19,6 +19,7 @@ public class ConditionBiPredicates {
 
   public static final BiPredicate<Integer, Integer> GREATER_THAN = (x, y) -> x > y;
   public static final BiPredicate<Integer, Integer> EQUAL_TO = (x, y) -> x.equals(y);
+  public static final BiPredicate<Integer, Integer> NOT_EQUAL_TO = (x, y) -> !x.equals(y);
   public static final BiPredicate<Integer, Integer> LESS_THAN = (x, y) -> x < y;
   public static final BiPredicate<Integer, Integer> GREATER_THAN_OR_EQUAL_TO = (x, y) -> x >= y;
   public static final BiPredicate<Integer, Integer> LESS_THAN_OR_EQUAL_TO = (x, y) -> x <= y;
