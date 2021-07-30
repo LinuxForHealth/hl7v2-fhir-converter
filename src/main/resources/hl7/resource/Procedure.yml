@@ -1,0 +1,33 @@
+#
+# (C) Copyright IBM Corp. 2021
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+resourceType: Procedure
+id:
+   type: STRING
+   valueOf: 'UUID.randomUUID()'
+   expressionType: JEXL
+
+identifier_1:
+   type:
+   valueOf: datatype/Identifier
+   generateList: true
+   expressionType: resource
+   vars:
+      system: SYSTEM_URL, $sys
+      value: OBR.4.4 | OBR.4.5 | MSH.10
+   constants:
+      sys: "urn:id:extID"
+
+identifier_2:
+   valueOf: datatype/Identifier_var
+   generateList: true
+   expressionType: resource
+   vars:
+      valueIn: OBR.2.1 | ORC.3.1 | OBR.3.1 | ORC.2.1 | MSH.7
+   constants:
+      system: "http://terminology.hl7.org/CodeSystem/v2-0203"
+      code: "VN"
+      display: "Visitor Number"
+   
