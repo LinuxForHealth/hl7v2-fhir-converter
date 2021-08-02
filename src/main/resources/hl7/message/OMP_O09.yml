@@ -20,6 +20,7 @@ resources:
     repeats: false
     additionalSegments:
       - .PD1
+      - MSH
 
   - resourceName: Encounter
     segment: .PATIENT_VISIT.PV1
@@ -29,6 +30,7 @@ resources:
     repeats: false
     additionalSegments:
       - .PATIENT_VISIT.PV2
+      - MSH
 
   - resourceName: Medication
     segment: .RXO
@@ -39,9 +41,11 @@ resources:
     additionalSegments:
       - .ORC
       - .COMPONENT.RXC
+      - MSH
 
   - resourceName: AllergyIntolerance
     segment: AL1
     resourcePath: resource/AllergyIntolerance
     repeats: true
     additionalSegments:
+      - MSH
