@@ -90,11 +90,11 @@ public class HL7DataBasedResourceModel implements ResourceModel {
       LOGGER.warn("Resource Constraint condition not satisfied for  {} , exception {}", this.name,
           e.getMessage());
       LOGGER.debug("Resource Constraint condition not satisfied for  {} , exception {}", this.name,
-          e);
+          e.toString());
       return null;
 
     } catch (IllegalArgumentException | IllegalStateException | DataExtractionException e) {
-      LOGGER.error("Exception during  resource {} evaluation reason {}", this.name, e);
+      LOGGER.error("Exception during  resource {} evaluation reason {}", this.name, e.toString());
       return null;
 
     }

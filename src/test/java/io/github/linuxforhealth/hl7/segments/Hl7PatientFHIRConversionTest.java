@@ -60,7 +60,7 @@ public class Hl7PatientFHIRConversionTest {
     assertThat(patientResource).hasSize(1);
     Patient patient = getResourcePatient(patientResource.get(0));
     List<Reference> refs = patient.getGeneralPractitioner();
-    assertThat(refs.size() > 0);
+    assertThat(refs.size()).isGreaterThan(0);
 
     List<Resource> practitionerResource =
         e.stream().filter(v -> ResourceType.Practitioner == v.getResource().getResourceType())
@@ -68,7 +68,7 @@ public class Hl7PatientFHIRConversionTest {
     assertThat(practitionerResource).hasSize(1);
     Practitioner doc = getResourcePractitioner(practitionerResource.get(0));
     String lastName = doc.getName().get(0).getFamily();
-    assertThat(lastName.equals("LastName"));
+    assertThat(lastName).isEqualTo("LastName");
   }
 
 
@@ -316,13 +316,13 @@ public class Hl7PatientFHIRConversionTest {
     assertThat(patientObjEnglish.getCommunication().get(0).getPreferred()).isTrue();
     assertThat(patientObjEnglish.getCommunication()).hasSize(1);
     // Note that today the text is not set, though we would like it set to "English"
-    assertThat(patientObjEnglish.getText().equals("English"));
+    assertThat(patientObjEnglish.getText()).isEqualTo("English");
     Patient.PatientCommunicationComponent cc = patientObjEnglish.getCommunication().get(0);
     assertThat(cc.getPreferred()).isTrue();
     Coding code = cc.getLanguage().getCodingFirstRep();
-    assertThat(code.getCode().equals("ENG"));
+    assertThat(code.getCode()).isEqualTo("ENG");
     // System is constant, regardless of what is in the HL7 msg -- other systems fail FHIR validation.
-    assertThat(code.getSystem().equals("urn:ietf:bcp:47"));
+    assertThat(code.getSystem()).isEqualTo("urn:ietf:bcp:47");
 
 
   }

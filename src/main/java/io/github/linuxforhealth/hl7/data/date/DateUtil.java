@@ -217,7 +217,7 @@ public class DateUtil {
       LOGGER.warn("Attempt to parse input value {} to temporal failed ", dateString);
       for (Entry<String, DateTimeParseException> entry : warnings.entrySet()) {
         LOGGER.warn("{} reason {}", entry.getKey(), entry.getValue().getMessage());
-        LOGGER.debug("{} reason {}", entry.getKey(), entry.getValue());
+        LOGGER.debug("{} reason {}", entry.getKey(), entry.getValue().toString());
 
       }
 
