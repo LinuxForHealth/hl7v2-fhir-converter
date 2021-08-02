@@ -70,7 +70,7 @@ public class Hl7AllergyFHIRConversionTest {
         Date onsetReaction = allergy.getReaction().get(0).getOnset();
         Assertions.assertNull(onsetReaction);
         DateTimeType onsetAllergy = allergy.getOnsetDateTimeType();
-        assertThat(onsetAllergy.getValueAsString()).isEqualTo("20210101");
+        assertThat(onsetAllergy.getValueAsString()).isEqualTo("2021-01-01");
     }
 
 }
