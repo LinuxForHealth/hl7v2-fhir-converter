@@ -23,7 +23,6 @@ identifier_1:
 
 identifier_2:
   condition: DG1.1 NOT_NULL
-  type:
   valueOf: datatype/Identifier
   generateList: true
   expressionType: resource
@@ -34,14 +33,11 @@ identifier_2:
     sys: "urn:id:extID"
 
 identifier_3:
-  condition: PRB4.1 NOT_NULL
-  type:
   valueOf: datatype/Identifier
-  generateList: true
   expressionType: resource
   vars:
     system: SYSTEM_URL, $sys
-    value: BUILD_FROM_CWE, PRB4.1
+    value: PRB.4.1
   constants:
     sys: "urn:id:extID"
 
