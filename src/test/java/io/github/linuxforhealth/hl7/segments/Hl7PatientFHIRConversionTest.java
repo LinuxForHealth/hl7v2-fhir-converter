@@ -6,7 +6,6 @@
 package io.github.linuxforhealth.hl7.segments;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.Extensions;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.Assertions;
@@ -166,7 +165,7 @@ public class Hl7PatientFHIRConversionTest {
      * N + blank = N
      * blank + number = number
      * blank + blank = nothing. 
-     * 
+    * 
      */
 
     String patientMsgEmptyMultiple =
@@ -340,7 +339,7 @@ public class Hl7PatientFHIRConversionTest {
     return (Practitioner) context.getParser().parseResource(klass, s);
   }
 
-  private void validate_lineage_json(List<Extension>  extensions) {
+  private void validate_lineage_json(List<Extension>  extensions, String messageType) {
 
     assertThat(extensions.size()).isEqualTo(6);
 
@@ -366,6 +365,10 @@ public class Hl7PatientFHIRConversionTest {
         LOGGER.debug("Name:" + name);
         LOGGER.debug("Value:" + value);
 
+        LOGGER.debug("Message Type:" + messageType);
+
+        String[] messageParts = messageType.split("\\^");
+
         // test value based off the name.
         switch(name) {
           case "source-event-timestamp":
@@ -381,10 +384,10 @@ public class Hl7PatientFHIRConversionTest {
             assertThat(value).isEqualTo("SendingApplication");
             break;
           case "source-event-trigger":
-            assertThat(value).isEqualTo("R01");
+            assertThat(value).isEqualTo(messageParts[1]);
             break;
           case "source-record-type":
-            assertThat(value).isEqualTo("ORU");
+            assertThat(value).isEqualTo(messageParts[0]);
             break;
           default:
             // this shouldn't happen
@@ -397,7 +400,7 @@ public class Hl7PatientFHIRConversionTest {
 
   }
 
-  private List<Extension> convert_hl7_message(String hl7message, ResourceType resourceType) {
+  private void validate_data_lineage(String hl7message, String messageType) {
 
     HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
     String json = ftv.convert(hl7message , PatientUtils.OPTIONS);
@@ -413,36 +416,67 @@ public class Hl7PatientFHIRConversionTest {
     // Meta bundleMeta = b.getMeta();
     // List<Extension> bundleMetaExtensions = bundleMeta.getExtension();
 
-    // Get the Resource
-    List<Resource> resource =
-    e.stream().filter(v -> ResourceType.Patient == v.getResource().getResourceType())
-        .map(BundleEntryComponent::getResource).collect(Collectors.toList());
-    assertThat(resource).hasSize(1);
-    // Resource resource = getResourcePatient(resource.get(0));
+    LOGGER.debug("Found {} resources.", e.stream().count());
 
-    // Get meta extension from Patient Resource
-    Meta meta = resource.get(0).getMeta();
-    List<Extension> extensions =  meta.getExtension();
+    e.stream().forEach(bec -> { 
+      LOGGER.debug("Validating "+bec.getResource().getResourceType());
+      Meta meta = bec.getResource().getMeta();
+      List<Extension> extensions =  meta.getExtension();
+      LOGGER.debug("Found "+extensions.size()+" meta extensions");
+      validate_lineage_json(extensions, messageType); 
+    });
 
-    LOGGER.debug("Found "+extensions.size()+" meta extensions");
-
-    return extensions;
   }
 
-  // Tests that meta yaml in the Common.yml is placed in the meta extensions for the Patient resource.
+  // Tests Data lineage for a ORU^R01 message
   @Test
-  public void verify_data_lineage_1() {
+  public void verify_data_lineage_ORU() {
+
     String hl7message = 
         "MSH|^~\\&|SendingApplication|Sending^Facility|Receiving-Application|ReceivingFacility|20060915210000||ORU^R01|1473973200100600|P|2.3|||NE|NE\n" +
         "PID|1||1234^^^AssigningAuthority^MR||TEST^PATIENT|\n" +
         "PD1|||Sample Family Practice^^2222|1111^LastName^ClinicianFirstName^^^^Title||||||||||||A|";
 
-    // Convert hl7message and get the resource we are looking for...
-    List<Extension> extensions = convert_hl7_message(hl7message, ResourceType.Patient);
-
-    // Validate the extensions are correct.
-    validate_lineage_json(extensions);
+    validate_data_lineage(hl7message, "ORU^R01");  
 
   }
+
+  // Tests Data lineage for a ADT^A01 message
+  @Test
+  public void verify_data_lineage_ADT() {
+
+    String hl7message = "MSH|^~\\&|SendingApplication|hl7Integration|||20060915210000||ADT^A01|1473973200100600||2.3|\r"
+        + "EVN|A01|20130617154644\r"
+        + "PID|1|465 306 5961|000010016^^^MR~000010017^^^MR~000010018^^^MR|407623|Wood^Patrick^^Sr^MR||19700101|female|||High Street^^Oxford^^Ox1 4DP~George St^^Oxford^^Ox1 5AP|||||||\r"
+        + "NK1|1|Wood^John^^^MR|Father||999-9999\r" + "NK1|2|Jones^Georgie^^^MSS|MOTHER||999-9999\r"
+        + "PV1|1||Location||||||||||||||||261938_6_201306171546|||||||||||||||||||||||||20130617134644|||||||||\r"
+        + "OBX|1|TX|1234||First line: ECHOCARDIOGRAPHIC REPORT||||||F|||||2740^Tsadok^Janetary~2913^Merrit^Darren^F~3065^Mahoney^Paul^J~4723^Loh^Robert^L~9052^Winter^Oscar^|\r";
+
+    validate_data_lineage(hl7message, "ADT^A01");
+
+  }
+
+
+  // Tests Data lineage for a VXU^V04 message
+  @Test
+  public void verify_data_lineage_VXU() {
+
+    String hl7message = 
+    "MSH|^~\\&|SendingApplication|RI88140101|KIDSNET_IFL|RIHEALTH|20060915210000||VXU^V04|1473973200100600|P|2.3|||NE|AL||||||RI543763\r"
+    + "PID|1||432155^^^^MR||Patient^Johnny^New^^^^L|Smith^Sally|20130414|M||2106-3^White^HL70005|123 Any St^^Somewhere^WI^54000^^M\r"
+    + "NK1|1|Patient^Sally|MTH^mother^HL70063|123 Any St^^Somewhere^WI^54000^^M|^PRN^PH^^^608^5551212|||||||||||19820517||||eng^English^ISO639\r"
+    + "ORC|RE||197027|||||||^Clerk^Myron||MD67895^Pediatric^MARY^^^^MD^^RIA|||||RI2050\r"
+    + "RXA|0|1|20130531|20130531|48^HIB PRP-T^CVX|0.5|ML^^ISO+||00^new immunization record^NIP001|^Sticker^Nurse|^^^RI2050||||33k2a|20131210|PMC^sanofi^MVX|||CP|A\r"
+    + "RXR|C28161^IM^NCIT^IM^INTRAMUSCULAR^HL70162|RT^right thigh^HL70163\r"
+    + "OBX|1|CE|64994-7^vaccine fund pgm elig cat^LN|1|V02^VFC eligible Medicaid/MedicaidManaged Care^HL70064||||||F|||20130531|||VXC40^per imm^CDCPHINVS\r"
+    + "OBX|2|CE|30956-7^Vaccine Type^LN|2|48^HIB PRP-T^CVX||||||F|||20130531\r"
+    + "OBX|3|TS|29768-9^VIS Publication Date^LN|2|19981216||||||F|||20130531\r"
+    + "OBX|4|TS|59785-6^VIS Presentation Date^LN|2|20130531||||||F|||20130531\r"
+    + "OBX|5|ST|48767-8^Annotation^LN|2|Some text from doctor||||||F|||20130531\r";
+
+    validate_data_lineage(hl7message, "VXU^V04");
+
+  }
+
 
 }
