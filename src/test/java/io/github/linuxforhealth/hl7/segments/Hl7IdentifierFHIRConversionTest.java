@@ -255,7 +255,7 @@ public class Hl7IdentifierFHIRConversionTest {
 
     assertThat(Obx1AndObx3.hasIdentifier()).isTrue();
     assertThat(Obx1AndObx3Value).isEqualTo("201512201012-DINnumber-LSFUSERDATAE");
-    assertThat(system).isNull();
+    assertThat(system).isEqualTo("urn:id:extID");
 
     Observation Obx1 = ObservationUtils.createObservationFromHl7Segment(joinObx1);
 
