@@ -77,7 +77,7 @@ public class HL7DataBasedResourceDeserializer extends JsonDeserializer<HL7DataBa
     }
 
     // Add the common expresions to the list of expressions if this resources has expressions
-    // And is base object not a datatype/? or reference/? etc.
+    // And is base FHIR resource like Patient and Organization. Not a datatype/? or reference/? etc.
     if (!expressions.isEmpty() && name.indexOf("/") == -1) {
       LOGGER.debug("Adding common expressions to the list of expressions for {}",name);
       expressions.putAll(getCommonExpressions());

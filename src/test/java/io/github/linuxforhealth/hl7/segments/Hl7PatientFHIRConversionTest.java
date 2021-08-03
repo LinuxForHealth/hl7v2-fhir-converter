@@ -5,7 +5,12 @@
  */
 package io.github.linuxforhealth.hl7.segments;
 
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.Extensions;
+
 import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.Assertions;
+
 import java.util.List;
 import java.util.stream.Collectors;
 import org.hl7.fhir.instance.model.api.IBaseResource;
@@ -23,7 +28,7 @@ import org.hl7.fhir.r4.model.Resource;
 import org.hl7.fhir.r4.model.ResourceType;
 import org.hl7.fhir.r4.model.StringType;
 import org.hl7.fhir.r4.model.codesystems.V3MaritalStatus;
-import org.junit.jupiter.api.Test;
+
 import io.github.linuxforhealth.fhir.FHIRContext;
 import io.github.linuxforhealth.hl7.HL7ToFHIRConverter;
 import io.github.linuxforhealth.hl7.segments.util.PatientUtils;
@@ -324,53 +329,22 @@ public class Hl7PatientFHIRConversionTest {
   }
 
   private Patient getResourcePatient(Resource resource) {
-	    String s = context.getParser().encodeResourceToString(resource);
-	    Class<? extends IBaseResource> klass = Patient.class;
-	    return (Patient) context.getParser().parseResource(klass, s);
+    String s = context.getParser().encodeResourceToString(resource);
+    Class<? extends IBaseResource> klass = Patient.class;
+    return (Patient) context.getParser().parseResource(klass, s);
   }
 
   private static Practitioner getResourcePractitioner(Resource resource) {
-	String s = context.getParser().encodeResourceToString(resource);
-	Class<? extends IBaseResource> klass = Practitioner.class;
-	return (Practitioner) context.getParser().parseResource(klass, s);
+    String s = context.getParser().encodeResourceToString(resource);
+    Class<? extends IBaseResource> klass = Practitioner.class;
+    return (Practitioner) context.getParser().parseResource(klass, s);
   }
 
-  // Tests that meta yaml in the Common.yml is placed in the meta extensions for the Patient resource.
-  @Test
-  public void test_metadata() {
-    String hl7message = 
-        "MSH|^~\\&|SendingApplication|Sending^Facility|Receiving-Application|ReceivingFacility|20060915210000||ORU^R01|1473973200100600|P|2.3|||NE|NE\n" +
-        "PID|1||1234^^^AssigningAuthority^MR||TEST^PATIENT|\n" +
-        "PD1|||Sample Family Practice^^2222|1111^LastName^ClinicianFirstName^^^^Title||||||||||||A|";
+  private void validate_lineage_json(List<Extension>  extensions) {
 
-    HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
-    String json = ftv.convert(hl7message , PatientUtils.OPTIONS);
-    System.out.println(json);
-    assertThat(json).isNotBlank();
+    assertThat(extensions.size()).isEqualTo(6);
 
-    IBaseResource bundleResource = context.getParser().parseResource(json);
-    assertThat(bundleResource).isNotNull();
-    Bundle b = (Bundle) bundleResource;
-    List<BundleEntryComponent> e = b.getEntry();
-
-    // Get bundle meta extensions *not using these currently*
-    // Meta bundleMeta = b.getMeta();
-    // List<Extension> bundleMetaExtensions = bundleMeta.getExtension();
-
-    // Get the Patient Resource
-    List<Resource> patientResource =
-        e.stream().filter(v -> ResourceType.Patient == v.getResource().getResourceType())
-            .map(BundleEntryComponent::getResource).collect(Collectors.toList());
-    assertThat(patientResource).hasSize(1);
-    Patient patient = getResourcePatient(patientResource.get(0));
-
-    // Get meta extension from Patient Resource
-    Meta patientMeta = patient.getMeta();
-    List<Extension> patientMetaExtensions = patientMeta.getExtension();
-
-    LOGGER.debug("Found "+patientMetaExtensions.size()+" meta extensions");
-
-    for(Extension extension: patientMetaExtensions) {
+    for(Extension extension: extensions) {
 
         // Get the URL
         String url = extension.getUrl();
@@ -395,27 +369,27 @@ public class Hl7PatientFHIRConversionTest {
         // test value based off the name.
         switch(name) {
           case "source-event-timestamp":
-            assertThat(value.equals("2006-09-15T21:00:00+08:00"));
+            assertThat(value).isEqualTo("2006-09-15T21:00:00+08:00");
             break;
           case "source-record-id":
-            assertThat(value.equals("1473973200100600"));
+            assertThat(value).isEqualTo("1473973200100600");
             break;
           case "source-data-model-version":
-            assertThat(value.equals("2.3"));
+            assertThat(value).isEqualTo("2.3");
             break;
           case "process-client-id":
-            assertThat(value.equals("SendingApplication"));
+            assertThat(value).isEqualTo("SendingApplication");
             break;
           case "source-event-trigger":
-            assertThat(value.equals("R01"));
+            assertThat(value).isEqualTo("R01");
             break;
           case "source-record-type":
-            assertThat(value.equals("ORU"));
+            assertThat(value).isEqualTo("ORU");
             break;
           default:
             // this shouldn't happen
             LOGGER.debug("Not found");
-            assertThat(false);
+            Assertions.fail();
             break;
         }
 
@@ -423,5 +397,52 @@ public class Hl7PatientFHIRConversionTest {
 
   }
 
+  private List<Extension> convert_hl7_message(String hl7message, ResourceType resourceType) {
+
+    HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
+    String json = ftv.convert(hl7message , PatientUtils.OPTIONS);
+    System.out.println(json);
+    assertThat(json).isNotBlank();
+
+    IBaseResource bundleResource = context.getParser().parseResource(json);
+    assertThat(bundleResource).isNotNull();
+    Bundle b = (Bundle) bundleResource;
+    List<BundleEntryComponent> e = b.getEntry();
+
+    // Get bundle meta extensions *not using these currently*
+    // Meta bundleMeta = b.getMeta();
+    // List<Extension> bundleMetaExtensions = bundleMeta.getExtension();
+
+    // Get the Resource
+    List<Resource> resource =
+    e.stream().filter(v -> ResourceType.Patient == v.getResource().getResourceType())
+        .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+    assertThat(resource).hasSize(1);
+    // Resource resource = getResourcePatient(resource.get(0));
+
+    // Get meta extension from Patient Resource
+    Meta meta = resource.get(0).getMeta();
+    List<Extension> extensions =  meta.getExtension();
+
+    LOGGER.debug("Found "+extensions.size()+" meta extensions");
+
+    return extensions;
+  }
+
+  // Tests that meta yaml in the Common.yml is placed in the meta extensions for the Patient resource.
+  @Test
+  public void verify_data_lineage_1() {
+    String hl7message = 
+        "MSH|^~\\&|SendingApplication|Sending^Facility|Receiving-Application|ReceivingFacility|20060915210000||ORU^R01|1473973200100600|P|2.3|||NE|NE\n" +
+        "PID|1||1234^^^AssigningAuthority^MR||TEST^PATIENT|\n" +
+        "PD1|||Sample Family Practice^^2222|1111^LastName^ClinicianFirstName^^^^Title||||||||||||A|";
+
+    // Convert hl7message and get the resource we are looking for...
+    List<Extension> extensions = convert_hl7_message(hl7message, ResourceType.Patient);
+
+    // Validate the extensions are correct.
+    validate_lineage_json(extensions);
+
+  }
 
 }

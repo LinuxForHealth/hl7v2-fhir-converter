@@ -35,12 +35,6 @@
 # source-event-trigger
 - id: "source-event-trigger"
   url: "http://ibm.com/fhir/cdm/StructureDefinition/source-event-trigger" 
-# source-event-trigger-system
-- id: "source-event-trigger-system"
-  url: "http://terminology.hl7.org/CodeSystem/v2-0003" 
 # source-record-type
 - id: "source-record-type"
   url: "http://ibm.com/fhir/cdm/StructureDefinition/source-record-type" 
-# source-message-type-system
-- id: "source-message-type-system"
-  url: "http://terminology.hl7.org/CodeSystem/v2-0076" 
