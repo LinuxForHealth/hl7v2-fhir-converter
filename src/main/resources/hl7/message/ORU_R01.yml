@@ -20,6 +20,7 @@ resources:
       repeats: false
       additionalSegments:
           - .PD1
+          - MSH
       
     - resourceName: Encounter
       segment: .PV1
@@ -29,6 +30,7 @@ resources:
       repeats: false
       additionalSegments:
           - .PV2
+          - MSH
       
     - resourceName: Observation
       segment: .OBSERVATION.OBX
@@ -39,6 +41,7 @@ resources:
       additionalSegments: 
           - .OBR
           - .OBSERVATION.NTE
+          - MSH
         
     - resourceName: Specimen
       segment: .SPECIMEN.SPM
@@ -49,6 +52,7 @@ resources:
       additionalSegments:
           - .OBSERVATION.OBX
           - .OBSERVATION.NTE
+          - MSH
       
     - resourceName: DiagnosticReport
       segment: .OBR
@@ -59,3 +63,4 @@ resources:
           - .ORC
           - .NTE
           - .OBSERVATION.OBX
+          - MSH

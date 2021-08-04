@@ -1,0 +1,46 @@
+#
+# (C) Copyright IBM Corp. 2021
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+# FHIR Resources to extract from PPR_PC3 message
+---
+resources:
+    - resourceName: MessageHeader
+      segment: MSH
+      resourcePath: resource/MessageHeader
+      repeats: false
+      isReferenced: false
+      additionalSegments:
+   
+    - resourceName: Patient
+      segment: PID
+      resourcePath: resource/Patient
+      isReferenced: true
+      repeats: false
+      additionalSegments:
+             - .PD1
+      
+    - resourceName: Encounter
+      segment: .PV1
+      group: PATIENT_VISIT
+      resourcePath: resource/Encounter
+      isReferenced: true
+      repeats: false
+      additionalSegments:
+             - .PV2
+      
+    - resourceName: Observation
+      segment: .PROBLEM_OBSERVATION.OBX
+      group: PROBLEM
+      resourcePath: resource/Observation
+      repeats: true
+      isReferenced: true
+      additionalSegments:
+
+    - resourceName: Condition
+      segment: .PRB
+      group: PROBLEM
+      resourcePath: resource/Condition
+      repeats: true
+      additionalSegments:
