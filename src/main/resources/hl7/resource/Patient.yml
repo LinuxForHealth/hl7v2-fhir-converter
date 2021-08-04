@@ -155,6 +155,7 @@ extension:
       constants:
          KEY_NAME_SUFFIX: String
          urlValue: mothersMaidenName
+
    -  expressionType: nested
       expressionsMap:
          url:
@@ -181,9 +182,9 @@ extension:
          valueCodeableConcept:
             valueOf: datatype/CodeableConcept
             expressionType: resource
-            # condition: $coding NOT_NULL
+            condition: $coding NOT_NULL
             vars:
-               coding: CODING_SYSTEM_V2, PID.10   
+               coding: CODING_SYSTEM_V2, CWE   
 
 communication:
    condition: $language NOT_NULL
