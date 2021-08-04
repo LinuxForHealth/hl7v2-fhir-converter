@@ -1,0 +1,15 @@
+#
+# (C) Copyright IBM Corp. 2021
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+---
+url:
+   type: SYSTEM_URL
+   value: 'race'
+valueCodeableConcept:
+   valueOf: datatype/CodeableConcept
+   expressionType: resource
+   condition: $coding NOT_NULL
+   vars:
+      coding: CODING_SYSTEM_V2, PID.10 
