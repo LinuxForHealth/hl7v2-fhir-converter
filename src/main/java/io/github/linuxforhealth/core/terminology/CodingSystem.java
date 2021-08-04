@@ -22,9 +22,9 @@ public class CodingSystem {
   /**
    * 
    * @param id
-   * @param display
+   * @param description
    * @param url
-   * @param OID
+   * @param oid
    */
   public CodingSystem(@JsonProperty("id") String id,
       @JsonProperty("description") String description, @JsonProperty("url") String url,

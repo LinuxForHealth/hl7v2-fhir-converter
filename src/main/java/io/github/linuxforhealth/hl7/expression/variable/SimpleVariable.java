@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.ImmutablePair;
 import com.google.common.collect.ImmutableMap;
 import io.github.linuxforhealth.api.EvaluationResult;
 import io.github.linuxforhealth.api.InputDataExtractor;
@@ -18,6 +19,7 @@ import io.github.linuxforhealth.core.expression.EvaluationResultFactory;
 import io.github.linuxforhealth.core.expression.VariableUtils;
 import io.github.linuxforhealth.hl7.data.SimpleDataTypeMapper;
 import io.github.linuxforhealth.hl7.expression.specification.SpecificationParser;
+import io.github.linuxforhealth.hl7.util.ExpressionUtility;
 
 
 /**
@@ -120,9 +122,10 @@ public class SimpleVariable implements Variable {
             getVariableValueFromVariableContextMap(specValue, ImmutableMap.copyOf(contextValues));
       } else {
         EvaluationResult gen;
-        Specification hl7spec = SpecificationParser.parse(specValue, this.extractMultiple, false, this.retainEmpty);
+        Specification spec =
+            SpecificationParser.parse(specValue, this.extractMultiple, false, this.retainEmpty);
 
-        gen = hl7spec.extractValueForSpec(dataSource, contextValues);
+        gen = spec.extractValueForSpec(dataSource, contextValues);
 
         if (gen != null && !gen.isEmpty()) {
           fetchedValue = gen;
@@ -145,12 +148,24 @@ public class SimpleVariable implements Variable {
       ImmutableMap<String, EvaluationResult> contextValues) {
     if (StringUtils.isNotBlank(varName)) {
       EvaluationResult fetchedValue;
+      if (varName.startsWith("$") && varName.contains(":")) {
+        return fetchValueFromVar(varName, contextValues);
+      } else {
       fetchedValue = contextValues.get(VariableUtils.getVarName(varName));
-
+      }
       return fetchedValue;
     } else {
       return null;
     }
+  }
+
+  private static EvaluationResult fetchValueFromVar(String varName,
+      ImmutableMap<String, EvaluationResult> contextValues) {
+    String[] tokens = StringUtils.split(varName, ":", 2);
+    ImmutablePair<String, String> fetch = ImmutablePair.of(tokens[0], tokens[1]);
+    EvaluationResult resource = contextValues.get(VariableUtils.getVarName(fetch.left));
+
+    return ExpressionUtility.extractComponent(fetch, resource);
   }
 
 

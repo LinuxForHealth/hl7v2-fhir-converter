@@ -5,6 +5,8 @@
  */
 package io.github.linuxforhealth.core.terminology;
 
+import java.util.Map;
+import com.google.common.collect.ImmutableMap;
 import com.ibm.fhir.model.resource.CodeSystem;
 import com.ibm.fhir.model.type.Code;
 import com.ibm.fhir.model.type.Uri;
@@ -17,12 +19,18 @@ public class TerminologyLookup {
     private static final FHIRRegistry REGISTRY = FHIRRegistry.getInstance();
     private static final FHIRTermService TERMINOLOGY_SEVICE = FHIRTermService.getInstance();
     private static TerminologyLookup termInstance;
-
+    static Map<String, String> alternativeCodingSystemMapping =
+        ImmutableMap.of("v2-0005", "v3-Race");
     private TerminologyLookup() {
     }
 
     public static SimpleCode lookup(String system, String value) {
-        Uri url = getSystemUrl(system);
+      String codingSystemName = system;
+      if (alternativeCodingSystemMapping.containsKey(system)) {
+        codingSystemName = alternativeCodingSystemMapping.get(system);
+      }
+      Uri url = getSystemUrl(codingSystemName);
+
         if (url != null) {
             Code c = Code.of(value);
             LookupOutcome outcome = TERMINOLOGY_SEVICE.lookup(url, null, c);
@@ -44,6 +52,9 @@ public class TerminologyLookup {
         }
         return null;
     }
+
+
+
 
     public static void init() {
         if (termInstance == null) {

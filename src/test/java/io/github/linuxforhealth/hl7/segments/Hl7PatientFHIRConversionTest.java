@@ -6,16 +6,22 @@
 package io.github.linuxforhealth.hl7.segments;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import org.hl7.fhir.r4.model.*;
 import org.hl7.fhir.instance.model.api.IBaseResource;
-import org.hl7.fhir.r4.model.codesystems.V3MaritalStatus;
+import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
+import org.hl7.fhir.r4.model.Coding;
+import org.hl7.fhir.r4.model.Enumerations;
+import org.hl7.fhir.r4.model.HumanName;
+import org.hl7.fhir.r4.model.Patient;
+import org.hl7.fhir.r4.model.Practitioner;
+import org.hl7.fhir.r4.model.Reference;
+import org.hl7.fhir.r4.model.Resource;
+import org.hl7.fhir.r4.model.ResourceType;
+import org.hl7.fhir.r4.model.StringType;
+import org.hl7.fhir.r4.model.codesystems.V3MaritalStatus;
 import org.junit.jupiter.api.Test;
-
 import io.github.linuxforhealth.fhir.FHIRContext;
 import io.github.linuxforhealth.hl7.HL7ToFHIRConverter;
 import io.github.linuxforhealth.hl7.segments.util.PatientUtils;
@@ -25,7 +31,7 @@ public class Hl7PatientFHIRConversionTest {
   private static FHIRContext context = new FHIRContext(true, false);
 
   @Test
-  public void test_patient_additional_demographics() throws IOException {
+  public void test_patient_additional_demographics() {
     String hl7message = "MSH|^~\\&|hl7Integration|hl7Integration|||||ADT^A01|||2.6|\n"
     		+ "PID|1||1234^^^AssigningAuthority^MR||TEST^PATIENT|\n"
     		+ "PD1|||Sample Family Practice^^2222|1111^LastName^ClinicianFirstName^^^^Title||||||||||||A|";
@@ -61,7 +67,7 @@ public class Hl7PatientFHIRConversionTest {
    * In order to generate messageHeader resource, MSH should have MSH.24.2 as this is required
    * attribute for source attribute, and source is required for MessageHeader resource.
    * 
-   * @throws IOException
+   * 
    */
 
   @Test
@@ -283,7 +289,8 @@ public class Hl7PatientFHIRConversionTest {
 
     Patient patientObjMarriedAltText = PatientUtils.createPatientFromHl7Segment(AltTextField);
     assertThat(patientObjMarriedAltText.hasMaritalStatus()).isTrue();
-    assertThat(patientObjMarriedAltText.getMaritalStatus().getText()).isNull(); // as of now Text  and Version will always return null.
+    assertThat(patientObjMarriedAltText.getMaritalStatus().getText()).isEqualTo("Never Married");
+    // as of now Version will always return null.
     assertThat(patientObjMarriedAltText.getMaritalStatus().getCodingFirstRep().getVersion()).isNull();
 
   }
