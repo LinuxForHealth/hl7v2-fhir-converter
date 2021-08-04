@@ -12,4 +12,4 @@ valueCodeableConcept:
    expressionType: resource
    condition: $coding NOT_NULL
    vars:
-      coding: CODING_SYSTEM_V2, PID.10 
+      coding: CODING_SYSTEM_V2, CWE 
