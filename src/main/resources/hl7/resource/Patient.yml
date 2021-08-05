@@ -175,6 +175,7 @@ extension:
    #  This also should work 
    -  expressionType: nested
       specs: PID.10
+      generateList: true
       expressionsMap:
          url:
             type: SYSTEM_URL

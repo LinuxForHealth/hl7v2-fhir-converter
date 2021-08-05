@@ -6,7 +6,9 @@
 package io.github.linuxforhealth.hl7.expression;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import org.slf4j.Logger;
@@ -32,6 +34,7 @@ public class NestedExpression extends AbstractExpression {
 
   private Map<String, Expression> childexpressions;
   private boolean generateMap;
+
   public NestedExpression(ExpressionAttributes attr) {
     super(attr);
     this.childexpressions = new HashMap<>();
@@ -75,12 +78,22 @@ public class NestedExpression extends AbstractExpression {
       if (this.generateMap) {
         return EvaluationResultFactory.getEvaluationResult(result.getResolveValues());
       } else {
-      return EvaluationResultFactory.getEvaluationResult(
-            new ArrayList<>(result.getResolveValues().values()),
+        List<Object> values = new ArrayList<>();
+
+        for (Object o : result.getResolveValues().values()) {
+          if (o instanceof Collection) {
+            values.addAll((Collection) o);
+          } else {
+            values.add(o);
+          }
+        }
+
+        return EvaluationResultFactory.getEvaluationResult(values,
             result.getAdditionalResolveValues());
       }
     }
   }
+
 
 
 
