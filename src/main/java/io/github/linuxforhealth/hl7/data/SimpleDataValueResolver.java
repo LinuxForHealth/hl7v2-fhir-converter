@@ -253,22 +253,20 @@ public class SimpleDataValueResolver {
     };
 
     public static final ValueExtractor<Object, String> BUILD_FROM_CWE = (Object value) -> {
-        System.out.println(value);
-
         CWE newValue = ((CWE) value);
-        String dot1 = newValue.getCwe1_Identifier().toString();
-        String dot2 = newValue.getCwe2_Text().toString();
-        String dot3 = newValue.getCwe3_NameOfCodingSystem().toString();
-        if (dot1 != null ) {
-            if (dot3 != null) {
-                String join = dot1 + "-" + dot3;
+        String identifier = newValue.getCwe1_Identifier().toString();
+        String text = newValue.getCwe2_Text().toString();
+        String codingSystem = newValue.getCwe3_NameOfCodingSystem().toString();
+        if (identifier != null ) {
+            if (codingSystem != null) {
+                String join = identifier + "-" + codingSystem;
                 return join;
             }
             else {
-                return dot1;
+                return identifier;
             }
         }
-        else return dot2;
+        else return text;
     };
 
     public static final ValueExtractor<Object, String> ALLERGY_INTOLERANCE_CRITICALITY_CODE_FHIR = (Object value) -> {

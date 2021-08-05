@@ -282,9 +282,9 @@ Engine supports the following condition types:
 Conditions can be used to choose between multiple sources of data when mapping to a FHIR type. For example, see how `coding` is set in [CodeableConcept.yml](src/main/resources/hl7/datatype/CodeableConcept.yml). `coding` is set by the either coding_1, coding_2, or coding_3 based on the conditions. The last condition that evaluates to true in the list will create the value.
 
 #### Concatenation
-* There are a number of instances  where  we need to take strings from  different fields and concatenate them together to form a unique identifier.
-* In order to  do this we need to pass the two fields as variables into a custom Identifier type that will  join the two fields together
-* The  resource yaml would like:
+* There are a number of instances where we need to take strings from different fields and concatenate them together to form a unique identifier.
+* In order to do this we need to pass the two fields as variables into a custom Identifier type that will join the two fields together
+* The resource yaml would like:
 ```yml
 identifier_1:
   valueOf: datatype/Identifier_Observation

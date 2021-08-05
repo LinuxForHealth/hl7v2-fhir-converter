@@ -10,13 +10,12 @@ id:
    expressionType: JEXL
 
 identifier_1:
-   type:
    valueOf: datatype/Identifier
    generateList: true
    expressionType: resource
    vars:
       system: SYSTEM_URL, $sys
-      value: OBR.4.4 | OBR.4.5 | MSH.10
+      value: OBR.44.1 | OBR.45.1 | MSH.7
    constants:
       sys: "urn:id:extID"
 
@@ -25,9 +24,39 @@ identifier_2:
    generateList: true
    expressionType: resource
    vars:
-      valueIn: OBR.2.1 | ORC.3.1 | OBR.3.1 | ORC.2.1 | MSH.7
+      valueIn: MSH.7
    constants:
       system: "http://terminology.hl7.org/CodeSystem/v2-0203"
       code: "VN"
-      display: "Visitor Number"
+      display: "Visit Number"
+
+identifier_3:
+   valueOf: datatype/Identifier_var
+   generateList: true
+   expressionType: resource
+   vars:
+      valueIn: ORC.3.1 | OBR.3.1
+   constants:
+      system: "http://terminology.hl7.org/CodeSystem/v2-0203"
+      code: "FILL"
+      display: "Filler Identifier"
+
+identifier_4:
+   valueOf: datatype/Identifier_var
+   generateList: true
+   expressionType: resource
+   vars:
+      valueIn: ORC.2.1 | OBR.2.1
+   constants:
+      system: "http://terminology.hl7.org/CodeSystem/v2-0203"
+      code: "PLAC"
+      display: "Placer Identifier"
+
+#status:
+#   valueOf: datatype/CodeableConcept
+#   expressionType: resource
+#   vars:
+#      code: $coded
+#   constants:
+#      coded: "Preparation"
    
