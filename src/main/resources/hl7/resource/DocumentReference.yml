@@ -43,3 +43,15 @@ identifier_3:
       code: "PLAC"
       display: "Placer Identifier"
    
+status:
+   type: STRING
+   valueOf: $default
+   expressionType: HL7Spec
+   constants:
+      default: "current"
+
+content:
+   valueOf: secondary/Content
+   expressionType: resource
+   constants:
+      value: "attachment"

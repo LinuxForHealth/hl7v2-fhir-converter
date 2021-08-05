@@ -1,0 +1,36 @@
+#
+# (C) Copyright IBM Corp. 2021
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+# FHIR Resources to extract from RDE_O25 message
+---
+resources:
+  - resourceName: MessageHeader
+    segment: MSH
+    resourcePath: resource/MessageHeader
+    repeats: false
+    isReferenced: false
+
+  - resourceName: Encounter
+    segment: PV1
+    resourcePath: resource/Encounter
+    repeats: false
+    isReferenced: true
+    additionalSegments:
+      - PV2
+      - EVN
+
+  - resourceName: Patient
+    segment: PATIENT.PID
+    resourcePath: resource/Patient
+    isReferenced: true
+    repeats: false
+    additionalSegments:
+      - .PD1
+
+  - resourceName: DocumentReference
+    segment: TXA
+    resourcePath: resource/DocumentReference
+    repeats: true
+    additionalSegments:

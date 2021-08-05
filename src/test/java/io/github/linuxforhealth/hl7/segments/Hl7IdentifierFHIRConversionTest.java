@@ -467,4 +467,52 @@ public class Hl7IdentifierFHIRConversionTest {
 
   }
 
+  @Test
+  public void document_reference_identifier_test() {
+
+    String documentReference =
+            "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|MDM^T01^MDM_T01|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6|56789^NID^UID|MCM|CDP|^4086::132:2A57:3C28^IPV6|^4086::132:2A57:3C25^IPV6|\n" +
+            "PID|||1234||DOE^JANE^|||F||||||||||||||||||||||\n" +
+            "TXA|1||B45678||||||\n" +
+            "ORC|NW|PON001|FON001|PGN001|SC|D|1||20170825010500|MS|MS||||20170825010500|\n" +
+            "OBR|1||CD_000000|2244^General Order|||20170825010500||||||Relevant Clinical Information|||||||002|||||F|||550600^Tsadok550600^Janetary~660600^Merrit660600^Darren^F~770600^Das770600^Surjya^P~880600^Winter880600^Oscar^||||770600&Das770600&Surjya&P^^^6N^1234^A|\n";
+
+    DocumentReference report = DocumentReferenceUtils.createDocumentReferenceFromHl7Segment(documentReference);
+
+    assertThat(report.getIdentifier()).hasSize(3);
+
+    Identifier identifier1 = report.getIdentifier().get(0);
+    String value = identifier1.getValue();
+    String system = identifier1.getSystem();
+
+    assertThat(report.hasIdentifier()).isTrue();
+    assertThat(value).isEqualTo("200911021022");
+    assertThat(system).isEqualTo("urn:id:extID");
+
+    Identifier identifier2 = report.getIdentifier().get(1);
+    String identifier2Value = identifier2.getValue();
+    String identifier2System = identifier2.getSystem();
+
+    assertThat(identifier2Value).isEqualTo("FON001");
+    assertThat(identifier2System).isNull();
+    CodeableConcept type = identifier2.getType();
+    Coding typeValues = type.getCoding().get(0);
+    assertThat(typeValues.getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/v2-0203");
+    assertThat(typeValues.getCode()).isEqualTo("FILL");
+    assertThat(typeValues.getDisplay()).isEqualTo("Filler Identifier");
+
+    Identifier identifier3 = report.getIdentifier().get(2);
+    String identifier3Value = identifier3.getValue();
+    String identifier3System = identifier3.getSystem();
+
+    assertThat(identifier3Value).isEqualTo("PON001");
+    assertThat(identifier3System).isNull();
+    CodeableConcept Type = identifier3.getType();
+    Coding typeValue = Type.getCoding().get(0);
+    assertThat(typeValue.getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/v2-0203");
+    assertThat(typeValue.getCode()).isEqualTo("PLAC");
+    assertThat(typeValue.getDisplay()).isEqualTo("Placer Identifier");
+
+  }
+
 }
