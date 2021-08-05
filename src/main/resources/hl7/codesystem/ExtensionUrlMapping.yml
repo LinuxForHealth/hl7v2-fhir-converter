@@ -19,7 +19,7 @@
   url: "http://hl7.org/fhir/StructureDefinition/patient-religion"
 # race
 - id: "race"
-  url: "http://hl7.org/fhir/us/core/StructureDefinition/us-core-race" 
+  url: "http://ibm.com/fhir/cdm/StructureDefinition/local-race-cd" 
 # process-client-id
 - id: "process-client-id"
   url: "http://ibm.com/fhir/cdm/StructureDefinition/process-client-id"
