@@ -167,12 +167,6 @@ extension:
             condition: $coding NOT_NULL
             vars:
                coding: RELIGIOUS_AFFILIATION_CC, PID.17
-   #  This should work            
-   # -  expressionType: resource
-   #    valueOf: extension/ExtensionRace
-   #    specs: PID.10
-   #
-   #  This also should work 
    -  expressionType: nested
       specs: PID.10
       generateList: true

@@ -26,14 +26,11 @@ import io.github.linuxforhealth.core.expression.EmptyEvaluationResult;
 import io.github.linuxforhealth.core.expression.EvaluationResultFactory;
 import io.github.linuxforhealth.hl7.resource.ResourceEvaluationResult;
 
-
 public class ExpressionUtility {
 
   private static final String KEY_NAME_SUFFIX = "KEY_NAME_SUFFIX";
 
-
   private static final String EVALUATING = "Evaluating {} {}";
-
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ExpressionUtility.class);
 
@@ -54,12 +51,10 @@ public class ExpressionUtility {
 
     try {
 
-
       Map<String, EvaluationResult> localContext = new HashMap<>(context);
       // initialize the map and list to collect values
       List<ResourceValue> additionalResolveValues = new ArrayList<>();
       Map<String, Object> resolveValues = new HashMap<>();
-
 
       for (Entry<String, Expression> entry : expressionMap.entrySet()) {
 
@@ -89,12 +84,9 @@ public class ExpressionUtility {
         }
       }
 
-
-
       resolveValues.values().removeIf(Objects::isNull);
 
       return new ResourceEvaluationResult(resolveValues, additionalResolveValues);
-
 
     } catch (RequiredConstraintFailureException e) {
       LOGGER.warn("Resource Constraint condition not satisfied , exception {}", e.getMessage());
@@ -109,10 +101,6 @@ public class ExpressionUtility {
 
   }
 
-
-
-
-
   private static String getKeyName(String key, String suffix) {
     String[] keyComponents = StringUtils.split(key, "_", 2);
     if (keyComponents.length == 2 && KEY_NAME_SUFFIX.equalsIgnoreCase(keyComponents[1])) {
@@ -121,12 +109,7 @@ public class ExpressionUtility {
       return keyComponents[0];
     }
 
-
-
   }
-
-
-
 
   private static String getKeyNameSuffix(Map<String, EvaluationResult> localContext) {
     EvaluationResult res = localContext.get(KEY_NAME_SUFFIX);
@@ -135,7 +118,6 @@ public class ExpressionUtility {
     }
     return res.getValue();
   }
-
 
   public static EvaluationResult extractComponent(ImmutablePair<String, String> fetch,
       EvaluationResult resource) {
@@ -147,14 +129,11 @@ public class ExpressionUtility {
       Map<String, Object> resourceMap = (Map<String, Object>) resource.getValue();
       return EvaluationResultFactory.getEvaluationResult(resourceMap.get(fetch.getValue()));
     } else if (resource != null && !resource.isEmpty()) {
-      Map<String, Object> resourceMap =
-          ObjectMapperUtil.getJSONInstance().convertValue(resource.getValue(), Map.class);
+      Map<String, Object> resourceMap = ObjectMapperUtil.getJSONInstance().convertValue(resource.getValue(), Map.class);
       return EvaluationResultFactory.getEvaluationResult(resourceMap.get(fetch.getValue()));
     } else {
       return new EmptyEvaluationResult();
     }
   }
-
-
 
 }

@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2020
+ * (C) Copyright IBM Corp. 2020, 2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -64,14 +64,12 @@ public class NestedExpression extends AbstractExpression {
         "childexpressions cannot be null or empty");
   }
 
-
-
   @Override
   protected EvaluationResult evaluateExpression(InputDataExtractor dataSource,
       Map<String, EvaluationResult> contextValues, EvaluationResult baseValue) {
     LOGGER.info("Evaluating child expressions {}", this.getExpressionAttr().getName());
-    ResourceEvaluationResult result =
-        ExpressionUtility.evaluate(dataSource, contextValues, baseValue, this.childexpressions);
+    ResourceEvaluationResult result = ExpressionUtility.evaluate(dataSource, contextValues, baseValue,
+        this.childexpressions);
     if (result.getResolveValues() == null || result.getResolveValues().isEmpty()) {
       return EvaluationResultFactory.getEvaluationResult(null);
     } else {
@@ -93,8 +91,5 @@ public class NestedExpression extends AbstractExpression {
       }
     }
   }
-
-
-
 
 }
