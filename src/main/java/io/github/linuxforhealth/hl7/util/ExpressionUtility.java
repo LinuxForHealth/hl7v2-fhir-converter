@@ -71,8 +71,7 @@ public class ExpressionUtility {
         if (obj != null && !obj.isEmpty()) {
           String keyNameSuffix = getKeyNameSuffix(localContext);
           // Check if the key already exist in the HashMap, if found append, do not replace
-          if (!resolveValues.containsKey(getKeyName(entry.getKey(), keyNameSuffix))
-              || shouldReplace(entry.getKey())) {
+          if (!resolveValues.containsKey(getKeyName(entry.getKey(), keyNameSuffix))) {
             resolveValues.put(getKeyName(entry.getKey(), keyNameSuffix), obj.getValue());
           } else {
             Object existing = resolveValues.get(getKeyName(entry.getKey(), keyNameSuffix));
@@ -126,11 +125,6 @@ public class ExpressionUtility {
 
   }
 
-  private static boolean shouldReplace(String key) {
-    String[] keyComponents = StringUtils.split(key, "_", 2);
-    return keyComponents.length == 2;
-
-  }
 
 
 
