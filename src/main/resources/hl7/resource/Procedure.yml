@@ -20,6 +20,7 @@ identifier_1:
       sys: "urn:id:extID"
 
 identifier_2:
+   condition: $valueIn NOT_NULL
    valueOf: datatype/Identifier_var
    generateList: true
    expressionType: resource
@@ -31,6 +32,7 @@ identifier_2:
       display: "Visit Number"
 
 identifier_3:
+   condition: $valueIn NOT_NULL
    valueOf: datatype/Identifier_var
    generateList: true
    expressionType: resource
@@ -42,6 +44,7 @@ identifier_3:
       display: "Filler Identifier"
 
 identifier_4:
+   condition: $valueIn NOT_NULL
    valueOf: datatype/Identifier_var
    generateList: true
    expressionType: resource
@@ -52,11 +55,15 @@ identifier_4:
       code: "PLAC"
       display: "Placer Identifier"
 
-#status:
-#   valueOf: datatype/CodeableConcept
-#   expressionType: resource
-#   vars:
-#      code: $coded
-#   constants:
-#      coded: "Preparation"
+status:
+   type: STRING
+   valueOf: $default
+   expressionType: HL7Spec
+   constants:
+      default: "unknown"
+
+subject:
+   valueOf: datatype/Reference
+   expressionType: resource
+   specs: $Patient
    

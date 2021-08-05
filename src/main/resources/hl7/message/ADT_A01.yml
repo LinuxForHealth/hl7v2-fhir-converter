@@ -43,3 +43,10 @@ resources:
       resourcePath: resource/AllergyIntolerance
       repeats: true
       additionalSegments:
+
+    - resourceName: Procedure
+      segment: ROL
+      resourcePath: resource/Procedure
+      repeats: true
+      additionalSegments:
+            - PR1

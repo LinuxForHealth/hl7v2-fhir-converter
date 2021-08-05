@@ -20,6 +20,7 @@ identifier_1:
       sys: "urn:id:extID"
 
 identifier_2:
+   condition: $valueIn NOT_NULL
    valueOf: datatype/Identifier_var
    generateList: true
    expressionType: resource
@@ -31,6 +32,7 @@ identifier_2:
       display: "Filler Identifier"
 
 identifier_3:
+   condition: $valueIn NOT_NULL
    valueOf: datatype/Identifier_var
    generateList: true
    expressionType: resource

@@ -10,6 +10,7 @@ id:
    expressionType: JEXL
    
 identifier_1:
+   condition: $valueIn NOT_NULL
    valueOf: datatype/Identifier_var
    generateList: true
    expressionType: resource
@@ -21,6 +22,7 @@ identifier_1:
       display: "Visit Number"
 
 identifier_2:
+   condition: $valueIn NOT_NULL
    valueOf: datatype/Identifier_var
    generateList: true
    expressionType: resource
@@ -32,6 +34,7 @@ identifier_2:
       display: "Filler Identifier"
 
 identifier_3:
+   condition: $valueIn NOT_NULL
    valueOf: datatype/Identifier_var
    generateList: true
    expressionType: resource

@@ -11,6 +11,7 @@ id:
   expressionType: JEXL
 
 identifier_1:
+  condition: $valueIn NOT_NULL
   valueOf: datatype/Identifier_var
   generateList: true
   expressionType: resource

@@ -16,3 +16,4 @@ Organization: org.hl7.fhir.r4.model.Organization
 MessageHeader: org.hl7.fhir.r4.model.MessageHeader
 Medication: org.hl7.fhir.r4.model.Medication
 Specimen: org.hl7.fhir.r4.model.Specimen
+Procedure: org.hl7.fhir.r4.model.Procedure

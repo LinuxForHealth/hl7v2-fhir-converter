@@ -227,13 +227,13 @@ public class Hl7IdentifierFHIRConversionTest {
     assertThat(typeValues.getCode()).isEqualTo("VN");
     assertThat(typeValues.getDisplay()).isEqualTo("Visit Number");
 
-    Identifier identifier2 = prb4.getIdentifier().get(1);
-    String identifier2Value = identifier2.getValue();
-    String identifier2System = identifier2.getSystem();
+    Identifier identifier3 = prb4.getIdentifier().get(1);
+    String identifier3Value = identifier3.getValue();
+    String identifier3System = identifier3.getSystem();
 
     assertThat(prb4.hasIdentifier()).isTrue();
-    assertThat(identifier2Value).isEqualTo("26744");
-    assertThat(identifier2System).isEqualTo("urn:id:extID");
+    assertThat(identifier3Value).isEqualTo("26744");
+    assertThat(identifier3System).isEqualTo("urn:id:extID");
 
   }
 
@@ -404,6 +404,67 @@ public class Hl7IdentifierFHIRConversionTest {
     assertThat(immunizationF2.hasIdentifier()).isTrue();
     assertThat(field2Value).isEqualTo("HIB PRP-T");
     assertThat(field2System).isEqualTo("urn:id:extID");
+  }
+
+  @Test
+  public void Procedure_identifier_test() {
+
+    String procedure =
+            "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|ADT^A01^ADT_A01|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6|56789^NID^UID|MCM|CDP|^4086::132:2A57:3C28^IPV6|^4086::132:2A57:3C25^IPV6|\n" +
+             "PID|||1234||DOE^JANE^|||F||||||||||||||||||||||\n" +
+             "ORC|NW|PON001|FON001|PGN001|SC|D|1||20170825010500|MS|MS||||20170825010500|\n" +
+             "OBR|1||CD_000000|2244^General Order|||20170825010500||||||Relevant Clinical Information|||||||002|||||F|||550600^Tsadok550600^Janetary~660600^Merrit660600^Darren^F~770600^Das770600^Surjya^P~880600^Winter880600^Oscar^||||770600&Das770600&Surjya&P^^^6N^1234^A|\n" +
+             "ROL|5897|UP|AD|Dr Disney|20210322133821|20210322133822|10||Hospital|ST|19 Raymond St^Route 3^Albany^NY|1-555-222-3333|1-555-444-5555|USA\n" +
+             "PR1|1|ICD10|B45678|Fix break|20210322155008|A|75|DR FISH|V46|80|DR WHITE|DR RED|32|1|D22|G45|1|G|P98|X|0|0\n";
+    Procedure report = ProcedureUtils.createProcedureFromHl7Segment(procedure);
+
+    assertThat(report.getIdentifier()).hasSize(4);
+
+    Identifier identifier1 = report.getIdentifier().get(0);
+    String val = identifier1.getValue();
+    String sys = identifier1.getSystem();
+
+    assertThat(report.hasIdentifier()).isTrue();
+    assertThat(val).isEqualTo("200911021022");
+    assertThat(sys).isEqualTo("urn:id:extID");
+
+    Identifier identifier2 = report.getIdentifier().get(1);
+    String value = identifier2.getValue();
+    String system = identifier2.getSystem();
+
+    assertThat(report.hasIdentifier()).isTrue();
+    assertThat(value).isEqualTo("200911021022");
+    assertThat(system).isNull();
+    CodeableConcept type = identifier2.getType();
+    Coding typeValues = type.getCoding().get(0);
+    assertThat(typeValues.getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/v2-0203");
+    assertThat(typeValues.getCode()).isEqualTo("VN");
+    assertThat(typeValues.getDisplay()).isEqualTo("Visit Number");
+
+    Identifier identifier3 = report.getIdentifier().get(2);
+    String identifier3Value = identifier3.getValue();
+    String identifier3System = identifier3.getSystem();
+
+    assertThat(identifier3Value).isEqualTo("FON001");
+    assertThat(identifier3System).isNull();
+    CodeableConcept types = identifier3.getType();
+    Coding typevalues = types.getCoding().get(0);
+    assertThat(typevalues.getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/v2-0203");
+    assertThat(typevalues.getCode()).isEqualTo("FILL");
+    assertThat(typevalues.getDisplay()).isEqualTo("Filler Identifier");
+
+    Identifier identifier4 = report.getIdentifier().get(3);
+    String identifier4Value = identifier4.getValue();
+    String identifier4System = identifier4.getSystem();
+
+    assertThat(identifier4Value).isEqualTo("PON001");
+    assertThat(identifier4System).isNull();
+    CodeableConcept Type = identifier4.getType();
+    Coding typeValue = Type.getCoding().get(0);
+    assertThat(typeValue.getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/v2-0203");
+    assertThat(typeValue.getCode()).isEqualTo("PLAC");
+    assertThat(typeValue.getDisplay()).isEqualTo("Placer Identifier");
+
   }
 
 }
