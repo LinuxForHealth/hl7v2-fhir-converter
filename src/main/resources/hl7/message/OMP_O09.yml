@@ -45,3 +45,10 @@ resources:
     resourcePath: resource/AllergyIntolerance
     repeats: true
     additionalSegments:
+
+  - resourceName: ServiceRequest
+    segment: .ORC
+    resourcePath: resource/ServiceRequest
+    group: ORDER
+    repeats: true
+    additionalSegments:

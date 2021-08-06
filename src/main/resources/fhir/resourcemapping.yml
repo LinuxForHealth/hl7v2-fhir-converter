@@ -18,3 +18,4 @@ Medication: org.hl7.fhir.r4.model.Medication
 Specimen: org.hl7.fhir.r4.model.Specimen
 Procedure: org.hl7.fhir.r4.model.Procedure
 DocumentReference: org.hl7.fhir.r4.model.DocumentReference
+ServiceRequest: org.hl7.fhir.r4.model.ServiceRequest

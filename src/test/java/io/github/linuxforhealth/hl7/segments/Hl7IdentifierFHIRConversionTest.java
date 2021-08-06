@@ -515,4 +515,56 @@ public class Hl7IdentifierFHIRConversionTest {
 
   }
 
+  @Test
+  public void service_request_identifier_test() {
+
+    String serviceRequest =
+            "MSH|^~\\&|SendTest1|Sendfac1|Receiveapp1|Receivefac1|200603081747|security|OMP^O09^OMP_O09|1|P^I|2.6|||AL|NE|764|ASCII||||||^4086::132:2A57:3C28^IPv6\r" +
+                    "PID|||555444222111^^^MPI&GenHosp^MR||smith^john||19600614|M||C|99 Oakland #106^^Toronto^ON^44889||||||||343132266|||N\r" +
+                    "ORC|NW|1000^OE|9999999^RX|||E|40^QID^D10^^^R\r" +
+                    "OBX|1|TX|^hunchback|1|Increasing||||||S\r" +
+                    "NTE|1|P|comment after OBX\r";
+
+    ServiceRequest report = ServiceRequestUtils.createServiceRequestFromHl7Segment(serviceRequest);
+
+    assertThat(report.getIdentifier()).hasSize(3);
+
+    Identifier identifier1 = report.getIdentifier().get(0);
+    String value = identifier1.getValue();
+    String system = identifier1.getSystem();
+
+    assertThat(report.hasIdentifier()).isTrue();
+    assertThat(value).isEqualTo("200603081747");
+    assertThat(system).isNull();
+    CodeableConcept type = identifier1.getType();
+    Coding typeValues = type.getCoding().get(0);
+    assertThat(typeValues.getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/v2-0203");
+    assertThat(typeValues.getCode()).isEqualTo("VN");
+    assertThat(typeValues.getDisplay()).isEqualTo("Visit Number");
+
+    Identifier identifier2 = report.getIdentifier().get(1);
+    String identifier2Value = identifier2.getValue();
+    String identifier2System = identifier2.getSystem();
+
+    assertThat(identifier2Value).isEqualTo("9999999");
+    assertThat(identifier2System).isNull();
+    CodeableConcept types = identifier2.getType();
+    Coding typevalues = types.getCoding().get(0);
+    assertThat(typevalues.getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/v2-0203");
+    assertThat(typevalues.getCode()).isEqualTo("FILL");
+    assertThat(typevalues.getDisplay()).isEqualTo("Filler Identifier");
+
+    Identifier identifier3 = report.getIdentifier().get(2);
+    String identifier3Value = identifier3.getValue();
+    String identifier3System = identifier3.getSystem();
+
+    assertThat(identifier3Value).isEqualTo("1000");
+    assertThat(identifier3System).isNull();
+    CodeableConcept Type = identifier3.getType();
+    Coding typeValue = Type.getCoding().get(0);
+    assertThat(typeValue.getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/v2-0203");
+    assertThat(typeValue.getCode()).isEqualTo("PLAC");
+    assertThat(typeValue.getDisplay()).isEqualTo("Placer Identifier");
+
+  }
 }

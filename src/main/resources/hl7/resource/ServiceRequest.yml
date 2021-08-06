@@ -44,4 +44,22 @@ identifier_3:
       system: "http://terminology.hl7.org/CodeSystem/v2-0203"
       code: "PLAC"
       display: "Placer Identifier"
-   
+
+status:
+   type: STRING
+   valueOf: $default
+   expressionType: HL7Spec
+   constants:
+      default: "unknown"
+
+intent:
+   type: STRING
+   valueOf: $default
+   expressionType: HL7Spec
+   constants:
+      default: "filler-order"
+
+subject:
+   valueOf: datatype/Reference
+   expressionType: resource
+   specs: $Patient
