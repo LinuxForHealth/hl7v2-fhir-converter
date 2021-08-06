@@ -34,3 +34,4 @@ resources:
     resourcePath: resource/DocumentReference
     repeats: true
     additionalSegments:
+      - MSH
