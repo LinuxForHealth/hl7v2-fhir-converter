@@ -21,6 +21,7 @@ import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Message;
 import ca.uhn.hl7v2.util.Hl7InputStreamMessageStringIterator;
 import io.github.linuxforhealth.core.terminology.TerminologyLookup;
+import io.github.linuxforhealth.core.terminology.UrlLookup;
 import io.github.linuxforhealth.fhir.FHIRContext;
 import io.github.linuxforhealth.hl7.message.HL7MessageEngine;
 import io.github.linuxforhealth.hl7.message.HL7MessageModel;
@@ -47,6 +48,7 @@ public class HL7ToFHIRConverter {
     try {
       messagetemplates.putAll(ResourceReader.getInstance().getMessageTemplates());
       TerminologyLookup.init();
+      UrlLookup.init();
     } catch (IOException | IllegalArgumentException e) {
       throw new IllegalStateException("Failure to initialize the templates for the converter.", e);
     }

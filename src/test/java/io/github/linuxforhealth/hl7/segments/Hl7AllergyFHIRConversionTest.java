@@ -46,9 +46,9 @@ public class Hl7AllergyFHIRConversionTest {
         assertThat(allergy.getCategory().get(0).getCode()).isEqualTo("medication");
         assertThat(allergy.getCode().getText()).isEqualTo("OXYCODONE");
         List<Coding> codings = allergy.getCode().getCoding();
-        Assertions.assertEquals(codings.size(), 1);
+        Assertions.assertEquals(1, codings.size());
         Coding coding = codings.get(0);
-        Assertions.assertEquals(coding.getCode(), "00000741");
+        Assertions.assertEquals("00000741", coding.getCode());
         Assertions.assertNull(coding.getDisplay());
         assertThat(allergy.getReaction().get(0).getManifestation()).extracting(m -> m.getText())
                 .containsExactly("HYPOTENSION");
@@ -70,7 +70,7 @@ public class Hl7AllergyFHIRConversionTest {
         Date onsetReaction = allergy.getReaction().get(0).getOnset();
         Assertions.assertNull(onsetReaction);
         DateTimeType onsetAllergy = allergy.getOnsetDateTimeType();
-        assertThat(onsetAllergy.getValueAsString().equals("20210101"));
+        assertThat(onsetAllergy.getValueAsString()).isEqualTo("2021-01-01");
     }
 
 }

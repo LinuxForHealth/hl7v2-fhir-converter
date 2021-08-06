@@ -294,6 +294,7 @@ public class HL7MessageEngine implements MessageEngine {
       if (obj != null) {
         LOGGER.info("Converting resourceName {} to FHIR {}", resourceClass, obj.getResource());
         String json = OBJ_MAPPER.writeValueAsString(obj.getResource());
+        LOGGER.info("Adding resourceName {} to FHIR {}", resourceClass, json);
         if (json != null) {
           org.hl7.fhir.r4.model.Resource parsed = context.getParser()
               .parseResource(FHIRResourceMapper.getResourceClass(resourceClass), json);

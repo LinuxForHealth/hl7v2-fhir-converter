@@ -26,6 +26,9 @@ public class DateFormats {
   private static final Pattern PATTERN3 = Pattern.compile("^\\d{4}\\d{2}\\d{2}$");
   private static final Pattern PATTERN2 = Pattern.compile("^\\d{4}\\d{2}$");
   private static final Pattern PATTERN1 = Pattern.compile("^\\d{4}$");
+  
+  private static final String YYYY_MM_DD = "yyyy-MM-dd";
+  
   static DateTimeFormatter FHIR_ZONE_DATE_TIME_FORMAT =
       DateTimeFormatter.ISO_OFFSET_DATE_TIME;
 
@@ -65,11 +68,11 @@ public class DateFormats {
     Map<Pattern, DateTimeFormatter> patterns = new HashMap<>();
     patterns.put(PATTERN1, DateTimeFormatter.ofPattern("yyyy"));
     patterns.put(PATTERN2, DateTimeFormatter.ofPattern("yyyy-MM"));
-    patterns.put(PATTERN3, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-    patterns.put(PATTERN5, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-    patterns.put(PATTERN6, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-    patterns.put(PATTERN7, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-    patterns.put(PATTERN8, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+    patterns.put(PATTERN3, DateTimeFormatter.ofPattern(YYYY_MM_DD));
+    patterns.put(PATTERN5, DateTimeFormatter.ofPattern(YYYY_MM_DD));
+    patterns.put(PATTERN6, DateTimeFormatter.ofPattern(YYYY_MM_DD));
+    patterns.put(PATTERN7, DateTimeFormatter.ofPattern(YYYY_MM_DD));
+    patterns.put(PATTERN8, DateTimeFormatter.ofPattern(YYYY_MM_DD));
     return patterns;
 
   }

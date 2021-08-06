@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2020
+ * (C) Copyright IBM Corp. 2020, 2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -9,7 +9,7 @@ import java.util.function.BiPredicate;
 import org.apache.commons.lang3.StringUtils;
 
 /**
- * This is a static class that defines different types of Rule predicate and there operations.
+ * This is a static class that defines different types of Rule predicates and their operations.
  * 
  * @author pbhallam@us.ibm.com
  *
@@ -19,16 +19,10 @@ public class ConditionBiPredicates {
 
   public static final BiPredicate<Integer, Integer> GREATER_THAN = (x, y) -> x > y;
   public static final BiPredicate<Integer, Integer> EQUAL_TO = (x, y) -> x.equals(y);
+  public static final BiPredicate<Integer, Integer> NOT_EQUAL_TO = (x, y) -> !x.equals(y);
   public static final BiPredicate<Integer, Integer> LESS_THAN = (x, y) -> x < y;
   public static final BiPredicate<Integer, Integer> GREATER_THAN_OR_EQUAL_TO = (x, y) -> x >= y;
   public static final BiPredicate<Integer, Integer> LESS_THAN_OR_EQUAL_TO = (x, y) -> x <= y;
-
-  public static final BiPredicate<Float, Float> GREATER_THAN_FLOAT = (x, y) -> x > y;
-  public static final BiPredicate<Float, Float> LESS_THAN_FLOAT = (x, y) -> x < y;
-  public static final BiPredicate<Float, Float> GREATER_THAN_OR_EQUAL_TO_FLOAT = (x, y) -> x >= y;
-  public static final BiPredicate<Float, Float> LESS_THAN_OR_EQUAL_TO_FLOAT = (x, y) -> x <= y;
-
-
 
   public static final BiPredicate<String, String> EQUALS_IC = StringUtils::equalsIgnoreCase;
   public static final BiPredicate<String, String> NOT_EQUALS = EQUALS_IC.negate();

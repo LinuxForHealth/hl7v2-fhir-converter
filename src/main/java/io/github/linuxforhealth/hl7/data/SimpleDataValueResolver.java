@@ -135,19 +135,21 @@ public class SimpleDataValueResolver {
         }
     };
 
-    public static final ValueExtractor<Object, CodeableConcept> RELIGIOUS_AFFILIATION_FHIR_CC = (Object value) -> {
+
+    public static final ValueExtractor<Object, SimpleCode> RELIGIOUS_AFFILIATION_FHIR_CC =
+        (Object value) -> {
         String val = Hl7DataHandlerUtil.getStringValue(value);
         String code = getFHIRCode(val, V3ReligiousAffiliation.class);
         if (code != null) {
-            V3ReligiousAffiliation rel = V3ReligiousAffiliation.fromCode(code);
-            CodeableConcept codeableConcept = new CodeableConcept();
-            codeableConcept.addCoding(new Coding(rel.getSystem(), code, rel.getDisplay()));
-            codeableConcept.setText(rel.getDisplay());
-            return codeableConcept;
+            V3ReligiousAffiliation status = V3ReligiousAffiliation.fromCode(code);
+            return new SimpleCode(code, status.getSystem(), status.getDisplay());
+
         } else {
             return null;
         }
     };
+
+
 
     public static final ValueExtractor<Object, String> IMMUNIZATION_STATUS_CODES = (Object value) -> {
         String val = Hl7DataHandlerUtil.getStringValue(value);
@@ -240,7 +242,7 @@ public class SimpleDataValueResolver {
         return value;
     };
 
-    public static final ValueExtractor<Object, Object> CODING_SYSTEM_V2 = (Object value) -> {
+    public static final ValueExtractor<Object, SimpleCode> CODING_SYSTEM_V2 = (Object value) -> {
         String table = Hl7DataHandlerUtil.getTableNumber(value);
         String val = Hl7DataHandlerUtil.getStringValue(value);
         if (table != null && val != null) {
@@ -291,8 +293,9 @@ public class SimpleDataValueResolver {
 
     public static final ValueExtractor<Object, String> SYSTEM_URL = (Object value) -> {
         String val = Hl7DataHandlerUtil.getStringValue(value);
-        return UrlLookup.getSystemUrl(val);
+      return UrlLookup.getAssociatedUrl(val);
     };
+
 
     // Convert an authority string to a valid system value
     // Prepend "urn:id:"; convert any spaces to underscores
@@ -361,6 +364,7 @@ public class SimpleDataValueResolver {
             return null;
         }
     };
+
 
     private SimpleDataValueResolver() {
     }

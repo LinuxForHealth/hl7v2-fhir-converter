@@ -51,12 +51,14 @@ public class ExpressionAttributes {
   private boolean useGroup;
   private ExpressionType expressionType;
   private String toString;
+  private List<ExpressionAttributes> expressions;
+  private Map<String, ExpressionAttributes> expressionsMap;
+
+
 
   // if valueof attribute ends with * then list of values will be generated
   private boolean generateMultiple;
 
-  // Property specific to ValueExtractionGeneralExpression
-  private ImmutablePair<String, String> fetch;
 
   private ExpressionAttributes(Builder exBuilder) {
     if (exBuilder.type == null) {
@@ -97,6 +99,18 @@ public class ExpressionAttributes {
       this.expressionType = ExpressionType.HL7SPEC;
     }
 
+    if (exBuilder.expressions != null) {
+      this.expressions = exBuilder.expressions;
+    }
+
+    if (exBuilder.expressionsMap != null) {
+      this.expressionsMap = exBuilder.expressionsMap;
+    }
+
+  }
+
+  public Map<String, ExpressionAttributes> getExpressionsMap() {
+    return expressionsMap;
   }
 
   public boolean isUseGroup() {
@@ -139,9 +153,6 @@ public class ExpressionAttributes {
     return value;
   }
 
-  public ImmutablePair<String, String> getFetch() {
-    return fetch;
-  }
 
   public ExpressionType getExpressionType() {
     return expressionType;
@@ -160,12 +171,20 @@ public class ExpressionAttributes {
     return name;
   }
 
+
+
+  public List<ExpressionAttributes> getExpressions() {
+    return expressions;
+  }
+
+
   /**
-   * Extract special chars:
-   *      * indicates to extract fields from multiple entries
-   *      & indicates to retain empty (null) fields
+   * Extract special chars: * indicates to extract fields from multiple entries & indicates to
+   * retain empty (null) fields
+   * 
    * @param inputString
-   * @return ExpressionModifiers object with booleans indicating which modifiers were used and the expression after modifiers have been removed
+   * @return ExpressionModifiers object with booleans indicating which modifiers were used and the
+   *         expression after modifiers have been removed
    */
   public static final ExpressionModifiers extractExpressionModifiers(String inputString) {
 
@@ -199,8 +218,8 @@ public class ExpressionAttributes {
     if (StringUtils.isNotBlank(exp.expression)) {
       StringTokenizer st = new StringTokenizer(exp.expression, "|").setIgnoreEmptyTokens(true)
           .setTrimmerMatcher(StringMatcherFactory.INSTANCE.spaceMatcher());
-      st.getTokenList()
-          .forEach(s -> specs.add(SpecificationParser.parse(s, exp.extractMultiple, useGroup, exp.retainEmpty)));
+      st.getTokenList().forEach(s -> specs
+          .add(SpecificationParser.parse(s, exp.extractMultiple, useGroup, exp.retainEmpty)));
     }
 
     return specs;
@@ -234,10 +253,6 @@ public class ExpressionAttributes {
 
 
 
-
-
-
-
   public static class Builder {
 
 
@@ -256,6 +271,9 @@ public class ExpressionAttributes {
     private String valueOf;
     private String value;
     private boolean generateList;
+    private List<ExpressionAttributes> expressions;
+
+    private Map<String, ExpressionAttributes> expressionsMap;
 
     public Builder() {}
 
@@ -313,6 +331,17 @@ public class ExpressionAttributes {
       return this;
     }
 
+    public Builder withExpressions(List<ExpressionAttributes> expressions) {
+      this.expressions = expressions;
+      return this;
+    }
+
+    public Builder withExpressionsMap(Map<String, ExpressionAttributes> expressionsMap) {
+      this.expressionsMap = expressionsMap;
+      return this;
+    }
+
+
     public Builder withValueOf(String valueOf) {
       this.valueOf = StringUtils.trim(valueOf);
       if (this.expressionType == null) {
@@ -343,12 +372,13 @@ public class ExpressionAttributes {
 
   }
 
-  // Class used when extracting modifiers from the expression, contains the expression after modifiers have been removed and
+  // Class used when extracting modifiers from the expression, contains the expression after
+  // modifiers have been removed and
   // booleans indicating which modifiers were in the expression.
   public static class ExpressionModifiers {
-    public boolean extractMultiple = false;  // true when * is used in the expression
-    public boolean retainEmpty = false;      // true when & is used in the expression
-    public String expression = "";           // resulting expression after the modifiers have been removed
+    public boolean extractMultiple = false; // true when * is used in the expression
+    public boolean retainEmpty = false; // true when & is used in the expression
+    public String expression = ""; // resulting expression after the modifiers have been removed
 
     ExpressionModifiers(boolean theExtractMultiple, boolean theRetainEmpty, String theExpression) {
       extractMultiple = theExtractMultiple;

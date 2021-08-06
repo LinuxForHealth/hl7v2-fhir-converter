@@ -4,20 +4,17 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 ---
-url:
+url_1:
+  condition: $urlValue NOT_NULL
   type: SYSTEM_URL
-  valueOf: $url
+  valueOf: $urlValue
 
-valueString:
+url_2:
+  condition: $urlString NOT_NULL
   type: STRING
-  valueOf: $valString
+  valueOf: $urlString
 
-valueAddress:
-  condition: $valAddress NOT_NULL
-  valueOf: datatype/Address
-  expressionType: resource
-  specs: $valAddress
 
-valueDateTime:
-  type: DATE_TIME
-  valueOf: $valDateTime
+value_KEY_NAME_SUFFIX:
+  valueOf: $value
+

@@ -85,7 +85,7 @@ public class Hl7RelatedGeneralUtilsTest {
   public void test_date_diff_valid_values_no_min() {
 
     Long diff = Hl7RelatedGeneralUtils.diffDateMin("2007-11-05",
-        "2007-11-04T01:33:06.345+09:00");
+        "2007-11-04T01:33:06.345+20:00");
     assertThat(diff).isNull();
   }
 

@@ -138,7 +138,7 @@ public class FHIRConverterTest {
     DiagnosticReport expectStatusUnknown = (DiagnosticReport) context.getParser().parseResource(klass, s);
     DiagnosticReport.DiagnosticReportStatus status = expectStatusUnknown.getStatus();
 
-    assertThat(expectStatusUnknown.hasStatus());
+    assertThat(expectStatusUnknown.hasStatus()).isTrue();
     assertThat(status).isEqualTo(DiagnosticReport.DiagnosticReportStatus.UNKNOWN);
   }
 

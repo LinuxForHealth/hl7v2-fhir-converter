@@ -59,7 +59,7 @@ Library Coordinates
 ```
 groupId = io.github.linuxforhealth
 artifactId = hl7v2-fhir-converter
-version = 1.0.7
+version = 1.0.9
 ```
 
 Maven dependency
@@ -67,13 +67,13 @@ Maven dependency
 <dependency>
   <groupId>io.github.linuxforhealth</groupId>
   <artifactId>hl7v2-fhir-converter</artifactId>
-  <version>1.0.7</version>
+  <version>1.0.9</version>
 </dependency>
 ```
 
 Gradle dependency:
 ```
-    implementation 'io.github.linuxforhealth:hl7v2-fhir-converter:1.0.7'
+    implementation 'io.github.linuxforhealth:hl7v2-fhir-converter:1.0.9'
 ```     
 
 Instantiate and execute the converter

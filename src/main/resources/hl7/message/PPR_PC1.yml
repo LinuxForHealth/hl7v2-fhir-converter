@@ -20,6 +20,7 @@ resources:
       repeats: false
       additionalSegments:
              - PD1
+             - MSH
       
     - resourceName: Encounter
       segment: .PV1
@@ -29,6 +30,7 @@ resources:
       repeats: false
       additionalSegments:
              - .PV2
+             - MSH
       
     - resourceName: Observation
       segment: .PROBLEM_OBSERVATION.OBX
@@ -37,6 +39,7 @@ resources:
       repeats: true
       isReferenced: true
       additionalSegments:
+        - MSH
 
     - resourceName: Condition
       segment: .PRB
@@ -44,7 +47,7 @@ resources:
       resourcePath: resource/Condition
       repeats: true
       additionalSegments:
-      
+        - MSH
 
       
   

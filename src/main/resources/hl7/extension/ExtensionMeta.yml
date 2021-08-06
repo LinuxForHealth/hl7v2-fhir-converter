@@ -1,0 +1,71 @@
+extension_1:
+   generateList: true
+   valueOf: extension/Extension
+   expressionType: resource
+   vars:
+      value: String, MSH.3
+   constants:
+      KEY_NAME_SUFFIX: String
+      urlValue: process-client-id
+
+extension_2:
+   generateList: true
+   valueOf: extension/Extension
+   expressionType: resource
+   vars:
+      value: String, MSH.12.1
+   constants:
+      KEY_NAME_SUFFIX: String
+      urlValue: source-data-model-version
+
+extension_3:
+   generateList: true
+   valueOf: extension/Extension
+   expressionType: resource
+   vars:
+      value: String, MSH.10
+   constants:
+      KEY_NAME_SUFFIX: String
+      urlValue: source-record-id
+
+extension_4:
+   generateList: true
+   valueOf: extension/Extension
+   expressionType: resource
+   vars:
+      value: DATE_TIME, MSH.7
+   constants:
+      KEY_NAME_SUFFIX: String
+      urlValue: source-event-timestamp
+
+extension_5:
+   generateList: true
+   expressionType: nested
+   expressionsMap:
+      url:
+         type: SYSTEM_URL
+         value: 'source-record-type'
+      valueCodeableConcept:
+         valueOf: datatype/CodeableConcept_var
+         expressionType: resource
+         vars:
+            system: SYSTEM_URL, $system_code
+            code: String, MSH.9.1
+         constants:
+            system_code: 'source-record-type-system'
+
+extension_6:
+   generateList: true
+   expressionType: nested
+   expressionsMap:
+      url:
+         type: SYSTEM_URL
+         value: 'source-event-trigger'
+      valueCodeableConcept:
+         valueOf: datatype/CodeableConcept_var
+         expressionType: resource
+         vars:
+            system: SYSTEM_URL, $system_code
+            code: String, MSH.9.2
+         constants:
+            system_code: 'source-event-trigger-system'

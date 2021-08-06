@@ -13,7 +13,8 @@ resources:
       isReferenced: false
       additionalSegments: 
              - EVN
-   
+             - MSH
+
     - resourceName: Patient
       segment: PID
       resourcePath: resource/Patient
@@ -21,7 +22,8 @@ resources:
       isReferenced: true
       additionalSegments:
              - PD1
-      
+             - MSH
+
     - resourceName: Encounter
       segment: PV1
       resourcePath: resource/Encounter
@@ -30,6 +32,7 @@ resources:
       additionalSegments:
              - PV2
              - EVN
+             - MSH
 
     - resourceName: Observation
       segment: OBX
@@ -37,12 +40,14 @@ resources:
       repeats: true
       isReferenced: true
       additionalSegments:
-      
+        - MSH
+
     - resourceName: AllergyIntolerance
       segment: AL1
       resourcePath: resource/AllergyIntolerance
       repeats: true
       additionalSegments:
+        - MSH
 
     - resourceName: Procedure
       segment: ROL
@@ -50,3 +55,4 @@ resources:
       repeats: true
       additionalSegments:
             - PR1
+            - MSH
