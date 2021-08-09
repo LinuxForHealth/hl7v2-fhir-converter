@@ -167,7 +167,10 @@ public class SimpleDataValueResolverTest {
     String gen = "ZZZ";
     SimpleCode code =
         SimpleDataValueResolver.RELIGIOUS_AFFILIATION_FHIR_CC.apply(gen);
-    assertThat(code).isNull();
+    assertThat(code).isNotNull();
+    assertThat(code.getCode()).isEqualToIgnoringCase("ZZZ");
+    assertThat(code.getSystem()).isNull(); 
+    assertThat(code.getDisplay()).isNull(); 
   }
 
   @Test

@@ -24,7 +24,7 @@ class FHIRExtensionsTest {
 
         String patientWithDataForExtensions = "MSH|^~\\&|MIICEHRApplication|MIIC|MIIC|MIIC|201705130822||VXU^V04^VXU_V04|test1100|P|2.5.1|||AL|AL|||||Z22^CDCPHINVS|^^^^^MIIC^SR^^^MIIC|MIIC\n"
                 // Test for mother's maiden name and religion and two race variants
-                + "PID|1||12345678^^^^MR|ALTID|Mouse^Mickey^J^III^^^|MotherMaiden^Mickette|20060504080400|M|Alias^Alias|2028-9^Asian^HL70005~2106-3^White^HL70005|12345 testing ave^^Minneapolis^MN^55407^^^^MN053|USAA|^PRN^^^PH^555^5555555|^PRN^^^PH^555^666666|english|married|LUT^Christian: Lutheran^|1234567_account|111-22-3333|DL00003333||2186-5^not Hispanic or Latino^CDCREC|Orlando Disney Hospital|Y|2|USA||||\n";
+                + "PID|1||12345678^^^^MR|ALTID|Mouse^Mickey^J^III^^^|MotherMaiden^Mickette|20060504080400|M|Alias^Alias|2028-9^Asian^HL70005~2106-3^White^HL70005||USAA|^PRN^^^PH^555^5555555|^PRN^^^PH^555^666666|english|married|LUT^Christian: Lutheran^|1234567_account|111-22-3333|DL00003333||2186-5^not Hispanic or Latino^CDCREC||Y|2|USA||||\n";
 
         Patient patient = PatientUtils.createPatientFromHl7Segment(patientWithDataForExtensions);
         assertThat(patient.hasExtension()).isTrue();
@@ -69,6 +69,27 @@ class FHIRExtensionsTest {
         assertThat(coding.getDisplay()).hasToString("White");
         assertThat(coding.getCode()).hasToString("2106-3");
         assertThat(coding.getSystem()).containsIgnoringCase("terminology.hl7.org/CodeSystem/v3-Race");
+    }
+
+    @Test
+    void test_that_extension_handles_text_only_religion_correctly() {
+
+        String patientWithDataForExtensions = "MSH|^~\\&|MIICEHRApplication|MIIC|MIIC|MIIC|201705130822||VXU^V04^VXU_V04|test1100|P|2.5.1|||AL|AL|||||Z22^CDCPHINVS|^^^^^MIIC^SR^^^MIIC|MIIC\n"
+                // Test text only race
+                + "PID|1||12345678^^^^MR|ALTID|Mouse^Mickey^J^III^^^|||M|Alias^Alias|||USAA|||english|married|Methodist|||DL00003333|||Orlando Disney Hospital|Y|2|USA||||\n";
+
+        Patient patient = PatientUtils.createPatientFromHl7Segment(patientWithDataForExtensions);
+        assertThat(patient.hasExtension()).isTrue();
+
+        Extension ext = patient.getExtensionByUrl(UrlLookup.getExtensionUrl("religion"));
+        assertThat(ext).isNotNull();
+        CodeableConcept cc = (CodeableConcept) ext.getValue();
+        assertThat(cc.hasCoding()).isTrue();
+        Coding coding = cc.getCodingFirstRep();
+        assertThat(coding.hasDisplay()).isFalse();
+        assertThat(coding.hasCode()).isTrue();
+        assertThat(coding.hasSystem()).isFalse();
+        assertThat(coding.getCode()).hasToString("Methodist");
     }
 
     @Test
