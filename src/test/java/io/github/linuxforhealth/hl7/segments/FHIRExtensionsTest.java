@@ -95,4 +95,30 @@ class FHIRExtensionsTest {
 
     }
 
+    @Test
+    void test_that_extension_handles_alternate_CDCREC_race_encoding() {
+
+        String patientWithDataForExtensions = "MSH|^~\\&|MIICEHRApplication|MIIC|MIIC|MIIC|201705130822||VXU^V04^VXU_V04|test1100|P|2.5.1|||AL|AL|||||Z22^CDCPHINVS|^^^^^MIIC^SR^^^MIIC|MIIC\n"
+                // Test text only race
+                + "PID|1||12345678^^^^MR|ALTID|Mouse^Mickey^J^III^^^|||M|Alias^Alias|2106-3^White^CDCREC|USAA|||english|married||||DL00003333|||Orlando Disney Hospital|Y|2|USA||||\n";
+
+        Patient patient = PatientUtils.createPatientFromHl7Segment(patientWithDataForExtensions);
+        assertThat(patient.hasExtension()).isTrue();
+
+        List<Extension> extensions = patient.getExtensionsByUrl(UrlLookup.getExtensionUrl("race"));
+        assertThat(extensions).isNotNull();
+        assertThat(extensions.size()).isEqualTo(1);
+        assertThat(extensions.get(0).hasValue()).isTrue();
+        CodeableConcept ccW = (CodeableConcept) extensions.get(0).getValue();
+        assertThat(ccW.hasCoding()).isTrue();
+        Coding coding = ccW.getCodingFirstRep();
+        assertThat(coding.hasDisplay()).isTrue();
+        assertThat(coding.hasCode()).isTrue();
+        assertThat(coding.hasSystem()).isTrue();
+        assertThat(coding.getDisplay()).hasToString("White");
+        assertThat(coding.getCode()).hasToString("2106-3");
+        assertThat(coding.getSystem()).containsIgnoringCase("terminology.hl7.org/CodeSystem/v3-Race");
+
+    }    
+
 }
