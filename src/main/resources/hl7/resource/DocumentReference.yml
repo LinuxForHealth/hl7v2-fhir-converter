@@ -25,7 +25,7 @@ identifier_2:
    generateList: true
    expressionType: resource
    vars:
-      valueIn: ORC.3.1 | OBR.3.1
+      valueIn: TXA.15.1 | ORC.3.1 | OBR.3.1
    constants:
       system: "http://terminology.hl7.org/CodeSystem/v2-0203"
       code: "FILL"
@@ -37,7 +37,7 @@ identifier_3:
    generateList: true
    expressionType: resource
    vars:
-      valueIn: ORC.2.1 | OBR.2.1
+      valueIn: TXA.14.1 | ORC.2.1 | OBR.2.1
    constants:
       system: "http://terminology.hl7.org/CodeSystem/v2-0203"
       code: "PLAC"

@@ -8,13 +8,14 @@ id:
    type: STRING
    valueOf: UUID.randomUUID()
    expressionType: JEXL
+
 identifier:
    valueOf: datatype/Identifier
    generateList: true
    expressionType: resource
    vars:
       system: SYSTEM_URL, $sys
-      value: BUILD_FROM_CWE, RXA.5
+      value: BUILD_IDENTIFIER_FROM_CWE, RXA.5
    constants:
       sys: "urn:id:extID"
 status:

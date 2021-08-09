@@ -23,13 +23,12 @@ identifier_1:
     display: "Visit Number"
 
 identifier_2:
-  condition: DG1.1 NOT_NULL
   valueOf: datatype/Identifier
   generateList: true
   expressionType: resource
   vars:
     system: SYSTEM_URL, $sys
-    value: BUILD_FROM_CWE, DG1.1
+    value: BUILD_IDENTIFIER_FROM_CWE, DG1.3
   constants:
     sys: "urn:id:extID"
 

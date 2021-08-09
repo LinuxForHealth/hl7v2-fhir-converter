@@ -5,11 +5,11 @@
 #
 # Creates an identifier for observation which concatenates value strings
 ---
-system: 
+system:
      type: SYSTEM_URL
-     valueOf: CX.4 | CWE.4 |EI.2 | $sys
+     valueOf: $sys
      expressionType: HL7Spec
-    
+
 value: 
      type: STRING
      valueOf: $join

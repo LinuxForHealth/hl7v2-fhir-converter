@@ -35,3 +35,10 @@ resources:
       repeats: true
       isReferenced: true
       additionalSegments:
+
+    - resourceName: DocumentReference
+      segment: TXA
+      resourcePath: resource/DocumentReference
+      repeats: true
+      additionalSegments:
+        - MSH

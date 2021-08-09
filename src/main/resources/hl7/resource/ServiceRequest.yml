@@ -15,7 +15,7 @@ identifier_1:
    generateList: true
    expressionType: resource
    vars:
-      valueIn: MSH.7
+      valueIn: PV1.19 | PID.18 | MSH.7
    constants:
       system: "http://terminology.hl7.org/CodeSystem/v2-0203"
       code: "VN"

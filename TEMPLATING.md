@@ -297,7 +297,7 @@ identifier_1:
       sys: "urn:id:extID"
       joinChar: '-'
 ```
-*  In the Indetifier_Observation we take the values and add them together in the `value  HL7Spec`
+* In the Identifier_Observation we take the values and add them together in the `value HL7Spec`
 ```yml
 value: 
      type: STRING

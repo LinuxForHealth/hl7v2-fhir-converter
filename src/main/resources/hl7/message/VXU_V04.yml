@@ -43,3 +43,13 @@ resources:
               - .RXR
               - .OBSERVATION.OBX
               - MSH
+
+    - resourceName: MedicationAdministration
+      segment: .RXA
+      group: ORDER
+      resourcePath: resource/MedicationAdministration
+      repeats: true
+      isReferenced: false
+      additionalSegments:
+        - .RXR
+        - MSH

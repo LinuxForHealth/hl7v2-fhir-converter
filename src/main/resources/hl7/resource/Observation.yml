@@ -17,7 +17,7 @@ identifier_1: #joins filler | placer | MSH.7 with whatever gets returned from BU
   generateList: true
   expressionType: resource
   vars:
-    obx3: BUILD_FROM_CWE, OBX.3
+    obx3: BUILD_IDENTIFIER_FROM_CWE, OBX.3
     fillpla: STRING, ORC.3.1 | OBR.3.1 | ORC.2.1 | OBR.2.1 | MSH.7
   constants:
       sys: "urn:id:extID"

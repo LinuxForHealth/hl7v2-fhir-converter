@@ -51,7 +51,8 @@ public enum SimpleDataTypeMapper {
   NAME_USE(SimpleDataValueResolver.NAME_USE_CODE_FHIR),
   RELIGIOUS_AFFILIATION_CC(SimpleDataValueResolver.RELIGIOUS_AFFILIATION_FHIR_CC),
   MARITAL_STATUS(SimpleDataValueResolver.MARITAL_STATUS),
-  BUILD_FROM_CWE(SimpleDataValueResolver.BUILD_FROM_CWE);
+  BUILD_IDENTIFIER_FROM_CWE(SimpleDataValueResolver.BUILD_IDENTIFIER_FROM_CWE),
+  MEDREQ_STATUS(SimpleDataValueResolver.MEDREQ_STATUS_CODE_FHIR);
 
 
 

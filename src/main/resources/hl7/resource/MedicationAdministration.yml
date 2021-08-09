@@ -22,15 +22,43 @@ identifier_1:
     display: "Visit Number"
 
 identifier_2:
-  condition: RXO.1 NOT_NULL
-  type:
   valueOf: datatype/Identifier
   generateList: true
   expressionType: resource
   vars:
     system: SYSTEM_URL, $sys
-    value: BUILD_FROM_CWE, RXO.1
+    value: BUILD_IDENTIFIER_FROM_CWE, RXA.5
   constants:
     sys: "urn:id:extID"
 
+status:
+  type: MEDREQ_STATUS
+  valueOf:  RXA.20
+  expressionType: HL7Spec
 
+medicationCodeableConcept:
+  valueOf: datatype/CodeableConcept
+  expressionType: resource
+  specs: RXA.5
+
+medicationReference:
+  valueOf: datatype/Reference
+  expressionType: resource
+  specs: $Medication
+
+effectiveDateTime:
+  type: DATE_TIME
+  valueOf: RXA.3 | RXA.4
+  expressionType: HL7Spec
+
+effectivePeriod:
+  valueOf: datatype/Period
+  expressionType: resource
+  vars:
+    start: RXA.3
+    end: RXA.4
+
+subject:
+  valueOf: datatype/Reference
+  expressionType: resource
+  specs: $Patient

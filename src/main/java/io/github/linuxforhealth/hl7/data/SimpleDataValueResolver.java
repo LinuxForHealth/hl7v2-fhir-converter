@@ -20,11 +20,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.hl7.fhir.r4.model.AllergyIntolerance.AllergyIntoleranceCategory;
 import org.hl7.fhir.r4.model.AllergyIntolerance.AllergyIntoleranceCriticality;
-import org.hl7.fhir.r4.model.CodeableConcept;
-import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.DiagnosticReport.DiagnosticReportStatus;
 import org.hl7.fhir.r4.model.Enumerations.AdministrativeGender;
 import org.hl7.fhir.r4.model.Immunization.ImmunizationStatus;
+import org.hl7.fhir.r4.model.MedicationRequest;
 import org.hl7.fhir.r4.model.Observation.ObservationStatus;
 import org.hl7.fhir.r4.model.Specimen.SpecimenStatus;
 import org.hl7.fhir.r4.model.codesystems.V3MaritalStatus;
@@ -101,6 +100,15 @@ public class SimpleDataValueResolver {
         } else {
             return AdministrativeGender.UNKNOWN.toCode();
         }
+    };
+
+    public static final ValueExtractor<Object, String> MEDREQ_STATUS_CODE_FHIR = (Object value) -> {
+        String val = Hl7DataHandlerUtil.getStringValue(value);
+        String code = getFHIRCode(val, MedicationRequest.class);
+        if (code != null) {
+            return code;
+        }
+        else return "unknown"; // when the HL7 status codes get mapped in v2toFhirMapping, we will return code. "unknown" is being returned because the hl7 message is not mapped to fhir yet.
     };
 
     public static final ValueExtractor<Object, String> OBSERVATION_STATUS_CODE_FHIR = (Object value) -> {
@@ -254,7 +262,7 @@ public class SimpleDataValueResolver {
         }
     };
 
-    public static final ValueExtractor<Object, String> BUILD_FROM_CWE = (Object value) -> {
+    public static final ValueExtractor<Object, String> BUILD_IDENTIFIER_FROM_CWE = (Object value) -> {
         CWE newValue = ((CWE) value);
         String identifier = newValue.getCwe1_Identifier().toString();
         String text = newValue.getCwe2_Text().toString();
