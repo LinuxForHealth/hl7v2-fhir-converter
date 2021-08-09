@@ -22,6 +22,18 @@ identifier_1:
     code: "VN"
     display: "Visit Number"
 
+identifier_2:
+  condition: $valueIn NOT_NULL
+  valueOf: datatype/Identifier_var
+  generateList: true
+  expressionType: resource
+  vars:
+    valueIn: PV1.50
+  constants:
+    system: "http://terminology.hl7.org/CodeSystem/v2-0203"
+    code: "VN"
+    display: "Visit Number"
+
 status:
     type: STRING
     valueOf: 'GeneralUtils.getEncounterStatus(vars1,vars2,vars3)'

@@ -156,6 +156,7 @@ public class Hl7IdentifierFHIRConversionTest {
    AllergyIntolerance joined = getResourceUtils.getAllergyResource(Field1andField3);
 
     Identifier values = joined.getIdentifier().get(0);
+    assertThat(joined.getIdentifier()).hasSize(1);
     String joinedValue = values.getValue();
     String system = values.getSystem();
 
@@ -166,6 +167,7 @@ public class Hl7IdentifierFHIRConversionTest {
     AllergyIntolerance field1 = getResourceUtils.getAllergyResource(Field1andField2);
 
     Identifier field1Values = field1.getIdentifier().get(0);
+    assertThat(field1.getIdentifier()).hasSize(1);
     String field1Value = field1Values.getValue();
     String field1System = field1Values.getSystem();
 
@@ -176,6 +178,7 @@ public class Hl7IdentifierFHIRConversionTest {
     AllergyIntolerance field2 = getResourceUtils.getAllergyResource(justField2);
 
     Identifier field2Values = field2.getIdentifier().get(0);
+    assertThat(field2.getIdentifier()).hasSize(1);
     String field2Value = field2Values.getValue();
     String field2System = field2Values.getSystem();
 
@@ -194,7 +197,7 @@ public class Hl7IdentifierFHIRConversionTest {
             "PRB|AD|2004062916460000|596.5^BLADDER DYSFUNCTION^I9||||20040629||||||ACTIVE|||20040629";
     String withPRB4 =
             "MSH|^~\\&|||||20040629164652|1|PPR^PC1|331|P|2.3.1||\n" +
-            "PID|||10290^^^WEST^MR||KARLS^TOM^ANDREW^^MR.^||20040530|M|||||||||||398-44-5555|||||||||||N\n" +
+            "PID|1||000054321^^^MRN||COOPER^SHELDON^ANDREW||19820512|M||2106-3|||||EN^English|M|CAT|78654||||N\r" +
             "PRB|AD|2004062916460000|596.5^BLADDER DYSFUNCTION^I9|26744|||20040629||||||ACTIVE|||20040629";
 
     Condition noPrb4 = getResourceUtils.getCondition(withoutPRB4);
@@ -219,7 +222,7 @@ public class Hl7IdentifierFHIRConversionTest {
 
     assertThat(prb4.hasIdentifier()).isTrue();
     assertThat(prb4.getIdentifier()).hasSize(2);
-    assertThat(identifier1Value).isEqualTo("331");
+    assertThat(identifier1Value).isEqualTo("78654");
     assertThat(identifier1System).isNull();
     CodeableConcept type = identifier1.getType();
     Coding typeValues = type.getCoding().get(0);
@@ -333,6 +336,12 @@ public class Hl7IdentifierFHIRConversionTest {
                     + "PID|1||432155^^^ANF^MR||Patient^Johnny^New^^^^L|Smith^Sally|20130414|M||2106-3^White^HL70005|123 Any St^^Somewhere^WI^54000^^M\r"
                     + "PV1||I|6N^1234^A^GENERAL HOSPITAL2||||0100^ANDERSON,CARL|0148^ADDISON,JAMES||SUR|||||||0148^ANDERSON,CARL|S|8846511|A|||||||||||||||||||SF|K||||20170215080000\r" ;
 
+    String encounterW2Identifiers =
+            "MSH|^~\\&|MYEHR2.5|RI88140101|KIDSNET_IFL|RIHEALTH|20130531||VXU^V04^VXU_V04|20130531RI881401010105|P|2.6|||AL|NE|764|ASCII||||||^4086::132:2A57:3C28^IPv6\r"
+                    + "EVN|A01|20130617154644||01\r"
+                    + "PID|1||432155^^^ANF^MR||Patient^Johnny^New^^^^L|Smith^Sally|20130414|M||2106-3^White^HL70005|123 Any St^^Somewhere^WI^54000^^M\r"
+                    + "PV1||I|6N^1234^A^GENERAL HOSPITAL2||||0100^ANDERSON,CARL|0148^ADDISON,JAMES||SUR|||||||0148^ANDERSON,CARL|S|8846511|A|||||||||||||||||||SF|K||||20170215080000||||||POL8009|\r" ;
+
     Encounter encounterResource = getResourceUtils.getEncounter(encounter);
 
     Identifier values = encounterResource.getIdentifier().get(0);
@@ -346,6 +355,30 @@ public class Hl7IdentifierFHIRConversionTest {
     assertThat(typeValues.getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/v2-0203");
     assertThat(typeValues.getCode()).isEqualTo("VN");
     assertThat(typeValues.getDisplay()).isEqualTo("Visit Number");
+
+    Encounter encounters = getResourceUtils.getEncounter(encounterW2Identifiers);
+
+    Identifier encounter1values = encounters.getIdentifier().get(0);
+    String encounter1value = encounter1values.getValue();
+    Identifier encounter2values = encounters.getIdentifier().get(1);
+    String encounter2value = encounter2values.getValue();
+
+    assertThat(encounters.hasIdentifier()).isTrue();
+    assertThat(encounters.getIdentifier()).hasSize(2);
+
+    assertThat(encounter1value).isEqualTo("8846511");
+    CodeableConcept encounter1type = encounter1values.getType();
+    Coding encounter1typeValues = encounter1type.getCoding().get(0);
+    assertThat(encounter1typeValues.getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/v2-0203");
+    assertThat(encounter1typeValues.getCode()).isEqualTo("VN");
+    assertThat(encounter1typeValues.getDisplay()).isEqualTo("Visit Number");
+
+    assertThat(encounter2value).isEqualTo("POL8009");
+    CodeableConcept encounter2type = encounter2values.getType();
+    Coding encounter2typeValues = encounter2type.getCoding().get(0);
+    assertThat(encounter2typeValues.getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/v2-0203");
+    assertThat(encounter2typeValues.getCode()).isEqualTo("VN");
+    assertThat(encounter2typeValues.getDisplay()).isEqualTo("Visit Number");
   }
 
   @Test
@@ -404,7 +437,7 @@ public class Hl7IdentifierFHIRConversionTest {
             "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|ADT^A01^ADT_A01|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6|56789^NID^UID|MCM|CDP|^4086::132:2A57:3C28^IPV6|^4086::132:2A57:3C25^IPV6|\n" +
              "PID|||1234||DOE^JANE^|||F||||||||||||||||||||||\n" +
              "ORC|NW|PON001|FON001|PGN001|SC|D|1||20170825010500|MS|MS||||20170825010500|\n" +
-             "OBR|1||CD_000000|2244^General Order|||20170825010500||||||Relevant Clinical Information|||||||002|||||F|||550600^Tsadok550600^Janetary~660600^Merrit660600^Darren^F~770600^Das770600^Surjya^P~880600^Winter880600^Oscar^||||770600&Das770600&Surjya&P^^^6N^1234^A|\n" +
+             "OBR|1||CD_000000|2244^General Order|||20170825010500||||||Relevant Clinical Information|||||||002|||||F|||550600^Tsadok550600^Janetary~660600^Merrit660600^Darren^F~770600^Das770600^Surjya^P~880600^Winter880600^Oscar^||||770600&Das770600&Surjya&P^^^6N^1234^A|||||||||||||78654|7865|\n" +
              "ROL|5897|UP|AD|Dr Disney|20210322133821|20210322133822|10||Hospital|ST|19 Raymond St^Route 3^Albany^NY|1-555-222-3333|1-555-444-5555|USA\n" +
              "PR1|1|ICD10|B45678|Fix break|20210322155008|A|75|DR FISH|V46|80|DR WHITE|DR RED|32|1|D22|G45|1|G|P98|X|0|0\n";
     Procedure report = getResourceUtils.getProcedure(procedure);
@@ -416,7 +449,7 @@ public class Hl7IdentifierFHIRConversionTest {
     String sys = identifier1.getSystem();
 
     assertThat(report.hasIdentifier()).isTrue();
-    assertThat(val).isEqualTo("200911021022");
+    assertThat(val).isEqualTo("78654");
     assertThat(sys).isEqualTo("urn:id:extID");
 
     Identifier identifier2 = report.getIdentifier().get(1);
@@ -424,7 +457,7 @@ public class Hl7IdentifierFHIRConversionTest {
     String system = identifier2.getSystem();
 
     assertThat(report.hasIdentifier()).isTrue();
-    assertThat(value).isEqualTo("200911021022");
+    assertThat(value).isEqualTo("78654");
     assertThat(system).isNull();
     CodeableConcept type = identifier2.getType();
     Coding typeValues = type.getCoding().get(0);
