@@ -138,9 +138,8 @@ public class SimpleDataValueResolver {
         if (code != null) {
             V3ReligiousAffiliation status = V3ReligiousAffiliation.fromCode(code);
             return new SimpleCode(code, status.getSystem(), status.getDisplay());
-
         } else {
-            return null;
+            return new SimpleCode(val, null, null);
         }
     };
 

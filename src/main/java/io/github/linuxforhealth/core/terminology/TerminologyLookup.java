@@ -20,8 +20,8 @@ public class TerminologyLookup {
     private static final FHIRTermService TERMINOLOGY_SEVICE = FHIRTermService.getInstance();
     private static TerminologyLookup termInstance;
     static Map<String, String> alternativeCodingSystemMapping =
-        ImmutableMap.of("v2-0005", "v3-Race");
-    private TerminologyLookup() {
+        ImmutableMap.of("v2-0005", "v3-Race", "CDCREC", "v3-Race");
+     private TerminologyLookup() {
     }
 
     public static SimpleCode lookup(String system, String value) {
