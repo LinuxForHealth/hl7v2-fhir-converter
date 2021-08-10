@@ -50,3 +50,12 @@ resources:
     repeats: true
     additionalSegments:
       - MSH
+
+  - resourceName: MedicationRequest
+    segment: .RXE
+    group: ORDER
+    resourcePath: resource/MedicationRequest
+    repeats: true
+    additionalSegments:
+      - .ORDER_DETAIL.RXO
+      - MSH

@@ -12,12 +12,12 @@ type:
 
 system: 
      type: SYSTEM_URL
-     valueOf: CX.4 | CWE.4 |EI.2
+     valueOf: CX.4 | CWE.4 |EI.2 | $system
      expressionType: HL7Spec
     
 value: 
      type: STRING
-     valueOf: CX.1 | CWE.1 |EI.1
+     valueOf: CX.1 | CWE.1 |EI.1 | $value
      expressionType: HL7Spec
      required: true
 

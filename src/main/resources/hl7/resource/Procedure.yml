@@ -1,0 +1,69 @@
+#
+# (C) Copyright IBM Corp. 2021
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+resourceType: Procedure
+id:
+   type: STRING
+   valueOf: 'UUID.randomUUID()'
+   expressionType: JEXL
+
+identifier_1:
+   valueOf: datatype/Identifier
+   generateList: true
+   expressionType: resource
+   vars:
+      system: SYSTEM_URL, $sys
+      value: OBR.44.1 | OBR.45.1 | MSH.7
+   constants:
+      sys: "urn:id:extID"
+
+identifier_2:
+   condition: $valueIn NOT_NULL
+   valueOf: datatype/Identifier_var
+   generateList: true
+   expressionType: resource
+   vars:
+      valueIn: PV1.19 | PID.18 | MSH.7
+   constants:
+      system: "http://terminology.hl7.org/CodeSystem/v2-0203"
+      code: "VN"
+      display: "Visit number"
+
+identifier_3:
+   condition: $valueIn NOT_NULL
+   valueOf: datatype/Identifier_var
+   generateList: true
+   expressionType: resource
+   vars:
+      valueIn: ORC.3.1 | OBR.3.1
+   constants:
+      system: "http://terminology.hl7.org/CodeSystem/v2-0203"
+      code: "FILL"
+      display: "Filler Identifier"
+
+identifier_4:
+   condition: $valueIn NOT_NULL
+   valueOf: datatype/Identifier_var
+   generateList: true
+   expressionType: resource
+   vars:
+      valueIn: ORC.2.1 | OBR.2.1
+   constants:
+      system: "http://terminology.hl7.org/CodeSystem/v2-0203"
+      code: "PLAC"
+      display: "Placer Identifier"
+
+status:
+   type: STRING
+   valueOf: $default
+   expressionType: HL7Spec
+   constants:
+      default: "unknown"
+
+subject:
+   valueOf: datatype/Reference
+   expressionType: resource
+   specs: $Patient
+   

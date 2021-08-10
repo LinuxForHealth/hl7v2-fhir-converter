@@ -49,3 +49,11 @@ resources:
     repeats: true
     additionalSegments:
       - MSH
+
+  - resourceName: ServiceRequest
+    segment: .ORC
+    resourcePath: resource/ServiceRequest
+    group: ORDER
+    repeats: true
+    additionalSegments:
+      - MSH

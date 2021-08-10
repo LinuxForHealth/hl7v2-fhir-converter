@@ -8,12 +8,40 @@ id:
    type: STRING
    valueOf: 'UUID.randomUUID()'
    expressionType: JEXL
-   
-identifier:
+
+identifier_1:
    valueOf: datatype/Identifier
    generateList: true
    expressionType: resource
-   specs: OBR.3
+   vars:
+      value: MSH.7
+      system: SYSTEM_URL, $sys
+   constants:
+      sys: "urn:id:extID"
+
+identifier_2:
+   condition: $valueIn NOT_NULL
+   valueOf: datatype/Identifier_var
+   generateList: true
+   expressionType: resource
+   vars:
+      valueIn: ORC.3.1 | OBR.3.1
+   constants:
+      system: "http://terminology.hl7.org/CodeSystem/v2-0203"
+      code: "FILL"
+      display: "Filler Identifier"
+
+identifier_3:
+   condition: $valueIn NOT_NULL
+   valueOf: datatype/Identifier_var
+   generateList: true
+   expressionType: resource
+   vars:
+      valueIn: ORC.2.1 | OBR.2.1
+   constants:
+      system: "http://terminology.hl7.org/CodeSystem/v2-0203"
+      code: "PLAC"
+      display: "Placer Identifier"
    
 status:
    type: DIAGNOSTIC_REPORT_STATUS

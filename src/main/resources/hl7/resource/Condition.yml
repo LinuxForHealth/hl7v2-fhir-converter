@@ -10,6 +10,36 @@ id:
   valueOf: 'UUID.randomUUID()'
   expressionType: JEXL
 
+identifier_1:
+  condition: $valueIn NOT_NULL
+  valueOf: datatype/Identifier_var
+  generateList: true
+  expressionType: resource
+  vars:
+    valueIn: PV1.19 | PID.18 | MSH.10
+  constants:
+    system: "http://terminology.hl7.org/CodeSystem/v2-0203"
+    code: "VN"
+    display: "Visit number"
+
+identifier_2:
+  valueOf: datatype/Identifier
+  generateList: true
+  expressionType: resource
+  vars:
+    system: SYSTEM_URL, $sys
+    value: BUILD_IDENTIFIER_FROM_CWE, DG1.3
+  constants:
+    sys: "urn:id:extID"
+
+identifier_3:
+  valueOf: datatype/Identifier
+  expressionType: resource
+  vars:
+    system: SYSTEM_URL, $sys
+    value: PRB.4.1
+  constants:
+    sys: "urn:id:extID"
 
 category_x1:
    valueOf: datatype/CodeableConcept_var

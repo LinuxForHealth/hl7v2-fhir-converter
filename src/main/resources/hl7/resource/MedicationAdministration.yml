@@ -1,0 +1,64 @@
+#
+# (C) Copyright IBM Corp. 2021
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+resourceType: MedicationAdministration
+id:
+  type: STRING
+  valueOf: UUID.randomUUID()
+  expressionType: JEXL
+
+identifier_1:
+  condition: $valueIn NOT_NULL
+  valueOf: datatype/Identifier_var
+  generateList: true
+  expressionType: resource
+  vars:
+    valueIn: PV1.19 | PID.18 | MSH.7
+  constants:
+    system: "http://terminology.hl7.org/CodeSystem/v2-0203"
+    code: "VN"
+    display: "Visit number"
+
+identifier_2:
+  valueOf: datatype/Identifier
+  generateList: true
+  expressionType: resource
+  vars:
+    system: SYSTEM_URL, $sys
+    value: BUILD_IDENTIFIER_FROM_CWE, RXA.5
+  constants:
+    sys: "urn:id:extID"
+
+status:
+  type: MEDREQ_STATUS
+  valueOf:  RXA.20
+  expressionType: HL7Spec
+
+medicationCodeableConcept:
+  valueOf: datatype/CodeableConcept
+  expressionType: resource
+  specs: RXA.5
+
+medicationReference:
+  valueOf: datatype/Reference
+  expressionType: resource
+  specs: $Medication
+
+effectiveDateTime:
+  type: DATE_TIME
+  valueOf: RXA.3 | RXA.4
+  expressionType: HL7Spec
+
+effectivePeriod:
+  valueOf: datatype/Period
+  expressionType: resource
+  vars:
+    start: RXA.3
+    end: RXA.4
+
+subject:
+  valueOf: datatype/Reference
+  expressionType: resource
+  specs: $Patient
