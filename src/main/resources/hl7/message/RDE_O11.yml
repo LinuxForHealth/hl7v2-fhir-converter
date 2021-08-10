@@ -56,7 +56,6 @@ resources:
     group: ORDER
     resourcePath: resource/MedicationRequest
     repeats: true
-    isReferenced: false
     additionalSegments:
       - .ORDER_DETAIL.RXO
       - MSH

@@ -627,37 +627,4 @@ public class Hl7IdentifierFHIRConversionTest {
     assertThat(medReqSystem).isEqualTo("urn:id:extID");
   }
 
-  @Test
-  public void medicationAdministration_identifier_test() {
-    String medicationAdministration =
-            "MSH|^~\\&|MYEHR2.5|RI88140101|KIDSNET_IFL|RIHEALTH|20130531||VXU^V04^VXU_V04|20130531RI881401010105|P|2.5.1|||NE|AL||||||RI543763\r"
-                    + "PID|1||000054321^^^MRN||COOPER^SHELDON^ANDREW||19820512|M||2106-3|||||EN^English|M|CAT|78654||||N\r"
-                    + "ORC|RE||197027|||||||^Clerk^Myron||MD67895^Pediatric^MARY^^^^MD^^RIA|||||RI2050\r"
-                    + "RXA|0|1|20130531|20130531|48^HIB PRP-T^CVX|0.5|ML^^ISO+||00^new immunization record^NIP001|^Sticker^Nurse|^^^RI2050||||33k2a|20131210|PMC^sanofi^MVX|||CP|A\r"
-                    + "RXR|C28161^IM^NCIT^IM^INTRAMUSCULAR^HL70162|RT^right thigh^HL70163\r";
-
-    MedicationAdministration medAdmin = ResourceUtils.getMedicationAdministration(medicationAdministration);
-
-    assertThat(medAdmin.hasIdentifier()).isTrue();
-    assertThat(medAdmin.getIdentifier()).hasSize(2);
-
-    Identifier identifier1 = medAdmin.getIdentifier().get(0);
-    String medAdminValue = identifier1.getValue();
-
-    assertThat(medAdmin.hasIdentifier()).isTrue();
-    assertThat(medAdmin.getIdentifier()).hasSize(2);
-    assertThat(medAdminValue).isEqualTo("78654");
-    CodeableConcept medAdminType = identifier1.getType();
-    Coding medAdminTypeValues = medAdminType.getCoding().get(0);
-    assertThat(medAdminTypeValues.getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/v2-0203");
-    assertThat(medAdminTypeValues.getCode()).isEqualTo("VN");
-    assertThat(medAdminTypeValues.getDisplay()).isEqualTo("Visit Number");
-
-    Identifier identifier2 = medAdmin.getIdentifier().get(1);
-    String medAdminVal = identifier2.getValue();
-    String medAdminSystem = identifier2.getSystem();
-
-    assertThat(medAdminVal).isEqualTo("48-CVX");
-    assertThat(medAdminSystem).isEqualTo("urn:id:extID");
-  }
 }

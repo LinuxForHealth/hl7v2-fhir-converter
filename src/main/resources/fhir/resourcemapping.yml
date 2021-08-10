@@ -20,4 +20,3 @@ Procedure: org.hl7.fhir.r4.model.Procedure
 DocumentReference: org.hl7.fhir.r4.model.DocumentReference
 ServiceRequest: org.hl7.fhir.r4.model.ServiceRequest
 MedicationRequest: org.hl7.fhir.r4.model.MedicationRequest
-MedicationAdministration: org.hl7.fhir.r4.model.MedicationAdministration
