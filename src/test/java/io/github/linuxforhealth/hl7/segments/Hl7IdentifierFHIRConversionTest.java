@@ -212,7 +212,7 @@ public class Hl7IdentifierFHIRConversionTest {
     Coding noPrb4TypeValues = noPrb4Type.getCoding().get(0);
     assertThat(noPrb4TypeValues.getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/v2-0203");
     assertThat(noPrb4TypeValues.getCode()).isEqualTo("VN");
-    assertThat(noPrb4TypeValues.getDisplay()).isEqualTo("Visit Number");
+    assertThat(noPrb4TypeValues.getDisplay()).isEqualTo("Visit number");
 
     Condition prb4 = ResourceUtils.getCondition(withPRB4);
 
@@ -228,7 +228,7 @@ public class Hl7IdentifierFHIRConversionTest {
     Coding typeValues = type.getCoding().get(0);
     assertThat(typeValues.getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/v2-0203");
     assertThat(typeValues.getCode()).isEqualTo("VN");
-    assertThat(typeValues.getDisplay()).isEqualTo("Visit Number");
+    assertThat(typeValues.getDisplay()).isEqualTo("Visit number");
 
     Identifier identifier3 = prb4.getIdentifier().get(1);
     String identifier3Value = identifier3.getValue();
@@ -354,7 +354,7 @@ public class Hl7IdentifierFHIRConversionTest {
     Coding typeValues = type.getCoding().get(0);
     assertThat(typeValues.getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/v2-0203");
     assertThat(typeValues.getCode()).isEqualTo("VN");
-    assertThat(typeValues.getDisplay()).isEqualTo("Visit Number");
+    assertThat(typeValues.getDisplay()).isEqualTo("Visit number");
 
     Encounter encounters = ResourceUtils.getEncounter(encounterW2Identifiers);
 
@@ -371,14 +371,14 @@ public class Hl7IdentifierFHIRConversionTest {
     Coding encounter1typeValues = encounter1type.getCoding().get(0);
     assertThat(encounter1typeValues.getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/v2-0203");
     assertThat(encounter1typeValues.getCode()).isEqualTo("VN");
-    assertThat(encounter1typeValues.getDisplay()).isEqualTo("Visit Number");
+    assertThat(encounter1typeValues.getDisplay()).isEqualTo("Visit number");
 
     assertThat(encounter2value).isEqualTo("POL8009");
     CodeableConcept encounter2type = encounter2values.getType();
     Coding encounter2typeValues = encounter2type.getCoding().get(0);
     assertThat(encounter2typeValues.getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/v2-0203");
     assertThat(encounter2typeValues.getCode()).isEqualTo("VN");
-    assertThat(encounter2typeValues.getDisplay()).isEqualTo("Visit Number");
+    assertThat(encounter2typeValues.getDisplay()).isEqualTo("Visit number");
   }
 
   @Test
@@ -463,7 +463,7 @@ public class Hl7IdentifierFHIRConversionTest {
     Coding typeValues = type.getCoding().get(0);
     assertThat(typeValues.getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/v2-0203");
     assertThat(typeValues.getCode()).isEqualTo("VN");
-    assertThat(typeValues.getDisplay()).isEqualTo("Visit Number");
+    assertThat(typeValues.getDisplay()).isEqualTo("Visit number");
 
     Identifier identifier3 = report.getIdentifier().get(2);
     String identifier3Value = identifier3.getValue();
@@ -564,7 +564,7 @@ public class Hl7IdentifierFHIRConversionTest {
     Coding typeValues = type.getCoding().get(0);
     assertThat(typeValues.getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/v2-0203");
     assertThat(typeValues.getCode()).isEqualTo("VN");
-    assertThat(typeValues.getDisplay()).isEqualTo("Visit Number");
+    assertThat(typeValues.getDisplay()).isEqualTo("Visit number");
 
     Identifier identifier2 = report.getIdentifier().get(1);
     String identifier2Value = identifier2.getValue();
@@ -617,7 +617,7 @@ public class Hl7IdentifierFHIRConversionTest {
     Coding medReqTypeValues = medReqType.getCoding().get(0);
     assertThat(medReqTypeValues.getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/v2-0203");
     assertThat(medReqTypeValues.getCode()).isEqualTo("VN");
-    assertThat(medReqTypeValues.getDisplay()).isEqualTo("Visit Number");
+    assertThat(medReqTypeValues.getDisplay()).isEqualTo("Visit number");
 
     Identifier identifier2 = medReq.getIdentifier().get(1);
     String medReqVal = identifier2.getValue();

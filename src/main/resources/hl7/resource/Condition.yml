@@ -20,7 +20,7 @@ identifier_1:
   constants:
     system: "http://terminology.hl7.org/CodeSystem/v2-0203"
     code: "VN"
-    display: "Visit Number"
+    display: "Visit number"
 
 identifier_2:
   valueOf: datatype/Identifier
