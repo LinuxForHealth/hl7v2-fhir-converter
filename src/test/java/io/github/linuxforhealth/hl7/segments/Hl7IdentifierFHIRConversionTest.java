@@ -207,7 +207,7 @@ public class Hl7IdentifierFHIRConversionTest {
 
     assertThat(noPrb4.hasIdentifier()).isTrue();
     assertThat(noPrb4.getIdentifier()).hasSize(1);
-    assertThat(noPrb4Value).isEqualTo("331");
+    assertThat(noPrb4Value).isEqualTo("20040629164652");
     CodeableConcept noPrb4Type = values.getType();
     Coding noPrb4TypeValues = noPrb4Type.getCoding().get(0);
     assertThat(noPrb4TypeValues.getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/v2-0203");
