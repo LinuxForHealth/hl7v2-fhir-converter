@@ -10,7 +10,8 @@ system:
      valueOf: $sys
      expressionType: HL7Spec
 
-value: 
+value:
+     condition: $fillpla NOT_NULL
      type: STRING
      valueOf: $join
      expressionType: HL7Spec

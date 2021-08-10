@@ -16,7 +16,7 @@ import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.DateTimeType;
 import org.junit.jupiter.api.Test;
 
-import io.github.linuxforhealth.hl7.segments.util.getResourceUtils;
+import io.github.linuxforhealth.hl7.segments.util.ResourceUtils;
 
 public class Hl7AllergyFHIRConversionTest {
 
@@ -27,7 +27,7 @@ public class Hl7AllergyFHIRConversionTest {
                 + "AL1|1|DA|^PENICILLIN|MI|PRODUCES HIVES~RASH|MI\r"
                 + "AL1|2|AA|^CAT DANDER|SV";
 
-        AllergyIntolerance allergy = getResourceUtils.getAllergyResource(hl7message);
+        AllergyIntolerance allergy = ResourceUtils.getAllergyResource(hl7message);
         assertThat(allergy.getCriticality().toCode()).isEqualTo("low");
         assertThat(allergy.getCategory().get(0).getCode()).isEqualTo("medication");
         assertThat(allergy.getCode().getText()).isEqualTo("PENICILLIN");
@@ -41,7 +41,7 @@ public class Hl7AllergyFHIRConversionTest {
                 + "PID|0010||PID1234^5^M11^A^MR^HOSP~1234568965^^^USA^SS||DOE^JOHN^A^||19800202|F||W|111 TEST_STREET_NAME^^TEST_CITY^NY^111-1111^USA||(905)111-1111|||S|ZZ|12^^^124|34-13-312||||TEST_BIRTH_PLACE\r"
                 + "AL1|1|DA|00000741^OXYCODONE||HYPOTENSION\r";
 
-        AllergyIntolerance allergy = getResourceUtils.getAllergyResource(hl7message);
+        AllergyIntolerance allergy = ResourceUtils.getAllergyResource(hl7message);
         assertThat(allergy.hasCriticality()).isFalse();
         assertThat(allergy.getCategory().get(0).getCode()).isEqualTo("medication");
         assertThat(allergy.getCode().getText()).isEqualTo("OXYCODONE");
@@ -63,7 +63,7 @@ public class Hl7AllergyFHIRConversionTest {
                 + "PID|0010||PID1234||DOE^JANE|||F\r"
                 + "AL1|1|DA|00000741^OXYCODONE||HYPOTENSION|20210101\r";
 
-        AllergyIntolerance allergy = getResourceUtils.getAllergyResource(hl7message);
+        AllergyIntolerance allergy = ResourceUtils.getAllergyResource(hl7message);
         assertThat(allergy.getCategory().get(0).getCode()).isEqualTo("medication");
         assertThat(allergy.getReaction().get(0).getManifestation()).extracting(m -> m.getText())
                 .containsExactly("HYPOTENSION");

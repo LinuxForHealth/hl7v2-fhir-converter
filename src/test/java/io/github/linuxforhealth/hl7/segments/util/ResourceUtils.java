@@ -20,10 +20,10 @@ import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class getResourceUtils {
+public class ResourceUtils {
 
   private static FHIRContext context = new FHIRContext();
-  private static final Logger LOGGER = LoggerFactory.getLogger(getResourceUtils.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(ResourceUtils.class);
   private static final ConverterOptions OPTIONS =
     new Builder().withValidateResource().withPrettyPrint().build();
 

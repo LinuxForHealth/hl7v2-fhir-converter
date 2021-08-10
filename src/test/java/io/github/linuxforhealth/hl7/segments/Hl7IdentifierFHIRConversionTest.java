@@ -153,7 +153,7 @@ public class Hl7IdentifierFHIRConversionTest {
             + "PID|||1234||DOE^JANE^|||F||||||||||||||||||||||\r"
             + "AL1|1|DA|^OXYCODONE||HYPOTENSION\r";
 
-   AllergyIntolerance joined = getResourceUtils.getAllergyResource(Field1andField3);
+   AllergyIntolerance joined = ResourceUtils.getAllergyResource(Field1andField3);
 
     Identifier values = joined.getIdentifier().get(0);
     assertThat(joined.getIdentifier()).hasSize(1);
@@ -164,7 +164,7 @@ public class Hl7IdentifierFHIRConversionTest {
     assertThat(joinedValue).isEqualTo("00000741-LN");
     assertThat(system).isEqualTo("urn:id:extID");
 
-    AllergyIntolerance field1 = getResourceUtils.getAllergyResource(Field1andField2);
+    AllergyIntolerance field1 = ResourceUtils.getAllergyResource(Field1andField2);
 
     Identifier field1Values = field1.getIdentifier().get(0);
     assertThat(field1.getIdentifier()).hasSize(1);
@@ -175,7 +175,7 @@ public class Hl7IdentifierFHIRConversionTest {
     assertThat(field1Value).isEqualTo("00000741");
     assertThat(field1System).isEqualTo("urn:id:extID");
 
-    AllergyIntolerance field2 = getResourceUtils.getAllergyResource(justField2);
+    AllergyIntolerance field2 = ResourceUtils.getAllergyResource(justField2);
 
     Identifier field2Values = field2.getIdentifier().get(0);
     assertThat(field2.getIdentifier()).hasSize(1);
@@ -200,7 +200,7 @@ public class Hl7IdentifierFHIRConversionTest {
             "PID|1||000054321^^^MRN||COOPER^SHELDON^ANDREW||19820512|M||2106-3|||||EN^English|M|CAT|78654||||N\r" +
             "PRB|AD|2004062916460000|596.5^BLADDER DYSFUNCTION^I9|26744|||20040629||||||ACTIVE|||20040629";
 
-    Condition noPrb4 = getResourceUtils.getCondition(withoutPRB4);
+    Condition noPrb4 = ResourceUtils.getCondition(withoutPRB4);
 
     Identifier values = noPrb4.getIdentifier().get(0);
     String noPrb4Value = values.getValue();
@@ -214,7 +214,7 @@ public class Hl7IdentifierFHIRConversionTest {
     assertThat(noPrb4TypeValues.getCode()).isEqualTo("VN");
     assertThat(noPrb4TypeValues.getDisplay()).isEqualTo("Visit Number");
 
-    Condition prb4 = getResourceUtils.getCondition(withPRB4);
+    Condition prb4 = ResourceUtils.getCondition(withPRB4);
 
     Identifier identifier1 = prb4.getIdentifier().get(0);
     String identifier1Value = identifier1.getValue();
@@ -259,7 +259,7 @@ public class Hl7IdentifierFHIRConversionTest {
 
 
 
-    Observation Obx1AndObx3 = getResourceUtils.getObservation(joinFillPlaAndObx3);
+    Observation Obx1AndObx3 = ResourceUtils.getObservation(joinFillPlaAndObx3);
 
     Identifier values = Obx1AndObx3.getIdentifier().get(0);
     String Obx1AndObx3Value = values.getValue();
@@ -269,7 +269,7 @@ public class Hl7IdentifierFHIRConversionTest {
     assertThat(Obx1AndObx3Value).isEqualTo("R-511-DINnumber-LSFUSERDATAE");
     assertThat(system).isEqualTo("urn:id:extID");
 
-    Observation Obx1 = getResourceUtils.getObservation(joinObx1);
+    Observation Obx1 = ResourceUtils.getObservation(joinObx1);
 
     Identifier identifier = Obx1.getIdentifier().get(0);
     String Obx1Value = identifier.getValue();
@@ -290,7 +290,7 @@ public class Hl7IdentifierFHIRConversionTest {
                     "ORC|NW|PON001|FON001|PGN001|SC|D|1||20170825010500|MS|MS||||20170825010500|\n" +
                     "OBR|1||CD_000000|2244^General Order|||20170825010500||||||Relevant Clinical Information|||||||002|||||F|||550600^Tsadok550600^Janetary~660600^Merrit660600^Darren^F~770600^Das770600^Surjya^P~880600^Winter880600^Oscar^||||770600&Das770600&Surjya&P^^^6N^1234^A|\n" +
                     "OBX|1|TX|||--------------------------------------------------Impression: 1. Markedly intense metabolic activity corresponding with the area of nodular enhancement in the left oral cavity. Degree of uptake is most suggestive of recurrent tumor.||||||F|||20170825010500\n";
-    DiagnosticReport report = getResourceUtils.getDiagnosticReport(diagnosticReport);
+    DiagnosticReport report = ResourceUtils.getDiagnosticReport(diagnosticReport);
 
     assertThat(report.getIdentifier()).hasSize(3);
 
@@ -342,7 +342,7 @@ public class Hl7IdentifierFHIRConversionTest {
                     + "PID|1||432155^^^ANF^MR||Patient^Johnny^New^^^^L|Smith^Sally|20130414|M||2106-3^White^HL70005|123 Any St^^Somewhere^WI^54000^^M\r"
                     + "PV1||I|6N^1234^A^GENERAL HOSPITAL2||||0100^ANDERSON,CARL|0148^ADDISON,JAMES||SUR|||||||0148^ANDERSON,CARL|S|8846511|A|||||||||||||||||||SF|K||||20170215080000||||||POL8009|\r" ;
 
-    Encounter encounterResource = getResourceUtils.getEncounter(encounter);
+    Encounter encounterResource = ResourceUtils.getEncounter(encounter);
 
     Identifier values = encounterResource.getIdentifier().get(0);
     String value = values.getValue();
@@ -356,7 +356,7 @@ public class Hl7IdentifierFHIRConversionTest {
     assertThat(typeValues.getCode()).isEqualTo("VN");
     assertThat(typeValues.getDisplay()).isEqualTo("Visit Number");
 
-    Encounter encounters = getResourceUtils.getEncounter(encounterW2Identifiers);
+    Encounter encounters = ResourceUtils.getEncounter(encounterW2Identifiers);
 
     Identifier encounter1values = encounters.getIdentifier().get(0);
     String encounter1value = encounter1values.getValue();
@@ -399,7 +399,7 @@ public class Hl7IdentifierFHIRConversionTest {
                     + "ORC|RE||197027|||||||^Clerk^Myron||MD67895^Pediatric^MARY^^^^MD^^RIA|||||RI2050\r"
                     + "RXA|0|1|20130531|20130531|^HIB PRP-T|0.5|ML^^ISO+||00^new immunization record^NIP001|^Sticker^Nurse|^^^RI2050||||33k2a|20131210|PMC^sanofi^MVX|||CP|A\r";
 
-    Immunization immunizationF1F3 = getResourceUtils.getImmunization(field1AndField3);
+    Immunization immunizationF1F3 = ResourceUtils.getImmunization(field1AndField3);
 
     Identifier values = immunizationF1F3.getIdentifier().get(0);
     String value = values.getValue();
@@ -409,7 +409,7 @@ public class Hl7IdentifierFHIRConversionTest {
     assertThat(value).isEqualTo("48-CVX");
     assertThat(system).isEqualTo("urn:id:extID");
 
-    Immunization immunizationF1F2 = getResourceUtils.getImmunization(field1AndField2);
+    Immunization immunizationF1F2 = ResourceUtils.getImmunization(field1AndField2);
 
     Identifier field1Values = immunizationF1F2.getIdentifier().get(0);
     String field1Value = field1Values.getValue();
@@ -419,7 +419,7 @@ public class Hl7IdentifierFHIRConversionTest {
     assertThat(field1Value).isEqualTo("48");
     assertThat(field1System).isEqualTo("urn:id:extID");
 
-    Immunization immunizationF2 = getResourceUtils.getImmunization(justField2);
+    Immunization immunizationF2 = ResourceUtils.getImmunization(justField2);
 
     Identifier field2Values = immunizationF2.getIdentifier().get(0);
     String field2Value = field2Values.getValue();
@@ -435,12 +435,12 @@ public class Hl7IdentifierFHIRConversionTest {
 
     String procedure =
             "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|ADT^A01^ADT_A01|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6|56789^NID^UID|MCM|CDP|^4086::132:2A57:3C28^IPV6|^4086::132:2A57:3C25^IPV6|\n" +
-             "PID|||1234||DOE^JANE^|||F||||||||||||||||||||||\n" +
+             "PID|1||000054321^^^MRN||COOPER^SHELDON^ANDREW||19820512|M||2106-3|||||EN^English|M|CAT|78654||||N\n" +
              "ORC|NW|PON001|FON001|PGN001|SC|D|1||20170825010500|MS|MS||||20170825010500|\n" +
              "OBR|1||CD_000000|2244^General Order|||20170825010500||||||Relevant Clinical Information|||||||002|||||F|||550600^Tsadok550600^Janetary~660600^Merrit660600^Darren^F~770600^Das770600^Surjya^P~880600^Winter880600^Oscar^||||770600&Das770600&Surjya&P^^^6N^1234^A|||||||||||||78654|7865|\n" +
              "ROL|5897|UP|AD|Dr Disney|20210322133821|20210322133822|10||Hospital|ST|19 Raymond St^Route 3^Albany^NY|1-555-222-3333|1-555-444-5555|USA\n" +
              "PR1|1|ICD10|B45678|Fix break|20210322155008|A|75|DR FISH|V46|80|DR WHITE|DR RED|32|1|D22|G45|1|G|P98|X|0|0\n";
-    Procedure report = getResourceUtils.getProcedure(procedure);
+    Procedure report = ResourceUtils.getProcedure(procedure);
 
     assertThat(report.getIdentifier()).hasSize(4);
 
@@ -549,7 +549,7 @@ public class Hl7IdentifierFHIRConversionTest {
                     "OBX|1|TX|^hunchback|1|Increasing||||||S\r" +
                     "NTE|1|P|comment after OBX\r";
 
-    ServiceRequest report = getResourceUtils.getServiceRequest(serviceRequest);
+    ServiceRequest report = ResourceUtils.getServiceRequest(serviceRequest);
 
     assertThat(report.getIdentifier()).hasSize(3);
 
@@ -602,7 +602,7 @@ public class Hl7IdentifierFHIRConversionTest {
                     "RXO|RX700001^DOCUSATE SODIUM 100 MG CAPSULE|100||mg|||||G||10||5|\r" +
                     "RXE|^^^20170923230000^^R|999^Ampicillin 250 MG TAB^NDC|100||mg|123^test^ABC||||10||5|";
 
-    MedicationRequest medReq = getResourceUtils.getMedicationRequest(medicationRequest);
+    MedicationRequest medReq = ResourceUtils.getMedicationRequest(medicationRequest);
 
     assertThat(medReq.hasIdentifier()).isTrue();
     assertThat(medReq.getIdentifier()).hasSize(2);
@@ -636,7 +636,7 @@ public class Hl7IdentifierFHIRConversionTest {
                     + "RXA|0|1|20130531|20130531|48^HIB PRP-T^CVX|0.5|ML^^ISO+||00^new immunization record^NIP001|^Sticker^Nurse|^^^RI2050||||33k2a|20131210|PMC^sanofi^MVX|||CP|A\r"
                     + "RXR|C28161^IM^NCIT^IM^INTRAMUSCULAR^HL70162|RT^right thigh^HL70163\r";
 
-    MedicationAdministration medAdmin = getResourceUtils.getMedicationAdministration(medicationAdministration);
+    MedicationAdministration medAdmin = ResourceUtils.getMedicationAdministration(medicationAdministration);
 
     assertThat(medAdmin.hasIdentifier()).isTrue();
     assertThat(medAdmin.getIdentifier()).hasSize(2);
