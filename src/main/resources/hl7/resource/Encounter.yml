@@ -80,7 +80,7 @@ reasonCode:
 reasonReference:
     valueOf: datatype/Reference
     expressionType: resource
-    specs: $Condition | $Procedure | $Observation | $ImmunizationRecommendation
+    specs: $Condition | $Observation
 
 hospitalization:
     valueOf: secondary/Hospitalization
