@@ -251,11 +251,20 @@ public class SimpleDataValueResolver {
 
     public static final ValueExtractor<Object, SimpleCode> CODING_SYSTEM_V2 = (Object value) -> {
         String table = Hl7DataHandlerUtil.getTableNumber(value);
-        String val = Hl7DataHandlerUtil.getStringValue(value);
-        if (table != null && val != null) {
-            return TerminologyLookup.lookup(table, val);
-        } else if (val != null) {
-            return new SimpleCode(val, null, null);
+        String code = Hl7DataHandlerUtil.getStringValue(value);
+        String text = Hl7DataHandlerUtil.getOriginalDisplayText(value);
+        if (table != null && code != null) {
+            // Found table and a code. Try looking it up.
+            SimpleCode coding = TerminologyLookup.lookup(table, code);
+            if (coding != null) {
+                return coding;
+            } else { 
+                // No success looking up the code, build our own fall-back code
+                return new SimpleCode(code, "urn:id:"+table, text) ;
+            }
+        } else if (code != null) {
+            // A code but no system: build a simple systemless code
+            return new SimpleCode(code, null, null);
         } else {
             return null;
         }
