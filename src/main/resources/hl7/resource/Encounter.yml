@@ -79,7 +79,7 @@ period:
     valueOf: datatype/Period
     expressionType: resource
     vars: 
-       start: PV1.44
+       start: PV1.44 | EVN.6
        end: PV1.45
 
 length:
@@ -95,7 +95,10 @@ reasonCode:
     expressionType: resource
     specs: EVN.4 | PV2.3
 
-
+reasonReference:
+    valueOf: datatype/Reference
+    expressionType: resource
+    specs: $Condition | $Observation
 
 hospitalization:
     valueOf: secondary/Hospitalization
