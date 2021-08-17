@@ -437,9 +437,16 @@ public class Hl7IdentifierFHIRConversionTest {
             "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|ADT^A01^ADT_A01|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6|56789^NID^UID|MCM|CDP|^4086::132:2A57:3C28^IPV6|^4086::132:2A57:3C25^IPV6|\n" +
              "PID|1||000054321^^^MRN||COOPER^SHELDON^ANDREW||19820512|M||2106-3|||||EN^English|M|CAT|78654||||N\n" +
              "ORC|NW|PON001|FON001|PGN001|SC|D|1||20170825010500|MS|MS||||20170825010500|\n" +
-             "OBR|1||CD_000000|2244^General Order|||20170825010500||||||Relevant Clinical Information|||||||002|||||F|||550600^Tsadok550600^Janetary~660600^Merrit660600^Darren^F~770600^Das770600^Surjya^P~880600^Winter880600^Oscar^||||770600&Das770600&Surjya&P^^^6N^1234^A|||||||||||||78654|7865|\n" +
+             "OBR|1||CD_000000|2244^General Order|||20170825010500||||||Relevant Clinical Information|||||||002|||||F|||550600^Tsadok550600^Janetary~660600^Merrit660600^Darren^F~770600^Das770600^Surjya^P~880600^Winter880600^Oscar^||||770600&Das770600&Surjya&P^^^6N^1234^A||||||||||||78654||\n" +
              "ROL|5897|UP|AD|Dr Disney|20210322133821|20210322133822|10||Hospital|ST|19 Raymond St^Route 3^Albany^NY|1-555-222-3333|1-555-444-5555|USA\n" +
              "PR1|1|ICD10|B45678|Fix break|20210322155008|A|75|DR FISH|V46|80|DR WHITE|DR RED|32|1|D22|G45|1|G|P98|X|0|0\n";
+
+    String procedureOBR =
+            "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|ADT^A01^ADT_A01|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6|56789^NID^UID|MCM|CDP|^4086::132:2A57:3C28^IPV6|^4086::132:2A57:3C25^IPV6|\n" +
+            "PID|1||000054321^^^MRN||COOPER^SHELDON^ANDREW||19820512|M||2106-3|||||EN^English|M|CAT|78654||||N\n" +
+            "OBR|1|PON001|CD_000000|2244^General Order|||20170825010500||||||Relevant Clinical Information|||||||002|||||F|||550600^Tsadok550600^Janetary~660600^Merrit660600^Darren^F~770600^Das770600^Surjya^P~880600^Winter880600^Oscar^||||770600&Das770600&Surjya&P^^^6N^1234^A|||||||||||||7865||\n" +
+            "ROL|5897|UP|AD|Dr Disney|20210322133821|20210322133822|10||Hospital|ST|19 Raymond St^Route 3^Albany^NY|1-555-222-3333|1-555-444-5555|USA\n" +
+            "PR1|1|ICD10|B45678|Fix break|20210322155008|A|75|DR FISH|V46|80|DR WHITE|DR RED|32|1|D22|G45|1|G|P98|X|0|0\n";
     Procedure report = ResourceUtils.getProcedure(procedure);
 
     assertThat(report.getIdentifier()).hasSize(4);
@@ -449,7 +456,7 @@ public class Hl7IdentifierFHIRConversionTest {
     String sys = identifier1.getSystem();
 
     assertThat(report.hasIdentifier()).isTrue();
-    assertThat(val).isEqualTo("78654");
+    assertThat(val).isEqualTo("78654"); //OBR.44.1
     assertThat(sys).isEqualTo("urn:id:extID");
 
     Identifier identifier2 = report.getIdentifier().get(1);
@@ -488,6 +495,55 @@ public class Hl7IdentifierFHIRConversionTest {
     assertThat(typeValue.getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/v2-0203");
     assertThat(typeValue.getCode()).isEqualTo("PLAC");
     assertThat(typeValue.getDisplay()).isEqualTo("Placer Identifier");
+
+    Procedure reportOBR = ResourceUtils.getProcedure(procedureOBR);
+
+    assertThat(reportOBR.getIdentifier()).hasSize(4);
+
+    Identifier identifier1OBR = reportOBR.getIdentifier().get(0);
+    String valOBR = identifier1OBR.getValue();
+    String sysOBR = identifier1OBR.getSystem();
+
+    assertThat(reportOBR.hasIdentifier()).isTrue();
+    assertThat(valOBR).isEqualTo("7865"); //OBR.45.1
+    assertThat(sysOBR).isEqualTo("urn:id:extID");
+
+    Identifier identifier2OBR = reportOBR.getIdentifier().get(1);
+    String valueOBR = identifier2OBR.getValue();
+    String systemOBR = identifier2OBR.getSystem();
+
+    assertThat(reportOBR.hasIdentifier()).isTrue();
+    assertThat(valueOBR).isEqualTo("78654");
+    assertThat(systemOBR).isNull();
+    CodeableConcept typeOBR = identifier2OBR.getType();
+    Coding typeValuesOBR = typeOBR.getCoding().get(0);
+    assertThat(typeValuesOBR.getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/v2-0203");
+    assertThat(typeValuesOBR.getCode()).isEqualTo("VN");
+    assertThat(typeValuesOBR.getDisplay()).isEqualTo("Visit number");
+
+    Identifier identifier3OBR = reportOBR.getIdentifier().get(2);
+    String identifier3ValueOBR = identifier3OBR.getValue();
+    String identifier3SystemOBR = identifier3OBR.getSystem();
+
+    assertThat(identifier3ValueOBR).isEqualTo("CD_000000");
+    assertThat(identifier3SystemOBR).isNull();
+    CodeableConcept typesOBR = identifier3OBR.getType();
+    Coding typevaluesOBR = typesOBR.getCoding().get(0);
+    assertThat(typevaluesOBR.getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/v2-0203");
+    assertThat(typevaluesOBR.getCode()).isEqualTo("FILL");
+    assertThat(typevaluesOBR.getDisplay()).isEqualTo("Filler Identifier");
+
+    Identifier identifier4OBR = reportOBR.getIdentifier().get(3);
+    String identifier4ValueOBR = identifier4OBR.getValue();
+    String identifier4SystemOBR = identifier4OBR.getSystem();
+
+    assertThat(identifier4ValueOBR).isEqualTo("PON001");
+    assertThat(identifier4SystemOBR).isNull();
+    CodeableConcept TypeOBR = identifier4OBR.getType();
+    Coding typeValueOBR = TypeOBR.getCoding().get(0);
+    assertThat(typeValueOBR.getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/v2-0203");
+    assertThat(typeValueOBR.getCode()).isEqualTo("PLAC");
+    assertThat(typeValueOBR.getDisplay()).isEqualTo("Placer Identifier");
 
   }
 

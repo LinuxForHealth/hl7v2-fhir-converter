@@ -14,7 +14,11 @@ value:
    type: STRING
    valueOf: $valueIn
 
-system:
+system_1:
    type: STRING
    valueOf: $systemId 
 
+system_2:
+   condition: $field NOT_NULL
+   type: STRING
+   valueOf: $sys + $field
