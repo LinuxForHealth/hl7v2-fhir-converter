@@ -257,9 +257,18 @@ public class SimpleDataValueResolver {
             // Found table and a code. Try looking it up.
             SimpleCode coding = TerminologyLookup.lookup(table, code);
             if (coding != null) {
-                return coding;
+                String display = coding.getDisplay();
+                // Successful display confirms a valid code and system 
+                if (display != null ) {
+                    // We have a table, code, and display, so code was valid
+                    return coding;
+                } else {
+                    // Display was not found; create an error message in the display text
+                    display = "Invalid input: code: '" + code + "' for system: '" + table + "' display: '" + text +"'";
+                    return new SimpleCode(null, coding.getSystem(), display);
+                }
             } else { 
-                // No success looking up the code, build our own fall-back code
+                // No success looking up the code, build our own fall-back system using table name
                 return new SimpleCode(code, "urn:id:"+table, text) ;
             }
         } else if (code != null) {
