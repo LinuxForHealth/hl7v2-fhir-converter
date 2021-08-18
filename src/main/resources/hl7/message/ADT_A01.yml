@@ -56,3 +56,9 @@ resources:
       additionalSegments:
             - PR1
             - MSH
+
+    - resourceName: Condition
+      segment: DG1
+      resourcePath: resource/Condition
+      repeats: true
+      additionalSegments:

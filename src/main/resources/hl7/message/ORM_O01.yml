@@ -43,3 +43,9 @@ resources:
       resourcePath: resource/AllergyIntolerance
       repeats: true
       additionalSegments:
+
+    - resourceName: Condition
+      segment: DG1
+      resourcePath: resource/Condition
+      repeats: true
+      additionalSegments:

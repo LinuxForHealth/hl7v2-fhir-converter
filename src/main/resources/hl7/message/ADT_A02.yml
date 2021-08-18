@@ -21,3 +21,9 @@ resources:
       isReferenced: true
       additionalSegments:
              - PD1
+
+    - resourceName: Condition
+      segment: DG1
+      resourcePath: resource/Condition
+      repeats: true
+      additionalSegments:
