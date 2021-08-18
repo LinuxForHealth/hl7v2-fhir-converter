@@ -48,6 +48,7 @@ resources:
       repeats: true
       additionalSegments:
         - MSH
+        - PATIENT_VISIT.PV1
 
       
   

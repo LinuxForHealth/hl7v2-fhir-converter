@@ -194,20 +194,23 @@ public class Hl7IdentifierFHIRConversionTest {
     String withoutPRB4 =
             "MSH|^~\\&|||||20040629164652|1|PPR^PC1|331|P|2.3.1||\n" +
             "PID|||10290^^^WEST^MR||KARLS^TOM^ANDREW^^MR.^||20040530|M|||||||||||398-44-5555|||||||||||N\n" +
+            "PV1||I|6N^1234^A^GENERAL HOSPITAL2||||0100^ANDERSON,CARL|0148^ADDISON,JAMES||SUR|||||||0148^ANDERSON,CARL|S|8846511^^^ACME|A|||||||||||||||||||SF|K||||20170215080000\n" +
             "PRB|AD|2004062916460000|596.5^BLADDER DYSFUNCTION^I9||||20040629||||||ACTIVE|||20040629";
     String withPRB4 =
             "MSH|^~\\&|||||20040629164652|1|PPR^PC1|331|P|2.3.1||\n" +
-            "PID|1||000054321^^^MRN||COOPER^SHELDON^ANDREW||19820512|M||2106-3|||||EN^English|M|CAT|78654||||N\r" +
+            "PID|1||000054321^^^MRN||COOPER^SHELDON^ANDREW||19820512|M||2106-3|||||EN^English|M|CAT|78654||||N\n" +
             "PRB|AD|2004062916460000|596.5^BLADDER DYSFUNCTION^I9|26744|||20040629||||||ACTIVE|||20040629";
 
     Condition noPrb4 = ResourceUtils.getCondition(withoutPRB4);
 
     Identifier values = noPrb4.getIdentifier().get(0);
     String noPrb4Value = values.getValue();
+    String noPrb4System= values.getSystem();
 
     assertThat(noPrb4.hasIdentifier()).isTrue();
     assertThat(noPrb4.getIdentifier()).hasSize(1);
-    assertThat(noPrb4Value).isEqualTo("20040629164652");
+    assertThat(noPrb4Value).isEqualTo("8846511");
+    assertThat(noPrb4System).isEqualTo("urn:id:ACME");
     CodeableConcept noPrb4Type = values.getType();
     Coding noPrb4TypeValues = noPrb4Type.getCoding().get(0);
     assertThat(noPrb4TypeValues.getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/v2-0203");
@@ -668,7 +671,7 @@ public class Hl7IdentifierFHIRConversionTest {
 
     assertThat(medReq.hasIdentifier()).isTrue();
     assertThat(medReq.getIdentifier()).hasSize(2);
-    assertThat(medReqValue).isEqualTo("20170215080000");
+    assertThat(medReqValue).isEqualTo("8846511");
     CodeableConcept medReqType = identifier1.getType();
     Coding medReqTypeValues = medReqType.getCoding().get(0);
     assertThat(medReqTypeValues.getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/v2-0203");

@@ -10,7 +10,7 @@ type:
    generateList: true
    expressionType: resource
     
-value: 
+value:
    type: STRING
    valueOf: $valueIn
 
@@ -19,6 +19,5 @@ system_1:
    valueOf: $systemId 
 
 system_2:
-   condition: $field NOT_NULL
    type: STRING
-   valueOf: $sys + $field
+   valueOf: $systemCX

@@ -15,6 +15,8 @@ import java.util.Map;
 import java.util.UUID;
 
 import ca.uhn.hl7v2.model.v26.datatype.CWE;
+import ca.uhn.hl7v2.model.v26.datatype.CX;
+import ca.uhn.hl7v2.model.v26.datatype.HD;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -276,6 +278,16 @@ public class SimpleDataValueResolver {
             }
         }
         else return text;
+    };
+    public static final ValueExtractor<Object,String> VISIT_NUMBER_SYSTEM = (Object value) -> {
+
+       HD codingSystem = ((CX) value).getCx4_AssigningAuthority();
+
+      if (codingSystem != null) {
+            String system =  "urn:id:" + codingSystem.getHd1_NamespaceID();
+          return system;
+      }
+        else return null;
     };
 
     public static final ValueExtractor<Object, String> ALLERGY_INTOLERANCE_CRITICALITY_CODE_FHIR = (Object value) -> {

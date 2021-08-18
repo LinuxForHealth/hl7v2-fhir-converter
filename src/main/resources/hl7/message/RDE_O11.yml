@@ -57,5 +57,6 @@ resources:
     resourcePath: resource/MedicationRequest
     repeats: true
     additionalSegments:
+      - PATIENT.PATIENT_VISIT.PV1
       - .ORDER_DETAIL.RXO
       - MSH

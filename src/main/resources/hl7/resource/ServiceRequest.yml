@@ -16,13 +16,11 @@ identifier_1:
    expressionType: resource
    vars:
       valueIn: PV1.19.1 | PID.18.1 | MSH.7
-      field: PV1.19.4 | PV1.18.4
-      sys: $sys
+      systemId: VISIT_NUMBER_SYSTEM,  PV1.19 | PID.18
    constants:
       system: "http://terminology.hl7.org/CodeSystem/v2-0203"
       code: "VN"
       display: "Visit number"
-      sys: "urn:id:"
 
 identifier_2:
    condition: $valueIn NOT_NULL
