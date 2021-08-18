@@ -320,8 +320,7 @@ public class Hl7PatientFHIRConversionTest {
     assertThat(cc.getLanguage().getText()).isEqualTo("English");
     Coding code = cc.getLanguage().getCodingFirstRep();
     assertThat(code.getCode()).isEqualTo("ENG");
-    // System is constant, regardless of what is in the HL7 msg -- other systems fail FHIR validation.
-    assertThat(code.getSystem()).isEqualTo("urn:ietf:bcp:47");
+    assertThat(code.getSystem()).isNull();
 
 
   }
