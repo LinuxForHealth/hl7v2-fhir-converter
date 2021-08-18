@@ -1,0 +1,27 @@
+#
+# (C) Copyright IBM Corp. 2020
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+---
+
+condition:
+   valueOf: datatype/Reference
+   expressionType: resource
+   specs: $Condition
+
+use: 
+   valueOf: datatype/CodeableConcept
+   generateList: true
+   expressionType: resource
+   specs: DIAGNOSIS_USE, DG1.6
+   vars:
+     code: DG1.6
+
+rank: 
+   valueOf: datatype/CodeableConcept
+   generateList: true
+   expressionType: resource
+   specs: DIAGNOSIS_USE, DG1.15
+   vars:
+     code: DG1.15

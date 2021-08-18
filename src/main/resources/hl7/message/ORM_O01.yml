@@ -31,8 +31,15 @@ resources:
       group: PATIENT
       repeats: false
       additionalSegments:
-            - .PATIENT_VISIT.PV2
-            - MSH
+             - .PATIENT_VISIT.PV2
+             - MSH
+
+    - resourceName: Observation
+      segment: OBX
+      resourcePath: resource/Observation
+      repeats: true
+      isReferenced: true
+      additionalSegments:
       
     - resourceName: AllergyIntolerance
       segment: AL1
@@ -40,3 +47,9 @@ resources:
       repeats: true
       additionalSegments:
              - MSH
+
+    - resourceName: Condition
+      segment: DG1
+      resourcePath: resource/Condition
+      repeats: true
+      additionalSegments:

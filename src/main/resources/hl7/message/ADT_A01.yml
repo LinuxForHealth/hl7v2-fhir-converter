@@ -59,3 +59,9 @@ resources:
         - MSH
         - PID
         - PV1
+
+    - resourceName: Condition
+      segment: DG1
+      resourcePath: resource/Condition
+      repeats: true
+      additionalSegments:

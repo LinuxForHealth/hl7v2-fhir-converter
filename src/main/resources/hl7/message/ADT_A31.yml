@@ -32,7 +32,7 @@ resources:
              - PV2
              - EVN
              - MSH
-      
+
     - resourceName: Observation
       segment: OBX
       resourcePath: resource/Observation
@@ -40,10 +40,16 @@ resources:
       isReferenced: true
       additionalSegments:
              - MSH
-      
+
     - resourceName: AllergyIntolerance
       segment: AL1
       resourcePath: resource/AllergyIntolerance
       repeats: true
       additionalSegments:
              - MSH
+
+    - resourceName: Condition
+      segment: DG1
+      resourcePath: resource/Condition
+      repeats: true
+      additionalSegments:

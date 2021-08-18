@@ -94,10 +94,11 @@ reasonCode:
     valueOf: datatype/CodeableConcept
     generateList: true
     expressionType: resource
-    specs: EVN.4 | PV2.3
+    specs: CODING_SYSTEM_V2, EVN.4 | PV2.3
 
 reasonReference:
     valueOf: datatype/Reference
+    generateList: true
     expressionType: resource
     specs: $Condition | $Observation
 
@@ -110,11 +111,16 @@ subject:
     expressionType: resource
     specs: $Patient
 
+diagnosis:
+    valueOf: datatype/Diagnosis
+    expressionType: resource
+    specs: DG1
+
 text:
    condition: $text NOT_NULL
    valueOf: datatype/Narrative
    expressionType: resource
-   vars: 
+   vars:
       text: PV2.12
    constants:
       status: "additional"
