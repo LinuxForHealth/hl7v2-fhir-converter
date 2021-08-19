@@ -297,16 +297,6 @@ public class SimpleDataValueResolver {
         }
         else return text;
     };
-    public static final ValueExtractor<Object,String> VISIT_NUMBER_SYSTEM = (Object value) -> {
-
-       HD codingSystem = ((CX) value).getCx4_AssigningAuthority();
-
-      if (codingSystem != null) {
-            String system =  "urn:id:" + codingSystem.getHd1_NamespaceID();
-          return system;
-      }
-        else return null;
-    };
 
     public static final ValueExtractor<Object, String> ALLERGY_INTOLERANCE_CRITICALITY_CODE_FHIR = (Object value) -> {
         String val = Hl7DataHandlerUtil.getStringValue(value);

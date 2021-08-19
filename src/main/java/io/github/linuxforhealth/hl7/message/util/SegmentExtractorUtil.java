@@ -248,6 +248,7 @@ public class SegmentExtractorUtil {
           dataExtractor);
 
     } else  {
+      //extracts data from segment that is in a group outside of the primary group for that specific resource
       List<Structure> parentSegments = getChildStructures(seg.getGroup(), dataExtractor);
       values = new ArrayList<>();
       for (Structure par : parentSegments) {

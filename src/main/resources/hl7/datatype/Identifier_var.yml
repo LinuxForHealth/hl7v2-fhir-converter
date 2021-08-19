@@ -24,3 +24,5 @@ system_2:
    valueOf: $join
    vars:
       join: $sys + $systemCX
+   constants:
+      sys: "urn:id:"

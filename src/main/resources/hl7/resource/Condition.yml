@@ -22,7 +22,6 @@ identifier_1:
     system: "http://terminology.hl7.org/CodeSystem/v2-0203"
     code: "VN"
     display: "Visit number"
-    sys: "urn:id:"
 
 identifier_2:
   valueOf: datatype/Identifier

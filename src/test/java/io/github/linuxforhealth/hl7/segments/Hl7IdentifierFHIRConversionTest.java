@@ -226,7 +226,7 @@ public class Hl7IdentifierFHIRConversionTest {
     assertThat(prb4.hasIdentifier()).isTrue();
     assertThat(prb4.getIdentifier()).hasSize(2);
     assertThat(identifier1Value).isEqualTo("78654");
-    assertThat(identifier1System).isEqualTo("urn:id:78654");
+    assertThat(identifier1System).isNull();
     CodeableConcept type = identifier1.getType();
     Coding typeValues = type.getCoding().get(0);
     assertThat(typeValues.getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/v2-0203");
@@ -438,7 +438,7 @@ public class Hl7IdentifierFHIRConversionTest {
 
     String procedure =
             "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|ADT^A01^ADT_A01|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6|56789^NID^UID|MCM|CDP|^4086::132:2A57:3C28^IPV6|^4086::132:2A57:3C25^IPV6|\n" +
-             "PID|1||000054321^^^MRN||COOPER^SHELDON^ANDREW||19820512|M||2106-3|||||EN^English|M|CAT|78654||||N\n" +
+             "PID|1||000054321^^^MRN||COOPER^SHELDON^ANDREW||19820512|M||2106-3|||||EN^English|M|CAT|78654^^^ACME||||N\n" +
              "ORC|NW|PON001|FON001|PGN001|SC|D|1||20170825010500|MS|MS||||20170825010500|\n" +
              "OBR|1||CD_000000|2244^General Order|||20170825010500||||||Relevant Clinical Information|||||||002|||||F|||550600^Tsadok550600^Janetary~660600^Merrit660600^Darren^F~770600^Das770600^Surjya^P~880600^Winter880600^Oscar^||||770600&Das770600&Surjya&P^^^6N^1234^A||||||||||||78654||\n" +
              "ROL|5897|UP|AD|Dr Disney|20210322133821|20210322133822|10||Hospital|ST|19 Raymond St^Route 3^Albany^NY|1-555-222-3333|1-555-444-5555|USA\n" +
@@ -468,7 +468,7 @@ public class Hl7IdentifierFHIRConversionTest {
 
     assertThat(report.hasIdentifier()).isTrue();
     assertThat(value).isEqualTo("78654");
-    assertThat(system).isEqualTo("urn:id:78654");
+    assertThat(system).isEqualTo("urn:id:ACME");
     CodeableConcept type = identifier2.getType();
     Coding typeValues = type.getCoding().get(0);
     assertThat(typeValues.getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/v2-0203");
@@ -517,7 +517,7 @@ public class Hl7IdentifierFHIRConversionTest {
 
     assertThat(reportOBR.hasIdentifier()).isTrue();
     assertThat(valueOBR).isEqualTo("78654");
-    assertThat(system).isEqualTo("urn:id:78654");
+    assertThat(systemOBR).isNull();
     CodeableConcept typeOBR = identifier2OBR.getType();
     Coding typeValuesOBR = typeOBR.getCoding().get(0);
     assertThat(typeValuesOBR.getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/v2-0203");
@@ -656,7 +656,7 @@ public class Hl7IdentifierFHIRConversionTest {
     String medicationRequest =
             "MSH|^~\\&|PROSLOV|MYHOSPITAL|WHIA|IBM|20170215080000||RDE^O11^RDE_O11|MSGID005520|T|2.6|||AL|NE|764|ASCII||||||^4086::132:2A57:3C28^IPv6\r" +
                     "PID|1||000054321^^^MRN||COOPER^SHELDON^||19820512|M|||765 SOMESTREET RD UNIT 3A^^PASADENA^LA^|||||S||78654|\r" +
-                    "PV1||I|6N^1234^A^GENERAL HOSPITAL2||||0100^ANDERSON,CARL|0148^ADDISON,JAMES||SUR|||||||0148^ANDERSON,CARL|S|8846511|A|||||||||||||||||||SF|K||||20170215080000\r" +
+                    "PV1||I|6N^1234^A^GENERAL HOSPITAL2||||0100^ANDERSON,CARL|0148^ADDISON,JAMES||SUR|||||||0148^ANDERSON,CARL|S||A|||||||||||||||||||SF|K||||20170215080000\r" +
                     "ORC|NW|PON001^OE|CD2017071101^RX|||E|10^BID^D4^^^R||20170215080000\r" +
                     "RXO|RX700001^DOCUSATE SODIUM 100 MG CAPSULE|100||mg|||||G||10||5|\r" +
                     "RXE|^^^20170923230000^^R|999^Ampicillin 250 MG TAB^NDC|100||mg|123^test^ABC||||10||5|";
@@ -671,7 +671,7 @@ public class Hl7IdentifierFHIRConversionTest {
 
     assertThat(medReq.hasIdentifier()).isTrue();
     assertThat(medReq.getIdentifier()).hasSize(2);
-    assertThat(medReqValue).isEqualTo("8846511");
+    assertThat(medReqValue).isEqualTo("78654");
     CodeableConcept medReqType = identifier1.getType();
     Coding medReqTypeValues = medReqType.getCoding().get(0);
     assertThat(medReqTypeValues.getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/v2-0203");

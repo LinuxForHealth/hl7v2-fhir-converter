@@ -54,5 +54,6 @@ resources:
       resourcePath: resource/Procedure
       repeats: true
       additionalSegments:
-            - PR1
-            - MSH
+        - MSH
+        - PID
+        - PR1

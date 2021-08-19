@@ -29,6 +29,7 @@ resources:
     group: PATIENT
     repeats: false
     additionalSegments:
+      - .PID
       - .PATIENT_VISIT.PV2
       - MSH
 
@@ -57,6 +58,7 @@ resources:
     resourcePath: resource/MedicationRequest
     repeats: true
     additionalSegments:
-      - PATIENT.PATIENT_VISIT.PV1
-      - .ORDER_DETAIL.RXO
       - MSH
+      - PATIENT.PATIENT_VISIT.PV1
+      - PATIENT.PID
+      - .ORDER_DETAIL.RXO
