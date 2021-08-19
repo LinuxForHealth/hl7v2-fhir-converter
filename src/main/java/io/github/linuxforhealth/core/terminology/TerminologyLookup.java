@@ -36,6 +36,8 @@ public class TerminologyLookup {
             LookupOutcome outcome = TERMINOLOGY_SEVICE.lookup(url, null, c);
             if (outcome != null && outcome.getDisplay() != null) {
                 return new SimpleCode(value, url.getValue(), outcome.getDisplay().getValue());
+            } else {
+                return new SimpleCode(value, url.getValue(), null);
             }
         }
         return null;

@@ -18,6 +18,7 @@ import ca.uhn.hl7v2.model.Variable;
 import ca.uhn.hl7v2.model.primitive.ID;
 import ca.uhn.hl7v2.model.primitive.IS;
 import ca.uhn.hl7v2.model.v26.datatype.CWE;
+import ca.uhn.hl7v2.model.v26.datatype.ST;
 
 public class Hl7DataHandlerUtil {
 
@@ -65,34 +66,48 @@ public class Hl7DataHandlerUtil {
     }
 
     public static String getTableNumber(Object obj) {
-
-      if (obj instanceof ID) {
-        ID id = (ID) obj;
-        return "v2-" + StringUtils.leftPad(String.valueOf(id.getTable()), 4, '0');
-      } else if (obj instanceof IS) {
-        IS id = (IS) obj;
-        return "v2-" + StringUtils.leftPad(String.valueOf(id.getTable()), 4, '0');
-      } else if (obj instanceof CWE) {
-        CWE id = (CWE) obj;
-        return getAssociatedtable(id);
-
+        if (obj instanceof ID) {
+            ID id = (ID) obj;
+            return "v2-" + StringUtils.leftPad(String.valueOf(id.getTable()), 4, '0');
+        } else if (obj instanceof IS) {
+            IS id = (IS) obj;
+            return "v2-" + StringUtils.leftPad(String.valueOf(id.getTable()), 4, '0');
+        } else if (obj instanceof CWE) {
+            CWE id = (CWE) obj;
+            return getAssociatedtable(id);
         }
-      return null;
+        return null;
+    }
+
+    public static String getOriginalDisplayText(Object obj) {
+        if (obj instanceof CWE) {
+            CWE id = (CWE) obj;
+            ST st = id.getText();
+            if (st != null) {
+                String str = st.getValue();
+                if (str != null) {
+                    return str.trim();
+                }
+                return null;
+            }
+            return null;
+        }
+        return null;
     }
 
     private static String getAssociatedtable(CWE id) {
-      ID val = id.getCwe3_NameOfCodingSystem();
-      if (val != null && StringUtils.startsWith(val.getValue(), "HL7")) {
-        return "v2-" + StringUtils
-            .leftPad(String.valueOf(StringUtils.removeStart(val.getValue(), "HL7")), 4, '0');
-      } else if (val != null) {
-        return val.getValue();
-      }
-      return null;
+        ID val = id.getCwe3_NameOfCodingSystem();
+        if (val != null && StringUtils.startsWith(val.getValue(), "HL7")) {
+            return "v2-" + StringUtils
+                    .leftPad(String.valueOf(StringUtils.removeStart(val.getValue(), "HL7")), 4, '0');
+        } else if (val != null) {
+            String returnValue = val.getValue();
+            return returnValue != null ? returnValue.trim() : null;
+        }
+        return null;
     }
 
     private static String toStringValue(Object local, boolean allComponents) {
-
         if (local == null) {
             return null;
         }
@@ -130,7 +145,6 @@ public class Hl7DataHandlerUtil {
     }
 
     private static String getValueFromComposite(Composite com) {
-
         Type[] types = com.getComponents();
         StringBuilder sb = new StringBuilder();
         for (Type t : types) {
@@ -140,7 +154,6 @@ public class Hl7DataHandlerUtil {
             }
         }
         return StringUtils.stripEnd(sb.toString(), ", ");
-
     }
 
 }
