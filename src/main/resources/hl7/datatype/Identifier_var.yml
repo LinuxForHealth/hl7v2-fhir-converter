@@ -19,5 +19,8 @@ system_1:
    valueOf: $systemId 
 
 system_2:
+   condition: $systemCX NOT_NULL
    type: STRING
-   valueOf: $systemCX
+   valueOf: $join
+   vars:
+      join: $sys + $systemCX

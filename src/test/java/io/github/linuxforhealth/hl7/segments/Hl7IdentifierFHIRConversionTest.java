@@ -226,7 +226,7 @@ public class Hl7IdentifierFHIRConversionTest {
     assertThat(prb4.hasIdentifier()).isTrue();
     assertThat(prb4.getIdentifier()).hasSize(2);
     assertThat(identifier1Value).isEqualTo("78654");
-    assertThat(identifier1System).isNull();
+    assertThat(identifier1System).isEqualTo("urn:id:78654");
     CodeableConcept type = identifier1.getType();
     Coding typeValues = type.getCoding().get(0);
     assertThat(typeValues.getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/v2-0203");
@@ -468,7 +468,7 @@ public class Hl7IdentifierFHIRConversionTest {
 
     assertThat(report.hasIdentifier()).isTrue();
     assertThat(value).isEqualTo("78654");
-    assertThat(system).isNull();
+    assertThat(system).isEqualTo("urn:id:78654");
     CodeableConcept type = identifier2.getType();
     Coding typeValues = type.getCoding().get(0);
     assertThat(typeValues.getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/v2-0203");
@@ -517,7 +517,7 @@ public class Hl7IdentifierFHIRConversionTest {
 
     assertThat(reportOBR.hasIdentifier()).isTrue();
     assertThat(valueOBR).isEqualTo("78654");
-    assertThat(systemOBR).isNull();
+    assertThat(system).isEqualTo("urn:id:78654");
     CodeableConcept typeOBR = identifier2OBR.getType();
     Coding typeValuesOBR = typeOBR.getCoding().get(0);
     assertThat(typeValuesOBR.getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/v2-0203");
