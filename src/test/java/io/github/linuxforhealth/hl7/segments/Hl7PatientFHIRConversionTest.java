@@ -320,7 +320,7 @@ public class Hl7PatientFHIRConversionTest {
     assertThat(cc.getLanguage().getText()).isEqualTo("English");
     Coding code = cc.getLanguage().getCodingFirstRep();
     assertThat(code.getCode()).isEqualTo("ENG");
-    assertThat(code.getSystem()).isNull();
+    assertThat(code.getSystem()).isEqualTo("urn:id:HL70296");
 
 
   }
