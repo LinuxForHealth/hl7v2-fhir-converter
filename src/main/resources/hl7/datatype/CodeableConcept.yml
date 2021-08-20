@@ -4,19 +4,21 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 # Represents codeable concept that can be derived from CE/CNE/CWE
+
 coding_1:
 # coding requires code,display and system defined as variables from the resource that calls this resource
    valueOf: datatype/Coding
    generateList: true
    expressionType: resource
    condition: $code NOT_NULL &&  $coding NULL
-   specs: CWE |CE |CNE
+   specs: CE |CNE
    vars:
-      code: CWE.1 |CE.1 |CNE.1
-      system: CWE.3 |CE.3 |CNE.3
-      version: CWE.7 |CE.6 |CNE.7
+      code: CE.1 |CNE.1
+      system: CE.3 |CNE.3
+      version: CE.6 |CNE.7
+
 coding_2:
-   condition: $code NOT_NULL &&  $coding NULL
+   condition: $code NOT_NULL && $coding NULL
    type: CODING_SYSTEM_V2
    valueOf: ID |IS |TX
    generateList: true
@@ -35,7 +37,17 @@ coding_3:
       system: CWE.6
       display: CWE.5
       version: CWE.8
+      
+# Generalized CWE through CODING_SYSTEM_V2 handles mismatched systems and codes      
 coding_4:
+   valueOf: $coding
+   generateList: true
+   condition: $coding NOT_NULL
+   specs: CWE
+   vars:
+      coding: CODING_SYSTEM_V2, CWE      
+
+coding_5:
    valueOf: $coding
    condition: $coding NOT_NULL
    generateList: true

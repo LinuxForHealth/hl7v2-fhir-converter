@@ -1,5 +1,5 @@
 #
-# (C) Copyright IBM Corp. 2020
+# (C) Copyright IBM Corp. 2020, 2021
 #
 # SPDX-License-Identifier: Apache-2.0
 #
@@ -7,7 +7,7 @@
 resourceType: Condition
 id:
   type: STRING
-  valueOf: 'UUID.randomUUID()'
+  valueOf: "UUID.randomUUID()"
   expressionType: JEXL
 
 identifier_1:
@@ -43,73 +43,70 @@ identifier_3:
     sys: "urn:id:extID"
 
 category_x1:
-   valueOf: datatype/CodeableConcept_var
-   generateList: true
-   expressionType: resource
-   condition:  $source NOT_NULL
-   vars:
-     code: CONDITION_CATEGORY_CODES, $type
-     text: $type
-     source: PRB.3
-   constants:
-      type: problem-list-item
+  valueOf: datatype/CodeableConcept_var
+  generateList: true
+  expressionType: resource
+  condition: $source NOT_NULL
+  vars:
+    code: CONDITION_CATEGORY_CODES, $type
+    text: $type
+    source: PRB.3
+  constants:
+    type: problem-list-item
 
 category_x2:
-   valueOf: datatype/CodeableConcept_var
-   generateList: true
-   expressionType: resource
-   condition:  $source NULL
-   vars:     
-     code: CONDITION_CATEGORY_CODES, $type
-     text: $type
-     source: PRB.3
-   constants:
-      type: encounter-diagnosis
-           
+  valueOf: datatype/CodeableConcept_var
+  generateList: true
+  expressionType: resource
+  condition: $source NULL
+  vars:
+    code: CONDITION_CATEGORY_CODES, $type
+    text: $type
+    source: PRB.3
+  constants:
+    type: encounter-diagnosis
 
 severity:
-   valueOf: datatype/CodeableConcept
-   generateList: true
-   expressionType: resource
-   specs: PRB.26
-   vars:
-     code: PRB.26
-     
+  valueOf: datatype/CodeableConcept
+  generateList: true
+  expressionType: resource
+  specs: PRB.26
+  vars:
+    code: PRB.26
+
 code:
-   valueOf: datatype/CodeableConcept
-   generateList: true
-   expressionType: resource
-   specs: PRB.3
-   vars:
-     code: PRB.3
-     
-     
+  valueOf: datatype/CodeableConcept
+  generateList: true
+  expressionType: resource
+  specs: PRB.3
+
 encounter:
-    valueOf: datatype/Reference
-    expressionType: resource
-    specs: $Encounter
-      
+  valueOf: datatype/Reference
+  expressionType: resource
+  specs: $Encounter
+
 subject:
-    valueOf: datatype/Reference
-    expressionType: resource
-    specs: $Patient
+  valueOf: datatype/Reference
+  expressionType: resource
+  specs: $Patient
 
 onsetDateTime:
-     type: DATE_TIME
-     valueOf: PRB.16 
-     expressionType: HL7Spec
+  type: DATE_TIME
+  valueOf: PRB.16
+  expressionType: HL7Spec
 
 stage:
-   valueOf: secondary/Stage
-   generateList: true
-   expressionType: resource
-   specs: PRB.14
-   vars:
-     code: PRB.14
+  valueOf: secondary/Stage
+  generateList: true
+  expressionType: resource
+  specs: PRB.14
+  vars:
+    code: PRB.14
+
 evidence:
-   valueOf: secondary/evidence
-   generateList: true
-   expressionType: resource
-   specs: $Observation
-   useGroup: true
+  valueOf: secondary/evidence
+  generateList: true
+  expressionType: resource
+  specs: $Observation
+  useGroup: true
 
