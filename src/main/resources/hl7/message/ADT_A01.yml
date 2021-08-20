@@ -50,10 +50,12 @@ resources:
         - MSH
 
     - resourceName: Procedure
-      segment: ROL
+      segment: .PR1
+      group: PROCEDURE
       resourcePath: resource/Procedure
       repeats: true
       additionalSegments:
+        - .ROL
         - MSH
         - PID
-        - PR1
+        - PV1
