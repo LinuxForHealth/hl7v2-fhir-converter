@@ -66,7 +66,7 @@ public class ConfigDirectoryLocationStrategy implements FileLocationStrategy {
 
   private static String fetchHomeDirectory() {
 	String homeDirectory = System.getenv(CONF_PROP_HOME);
-	if (homeDirectory==null || homeDirectory.isBlank())
+	if (homeDirectory==null || homeDirectory.trim().isEmpty())
 		return System.getProperty(CONF_PROP_HOME);
 	return homeDirectory;
   }
