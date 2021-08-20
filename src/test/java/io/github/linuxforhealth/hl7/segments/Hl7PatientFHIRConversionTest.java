@@ -311,6 +311,10 @@ public class Hl7PatientFHIRConversionTest {
             "MSH|^~\\&|MyEMR|DE-000001| |CAIRLO|20160701123030-0700||VXU^V04^VXU_V04|CA0001|P|2.6|||ER|AL|||||Z22^CDCPHINVS|DE-000001\r" +
                     "PID|1||PA123456^^^MYEMR^MR||JONES^GEORGE^M^JR^^^L|MILLER^MARTHA^G^^^^M|20140227|M||2106-3^WHITE^CDCREC|1234 W FIRST ST^^BEVERLY HILLS^CA^90210^^H||^PRN^PH^^^555^5555555||ENG^English^HL70296|||||||2186-5^ not Hispanic or Latino^CDCREC||Y|2\r";
 
+    String patientEnglishNoCode = //NO coding system given in the CWE
+            "MSH|^~\\&|MyEMR|DE-000001| |CAIRLO|20160701123030-0700||VXU^V04^VXU_V04|CA0001|P|2.6|||ER|AL|||||Z22^CDCPHINVS|DE-000001\r" +
+                    "PID|1||PA123456^^^MYEMR^MR||JONES^GEORGE^M^JR^^^L|MILLER^MARTHA^G^^^^M|20140227|M||2106-3^WHITE^CDCREC|1234 W FIRST ST^^BEVERLY HILLS^CA^90210^^H||^PRN^PH^^^555^5555555||ENG^English|||||||2186-5^ not Hispanic or Latino^CDCREC||Y|2\r";
+
     Patient patientObjEnglish = PatientUtils.createPatientFromHl7Segment(patientSpeaksEnglish);
     assertThat(patientObjEnglish.hasCommunication()).isTrue();
     assertThat(patientObjEnglish.getCommunication().get(0).getPreferred()).isTrue();
@@ -320,8 +324,18 @@ public class Hl7PatientFHIRConversionTest {
     assertThat(cc.getLanguage().getText()).isEqualTo("English");
     Coding code = cc.getLanguage().getCodingFirstRep();
     assertThat(code.getCode()).isEqualTo("ENG");
-    assertThat(code.getSystem()).isEqualTo("urn:id:HL70296");
+    assertThat(code.getSystem()).isEqualTo("urn:id:v2-0296");
 
+    Patient patientObjNoCode = PatientUtils.createPatientFromHl7Segment(patientEnglishNoCode);
+    assertThat(patientObjNoCode.hasCommunication()).isTrue();
+    assertThat(patientObjNoCode.getCommunication().get(0).getPreferred()).isTrue();
+    assertThat(patientObjNoCode.getCommunication()).hasSize(1);
+    Patient.PatientCommunicationComponent ccNoCode = patientObjNoCode.getCommunication().get(0);
+    assertThat(ccNoCode.getPreferred()).isTrue();
+    assertThat(ccNoCode.getLanguage().getText()).isEqualTo("English");
+    Coding codeNo = ccNoCode.getLanguage().getCodingFirstRep();
+    assertThat(codeNo.getCode()).isEqualTo("ENG");
+    assertThat(codeNo.getSystem()).isNull();
 
   }
 

@@ -55,15 +55,10 @@ public class UrlLookup {
     public static String getAssociatedUrl(String value) {
       String url = getUrl(Constants.CODING_SYSTEM_MAPPING, value);
       if (url == null) {
-        String extUrl = getUrl(Constants.EXTENSION_URL_MAPPING, value);
-        if (extUrl == null ){
-            return "urn:id:"+ value;
-        }
-        else return extUrl;
+        url = getUrl(Constants.EXTENSION_URL_MAPPING, value);
       }
-      else return url;
+      return url;
     }
-
     /**
      * Get the system associated with the value for the URL set.
      */
