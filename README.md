@@ -93,11 +93,13 @@ The converter configuration file, config.properties, supports the following sett
 | default.zoneid          | ISO 8601 timezone offset (optional). The zoneid is applied to translations when the target FHIR resource field requires a timezone, but the source HL7 field does not include it. | +08:00                          |
 | additional.conceptmap   | Path to additional concept map configuration. Concept maps are used for mapping one code system to another.                                                                       | /opt/converter/concept-map.yaml |
 
-The config.properties file location is set using the System property, `config.home`
+### HL7 Converter Configuration Property Location
 
-```
--Dconfig.home=/opt/converter/config
-```
+The config.properties file location is set using the Environment Variable or System property `HL7CONVERTER_CONFIG_HOME`
+
+* HL7CONVERTER_CONFIG_HOME environment variable is checked first
+* The variable can only be set as System Property ``` -DHL7CONVERTER_CONFIG_HOME=/opt/converter/config_home_folder/```
+* Lastly, the local resource folder will be searched for config.properties
 
 ## Additional Documentation
 * [Templating Configuration](./TEMPLATING.md)

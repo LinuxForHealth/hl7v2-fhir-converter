@@ -25,7 +25,7 @@ import io.github.linuxforhealth.core.terminology.UrlLookup;
 public class ConverterConfigurationTest {
 
 
-	private static final String CONF_PROP_HOME = "config.home";
+	private static final String CONF_PROP_HOME = "HL7CONVERTER_CONFIG_HOME";
     @TempDir
     static File folder;
     
@@ -56,7 +56,7 @@ public class ConverterConfigurationTest {
     public void test_that_additional_conceptmap_values_are_loaded() throws IOException {
     	File configFile = new File(folder, "config.properties");
         writeProperties(configFile);
-        System.setProperty("config.home", configFile.getParent());
+        System.setProperty(CONF_PROP_HOME, configFile.getParent());
         ConverterConfiguration.reset();
         UrlLookup.reset(Constants.CODING_SYSTEM_MAPPING);
         String url = UrlLookup.getSystemUrl("LN");
