@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2020
+ * (C) Copyright IBM Corp. 2020, 2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -42,7 +42,6 @@ public class ResourceExpressionTest {
     ResourceExpression exp = new ResourceExpression(attr);
     assertThat(exp.getData()).isNotNull();
 
-
     Map<String, EvaluationResult> context = new HashMap<>();
 
     EvaluationResult value = exp.evaluate(new HL7MessageData(hl7DTE), ImmutableMap.copyOf(context),
@@ -52,10 +51,7 @@ public class ResourceExpressionTest {
     assertThat(result.get("use")).isEqualTo(null);
     assertThat(result.get("value")).isEqualTo("000010016");
 
-
-
   }
-
 
 
   @Test
@@ -76,15 +72,12 @@ public class ResourceExpressionTest {
     ResourceExpression exp = new ResourceExpression(attr);
     assertThat(exp.getData()).isNotNull();
 
-
     Map<String, EvaluationResult> context = new HashMap<>();
 
     EvaluationResult value = exp.evaluate(new HL7MessageData(hl7DTE), ImmutableMap.copyOf(context),
         new SimpleEvaluationResult(s));
 
     assertThat(value).isNull();
-
-
 
   }
 
@@ -108,7 +101,6 @@ public class ResourceExpressionTest {
     ResourceExpression exp = new ResourceExpression(attr);
     assertThat(exp.getData()).isNotNull();
 
-
     Map<String, EvaluationResult> context = new HashMap<>();
 
     EvaluationResult value = exp.evaluate(new HL7MessageData(hl7DTE), ImmutableMap.copyOf(context),
@@ -120,10 +112,7 @@ public class ResourceExpressionTest {
     assertThat(result.get("value")).isEqualTo("000010017");
     assertThat(result.get("type")).isNull();
 
-
-
-  }
-
+}
 
 
   @Test
@@ -136,7 +125,6 @@ public class ResourceExpressionTest {
     Message hl7message = getMessage(message);
     HL7DataExtractor hl7DTE = new HL7DataExtractor(hl7message);
 
-
     Structure s = hl7DTE.getStructure("PID", 0).getValue();
     ExpressionAttributes attr = new ExpressionAttributes.Builder().withSpecs("PID.3")
         .withValueOf("datatype/Identifier").withGenerateList(true).build();
@@ -144,10 +132,8 @@ public class ResourceExpressionTest {
     ResourceExpression exp = new ResourceExpression(attr);
     assertThat(exp.getData()).isNotNull();
 
-
     Map<String, EvaluationResult> context = new HashMap<>();
     context.put("code", new SimpleEvaluationResult(hl7DTE.getTypes((Segment) s, 3)));
-
 
     EvaluationResult value = exp.evaluate(new HL7MessageData(hl7DTE), ImmutableMap.copyOf(context),
         new SimpleEvaluationResult(s));
@@ -155,17 +141,13 @@ public class ResourceExpressionTest {
     List<Object> results = (List<Object>) value.getValue();
     assertThat(results).hasSize(3);
 
-
     Map<String, Object> result = (Map<String, Object>) results.get(0);
     assertThat(result.get("use")).isEqualTo(null);
     assertThat(result.get("value")).isEqualTo("000010016");
     assertThat(result.get("system")).isNull();
     assertThat(result.get("type")).isNotNull();
 
-
-
   }
-
 
 
   @Test
@@ -179,7 +161,6 @@ public class ResourceExpressionTest {
     Message hl7message = getMessage(message);
     HL7DataExtractor hl7DTE = new HL7DataExtractor(hl7message);
 
-
     Structure s = hl7DTE.getStructure("OBX", 0).getValue();
     ExpressionAttributes attr = new ExpressionAttributes.Builder().withSpecs("OBX.3")
         .withValueOf("datatype/Identifier").build();
@@ -187,9 +168,7 @@ public class ResourceExpressionTest {
     ResourceExpression exp = new ResourceExpression(attr);
     assertThat(exp.getData()).isNotNull();
 
-
     Map<String, EvaluationResult> context = new HashMap<>();
-
 
     EvaluationResult value = exp.evaluate(new HL7MessageData(hl7DTE), ImmutableMap.copyOf(context),
         new SimpleEvaluationResult(s));
@@ -198,24 +177,20 @@ public class ResourceExpressionTest {
     assertThat(result.get("value")).isEqualTo("1234");
     assertThat(result.get("system")).isEqualTo(null);
 
-
-
   }
 
+
   @Test
-  public void test1_segment_identifier_obx_cc() throws IOException {
+  public void testSegmentIdentifierObxCc() throws IOException {
     String message = "MSH|^~\\&|hl7Integration|hl7Integration|||||ADT^A01|||2.3|\r"
         + "EVN|A01|20130617154644\r"
-        + "PID|1|465 306 5961|000010016^^^MR~000010017^^^MR~000010018^^^MR|407623|Wood^Patrick^^^MR||19700101|female|||High Street^^Oxford^^Ox1 4DP~George St^^Oxford^^Ox1 5AP|||||||\r"
-        + "NK1|1|Wood^John^^^MR|Father||999-9999\r" + "NK1|2|Jones^Georgie^^^MSS|MOTHER||999-9999\r"
+        + "PID|1|465 306 5961|12345678^^^MR|407623|TestPatient^John^^MR||19700101|male||||||||||\r"
         + "PV1|1||Location||||||||||||||||261938_6_201306171546|||||||||||||||||||||||||20130617134644|||||||||\r"
         + "OBX|1|TX|1234^some text^SCT||First line: ECHOCARDIOGRAPHIC REPORT||||||F||\r";
-
 
     Message hl7message = getMessage(message);
 
     HL7DataExtractor hl7DTE = new HL7DataExtractor(hl7message);
-
 
     Structure s = hl7DTE.getStructure("OBX", 0).getValue();
     ExpressionAttributes attr = new ExpressionAttributes.Builder().withSpecs("OBX.3")
@@ -234,28 +209,25 @@ public class ResourceExpressionTest {
     assertThat(type.get("text")).isEqualTo("some text");
     assertThat(type.get("coding")).isNotNull();
     List<Object> list = (List) type.get("coding");
-    Map<String, String> sp = (Map<String, String>) list.get(0);
-    assertThat(sp.get("code")).isEqualTo("1234");
-    assertThat(sp.get("system")).isEqualTo("http://snomed.info/sct");
-
+    SimpleCode scs = (SimpleCode)list.get(0);
+    assertThat(scs.getCode()).isEqualTo("1234");
+    assertThat(scs.getSystem()).isEqualTo("http://snomed.info/sct");
+    assertThat(scs.getDisplay()).isEqualTo("some text");
 
   }
 
 
   @Test
-  public void test1_segment_identifier_obx_cc_known_system() throws IOException {
+  public void testSegmentIdentifierObxCcKnownSystem() throws IOException {
     String message = "MSH|^~\\&|hl7Integration|hl7Integration|||||ADT^A01|||2.3|\r"
         + "EVN|A01|20130617154644\r"
-        + "PID|1|465 306 5961|000010016^^^MR~000010017^^^MR~000010018^^^MR|407623|Wood^Patrick^^^MR||19700101|female|||High Street^^Oxford^^Ox1 4DP~George St^^Oxford^^Ox1 5AP|||||||\r"
-        + "NK1|1|Wood^John^^^MR|Father||999-9999\r" + "NK1|2|Jones^Georgie^^^MSS|MOTHER||999-9999\r"
+        + "PID|1|465 306 5961|123456^^^MR|407623|TestPatient^John^^^MR||19700101|male||||||||||\r"
         + "PV1|1||Location||||||||||||||||261938_6_201306171546|||||||||||||||||||||||||20130617134644|||||||||\r"
         + "OBX|1|TX|1234^some text^SCT||First line: ECHOCARDIOGRAPHIC REPORT||||||F||\r";
-
 
     Message hl7message = getMessage(message);
 
     HL7DataExtractor hl7DTE = new HL7DataExtractor(hl7message);
-
 
     Structure s = hl7DTE.getStructure("OBX", 0).getValue();
     ExpressionAttributes attr = new ExpressionAttributes.Builder().withSpecs("OBX.3")
@@ -273,27 +245,24 @@ public class ResourceExpressionTest {
     assertThat(result.get(0).get("text")).isEqualTo("some text");
     assertThat(result.get(0).get("coding")).isNotNull();
     List<Object> list = (List) result.get(0).get("coding");
-    Map<String, String> sp = (Map<String, String>) list.get(0);
-    assertThat(sp.get("code")).isEqualTo("1234");
-    assertThat(sp.get("system")).isEqualTo("http://snomed.info/sct");
-
+    SimpleCode scs = (SimpleCode)list.get(0);
+    assertThat(scs.getCode()).isEqualTo("1234");
+    assertThat(scs.getSystem()).isEqualTo("http://snomed.info/sct");
+    assertThat(scs.getDisplay()).isEqualTo("some text");
 
   }
 
   @Test
-  public void test1_codeable_concept_from_IS_type() throws IOException {
+  public void testCodeableConceptFromISTtype() throws IOException {
     String message = "MSH|^~\\&|hl7Integration|hl7Integration|||||ADT^A01|||2.3|\r"
         + "EVN|A01|20130617154644\r"
-        + "PID|1|465 306 5961|000010016^^^MR~000010017^^^MR~000010018^^^MR|407623|Wood^Patrick^^^MR||19700101|female|||High Street^^Oxford^^Ox1 4DP~George St^^Oxford^^Ox1 5AP|||||||\r"
-        + "NK1|1|Wood^John^^^MR|Father||999-9999\r" + "NK1|2|Jones^Georgie^^^MSS|MOTHER||999-9999\r"
+        + "PID|1|465 306 5961|000010016^^^MR~000010017^^^MR~000010018^^^MR|407623|TestPatient^Jane|19700101|female||||||||||\r"
         + "PV1|1||Location||||||||||||||||261938_6_201306171546|||||||||||||||||||||||||20130617134644|||||||||\r"
         + "OBX|1|TX|1234^^SCT||First line: ECHOCARDIOGRAPHIC REPORT|||AA|||F||\r";
-
 
     Message hl7message = getMessage(message);
 
     HL7DataExtractor hl7DTE = new HL7DataExtractor(hl7message);
-
 
     Structure s = hl7DTE.getStructure("OBX", 0).getValue();
     ExpressionAttributes attr = new ExpressionAttributes.Builder().withSpecs("OBX.8")
@@ -315,7 +284,6 @@ public class ResourceExpressionTest {
     assertThat(sc.getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/v2-0078");
     assertThat(sc.getDisplay()).isEqualTo("Critically abnormal");
 
-
   }
 
 
@@ -334,11 +302,9 @@ public class ResourceExpressionTest {
             + "OBX|4|TS|59785-6^VIS Presentation Date^LN|2|20130531||||||F|||20130531\r"
             + "OBX|5|ST|48767-8^Annotation^LN|2|Some text from doctor||||||F|||20130531\r";
 
-
     Message hl7message = getMessage(message);
 
     HL7DataExtractor hl7DTE = new HL7DataExtractor(hl7message);
-
 
     Structure s = hl7DTE.getAllStructures("ORDER", 0, "RXA").getValue();
     ExpressionAttributes attr = new ExpressionAttributes.Builder().withSpecs("RXA.17")
@@ -356,7 +322,6 @@ public class ResourceExpressionTest {
     assertThat(result.get(0).get("identifier")).isNull();
 
     System.out.println(result);
-
 
   }
 
@@ -376,11 +341,9 @@ public class ResourceExpressionTest {
             + "OBX|4|TS|59785-6^VIS Presentation Date^LN|2|20130531||||||F|||20130531\r"
             + "OBX|5|ST|48767-8^Annotation^LN|2|Some text from doctor||||||F|||20130531\r";
 
-
     Message hl7message = getMessage(message);
 
     HL7DataExtractor hl7DTE = new HL7DataExtractor(hl7message);
-
 
     Structure s = hl7DTE.getAllStructures("ORDER", 0, "RXA").getValue();
     ExpressionAttributes attr = new ExpressionAttributes.Builder().withSpecs("RXA.17")
@@ -394,8 +357,6 @@ public class ResourceExpressionTest {
         new SimpleEvaluationResult(s));
 
     assertThat(value).isNull();
-
-
 
   }
 
@@ -415,11 +376,9 @@ public class ResourceExpressionTest {
             + "OBX|4|TS|59785-6^VIS Presentation Date^LN|2|20130531||||||F|||20130531\r"
             + "OBX|5|ST|48767-8^Annotation^LN|2|Some text from doctor||||||F|||20130531\r";
 
-
     Message hl7message = getMessage(message);
 
     HL7DataExtractor hl7DTE = new HL7DataExtractor(hl7message);
-
 
     Structure s = hl7DTE.getAllStructures("ORDER", 0, "RXA").getValue();
     ExpressionAttributes attr = new ExpressionAttributes.Builder().withSpecs("RXA.17")
@@ -439,7 +398,6 @@ public class ResourceExpressionTest {
     assertThat(identifiers.get(0).get("value")).isEqualTo("PMC");
 
     System.out.println(result);
-
 
   }
 
