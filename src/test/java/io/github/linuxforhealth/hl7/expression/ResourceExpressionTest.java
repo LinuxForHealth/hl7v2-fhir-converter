@@ -181,7 +181,7 @@ public class ResourceExpressionTest {
 
 
   @Test
-  public void test1_segment_identifier_obx_cc() throws IOException {
+  public void testSegmentIdentifierObxCc() throws IOException {
     String message = "MSH|^~\\&|hl7Integration|hl7Integration|||||ADT^A01|||2.3|\r"
         + "EVN|A01|20130617154644\r"
         + "PID|1|465 306 5961|12345678^^^MR|407623|TestPatient^John^^MR||19700101|male||||||||||\r"
@@ -212,7 +212,7 @@ public class ResourceExpressionTest {
     SimpleCode scs = (SimpleCode)list.get(0);
     assertThat(scs.getCode()).isEqualTo("1234");
     assertThat(scs.getSystem()).isEqualTo("http://snomed.info/sct");
-    assertThat(scs.getDisplay()).isNullOrEmpty();
+    assertThat(scs.getDisplay()).isEqualTo("some text");
 
   }
 
@@ -248,7 +248,7 @@ public class ResourceExpressionTest {
     SimpleCode scs = (SimpleCode)list.get(0);
     assertThat(scs.getCode()).isEqualTo("1234");
     assertThat(scs.getSystem()).isEqualTo("http://snomed.info/sct");
-    assertThat(scs.getDisplay()).isNullOrEmpty();
+    assertThat(scs.getDisplay()).isEqualTo("some text");
 
   }
 

@@ -47,9 +47,6 @@ medicationCodeableConcept:
   valueOf: datatype/CodeableConcept
   expressionType: resource
   specs: RXE.2 | RXO.1 | RXC.2
-  condition: $coding NOT_NULL
-  vars:
-      coding: CODING_SYSTEM_V2, RXE.2 
 
 medicationReference:
   valueOf: datatype/Reference

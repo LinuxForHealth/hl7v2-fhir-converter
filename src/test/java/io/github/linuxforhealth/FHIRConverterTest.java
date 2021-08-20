@@ -264,8 +264,7 @@ String hl7message =
         // Test MVX
         + "RXA|0|1|20130528|20130529|48^HIB PRP-T^CVX|0.5|ML^^ISO+||00^new immunization record^NIP001|^Sticker^Nurse|^^^RI2050||||33k2a|20131210|PMC^sanofi^MVX|||CP|A\r"
         // Test HL70162 & HL70163
-        + "RXR|C28161^IM^NCIT^IM^INTRAMUSCULAR^HL70162|RT^right thigh^HL70163\r"
-        ;
+        + "RXR|C28161^IM^NCIT^IM^INTRAMUSCULAR^HL70162|RT^right thigh^HL70163\r";
 
     HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
 
