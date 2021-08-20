@@ -95,13 +95,14 @@ The converter configuration file, config.properties, supports the following sett
 
 ### HL7 Converter Configuration Property Location
 
-The config.properties file location is set using the Environment Variable or System property `HL7CONVERTER_CONFIG_HOME`
+The config.properties file location is searched in the following order:
 
 * HL7CONVERTER_CONFIG_HOME environment variable is checked first
-* The variable can only be set as System Property 
-   ``` -DHL7CONVERTER_CONFIG_HOME=/opt/converter/config_home_folder/ ```
+* hl7converter.config.home system property is checked next 
+   
+   ``` -Dhl7converter.config.home=/opt/converter/config_home_folder/```
 
-* Lastly, the local resource folder will be searched for config.properties
+* Lastly, the local classpath resource folder will be searched for config.properties
 
 ## Additional Documentation
 * [Templating Configuration](./TEMPLATING.md)

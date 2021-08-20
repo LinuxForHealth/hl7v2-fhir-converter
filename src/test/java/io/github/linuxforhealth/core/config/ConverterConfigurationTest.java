@@ -25,8 +25,9 @@ import io.github.linuxforhealth.core.terminology.UrlLookup;
 public class ConverterConfigurationTest {
 
 
-	private static final String CONF_PROP_HOME = "HL7CONVERTER_CONFIG_HOME";
-    @TempDir
+	private static final String CONF_PROP_HOME = "hl7converter.config.home";
+    
+	@TempDir
     static File folder;
     
     static String originalConfigHome;
