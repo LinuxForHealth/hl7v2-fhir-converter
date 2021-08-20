@@ -98,7 +98,9 @@ The converter configuration file, config.properties, supports the following sett
 The config.properties file location is set using the Environment Variable or System property `HL7CONVERTER_CONFIG_HOME`
 
 * HL7CONVERTER_CONFIG_HOME environment variable is checked first
-* The variable can only be set as System Property ``` -DHL7CONVERTER_CONFIG_HOME=/opt/converter/config_home_folder/```
+* The variable can only be set as System Property 
+   ``` -DHL7CONVERTER_CONFIG_HOME=/opt/converter/config_home_folder/ ```
+
 * Lastly, the local resource folder will be searched for config.properties
 
 ## Additional Documentation
