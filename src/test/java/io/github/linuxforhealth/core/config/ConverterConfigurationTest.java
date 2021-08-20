@@ -13,7 +13,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Properties;
 
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -22,15 +24,33 @@ import io.github.linuxforhealth.core.terminology.UrlLookup;
 
 public class ConverterConfigurationTest {
 
+
+	private static final String CONF_PROP_HOME = "config.home";
     @TempDir
     static File folder;
+    
+    static String originalConfigHome;
+    
+    @BeforeAll
+    public static void saveConfigHomeProperty() {
+    	originalConfigHome = System.getProperty(CONF_PROP_HOME);
+    }
 
     @AfterEach
     public void reset() {
-        System.clearProperty("config.home");
+        System.clearProperty(CONF_PROP_HOME);
         ConverterConfiguration.reset();
         UrlLookup.reset();
     }
+    @AfterAll
+    public static void reloadPreviousConfigurations() {
+    	if (originalConfigHome != null)
+    		System.setProperty(CONF_PROP_HOME, originalConfigHome);
+    	else
+    		System.clearProperty(CONF_PROP_HOME);
+        UrlLookup.reset();
+    }
+
 
     @Test
     public void test_that_additional_conceptmap_values_are_loaded() throws IOException {

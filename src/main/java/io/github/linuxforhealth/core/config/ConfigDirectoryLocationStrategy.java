@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 
 public class ConfigDirectoryLocationStrategy implements FileLocationStrategy {
 
+  private static final String ENV_CONF_PROP_HOME = "hl7converter.config.home";
   private static final String CONF_PROP_HOME = "config.home";
   private static final Logger LOGGER =
       LoggerFactory.getLogger(ConfigDirectoryLocationStrategy.class);
@@ -65,6 +66,9 @@ public class ConfigDirectoryLocationStrategy implements FileLocationStrategy {
 
 
   private static String fetchHomeDirectory() {
-    return System.getProperty(CONF_PROP_HOME);
+	String homeDirectory = System.getenv(ENV_CONF_PROP_HOME);
+	if (homeDirectory==null || homeDirectory.isBlank())
+		return System.getProperty(CONF_PROP_HOME);
+	return homeDirectory;
   }
 }
