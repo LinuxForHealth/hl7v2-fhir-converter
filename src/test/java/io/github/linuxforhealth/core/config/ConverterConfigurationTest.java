@@ -13,7 +13,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Properties;
 
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -22,21 +24,40 @@ import io.github.linuxforhealth.core.terminology.UrlLookup;
 
 public class ConverterConfigurationTest {
 
-    @TempDir
+
+	private static final String CONF_PROP_HOME = "hl7converter.config.home";
+    
+	@TempDir
     static File folder;
+    
+    static String originalConfigHome;
+    
+    @BeforeAll
+    public static void saveConfigHomeProperty() {
+    	originalConfigHome = System.getProperty(CONF_PROP_HOME);
+    }
 
     @AfterEach
     public void reset() {
-        System.clearProperty("config.home");
+        System.clearProperty(CONF_PROP_HOME);
         ConverterConfiguration.reset();
         UrlLookup.reset();
     }
+    @AfterAll
+    public static void reloadPreviousConfigurations() {
+    	if (originalConfigHome != null)
+    		System.setProperty(CONF_PROP_HOME, originalConfigHome);
+    	else
+    		System.clearProperty(CONF_PROP_HOME);
+        UrlLookup.reset();
+    }
+
 
     @Test
     public void test_that_additional_conceptmap_values_are_loaded() throws IOException {
     	File configFile = new File(folder, "config.properties");
         writeProperties(configFile);
-        System.setProperty("config.home", configFile.getParent());
+        System.setProperty(CONF_PROP_HOME, configFile.getParent());
         ConverterConfiguration.reset();
         UrlLookup.reset(Constants.CODING_SYSTEM_MAPPING);
         String url = UrlLookup.getSystemUrl("LN");
