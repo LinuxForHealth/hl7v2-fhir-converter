@@ -31,6 +31,7 @@ resources:
       additionalSegments:
              - .PV2
              - MSH
+             - PID
       
     - resourceName: Observation
       segment: .PROBLEM_OBSERVATION.OBX
@@ -48,6 +49,8 @@ resources:
       repeats: true
       additionalSegments:
         - MSH
+        - PID
+        - PATIENT_VISIT.PV1
 
       
   

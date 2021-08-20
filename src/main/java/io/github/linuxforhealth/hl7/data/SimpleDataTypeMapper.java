@@ -56,6 +56,7 @@ public enum SimpleDataTypeMapper {
 
 
 
+
   private ValueExtractor<Object, ?> valueResolver;
 
   SimpleDataTypeMapper(ValueExtractor<Object, ?> valueResolver) {

@@ -15,6 +15,8 @@ import java.util.Map;
 import java.util.UUID;
 
 import ca.uhn.hl7v2.model.v26.datatype.CWE;
+import ca.uhn.hl7v2.model.v26.datatype.CX;
+import ca.uhn.hl7v2.model.v26.datatype.HD;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
