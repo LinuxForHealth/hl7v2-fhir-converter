@@ -227,7 +227,7 @@ public class Hl7ORUMessageTest {
 
         //Verify attachment to diagnostic report
         Attachment a = attachments.get(0);
-        Assertions.assertTrue(a.getContentType().equalsIgnoreCase("text"), "Incorrect content type");
+        Assertions.assertTrue(a.getContentType().equalsIgnoreCase("text/plain"), "Incorrect content type");
         Assertions.assertTrue(a.getLanguage().equalsIgnoreCase("en"), "Incorrect language");
 
         //Verify data attachment after decoding

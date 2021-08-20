@@ -15,6 +15,8 @@ import java.util.Map;
 import java.util.UUID;
 
 import ca.uhn.hl7v2.model.v26.datatype.CWE;
+import ca.uhn.hl7v2.model.v26.datatype.CX;
+import ca.uhn.hl7v2.model.v26.datatype.HD;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -260,11 +262,16 @@ public class SimpleDataValueResolver {
                 String display = coding.getDisplay();
                 // Successful display confirms a valid code and system 
                 if (display != null ) {
+
+                    if (display.isEmpty()) {
+                        // We have a table, code, but unknown display, so we can't tell if it's good, use the original display text
+                        coding = new SimpleCode(coding.getCode(), coding.getSystem(), text);
+                    }
                     // We have a table, code, and display, so code was valid
                     return coding;
                 } else {
                     // Display was not found; create an error message in the display text
-                    display = "Invalid input: code: '" + code + "' for system: '" + table + "' display: '" + text +"'";
+                    display = "Invalid input: code: '" + code + "' for system: '" + table + "' original display: '" + text +"'";
                     return new SimpleCode(null, coding.getSystem(), display);
                 }
             } else { 
