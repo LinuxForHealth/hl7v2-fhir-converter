@@ -79,8 +79,12 @@ code:
    generateList: true
    expressionType: resource
    specs: PRB.3
+  #  vars:
+  #    code: PRB.3
+   condition: $coding NOT_NULL
    vars:
-     code: PRB.3
+        coding: CODING_SYSTEM_V2, PRB.3 
+
      
      
 encounter:

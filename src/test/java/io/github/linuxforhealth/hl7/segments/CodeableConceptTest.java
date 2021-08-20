@@ -13,9 +13,11 @@ import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.Extension;
 import org.hl7.fhir.r4.model.Patient;
+import org.hl7.fhir.r4.model.MedicationRequest;
+import org.hl7.fhir.r4.model.Condition;
 import org.junit.jupiter.api.Test;
 import io.github.linuxforhealth.core.terminology.UrlLookup;
-import io.github.linuxforhealth.hl7.segments.util.PatientUtils;
+import io.github.linuxforhealth.hl7.segments.util.*;
 
 class CodeableConceptTest {
 
@@ -197,6 +199,63 @@ class CodeableConceptTest {
         assertThat(coding.getDisplay()).containsPattern("Invalid.*2186-5.*CDCREC.*hispan");
         assertThat(coding.getSystem()).containsIgnoringCase("http://terminology.hl7.org/CodeSystem/v3-Race");
 
+    }
+
+    @Test
+    void testCodeableConceptForNDC() {
+
+        String medicationRequestWithCodeableConcept = "MSH|^~\\&|APP|FAC|WHIA|IBM|20180622230000||RDE^O11^RDE_O11|MSGID221xx0xcnvMed31|T|2.6\n"
+                + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
+                + "ORC|NW|F800006^OE|P800006^RX|||E|10^BID^D4^^^R||20180622230000\n"
+                // Medication request has unknown code in .2
+                + "RXE|^^^20180622230000^^R|73056-017^Test15 SODIUM 100 MG CAPSULE^NDC|100||mg|||||10||5\n";
+
+        MedicationRequest medReq = ResourceUtils.getMedicationRequest(medicationRequestWithCodeableConcept);
+
+        assertThat(medReq.hasMedicationCodeableConcept()).isTrue();
+        CodeableConcept medCC = medReq.getMedicationCodeableConcept();
+        assertThat(medCC.hasText()).isTrue();
+        assertThat(medCC.getText()).isEqualTo("Test15 SODIUM 100 MG CAPSULE");
+        assertThat(medCC.hasCoding()).isTrue();
+
+        Coding medCoding = medCC.getCoding().get(0);
+        assertThat(medCoding.hasSystem()).isTrue();
+        assertThat(medCoding.getSystem()).isEqualTo("http://hl7.org/fhir/sid/ndc");
+        assertThat(medCoding.hasCode()).isTrue();
+        assertThat(medCoding.getCode()).isEqualTo("73056-017");
+        assertThat(medCoding.hasDisplay()).isFalse();
+
+    }
+
+    @Test
+    public void testCodeableConceptForI9() {
+        String conditionWithCodeableConcept = "MSH|^~\\&|||||20040629164652|1|PPR^PC1|331|P|2.3.1||\n"
+                + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
+                + "PRB|AD|2004062916460000|596.5^BLADDER DYSFUNCTION^I9||||20040629||||||ACTIVE|||20040629";
+
+        // With a valid (to us) but unregistered (to FHIR) system, we should produce:
+        // "code": {
+        //     "coding": [ {
+        //       "system": <known-to-us-system-via-our-lookup>,
+        //       "code": <code-from-input>
+        //     } ],
+        //     "text": <original-display-value>
+        //   },
+
+        Condition condition = ResourceUtils.getCondition(conditionWithCodeableConcept);
+
+        assertThat(condition.hasCode()).isTrue();
+        CodeableConcept condCC = condition.getCode();
+        assertThat(condCC.hasText()).isTrue();
+        assertThat(condCC.getText()).isEqualTo("BLADDER DYSFUNCTION");
+        assertThat(condCC.hasCoding()).isTrue();
+
+        Coding condCoding = condCC.getCoding().get(0);
+        assertThat(condCoding.hasSystem()).isTrue();
+        assertThat(condCoding.getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/icd9");
+        assertThat(condCoding.hasCode()).isTrue();
+        assertThat(condCoding.getCode()).isEqualTo("596.5");
+        assertThat(condCoding.hasDisplay()).isFalse();
     }
 
 }

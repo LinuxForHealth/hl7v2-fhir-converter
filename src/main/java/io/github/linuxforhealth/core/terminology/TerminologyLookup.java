@@ -19,17 +19,18 @@ public class TerminologyLookup {
     private static final FHIRRegistry REGISTRY = FHIRRegistry.getInstance();
     private static final FHIRTermService TERMINOLOGY_SEVICE = FHIRTermService.getInstance();
     private static TerminologyLookup termInstance;
-    static Map<String, String> alternativeCodingSystemMapping =
-        ImmutableMap.of("v2-0005", "v3-Race", "CDCREC", "v3-Race");
-     private TerminologyLookup() {
+    static Map<String, String> alternativeCodingSystemMapping = ImmutableMap.of("v2-0005", "v3-Race", "CDCREC",
+            "v3-Race");
+
+    private TerminologyLookup() {
     }
 
     public static SimpleCode lookup(String system, String value) {
-      String codingSystemName = system;
-      if (alternativeCodingSystemMapping.containsKey(system)) {
-        codingSystemName = alternativeCodingSystemMapping.get(system);
-      }
-      Uri url = getSystemUrl(codingSystemName);
+        String codingSystemName = system;
+        if (alternativeCodingSystemMapping.containsKey(system)) {
+            codingSystemName = alternativeCodingSystemMapping.get(system);
+        }
+        Uri url = getSystemUrl(codingSystemName);
 
         if (url != null) {
             Code c = Code.of(value);
@@ -37,7 +38,15 @@ public class TerminologyLookup {
             if (outcome != null && outcome.getDisplay() != null) {
                 return new SimpleCode(value, url.getValue(), outcome.getDisplay().getValue());
             } else {
-                return new SimpleCode(value, url.getValue(), null);
+                // Failed to find the code. Is it a registered URL?
+                CodeSystem s = null;
+                s = REGISTRY.getResource(url.getValue(), CodeSystem.class);
+                if (s != null && s.getUrl() != null) {
+                    // If registered system, then it was a bad code 
+                    return new SimpleCode(value, url.getValue(), null);
+                }
+                // Else system known to us but not registered, so we can't tell goodness of code
+                return new SimpleCode(value, url.getValue(), "");
             }
         }
         return null;
@@ -45,18 +54,8 @@ public class TerminologyLookup {
 
     private static Uri getSystemUrl(String value) {
         String sys = UrlLookup.getSystemUrl(value);
-        CodeSystem s = null;
-        if (sys != null) {
-            s = REGISTRY.getResource(sys, CodeSystem.class);
-            if (s != null && s.getUrl() != null) {
-                return s.getUrl();
-            }
-        }
-        return null;
+        return (sys != null) ? Uri.uri(sys) : null;
     }
-
-
-
 
     public static void init() {
         if (termInstance == null) {
