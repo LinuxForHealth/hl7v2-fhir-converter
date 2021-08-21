@@ -26,17 +26,14 @@ coding_2:
    vars:
       code: ID |IS |TX
 
+# Generalized CWE for alternate codes handles mismatched systems and codes       
 coding_3:
-   valueOf: datatype/Coding
+   valueOf: $coding
    generateList: true
-   expressionType: resource
-   condition: $code NOT_NULL &&  $coding NULL
+   condition: $coding NOT_NULL
    specs: CWE
    vars:
-      code: CWE.4
-      system: CWE.6
-      display: CWE.5
-      version: CWE.8
+      coding: CODING_SYSTEM_V2_ALTERNATE, CWE          
       
 # Generalized CWE through CODING_SYSTEM_V2 handles mismatched systems and codes      
 coding_4:

@@ -303,37 +303,56 @@ class CodeableConceptTest {
     }
 
     @Test
-    public void testCodeableConceptForI9() {
+    public void testCodeableConceptForLoincAltenativeI9WithVersions() {
 
-        // With a valid (to us) but unregistered (to FHIR) system, we should produce:
+        // With a valid (to us) but unregistered (to FHIR) system, and with a version, we should produce:
         // "code": {
         //     "coding": [ {
-        //       "system": <known-to-us-system-via-our-lookup>,
+        //       "system": <known-to-us-system-via-our-lookup>,  << FIRST CODING
         //       "display": <original-display-value>
         //       "code": <code-from-input>
+        //       "version": <version>        
+        //     },
+        //     {    
+        //       "system": <known-to-us-system-via-our-lookup>,  << SECOND (ALTERNATE CODING)
+        //       "display": <original-display-value>
+        //       "code": <code-from-input>
+        //       "version": <version>        
         //     } ],
         //     "text": <original-display-value>
         //   },
 
-        String conditionWithCodeableConcept = "MSH|^~\\&|||||20040629164652|1|PPR^PC1|331|P|2.3.1||\n"
+        String conditionWithVersionedAlternateCodeableConcept = "MSH|^~\\&|||||20040629164652|1|PPR^PC1|331|P|2.3.1||\n"
                 + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
-                + "PRB|AD|2004062916460000|596.5^BLADDER DYSFUNCTION^I9||||20040629||||||ACTIVE|||20040629";
+                + "PRB|AD|2004062916460000|2148-5^CREATININE^LN^F-11380^CREATININE^I9^474747^22222||||20040629||||||ACTIVE|||20040629";
 
-        Condition condition = ResourceUtils.getCondition(conditionWithCodeableConcept);
+        Condition condition = ResourceUtils.getCondition(conditionWithVersionedAlternateCodeableConcept);
 
         assertThat(condition.hasCode()).isTrue();
         CodeableConcept condCC = condition.getCode();
         assertThat(condCC.hasText()).isTrue();
-        assertThat(condCC.getText()).isEqualTo("BLADDER DYSFUNCTION");
+        assertThat(condCC.getText()).isEqualTo("CREATININE");
         assertThat(condCC.hasCoding()).isTrue();
 
         Coding condCoding = condCC.getCoding().get(0);
         assertThat(condCoding.hasSystem()).isTrue();
+        assertThat(condCoding.getSystem()).isEqualTo("http://loinc.org");
+        assertThat(condCoding.hasCode()).isTrue();
+        assertThat(condCoding.getCode()).isEqualTo("2148-5");
+        assertThat(condCoding.hasDisplay()).isTrue();
+        assertThat(condCoding.getDisplay()).isEqualTo("CREATININE");
+        assertThat(condCoding.hasVersion()).isTrue();
+        assertThat(condCoding.getVersion()).isEqualTo("474747");
+
+        condCoding = condCC.getCoding().get(1);
+        assertThat(condCoding.hasSystem()).isTrue();
         assertThat(condCoding.getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/icd9");
         assertThat(condCoding.hasCode()).isTrue();
-        assertThat(condCoding.getCode()).isEqualTo("596.5");
+        assertThat(condCoding.getCode()).isEqualTo("F-11380");
         assertThat(condCoding.hasDisplay()).isTrue();
-        assertThat(condCoding.getDisplay()).isEqualTo("BLADDER DYSFUNCTION");
+        assertThat(condCoding.getDisplay()).isEqualTo("CREATININE");
+        assertThat(condCoding.hasVersion()).isTrue();
+        assertThat(condCoding.getVersion()).isEqualTo("22222");
     }
 
 }
