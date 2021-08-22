@@ -58,18 +58,15 @@ type:
    expressionType: resource
    specs: PV1.4 | PV1.18
 
-
 serviceType:
    valueOf: datatype/CodeableConcept
    expressionType: resource
    specs: PV1.10
 
-
 priority:
    valueOf: datatype/CodeableConcept
    expressionType: resource
    specs: PV2.25
-
 
 episodeOfCare:
    type: STRING
@@ -94,7 +91,7 @@ reasonCode:
     valueOf: datatype/CodeableConcept
     generateList: true
     expressionType: resource
-    specs: CODING_SYSTEM_V2, EVN.4 | PV2.3
+    specs: EVN.4 | PV2.3
 
 reasonReference:
     valueOf: datatype/Reference
