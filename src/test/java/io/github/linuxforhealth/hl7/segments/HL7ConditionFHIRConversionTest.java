@@ -29,7 +29,7 @@ import io.github.linuxforhealth.hl7.segments.util.ResourceUtils;
 
 public class HL7ConditionFHIRConversionTest {
 
-    private static final ConverterOptions OPTIONS = new Builder().withPrettyPrint().build();
+    private static final ConverterOptions OPTIONS = new Builder().withValidateResource().withPrettyPrint().build();
 
     // Tests the DG1 segment (encounter) with all support message types.
     @ParameterizedTest
@@ -112,7 +112,8 @@ public class HL7ConditionFHIRConversionTest {
         Base catCoding = ResourceUtils.getValue(category, "coding");
         assertThat(ResourceUtils.getValueAsString(catCoding, "system"))
                 .isEqualTo("UriType[http://terminology.hl7.org/CodeSystem/condition-category]");
-        assertThat(ResourceUtils.getValueAsString(catCoding, "code")).isEqualTo("Encounter Diagnosis");
+        assertThat(ResourceUtils.getValueAsString(catCoding, "code")).isEqualTo("encounter-diagnosis");
+        assertThat(ResourceUtils.getValueAsString(catCoding, "display")).isEqualTo("Encounter Diagnosis");
 
         // Find the practitioner resource from the FHIR bundle.
         List<Resource> practitionerResource = e.stream()
@@ -255,7 +256,8 @@ public class HL7ConditionFHIRConversionTest {
         Base catCoding = ResourceUtils.getValue(category, "coding");
         assertThat(ResourceUtils.getValueAsString(catCoding, "system"))
                 .isEqualTo("UriType[http://terminology.hl7.org/CodeSystem/condition-category]");
-        assertThat(ResourceUtils.getValueAsString(catCoding, "code")).isEqualTo("Problem List Item");
+        assertThat(ResourceUtils.getValueAsString(catCoding, "display")).isEqualTo("Problem List Item");
+        assertThat(ResourceUtils.getValueAsString(catCoding, "code")).isEqualTo("problem-list-item");
 
         // Verify extension is set correctly.
         Base extension = ResourceUtils.getValue(condition, "extension");
@@ -327,7 +329,8 @@ public class HL7ConditionFHIRConversionTest {
         Base catCoding = ResourceUtils.getValue(category, "coding");
         assertThat(ResourceUtils.getValueAsString(catCoding, "system"))
                 .isEqualTo("UriType[http://terminology.hl7.org/CodeSystem/condition-category]");
-        assertThat(ResourceUtils.getValueAsString(catCoding, "code")).isEqualTo("Problem List Item");
+        assertThat(ResourceUtils.getValueAsString(catCoding, "display")).isEqualTo("Problem List Item");
+        assertThat(ResourceUtils.getValueAsString(catCoding, "code")).isEqualTo("problem-list-item");
 
     }
 

@@ -194,11 +194,11 @@ public class Hl7IdentifierFHIRConversionTest {
     String withoutPRB4 =
             "MSH|^~\\&|||||20040629164652|1|PPR^PC1|331|P|2.3.1||\n" +
             "PID|||10290^^^WEST^MR||KARLS^TOM^ANDREW^^MR.^||20040530|M|||||||||||398-44-5555|||||||||||N\n" +
-            "PRB|AD|2004062916460000|596.5^BLADDER DYSFUNCTION^I9||||20040629||||||ACTIVE|||20040629";
+            "PRB|AD|2004062916460000|596.5^BLADDER DYSFUNCTION^I9||||20040629|||||||||20040629";
     String withPRB4 =
             "MSH|^~\\&|||||20040629164652|1|PPR^PC1|331|P|2.3.1||\n" +
             "PID|1||000054321^^^MRN||COOPER^SHELDON^ANDREW||19820512|M||2106-3|||||EN^English|M|CAT|78654||||N\r" +
-            "PRB|AD|2004062916460000|596.5^BLADDER DYSFUNCTION^I9|26744|||20040629||||||ACTIVE|||20040629";
+            "PRB|AD|2004062916460000|596.5^BLADDER DYSFUNCTION^I9|26744|||20040629|||||||||20040629";
 
     Condition noPrb4 = ResourceUtils.getCondition(withoutPRB4);
 
