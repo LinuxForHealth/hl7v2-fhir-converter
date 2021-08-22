@@ -288,6 +288,57 @@ public class Hl7IdentifierFHIRConversionTest {
         //        assertThat(system).isEqualTo("urn:id:extID");
     }
 
+  @Test
+  public void condition_identifier_test() {
+    //NOTE: the DG3 segment is still being worked on so we do not have a test case for this one but it  is similar to PRB4
+    String withoutPRB4 =
+            "MSH|^~\\&|||||20040629164652|1|PPR^PC1|331|P|2.3.1||\n" +
+            "PID|||10290^^^WEST^MR||KARLS^TOM^ANDREW^^MR.^||20040530|M|||||||||||398-44-5555|||||||||||N\n" +
+            "PRB|AD|2004062916460000|596.5^BLADDER DYSFUNCTION^I9||||20040629|||||||||20040629";
+    String withPRB4 =
+            "MSH|^~\\&|||||20040629164652|1|PPR^PC1|331|P|2.3.1||\n" +
+            "PID|1||000054321^^^MRN||COOPER^SHELDON^ANDREW||19820512|M||2106-3|||||EN^English|M|CAT|78654||||N\r" +
+            "PRB|AD|2004062916460000|596.5^BLADDER DYSFUNCTION^I9|26744|||20040629|||||||||20040629";
+
+    Condition noPrb4 = ResourceUtils.getCondition(withoutPRB4);
+
+    Identifier values = noPrb4.getIdentifier().get(0);
+    String noPrb4Value = values.getValue();
+
+    assertThat(noPrb4.hasIdentifier()).isTrue();
+    assertThat(noPrb4.getIdentifier()).hasSize(1);
+    assertThat(noPrb4Value).isEqualTo("20040629164652");
+    CodeableConcept noPrb4Type = values.getType();
+    Coding noPrb4TypeValues = noPrb4Type.getCoding().get(0);
+    assertThat(noPrb4TypeValues.getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/v2-0203");
+    assertThat(noPrb4TypeValues.getCode()).isEqualTo("VN");
+    assertThat(noPrb4TypeValues.getDisplay()).isEqualTo("Visit number");
+
+    Condition prb4 = ResourceUtils.getCondition(withPRB4);
+
+    Identifier identifier1 = prb4.getIdentifier().get(0);
+    String identifier1Value = identifier1.getValue();
+    String identifier1System = identifier1.getSystem();
+
+    assertThat(prb4.hasIdentifier()).isTrue();
+    assertThat(prb4.getIdentifier()).hasSize(2);
+    assertThat(identifier1Value).isEqualTo("78654");
+    assertThat(identifier1System).isNull();
+    CodeableConcept type = identifier1.getType();
+    Coding typeValues = type.getCoding().get(0);
+    assertThat(typeValues.getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/v2-0203");
+    assertThat(typeValues.getCode()).isEqualTo("VN");
+    assertThat(typeValues.getDisplay()).isEqualTo("Visit number");
+
+    Identifier identifier3 = prb4.getIdentifier().get(1);
+    String identifier3Value = identifier3.getValue();
+    String identifier3System = identifier3.getSystem();
+
+    assertThat(prb4.hasIdentifier()).isTrue();
+    assertThat(identifier3Value).isEqualTo("26744");
+    assertThat(identifier3System).isEqualTo("urn:id:extID");
+
+  }
     @Test
     public void condition_DG1_identifier_test() {
         // TODO: Add test for extId from DG1-3
@@ -509,7 +560,7 @@ public class Hl7IdentifierFHIRConversionTest {
         assertThat(encounter.hasIdentifier()).isTrue();
         assertThat(encounter.getIdentifier()).hasSize(2);
 
-        // Identifier 1: 
+        // Identifier 1:
         identifier = encounter.getIdentifier().get(0);
         value = identifier.getValue();
         system = identifier.getSystem();
@@ -521,7 +572,7 @@ public class Hl7IdentifierFHIRConversionTest {
         assertThat(coding.getCode()).isEqualTo("VN");
         assertThat(coding.getDisplay()).isEqualTo("Visit number");
 
-        // Identifier 2: 
+        // Identifier 2:
         identifier = encounter.getIdentifier().get(1);
         value = identifier.getValue();
         system = identifier.getSystem();
@@ -839,7 +890,7 @@ public class Hl7IdentifierFHIRConversionTest {
         assertThat(coding.getCode()).isEqualTo("PLAC");
         assertThat(coding.getDisplay()).isEqualTo("Placer Identifier");
 
-        // Test 2: 
+        // Test 2:
         //  - Visit number with PID-18
         //  - filler and placer from OBR
         serviceRequest = "MSH|^~\\&|SendTest1|Sendfac1|Receiveapp1|Receivefac1|200603081747|security|OMP^O09^OMP_O09|1|P^I|2.6|||AL|NE|764|ASCII||||||^4086::132:2A57:3C28^IPv6\r"
@@ -892,7 +943,7 @@ public class Hl7IdentifierFHIRConversionTest {
         //        assertThat(coding.getCode()).isEqualTo("PLAC");
         //        assertThat(coding.getDisplay()).isEqualTo("Placer Identifier");
 
-        // Test 3: 
+        // Test 3:
         //  - Visit number with PV1-19
         //  - filler from OBR
         //  - placer from ORC
@@ -991,7 +1042,7 @@ public class Hl7IdentifierFHIRConversionTest {
         assertThat(coding.getCode()).isEqualTo("VN");
         assertThat(coding.getDisplay()).isEqualTo("Visit number");
 
-        // Identifier 2: extID based on RXO-1.2 
+        // Identifier 2: extID based on RXO-1.2
         identifier = medReq.getIdentifier().get(1);
         value = identifier.getValue();
         system = identifier.getSystem();

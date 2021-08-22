@@ -66,7 +66,8 @@ category_x1:
    vars:     
      source: PRB.3
    constants:
-     code: 'Problem List Item'
+     display: 'Problem List Item'
+     code: 'problem-list-item'
      text: 'problem-list-item'
      system: 'http://terminology.hl7.org/CodeSystem/condition-category'
      type: problem-list-item
@@ -80,10 +81,20 @@ category_x2:
    vars:     
      source: PRB.3
    constants:
-     code: 'Encounter Diagnosis'
+     display: 'Encounter Diagnosis'
+     code: 'encounter-diagnosis'
      text: 'encounter-diagnosis'
-     system: 'http://terminology.hl7.org/CodeSystem/condition-category'
+     system: 'http://terminology.hl7.org/CodeSystem/condition-category' 
      type: encounter-diagnosis
+
+clinicalStatus:
+   valueOf: datatype/CodeableConcept_var
+   generateList: true
+   expressionType: resource
+   constants:
+      system: 'http://terminology.hl7.org/CodeSystem/condition-clinical'
+      code: 'resolved'
+      display: 'Resolved'
 
 severity:
   valueOf: datatype/CodeableConcept
@@ -98,7 +109,9 @@ code:
    generateList: true
    expressionType: resource
    specs: PRB.3 | DG1.3
-
+   vars:
+     code: PRB.3 | DG1.3
+          
 encounter:
   valueOf: datatype/Reference
   expressionType: resource
@@ -152,16 +165,7 @@ verificationStatus:
   specs: PRB.13
   vars:
     code: PRB.13
-
-clinicalStatus:
-   valueOf: datatype/CodeableConcept_var
-   generateList: true
-   expressionType: resource
-   constants:
-      system: 'http://terminology.hl7.org/CodeSystem/allergyintolerance-clinical'
-      code: 'active'
-      display: 'Active'
-
+  
 onsetString:
   type: STRING
   valueOf: PRB.17
