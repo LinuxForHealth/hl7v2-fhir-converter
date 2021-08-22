@@ -36,6 +36,7 @@ public class HL7EventTypeFHIRConversionTest {
 
     HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
     String json = ftv.convert(hl7message, OPTIONS);
+    System.out.println(json);
     assertThat(json).isNotBlank();
 
     FHIRContext context = new FHIRContext(true, false);
