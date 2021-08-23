@@ -195,6 +195,16 @@ String hl7message =
         ftv.convert(hl7message);
     });
   }
+//  @Test
+//  public void test_adt_40_message() {
+//    String hl7message =
+//            "MSH|^~\\&|REGADT|MCM|RSP1P8|MCM|200301051530|SEC|ADT^A40^ADT_A39|00000003|P|2.5\n" +
+//            "EVN|A40|200301051530\n" +
+//            "PID|||MR1^^^XYZ||MAIDENNAME^EVE\n" +
+//            "MRG|MR2^^^XYZ";
+//    HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
+//    String json = ftv.convert(hl7message, OPTIONS);
+//  }
 
   @Test
   public void test_VXU_V04_message() {
