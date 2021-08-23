@@ -15,6 +15,8 @@ import java.util.Map;
 import java.util.UUID;
 
 import ca.uhn.hl7v2.model.v26.datatype.CWE;
+import ca.uhn.hl7v2.model.v26.datatype.CX;
+import ca.uhn.hl7v2.model.v26.datatype.HD;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -251,11 +253,34 @@ public class SimpleDataValueResolver {
 
     public static final ValueExtractor<Object, SimpleCode> CODING_SYSTEM_V2 = (Object value) -> {
         String table = Hl7DataHandlerUtil.getTableNumber(value);
-        String val = Hl7DataHandlerUtil.getStringValue(value);
-        if (table != null && val != null) {
-            return TerminologyLookup.lookup(table, val);
-        } else if (val != null) {
-            return new SimpleCode(val, null, null);
+        String code = Hl7DataHandlerUtil.getStringValue(value);
+        String text = Hl7DataHandlerUtil.getOriginalDisplayText(value);
+        if (table != null && code != null) {
+            // Found table and a code. Try looking it up.
+            SimpleCode coding = TerminologyLookup.lookup(table, code);
+            if (coding != null) {
+                String display = coding.getDisplay();
+                // Successful display confirms a valid code and system 
+                if (display != null ) {
+
+                    if (display.isEmpty()) {
+                        // We have a table, code, but unknown display, so we can't tell if it's good, use the original display text
+                        coding = new SimpleCode(coding.getCode(), coding.getSystem(), text);
+                    }
+                    // We have a table, code, and display, so code was valid
+                    return coding;
+                } else {
+                    // Display was not found; create an error message in the display text
+                    display = "Invalid input: code: '" + code + "' for system: '" + table + "' original display: '" + text +"'";
+                    return new SimpleCode(null, coding.getSystem(), display);
+                }
+            } else { 
+                // No success looking up the code, build our own fall-back system using table name
+                return new SimpleCode(code, "urn:id:"+table, text) ;
+            }
+        } else if (code != null) {
+            // A code but no system: build a simple systemless code
+            return new SimpleCode(code, null, null);
         } else {
             return null;
         }

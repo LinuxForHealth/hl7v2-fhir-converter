@@ -29,6 +29,7 @@ resources:
     group: PATIENT
     repeats: false
     additionalSegments:
+      - .PID
       - .PATIENT_VISIT.PV2
       - MSH
 
@@ -57,3 +58,5 @@ resources:
     repeats: true
     additionalSegments:
       - MSH
+      - PATIENT.PID
+      - PATIENT.PATIENT_VISIT.PV1
