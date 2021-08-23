@@ -31,7 +31,7 @@ public class HL7ConditionFHIRConversionTest {
 
     private static final ConverterOptions OPTIONS = new Builder().withValidateResource().withPrettyPrint().build();
 
-    // Tests the DG1 segment (encounter) with all support message types.
+    // Tests the DG1 segment (encounter) with all supported message types.
     @ParameterizedTest
     @ValueSource(strings = { "MSH|^~\\&|||||||ADT^A01^ADT_A01|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6||||||\r",
         //     "MSH|^~\\&|||||||ADT^A03|64322|P|2.4|123|456|ER|AL|USA|ASCII|en|2.4||||||\r",
@@ -198,7 +198,7 @@ public class HL7ConditionFHIRConversionTest {
         String hl7message = "MSH|^~\\&|||||20040629164652|1|PPR^PC1|331|P|2.3.1||\r"
                 + "PID|1||12345678^^^^MR|ALTID|Mouse^Mickey^J^III^^^||||||||||||||||||Born in USA|Y||USA||||\r"
                 + "PV1||I|6N^1234^A^GENHOS||||0100^ANDERSON^CARL|0148^ADDISON^JAMES||SUR|||||||0148^ANDERSON^CARL|S|1400|A|||||||||||||||||||SF|K||||199501102300\r"
-                + "PRB|AD|20170110074000|K80.00^Cholelithiasis^I10|53956|E1|1|20100907175347|20150907175347|20180310074000||||confirmed^Confirmed^http://terminology.hl7.org/CodeSystem/condition-ver-status|resolved|20180310074000|20170102074000|textual representation of the time when the problem began|1^primary|ME^Medium|0.4|marginal|good|marginal|marginal|highly sensitive|some prb detail|\r";
+                + "PRB|AD|20170110074000|K80.00^Cholelithiasis^I10|53956|E1|1|20100907175347|20150907175347|20180310074000||||confirmed^Confirmed^http://terminology.hl7.org/CodeSystem/condition-ver-status|remission^Remission^http://terminology.hl7.org/CodeSystem/condition-clinical|20180310074000|20170102074000|textual representation of the time when the problem began|1^primary|ME^Medium|0.4|marginal|good|marginal|marginal|highly sensitive|some prb detail|\r";
 
         HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
         String json = ftv.convert(hl7message, OPTIONS);
@@ -287,7 +287,7 @@ public class HL7ConditionFHIRConversionTest {
          Base summary = ResourceUtils.getValue(stage, "summary");
          Base sumCoding = ResourceUtils.getValue(summary, "coding");
          assertThat(ResourceUtils.getValueAsString(sumCoding, "code"))
-                 .isEqualTo("resolved");
+                 .isEqualTo("remission");
 
     }
 
