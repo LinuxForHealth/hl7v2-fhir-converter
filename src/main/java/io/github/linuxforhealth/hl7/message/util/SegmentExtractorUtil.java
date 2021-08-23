@@ -247,9 +247,13 @@ public class SegmentExtractorUtil {
       values = getChildStructures(commonParent, relativeGroupsToCommonParent, seg.getSegment(),
           dataExtractor);
 
-    } else {
-
-      throw new IllegalStateException("Unknow state , cannot extract additional elements");
+    } else  {
+      //extracts data from segment that is in a group outside of the primary group for that specific resource
+      List<Structure> parentSegments = getChildStructures(seg.getGroup(), dataExtractor);
+      values = new ArrayList<>();
+      for (Structure par : parentSegments) {
+        values.addAll(getStructures(par, seg.getSegment(), dataExtractor));
+      }
     }
     return values;
 
