@@ -371,7 +371,7 @@ public class Hl7PatientFHIRConversionTest {
         // test value based off the name.
         switch(name) {
           case "source-event-timestamp":
-            assertThat(value).isEqualTo("2006-09-15T21:00:00+08:00");
+            assertThat(value).isEqualTo("DateTimeType[2006-09-15T21:00:00+08:00]");
             break;
           case "source-record-id":
             assertThat(value).isEqualTo("1473973200100600");
