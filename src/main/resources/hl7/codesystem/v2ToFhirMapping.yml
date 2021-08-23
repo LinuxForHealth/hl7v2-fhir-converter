@@ -276,3 +276,6 @@ V3ReligiousAffiliation:
   # OTH:   NO REASONABLE MATCH
   # Unknown
   # VAR:   NO REASONABLE MATCH
+
+DiagnosisRole:
+   A: AD

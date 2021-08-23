@@ -110,8 +110,11 @@ subject:
 
 # diagnosis:
 #     valueOf: datatype/Diagnosis
+#     generateList: true
 #     expressionType: resource
 #     specs: DG1
+#     vars:
+#       Condition: $Condition
 
 text:
    condition: $text NOT_NULL
