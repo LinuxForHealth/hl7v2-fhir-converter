@@ -41,6 +41,7 @@ resources:
       isReferenced: true
       repeats: true
       additionalSegments:
+        - MSH
 
     - resourceName: Observation
       segment: OBX

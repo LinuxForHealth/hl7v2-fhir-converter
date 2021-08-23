@@ -40,3 +40,4 @@ resources:
       resourcePath: resource/Condition
       repeats: true
       additionalSegments:
+        - MSH

@@ -92,8 +92,8 @@ clinicalStatus:
    expressionType: resource
    constants:
       system: 'http://terminology.hl7.org/CodeSystem/condition-clinical'
-      code: 'resolved'
-      display: 'Resolved'
+      code: 'remission'
+      display: 'Remission'
 
 severity:
    valueOf: datatype/CodeableConcept
