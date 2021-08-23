@@ -107,7 +107,7 @@ subject:
     expressionType: resource
     specs: $Patient
 
-diagnosis:
-    valueOf: datatype/Diagnosis
-    expressionType: resource
-    specs: DG1
+# diagnosis:
+#     valueOf: datatype/Diagnosis
+#     expressionType: resource
+#     specs: DG1
