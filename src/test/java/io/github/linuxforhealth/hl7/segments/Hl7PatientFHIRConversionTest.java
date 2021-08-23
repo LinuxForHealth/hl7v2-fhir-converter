@@ -309,11 +309,11 @@ public class Hl7PatientFHIRConversionTest {
 
     String patientSpeaksEnglish =
             "MSH|^~\\&|MyEMR|DE-000001| |CAIRLO|20160701123030-0700||VXU^V04^VXU_V04|CA0001|P|2.6|||ER|AL|||||Z22^CDCPHINVS|DE-000001\r" +
-                    "PID|1||PA123456^^^MYEMR^MR||JONES^GEORGE^M^JR^^^L|MILLER^MARTHA^G^^^^M|20140227|M||2106-3^WHITE^CDCREC|1234 W FIRST ST^^BEVERLY HILLS^CA^90210^^H||^PRN^PH^^^555^5555555||ENG^English^HL70296|||||||2186-5^ not Hispanic or Latino^CDCREC||Y|2\r";
+                    "PID|1||PA123456^^^MYEMR^MR||DOE^JOHN|||M|||||||ENG^English^HL70296|||||||||Y|2\r";
 
     String patientEnglishNoCode = //NO coding system given in the CWE
             "MSH|^~\\&|MyEMR|DE-000001| |CAIRLO|20160701123030-0700||VXU^V04^VXU_V04|CA0001|P|2.6|||ER|AL|||||Z22^CDCPHINVS|DE-000001\r" +
-                    "PID|1||PA123456^^^MYEMR^MR||JONES^GEORGE^M^JR^^^L|MILLER^MARTHA^G^^^^M|20140227|M||2106-3^WHITE^CDCREC|1234 W FIRST ST^^BEVERLY HILLS^CA^90210^^H||^PRN^PH^^^555^5555555||ENG^English|||||||2186-5^ not Hispanic or Latino^CDCREC||Y|2\r";
+                    "PID|1||PA123456^^^MYEMR^MR||DOE^JANE|||M|||||||ENG^English|||||||||Y|2\r";
 
     Patient patientObjEnglish = PatientUtils.createPatientFromHl7Segment(patientSpeaksEnglish);
     assertThat(patientObjEnglish.hasCommunication()).isTrue();
