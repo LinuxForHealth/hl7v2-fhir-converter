@@ -42,7 +42,7 @@ class CodeableConceptTest {
 
         String patientWithCodeableConcept = "MSH|^~\\&|MIICEHRApplication|MIIC|MIIC|MIIC|201705130822||VXU^V04^VXU_V04|test1100|P|2.5.1|||AL|AL|||||Z22^CDCPHINVS|^^^^^MIIC^SR^^^MIIC|MIIC\n"
                 // Test text only race
-                + "PID|1||12345678^^^^MR||Jane^TestPatientLastName|||||W\n";
+                + "PID|1||12345678^^^^MR||TestPatientLastName^Jane^|||||W\n";
 
         Patient patient = PatientUtils.createPatientFromHl7Segment(patientWithCodeableConcept);
         assertThat(patient.hasExtension()).isTrue();
@@ -53,6 +53,7 @@ class CodeableConceptTest {
         assertThat(extensions.get(0).hasValue()).isTrue();
         CodeableConcept ccW = (CodeableConcept) extensions.get(0).getValue();
         assertThat(ccW.hasCoding()).isTrue();
+        assertThat(ccW.getCoding().size()).isEqualTo(1);
         assertThat(ccW.hasText()).isFalse();
         Coding coding = ccW.getCodingFirstRep();
         assertThat(coding.hasDisplay()).isFalse();
@@ -77,6 +78,7 @@ class CodeableConceptTest {
         assertThat(extensions.get(0).hasValue()).isTrue();
         CodeableConcept ccW = (CodeableConcept) extensions.get(0).getValue();
         assertThat(ccW.hasCoding()).isTrue();
+        assertThat(ccW.getCoding().size()).isEqualTo(1);
         assertThat(ccW.hasText()).isTrue();
         assertThat(ccW.getText()).hasToString("White");
         Coding coding = ccW.getCodingFirstRep();
@@ -115,6 +117,7 @@ class CodeableConceptTest {
         assertThat(extensions.get(0).hasValue()).isTrue();
         CodeableConcept ccW = (CodeableConcept) extensions.get(0).getValue();
         assertThat(ccW.hasCoding()).isTrue();
+        assertThat(ccW.getCoding().size()).isEqualTo(1);
         Coding coding = ccW.getCodingFirstRep();
         assertThat(coding.hasDisplay()).isTrue();
         assertThat(coding.hasCode()).isTrue();
@@ -151,6 +154,7 @@ class CodeableConceptTest {
         assertThat(extensions.get(0).hasValue()).isTrue();
         CodeableConcept ccW = (CodeableConcept) extensions.get(0).getValue();
         assertThat(ccW.hasCoding()).isTrue();
+        assertThat(ccW.getCoding().size()).isEqualTo(1);
         Coding coding = ccW.getCodingFirstRep();
         assertThat(coding.hasDisplay()).isTrue();
         assertThat(coding.hasCode()).isTrue();
@@ -170,9 +174,8 @@ class CodeableConceptTest {
         //       "system": <known-to-FHIR-system>,
         //       "display": <display value looked up from code>;
         //       "code": <code-from-input(invalid)>
-        //     } ],
-        //     "text": <display value looked up from code>;
-        //   },
+        //     } ]
+        //   },    << No TEXT because there is no CWE.2 or CWE.9
 
         String patientWithCodeableConcept = "MSH|^~\\&|MIICEHRApplication|MIIC|MIIC|MIIC|201705130822||VXU^V04^VXU_V04|test1100|P|2.5.1|||AL|AL|||||Z22^CDCPHINVS|^^^^^MIIC^SR^^^MIIC|MIIC\n"
                 // Race with good code in known system but no display text
@@ -187,7 +190,8 @@ class CodeableConceptTest {
         assertThat(extensions.get(0).hasValue()).isTrue();
         CodeableConcept ccW = (CodeableConcept) extensions.get(0).getValue();
         assertThat(ccW.hasCoding()).isTrue();
-        assertThat(ccW.hasText()).isTrue();
+        assertThat(ccW.hasText()).isFalse();
+        assertThat(ccW.getCoding().size()).isEqualTo(1);
         Coding coding = ccW.getCodingFirstRep();
         assertThat(coding.hasDisplay()).isTrue();
         assertThat(coding.hasCode()).isTrue();
@@ -222,6 +226,7 @@ class CodeableConceptTest {
         assertThat(extensions.get(0).hasValue()).isTrue();
         CodeableConcept ccW = (CodeableConcept) extensions.get(0).getValue();
         assertThat(ccW.hasCoding()).isTrue();
+        assertThat(ccW.getCoding().size()).isEqualTo(1);
         Coding coding = ccW.getCodingFirstRep();
         assertThat(coding.hasDisplay()).isTrue();
         assertThat(coding.hasCode()).isFalse();
@@ -242,7 +247,6 @@ class CodeableConceptTest {
         //     "text": <original-display-value>
         //   },
 
-
         String patientWithCodeableConcept = "MSH|^~\\&|MIICEHRApplication|MIIC|MIIC|MIIC|201705130822||VXU^V04^VXU_V04|test1100|P|2.5.1|||AL|AL|||||Z22^CDCPHINVS|^^^^^MIIC^SR^^^MIIC|MIIC\n"
                 // This code does not exist in the CDCREC system, and will fail the lookup, resulting in an error message in display.
                 + "PID|1||12345678^^^^MR||Jane^TestPatientLastName|||||2186-5^hispan^CDCREC\n";
@@ -256,6 +260,7 @@ class CodeableConceptTest {
         assertThat(extensions.get(0).hasValue()).isTrue();
         CodeableConcept ccW = (CodeableConcept) extensions.get(0).getValue();
         assertThat(ccW.hasCoding()).isTrue();
+        assertThat(ccW.getCoding().size()).isEqualTo(1);
         Coding coding = ccW.getCodingFirstRep();
         assertThat(coding.hasDisplay()).isTrue();
         assertThat(coding.hasCode()).isFalse();
@@ -333,6 +338,7 @@ class CodeableConceptTest {
         assertThat(condCC.hasText()).isTrue();
         assertThat(condCC.getText()).isEqualTo("CREATININE");
         assertThat(condCC.hasCoding()).isTrue();
+        assertThat(condCC.getCoding().size()).isEqualTo(2);
 
         Coding condCoding = condCC.getCoding().get(0);
         assertThat(condCoding.hasSystem()).isTrue();
@@ -353,6 +359,68 @@ class CodeableConceptTest {
         assertThat(condCoding.getDisplay()).isEqualTo("CREATININE");
         assertThat(condCoding.hasVersion()).isTrue();
         assertThat(condCoding.getVersion()).isEqualTo("22222");
+    }
+
+    @Test
+    public void testCodeableConceptDoubleRaceWithVersionAndAlternate() {
+
+        // This has both a known and an unknown system.
+        // "valueCodeableConcept": {
+        //     "coding": [ {
+        //       "system": <known-to-FHIR>,  << FIRST CODING
+        //       "display": <original-display-value>
+        //       "code": <code-from-input>
+        //       "version": <version>        
+        //     },
+        //     {    
+        //       "system": <unknown, so made up "urn:id:L">,  << SECOND (ALTERNATE CODING)
+        //       "display": <original-alternate display-value>
+        //       "code": <altenate-code>
+        //       "version": <alternate-version>        
+        //     } ],
+        //     "text": <original-display-value>
+        //   },
+
+        String patientWithDoubleRaceWithVersionAndAlternate = "MSH|^~\\&|MIICEHRApplication|MIIC|MIIC|MIIC|201705130822||VXU^V04^VXU_V04|test1100|P|2.5.1|||AL|AL|||||Z22^CDCPHINVS|^^^^^MIIC^SR^^^MIIC|MIIC\n"
+                // Test double race in the SAME CWE (not a second CWE) and versions.  Use made up Cauc to ensure test doesn't mix up whites.
+                + "PID|1||12345678^^^^MR||TestPatientLastName^Jane|||||2106-3^White^CDCREC^CA^Caucasian^L^1.1^4|\n";
+
+        Patient patient = PatientUtils.createPatientFromHl7Segment(patientWithDoubleRaceWithVersionAndAlternate);
+        assertThat(patient.hasExtension()).isTrue();
+
+        List<Extension> extensions = patient.getExtensionsByUrl(UrlLookup.getExtensionUrl("race"));
+        assertThat(extensions).isNotNull();
+        assertThat(extensions.size()).isEqualTo(1);
+
+        assertThat(extensions.get(0).hasValue()).isTrue();
+        CodeableConcept ccW = (CodeableConcept) extensions.get(0).getValue();
+        assertThat(ccW.hasCoding()).isTrue();
+        assertThat(ccW.hasText()).isTrue();
+        assertThat(ccW.getText()).hasToString("White");
+
+        List<Coding> codings = ccW.getCoding();
+        assertThat(codings.size()).isEqualTo(2);
+
+        Coding coding = codings.get(0);
+        assertThat(coding.hasDisplay()).isTrue();
+        assertThat(coding.getDisplay()).hasToString("White");
+        assertThat(coding.hasCode()).isTrue();
+        assertThat(coding.getCode()).hasToString("2106-3");
+        assertThat(coding.hasSystem()).isTrue();
+        assertThat(coding.getSystem()).hasToString("http://terminology.hl7.org/CodeSystem/v3-Race");
+        assertThat(coding.hasVersion()).isTrue();
+        assertThat(coding.getVersion()).hasToString("1.1");
+
+        coding = codings.get(1);
+        assertThat(coding.hasDisplay()).isTrue();
+        assertThat(coding.getDisplay()).hasToString("Caucasian");
+        assertThat(coding.hasCode()).isTrue();
+        assertThat(coding.getCode()).hasToString("CA");
+        assertThat(coding.hasSystem()).isTrue();
+        assertThat(coding.getSystem()).hasToString("urn:id:L");
+        assertThat(coding.hasVersion()).isTrue();
+        assertThat(coding.getVersion()).hasToString("4");
+
     }
 
 }

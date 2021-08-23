@@ -49,6 +49,8 @@ coding_5:
    condition: $coding NOT_NULL
    generateList: true
    
+# If hideText is not passed by parent, the value is NULL, making it backward compatible with all other uses of CodeableConcept
+# Any value in hideText will cause the text to be hidden.  Used by Identifier_SystemID.   
 text:
    condition: $hideText NULL  && $displayText NOT_NULL
    type: STRING
@@ -59,5 +61,3 @@ text:
 # ----------------
 # Orphan comments:
 # ----------------
-# Was at begin of line:56 :# If hideText is not passed by parent, the value is NULL, making it backward compatible with all other uses of CodeableConcept
-# Was at begin of line:57 :# Any value in hideText will cause the text to be hidden.  Used by Identifier_SystemID.
