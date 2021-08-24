@@ -54,7 +54,6 @@ public class Hl7ORUMessageTest {
         HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
         String json = ftv.convert(hl7message, OPTIONS);
         assertThat(json).isNotBlank();
-        System.out.println(json);
         IBaseResource bundleResource = context.getParser().parseResource(json);
         assertThat(bundleResource).isNotNull();
         Bundle b = (Bundle) bundleResource;
@@ -177,7 +176,6 @@ public class Hl7ORUMessageTest {
         HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
         String json = ftv.convert(hl7message, OPTIONS);
         assertThat(json).isNotBlank();
-        System.out.println(json);
         IBaseResource bundleResource = context.getParser().parseResource(json);
         assertThat(bundleResource).isNotNull();
         Bundle b = (Bundle) bundleResource;
