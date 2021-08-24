@@ -20,6 +20,8 @@ import io.github.linuxforhealth.core.terminology.UrlLookup;
 import io.github.linuxforhealth.hl7.segments.util.*;
 
 class CodeableConceptTest {
+    private static final String V3_RACE_SYSTEM = "http://terminology.hl7.org/CodeSystem/v3-Race";
+
 
     // These test cover all the paths to create codeableConcepts from CWEs.
     // 
@@ -87,7 +89,7 @@ class CodeableConceptTest {
         assertThat(coding.hasSystem()).isTrue();
         assertThat(coding.getDisplay()).hasToString("White");
         assertThat(coding.getCode()).hasToString("2106-3");
-        assertThat(coding.getSystem()).containsIgnoringCase("terminology.hl7.org/CodeSystem/v3-Race");
+        assertThat(coding.getSystem()).containsIgnoringCase(V3_RACE_SYSTEM);
 
     }
 
@@ -116,6 +118,8 @@ class CodeableConceptTest {
         assertThat(extensions.size()).isEqualTo(1);
         assertThat(extensions.get(0).hasValue()).isTrue();
         CodeableConcept ccW = (CodeableConcept) extensions.get(0).getValue();
+        assertThat(ccW.hasText()).isTrue();
+        assertThat(ccW.getText()).hasToString("WHITE");
         assertThat(ccW.hasCoding()).isTrue();
         assertThat(ccW.getCoding().size()).isEqualTo(1);
         Coding coding = ccW.getCodingFirstRep();
@@ -153,6 +157,8 @@ class CodeableConceptTest {
         assertThat(extensions.size()).isEqualTo(1);
         assertThat(extensions.get(0).hasValue()).isTrue();
         CodeableConcept ccW = (CodeableConcept) extensions.get(0).getValue();
+        assertThat(ccW.hasText()).isTrue();
+        assertThat(ccW.getText()).hasToString("WHITE");
         assertThat(ccW.hasCoding()).isTrue();
         assertThat(ccW.getCoding().size()).isEqualTo(1);
         Coding coding = ccW.getCodingFirstRep();
@@ -231,8 +237,8 @@ class CodeableConceptTest {
         assertThat(coding.hasDisplay()).isTrue();
         assertThat(coding.hasCode()).isFalse();
         assertThat(coding.hasSystem()).isTrue();
-        assertThat(coding.getDisplay()).containsPattern("Invalid.*2186-5.*CDCREC");
-        assertThat(coding.getSystem()).containsIgnoringCase("http://terminology.hl7.org/CodeSystem/v3-Race");
+        assertThat(coding.getDisplay()).containsPattern("Invalid.*2186-5.*"+V3_RACE_SYSTEM);
+        assertThat(coding.getSystem()).containsIgnoringCase(V3_RACE_SYSTEM);
     }
 
     @Test
@@ -265,8 +271,8 @@ class CodeableConceptTest {
         assertThat(coding.hasDisplay()).isTrue();
         assertThat(coding.hasCode()).isFalse();
         assertThat(coding.hasSystem()).isTrue();
-        assertThat(coding.getDisplay()).containsPattern("Invalid.*2186-5.*CDCREC.*hispan");
-        assertThat(coding.getSystem()).containsIgnoringCase("http://terminology.hl7.org/CodeSystem/v3-Race");
+        assertThat(coding.getDisplay()).containsPattern("Invalid.*2186-5.*"+V3_RACE_SYSTEM+".*hispan");
+        assertThat(coding.getSystem()).containsIgnoringCase(V3_RACE_SYSTEM);
 
     }
 
@@ -407,7 +413,7 @@ class CodeableConceptTest {
         assertThat(coding.hasCode()).isTrue();
         assertThat(coding.getCode()).hasToString("2106-3");
         assertThat(coding.hasSystem()).isTrue();
-        assertThat(coding.getSystem()).hasToString("http://terminology.hl7.org/CodeSystem/v3-Race");
+        assertThat(coding.getSystem()).hasToString(V3_RACE_SYSTEM);
         assertThat(coding.hasVersion()).isTrue();
         assertThat(coding.getVersion()).hasToString("1.1");
 
@@ -422,5 +428,6 @@ class CodeableConceptTest {
         assertThat(coding.getVersion()).hasToString("4");
 
     }
+
 
 }
