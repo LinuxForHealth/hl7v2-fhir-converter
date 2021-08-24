@@ -34,17 +34,16 @@ public class HL7ConditionFHIRConversionTest {
     // Tests the DG1 segment (encounter) with all supported message types.
     @ParameterizedTest
     @ValueSource(strings = { "MSH|^~\\&|||||||ADT^A01^ADT_A01|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6||||||\r",
-        //     "MSH|^~\\&|||||||ADT^A03|64322|P|2.4|123|456|ER|AL|USA|ASCII|en|2.4||||||\r",
-        //     "MSH|^~\\&|||||||ADT^A04|64322|P|2.4|123|456|ER|AL|USA|ASCII|en|2.4||||||\r",
-        //     "MSH|^~\\&|||||||ADT^A08|64322|P|2.4|123|456|ER|AL|USA|ASCII|en|2.4||||||\r",
-        //     "MSH|^~\\&|||||||ADT^A28^ADT^A28|64322|P|2.4|123|456|ER|AL|USA|ASCII|en|2.4||||||\r",
-        //     "MSH|^~\\&|||||||ADT^A31|64322|P|2.4|123|456|ER|AL|USA|ASCII|en|2.4||||||\r",
-        //     "MSH|^~\\&|||||||ORM^O01|64322|P|2.4|123|456|ER|AL|USA|ASCII|en|2.4||||||\r" 
-        })
+    // "MSH|^~\\&|||||||ADT^A03|64322|P|2.4|123|456|ER|AL|USA|ASCII|en|2.4||||||\r",
+    // "MSH|^~\\&|||||||ADT^A04|64322|P|2.4|123|456|ER|AL|USA|ASCII|en|2.4||||||\r",
+    // "MSH|^~\\&|||||||ADT^A08|64322|P|2.4|123|456|ER|AL|USA|ASCII|en|2.4||||||\r",
+    // "MSH|^~\\&|||||||ADT^A28^ADT^A28|64322|P|2.4|123|456|ER|AL|USA|ASCII|en|2.4||||||\r",
+    // "MSH|^~\\&|||||||ADT^A31|64322|P|2.4|123|456|ER|AL|USA|ASCII|en|2.4||||||\r",
+    // "MSH|^~\\&|||||||ORM^O01|64322|P|2.4|123|456|ER|AL|USA|ASCII|en|2.4||||||\r"
+    })
     public void validate_encounter(String msh) {
 
-        String hl7message = msh
-                + "PID||||||||||||||||||||||||||||||\r"
+        String hl7message = msh + "PID||||||||||||||||||||||||||||||\r"
                 + "PV1||I|||||||||||||||||1400|||||||||||||||||||||||||\r"
                 + "DG1|1|ICD10|B45678|Broken Arm|20210322154449|A|E123|R45|Y|J76|C|15|1458.98||1|123^DOE^JOHN^A^|C|Y|20210322154326|V45|S1234|Parent Diagnosis|Value345|Group567|DiagnosisG45|Y\r";
 
@@ -57,7 +56,6 @@ public class HL7ConditionFHIRConversionTest {
         assertThat(bundleResource).isNotNull();
         Bundle b = (Bundle) bundleResource;
         List<BundleEntryComponent> e = b.getEntry();
-
 
         // --- CONDITION TESTS ---
 
@@ -97,7 +95,7 @@ public class HL7ConditionFHIRConversionTest {
         Base code = ResourceUtils.getValue(condition, "code");
         Base coding = ResourceUtils.getValue(code, "coding");
         assertThat(ResourceUtils.getValueAsString(coding, "code")).isEqualTo("B45678");
-        
+
         // Verify encounter reference exists
         Base encounterProp = ResourceUtils.getValue(condition, "encounter");
         assertThat(ResourceUtils.getValueAsString(encounterProp, "reference").substring(0, 10)).isEqualTo("Encounter/");
@@ -117,7 +115,6 @@ public class HL7ConditionFHIRConversionTest {
         assertThat(ResourceUtils.getValueAsString(catCoding, "code")).isEqualTo("encounter-diagnosis");
         assertThat(ResourceUtils.getValueAsString(catCoding, "display")).isEqualTo("Encounter Diagnosis");
 
-
         // --- ENCOUNTER TESTS ---
 
         List<Resource> encounterResource = e.stream()
@@ -128,20 +125,23 @@ public class HL7ConditionFHIRConversionTest {
         // Get the encounter resource
         Base encounter = encounterResource.get(0);
 
-        // Verify encounter use is set correctly -- COMMENTED OUT UNTIL WE CAN REFERNCE CONDITION FROM ENCOUNTER
+        // Verify encounter use is set correctly -- COMMENTED OUT UNTIL WE CAN REFERNCE
+        // CONDITION FROM ENCOUNTER
         // Base diagnosis = ResourceUtils.getValue(encounter, "diagnosis");
         // Base use = ResourceUtils.getValue(diagnosis, "use");
         // assertThat(ResourceUtils.getValueAsString(use, "text")).isEqualTo("A");
         // Base diagCoding = ResourceUtils.getValue(use, "coding");
         // assertThat(ResourceUtils.getValueAsString(diagCoding, "system"))
-        //         .isEqualTo("UriType[http://terminology.hl7.org/CodeSystem/diagnosis-role]");
-        // assertThat(ResourceUtils.getValueAsString(diagCoding, "code")).isEqualTo("AD");
-        // assertThat(ResourceUtils.getValueAsString(diagCoding, "display")).isEqualTo("Admission diagnosis");
+        // .isEqualTo("UriType[http://terminology.hl7.org/CodeSystem/diagnosis-role]");
+        // assertThat(ResourceUtils.getValueAsString(diagCoding,
+        // "code")).isEqualTo("AD");
+        // assertThat(ResourceUtils.getValueAsString(diagCoding,
+        // "display")).isEqualTo("Admission diagnosis");
 
         // // Verify encounter rank is set correctly.
-        // assertThat(ResourceUtils.getValueAsString(diagnosis, "rank")).isEqualTo("PositiveIntType[1]");
+        // assertThat(ResourceUtils.getValueAsString(diagnosis,
+        // "rank")).isEqualTo("PositiveIntType[1]");
 
-        
         // --- PRACTIONER TESTS ---
 
         // Find the practitioner resource from the FHIR bundle.
@@ -161,14 +161,13 @@ public class HL7ConditionFHIRConversionTest {
 
     }
 
-    // Tests the DG1 segment (encounter) with a full Entity Identifier(EI) for the
-    // asserter
+    // Tests the DG1 segment (encounter) with a full Entity Identifier(EI).
+    // These values come from DG1.20.
     @Test
     public void validate_encounter_with_EI_identifiers() {
 
         String hl7message = "MSH|^~\\&|||||||ADT^A01^ADT_A01|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6||||||\r"
                 + "PID||||||||||||||||||||||||||||||\r"
-                + "PV1||I|||||||||||||||||1400|||||||||||||||||||||||||\r"
                 + "DG1|1|ICD10|B45678|Broken Arm|20210322154449|A|E123|R45|Y|J76|C|15|1458.98||1|123^DOE^JOHN^A^|C|Y|20210322154326|one^https://terminology.hl7.org/CodeSystem/two^three^https://terminology.hl7.org/CodeSystem/four|S1234|Parent Diagnosis|Value345|Group567|DiagnosisG45|Y\r";
 
         HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
@@ -217,20 +216,19 @@ public class HL7ConditionFHIRConversionTest {
 
     // Tests the PRB segment (problem) with all supported message types.
     @ParameterizedTest
-    @ValueSource(strings = { 
-        "MSH|^~\\&|||||20040629164652|1|PPR^PC1|331|P|2.3.1||\r",
-        // "MSH|^~\\&|||||20040629164652|1|PPR^PC2|331|P|2.3.1||\r",
-        // "MSH|^~\\&|||||20040629164652|1|PPR^PC3|331|P|2.3.1||\r",
+    @ValueSource(strings = { "MSH|^~\\&|||||20040629164652|1|PPR^PC1|331|P|2.3.1||\r",
+    // "MSH|^~\\&|||||20040629164652|1|PPR^PC2|331|P|2.3.1||\r",
+    // "MSH|^~\\&|||||20040629164652|1|PPR^PC3|331|P|2.3.1||\r",
     })
-    public void validate_problem() {
+    public void validate_problem(String msh) {
 
-        String hl7message = "MSH|^~\\&|||||20040629164652|1|PPR^PC1|331|P|2.3.1||\r"
-                + "PID||||||||||||||||||||||||||||||\r"
+        String hl7message = msh + "PID||||||||||||||||||||||||||||||\r"
                 + "PV1||I||||||||||||||||||||||||||||||||||||||||||\r"
                 + "PRB|AD|20170110074000|K80.00^Cholelithiasis^I10|53956|E1|1|20100907175347|20150907175347|20180310074000||||confirmed^Confirmed^http://terminology.hl7.org/CodeSystem/condition-ver-status|remission^Remission^http://terminology.hl7.org/CodeSystem/condition-clinical|20180310074000|20170102074000|textual representation of the time when the problem began|1^primary|ME^Medium|0.4|marginal|good|marginal|marginal|highly sensitive|some prb detail|\r";
 
         HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
         String json = ftv.convert(hl7message, OPTIONS);
+        System.out.println(json);
         assertThat(json).isNotBlank();
 
         FHIRContext context = new FHIRContext(true, false);
@@ -264,7 +262,8 @@ public class HL7ConditionFHIRConversionTest {
         Base coding = ResourceUtils.getValue(verificationStatus, "coding");
         assertThat(ResourceUtils.getValueAsString(coding, "code")).isEqualTo("confirmed");
 
-        // Verify onset string is set correctly.
+        // Verify onset string is set correctly (PRB.17). Only present if PRB.16 is
+        // present. In this test case it is.
         assertThat(ResourceUtils.getValueAsString(condition, "onsetString"))
                 .isEqualTo("textual representation of the time when the problem began");
 
@@ -297,8 +296,7 @@ public class HL7ConditionFHIRConversionTest {
         // Verify severity code is set correctly.
         Base severity = ResourceUtils.getValue(condition, "severity");
         Base sevCoding = ResourceUtils.getValue(severity, "coding");
-        assertThat(ResourceUtils.getValueAsString(sevCoding, "code"))
-                .isEqualTo("some prb detail");
+        assertThat(ResourceUtils.getValueAsString(sevCoding, "code")).isEqualTo("some prb detail");
 
         // Verify code text is set correctly.
         Base code = ResourceUtils.getValue(condition, "code");
@@ -309,13 +307,12 @@ public class HL7ConditionFHIRConversionTest {
         assertThat(ResourceUtils.getValueAsString(codeCoding, "system"))
                 .isEqualTo("UriType[http://hl7.org/fhir/sid/icd-10]");
         assertThat(ResourceUtils.getValueAsString(codeCoding, "code")).isEqualTo("K80.00");
-        
-         // Verify stage summary code is set correctly.
-         Base stage = ResourceUtils.getValue(condition, "stage");
-         Base summary = ResourceUtils.getValue(stage, "summary");
-         Base sumCoding = ResourceUtils.getValue(summary, "coding");
-         assertThat(ResourceUtils.getValueAsString(sumCoding, "code"))
-                 .isEqualTo("remission");
+
+        // Verify stage summary code is set correctly.
+        Base stage = ResourceUtils.getValue(condition, "stage");
+        Base summary = ResourceUtils.getValue(stage, "summary");
+        Base sumCoding = ResourceUtils.getValue(summary, "coding");
+        assertThat(ResourceUtils.getValueAsString(sumCoding, "code")).isEqualTo("remission");
 
         // Verify clinicalStatus coding is set correctly
         Base clinicalStatus = ResourceUtils.getValue(condition, "clinicalStatus");
@@ -323,21 +320,25 @@ public class HL7ConditionFHIRConversionTest {
         assertThat(ResourceUtils.getValueAsString(clinCoding, "system"))
                 .isEqualTo("UriType[http://terminology.hl7.org/CodeSystem/condition-clinical]");
         assertThat(ResourceUtils.getValueAsString(clinCoding, "code")).isEqualTo("remission");
-        assertThat(ResourceUtils.getValueAsString(clinCoding, "display")).isEqualTo("Remission");               
+        assertThat(ResourceUtils.getValueAsString(clinCoding, "display")).isEqualTo("Remission");
 
     }
 
-    // Tests a particular PRB segment that wasn't working properly recently regards to condition category.
-    // Specifically that this HL7 messagee would create a code field with all 3 coding values (code, display, system)
+    // Tests a particular PRB segment that wasn't working properly recently regards
+    // to condition category.
+    // Specifically that this HL7 messagee would create a code field with all 3
+    // coding values (code, display, system)
     // instead of seperating them out.
     // "category": [
     // {
-    //   "coding": [
-    //     {
-    //        "code": "http://terminology.hl7.org/CodeSystem/condition-category,problem-list-item,Problem List Item"
-    //     }
-    //   ],
-    //   "text": "problem-list-item"
+    // "coding": [
+    // {
+    // "code":
+    // "http://terminology.hl7.org/CodeSystem/condition-category,problem-list-item,Problem
+    // List Item"
+    // }
+    // ],
+    // "text": "problem-list-item"
     // }
     // ]
     @Test
@@ -345,7 +346,6 @@ public class HL7ConditionFHIRConversionTest {
 
         String hl7message = "MSH|^~\\&|||||20040629164652|1|PPR^PC1|331|P|2.3.1||\r"
                 + "PID||||||||||||||||||||||||||||||\r"
-                + "PV1||||||||||||||||||||||||||||||||||||||||||||\r"
                 + "PRB|AD|20210101000000|G47.31^Primary central sleep apnea^ICD-10-CM|28827016|||20210101000000|20210101000000|20210101000000||||confirmed^Confirmed^http://terminology.hl7.org/CodeSystem/condition-ver-status||20210101000000|20210101000000\r";
 
         HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
@@ -380,6 +380,41 @@ public class HL7ConditionFHIRConversionTest {
 
     }
 
+    // Tests that onset text (PRB.17) doesn't show up without the onset date
+    // (PRB.16)
+    @Test
+    public void validate_problem_with_no_onsetdate() {
+
+        String hl7message = "MSH|^~\\&|||||20040629164652|1|PPR^PC1|331|P|2.3.1||\r"
+                + "PID||||||||||||||||||||||||||||||\r"
+                + "PRB|AD|20170110074000|K80.00^Cholelithiasis^I10|53956|E1|1|20100907175347|20150907175347|20180310074000||||confirmed^Confirmed^http://terminology.hl7.org/CodeSystem/condition-ver-status|remission^Remission^http://terminology.hl7.org/CodeSystem/condition-clinical|20180310074000||textual representation of the time when the problem began|1^primary|ME^Medium|0.4|marginal|good|marginal|marginal|highly sensitive|some prb detail|\r";
+
+        HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
+        String json = ftv.convert(hl7message, OPTIONS);
+        System.out.println(json);
+        assertThat(json).isNotBlank();
+
+        FHIRContext context = new FHIRContext(true, false);
+        IBaseResource bundleResource = context.getParser().parseResource(json);
+        assertThat(bundleResource).isNotNull();
+        Bundle b = (Bundle) bundleResource;
+        List<BundleEntryComponent> e = b.getEntry();
+
+        // Find the condition from the FHIR bundle.
+        List<Resource> conditionResource = e.stream()
+                .filter(v -> ResourceType.Condition == v.getResource().getResourceType())
+                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        assertThat(conditionResource).hasSize(1);
+
+        // Get the condition Resource
+        Resource condition = conditionResource.get(0);
+
+        // Verify onset string is set correctly (PRB.17). only present if PRB.16 is
+        // present and in this test case it is not.
+        int numOnsetText = condition.getNamedProperty("onsetString").getValues().size();
+        assertThat(numOnsetText).isZero();
+    }
+
     // Tests multiple DG1 segments to verify we get multiple conditions with
     // references to the encounter.
     @Test
@@ -388,7 +423,6 @@ public class HL7ConditionFHIRConversionTest {
         String hl7message = "MSH|^~\\&||||||S1|ADT^A01^ADT_A01||T|2.6|||||||||\r"
                 + "EVN|A04|20151008111200|20171013152901|O|OID1006|20171013153621|EVN1009\r"
                 + "PID||||||||||||||||||||||||||||||\r"
-                + "PV1||||||||||||||||||||||||||||||||||||||||||||\r"
                 + "PV2|||||||||||||||||||||||||||||||RR|Y|2|Y|Y|N|N|\r"
                 + "DG1|1|D1|V72.83^Other specified pre-operative examination^ICD-9^^^|Other specified pre-operative examination|20151008111200|A\r"
                 + "DG1|2|D2|R00.0^Tachycardia, unspecified^ICD-10^^^|Tachycardia, unspecified|20150725201300|A\r"
@@ -418,19 +452,15 @@ public class HL7ConditionFHIRConversionTest {
     @Test
     public void validate_problem_multiple_reasonReferences() {
 
-        String hl7message = "MSH|^~\\&||||||S1|ADT^A01^ADT_A01||T|2.6|||||||||\r"
-                + "EVN|A04|20151008111200|20171013152901|O|OID1006|20171013153621|EVN1009\r"
+        String hl7message = "MSH|^~\\&|||||20040629164652|1|PPR^PC1|331|P|2.3.1||\r"
                 + "PID||||||||||||||||||||||||||||||\r"
-                + "PV1||||||||||||||||||||||||||||||||||||||||||||\r"
-                + "PV2||||||||||||||||||||||||||||||||||||||\r"
-                + "DG1|1|D1|V72.83^Other specified pre-operative examination^ICD-9^^^|Other specified pre-operative examination|20151008111200|A\r"
-                + "DG1|2|D2|R00.0^Tachycardia, unspecified^ICD-10^^^|Tachycardia, unspecified|20150725201300|A\r"
-                + "DG1|3|D3|R06.02^Shortness of breath^ICD-10^^^|Shortness of breath||A\r"
-                + "DG1|7|D8|J45.909^Unspecified asthma, uncomplicated^ICD-10^^^|Unspecified asthma, uncomplicated||A";
+                + "PRB|AD|20170110074000|N39.0^Urinary Tract Infection^I9|53957|E2|1|20090907175347|20150907175347||||||||||||||||||\r"
+                + "PRB|AD|20170110074000|C56.9^Ovarian Cancer^I10|53958|E3|2|20110907175347|20160907175347||||||||||||||||||\r";
 
         HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
         String json = ftv.convert(hl7message, OPTIONS);
         assertThat(json).isNotBlank();
+        System.out.println(json);
 
         FHIRContext context = new FHIRContext(true, false);
         IBaseResource bundleResource = context.getParser().parseResource(json);
@@ -442,7 +472,7 @@ public class HL7ConditionFHIRConversionTest {
         List<Resource> conditionResource = e.stream()
                 .filter(v -> ResourceType.Condition == v.getResource().getResourceType())
                 .map(BundleEntryComponent::getResource).collect(Collectors.toList());
-        assertThat(conditionResource).hasSize(4);
+        assertThat(conditionResource).hasSize(2);
 
     }
 
