@@ -21,6 +21,16 @@ resources:
       isReferenced: true
       additionalSegments:
              - PD1
+
+    - resourceName: Encounter
+      segment: PV1
+      resourcePath: resource/Encounter
+      repeats: false
+      isReferenced: true
+      additionalSegments:
+             - PV2
+             - EVN
+             - MSH
       
     - resourceName: Observation
       segment: OBX
