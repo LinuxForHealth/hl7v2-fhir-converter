@@ -95,6 +95,22 @@ public class Hl7DataHandlerUtil {
         return null;
     }
 
+    public static String getVersion(Object obj) {
+        if (obj instanceof CWE) {
+            CWE id = (CWE) obj;
+            ST st = id.getCodingSystemVersionID();
+            if (st != null) {
+                String str = st.getValue();
+                if (str != null) {
+                    return str.trim();
+                }
+                return null;
+            }
+            return null;
+        }
+        return null;
+    }
+
     private static String getAssociatedtable(CWE id) {
         ID val = id.getCwe3_NameOfCodingSystem();
         if (val != null && StringUtils.startsWith(val.getValue(), "HL7")) {

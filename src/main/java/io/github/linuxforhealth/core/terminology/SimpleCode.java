@@ -13,6 +13,7 @@ public class SimpleCode {
   private String system;
   private String code;
   private String display;
+  private String version;
 
   /**
    * Returns simple representation of Code.
@@ -20,12 +21,21 @@ public class SimpleCode {
    * @param code
    * @param system
    * @param display
+   * @param version
    */
 
   public SimpleCode(String code, String system, String display) {
     this.code = code;
     this.system = system;
     this.display = display;
+    this.version = null;
+  }
+
+  public SimpleCode(String code, String system, String display, String version) {
+    this.code = code;
+    this.system = system;
+    this.display = display;
+    this.version = version;
   }
 
   public String getSystem() {
@@ -36,10 +46,16 @@ public class SimpleCode {
     return code;
   }
 
-
-
   public String getDisplay() {
     return display;
+  }
+
+  public String getVersion() {
+    return version;
+  }
+
+  public void setVersion(String version) {
+    this.version = version;
   }
 
   public String toString() {

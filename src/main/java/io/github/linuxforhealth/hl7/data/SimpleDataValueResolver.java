@@ -262,10 +262,28 @@ public class SimpleDataValueResolver {
         return value;
     };
 
+    public static final ValueExtractor<Object, SimpleCode> CODING_SYSTEM_V2_ALTERNATE = (Object value) -> {
+        // ensure we have a CWE
+        if (value instanceof CWE) {
+            CWE cwe = (CWE) value;
+            String table = Hl7DataHandlerUtil.getStringValue(cwe.getCwe6_NameOfAlternateCodingSystem());
+            String code = Hl7DataHandlerUtil.getStringValue(cwe.getCwe4_AlternateIdentifier()); 
+            String text = Hl7DataHandlerUtil.getStringValue(cwe.getCwe5_AlternateText());
+            String version = Hl7DataHandlerUtil.getStringValue(cwe.getCwe8_AlternateCodingSystemVersionID());
+            return commonCodingSystemV2(table, code, text, version);
+        } 
+        return null;
+    };
+
     public static final ValueExtractor<Object, SimpleCode> CODING_SYSTEM_V2 = (Object value) -> {
         String table = Hl7DataHandlerUtil.getTableNumber(value);
         String code = Hl7DataHandlerUtil.getStringValue(value);
         String text = Hl7DataHandlerUtil.getOriginalDisplayText(value);
+        String version = Hl7DataHandlerUtil.getVersion(value);
+        return commonCodingSystemV2(table, code, text, version);
+    };
+
+    private static final SimpleCode commonCodingSystemV2 (String table, String code, String text, String version) {
         if (table != null && code != null) {
             // Found table and a code. Try looking it up.
             SimpleCode coding = TerminologyLookup.lookup(table, code);
@@ -276,8 +294,9 @@ public class SimpleDataValueResolver {
 
                     if (display.isEmpty()) {
                         // We have a table, code, but unknown display, so we can't tell if it's good, use the original display text
-                        coding = new SimpleCode(coding.getCode(), coding.getSystem(), text);
+                        coding = new SimpleCode(coding.getCode(), coding.getSystem(), text, version);
                     }
+                    coding.setVersion(version);
                     // We have a table, code, and display, so code was valid
                     return coding;
                 } else {
@@ -287,7 +306,7 @@ public class SimpleDataValueResolver {
                 }
             } else { 
                 // No success looking up the code, build our own fall-back system using table name
-                return new SimpleCode(code, "urn:id:"+table, text) ;
+                return new SimpleCode(code, "urn:id:"+table, text, version) ;
             }
         } else if (code != null) {
             // A code but no system: build a simple systemless code
@@ -295,7 +314,7 @@ public class SimpleDataValueResolver {
         } else {
             return null;
         }
-    };
+    }
 
     public static final ValueExtractor<Object, String> BUILD_IDENTIFIER_FROM_CWE = (Object value) -> {
         CWE newValue = ((CWE) value);
