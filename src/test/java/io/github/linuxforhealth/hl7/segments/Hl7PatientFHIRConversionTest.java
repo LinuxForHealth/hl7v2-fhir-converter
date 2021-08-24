@@ -294,14 +294,21 @@ public class Hl7PatientFHIRConversionTest {
 
     Patient patientObjMarried = PatientUtils.createPatientFromHl7Segment(marriedPatientWithVersion);
     assertThat(patientObjMarried.hasMaritalStatus()).isTrue();
-    assertThat(patientObjMarried.getMaritalStatus().getCodingFirstRep().getDisplay()).isEqualTo(V3MaritalStatus.M.getDisplay());
-    assertThat(patientObjMarried.getMaritalStatus().getCodingFirstRep().getSystem()).isEqualTo(V3MaritalStatus.M.getSystem());
-    assertThat(patientObjMarried.getMaritalStatus().getCodingFirstRep().getVersion()).isEqualTo("47");
+    assertThat(patientObjMarried.getMaritalStatus().getText()).isEqualTo("Married");
+    assertThat(patientObjMarried.getMaritalStatus().getCoding()).hasSize(1);
+    Coding coding = patientObjMarried.getMaritalStatus().getCodingFirstRep();
+    assertThat(coding.getDisplay()).isEqualTo(V3MaritalStatus.M.getDisplay());
+    assertThat(coding.getSystem()).isEqualTo(V3MaritalStatus.M.getSystem());
+    assertThat(coding.getVersion()).isEqualTo("47");
 
     Patient patientObjMarriedAltText = PatientUtils.createPatientFromHl7Segment(singlePatientWithVersion);
     assertThat(patientObjMarriedAltText.hasMaritalStatus()).isTrue();
     assertThat(patientObjMarriedAltText.getMaritalStatus().getText()).isEqualTo("Never Married");
-    assertThat(patientObjMarriedAltText.getMaritalStatus().getCodingFirstRep().getVersion()).isEqualTo("1.1");
+    assertThat(patientObjMarriedAltText.getMaritalStatus().getCoding()).hasSize(1);
+    coding = patientObjMarriedAltText.getMaritalStatus().getCodingFirstRep();
+    assertThat(coding.getDisplay()).isEqualTo(V3MaritalStatus.S.getDisplay());
+    assertThat(coding.getSystem()).isEqualTo(V3MaritalStatus.S.getSystem());
+    assertThat(coding.getVersion()).isEqualTo("1.1");
 
   }
 
@@ -330,6 +337,7 @@ public class Hl7PatientFHIRConversionTest {
     Coding code = cc.getLanguage().getCodingFirstRep();
     assertThat(code.getCode()).isEqualTo("ENG");
     assertThat(code.getSystem()).isEqualTo("urn:id:v2-0296");
+    assertThat(code.getDisplay()).isEqualTo("English");
 
     Patient patientObjNoSystem = PatientUtils.createPatientFromHl7Segment(patientEnglishNoSystem);
     assertThat(patientObjNoSystem.hasCommunication()).isTrue();
@@ -341,6 +349,7 @@ public class Hl7PatientFHIRConversionTest {
     Coding codeNo = ccNoCode.getLanguage().getCodingFirstRep();
     assertThat(codeNo.getCode()).isEqualTo("ENG");
     assertThat(codeNo.getSystem()).isNull();
+    assertThat(codeNo.hasDisplay()).isFalse();
 
     Patient patientObjCodeOnly = PatientUtils.createPatientFromHl7Segment(patientEnglishCodeOnly);
     assertThat(patientObjCodeOnly.hasCommunication()).isTrue();
@@ -352,6 +361,7 @@ public class Hl7PatientFHIRConversionTest {
     Coding coding = ccCodeOnly.getLanguage().getCodingFirstRep();
     assertThat(coding.getCode()).isEqualTo("ENG");
     assertThat(coding.getSystem()).isNull();
+    assertThat(codeNo.hasDisplay()).isFalse();
 
   }
 
