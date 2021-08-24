@@ -233,7 +233,7 @@ public class Hl7PatientFHIRConversionTest {
   public void patient_use_name_conversion_test() {
     String patientUseName =
             "MSH|^~\\&|MyEMR|DE-000001| |CAIRLO|20160701123030-0700||VXU^V04^VXU_V04|CA0001|P|2.6|||ER|AL|||||Z22^CDCPHINVS|DE-000001\r" +
-                    "PID|1||PA123456^^^MYEMR^MR||JONES^GEORGE^M^JR^^^B|MILLER^MARTHA^G^^^^M|20140227|M||2106-3^WHITE^CDCREC|1234 W FIRST ST^^BEVERLY HILLS^CA^90210^^H||^PRN^PH^^^555^5555555||ENG^English^HL70296|||||||2186-5^ not Hispanic or Latino^CDCREC||Y|2\r";
+                    "PID|1||PA123456^^^MYEMR^MR||TestPatient^John^M^^^^B|MILLER^MARTHA^G^^^^M|20140227|M||2106-3^WHITE^CDCREC|1234 W FIRST ST^^BEVERLY HILLS^CA^90210^^H||^PRN^PH^^^555^5555555||ENG^English^HL70296|||||||2186-5^ not Hispanic or Latino^CDCREC||Y|2\r";
 
     Patient patientObjUsualName = PatientUtils.createPatientFromHl7Segment(patientUseName);
 
@@ -263,14 +263,14 @@ public class Hl7PatientFHIRConversionTest {
   }
 
   @Test
-  public void patient_gender_test() {
+  public void patientGenderTest() {
     String patientEmptyGenderField =
             "MSH|^~\\&|MyEMR|DE-000001| |CAIRLO|20160701123030-0700||VXU^V04^VXU_V04|CA0001|P|2.6|||ER|AL|||||Z22^CDCPHINVS|DE-000001\r" +
-                    "PID|0010||PID1234^5^M11^A^MR^HOSP~1234568965^^^USA^SS||DOE^JOHN^A^||19800202|||W|111 TEST_STREET_NAME^^TEST_CITY^NY^111-1111^USA||(905)111-1111|||S|ZZ|12^^^124|34-13-312||||TEST_BIRTH_PLACE\r";
+                    "PID|0010||||DOE^JOHN^A^|||||||\r";
 
     String patientWithGenderField =
             "MSH|^~\\&|MyEMR|DE-000001| |CAIRLO|20160701123030-0700||VXU^V04^VXU_V04|CA0001|P|2.6|||ER|AL|||||Z22^CDCPHINVS|DE-000001\r" +
-                    "PID|0010||PID1234^5^M11^A^MR^HOSP~1234568965^^^USA^SS||DOE^JOHN^A^||19800202|M||W|111 TEST_STREET_NAME^^TEST_CITY^NY^111-1111^USA||(905)111-1111|||S|ZZ|12^^^124|34-13-312||||TEST_BIRTH_PLACE\r";
+                    "PID|0010||||DOE^JOHN^A^|||M|||||||\r";
 
     Patient patientObjNoGender = PatientUtils.createPatientFromHl7Segment(patientEmptyGenderField);
     Enumerations.AdministrativeGender gender = patientObjNoGender.getGender();
@@ -281,41 +281,53 @@ public class Hl7PatientFHIRConversionTest {
     assertThat(gen).isNotNull();
     assertThat(gen).isEqualTo(Enumerations.AdministrativeGender.MALE);
   }
+
   @Test
-  public void patient_marital_status_test(){
-    String marriedPatient =
+  public void patientMaritalStatusTest(){
+    String marriedPatientWithVersion =
             "MSH|^~\\&|MyEMR|DE-000001| |CAIRLO|20160701123030-0700||VXU^V04^VXU_V04|CA0001|P|2.6|||ER|AL|||||Z22^CDCPHINVS|DE-000001\r" +
-                    "PID|1||000054321^^^MRN||COOPER^SHELDON^ANDREW||19820512|M||2106-3|765 SOMESTREET RD UNIT 3A^^PASADENA^LA^558846^United States of America||4652141486^Home^^shelly@gmail.com||EN^English|M|CAT|78654||||N\r";
+                    "PID|1||12345678^^^MRN||TestPatient^Jane|||||||||||M^^^^^^47||||||\r";
 
-    String AltTextField =
+    String singlePatientWithVersion =
             "MSH|^~\\&|MyEMR|DE-000001| |CAIRLO|20160701123030-0700||VXU^V04^VXU_V04|CA0001|P|2.6|||ER|AL|||||Z22^CDCPHINVS|DE-000001\r" +
-                    "PID|1||000054321^^^MRN||COOPER^SHELDON^ANDREW||19820512|M^Married||2106-3|765 SOMESTREET RD UNIT 3A^^PASADENA^LA^558846^United States of America||4652141486^Home^^shelly@gmail.com||EN^English|S|CAT|78654||||N\r";
+                    "PID|1||12345678^^^MRN||TestPatient^Jane|||||||||||S^^^^^^1.1||||||\r";
 
-    Patient patientObjMarried = PatientUtils.createPatientFromHl7Segment(marriedPatient);
+    Patient patientObjMarried = PatientUtils.createPatientFromHl7Segment(marriedPatientWithVersion);
     assertThat(patientObjMarried.hasMaritalStatus()).isTrue();
-    assertThat(patientObjMarried.getMaritalStatus().getCodingFirstRep().getDisplay()).isEqualTo(V3MaritalStatus.M.getDisplay());
-    assertThat(patientObjMarried.getMaritalStatus().getCodingFirstRep().getSystem()).isEqualTo(V3MaritalStatus.M.getSystem());
+    assertThat(patientObjMarried.getMaritalStatus().getText()).isEqualTo("Married");
+    assertThat(patientObjMarried.getMaritalStatus().getCoding()).hasSize(1);
+    Coding coding = patientObjMarried.getMaritalStatus().getCodingFirstRep();
+    assertThat(coding.getDisplay()).isEqualTo(V3MaritalStatus.M.getDisplay());
+    assertThat(coding.getSystem()).isEqualTo(V3MaritalStatus.M.getSystem());
+    assertThat(coding.getVersion()).isEqualTo("47");
 
-    Patient patientObjMarriedAltText = PatientUtils.createPatientFromHl7Segment(AltTextField);
+    Patient patientObjMarriedAltText = PatientUtils.createPatientFromHl7Segment(singlePatientWithVersion);
     assertThat(patientObjMarriedAltText.hasMaritalStatus()).isTrue();
     assertThat(patientObjMarriedAltText.getMaritalStatus().getText()).isEqualTo("Never Married");
-    // as of now Version will always return null.
-    assertThat(patientObjMarriedAltText.getMaritalStatus().getCodingFirstRep().getVersion()).isNull();
+    assertThat(patientObjMarriedAltText.getMaritalStatus().getCoding()).hasSize(1);
+    coding = patientObjMarriedAltText.getMaritalStatus().getCodingFirstRep();
+    assertThat(coding.getDisplay()).isEqualTo(V3MaritalStatus.S.getDisplay());
+    assertThat(coding.getSystem()).isEqualTo(V3MaritalStatus.S.getSystem());
+    assertThat(coding.getVersion()).isEqualTo("1.1");
 
   }
 
   @Test
-  public void patient_communication_language(){
+  public void patientCommunicationLanguage(){
 
-    String patientSpeaksEnglish =
+    String patientSpeaksEnglishWithSystem =
             "MSH|^~\\&|MyEMR|DE-000001| |CAIRLO|20160701123030-0700||VXU^V04^VXU_V04|CA0001|P|2.6|||ER|AL|||||Z22^CDCPHINVS|DE-000001\r" +
                     "PID|1||PA123456^^^MYEMR^MR||DOE^JOHN|||M|||||||ENG^English^HL70296|||||||||Y|2\r";
 
-    String patientEnglishNoCode = //NO coding system given in the CWE
+    String patientEnglishNoSystem = //NO coding system given in the CWE
             "MSH|^~\\&|MyEMR|DE-000001| |CAIRLO|20160701123030-0700||VXU^V04^VXU_V04|CA0001|P|2.6|||ER|AL|||||Z22^CDCPHINVS|DE-000001\r" +
                     "PID|1||PA123456^^^MYEMR^MR||DOE^JANE|||M|||||||ENG^English|||||||||Y|2\r";
 
-    Patient patientObjEnglish = PatientUtils.createPatientFromHl7Segment(patientSpeaksEnglish);
+    String patientEnglishCodeOnly = //NO coding system given in the CWE
+    "MSH|^~\\&|MyEMR|DE-000001| |CAIRLO|20160701123030-0700||VXU^V04^VXU_V04|CA0001|P|2.6|||ER|AL|||||Z22^CDCPHINVS|DE-000001\r" +
+            "PID|1||PA123456^^^MYEMR^MR||DOE^JANE|||M|||||||ENG|||||||||Y|2\r";                
+
+    Patient patientObjEnglish = PatientUtils.createPatientFromHl7Segment(patientSpeaksEnglishWithSystem);
     assertThat(patientObjEnglish.hasCommunication()).isTrue();
     assertThat(patientObjEnglish.getCommunication().get(0).getPreferred()).isTrue();
     assertThat(patientObjEnglish.getCommunication()).hasSize(1);
@@ -325,17 +337,31 @@ public class Hl7PatientFHIRConversionTest {
     Coding code = cc.getLanguage().getCodingFirstRep();
     assertThat(code.getCode()).isEqualTo("ENG");
     assertThat(code.getSystem()).isEqualTo("urn:id:v2-0296");
+    assertThat(code.getDisplay()).isEqualTo("English");
 
-    Patient patientObjNoCode = PatientUtils.createPatientFromHl7Segment(patientEnglishNoCode);
-    assertThat(patientObjNoCode.hasCommunication()).isTrue();
-    assertThat(patientObjNoCode.getCommunication().get(0).getPreferred()).isTrue();
-    assertThat(patientObjNoCode.getCommunication()).hasSize(1);
-    Patient.PatientCommunicationComponent ccNoCode = patientObjNoCode.getCommunication().get(0);
+    Patient patientObjNoSystem = PatientUtils.createPatientFromHl7Segment(patientEnglishNoSystem);
+    assertThat(patientObjNoSystem.hasCommunication()).isTrue();
+    assertThat(patientObjNoSystem.getCommunication().get(0).getPreferred()).isTrue();
+    assertThat(patientObjNoSystem.getCommunication()).hasSize(1);
+    Patient.PatientCommunicationComponent ccNoCode = patientObjNoSystem.getCommunication().get(0);
     assertThat(ccNoCode.getPreferred()).isTrue();
     assertThat(ccNoCode.getLanguage().getText()).isEqualTo("English");
     Coding codeNo = ccNoCode.getLanguage().getCodingFirstRep();
     assertThat(codeNo.getCode()).isEqualTo("ENG");
     assertThat(codeNo.getSystem()).isNull();
+    assertThat(codeNo.hasDisplay()).isFalse();
+
+    Patient patientObjCodeOnly = PatientUtils.createPatientFromHl7Segment(patientEnglishCodeOnly);
+    assertThat(patientObjCodeOnly.hasCommunication()).isTrue();
+    assertThat(patientObjCodeOnly.getCommunication().get(0).getPreferred()).isTrue();
+    assertThat(patientObjCodeOnly.getCommunication()).hasSize(1);
+    Patient.PatientCommunicationComponent ccCodeOnly = patientObjCodeOnly.getCommunication().get(0);
+    assertThat(ccCodeOnly.getPreferred()).isTrue();
+    assertThat(ccCodeOnly.getLanguage().hasText()).isFalse();
+    Coding coding = ccCodeOnly.getLanguage().getCodingFirstRep();
+    assertThat(coding.getCode()).isEqualTo("ENG");
+    assertThat(coding.getSystem()).isNull();
+    assertThat(codeNo.hasDisplay()).isFalse();
 
   }
 
