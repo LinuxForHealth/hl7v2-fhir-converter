@@ -6,6 +6,7 @@
 package io.github.linuxforhealth.hl7.segments;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -381,40 +382,6 @@ public class HL7ConditionFHIRConversionTest {
 
     }
 
-    // Tests that onset text (PRB.17) doesn't show up without the onset date
-    // (PRB.16)
-    @Test
-    public void validate_problem_with_no_onsetdate() {
-
-        String hl7message = "MSH|^~\\&|||||20040629164652|1|PPR^PC1|331|P|2.3.1||\r"
-                + "PID||||||||||||||||||||||||||||||\r"
-                + "PRB|AD|20170110074000|K80.00^Cholelithiasis^I10|53956|E1|1|20100907175347|20150907175347|20180310074000||||confirmed^Confirmed^http://terminology.hl7.org/CodeSystem/condition-ver-status|remission^Remission^http://terminology.hl7.org/CodeSystem/condition-clinical|20180310074000||textual representation of the time when the problem began|1^primary|ME^Medium|0.4|marginal|good|marginal|marginal|highly sensitive|some prb detail|\r";
-
-        HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
-        String json = ftv.convert(hl7message, OPTIONS);
-        System.out.println(json);
-        assertThat(json).isNotBlank();
-
-        FHIRContext context = new FHIRContext(true, false);
-        IBaseResource bundleResource = context.getParser().parseResource(json);
-        assertThat(bundleResource).isNotNull();
-        Bundle b = (Bundle) bundleResource;
-        List<BundleEntryComponent> e = b.getEntry();
-
-        // Find the condition from the FHIR bundle.
-        List<Resource> conditionResource = e.stream()
-                .filter(v -> ResourceType.Condition == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
-        assertThat(conditionResource).hasSize(1);
-
-        // Get the condition Resource
-        Resource condition = conditionResource.get(0);
-
-        // Verify onset string is set correctly (PRB.17). Only present if PRB.16 is
-        // present and in this test case it is not.
-        assertThat(condition.getNamedProperty("onsetString").getValues()).isEmpty();
-    }
-
     // Tests multiple DG1 segments to verify we get multiple conditions with
     // references to the encounter.
     @Test
@@ -473,6 +440,41 @@ public class HL7ConditionFHIRConversionTest {
                 .filter(v -> ResourceType.Condition == v.getResource().getResourceType())
                 .map(BundleEntryComponent::getResource).collect(Collectors.toList());
         assertThat(conditionResource).hasSize(2);
+
+    }
+
+    // Tests that onset text (PRB.17) doesn't show up without the onset date
+    // (PRB.16)
+    @Test
+    public void validate_problem_with_no_onsetdate() {
+
+        String hl7message = "MSH|^~\\&|||||20040629164652|1|PPR^PC1|331|P|2.3.1||\r"
+                + "PID||||||||||||||||||||||||||||||\r"
+                + "PRB|AD|20170110074000|K80.00^Cholelithiasis^I10|53956|E1|1|20100907175347|20150907175347|20180310074000||||confirmed^Confirmed^http://terminology.hl7.org/CodeSystem/condition-ver-status|remission^Remission^http://terminology.hl7.org/CodeSystem/condition-clinical|20180310074000||textual representation of the time when the problem began|1^primary|ME^Medium|0.4|marginal|good|marginal|marginal|highly sensitive|some prb detail|\r";
+
+        HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
+        String json = ftv.convert(hl7message, OPTIONS);
+        System.out.println(json);
+        assertThat(json).isNotBlank();
+
+        FHIRContext context = new FHIRContext(true, false);
+        IBaseResource bundleResource = context.getParser().parseResource(json);
+        assertThat(bundleResource).isNotNull();
+        Bundle b = (Bundle) bundleResource;
+        List<BundleEntryComponent> e = b.getEntry();
+
+        // Find the condition from the FHIR bundle.
+        List<Resource> conditionResource = e.stream()
+                .filter(v -> ResourceType.Condition == v.getResource().getResourceType())
+                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        assertThat(conditionResource).hasSize(1);
+
+        // Get the condition Resource
+        Resource condition = conditionResource.get(0);
+
+        // Verify onset string is set correctly (PRB.17). Only present if PRB.16 is
+        // present and in this test case it is not.
+        assertThat(condition.getNamedProperty("onset").hasValues()).isTrue();
 
     }
 
