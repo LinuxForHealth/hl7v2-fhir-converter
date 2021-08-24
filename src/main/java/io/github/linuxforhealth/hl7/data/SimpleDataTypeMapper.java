@@ -33,6 +33,7 @@ public enum SimpleDataTypeMapper {
   NAMED_UUID(SimpleDataValueResolver.NAMED_UUID),
   OBJECT(SimpleDataValueResolver.OBJECT),
   CODING_SYSTEM_V2(SimpleDataValueResolver.CODING_SYSTEM_V2),
+  CODING_SYSTEM_V2_ALTERNATE(SimpleDataValueResolver.CODING_SYSTEM_V2_ALTERNATE),
   SYSTEM_URL(SimpleDataValueResolver.SYSTEM_URL),
   SYSTEM_ID(SimpleDataValueResolver.SYSTEM_ID),
 

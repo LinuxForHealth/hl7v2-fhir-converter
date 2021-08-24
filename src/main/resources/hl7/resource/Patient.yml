@@ -177,9 +177,7 @@ extension:
          valueCodeableConcept:
             valueOf: datatype/CodeableConcept
             expressionType: resource
-            condition: $coding NOT_NULL
-            vars:
-               coding: CODING_SYSTEM_V2, CWE   
+            specs: CWE
 
 communication:
    condition: $language NOT_NULL
