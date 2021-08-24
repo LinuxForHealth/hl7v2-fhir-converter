@@ -340,26 +340,16 @@ public class HL7DataExtractor {
     try {
       MSH msh = (MSH) message.get("MSH");
       String theActualMessageType = msh.getMessageType().getMsg1_MessageCode().getValue() + "_" + msh.getMessageType().getMsg2_TriggerEvent().getValue();
-      System.out.println(message.getName());
       return theActualMessageType;
     } catch (HL7Exception e){
       // TODO Auto generated catch block
-      e.printStackTrace();
+      throw new IllegalArgumentException("Message type not yet supported" + message.getName());
     }
-    return null;
   }
 
 
   public String getMessageType() {
-    try {
-      MSH msh = (MSH) message.get("MSH");
-      String theActualMessageType = msh.getMessageType().getMsg1_MessageCode().getValue() + "_" + msh.getMessageType().getMsg2_TriggerEvent().getValue();
-      return theActualMessageType;
-    } catch (HL7Exception e){
-      // TODO Auto generated catch block
-      e.printStackTrace();
-    }
-    return null;
+  return getMessageType(message);
   }
 
 
