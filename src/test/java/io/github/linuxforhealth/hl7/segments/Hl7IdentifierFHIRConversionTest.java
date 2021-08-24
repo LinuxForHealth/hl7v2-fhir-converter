@@ -209,7 +209,7 @@ public class Hl7IdentifierFHIRConversionTest {
         String withoutPRB4 = "MSH|^~\\&|||||20040629164652|1|PPR^PC1|331|P|2.3.1||\n"
                 + "PID|||10290^^^WEST^MR||||20040530|M||||||||||||||||||||||N\n"
                 + "PV1||I||||||||SUR||||||||S|8846511^^^ACME|A|||||||||||||||||||SF|K||||20170215080000\n"
-                + "PRB|AD|2004062916460000|596.5^BLADDER DYSFUNCTION^I9||||20040629||||||ACTIVE|||20040629";
+                + "PRB|AD|2004062916460000|596.5^BLADDER DYSFUNCTION^I9||||20040629|||||||||20040629";
         Condition condition = ResourceUtils.getCondition(withoutPRB4);
 
         // Expect a single identifier
@@ -231,7 +231,7 @@ public class Hl7IdentifierFHIRConversionTest {
         // Test with no PV1-19, but with PID-18 for visit number; PRB-4.1 and PRB-4.3
         String withPRB4 = "MSH|^~\\&|||||20040629164652|1|PPR^PC1|331|P|2.3.1||\n" +
                 "PID|1||000054321^^^MRN||||19820512|M||2106-3|||||EN^English|M|CAT|78654||||N\n" +
-                "PRB|AD|2004062916460000|596.5^BLADDER DYSFUNCTION^I9|26744^^hithere|||20040629||||||ACTIVE|||20040629";
+                "PRB|AD|2004062916460000|596.5^BLADDER DYSFUNCTION^I9|26744^^hithere|||20040629|||||||||20040629";
         condition = ResourceUtils.getCondition(withPRB4);
 
         // Expect 2 identifiers
@@ -261,7 +261,7 @@ public class Hl7IdentifierFHIRConversionTest {
         String msg = "MSH|^~\\&|||||20040629164652|1|PPR^PC1|331|P|2.3.1||\n"
                 + "PID|||10290^^^WEST\n"
                 + "PV1||I\n"
-                + "PRB|AD|2004062916460000|596.5^BLADDER DYSFUNCTION^I9|^kittykat|||20040629||||||ACTIVE|||20040629";
+                + "PRB|AD|2004062916460000|596.5^BLADDER DYSFUNCTION^I9|^kittykat|||20040629|||||||||20040629";
         condition = ResourceUtils.getCondition(msg);
 
         // Expect 2 identifiers

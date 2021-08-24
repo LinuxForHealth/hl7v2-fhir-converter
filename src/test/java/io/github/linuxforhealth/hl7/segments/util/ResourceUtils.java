@@ -40,7 +40,19 @@ public class ResourceUtils {
     List<BundleEntryComponent> e = b.getEntry();
 
     return e;
-  }  
+  }
+
+  // Helper method that gets the first (and usually only) value of the property out of a FHIR Base object.
+  public static Base getValue(Base obj, String name) {
+    Base value = obj.getNamedProperty(name).getValues().get(0);
+    return value;
+  }
+
+  // Helper method that gets the first (and usually only) value of the property out of a FHIR Base object and returns it as string.
+  public static String getValueAsString(Base obj, String name) {
+    String value = obj.getNamedProperty(name).getValues().get(0).toString();
+    return value;
+  }
 
   public static AllergyIntolerance getAllergyResource(String inputSegment) {
     List<BundleEntryComponent> resource = createHl7Segment(inputSegment);
