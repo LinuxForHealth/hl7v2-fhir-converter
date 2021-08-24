@@ -89,7 +89,6 @@ category_x2:
 
 clinicalStatus:
    valueOf: datatype/CodeableConcept_var
-   generateList: true
    expressionType: resource
    constants:
       system: 'http://terminology.hl7.org/CodeSystem/condition-clinical'
@@ -170,13 +169,6 @@ onsetString:
   type: STRING
   valueOf: PRB.17
   expressionType: HL7Spec
-
-assertedDate:
-   generateList: true
-   valueOf: extension/Extension
-   expressionType: resource
-   vars:
-      value: String, PRB.7
 
 extension_1:
    generateList: true
