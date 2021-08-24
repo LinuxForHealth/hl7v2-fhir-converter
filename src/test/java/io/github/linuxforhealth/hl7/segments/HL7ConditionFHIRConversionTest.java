@@ -173,6 +173,7 @@ public class HL7ConditionFHIRConversionTest {
         HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
         String json = ftv.convert(hl7message, OPTIONS);
         assertThat(json).isNotBlank();
+        System.out.println(json);
 
         FHIRContext context = new FHIRContext(true, false);
         IBaseResource bundleResource = context.getParser().parseResource(json);
@@ -193,11 +194,11 @@ public class HL7ConditionFHIRConversionTest {
         Property identifierProperty = condition.getNamedProperty("identifier");
         List<Base> identifierList = identifierProperty.getValues();
 
-        // Verify we have 4 identifiers
-        assertThat(identifierList).hasSize(4);
+        // Verify we have 3 identifiers
+        assertThat(identifierList).hasSize(3);
 
         // 2nd identifier
-        Base identifierTwo = identifierList.get(2);
+        Base identifierTwo = identifierList.get(1);
         // value = DG1.20.1
         assertThat(ResourceUtils.getValueAsString(identifierTwo, "value")).isEqualTo("one");
         // system = DG1.20.2
@@ -205,7 +206,7 @@ public class HL7ConditionFHIRConversionTest {
                 .isEqualTo("UriType[https://terminology.hl7.org/CodeSystem/two]");
 
         // 3rd identifier.
-        Base identifierThree = identifierList.get(3);
+        Base identifierThree = identifierList.get(2);
         // value = DG1.20.3
         assertThat(ResourceUtils.getValueAsString(identifierThree, "value")).isEqualTo("three");
         // system = DG1.20.4
@@ -409,10 +410,9 @@ public class HL7ConditionFHIRConversionTest {
         // Get the condition Resource
         Resource condition = conditionResource.get(0);
 
-        // Verify onset string is set correctly (PRB.17). only present if PRB.16 is
+        // Verify onset string is set correctly (PRB.17). Only present if PRB.16 is
         // present and in this test case it is not.
-        int numOnsetText = condition.getNamedProperty("onsetString").getValues().size();
-        assertThat(numOnsetText).isZero();
+        assertThat(condition.getNamedProperty("onsetString").getValues()).isEmpty();
     }
 
     // Tests multiple DG1 segments to verify we get multiple conditions with
