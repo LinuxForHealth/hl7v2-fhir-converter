@@ -1,0 +1,22 @@
+#
+# (C) Copyright IBM Corp. 2020
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+# 
+---
+# See https://www.hl7.org/fhir/narrative.html
+# status : code 'generated| extensions| additional |empty'
+# div is xhtml content 
+status:
+    type: STRING
+    valueOf: $status
+
+div: 
+     type: STRING
+     valueOf: 'GeneralUtils.getNarrativeDiv(text)'
+     expressionType: JEXL
+     vars:
+          text: String, $text
+
+  

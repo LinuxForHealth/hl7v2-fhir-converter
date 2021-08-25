@@ -110,4 +110,12 @@ subject:
     expressionType: resource
     specs: $Patient
 
+text:
+   condition: $text NOT_NULL
+   valueOf: datatype/Narrative
+   expressionType: resource
+   vars: 
+      text: PV2.12
+   constants:
+      status: "additional"
 
