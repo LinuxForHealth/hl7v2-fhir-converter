@@ -33,6 +33,15 @@ resources:
              - PV2
              - EVN
              - MSH
+             - DG1
+
+    - resourceName: Condition
+      segment: DG1
+      resourcePath: resource/Condition
+      isReferenced: true
+      repeats: true
+      additionalSegments:
+        - MSH
 
     - resourceName: Observation
       segment: OBX

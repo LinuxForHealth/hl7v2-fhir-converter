@@ -42,44 +42,71 @@ identifier_3:
   constants:
     sys: "urn:id:extID"
 
-category_x1:
-  valueOf: datatype/CodeableConcept_var
-  generateList: true
+identifier_4:
+  valueOf: datatype/Identifier
   expressionType: resource
-  condition: $source NOT_NULL
   vars:
-    code: CONDITION_CATEGORY_CODES, $type
-    text: $type
-    source: PRB.3
-  constants:
-    type: problem-list-item
+    system: SYSTEM_URL, DG1.20.2
+    value: DG1.20.1
 
-category_x2:
-  valueOf: datatype/CodeableConcept_var
-  generateList: true
+identifier_5:
+  valueOf: datatype/Identifier
   expressionType: resource
-  condition: $source NULL
   vars:
-    code: CONDITION_CATEGORY_CODES, $type
-    text: $type
-    source: PRB.3
-  constants:
-    type: encounter-diagnosis
+    system: SYSTEM_URL, DG1.20.4
+    value: DG1.20.3
+
+# category uses the condition-category
+# if there is a problem id (and thus a PRB segment) we use the problem-list-item
+category_x1:
+   valueOf: datatype/CodeableConcept_var
+   generateList: true
+   expressionType: resource
+   condition:  $source NOT_NULL
+   vars:     
+     source: PRB.3
+   constants:
+     display: 'Problem List Item'
+     code: 'problem-list-item'
+     text: 'problem-list-item'
+     system: 'http://terminology.hl7.org/CodeSystem/condition-category'
+     type: problem-list-item
+
+# otherwise we use encounter-diagnosis (which uses a DG1 segment)
+category_x2:
+   valueOf: datatype/CodeableConcept_var
+   generateList: true
+   expressionType: resource
+   condition:  $source NULL
+   vars:     
+     source: PRB.3
+   constants:
+     display: 'Encounter Diagnosis'
+     code: 'encounter-diagnosis'
+     text: 'encounter-diagnosis'
+     system: 'http://terminology.hl7.org/CodeSystem/condition-category' 
+     type: encounter-diagnosis
+
+clinicalStatus:
+   valueOf: datatype/CodeableConcept_var
+   expressionType: resource
+   constants:
+      system: 'http://terminology.hl7.org/CodeSystem/condition-clinical'
+      code: 'remission'
+      display: 'Remission'
 
 severity:
   valueOf: datatype/CodeableConcept
   generateList: true
   expressionType: resource
   specs: PRB.26
-  vars:
-    code: PRB.26
 
 code:
-  valueOf: datatype/CodeableConcept
-  generateList: true
-  expressionType: resource
-  specs: PRB.3
-
+   valueOf: datatype/CodeableConcept
+   generateList: true
+   expressionType: resource
+   specs: PRB.3 | DG1.3
+          
 encounter:
   valueOf: datatype/Reference
   expressionType: resource
@@ -91,17 +118,17 @@ subject:
   specs: $Patient
 
 onsetDateTime:
-  type: DATE_TIME
-  valueOf: PRB.16
-  expressionType: HL7Spec
+     type: DATE_TIME
+     valueOf: PRB.16 | DG1.5
+     expressionType: HL7Spec
 
 stage:
-  valueOf: secondary/Stage
-  generateList: true
-  expressionType: resource
-  specs: PRB.14
-  vars:
-    code: PRB.14
+   valueOf: secondary/Stage
+   generateList: true
+   expressionType: resource
+   specs: PRB.14
+   vars:
+     code: PRB.14
 
 evidence:
   valueOf: secondary/evidence
@@ -110,3 +137,44 @@ evidence:
   specs: $Observation
   useGroup: true
 
+asserter:
+   valueOf: resource/Practitioner
+   generateList: true
+   expressionType: reference
+   specs: DG1.16
+
+recordedDate:
+   type: DATE_TIME
+   valueOf: DG1.19 | PRB.2
+   expressionType: HL7Spec
+
+abatementDateTime:
+  type: DATE_TIME
+  valueOf: PRB.9
+  expressionType: HL7Spec
+
+verificationStatus:
+  valueOf: datatype/CodeableConcept
+  generateList: true
+  expressionType: resource
+  specs: PRB.13
+  vars:
+    code: PRB.13
+  
+onsetString:
+  condition: $onsetDateTime NOT_NULL
+  type: STRING
+  valueOf: PRB.17
+  expressionType: HL7Spec
+  vars:
+    onsetDateTime: PRB.16
+
+extension_1:
+   generateList: true
+   valueOf: extension/Extension
+   expressionType: resource
+   vars:
+      value: DATE_TIME, PRB.7
+   constants:
+      KEY_NAME_SUFFIX: DateTime
+      urlValue: condition-assertedDate

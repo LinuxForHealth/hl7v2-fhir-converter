@@ -13,6 +13,7 @@ import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.Extension;
 import org.hl7.fhir.r4.model.Patient;
+import org.hl7.fhir.r4.model.codesystems.V3ReligiousAffiliation;
 import org.junit.jupiter.api.Test;
 import io.github.linuxforhealth.core.terminology.UrlLookup;
 import io.github.linuxforhealth.hl7.segments.util.PatientUtils;
@@ -52,10 +53,14 @@ class FHIRExtensionsTest {
         CodeableConcept cc = (CodeableConcept) ext.getValue();
         assertThat(cc.hasCoding()).isTrue();
         Coding coding = cc.getCodingFirstRep();
-        assertThat(coding.hasDisplay()).isFalse();
-        assertThat(coding.hasCode()).isTrue();
-        assertThat(coding.hasSystem()).isFalse();
-        assertThat(coding.getCode()).hasToString("Methodist");
+        assertThat(coding).isNotNull();
+
+        assertThat(coding.hasCode()).isFalse();
+        String theSystem = V3ReligiousAffiliation._1029.getSystem();
+        assertThat(coding.hasSystem()).isTrue();
+        assertThat(coding.getSystem()).isEqualTo(theSystem); 
+        assertThat(coding.hasDisplay()).isTrue();
+        assertThat(coding.getDisplay()).containsPattern("Invalid.*Methodist.*"+theSystem);
     }
 
     @Test

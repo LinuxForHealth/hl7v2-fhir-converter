@@ -134,19 +134,41 @@ public class SimpleDataValueResolverTest {
   }
 
 
+  @Test
+  public void testObservationStatusValueNotValid() {
+    String gen = "ZZZ";
+    SimpleCode code =
+        SimpleDataValueResolver.OBSERVATION_STATUS_FHIR.apply(gen);
+    assertThat(code).isNotNull();
+    assertThat(code.getCode()).isNull();
+    String theSystem = ObservationStatus.CANCELLED.getSystem();
+    assertThat(code.getSystem()).isEqualTo(theSystem); 
+    assertThat(code.getDisplay()).containsPattern("Invalid.*ZZZ.*"+theSystem);    
+  }
+
 
 
   @Test
-  public void get_religious_affiliation_value_valid() {
+  public void testReligiousAffiliationValueValid() {
     String gen = "LUT";
-
     SimpleCode code =
         SimpleDataValueResolver.RELIGIOUS_AFFILIATION_FHIR_CC.apply(gen);
-
     assertThat(code.getDisplay()).isEqualTo(V3ReligiousAffiliation._1028.getDisplay());
-
     assertThat(code.getCode()).isEqualTo(V3ReligiousAffiliation._1028.toCode());
     assertThat(code.getSystem()).isEqualTo(V3ReligiousAffiliation._1028.getSystem());
+  }
+
+
+  @Test
+  public void testReligiousAffiliationValueNonvalid() {
+    String gen = "ZZZ";
+    SimpleCode code =
+        SimpleDataValueResolver.RELIGIOUS_AFFILIATION_FHIR_CC.apply(gen);
+    assertThat(code).isNotNull();
+    assertThat(code.getCode()).isNull();
+    String theSystem = V3ReligiousAffiliation._1029.getSystem();
+    assertThat(code.getSystem()).isEqualTo(theSystem); 
+    assertThat(code.getDisplay()).containsPattern("Invalid.*ZZZ.*"+theSystem);
   }
 
   @Test
@@ -163,22 +185,23 @@ public class SimpleDataValueResolverTest {
   }
 
   @Test
-  public void get_religious_affiliation_value_nonvalid() {
-    String gen = "ZZZ";
-    SimpleCode code =
-        SimpleDataValueResolver.RELIGIOUS_AFFILIATION_FHIR_CC.apply(gen);
-    assertThat(code).isNotNull();
-    assertThat(code.getCode()).isEqualToIgnoringCase("ZZZ");
-    assertThat(code.getSystem()).isNull(); 
-    assertThat(code.getDisplay()).isNull(); 
-  }
-
-  @Test
-  public void get_marital_status_value_valid() {
+  public void testMaritalStatusValueValid() {
     String gen = "A";
     SimpleCode coding = (SimpleCode) SimpleDataValueResolver.MARITAL_STATUS.apply(gen);
     assertThat(coding.getDisplay()).isEqualTo(V3MaritalStatus.A.getDisplay());
     assertThat(coding.getSystem()).isEqualTo(V3MaritalStatus.A.getSystem());
+  }
+
+  @Test
+  public void testMaritalStatusValueNonValid() {
+    String gen = "ZZZ";
+    SimpleCode code =
+        SimpleDataValueResolver.MARITAL_STATUS.apply(gen);
+    assertThat(code).isNotNull();
+    assertThat(code.getCode()).isNull();
+    String theSystem = V3MaritalStatus.M.getSystem();
+    assertThat(code.getSystem()).isEqualTo(theSystem); 
+    assertThat(code.getDisplay()).containsPattern("Invalid.*ZZZ.*"+theSystem);
   }
 
   @Test

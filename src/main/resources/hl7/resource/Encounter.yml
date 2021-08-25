@@ -58,18 +58,15 @@ type:
    expressionType: resource
    specs: PV1.4 | PV1.18
 
-
 serviceType:
    valueOf: datatype/CodeableConcept
    expressionType: resource
    specs: PV1.10
 
-
 priority:
    valueOf: datatype/CodeableConcept
    expressionType: resource
    specs: PV2.25
-
 
 episodeOfCare:
    type: STRING
@@ -98,6 +95,7 @@ reasonCode:
 
 reasonReference:
     valueOf: datatype/Reference
+    generateList: true
     expressionType: resource
     specs: $Condition | $Observation
 
@@ -118,4 +116,15 @@ text:
       text: PV2.12
    constants:
       status: "additional"
+
+# Uncomment until we figure out to reference condition from encounter
+# diagnosis.condition is required
+#
+# diagnosis:
+#     valueOf: datatype/Diagnosis
+#     generateList: true
+#     expressionType: resource
+#     specs: DG1
+#     vars:
+#       Condition: $Condition
 
