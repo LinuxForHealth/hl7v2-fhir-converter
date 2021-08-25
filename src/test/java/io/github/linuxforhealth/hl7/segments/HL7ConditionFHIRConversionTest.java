@@ -49,7 +49,7 @@ public class HL7ConditionFHIRConversionTest {
 
         String hl7message = msh + "PID||||||||||||||||||||||||||||||\r"
                 + "PV1||I|||||||||||||||||1400|||||||||||||||||||||||||\r"
-                + "DG1|1|ICD10|G66^Mitral Valve Heart Arteriosclerosis With Calcification^ICD-10^^^|Broken Arm|20210322154449|A|E123|R45|Y|J76|C|15|1458.98||1|123^DOE^JOHN^A^|C|Y|20210322154326|V45|S1234|Parent Diagnosis|Value345|Group567|DiagnosisG45|Y\r";
+                + "DG1|1|ICD10|C56.9^Ovarian Cancer^I10|Test|20210322154449|A|E123|R45|Y|J76|C|15|1458.98||1|123^DOE^JOHN^A^|C|Y|20210322154326|V45|S1234|Parent Diagnosis|Value345|Group567|DiagnosisG45|Y\r";
 
         HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
         String json = ftv.convert(hl7message, OPTIONS);
@@ -77,11 +77,11 @@ public class HL7ConditionFHIRConversionTest {
         Property identifierProperty = condition.getNamedProperty("identifier");
         List<Base> identifierList = identifierProperty.getValues();
 
-        // Verify we have 3 identifiers - the other 
+        // Verify we have 3 identifiers
+        // NOTE: The other identifiers, not related to condition, are tested in the identifier suite of unit tests.
         assertThat(identifierList).hasSize(3);
 
         // The 3rd identifier value should be from DG1.20
-        // NOTE: The other identifiers, not related to condition, are tested in the identifier suite of unit tests.
         String thirdIdentiferValue = ResourceUtils.getValueAsString(identifierList.get(2), "value");
         assertThat(thirdIdentiferValue).isEqualTo("V45");
 
@@ -99,14 +99,14 @@ public class HL7ConditionFHIRConversionTest {
 
         // Verify code text is set correctly.
         Base code = ResourceUtils.getValue(condition, "code");
-        assertThat(ResourceUtils.getValueAsString(code, "text")).isEqualTo("Mitral Valve Heart Arteriosclerosis With Calcification");
+        assertThat(ResourceUtils.getValueAsString(code, "text")).isEqualTo("Ovarian Cancer");
 
         // Verify code coding is set correctly.
         Base coding = ResourceUtils.getValue(code, "coding");
         assertThat(ResourceUtils.getValueAsString(coding, "system"))
-            .isEqualTo("UriType[urn:id:ICD-10]");
-        assertThat(ResourceUtils.getValueAsString(coding, "code")).isEqualTo("G66");
-        assertThat(ResourceUtils.getValueAsString(coding, "display")).isEqualTo("Mitral Valve Heart Arteriosclerosis With Calcification");
+            .isEqualTo("UriType[http://hl7.org/fhir/sid/icd-10]");
+        assertThat(ResourceUtils.getValueAsString(coding, "code")).isEqualTo("C56.9");
+        assertThat(ResourceUtils.getValueAsString(coding, "display")).isEqualTo("Ovarian Cancer");
 
         // Verify encounter reference exists
         Base encounterProp = ResourceUtils.getValue(condition, "encounter");
