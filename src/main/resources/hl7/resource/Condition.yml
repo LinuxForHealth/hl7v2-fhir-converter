@@ -100,16 +100,12 @@ severity:
   generateList: true
   expressionType: resource
   specs: PRB.26
-  vars:
-    code: PRB.26
 
 code:
    valueOf: datatype/CodeableConcept
    generateList: true
    expressionType: resource
    specs: PRB.3 | DG1.3
-   vars:
-     code: PRB.3 | DG1.3
           
 encounter:
   valueOf: datatype/Reference
@@ -166,9 +162,12 @@ verificationStatus:
     code: PRB.13
   
 onsetString:
+  condition: $onsetDateTime NOT_NULL
   type: STRING
   valueOf: PRB.17
   expressionType: HL7Spec
+  vars:
+    onsetDateTime: PRB.16
 
 extension_1:
    generateList: true
