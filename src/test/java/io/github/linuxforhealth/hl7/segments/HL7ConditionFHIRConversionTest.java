@@ -27,9 +27,13 @@ import io.github.linuxforhealth.hl7.ConverterOptions.Builder;
 import io.github.linuxforhealth.hl7.HL7ToFHIRConverter;
 import io.github.linuxforhealth.hl7.segments.util.ResourceUtils;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class HL7ConditionFHIRConversionTest {
 
     private static final ConverterOptions OPTIONS = new Builder().withValidateResource().withPrettyPrint().build();
+    private static final Logger LOGGER = LoggerFactory.getLogger(Hl7PatientFHIRConversionTest.class);
 
     // Tests the DG1 segment (encounter) with all supported message types.
     @ParameterizedTest
@@ -45,11 +49,12 @@ public class HL7ConditionFHIRConversionTest {
 
         String hl7message = msh + "PID||||||||||||||||||||||||||||||\r"
                 + "PV1||I|||||||||||||||||1400|||||||||||||||||||||||||\r"
-                + "DG1|1|ICD10|B45678|Broken Arm|20210322154449|A|E123|R45|Y|J76|C|15|1458.98||1|123^DOE^JOHN^A^|C|Y|20210322154326|V45|S1234|Parent Diagnosis|Value345|Group567|DiagnosisG45|Y\r";
+                + "DG1|1|ICD10|G66^Mitral Valve Heart Arteriosclerosis With Calcification^ICD-10^^^|Broken Arm|20210322154449|A|E123|R45|Y|J76|C|15|1458.98||1|123^DOE^JOHN^A^|C|Y|20210322154326|V45|S1234|Parent Diagnosis|Value345|Group567|DiagnosisG45|Y\r";
 
         HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
         String json = ftv.convert(hl7message, OPTIONS);
         assertThat(json).isNotBlank();
+        LOGGER.info("FHIR json result:\n"+json);
 
         FHIRContext context = new FHIRContext(true, false);
         IBaseResource bundleResource = context.getParser().parseResource(json);
@@ -72,10 +77,11 @@ public class HL7ConditionFHIRConversionTest {
         Property identifierProperty = condition.getNamedProperty("identifier");
         List<Base> identifierList = identifierProperty.getValues();
 
-        // Verify we have 3 identifiers
+        // Verify we have 3 identifiers - the other 
         assertThat(identifierList).hasSize(3);
 
         // The 3rd identifier value should be from DG1.20
+        // NOTE: The other identifiers, not related to condition, are tested in the identifier suite of unit tests.
         String thirdIdentiferValue = ResourceUtils.getValueAsString(identifierList.get(2), "value");
         assertThat(thirdIdentiferValue).isEqualTo("V45");
 
@@ -87,14 +93,20 @@ public class HL7ConditionFHIRConversionTest {
         assertThat(ResourceUtils.getValueAsString(condition, "recordedDate"))
                 .isEqualTo("DateTimeType[2021-03-22T15:43:26+08:00]");
 
-        // Verify onset data time is set correctly.
+        // Verify onset date time is set correctly.
         assertThat(ResourceUtils.getValueAsString(condition, "onsetDateTime"))
                 .isEqualTo("DateTimeType[2021-03-22T15:44:49+08:00]");
 
-        // Verify code is set correctly.
+        // Verify code text is set correctly.
         Base code = ResourceUtils.getValue(condition, "code");
+        assertThat(ResourceUtils.getValueAsString(code, "text")).isEqualTo("Mitral Valve Heart Arteriosclerosis With Calcification");
+
+        // Verify code coding is set correctly.
         Base coding = ResourceUtils.getValue(code, "coding");
-        assertThat(ResourceUtils.getValueAsString(coding, "code")).isEqualTo("B45678");
+        assertThat(ResourceUtils.getValueAsString(coding, "system"))
+            .isEqualTo("UriType[urn:id:ICD-10]");
+        assertThat(ResourceUtils.getValueAsString(coding, "code")).isEqualTo("G66");
+        assertThat(ResourceUtils.getValueAsString(coding, "display")).isEqualTo("Mitral Valve Heart Arteriosclerosis With Calcification");
 
         // Verify encounter reference exists
         Base encounterProp = ResourceUtils.getValue(condition, "encounter");
@@ -159,6 +171,10 @@ public class HL7ConditionFHIRConversionTest {
         assertThat(ResourceUtils.getValueAsString(name, "family")).isEqualTo("DOE");
         assertThat(ResourceUtils.getValueAsString(name, "given")).isEqualTo("JOHN");
 
+        // Verify asserter identifier is set correctly.
+        Base identifier = ResourceUtils.getValue(practitioner, "identifier");
+        assertThat(ResourceUtils.getValueAsString(identifier, "value")).isEqualTo("123");
+
     }
 
     // Tests the DG1 segment (encounter) with a full Entity Identifier(EI).
@@ -173,7 +189,7 @@ public class HL7ConditionFHIRConversionTest {
         HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
         String json = ftv.convert(hl7message, OPTIONS);
         assertThat(json).isNotBlank();
-        System.out.println(json);
+        LOGGER.info("FHIR json result:\n"+json);
 
         FHIRContext context = new FHIRContext(true, false);
         IBaseResource bundleResource = context.getParser().parseResource(json);
@@ -194,10 +210,11 @@ public class HL7ConditionFHIRConversionTest {
         Property identifierProperty = condition.getNamedProperty("identifier");
         List<Base> identifierList = identifierProperty.getValues();
 
-        // Verify we have 3 identifiers
+        // Verify we have 3 identifier
+        // NOTE: The first identifier which is not related to condition is tested in the identifier suite of unit tests.
         assertThat(identifierList).hasSize(3);
 
-        // 2nd identifier
+        // Test 2nd identifier
         Base identifierTwo = identifierList.get(1);
         // value = DG1.20.1
         assertThat(ResourceUtils.getValueAsString(identifierTwo, "value")).isEqualTo("one");
@@ -205,7 +222,7 @@ public class HL7ConditionFHIRConversionTest {
         assertThat(ResourceUtils.getValueAsString(identifierTwo, "system"))
                 .isEqualTo("UriType[https://terminology.hl7.org/CodeSystem/two]");
 
-        // 3rd identifier.
+        // Test 3rd identifier.
         Base identifierThree = identifierList.get(2);
         // value = DG1.20.3
         assertThat(ResourceUtils.getValueAsString(identifierThree, "value")).isEqualTo("three");
@@ -229,8 +246,8 @@ public class HL7ConditionFHIRConversionTest {
 
         HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
         String json = ftv.convert(hl7message, OPTIONS);
-        System.out.println(json);
         assertThat(json).isNotBlank();
+        LOGGER.info("FHIR json result:\n"+json);
 
         FHIRContext context = new FHIRContext(true, false);
         IBaseResource bundleResource = context.getParser().parseResource(json);
@@ -259,8 +276,11 @@ public class HL7ConditionFHIRConversionTest {
         Base verificationStatus = ResourceUtils.getValue(condition, "verificationStatus");
         assertThat(ResourceUtils.getValueAsString(verificationStatus, "text")).isEqualTo("Confirmed");
 
-        // Verify verification status coding code is set correctly
+        // Verify verification status coding is set correctly
         Base coding = ResourceUtils.getValue(verificationStatus, "coding");
+        assertThat(ResourceUtils.getValueAsString(coding, "system"))
+                .isEqualTo("UriType[http://terminology.hl7.org/CodeSystem/condition-ver-status]");
+        assertThat(ResourceUtils.getValueAsString(coding, "display")).isEqualTo("Confirmed");
         assertThat(ResourceUtils.getValueAsString(coding, "code")).isEqualTo("confirmed");
 
         // Verify onset string is set correctly (PRB.17). Only present if PRB.16 is
@@ -352,6 +372,7 @@ public class HL7ConditionFHIRConversionTest {
         HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
         String json = ftv.convert(hl7message, OPTIONS);
         assertThat(json).isNotBlank();
+        LOGGER.info("FHIR json result:\n"+json);
 
         FHIRContext context = new FHIRContext(true, false);
         IBaseResource bundleResource = context.getParser().parseResource(json);
@@ -398,6 +419,7 @@ public class HL7ConditionFHIRConversionTest {
         HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
         String json = ftv.convert(hl7message, OPTIONS);
         assertThat(json).isNotBlank();
+        LOGGER.info("FHIR json result:\n"+json);
 
         FHIRContext context = new FHIRContext(true, false);
         IBaseResource bundleResource = context.getParser().parseResource(json);
@@ -426,7 +448,7 @@ public class HL7ConditionFHIRConversionTest {
         HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
         String json = ftv.convert(hl7message, OPTIONS);
         assertThat(json).isNotBlank();
-        System.out.println(json);
+        LOGGER.info("FHIR json result:\n"+json);
 
         FHIRContext context = new FHIRContext(true, false);
         IBaseResource bundleResource = context.getParser().parseResource(json);
@@ -453,8 +475,8 @@ public class HL7ConditionFHIRConversionTest {
 
         HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
         String json = ftv.convert(hl7message, OPTIONS);
-        System.out.println(json);
         assertThat(json).isNotBlank();
+        LOGGER.info("FHIR1 json result:\n"+json);
 
         FHIRContext context = new FHIRContext(true, false);
         IBaseResource bundleResource = context.getParser().parseResource(json);
@@ -473,8 +495,7 @@ public class HL7ConditionFHIRConversionTest {
 
         // Verify onset string is set correctly (PRB.17). Only present if PRB.16 is
         // present and in this test case it is not.
-        System.out.println(condition.listChildrenByName("onset").size());
-        //assertThat(condition.listChildrenByName("onset")).isEmpty();
+        assertThat(condition.listChildrenByName("onset")).isEmpty();
     }
 
 }
