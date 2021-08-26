@@ -9,6 +9,7 @@ import java.util.Map;
 import io.github.linuxforhealth.api.Condition;
 import io.github.linuxforhealth.api.EvaluationResult;
 import io.github.linuxforhealth.core.expression.VariableUtils;
+import io.github.linuxforhealth.hl7.data.Hl7DataHandlerUtil;
 
 public class SimpleBiCondition implements Condition {
 
@@ -41,10 +42,16 @@ public class SimpleBiCondition implements Condition {
       throw new IllegalArgumentException("First value should be a variable");
     }
 
-
     Object var2Value = getValue(contextVariables);
 
     if (var1Value != null && var2Value != null) {
+
+      // Some classes have string values, but are not strings and must be converted first.
+      if (var1Value.getClass().getTypeName().equalsIgnoreCase("ca.uhn.hl7v2.model.v26.datatype.ST")
+      || var1Value.getClass().getTypeName().equalsIgnoreCase("ca.uhn.hl7v2.model.v26.datatype.IS")
+      || var1Value.getClass().getTypeName().equalsIgnoreCase("ca.uhn.hl7v2.model.v26.datatype.NULLDT")){
+        var1Value = Hl7DataHandlerUtil.getStringValue(var1Value);
+      }
     
       ConditionPredicateEnum condEnum = ConditionPredicateEnum
           .getConditionPredicate(this.conditionOperator, variable1.getIdentifier());

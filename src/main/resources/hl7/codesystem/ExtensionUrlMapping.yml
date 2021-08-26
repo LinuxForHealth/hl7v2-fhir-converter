@@ -37,4 +37,7 @@
   url: "http://ibm.com/fhir/cdm/StructureDefinition/source-event-trigger" 
 # source-record-type
 - id: "source-record-type"
-  url: "http://ibm.com/fhir/cdm/StructureDefinition/source-record-type" 
+  url: "http://ibm.com/fhir/cdm/StructureDefinition/source-record-type"
+#condition-assertedDate
+- id: "condition-assertedDate"
+  url: "http://hl7.org/fhir/StructureDefinition/condition-assertedDate"

@@ -1,0 +1,23 @@
+#
+# (C) Copyright IBM Corp. 2021
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+---
+
+condition:
+   valueOf: datatype/Reference
+   expressionType: resource
+   specs: $Condition
+
+use: 
+   valueOf: datatype/CodeableConcept
+   expressionType: resource
+   specs: DG1.6
+   vars:
+     coding: DIAGNOSIS_USE, DG1.6
+
+rank: 
+   type: STRING
+   valueOf: DG1.15
+   expressionType: HL7Spec
