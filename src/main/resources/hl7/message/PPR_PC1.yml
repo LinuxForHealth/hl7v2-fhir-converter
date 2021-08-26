@@ -41,7 +41,7 @@ resources:
       isReferenced: true
       additionalSegments:
         - .ORDER.ORC
-        - .ORDER.ORDER_DETAIL.ORDER_DETAIL_SEGMENT.OBR
+        - .ORDER.ORDER_DETAIL.OBR
         - MSH
 
     - resourceName: Condition

@@ -197,7 +197,7 @@ public class Hl7IdentifierFHIRConversionTest {
         String withoutPRB4 = "MSH|^~\\&|||||20040629164652|1|PPR^PC1|331|P|2.3.1||\n"
                 + "PID|||10290^^^WEST^MR||||20040530|M||||||||||||||||||||||N\n"
                 + "PV1||I||||||||SUR||||||||S|8846511^^^ACME|A|||||||||||||||||||SF|K||||20170215080000\n"
-                + "PRB|AD|2004062916460000|596.5^BLADDER DYSFUNCTION^I9||||20040629||||||ACTIVE|||20040629";
+                + "PRB|AD|20170110074000|K80.00^Cholelithiasis^I10||E1|1|20100907175347|20150907175347|20180310074000||||confirmed^Confirmed^http://terminology.hl7.org/CodeSystem/condition-ver-status|remission^Remission^http://terminology.hl7.org/CodeSystem/condition-clinical|20180310074000|20170102074000|textual representation of the time when the problem began|1^primary|ME^Medium|0.4|marginal|good|marginal|marginal|highly sensitive|some prb detail|\r";
         Condition condition = ResourceUtils.getCondition(withoutPRB4);
 
         // Expect a single identifier
@@ -219,7 +219,7 @@ public class Hl7IdentifierFHIRConversionTest {
         // Test with no PV1-19, but with PID-18 for visit number; PRB-4.1 and PRB-4.3
         String withPRB4 = "MSH|^~\\&|||||20040629164652|1|PPR^PC1|331|P|2.3.1||\n" +
                 "PID|1||000054321^^^MRN||||19820512|M||2106-3|||||EN^English|M|CAT|78654||||N\n" +
-                "PRB|AD|2004062916460000|596.5^BLADDER DYSFUNCTION^I9|26744^^hithere|||20040629||||||ACTIVE|||20040629";
+                "PRB|AD|20170110074000|K80.00^Cholelithiasis^I10|53956|E1|1|20100907175347|20150907175347|20180310074000||||confirmed^Confirmed^http://terminology.hl7.org/CodeSystem/condition-ver-status|remission^Remission^http://terminology.hl7.org/CodeSystem/condition-clinical|20180310074000|20170102074000|textual representation of the time when the problem began|1^primary|ME^Medium|0.4|marginal|good|marginal|marginal|highly sensitive|some prb detail|\r";
         condition = ResourceUtils.getCondition(withPRB4);
 
         // Expect 2 identifiers
@@ -243,7 +243,75 @@ public class Hl7IdentifierFHIRConversionTest {
     @Test
     public void condition_DG1_identifier_test() {
         // TODO: Add test for extId from DG1-3
-        // does this block me until Joel's card is done??
+
+        String withoutDG120 = "MSH|^~\\&|||||||ADT^A01^ADT_A01|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6||||||\r"
+                + "PID|||10290^^^WEST^MR||||20040530|M||||||||||88654||||||||||||N\n"
+                + "PV1||I||||||||SUR||||||||S||A|||||||||||||||||||SF|K||||20170215080000\n"
+                + "DG1|1|ICD10|C56.9^Ovarian Cancer^I10|Test|20210322154449|A|E123|R45|Y|J76|C|15|1458.98||1|123^DOE^JOHN^A^|C|Y|20210322154326||S1234|Parent Diagnosis|Value345|Group567|DiagnosisG45|Y\r";
+        Condition condition = ResourceUtils.getCondition(withoutDG120);
+
+        // Expect 2 identifiers
+        assertThat(condition.hasIdentifier()).isTrue();
+        assertThat(condition.getIdentifier()).hasSize(2);
+
+        // Identifier 1: Visit number
+        Identifier identifier = condition.getIdentifier().get(0);
+        String value = identifier.getValue();
+        String system = identifier.getSystem();
+        assertThat(value).isEqualTo("88654"); // PID.18.1
+        assertThat(system).isNull(); // null because PV1.19.4 and PID18.4  are empty
+        CodeableConcept type = identifier.getType();
+        Coding coding = type.getCoding().get(0);
+        assertThat(coding.getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/v2-0203");
+        assertThat(coding.getCode()).isEqualTo("VN");
+        assertThat(coding.getDisplay()).isEqualTo("Visit number");
+
+        identifier = condition.getIdentifier().get(1);
+        value = identifier.getValue();
+        system = identifier.getSystem();
+        assertThat(value).isEqualTo("C56.9-I10"); // DG1.3.1-DG1.3.3
+        assertThat(system).isEqualTo("urn:id:extID");
+
+        // Test with no PV1-19, but with PID-18 for visit number; PRB-4.1 and PRB-4.3
+        String withDG120 = "MSH|^~\\&|||||||ADT^A01^ADT_A01|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6||||||\r"
+                + "PID|||10290^^^WEST^MR||||20040530|M||||||||||||||||||||||N\n"
+                + "PV1||I||||||||SUR||||||||S|8846511^^^ACME|A|||||||||||||||||||SF|K||||20170215080000\n"
+                + "DG1|1|ICD10|B45678|Broken Arm|20210322154449|A|E123|R45|Y|J76|C|15|1458.98||1|123^DOE^JOHN^A^|C|Y|20210322154326|one^https://terminology.hl7.org/CodeSystem/two^three^https://terminology.hl7.org/CodeSystem/four|S1234|Parent Diagnosis|Value345|Group567|DiagnosisG45|Y\r";
+        condition = ResourceUtils.getCondition(withDG120);
+
+        // Expect 2 identifiers
+        assertThat(condition.hasIdentifier()).isTrue();
+        assertThat(condition.getIdentifier()).hasSize(4);
+
+        // Identifier 1: Visit number
+        identifier = condition.getIdentifier().get(0);
+        value = identifier.getValue();
+        system = identifier.getSystem();
+        assertThat(value).isEqualTo("8846511"); // PV1.19.1
+        assertThat(system).isEqualTo("urn:id:ACME"); // PV1.19.4
+        type = identifier.getType();
+        coding = type.getCoding().get(0);
+        assertThat(coding.getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/v2-0203");
+        assertThat(coding.getCode()).isEqualTo("VN");
+        assertThat(coding.getDisplay()).isEqualTo("Visit number");
+
+        identifier = condition.getIdentifier().get(1);
+        value = identifier.getValue();
+        system = identifier.getSystem();
+        assertThat(value).isEqualTo("B45678"); // DG1.3.1
+        assertThat(system).isEqualTo("urn:id:extID");
+
+        identifier = condition.getIdentifier().get(2);
+        value = identifier.getValue();
+        system = identifier.getSystem();
+        assertThat(value).isEqualTo("one"); // DG1.20.1
+        assertThat(system).isEqualTo("https://terminology.hl7.org/CodeSystem/two"); // DG1.20.2
+
+        identifier = condition.getIdentifier().get(3);
+        value = identifier.getValue();
+        system = identifier.getSystem();
+        assertThat(value).isEqualTo("three"); // DG1.20.3
+        assertThat(system).isEqualTo("https://terminology.hl7.org/CodeSystem/four"); // DG1.20.4
     }
 
     @Test

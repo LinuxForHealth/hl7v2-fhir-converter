@@ -42,6 +42,8 @@ resources:
       repeats: true
       additionalSegments:
         - MSH
+        - PID
+        - PV1
 
     - resourceName: Observation
       segment: OBX
