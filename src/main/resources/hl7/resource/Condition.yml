@@ -87,20 +87,6 @@ category_x2:
      system: 'http://terminology.hl7.org/CodeSystem/condition-category' 
      type: encounter-diagnosis
 
-clinicalStatus:
-  valueOf: datatype/CodeableConcept
-  expressionType: resource
-  vars:
-    coding: CONDITION_CLINCAL_STATUS_FHIR, PRB.14
-    text: PRB.14
-
-verificationStatus:
-  valueOf: datatype/CodeableConcept
-  expressionType: resource
-  vars:
-    coding: CONDITION_VERIFICATION_STATUS_FHIR, PRB.13
-    text: PRB.13
-
 severity:
   valueOf: datatype/CodeableConcept
   generateList: true
@@ -184,3 +170,31 @@ extension_1:
    constants:
       KEY_NAME_SUFFIX: DateTime
       urlValue: condition-assertedDate
+
+verificationStatus_1:
+  valueOf: datatype/CodeableConcept
+  expressionType: resource
+  vars:
+    coding: CONDITION_VERIFICATION_STATUS_FHIR, PRB.13
+    text: String, PRB.13
+verificationStatus_2:
+  condition: $coding NULL
+  valueOf: datatype/CodeableConcept
+  expressionType: resource
+  vars:
+    coding: CONDITION_VERIFICATION_STATUS_FHIR, PRB.13
+    text: String, PRB.13.1
+
+clinicalStatus_1:
+  valueOf: datatype/CodeableConcept
+  expressionType: resource
+  vars:
+    coding: CONDITION_CLINICAL_STATUS_FHIR, PRB.14
+    text: String, PRB.14
+clinicalStatus_2:
+  condition: $coding NULL
+  valueOf: datatype/CodeableConcept
+  expressionType: resource
+  vars:
+    coding: CONDITION_CLINICAL_STATUS_FHIR, PRB.14
+    text: String, PRB.14.1
