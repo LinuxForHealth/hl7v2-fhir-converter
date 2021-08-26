@@ -138,6 +138,7 @@ maritalStatus:
    condition: $coding NOT_NULL
    vars:
       coding: MARITAL_STATUS, PID.16
+      text: String, PID.16.2
 generalPractitioner:
    valueOf: resource/Practitioner
    generateList: true
@@ -167,6 +168,8 @@ extension:
             condition: $coding NOT_NULL
             vars:
                coding: RELIGIOUS_AFFILIATION_CC, PID.17
+               text: String, PID.17.2
+
    -  expressionType: nested
       specs: PID.10
       generateList: true
