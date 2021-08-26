@@ -121,7 +121,7 @@ public class HL7ConditionFHIRConversionTest {
 
         // Verify category text is set correctly.
         Base category = ResourceUtils.getValue(condition, "category");
-        assertThat(ResourceUtils.getValueAsString(category, "text")).isEqualTo("encounter-diagnosis");
+        assertThat(ResourceUtils.getValueAsString(category, "text")).isEqualTo("Encounter Diagnosis");
 
         // Verify category coding fields are set correctly.
         Base catCoding = ResourceUtils.getValue(category, "coding");
@@ -349,7 +349,7 @@ public class HL7ConditionFHIRConversionTest {
 
         // Verify category text is set correctly.
         Base category = ResourceUtils.getValue(condition, "category");
-        assertThat(ResourceUtils.getValueAsString(category, "text")).isEqualTo("problem-list-item");
+        assertThat(ResourceUtils.getValueAsString(category, "text")).isEqualTo("Problem List Item");
 
         // Verify category coding fields are set correctly.
         Base catCoding = ResourceUtils.getValue(category, "coding");
@@ -428,7 +428,7 @@ public class HL7ConditionFHIRConversionTest {
 
         //Verify clinicalStatus text is set correctly
         Base clinicalStatus = ResourceUtils.getValue(condition, "clinicalStatus");
-        assertThat(ResourceUtils.getValueAsString(clinicalStatus, "text")).isEqualTo("Remission");
+        assertThat(ResourceUtils.getValueAsString(clinicalStatus, "text")).isEqualTo("remission");
 
         // Verify clinicalStatus coding is set correctly
         Base clinCoding = ResourceUtils.getValue(clinicalStatus, "coding");
@@ -446,11 +446,12 @@ public class HL7ConditionFHIRConversionTest {
 
         String hl7message = "MSH|^~\\&|||||20040629164652|1|PPR^PC1|331|P|2.3.1||\r"
                 + "PID||||||||||||||||||||||||||||||\r" + "PV1||I||||||||||||||||||||||||||||||||||||||||||\r"
-                + "PRB|AD|20170110074000|K80.00^Cholelithiasis^I10|53956|E1|1|20100907175347|20150907175347|20180310074000||||BAD^Confirmed^http://terminology.hl7.org/CodeSystem/condition-ver-status|INVALID^Remission^http://terminology.hl7.org/CodeSystem/condition-clinical|20180310074000|20170102074000|textual representation of the time when the problem began|1^primary|ME^Medium|0.4|marginal|good|marginal|marginal|highly sensitive|some prb detail|\r";
+                + "PRB|AD|20170110074000|K80.00^Cholelithiasis^I10|53956|E1|1|20100907175347|20150907175347|||||BAD^Confirmed^http://terminology.hl7.org/CodeSystem/condition-ver-status|INVALID^Remission^http://terminology.hl7.org/CodeSystem/condition-clinical|20180310074000|20170102074000|textual representation of the time when the problem began|1^primary|ME^Medium|0.4|marginal|good|marginal|marginal|highly sensitive|some prb detail|\r";
 
         HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
         String json = ftv.convert(hl7message, OPTIONS);
         assertThat(json).isNotBlank();
+        System.out.println(json);
         LOGGER.info("FHIR json result:\n" + json);
 
         FHIRContext context = new FHIRContext(true, false);
@@ -479,17 +480,13 @@ public class HL7ConditionFHIRConversionTest {
         // assertThat(ResourceUtils.getValueAsString(coding, "display")).isEqualTo("Confirmed");
         // assertThat(ResourceUtils.getValueAsString(coding, "code")).isEqualTo("confirmed");
 
+        //Verify clinicalStatus text is set correctly
+        Base clinicalStatus = ResourceUtils.getValue(condition, "clinicalStatus");
+        assertThat(ResourceUtils.getValueAsString(clinicalStatus, "text")).isEqualTo("Remission");
 
-        // //Verify clinicalStatus text is set correctly
-        // Base clinicalStatus = ResourceUtils.getValue(condition, "clinicalStatus");
-        // assertThat(ResourceUtils.getValueAsString(clinicalStatus, "text")).isEqualTo("Remission");
-
-        // // Verify clinicalStatus coding is set correctly
-        // Base clinCoding = ResourceUtils.getValue(clinicalStatus, "coding");
-        // assertThat(ResourceUtils.getValueAsString(clinCoding, "system"))
-        //         .isEqualTo("UriType[http://terminology.hl7.org/CodeSystem/condition-clinical]");
-        // assertThat(ResourceUtils.getValueAsString(clinCoding, "code")).isEqualTo("remission");
-        // assertThat(ResourceUtils.getValueAsString(clinCoding, "display")).isEqualTo("Remission");
+        // Verify clinicalStatus coding is set correctly
+        Base clinCoding = ResourceUtils.getValue(clinicalStatus, "coding");
+        assertThat(clinCoding.listChildrenByName("coding")).isEmpty();
       
 
     }
@@ -629,7 +626,7 @@ public class HL7ConditionFHIRConversionTest {
 
         // Verify category text is set correctly.
         Base category = ResourceUtils.getValue(condition, "category");
-        assertThat(ResourceUtils.getValueAsString(category, "text")).isEqualTo("problem-list-item");
+        assertThat(ResourceUtils.getValueAsString(category, "text")).isEqualTo("Problem List Item");
 
         // Verify category coding fields are set correctly.
         Base catCoding = ResourceUtils.getValue(category, "coding");

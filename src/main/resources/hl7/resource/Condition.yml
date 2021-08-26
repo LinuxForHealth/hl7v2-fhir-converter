@@ -92,12 +92,14 @@ clinicalStatus:
   expressionType: resource
   vars:
     coding: CONDITION_CLINCAL_STATUS_FHIR, PRB.14
+    text: PRB.14
 
 verificationStatus:
   valueOf: datatype/CodeableConcept
   expressionType: resource
   vars:
     coding: CONDITION_VERIFICATION_STATUS_FHIR, PRB.13
+    text: PRB.13
 
 severity:
   valueOf: datatype/CodeableConcept
