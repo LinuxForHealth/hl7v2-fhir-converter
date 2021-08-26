@@ -58,8 +58,10 @@ public enum ConditionPredicateEnum {
 
   public static ConditionPredicateEnum getConditionPredicate(String conditionOperator,
       String klassSimpleName) {
-    // Append the predicate if not already present      
-    String enumName = conditionOperator.endsWith(klassSimpleName.toUpperCase()) ? conditionOperator : conditionOperator + "_" + klassSimpleName;
+    // Append the predicate if not already present 
+    // Some classes need a string predicate     
+    String klassAdjustedName = klassSimpleName.equalsIgnoreCase("ST") || klassSimpleName.equalsIgnoreCase("IS") || klassSimpleName.equalsIgnoreCase("NULLDT") ? "STRING" : klassSimpleName.toUpperCase();
+    String enumName = conditionOperator.endsWith(klassAdjustedName) ? conditionOperator : conditionOperator + "_" + klassSimpleName;
     return EnumUtils.getEnumIgnoreCase(ConditionPredicateEnum.class, enumName);
 
   }
