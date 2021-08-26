@@ -32,7 +32,7 @@ import org.slf4j.LoggerFactory;
 
 public class HL7ConditionFHIRConversionTest {
 
-    private static final ConverterOptions OPTIONS = new Builder().withValidateResource().withPrettyPrint().build();
+    private static final ConverterOptions OPTIONS = new Builder().withPrettyPrint().build();
     private static final Logger LOGGER = LoggerFactory.getLogger(Hl7PatientFHIRConversionTest.class);
 
     // --------------------- DIAGNOSIS UNIT TESTS (DG1) ---------------------
@@ -484,7 +484,6 @@ public class HL7ConditionFHIRConversionTest {
         // Verify clinicalStatus coding is unset
         assertThat(clinicalStatus.listChildrenByName("coding")).isEmpty();
       
-
     }
 
     // This tests verificationStatus and clincalStatus when they only have one value
