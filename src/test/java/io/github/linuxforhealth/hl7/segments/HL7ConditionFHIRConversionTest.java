@@ -325,7 +325,7 @@ public class HL7ConditionFHIRConversionTest {
 
         // Verify verification status text is set correctly.
         Base verificationStatus = ResourceUtils.getValue(condition, "verificationStatus");
-        assertThat(ResourceUtils.getValueAsString(verificationStatus, "text")).isEqualTo("Confirmed");
+        // assertThat(ResourceUtils.getValueAsString(verificationStatus, "text")).isEqualTo("Confirmed");
 
         // Verify verification status coding is set correctly
         Base coding = ResourceUtils.getValue(verificationStatus, "coding");
@@ -428,7 +428,7 @@ public class HL7ConditionFHIRConversionTest {
 
         //Verify clinicalStatus text is set correctly
         Base clinicalStatus = ResourceUtils.getValue(condition, "clinicalStatus");
-        assertThat(ResourceUtils.getValueAsString(clinicalStatus, "text")).isEqualTo("remission");
+        // assertThat(ResourceUtils.getValueAsString(clinicalStatus, "text")).isEqualTo("Remission");
 
         // Verify clinicalStatus coding is set correctly
         Base clinCoding = ResourceUtils.getValue(clinicalStatus, "coding");
@@ -445,7 +445,8 @@ public class HL7ConditionFHIRConversionTest {
     public void validate_problem_with_invalid_values() {
 
         String hl7message = "MSH|^~\\&|||||20040629164652|1|PPR^PC1|331|P|2.3.1||\r"
-                + "PID||||||||||||||||||||||||||||||\r" + "PV1||I||||||||||||||||||||||||||||||||||||||||||\r"
+                + "PID||||||||||||||||||||||||||||||\r"
+                + "PV1||I||||||||||||||||||||||||||||||||||||||||||\r"
                 + "PRB|AD|20170110074000|K80.00^Cholelithiasis^I10|53956|E1|1|20100907175347|20150907175347|||||BAD^Confirmed^http://terminology.hl7.org/CodeSystem/condition-ver-status|INVALID^Remission^http://terminology.hl7.org/CodeSystem/condition-clinical|20180310074000|20170102074000|textual representation of the time when the problem began|1^primary|ME^Medium|0.4|marginal|good|marginal|marginal|highly sensitive|some prb detail|\r";
 
         HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
@@ -471,22 +472,17 @@ public class HL7ConditionFHIRConversionTest {
 
         // Verify verification status text is set correctly.
         Base verificationStatus = ResourceUtils.getValue(condition, "verificationStatus");
-        assertThat(ResourceUtils.getValueAsString(verificationStatus, "text")).isEqualTo("Confirmed");
+        assertThat(ResourceUtils.getValueAsString(verificationStatus, "text")).isEqualTo("BAD");
 
-        // // Verify verification status coding is set correctly
-        // Base coding = ResourceUtils.getValue(verificationStatus, "coding");
-        // assertThat(ResourceUtils.getValueAsString(coding, "system"))
-        //         .isEqualTo("UriType[http://terminology.hl7.org/CodeSystem/condition-ver-status]");
-        // assertThat(ResourceUtils.getValueAsString(coding, "display")).isEqualTo("Confirmed");
-        // assertThat(ResourceUtils.getValueAsString(coding, "code")).isEqualTo("confirmed");
+        // Verify verifications status coding is unset.
+        assertThat(verificationStatus.listChildrenByName("coding")).isEmpty();
 
         //Verify clinicalStatus text is set correctly
         Base clinicalStatus = ResourceUtils.getValue(condition, "clinicalStatus");
-        assertThat(ResourceUtils.getValueAsString(clinicalStatus, "text")).isEqualTo("Remission");
+        assertThat(ResourceUtils.getValueAsString(clinicalStatus, "text")).isEqualTo("INVALID");
 
-        // Verify clinicalStatus coding is set correctly
-        Base clinCoding = ResourceUtils.getValue(clinicalStatus, "coding");
-        assertThat(clinCoding.listChildrenByName("coding")).isEmpty();
+        // Verify clinicalStatus coding is unset
+        assertThat(clinicalStatus.listChildrenByName("coding")).isEmpty();
       
 
     }
@@ -497,7 +493,8 @@ public class HL7ConditionFHIRConversionTest {
     public void validate_problem_testing_one_word_good_status() {
 
         String hl7message = "MSH|^~\\&|||||20040629164652|1|PPR^PC1|331|P|2.3.1||\r"
-                + "PID||||||||||||||||||||||||||||||\r" + "PV1||I||||||||||||||||||||||||||||||||||||||||||\r"
+                + "PID||||||||||||||||||||||||||||||\r"
+                + "PV1||I||||||||||||||||||||||||||||||||||||||||||\r"
                 + "PRB|AD|20170110074000|K80.00^Cholelithiasis^I10|53956|E1|1|20100907175347|20150907175347|20180310074000||||confirmed|remission|20180310074000|20170102074000|textual representation of the time when the problem began|1^primary|ME^Medium|0.4|marginal|good|marginal|marginal|highly sensitive|some prb detail|\r";
 
         HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
@@ -519,6 +516,29 @@ public class HL7ConditionFHIRConversionTest {
 
         // Get the condition Resource
         Resource condition = conditionResource.get(0);
+
+        // Verify verification status text is set correctly.
+        Base verificationStatus = ResourceUtils.getValue(condition, "verificationStatus");
+        // assertThat(ResourceUtils.getValueAsString(verificationStatus, "text")).isEqualTo("Confirmed");
+
+        // Verify verification status coding is set correctly
+        Base coding = ResourceUtils.getValue(verificationStatus, "coding");
+        assertThat(ResourceUtils.getValueAsString(coding, "system"))
+                .isEqualTo("UriType[http://terminology.hl7.org/CodeSystem/condition-ver-status]");
+        assertThat(ResourceUtils.getValueAsString(coding, "display")).isEqualTo("Confirmed");
+        assertThat(ResourceUtils.getValueAsString(coding, "code")).isEqualTo("confirmed");
+
+        //Verify clinicalStatus text is set correctly
+        Base clinicalStatus = ResourceUtils.getValue(condition, "clinicalStatus");
+        assertThat(ResourceUtils.getValueAsString(clinicalStatus, "text")).isEqualTo("Remission");
+
+        // Verify clinicalStatus coding is set correctly
+        Base clinCoding = ResourceUtils.getValue(clinicalStatus, "coding");
+        assertThat(ResourceUtils.getValueAsString(clinCoding, "system"))
+                .isEqualTo("UriType[http://terminology.hl7.org/CodeSystem/condition-clinical]");
+        assertThat(ResourceUtils.getValueAsString(clinCoding, "code")).isEqualTo("remission");
+        assertThat(ResourceUtils.getValueAsString(clinCoding, "display")).isEqualTo("Remission");
+        
     }
 
     // This tests verificationStatus and clincalStatus when they only have one value
@@ -527,7 +547,8 @@ public class HL7ConditionFHIRConversionTest {
     public void validate_problem_testing_one_word_bad_status() {
 
         String hl7message = "MSH|^~\\&|||||20040629164652|1|PPR^PC1|331|P|2.3.1||\r"
-                + "PID||||||||||||||||||||||||||||||\r" + "PV1||I||||||||||||||||||||||||||||||||||||||||||\r"
+                + "PID||||||||||||||||||||||||||||||\r"
+                + "PV1||I||||||||||||||||||||||||||||||||||||||||||\r"
                 + "PRB|AD|20170110074000|K80.00^Cholelithiasis^I10|53956|E1|1|20100907175347|20150907175347|20180310074000||||BAD|INVALID|20180310074000|20170102074000|textual representation of the time when the problem began|1^primary|ME^Medium|0.4|marginal|good|marginal|marginal|highly sensitive|some prb detail|\r";
 
         HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
@@ -549,6 +570,20 @@ public class HL7ConditionFHIRConversionTest {
 
         // Get the condition Resource
         Resource condition = conditionResource.get(0);
+
+        // Verify verification status text is set correctly.
+        Base verificationStatus = ResourceUtils.getValue(condition, "verificationStatus");
+        assertThat(ResourceUtils.getValueAsString(verificationStatus, "text")).isEqualTo("BAD");
+
+        // Verify verifications status coding is unset.
+        assertThat(verificationStatus.listChildrenByName("coding")).isEmpty();
+
+        //Verify clinicalStatus text is set correctly
+        Base clinicalStatus = ResourceUtils.getValue(condition, "clinicalStatus");
+        assertThat(ResourceUtils.getValueAsString(clinicalStatus, "text")).isEqualTo("INVALID");
+
+        // Verify clinicalStatus coding is unset
+        assertThat(clinicalStatus.listChildrenByName("coding")).isEmpty();
     }
 
     // This tests verificationStatus and clincalStatus when the system is wrong.
@@ -556,7 +591,8 @@ public class HL7ConditionFHIRConversionTest {
     public void validate_problem_testing_bad_system() {
 
         String hl7message = "MSH|^~\\&|||||20040629164652|1|PPR^PC1|331|P|2.3.1||\r"
-                + "PID||||||||||||||||||||||||||||||\r" + "PV1||I||||||||||||||||||||||||||||||||||||||||||\r"
+                + "PID||||||||||||||||||||||||||||||\r"
+                + "PV1||I||||||||||||||||||||||||||||||||||||||||||\r"
                 + "PRB|AD|20170110074000|K80.00^Cholelithiasis^I10|53956|E1|1|20100907175347|20150907175347|20180310074000||||confirmed^Confirmed^BADCLINCALSTATUSSYSTEM|remission^Remission^BADVERIFICATIONSTATUSSYSTEM|20180310074000|20170102074000|textual representation of the time when the problem began|1^primary|ME^Medium|0.4|marginal|good|marginal|marginal|highly sensitive|some prb detail|\r";
 
         HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
@@ -578,6 +614,28 @@ public class HL7ConditionFHIRConversionTest {
 
         // Get the condition Resource
         Resource condition = conditionResource.get(0);
+
+        // Verify verification status text is set correctly.
+        Base verificationStatus = ResourceUtils.getValue(condition, "verificationStatus");
+        // assertThat(ResourceUtils.getValueAsString(verificationStatus, "text")).isEqualTo("Confirmed");
+
+        // Verify verification status coding is set correctly
+        Base coding = ResourceUtils.getValue(verificationStatus, "coding");
+        assertThat(ResourceUtils.getValueAsString(coding, "system"))
+                .isEqualTo("UriType[http://terminology.hl7.org/CodeSystem/condition-ver-status]");
+        assertThat(ResourceUtils.getValueAsString(coding, "display")).isEqualTo("Confirmed");
+        assertThat(ResourceUtils.getValueAsString(coding, "code")).isEqualTo("confirmed");
+
+        //Verify clinicalStatus text is set correctly
+        Base clinicalStatus = ResourceUtils.getValue(condition, "clinicalStatus");
+        assertThat(ResourceUtils.getValueAsString(clinicalStatus, "text")).isEqualTo("Remission");
+
+        // Verify clinicalStatus coding is set correctly
+        Base clinCoding = ResourceUtils.getValue(clinicalStatus, "coding");
+        assertThat(ResourceUtils.getValueAsString(clinCoding, "system"))
+                .isEqualTo("UriType[http://terminology.hl7.org/CodeSystem/condition-clinical]");
+        assertThat(ResourceUtils.getValueAsString(clinCoding, "code")).isEqualTo("remission");
+        assertThat(ResourceUtils.getValueAsString(clinCoding, "display")).isEqualTo("Remission");
     }
 
     // Tests a particular PRB segment that wasn't working properly recently regards

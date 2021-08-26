@@ -186,7 +186,7 @@ public class SimpleDataValueResolver {
         }
     };
 
-    public static final ValueExtractor<Object, SimpleCode> CONDITION_CLINCAL_STATUS_FHIR =
+    public static final ValueExtractor<Object, SimpleCode> CONDITION_CLINICAL_STATUS_FHIR =
         (Object value) -> {
         String val = Hl7DataHandlerUtil.getStringValue(value);
 
@@ -203,7 +203,8 @@ public class SimpleDataValueResolver {
         if (use != null) { // if it is then setup the simple code
             return new SimpleCode(val, use.getSystem(), use.getDisplay());
         } else { // otherwise we don't want the code at all
-            return new SimpleCode(null, null, null);
+            // return new SimpleCode(null, null, null);
+            return null;
         }
     };
 
@@ -223,7 +224,8 @@ public class SimpleDataValueResolver {
         if (use != null) { // if it is then setup the simple code
             return new SimpleCode(val, use.getSystem(), use.getDisplay());
         } else { // otherwise we don't want the code at all
-            return new SimpleCode(val, null, null);
+            // return new SimpleCode(null, null, null);
+            return null;
         }
     };
 
