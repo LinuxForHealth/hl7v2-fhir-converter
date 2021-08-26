@@ -288,22 +288,22 @@ public class Hl7PatientFHIRConversionTest {
             "MSH|^~\\&|MyEMR|DE-000001| |CAIRLO|20160701123030-0700||VXU^V04^VXU_V04|CA0001|P|2.6|||ER|AL|||||Z22^CDCPHINVS|DE-000001\r" +
                     "PID|1||12345678^^^MRN||TestPatient^Jane|||||||||||M^^^^^^47||||||\r";
 
-    String singlePatientWithVersion =
+    String singlePatientWithVersionAndOriginalText =
             "MSH|^~\\&|MyEMR|DE-000001| |CAIRLO|20160701123030-0700||VXU^V04^VXU_V04|CA0001|P|2.6|||ER|AL|||||Z22^CDCPHINVS|DE-000001\r" +
-                    "PID|1||12345678^^^MRN||TestPatient^Jane|||||||||||S^^^^^^1.1||||||\r";
+                    "PID|1||12345678^^^MRN||TestPatient^Jane|||||||||||S^unmarried^^^^^1.1||||||\r";
 
     Patient patientObjMarried = PatientUtils.createPatientFromHl7Segment(marriedPatientWithVersion);
     assertThat(patientObjMarried.hasMaritalStatus()).isTrue();
-    assertThat(patientObjMarried.getMaritalStatus().getText()).isEqualTo("Married");
+    assertThat(patientObjMarried.getMaritalStatus().hasText()).isFalse();
     assertThat(patientObjMarried.getMaritalStatus().getCoding()).hasSize(1);
     Coding coding = patientObjMarried.getMaritalStatus().getCodingFirstRep();
     assertThat(coding.getDisplay()).isEqualTo(V3MaritalStatus.M.getDisplay());
     assertThat(coding.getSystem()).isEqualTo(V3MaritalStatus.M.getSystem());
     assertThat(coding.getVersion()).isEqualTo("47");
 
-    Patient patientObjMarriedAltText = PatientUtils.createPatientFromHl7Segment(singlePatientWithVersion);
+    Patient patientObjMarriedAltText = PatientUtils.createPatientFromHl7Segment(singlePatientWithVersionAndOriginalText);
     assertThat(patientObjMarriedAltText.hasMaritalStatus()).isTrue();
-    assertThat(patientObjMarriedAltText.getMaritalStatus().getText()).isEqualTo("Never Married");
+    assertThat(patientObjMarriedAltText.getMaritalStatus().getText()).isEqualTo("unmarried");
     assertThat(patientObjMarriedAltText.getMaritalStatus().getCoding()).hasSize(1);
     coding = patientObjMarriedAltText.getMaritalStatus().getCodingFirstRep();
     assertThat(coding.getDisplay()).isEqualTo(V3MaritalStatus.S.getDisplay());
