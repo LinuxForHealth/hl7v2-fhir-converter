@@ -68,7 +68,7 @@ category_x1:
    constants:
      display: 'Problem List Item'
      code: 'problem-list-item'
-     text: 'problem-list-item'
+     text: 'Problem List Item'
      system: 'http://terminology.hl7.org/CodeSystem/condition-category'
      type: problem-list-item
 
@@ -83,17 +83,21 @@ category_x2:
    constants:
      display: 'Encounter Diagnosis'
      code: 'encounter-diagnosis'
-     text: 'encounter-diagnosis'
+     text: 'Encounter Diagnosis'
      system: 'http://terminology.hl7.org/CodeSystem/condition-category' 
      type: encounter-diagnosis
 
 clinicalStatus:
-   valueOf: datatype/CodeableConcept_var
-   expressionType: resource
-   constants:
-      system: 'http://terminology.hl7.org/CodeSystem/condition-clinical'
-      code: 'remission'
-      display: 'Remission'
+  valueOf: datatype/CodeableConcept
+  expressionType: resource
+  vars:
+    coding: CONDITION_CLINCAL_STATUS_FHIR, PRB.14
+
+verificationStatus:
+  valueOf: datatype/CodeableConcept
+  expressionType: resource
+  vars:
+    coding: CONDITION_VERIFICATION_STATUS_FHIR, PRB.13
 
 severity:
   valueOf: datatype/CodeableConcept
