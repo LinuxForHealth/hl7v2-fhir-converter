@@ -211,8 +211,8 @@ public class SimpleDataValueResolver {
         (Object value) -> {
         String val = Hl7DataHandlerUtil.getStringValue(value);
 
+         //Test to see if val is a valid code.
         ConditionVerStatus use = null;
-
         try{
             use = ConditionVerStatus.fromCode(val);
             LOGGER.info("Found ConditionVerStatus code for '{}'.",val);
@@ -220,9 +220,9 @@ public class SimpleDataValueResolver {
         catch(FHIRException e) {
             LOGGER.warn("Could not find ConditionVerStatus code for '{}'.",val);
         }
-        if (use != null) {
+        if (use != null) { // if it is then setup the simple code
             return new SimpleCode(val, use.getSystem(), use.getDisplay());
-        } else {
+        } else { // otherwise we don't want the code at all
             return new SimpleCode(val, null, null);
         }
     };
