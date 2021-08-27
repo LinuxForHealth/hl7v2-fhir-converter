@@ -109,11 +109,6 @@ subject:
   expressionType: resource
   specs: $Patient
 
-onsetDateTime:
-     type: DATE_TIME
-     valueOf: PRB.16 | DG1.5
-     expressionType: HL7Spec
-
 stage:
    valueOf: secondary/Stage
    generateList: true
@@ -152,6 +147,11 @@ verificationStatus:
   specs: PRB.13
   vars:
     code: PRB.13
+
+onsetDateTime:
+  type: DATE_TIME
+  valueOf: PRB.16 | DG1.5
+  expressionType: HL7Spec
   
 onsetString:
   condition: $onsetDateTime NOT_NULL
