@@ -70,6 +70,7 @@ public class FHIRConverterTest {
 
     HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
     String json = ftv.convert(hl7message, OPTIONS);
+    System.out.println(json);
     verifyResult(json, Constants.DEFAULT_BUNDLE_TYPE, false);
 
   }
@@ -238,7 +239,7 @@ String hl7message =
     assertThat(obsResource).hasSize(1);
     List<Resource> pracResource = e.stream().filter(v -> ResourceType.Practitioner == v.getResource().getResourceType())
         .map(BundleEntryComponent::getResource).collect(Collectors.toList());
-    assertThat(pracResource).hasSize(1);
+    assertThat(pracResource).hasSize(5);
 
     List<Resource> organizationRes = e.stream()
         .filter(v -> ResourceType.Organization == v.getResource().getResourceType())
@@ -337,7 +338,7 @@ String hl7message =
     assertThat(obsResource).hasSize(1);
     List<Resource> pracResource = e.stream().filter(v -> ResourceType.Practitioner == v.getResource().getResourceType())
         .map(BundleEntryComponent::getResource).collect(Collectors.toList());
-    assertThat(pracResource).hasSize(4);
+    assertThat(pracResource).hasSize(8);
 
     List<Resource> allergyResources = e.stream()
         .filter(v -> ResourceType.AllergyIntolerance == v.getResource().getResourceType())

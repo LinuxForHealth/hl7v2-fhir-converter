@@ -116,6 +116,50 @@ text:
       text: PV2.12
    constants:
       status: "additional"
+   
+participant_1:
+   condition: $practionerSpec NOT_NULL
+   valueOf: secondary/Participant
+   generateList: true
+   expressionType: resource
+   vars:
+      practionerSpec: PV1.7
+   constants:
+      codeableConceptCode: 'ATND'
+      codeableConceptText: 'attender'
+
+participant_2:
+   condition: $practionerSpec NOT_NULL
+   valueOf: secondary/Participant
+   generateList: true
+   expressionType: resource
+   vars:
+      practionerSpec: PV1.8
+   constants:
+      codeableConceptCode: 'REF'
+      codeableConceptText: 'referrer'
+         
+participant_3:
+   condition: $practionerSpec NOT_NULL
+   valueOf: secondary/Participant
+   generateList: true
+   expressionType: resource
+   vars:
+      practionerSpec: PV1.9
+   constants:
+      codeableConceptCode: 'CON'
+      codeableConceptText: 'consultant'
+               
+participant_4:
+   condition: $practionerSpec NOT_NULL
+   valueOf: secondary/Participant
+   generateList: true
+   expressionType: resource
+   vars:
+      practionerSpec: PV1.17
+   constants:
+      codeableConceptCode: 'ADM'
+      codeableConceptText: 'admitter'
 
 # Uncomment until we figure out to reference condition from encounter
 # diagnosis.condition is required
