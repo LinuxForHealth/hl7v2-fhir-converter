@@ -85,8 +85,9 @@ public class HL7ConditionFHIRConversionTest {
 
         // Verify code coding is set correctly.
         Base coding = ResourceUtils.getValue(code, "coding");
+        // change from http://hl7.org/fhir/sid/icd-10 to http://hl7.org/fhir/sid/icd-10-cm temporarily, see Issue #189
         assertThat(ResourceUtils.getValueAsString(coding, "system"))
-                .isEqualTo("UriType[http://hl7.org/fhir/sid/icd-10]");
+                .isEqualTo("UriType[http://hl7.org/fhir/sid/icd-10-cm]");
         assertThat(ResourceUtils.getValueAsString(coding, "code")).isEqualTo("C56.9");
         assertThat(ResourceUtils.getValueAsString(coding, "display")).isEqualTo("Ovarian Cancer");
 
@@ -354,8 +355,9 @@ public class HL7ConditionFHIRConversionTest {
 
         // Verify code coding fields are set correctly.
         Base codeCoding = ResourceUtils.getValue(code, "coding");
+        // change from http://hl7.org/fhir/sid/icd-10 to http://hl7.org/fhir/sid/icd-10-cm temporarily, see Issue #189
         assertThat(ResourceUtils.getValueAsString(codeCoding, "system"))
-                .isEqualTo("UriType[http://hl7.org/fhir/sid/icd-10]");
+                .isEqualTo("UriType[http://hl7.org/fhir/sid/icd-10-cm]");
         assertThat(ResourceUtils.getValueAsString(codeCoding, "code")).isEqualTo("K80.00");
 
         // Verify stage summary text is set correctly.
