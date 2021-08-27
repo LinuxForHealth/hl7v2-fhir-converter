@@ -18,6 +18,7 @@ import ca.uhn.hl7v2.model.v26.datatype.CWE;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.hl7.fhir.exceptions.FHIRException;
 import org.hl7.fhir.r4.model.AllergyIntolerance.AllergyIntoleranceCategory;
 import org.hl7.fhir.r4.model.AllergyIntolerance.AllergyIntoleranceCriticality;
 import org.hl7.fhir.r4.model.DiagnosticReport.DiagnosticReportStatus;
@@ -32,6 +33,8 @@ import org.hl7.fhir.r4.model.codesystems.MessageReasonEncounter;
 import org.hl7.fhir.r4.model.codesystems.NameUse;
 import org.hl7.fhir.r4.model.codesystems.V3ReligiousAffiliation;
 import org.hl7.fhir.r4.model.codesystems.DiagnosisRole;
+import org.hl7.fhir.r4.model.codesystems.ConditionClinical;
+import org.hl7.fhir.r4.model.codesystems.ConditionVerStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -180,6 +183,49 @@ public class SimpleDataValueResolver {
             return new SimpleCode(code, use.getSystem(), use.getDisplay());
         } else {
             return new SimpleCode(val, null, null);
+        }
+    };
+
+    public static final ValueExtractor<Object, SimpleCode> CONDITION_CLINICAL_STATUS_FHIR =
+        (Object value) -> {
+        String val = Hl7DataHandlerUtil.getStringValue(value);
+
+        //Test to see if val is a valid code.
+        ConditionClinical use = null;
+        try {
+            use = ConditionClinical.fromCode(val);
+            LOGGER.info("Found ConditionClinical code for '{}'.",val);
+        }
+        catch(FHIRException e) {
+            LOGGER.warn("Could not find ConditionClinical code for '{}'.",val);
+        }
+
+        if (use != null) { // if it is then setup the simple code
+            return new SimpleCode(val, use.getSystem(), use.getDisplay());
+        } else { // otherwise we don't want the code at all
+            // return new SimpleCode(null, null, null);
+            return null;
+        }
+    };
+
+    public static final ValueExtractor<Object, SimpleCode> CONDITION_VERIFICATION_STATUS_FHIR =
+        (Object value) -> {
+        String val = Hl7DataHandlerUtil.getStringValue(value);
+
+         //Test to see if val is a valid code.
+        ConditionVerStatus use = null;
+        try{
+            use = ConditionVerStatus.fromCode(val);
+            LOGGER.info("Found ConditionVerStatus code for '{}'.",val);
+        }
+        catch(FHIRException e) {
+            LOGGER.warn("Could not find ConditionVerStatus code for '{}'.",val);
+        }
+        if (use != null) { // if it is then setup the simple code
+            return new SimpleCode(val, use.getSystem(), use.getDisplay());
+        } else { // otherwise we don't want the code at all
+            // return new SimpleCode(null, null, null);
+            return null;
         }
     };
 
