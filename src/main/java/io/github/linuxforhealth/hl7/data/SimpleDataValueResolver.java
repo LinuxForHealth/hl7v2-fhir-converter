@@ -203,7 +203,6 @@ public class SimpleDataValueResolver {
         if (use != null) { // if it is then setup the simple code
             return new SimpleCode(val, use.getSystem(), use.getDisplay());
         } else { // otherwise we don't want the code at all
-            // return new SimpleCode(null, null, null);
             return null;
         }
     };
@@ -224,7 +223,6 @@ public class SimpleDataValueResolver {
         if (use != null) { // if it is then setup the simple code
             return new SimpleCode(val, use.getSystem(), use.getDisplay());
         } else { // otherwise we don't want the code at all
-            // return new SimpleCode(null, null, null);
             return null;
         }
     };
