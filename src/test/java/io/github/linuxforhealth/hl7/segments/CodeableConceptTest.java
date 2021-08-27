@@ -8,12 +8,6 @@ package io.github.linuxforhealth.hl7.segments;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
-import java.util.stream.Collectors;
-import org.hl7.fhir.instance.model.api.IBaseResource;
-import org.hl7.fhir.r4.model.Bundle;
-import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
-import org.hl7.fhir.r4.model.Resource;
-import org.hl7.fhir.r4.model.ResourceType;
 import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.Extension;
@@ -22,10 +16,8 @@ import org.hl7.fhir.r4.model.MedicationRequest;
 import org.hl7.fhir.r4.model.Condition;
 import org.junit.jupiter.api.Test;
 import io.github.linuxforhealth.core.terminology.UrlLookup;
-import io.github.linuxforhealth.fhir.FHIRContext;
 import io.github.linuxforhealth.hl7.ConverterOptions;
 import io.github.linuxforhealth.hl7.ConverterOptions.Builder;
-import io.github.linuxforhealth.hl7.HL7ToFHIRConverter;
 import io.github.linuxforhealth.hl7.segments.util.ResourceUtils;
 import io.github.linuxforhealth.hl7.segments.util.*;
 
@@ -251,7 +243,7 @@ class CodeableConceptTest {
         assertThat(coding.hasDisplay()).isTrue();
         assertThat(coding.hasCode()).isFalse();
         assertThat(coding.hasSystem()).isTrue();
-        assertThat(coding.getDisplay()).containsPattern("Invalid.*2186-5.*"+V3_RACE_SYSTEM);
+        assertThat(coding.getDisplay()).containsPattern("Invalid.*2186-5.*" + V3_RACE_SYSTEM);
         assertThat(coding.getSystem()).containsIgnoringCase(V3_RACE_SYSTEM);
     }
 
@@ -285,7 +277,7 @@ class CodeableConceptTest {
         assertThat(coding.hasDisplay()).isTrue();
         assertThat(coding.hasCode()).isFalse();
         assertThat(coding.hasSystem()).isTrue();
-        assertThat(coding.getDisplay()).containsPattern("Invalid.*2186-5.*"+V3_RACE_SYSTEM+".*hispan");
+        assertThat(coding.getDisplay()).containsPattern("Invalid.*2186-5.*" + V3_RACE_SYSTEM + ".*hispan");
         assertThat(coding.getSystem()).containsIgnoringCase(V3_RACE_SYSTEM);
 
     }
@@ -446,32 +438,13 @@ class CodeableConceptTest {
     @Test
     public void checkICD10Coding() {
 
-        String hl7MessageiCD10Coding = "MSH|^~\\&|||||20040629164652|1|PPR^PC1|331|P|2.3.1||\r" + "PID||||||||||||||||||||||||||||||\r"
+        String hl7MessageiCD10Coding = "MSH|^~\\&|||||20040629164652|1|PPR^PC1|331|P|2.3.1||\r"
+                + "PID||||||||||||||||||||||||||||||\r"
                 + "PV1||I||||||||||||||||||||||||||||||||||||||||||\r"
-                + "PRB|AD|20170110074000|K80.00^Cholelithiasis^I10|53956|E1|1|20100907175347|20150907175347|20180310074000||||confirmed^Confirmed^http://terminology.hl7.org/CodeSystem/condition-ver-status|remission^Remission^http://terminology.hl7.org/CodeSystem/condition-clinical|20180310074000|20170102074000|textual representation of the time when the problem began|1^primary|ME^Medium|0.4|marginal|good|marginal|marginal|highly sensitive|some prb detail|\r"
-                + "PRB|AD|20170110074000|N39.0^Urinary Tract Infection^I9|53957|E2|1|20090907175347|20150907175347||||||||||||||||||\r"
-                + "PRB|AD|20170110074000|C56.9^Ovarian Cancer^I10|53958|E3|2|20110907175347|20160907175347||||||||||||||||||\r";
+                + "PRB|AD|20170110074000|K80.00^Cholelithiasis^I10|53956|E1|1|20100907175347|20150907175347|20180310074000||||confirmed^Confirmed^http://terminology.hl7.org/CodeSystem/condition-ver-status|remission^Remission^http://terminology.hl7.org/CodeSystem/condition-clinical|20180310074000|20170102074000|textual representation of the time when the problem began|1^primary|ME^Medium|0.4|marginal|good|marginal|marginal|highly sensitive|some prb detail|\r";
 
-        // assertThat(condition.hasCode()).isTrue();        
-        HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
-        String json = ftv.convert(hl7MessageiCD10Coding, OPTIONS);
-        assertThat(json).isNotBlank();
-        LOGGER.info("FHIR json result:\n" + json);
+        Condition condition = ResourceUtils.getCondition(hl7MessageiCD10Coding);
 
-        FHIRContext context = new FHIRContext(true, false);
-        IBaseResource bundleResource = context.getParser().parseResource(json);
-        assertThat(bundleResource).isNotNull();
-        Bundle b = (Bundle) bundleResource;
-        List<BundleEntryComponent> e = b.getEntry();
-
-        // Find the condition from the FHIR bundle.
-        List<Resource> conditionResource = e.stream()
-                .filter(v -> ResourceType.Condition == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
-        assertThat(conditionResource).hasSize(3);
-
-        // Get the first condition Resource
-        Condition condition = (Condition) conditionResource.get(0);
         assertThat(condition.hasCode()).isTrue();
         CodeableConcept condCC = condition.getCode();
         assertThat(condCC.hasText()).isTrue();
@@ -487,43 +460,6 @@ class CodeableConceptTest {
         assertThat(condCoding.getCode()).isEqualTo("K80.00");
         assertThat(condCoding.hasDisplay()).isTrue();
         assertThat(condCoding.getDisplay()).isEqualTo("Cholelithiasis");
-        assertThat(condCoding.hasVersion()).isFalse();
-
-        // Get the second condition Resource
-        condition = (Condition) conditionResource.get(1);
-        assertThat(condition.hasCode()).isTrue();
-        condCC = condition.getCode();
-        assertThat(condCC.hasText()).isTrue();
-        assertThat(condCC.getText()).isEqualTo("Urinary Tract Infection");
-        assertThat(condCC.hasCoding()).isTrue();
-        assertThat(condCC.getCoding().size()).isEqualTo(1);
-
-        condCoding = condCC.getCoding().get(0);
-        assertThat(condCoding.hasSystem()).isTrue();
-        assertThat(condCoding.getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/icd9");
-        assertThat(condCoding.hasCode()).isTrue();
-        assertThat(condCoding.getCode()).isEqualTo("N39.0");
-        assertThat(condCoding.hasDisplay()).isTrue();
-        assertThat(condCoding.getDisplay()).isEqualTo("Urinary Tract Infection");
-        assertThat(condCoding.hasVersion()).isFalse();
-
-        // Get the third condition Resource
-        condition = (Condition) conditionResource.get(2);
-        assertThat(condition.hasCode()).isTrue();
-        condCC = condition.getCode();
-        assertThat(condCC.hasText()).isTrue();
-        assertThat(condCC.getText()).isEqualTo("Ovarian Cancer");
-        assertThat(condCC.hasCoding()).isTrue();
-        assertThat(condCC.getCoding().size()).isEqualTo(1);
-
-        condCoding = condCC.getCoding().get(0);
-        assertThat(condCoding.hasSystem()).isTrue();
-        // change from http://hl7.org/fhir/sid/icd-10 to http://hl7.org/fhir/sid/icd-10-cm temporarily, see Issue #189
-        assertThat(condCoding.getSystem()).isEqualTo("http://hl7.org/fhir/sid/icd-10-cm");
-        assertThat(condCoding.hasCode()).isTrue();
-        assertThat(condCoding.getCode()).isEqualTo("C56.9");
-        assertThat(condCoding.hasDisplay()).isTrue();
-        assertThat(condCoding.getDisplay()).isEqualTo("Ovarian Cancer");
         assertThat(condCoding.hasVersion()).isFalse();
 
     }
