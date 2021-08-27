@@ -171,30 +171,20 @@ extension_1:
       KEY_NAME_SUFFIX: DateTime
       urlValue: condition-assertedDate
 
-verificationStatus_1:
+# We don't populate this optional field if the value is invalid.
+verificationStatus:
+  condition: $coding NOT_NULL
   valueOf: datatype/CodeableConcept
   expressionType: resource
   vars:
     coding: CONDITION_VERIFICATION_STATUS_FHIR, PRB.13
-    text: String, PRB.13
-verificationStatus_2:
-  condition: $coding NULL
-  valueOf: datatype/CodeableConcept
-  expressionType: resource
-  vars:
-    coding: CONDITION_VERIFICATION_STATUS_FHIR, PRB.13
-    text: String, PRB.13.1
+    text: String, PRB.13.2
 
-clinicalStatus_1:
+# We don't populate this optional field if the value is invalid.
+clinicalStatus:
+  condition: $coding NOT_NULL
   valueOf: datatype/CodeableConcept
   expressionType: resource
   vars:
     coding: CONDITION_CLINICAL_STATUS_FHIR, PRB.14
-    text: String, PRB.14
-clinicalStatus_2:
-  condition: $coding NULL
-  valueOf: datatype/CodeableConcept
-  expressionType: resource
-  vars:
-    coding: CONDITION_CLINICAL_STATUS_FHIR, PRB.14
-    text: String, PRB.14.1
+    text: String, PRB.14.2
