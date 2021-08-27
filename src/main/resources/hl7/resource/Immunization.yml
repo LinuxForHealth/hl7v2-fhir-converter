@@ -90,8 +90,8 @@ performer:
    valueOf: secondary/Performer
    expressionType: resource
    vars:
-      orderingProvide: ORC.12
-      administeringProvide: RXA.10
+      orderingProvider: ORC.12
+      administeringProvider: RXA.10
 note:
    valueOf: datatype/Annotation
    expressionType: resource
