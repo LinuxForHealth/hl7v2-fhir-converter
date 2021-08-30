@@ -40,6 +40,8 @@ resources:
       repeats: true
       isReferenced: true
       additionalSegments:
+        - .ORDER.ORC
+        - .ORDER.ORDER_DETAIL.OBR
         - MSH
 
     - resourceName: Condition
@@ -52,5 +54,14 @@ resources:
         - PID
         - PATIENT_VISIT.PV1
 
-      
-  
+    - resourceName: ServiceRequest
+      segment: .ORDER.ORC
+      group: PROBLEM
+      resourcePath: resource/ServiceRequest
+      repeats: true
+      additionalSegments:
+        - .ORDER.ORDER_DETAIL.OBR
+        - .PROBLEM_OBSERVATION.OBX
+        - PATIENT_VISIT.PV1
+        - MSH
+        - PID
