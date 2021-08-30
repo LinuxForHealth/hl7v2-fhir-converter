@@ -30,7 +30,6 @@ public class ResourceUtils {
   public static List<BundleEntryComponent> createHl7Segment(String inputSegment){
     HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
     String json = ftv.convert(inputSegment, OPTIONS);
-    System.out.println(json);
     assertThat(json).isNotBlank();
     LOGGER.info("FHIR json result:\n" + json);
     FHIRContext context = new FHIRContext();

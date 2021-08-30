@@ -290,8 +290,8 @@ public class HL7ConditionFHIRConversionTest {
 
         // Verify onset string is set correctly (PRB.17). Only present if PRB.16 is
         // present. In this test case it is.
-        assertThat(ResourceUtils.getValueAsString(condition, "onsetString"))
-                .isEqualTo("textual representation of the time when the problem began");
+        assertThat(ResourceUtils.getValueAsString(condition, "onset"))
+                .isEqualTo("DateTimeType[2017-01-02T07:40:00+08:00]");
 
         // Verify encounter reference exists
         Base encounter = ResourceUtils.getValue(condition, "encounter");
@@ -657,17 +657,20 @@ public class HL7ConditionFHIRConversionTest {
                 .filter(v -> ResourceType.Condition == v.getResource().getResourceType())
                 .map(BundleEntryComponent::getResource).collect(Collectors.toList());
         assertThat(conditionResource).hasSize(2);
-
     }
 
-    // Tests that onset string (PRB.17) does show up when there in an onset date (PRB.16).
-    // Also onset date is in the FHIR as well.
-    @Test
-    public void validateProblemWithOnsetStringAndDate() {
+    // Tests that onset[x] is set to PRB.16 if it is present AND
+    // Tests that onset[x] is set to PRB.16 if it is present and PRB.17 is present.
+    @ParameterizedTest
+    @ValueSource(strings = { 
+        "PRB|AD|20170110074000|K80.00^Cholelithiasis^I10|53956|E1|1|20100907175347|20150907175347|||||||20180310074000|20180310074000||1^primary|ME^Medium|0.4|marginal|good|marginal|marginal|highly sensitive|some prb detail|\r",
+        "PRB|AD|20170110074000|K80.00^Cholelithiasis^I10|53956|E1|1|20100907175347|20150907175347|||||||20180310074000|20180310074000|textual representation of the time when the problem began|1^primary|ME^Medium|0.4|marginal|good|marginal|marginal|highly sensitive|some prb detail|\r"
+    })
+    public void validateProblemWithOnsetDateTimeWithNoOnsetString() {
 
         String hl7message = "MSH|^~\\&|||||20040629164652|1|PPR^PC1|331|P|2.3.1||\r"
                 + "PID||||||||||||||||||||||||||||||\r"
-                + "PRB|AD|20170110074000|K80.00^Cholelithiasis^I10|53956|E1|1|20100907175347|20150907175347|||||||20180310074000|20180310074000|textual representation of the time when the problem began|1^primary|ME^Medium|0.4|marginal|good|marginal|marginal|highly sensitive|some prb detail|\r";
+                + "PRB|AD|20170110074000|K80.00^Cholelithiasis^I10|53956|E1|1|20100907175347|20150907175347|||||||20180310074000|20180310074000||1^primary|ME^Medium|0.4|marginal|good|marginal|marginal|highly sensitive|some prb detail|\r";
 
         List<BundleEntryComponent> e =ResourceUtils.createHl7Segment(hl7message);
 
@@ -680,18 +683,13 @@ public class HL7ConditionFHIRConversionTest {
         // Get the condition Resource
         Resource condition = conditionResource.get(0);
 
-        // Verify onset string is set correctly.
-        assertThat(ResourceUtils.getValueAsString(condition, "onsetString"))
-                .isEqualTo("textual representation of the time when the problem began");
-
-        // THIS IS CURRENTLY COMMENTED OUT BECUASE ONSET DATE INCORRECTLY DOES NOT SHOW UP - I AM WORKING ON THIS DEFECT
-        // Verify onset date time is set correctly.
-        // assertThat(ResourceUtils.getValueAsString(condition, "onsetDateTime"))
-        //         .isEqualTo("DateTimeType[2021-03-22T15:44:49+08:00]");
+        // Verify onset is set correctly to PRB.16
+        assertThat(ResourceUtils.getValueAsString(condition, "onset"))
+                .isEqualTo("DateTimeType[2018-03-10T07:40:00+08:00]");
 
     }
 
-    // Tests that onset text (PRB.17) doesn't show up without the onset date (PRB.16).
+    // Tests that onset[x] is correctly set to PRB.17 if we have no PRB.16
     @Test
     public void validateProblemWithOnsetStringAndNoOnsetdate() {
 
@@ -710,9 +708,9 @@ public class HL7ConditionFHIRConversionTest {
         // Get the condition Resource
         Resource condition = conditionResource.get(0);
 
-        // Verify onset string is set correctly (PRB.17). Only present if PRB.16 is
-        // present and in this test case it is not.
-        assertThat(condition.listChildrenByName("onset")).isEmpty();
+        // Verify onset is set correctly to PRB.17
+        assertThat(ResourceUtils.getValueAsString(condition, "onset"))
+                .isEqualTo("textual representation of the time when the problem began");
     }
 
 }

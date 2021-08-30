@@ -154,12 +154,12 @@ onsetDateTime:
   expressionType: HL7Spec
   
 onsetString:
-  condition: $onsetDateTime NOT_NULL
+  condition: $onsetDateTime NULL
   type: STRING
   valueOf: PRB.17
   expressionType: HL7Spec
   vars:
-    onsetDateTime: PRB.16
+    onsetDateTime: PRB.16 | DG1.5
 
 extension_1:
    generateList: true
