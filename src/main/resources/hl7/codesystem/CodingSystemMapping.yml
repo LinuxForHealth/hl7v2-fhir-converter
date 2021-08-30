@@ -2872,7 +2872,7 @@
   oid: "urn:oid:1.0.3166.1.2.3"
 - id: "NCIT"
   description: "NCI Thesaurus"
-  url: "http://ncimeta.nci.nih.gov"
+  url: "http://ncithesaurus-stage.nci.nih.gov"
   oid: "urn:oid:2.16.840.1.113883.3.26.1.1"
 - id: "v3-nciThesaurus"
   description: "NCI Thesaurus"
