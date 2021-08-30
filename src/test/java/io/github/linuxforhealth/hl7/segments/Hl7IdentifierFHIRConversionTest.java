@@ -22,6 +22,7 @@ import org.hl7.fhir.r4.model.Observation;
 import org.hl7.fhir.r4.model.Patient;
 import org.hl7.fhir.r4.model.Procedure;
 import org.hl7.fhir.r4.model.ServiceRequest;
+//import org.hl7.fhir.r4.model.DocumentReference;
 import org.junit.jupiter.api.Test;
 
 import io.github.linuxforhealth.hl7.segments.util.PatientUtils;
@@ -255,7 +256,6 @@ public class Hl7IdentifierFHIRConversionTest {
 
     @Test
     public void conditionDg1IdentifierTest() {
-        // TODO: Add test for extId from DG1-3
 
         String withoutDG120 = "MSH|^~\\&|||||||ADT^A01^ADT_A01|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6||||||\r"
                 + "PID|||10290^^^WEST^MR||||20040530|M||||||||||88654||||||||||||N\n"
@@ -280,20 +280,22 @@ public class Hl7IdentifierFHIRConversionTest {
         assertThat(coding.getCode()).isEqualTo("VN");
         assertThat(coding.getDisplay()).isEqualTo("Visit number");
 
+        // Identifier 2:  extID based on DG1-3.1 + DG1-3.3
         identifier = condition.getIdentifier().get(1);
         value = identifier.getValue();
         system = identifier.getSystem();
         assertThat(value).isEqualTo("C56.9-I10"); // DG1.3.1-DG1.3.3
         assertThat(system).isEqualTo("urn:id:extID");
 
-        // Test with no PV1-19, but with PID-18 for visit number; PRB-4.1 and PRB-4.3
-        String withDG120 = "MSH|^~\\&|||||||ADT^A01^ADT_A01|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6||||||\r"
-                + "PID|||10290^^^WEST^MR||||20040530|M||||||||||||||||||||||N\n"
-                + "PV1||I||||||||SUR||||||||S|8846511^^^ACME|A|||||||||||||||||||SF|K||||20170215080000\n"
-                + "DG1|1|ICD10|B45678|Broken Arm|20210322154449|A|E123|R45|Y|J76|C|15|1458.98||1|123^DOE^JOHN^A^|C|Y|20210322154326|one^https://terminology.hl7.org/CodeSystem/two^three^https://terminology.hl7.org/CodeSystem/four|S1234|Parent Diagnosis|Value345|Group567|DiagnosisG45|Y\r";
+        // Test PV1-19 for visit number; extId with DG1-3.1.
+        // Also test DG1-20 creates additional identifiers.
+         String withDG120 = "MSH|^~\\&|||||||ADT^A01^ADT_A01|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6||||||\r"
+                        + "PID|||10290^^^WEST^MR||||20040530|M||||||||||||||||||||||N\n"
+                        + "PV1||I||||||||SUR||||||||S|8846511^^^ACME|A|||||||||||||||||||SF|K||||20170215080000\n"
+                        + "DG1|1|ICD10|B45678|Broken Arm|20210322154449|A|E123|R45|Y|J76|C|15|1458.98||1|123^DOE^JOHN^A^|C|Y|20210322154326|one^https://terminology.hl7.org/CodeSystem/two^three^https://terminology.hl7.org/CodeSystem/four|S1234|Parent Diagnosis|Value345|Group567|DiagnosisG45|Y\r";
         condition = ResourceUtils.getCondition(withDG120);
 
-        // Expect 2 identifiers
+        // Expect 4 identifiers
         assertThat(condition.hasIdentifier()).isTrue();
         assertThat(condition.getIdentifier()).hasSize(4);
 
@@ -310,23 +312,56 @@ public class Hl7IdentifierFHIRConversionTest {
         assertThat(coding.getCode()).isEqualTo("VN");
         assertThat(coding.getDisplay()).isEqualTo("Visit number");
 
+        // Identifier 2: DG1.3.1
         identifier = condition.getIdentifier().get(1);
         value = identifier.getValue();
         system = identifier.getSystem();
         assertThat(value).isEqualTo("B45678"); // DG1.3.1
         assertThat(system).isEqualTo("urn:id:extID");
 
+        // Identifier 3: DG1.20.1 and DG1.20.2
         identifier = condition.getIdentifier().get(2);
         value = identifier.getValue();
         system = identifier.getSystem();
         assertThat(value).isEqualTo("one"); // DG1.20.1
         assertThat(system).isEqualTo("https://terminology.hl7.org/CodeSystem/two"); // DG1.20.2
 
+        // Identifier 4: DG1.20.3 and DG1.20.4
         identifier = condition.getIdentifier().get(3);
         value = identifier.getValue();
         system = identifier.getSystem();
         assertThat(value).isEqualTo("three"); // DG1.20.3
         assertThat(system).isEqualTo("https://terminology.hl7.org/CodeSystem/four"); // DG1.20.4
+
+        String withDG132 = "MSH|^~\\&|||||201610015080000||ADT^A01^ADT_A01|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6||||||\r"
+                + "PID|||10290^^^WEST^MR||||20040530|M||||||||||||||||||||||N\n"
+                + "PV1||I||||||||SUR||||||||S||A|||||||||||||||||||SF|K||||20170215080000\n"
+                + "DG1|1|ICD10|^Ovarian Cancer|Test|20210322154449|A|E123|R45|Y|J76|C|15|1458.98||1|123^DOE^JOHN^A^|C|Y|20210322154326||S1234|Parent Diagnosis|Value345|Group567|DiagnosisG45|Y\r";
+        condition = ResourceUtils.getCondition(withDG132);
+
+        // Expect 4 identifiers
+        assertThat(condition.hasIdentifier()).isTrue();
+        assertThat(condition.getIdentifier()).hasSize(2);
+
+        // Identifier 1: Visit number
+        identifier = condition.getIdentifier().get(0);
+        value = identifier.getValue();
+        system = identifier.getSystem();
+        assertThat(value).isEqualTo("201610015080000"); // MSH.7
+        assertThat(system).isNull();
+        type = identifier.getType();
+        coding = type.getCoding().get(0);
+        assertThat(type.getText()).isNull();
+        assertThat(coding.getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/v2-0203");
+        assertThat(coding.getCode()).isEqualTo("VN");
+        assertThat(coding.getDisplay()).isEqualTo("Visit number");
+
+        // Identifier 3: DG1.3.2
+        identifier = condition.getIdentifier().get(1);
+        value = identifier.getValue();
+        system = identifier.getSystem();
+        assertThat(value).isEqualTo("Ovarian Cancer"); // DG1.3.2
+        assertThat(system).isEqualTo("urn:id:extID");
     }
 
     @Test
@@ -375,7 +410,7 @@ public class Hl7IdentifierFHIRConversionTest {
 
         // Filler from ORC-3; OBX-3.2
         msg = "MSH|^~\\&|SendTest1|Sendfac1|Receiveapp1|Receivefac1|200603081747|security|PPR^PC1^PPR_PC1|1|P^I|2.6||||||ASCII||\r"
-              + "PID|||555444222111^^^MPI&GenHosp&L^MR||james^anderson||19600614|M||C|99 Oakland #106^^qwerty^OH^44889||^^^^^626^5641111|^^^^^626^5647654|||||343132266|||N\r"
+              + "PID|||555444222111^^^MPI&GenHosp&L^MR||james^anderson||19600614|M||C|||^^^^^626^5641111|^^^^^626^5647654||||||||N\r"
               + "PV1||I|6N^1234^A^GENHOS||||0100^ANDERSON^CARL|0148^ADDISON^JAMES||SUR|||||||0148^ANDERSON^CARL|S|1400|A|||||||||||||||||||SF|K||||199501102300\r"
               + "PRB|AD|200603150625|aortic stenosis|53692||2||200603150625\r"
               + "OBX|1|TX|DINnumber^^LSFUSERDATAE||ECHOCARDIOGRAPHIC REPORT||||||F|||20150930164100|||\r"
@@ -393,12 +428,12 @@ public class Hl7IdentifierFHIRConversionTest {
         assertThat(value).isEqualTo("FON001-DINnumber-LSFUSERDATAE"); // ORC.3-OBX.3.1-OBX.3.3
         assertThat(system).isEqualTo("urn:id:extID");
 
-        // Placer from ORC-2; OBX-3.2
+        // Placer from ORC-2; OBX-3.1
         msg = "MSH|^~\\&|SendTest1|Sendfac1|Receiveapp1|Receivefac1|200603081747|security|PPR^PC1^PPR_PC1|1|P^I|2.6||||||ASCII||\r"
-              + "PID|||555444222111^^^MPI&GenHosp&L^MR||james^anderson||19600614|M||C|99 Oakland #106^^qwerty^OH^44889||^^^^^626^5641111|^^^^^626^5647654|||||343132266|||N\r"
-              + "PV1||I|6N^1234^A^GENHOS||||0100^ANDERSON^CARL|0148^ADDISON^JAMES||SUR|||||||0148^ANDERSON^CARL|S|1400|A|||||||||||||||||||SF|K||||199501102300\r"
+              + "PID|||555444222111^^^MPI&GenHosp&L^MR||james^anderson||19600614|M||C|99 Oakland #106^^qwerty^OH^44889||||||||||N\r"
+              + "PV1||I|6N^1234^A^GENHOS||||0100^ANDERSON^CARL|0148^ADDISON^JAMES||SUR|||||||0148^ANDERSON^CARL|S|1400|A||SF|K||||199501102300\r"
               + "PRB|AD|200603150625|aortic stenosis|53692||2||200603150625\r"
-              + "OBX|1|TX|^hunchback||ECHOCARDIOGRAPHIC REPORT||||||F|||20150930164100|||\r"
+              + "OBX|1|TX|DINnumber||ECHOCARDIOGRAPHIC REPORT||||||F|||20150930164100|||\r"
               + "ORC|NW|PON001|||SC|D|1||20170825010500|MS|MS|||||";
         observation = ResourceUtils.getObservation(msg);
 
@@ -406,11 +441,11 @@ public class Hl7IdentifierFHIRConversionTest {
         assertThat(observation.hasIdentifier()).isTrue();
         assertThat(observation.getIdentifier()).hasSize(1);
 
-        // Identifier 1: extID from OBR.2 and OBX-3.2
+        // Identifier 1: extID from OBR.2 and OBX-3.1
         identifier = observation.getIdentifier().get(0);
         value = identifier.getValue();
         system = identifier.getSystem();
-        assertThat(value).isEqualTo("PON001-hunchback"); // ORC.2-OBX.3.2
+        assertThat(value).isEqualTo("PON001-DINnumber"); // ORC.2-OBX.3.1
         assertThat(system).isEqualTo("urn:id:extID");
 
     }
@@ -654,20 +689,12 @@ public class Hl7IdentifierFHIRConversionTest {
         assertThat(value).isEqualTo("HIB PRP-T");
         assertThat(system).isEqualTo("urn:id:extID");
 
-        // No RXA-5
-//        String noRXA5 = "MSH|^~\\&|MYEHR2.5|RI88140101|KIDSNET_IFL|RIHEALTH|20130531||VXU^V04^VXU_V04|20130531RI881401010105|P|2.6|||AL|NE|764|ASCII||||||^4086::132:2A57:3C28^IPv6\r"
-//                + "PID|1||432155^^^ANF^MR||Patient^Johnny^New^^^^L\r"
-//                + "ORC|RE||197027||||||||||||||RI2050\r"
-//                + "RXA|0|1|20130531|20130531|||||00^new immunization record^NIP001|||||||20131210||||CP|A\r";
-//         immunization = ResourceUtils.getImmunization(noRXA5);  // TODO fails Test fails because RXA.5 is needed for vaccine codes which is required for immunization.
-//        //Expect no identifier, but we want to ensure conversion works
-//       // assertThat(immunization.hasIdentifier()).isFalse();
     }
 
     @Test
     public void procedureIdentifierTest() {
         // ExtID from OBR-44, filler and placer from ORC, visit number from PID-18
-        String procedureMsg = "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|ADT^A01^ADT_A01|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6|56789^NID^UID|MCM|CDP|^4086::132:2A57:3C28^IPV6|^4086::132:2A57:3C25^IPV6|\n"
+        String procedureMsg = "MSH|^~\\&|HL7Soup|Instance1|MCM||200911021022|Security|ADT^A01^ADT_A01|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6|56789^NID^UID|MCM|CDP|^4086::132:2A57:3C28^IPV6|^4086::132:2A57:3C25^IPV6|\n"
                 + "PID|1||000054321^^^MRN|||||||||||||M|CAT|78654^^^ACME||||N\n"
                 + "ORC|NW|PON001|FON001|PGN001|SC|D|1||20170825010500|MS|MS||||20170825010500|\n"
                 + "OBR|1||CD_000000|2244^General Order|||20170825010500||||||Relevant Clinical Information|||||||002|||||F|||||||||||||||||||78654||\n"
@@ -726,9 +753,9 @@ public class Hl7IdentifierFHIRConversionTest {
         assertThat(coding.getDisplay()).isEqualTo("Placer Identifier");
 
         // Test: ExtID from OBR-45, filler and placer from OBR, visit number from PV1-19
-        String procedureOBR = "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|ADT^A01^ADT_A01|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6|56789^NID^UID|MCM|CDP|^4086::132:2A57:3C28^IPV6|^4086::132:2A57:3C25^IPV6|\n"
+        String procedureOBR = "MSH|^~\\&|||MCM||200911021022|Security|ADT^A01^ADT_A01|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6||MCM|CDP|^4086::132:2A57:3C28^IPV6||\n"
                 + "PID|1||000054321^^^MRN|||||||||||||M|CAT|78654||||N\n"
-                + "OBR|1|PON001|CD_000000|2244^General Order|||20170825010500||||||Relevant Clinical Information|||||||002|||||F|||550600^Tsadok550600^Janetary~660600^Merrit660600^Darren^F~770600^Das770600^Surjya^P~880600^Winter880600^Oscar^||||770600&Das770600&Surjya&P^^^6N^1234^A|||||||||||||7865||\n"
+                + "OBR|1|PON001|CD_000000|2244^General Order|||20170825010500|||||||||||||002|||||F|||||||770600&Das770600&Surjya&P^^^6N^1234^A|||||||||||||7865||\n"
                 + "PV1||I|6N^1234^A^GENERAL HOSPITAL2|||||||SUR||||||||S|8846511|A|||||||||||||||||||SF|K||||20170215080000\n"
                 + "ROL|5897|UP|AD||20210322133821|20210322133822|10||Hospital|ST||||USA\n"
                 + "PR1|1|ICD10|B45678|Fix break|20210322155008|A|75||V46|80|||32|1|D22|G45|1|G|P98|X|0|0\n";
@@ -785,7 +812,7 @@ public class Hl7IdentifierFHIRConversionTest {
         assertThat(coding.getDisplay()).isEqualTo("Placer Identifier");
 
         // Test: ExtID from MSH-7, filler and placer from ORC, visit number from MSH-7
-        String procedureMSH = "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|ADT^A01^ADT_A01|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6|56789^NID^UID|MCM|CDP|^4086::132:2A57:3C28^IPV6|^4086::132:2A57:3C25^IPV6|\n"
+        String procedureMSH = "MSH|^~\\&||Instance1|MCM||200911021022|Security|ADT^A01^ADT_A01|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6|56789^NID^UID|MCM|CDP|^4086::132:2A57:3C28^IPV6|^4086::132:2A57:3C25^IPV6|\n"
                 + "PID|1||000054321^^^MRN|||||||||||||M|CAT|||||N\n"
                 + "ORC|NW|PON001|FON001|PGN001|SC|D|1||20170825010500|MS|MS||||20170825010500|\n"
                 + "OBR|1|||2244^General Order|||20170825010500||||||Relevant Clinical Information||\n"
@@ -847,6 +874,7 @@ public class Hl7IdentifierFHIRConversionTest {
 
 //      @Test //Test works, but message type is not configured yet
 //      public void documentReferenceIdentifierTest() {
+//         // Filler and placer from ORC, extId from MSH-7
 //        String documentReference =
 //                "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|MDM^T02^MDM_T02|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6|56789^NID^UID|MCM||||\n" +
 //                "PID|1||000054321^^^MRN|||||||||||||M|CAT|||||N\n" + // PID segment failing due to meta extension problem.
@@ -870,7 +898,7 @@ public class Hl7IdentifierFHIRConversionTest {
 //        identifier = report.getIdentifier().get(1);
 //        value = identifier.getValue();
 //        system = identifier.getSystem();
-//        assertThat(value).isEqualTo("FON001");
+//        assertThat(value).isEqualTo("FON001"); //ORC.3
 //        assertThat(system).isNull();
 //        CodeableConcept type = identifier.getType();
 //        Coding coding = type.getCoding().get(0);
@@ -883,7 +911,7 @@ public class Hl7IdentifierFHIRConversionTest {
 //        Identifier identifier3 = report.getIdentifier().get(2);
 //        value = identifier3.getValue();
 //        system = identifier3.getSystem();
-//        assertThat(value).isEqualTo("PON001");
+//        assertThat(value).isEqualTo("PON001"); //ORC.2
 //        assertThat(system).isNull();
 //        type = identifier3.getType();
 //        coding = type.getCoding().get(0);
@@ -892,6 +920,7 @@ public class Hl7IdentifierFHIRConversionTest {
 //        assertThat(coding.getCode()).isEqualTo("PLAC");
 //        assertThat(coding.getDisplay()).isEqualTo("Placer Identifier");
 //
+//          // Filler from OBR, placer from TXA-14
 //          documentReference =
 //                  "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|MDM^T02^MDM_T02|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6|56789^NID^UID|MCM||||\n" +
 //                          "PID|1||000054321^^^MRN|||||||||||||M|CAT|||||N\n" +
@@ -931,6 +960,51 @@ public class Hl7IdentifierFHIRConversionTest {
 //          assertThat(value).isEqualTo("PON001"); // TXA-14.1
 //          assertThat(system).isNull();
 //          type = identifier3.getType();
+//          coding = type.getCoding().get(0);
+//          assertThat(type.getText()).isNull();
+//          assertThat(coding.getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/v2-0203");
+//          assertThat(coding.getCode()).isEqualTo("PLAC");
+//          assertThat(coding.getDisplay()).isEqualTo("Placer Identifier");
+//
+//          // Placer from OBR, Filler from TXA-15
+//          documentReference =
+//                  "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|MDM^T02^MDM_T02|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6|56789^NID^UID|MCM||||\n" +
+//                          "PID|1||000054321^^^MRN|||||||||||||M|CAT|||||N\n" +
+//                          "TXA|1||B45678||||||||||||PON001\n" +
+//                          "ORC|NW|||PGN001|SC|D|1||20170825010500|MS|MS||||20170825010500|\n" +
+//                          "OBR|1|CD_000000||2244^General Order|||20170825010500||||||Relevant Clinical Information|||||||002|||||F|||550600^Tsadok550600^Janetary~660600^Merrit660600^Darren^F~770600^Das770600^Surjya^P~880600^Winter880600^Oscar^||||770600&Das770600&Surjya&P^^^6N^1234^A|\n";
+//          report = ResourceUtils.getDocumentReference(documentReference);
+//
+//          // Expect 3 identifiers
+//          assertThat(report.hasIdentifier()).isTrue();
+//          assertThat(report.getIdentifier()).hasSize(3);
+//          // Identifier 1: extID from MSH-7
+//          identifier = report.getIdentifier().get(0);
+//          value = identifier.getValue();
+//          system = identifier.getSystem();
+//          assertThat(value).isEqualTo("200911021022");  // MSH-7
+//          assertThat(system).isEqualTo("urn:id:extID");
+//
+//          // Identifier 2: Filler
+//          identifier3 = report.getIdentifier().get(1);
+//          value = identifier3.getValue();
+//          system = identifier3.getSystem();
+//          assertThat(value).isEqualTo("PON001"); // TXA-15.1
+//          assertThat(system).isNull();
+//          type = identifier3.getType();
+//          coding = type.getCoding().get(0);
+//          assertThat(type.getText()).isNull();
+//          assertThat(coding.getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/v2-0203");
+//          assertThat(coding.getCode()).isEqualTo("FILL");
+//          assertThat(coding.getDisplay()).isEqualTo("Filler Identifier");
+//
+//          // Identifier 3: Placer
+//          identifier = report.getIdentifier().get(2);
+//          value = identifier.getValue();
+//          system = identifier.getSystem();
+//          assertThat(value).isEqualTo("CD_000000"); //OBR.2
+//          assertThat(system).isNull();
+//          type = identifier.getType();
 //          coding = type.getCoding().get(0);
 //          assertThat(type.getText()).isNull();
 //          assertThat(coding.getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/v2-0203");
@@ -1055,7 +1129,7 @@ public class Hl7IdentifierFHIRConversionTest {
                 "PV1||I|6N^1234^A^GENERAL HOSPITAL2|||||||SUR||||||||S|8846511|A|||||||||||||||||||SF|K||||20170215080000\n" +
                 "PRB|AD|200603150625|aortic stenosis|53692||2||200603150625\n" +
                 "ORC||PON001||||E|^Q6H^D10^^^R\n" +
-                "OBR|1|CD150920001336|CD150920001336|||20150930000000|20150930164100|||||||||25055^MARCUSON^PATRICIA^L|||||||||F|||5755^DUNN^CHAD^B~25055^MARCUSON^PATRICIA^L|||WEAKNESS|DAS, SURJYA P||SHIELDS, SHARON A|||||||||";
+                "OBR|1||CD150920001336|||20150930000000|20150930164100|||||||||25055^MARCUSON^PATRICIA^L|||||||||F|||5755^DUNN^CHAD^B~25055^MARCUSON^PATRICIA^L|||WEAKNESS|DAS, SURJYA P||SHIELDS, SHARON A|||||||||";
 
         serviceReq = ResourceUtils.getServiceRequest(serviceRequest);
 
@@ -1235,8 +1309,7 @@ public class Hl7IdentifierFHIRConversionTest {
     @Test
     public void medicationAdministration_identifier_test() {
         // TODO
-        // Should be the same as MedicationRequest
-        // We left this test out originally because we weren't sure what messages would have a medication administration. Do we have that info yet?
+        // Currently no messages generate MedicationAdministration resources
     }
 
 }
