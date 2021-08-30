@@ -360,18 +360,6 @@ public class HL7ConditionFHIRConversionTest {
                 .isEqualTo("UriType[http://hl7.org/fhir/sid/icd-10-cm]");
         assertThat(ResourceUtils.getValueAsString(codeCoding, "code")).isEqualTo("K80.00");
 
-        // Verify stage summary text is set correctly.
-        Base stage = ResourceUtils.getValue(condition, "stage");
-        Base summary = ResourceUtils.getValue(stage, "summary");
-        assertThat(ResourceUtils.getValueAsString(summary, "text")).isEqualTo("Remission");
-
-        // Verify stage summary coding is set correctly.
-        Base sumCoding = ResourceUtils.getValue(summary, "coding");
-        assertThat(ResourceUtils.getValueAsString(sumCoding, "system"))
-                .isEqualTo("UriType[http://terminology.hl7.org/CodeSystem/condition-clinical]");
-        assertThat(ResourceUtils.getValueAsString(sumCoding, "code")).isEqualTo("remission");
-        assertThat(ResourceUtils.getValueAsString(sumCoding, "display")).isEqualTo("Remission");
-
         //Verify clinicalStatus text is set correctly
         Base clinicalStatus = ResourceUtils.getValue(condition, "clinicalStatus");
         assertThat(ResourceUtils.getValueAsString(clinicalStatus, "text")).isEqualTo("Remission");
