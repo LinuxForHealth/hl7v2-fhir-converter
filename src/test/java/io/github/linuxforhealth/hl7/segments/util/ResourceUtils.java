@@ -27,11 +27,11 @@ public class ResourceUtils {
   private static final ConverterOptions OPTIONS =
     new Builder().withValidateResource().withPrettyPrint().build();
 
-  private static List<BundleEntryComponent> createHl7Segment(String inputSegment){
+  public static List<BundleEntryComponent> createHl7Segment(String inputSegment){
     HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
     String json = ftv.convert(inputSegment, OPTIONS);
-    System.out.println(json);
     assertThat(json).isNotBlank();
+    LOGGER.info("FHIR json result:\n" + json);
     FHIRContext context = new FHIRContext();
     IBaseResource bundleResource = context.getParser().parseResource(json);
     assertThat(bundleResource).isNotNull();
@@ -40,7 +40,19 @@ public class ResourceUtils {
     List<BundleEntryComponent> e = b.getEntry();
 
     return e;
-  }  
+  }
+
+  // Helper method that gets the first (and usually only) value of the property out of a FHIR Base object.
+  public static Base getValue(Base obj, String name) {
+    Base value = obj.getNamedProperty(name).getValues().get(0);
+    return value;
+  }
+
+  // Helper method that gets the first (and usually only) value of the property out of a FHIR Base object and returns it as string.
+  public static String getValueAsString(Base obj, String name) {
+    String value = obj.getNamedProperty(name).getValues().get(0).toString();
+    return value;
+  }
 
   public static AllergyIntolerance getAllergyResource(String inputSegment) {
     List<BundleEntryComponent> resource = createHl7Segment(inputSegment);

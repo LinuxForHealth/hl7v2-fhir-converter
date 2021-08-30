@@ -13,6 +13,7 @@ import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.Extension;
 import org.hl7.fhir.r4.model.Patient;
+import org.hl7.fhir.r4.model.codesystems.V3ReligiousAffiliation;
 import org.junit.jupiter.api.Test;
 import io.github.linuxforhealth.core.terminology.UrlLookup;
 import io.github.linuxforhealth.hl7.segments.util.PatientUtils;
@@ -23,8 +24,8 @@ class FHIRExtensionsTest {
     void testExtensionMothersMaidenNameReligion() {
 
         String patientWithDataForExtensions = "MSH|^~\\&|MIICEHRApplication|MIIC|MIIC|MIIC|201705130822||VXU^V04^VXU_V04|test1100|P|2.5.1|||AL|AL|||||Z22^CDCPHINVS|^^^^^MIIC^SR^^^MIIC|MIIC\n"
-                // Test for mother's maiden name and religion and two race variants
-                + "PID|1||12345678^^^^MR||Jane^TestPatientLastName|TestMaidenName^Jane||||2028-9^Asian^HL70005~2106-3^White^HL70005|||||||LUT^Christian: Lutheran^|\n";
+                // Test for mother's maiden name and religion.  Using unique original CWE.2 text in religion to test that it is preserved
+                + "PID|1||12345678^^^^MR||TestPatientLastName^Jane|TestMaidenName^Sue|||||||||||LUT^Luther Synod^|\n";
 
         Patient patient = PatientUtils.createPatientFromHl7Segment(patientWithDataForExtensions);
         assertThat(patient.hasExtension()).isTrue();
@@ -34,7 +35,7 @@ class FHIRExtensionsTest {
         ext = patient.getExtensionByUrl(UrlLookup.getExtensionUrl("religion"));
         assertThat(ext).isNotNull();
         CodeableConcept cc = (CodeableConcept) ext.getValue();
-        assertThat(cc.getText()).hasToString("Lutheran");
+        assertThat(cc.getText()).hasToString("Luther Synod");
     }
 
     @Test
@@ -51,21 +52,26 @@ class FHIRExtensionsTest {
         assertThat(ext).isNotNull();
         CodeableConcept cc = (CodeableConcept) ext.getValue();
         assertThat(cc.hasCoding()).isTrue();
+        assertThat(cc.hasText()).isFalse();
         Coding coding = cc.getCodingFirstRep();
-        assertThat(coding.hasDisplay()).isFalse();
-        assertThat(coding.hasCode()).isTrue();
-        assertThat(coding.hasSystem()).isFalse();
-        assertThat(coding.getCode()).hasToString("Methodist");
+        assertThat(coding).isNotNull();
+
+        assertThat(coding.hasCode()).isFalse();
+        String theSystem = V3ReligiousAffiliation._1029.getSystem();
+        assertThat(coding.hasSystem()).isTrue();
+        assertThat(coding.getSystem()).isEqualTo(theSystem); 
+        assertThat(coding.hasDisplay()).isTrue();
+        assertThat(coding.getDisplay()).containsPattern("Invalid.*Methodist.*"+theSystem);
     }
 
-    @Test
+    @Test 
     void testExtensionTwoRaces() {
 
-        String patientWithDataForExtensions = "MSH|^~\\&|MIICEHRApplication|MIIC|MIIC|MIIC|201705130822||VXU^V04^VXU_V04|test1100|P|2.5.1|||AL|AL|||||Z22^CDCPHINVS|^^^^^MIIC^SR^^^MIIC|MIIC\n"
-                // Test for mother's maiden name and religion and two race variants
-                + "PID|1||12345678^^^^MR||Jane^TestPatientLastName|TestMaidenName^Jane||||2028-9^Asian^HL70005~2106-3^White^HL70005|||||||LUT^Christian: Lutheran^|\n";
+        String patientWithExtensionTwoRaces = "MSH|^~\\&|MIICEHRApplication|MIIC|MIIC|MIIC|201705130822||VXU^V04^VXU_V04|test1100|P|2.5.1|||AL|AL|||||Z22^CDCPHINVS|^^^^^MIIC^SR^^^MIIC|MIIC\n"
+                // Test for two race variants
+                + "PID|1||12345678^^^^MR||Jane^TestPatientLastName|||||2028-9^Asian^HL70005~2106-3^White^HL70005||||||||\n";
 
-        Patient patient = PatientUtils.createPatientFromHl7Segment(patientWithDataForExtensions);
+        Patient patient = PatientUtils.createPatientFromHl7Segment(patientWithExtensionTwoRaces);
         assertThat(patient.hasExtension()).isTrue();
 
         List<Extension> extensions = patient.getExtensionsByUrl(UrlLookup.getExtensionUrl("race"));

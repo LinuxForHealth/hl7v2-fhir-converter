@@ -20,6 +20,7 @@ resources:
       repeats: false
       isReferenced: true
       additionalSegments:
+        - MSH
       
     - resourceName: Encounter
       segment: PV1
@@ -27,7 +28,8 @@ resources:
       repeats: false
       isReferenced: true
       additionalSegments:
-             - EVN
+        - MSH
+        - EVN
 
     - resourceName: Observation
       segment: OBX
@@ -35,6 +37,7 @@ resources:
       repeats: true
       isReferenced: true
       additionalSegments:
+        - MSH
 
     - resourceName: DocumentReference
       segment: TXA
@@ -42,3 +45,6 @@ resources:
       repeats: true
       additionalSegments:
         - MSH
+        - PID
+        - ORC
+        - OBR

@@ -131,7 +131,8 @@
   oid: "urn:oid:2.16.840.1.113883.6.14"
 - id: "I10"
   description: "ICD-10"
-  url: "http://hl7.org/fhir/sid/icd-10"
+  # change from http://hl7.org/fhir/sid/icd-10 to http://hl7.org/fhir/sid/icd-10-cm temporarily, see Issue #189
+  url: "http://hl7.org/fhir/sid/icd-10-cm"
   oid: "urn:oid:2.16.840.1.113883.6.3"
 - id: "I10P"
   description: "ICD-10 Procedure Codes"
@@ -1003,7 +1004,8 @@
   oid: "urn:oid:2.16.840.1.113883.4.642.1.1258"
 - id: "icd10"
   description: "ICD-10"
-  url: "http://hl7.org/fhir/sid/icd-10"
+  # change from http://hl7.org/fhir/sid/icd-10 to http://hl7.org/fhir/sid/icd-10-cm temporarily, see Issue #189
+  url: "http://hl7.org/fhir/sid/icd-10-cm"
   oid: "urn:oid:2.16.840.1.113883.6.3"
 - id: "soc"
   description: "Standard Occupation Code"
@@ -4499,3 +4501,9 @@
   # source-event-trigger-system
 - id: "source-event-trigger-system"
   url: "http://terminology.hl7.org/CodeSystem/v2-0003"
+- id: "ConditionClinicalStatus"
+  url: "http://hl7.org/fhir/ValueSet/condition-clinical"
+  oid: "urn:oid:2.16.840.1.113883.4.642.3.164"
+- id: "ConditionVerificationStatus"
+  url: "http://hl7.org/fhir/ValueSet/condition-ver-status"
+  oid: "urn:oid:2.16.840.1.113883.4.642.3.166"

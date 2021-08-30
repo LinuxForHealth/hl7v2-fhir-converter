@@ -50,14 +50,10 @@ coding_5:
    generateList: true
    
 # If hideText is not passed by parent, the value is NULL, making it backward compatible with all other uses of CodeableConcept
-# Any value in hideText will cause the text to be hidden.  Used by Identifier_SystemID.   
+# Any value in hideText will cause the text to be hidden.  Used by Identifier_SystemID. 
 text:
-   condition: $hideText NULL  && $displayText NOT_NULL
+   condition: $hideText NULL && $displayText NOT_NULL
    type: STRING
    valueOf: $displayText
    vars:
-      displayText: CWE.2 |CWE.9 |CE.2 |CNE.2| ST |TX |ID |IS | CWE.5| $coding:display
-
-# ----------------
-# Orphan comments:
-# ----------------
+      displayText: $text | CWE.2 | CWE.9 | CE.2 | CNE.2| ST | TX | ID | IS | CWE.5
