@@ -109,14 +109,6 @@ subject:
   expressionType: resource
   specs: $Patient
 
-stage:
-   valueOf: secondary/Stage
-   generateList: true
-   expressionType: resource
-   specs: PRB.14
-   vars:
-     code: PRB.14
-
 evidence:
   valueOf: secondary/evidence
   generateList: true
