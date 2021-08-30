@@ -4505,3 +4505,9 @@
 - id: "ConditionVerificationStatus"
   url: "http://hl7.org/fhir/ValueSet/condition-ver-status"
   oid: "urn:oid:2.16.840.1.113883.4.642.3.166"
+  
+  # encounter extensions
+- id: "mode-of-arrival-system"
+  url: "http://terminology.hl7.org/CodeSystem/v2-0430"
+- id: "encounter-modeOfArrival-extension"
+  url: "http://hl7.org/fhir/StructureDefinition/encounter-modeOfArrival"
