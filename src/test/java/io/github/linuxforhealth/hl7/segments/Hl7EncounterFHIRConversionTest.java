@@ -150,7 +150,7 @@ public class Hl7EncounterFHIRConversionTest {
 
     List<Extension> extensionList = encounter.getExtension();
     assertNotNull(extensionList);
-    assertThat(extensionList).isNotEmpty();
+    assertThat(extensionList).hasSize(1);
     
     
     boolean extFound=false;
@@ -174,9 +174,8 @@ public class Hl7EncounterFHIRConversionTest {
    
   }
 
-  @Disabled("Missing functionality")
   @Test
-  public void test_encounter_modeOfarrival_invalid() {
+  public void test_encounter_modeOfarrival_invalid_singlevalue() {
     String hl7message = "MSH|^~\\&|WHI_LOAD_GENERATOR|IBM_TORONTO_LAB||IBM|20210330144208|8078780|ADT^A02|MSGID_4e1c575f-6c6d-47b2-ab9f-829f20c96db2|T|2.3\n"
     		+ "EVN||20210330144208||ADT_EVENT|007|20210309140700\n"
     		+ "PID|1||0a8a1752-e336-43e1-bf7f-0c8f6f437ca3^^^MRN||Patient^Load^Generator||19690720|M|Patient^Alias^Generator|AA|9999^^CITY^STATE^ZIP^CAN|COUNTY|(866)845-0900||ENGLISH^ENGLISH|SIN|NONE|Account_0a8a1752-e336-43e1-bf7f-0c8f6f437ca3|123-456-7890|||N|BIRTH PLACE|N||||||N\n"
@@ -216,9 +215,9 @@ public class Hl7EncounterFHIRConversionTest {
     
     		Coding valueCoding = (Coding) ext.getValue();
     		
-    		assertThat(valueCoding.getCode()).isEqualTo("C");
-    		assertThat(valueCoding.getDisplay()).isEqualTo("Car");
-    		assertThat(valueCoding.getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/v2-0430");
+    		assertThat(valueCoding.getCode()).isEqualTo("AMBULATORY");
+    		assertThat(valueCoding.getDisplay()).isNull();
+    		assertThat(valueCoding.getSystem()).isNull();
     		
     		break;
     	}
@@ -228,6 +227,111 @@ public class Hl7EncounterFHIRConversionTest {
    
   }
 
+  @Test
+  public void test_encounter_modeOfarrival_invalid_with_codeAndDisplay() {
+    String hl7message = "MSH|^~\\&|WHI_LOAD_GENERATOR|IBM_TORONTO_LAB||IBM|20210330144208|8078780|ADT^A02|MSGID_4e1c575f-6c6d-47b2-ab9f-829f20c96db2|T|2.3\n"
+    		+ "EVN||20210330144208||ADT_EVENT|007|20210309140700\n"
+    		+ "PID|1||0a8a1752-e336-43e1-bf7f-0c8f6f437ca3^^^MRN||Patient^Load^Generator||19690720|M|Patient^Alias^Generator|AA|9999^^CITY^STATE^ZIP^CAN|COUNTY|(866)845-0900||ENGLISH^ENGLISH|SIN|NONE|Account_0a8a1752-e336-43e1-bf7f-0c8f6f437ca3|123-456-7890|||N|BIRTH PLACE|N||||||N\n"
+    		+ "PV1||I|^^^Toronto^^5642 Hilly Av||||2905^Doctor^Attending^M^IV^^M.D|5755^Doctor^Referring^^Sr|770542^Doctor^Consulting^Jr||||||||59367^Doctor^Admitting||Visit_0a3be81e-144b-4885-9b4e-c5cd33c8f038|||||||||||||||||||||||||20210407191342\n"
+    		+ "PV2||TEL||||X-5546||20210330144208|20210309||||||||||||n|N|South Shore Hosptial Weymouth^SSHW^^^^^^SSH-WEYMOUTH|||||||||N||||||AMB^AMBULATORY\n";
+
+    HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
+    String json = ftv.convert(hl7message, OPTIONS);
+    assertThat(json).isNotBlank();
+
+    System.out.println(json);
+    
+    IBaseResource bundleResource = context.getParser().parseResource(json);
+    assertThat(bundleResource).isNotNull();
+    Bundle b = (Bundle) bundleResource;
+    List<BundleEntryComponent> e = b.getEntry();
+    
+    List<Resource> encounterResource = e.stream()
+            .filter(v -> ResourceType.Encounter == v.getResource().getResourceType())
+            .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+    assertThat(encounterResource).hasSize(1);
+    
+    Encounter encounter = getResourceEncounter(encounterResource.get(0));
+
+    List<Extension> extensionList = encounter.getExtension();
+    assertNotNull(extensionList);
+    assertThat(extensionList).isNotEmpty();
+    
+    
+    boolean extFound=false;
+    for (Extension ext : extensionList)
+    {
+    	if (ext.getUrl().equals("http://hl7.org/fhir/StructureDefinition/encounter-modeOfArrival"))
+    	{
+    		extFound = true;
+    		assertTrue(ext.getValue() instanceof Coding);
+    
+    		Coding valueCoding = (Coding) ext.getValue();
+    		
+    		assertThat(valueCoding.getCode()).isEqualTo("AMB");
+    		assertThat(valueCoding.getDisplay()).isEqualTo("AMBULATORY");
+    		assertThat(valueCoding.getSystem()).isNull();
+    		
+    		break;
+    	}
+    }
+    assertTrue(extFound, "modeOfArrival extension not found");
+   
+   
+  }
+
+  @Test
+  public void test_encounter_modeOfarrival_invalid_with_system() {
+    String hl7message = "MSH|^~\\&|WHI_LOAD_GENERATOR|IBM_TORONTO_LAB||IBM|20210330144208|8078780|ADT^A02|MSGID_4e1c575f-6c6d-47b2-ab9f-829f20c96db2|T|2.3\n"
+    		+ "EVN||20210330144208||ADT_EVENT|007|20210309140700\n"
+    		+ "PID|1||0a8a1752-e336-43e1-bf7f-0c8f6f437ca3^^^MRN||Patient^Load^Generator||19690720|M|Patient^Alias^Generator|AA|9999^^CITY^STATE^ZIP^CAN|COUNTY|(866)845-0900||ENGLISH^ENGLISH|SIN|NONE|Account_0a8a1752-e336-43e1-bf7f-0c8f6f437ca3|123-456-7890|||N|BIRTH PLACE|N||||||N\n"
+    		+ "PV1||I|^^^Toronto^^5642 Hilly Av||||2905^Doctor^Attending^M^IV^^M.D|5755^Doctor^Referring^^Sr|770542^Doctor^Consulting^Jr||||||||59367^Doctor^Admitting||Visit_0a3be81e-144b-4885-9b4e-c5cd33c8f038|||||||||||||||||||||||||20210407191342\n"
+    		+ "PV2||TEL||||X-5546||20210330144208|20210309||||||||||||n|N|South Shore Hosptial Weymouth^SSHW^^^^^^SSH-WEYMOUTH|||||||||N||||||AMB^AMBULATORY^FUNKY\n";
+
+    HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
+    String json = ftv.convert(hl7message, OPTIONS);
+    assertThat(json).isNotBlank();
+
+    System.out.println(json);
+    
+    IBaseResource bundleResource = context.getParser().parseResource(json);
+    assertThat(bundleResource).isNotNull();
+    Bundle b = (Bundle) bundleResource;
+    List<BundleEntryComponent> e = b.getEntry();
+    
+    List<Resource> encounterResource = e.stream()
+            .filter(v -> ResourceType.Encounter == v.getResource().getResourceType())
+            .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+    assertThat(encounterResource).hasSize(1);
+    
+    Encounter encounter = getResourceEncounter(encounterResource.get(0));
+
+    List<Extension> extensionList = encounter.getExtension();
+    assertNotNull(extensionList);
+    assertThat(extensionList).isNotEmpty();
+    
+    
+    boolean extFound=false;
+    for (Extension ext : extensionList)
+    {
+    	if (ext.getUrl().equals("http://hl7.org/fhir/StructureDefinition/encounter-modeOfArrival"))
+    	{
+    		extFound = true;
+    		assertTrue(ext.getValue() instanceof Coding);
+    
+    		Coding valueCoding = (Coding) ext.getValue();
+    		
+    		assertThat(valueCoding.getCode()).isEqualTo("AMB");
+    		assertThat(valueCoding.getDisplay()).isEqualTo("AMBULATORY");
+    		assertThat(valueCoding.getSystem()).isEqualTo("urn:id:FUNKY");
+    		
+    		break;
+    	}
+    }
+    assertTrue(extFound, "modeOfArrival extension not found");
+   
+   
+  }
   @Test
   public void test_encounter_PV2segment_missing() {
     String hl7message = "MSH|^~\\&|WHI_LOAD_GENERATOR|IBM_TORONTO_LAB||IBM|20210330144208|8078780|ADT^A02|MSGID_4e1c575f-6c6d-47b2-ab9f-829f20c96db2|T|2.3\n"

@@ -382,7 +382,7 @@ public class SimpleDataValueResolver {
             }
         } else if (code != null) {
             // A code but no system: build a simple systemless code
-            return new SimpleCode(code, null, null);
+            return new SimpleCode(code, null, text);
         } else {
             return null;
         }
