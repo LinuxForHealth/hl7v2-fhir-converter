@@ -12,7 +12,7 @@ resources:
       repeats: false
       isReferenced: false
       additionalSegments: 
-             - EVN
+        - EVN
    
     - resourceName: Patient
       segment: PID
@@ -20,17 +20,17 @@ resources:
       repeats: false
       isReferenced: true
       additionalSegments:
-             - MSH
-      
+        - MSH
+
     - resourceName: Encounter
       segment: PV1
       resourcePath: resource/Encounter
       repeats: false
       isReferenced: true
       additionalSegments:
-             - PV2
-             - EVN
-             - MSH
+        - PV2
+        - EVN
+        - MSH
 
     - resourceName: Observation
       segment: OBX
@@ -38,11 +38,14 @@ resources:
       repeats: true
       isReferenced: true
       additionalSegments:
-             - MSH
+        - MSH
 
     - resourceName: DocumentReference
       segment: TXA
       resourcePath: resource/DocumentReference
       repeats: true
       additionalSegments:
-             - MSH
+        - MSH
+        - PID
+        - ORC
+        - OBR

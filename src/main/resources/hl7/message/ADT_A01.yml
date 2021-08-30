@@ -42,6 +42,8 @@ resources:
       repeats: true
       additionalSegments:
         - MSH
+        - PID
+        - PV1
 
     - resourceName: Observation
       segment: OBX
@@ -49,6 +51,7 @@ resources:
       repeats: true
       isReferenced: true
       additionalSegments:
+        - ORC
         - MSH
 
     - resourceName: AllergyIntolerance
