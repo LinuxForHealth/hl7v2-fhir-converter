@@ -161,6 +161,28 @@ participant_4:
       codeableConceptCode: 'ADM'
       codeableConceptText: 'admitter'
 
+extension_1:
+   generateList: true
+   expressionType: nested
+   condition: $code NOT_NULL && $display NOT_NULL
+   vars:
+      code: String, PV2.38.1 
+      display: ENCOUNTER_MODE_ARRIVAL_DISPLAY, PV2.38.1 
+      system: SYSTEM_URL, $system_code
+   constants:
+      system_code: 'mode-of-arrival-system'
+   expressionsMap:
+      url:
+         type: SYSTEM_URL
+         value: 'encounter-modeOfArrival-extension'
+      valueCoding:
+         valueOf: datatype/Coding
+         expressionType: resource
+       
+            
+
+
+
 # Uncomment until we figure out to reference condition from encounter
 # diagnosis.condition is required
 #

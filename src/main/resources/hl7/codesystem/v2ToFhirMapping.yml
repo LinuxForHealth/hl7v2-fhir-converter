@@ -77,6 +77,15 @@ NameUse:
   TEMP: temp
   NOUSE: old
   BAD: old
+   
+EncounterModeOfArrivalDisplay:
+   A: Ambulance	
+   C: Car	
+   F: On foot	
+   H: Helicopter	
+   O: Other	
+   P: Public Transport	
+   U: Unknown
 
 V3MaritalStatus:
   A: A

@@ -259,6 +259,16 @@ public class SimpleDataValueResolver {
         }
     };
 
+
+    public static final ValueExtractor<Object, String> ENCOUNTER_MODE_ARRIVAL_DISPLAY = (Object value) -> {
+        String display = getFHIRCode(Hl7DataHandlerUtil.getStringValue(value), "EncounterModeOfArrivalDisplay");
+        if (display != null) {
+            return display;
+        } else {
+            return display;
+        }
+    };
+    
   public static final ValueExtractor<Object, SimpleCode> MARITAL_STATUS =
       (Object value) -> {
         String val = Hl7DataHandlerUtil.getStringValue(value);
@@ -522,8 +532,12 @@ public class SimpleDataValueResolver {
     }
 
     private static String getFHIRCode(String hl7Value, Class<?> fhirConceptClassName) {
+    	return getFHIRCode(hl7Value,fhirConceptClassName.getSimpleName());
+    }
+
+    private static String getFHIRCode(String hl7Value, String fhirMappingConceptName) {
         if (hl7Value != null) {
-            Map<String, String> mapping = Hl7v2Mapping.getMapping(fhirConceptClassName.getSimpleName());
+            Map<String, String> mapping = Hl7v2Mapping.getMapping(fhirMappingConceptName);
             if (mapping != null && !mapping.isEmpty()) {
                 return mapping.get(StringUtils.upperCase(hl7Value, Locale.ENGLISH));
             } else {
