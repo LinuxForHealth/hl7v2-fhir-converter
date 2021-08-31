@@ -343,8 +343,9 @@ public class HL7DataExtractor {
       return theActualMessageType;
     } catch (HL7Exception e){
       // TODO Auto generated catch block
-      throw new IllegalArgumentException("Message type not yet supported" + message.getName());
+      e.printStackTrace();
     }
+    return null;
   }
 
 
