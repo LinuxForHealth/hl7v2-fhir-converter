@@ -83,6 +83,7 @@ issued:
    expressionType: HL7Spec
    
 resultsInterpreter:
+   condition: OBR.32 NOT_NULL
    valueOf: resource/Practitioner
    generateList: true
    expressionType: reference

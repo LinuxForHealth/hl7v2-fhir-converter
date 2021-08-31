@@ -165,7 +165,8 @@ referenceRange:
      type: OBX.10
      unit: OBX.6
 
-performer: 
+performer:
+   condition: OBX.16 NOT_NULL
    valueOf: resource/Practitioner
    generateList: true
    expressionType: reference

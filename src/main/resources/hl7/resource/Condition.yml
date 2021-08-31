@@ -117,6 +117,7 @@ evidence:
   useGroup: true
 
 asserter:
+   condition: DG1.16 NOT_NULL
    valueOf: resource/Practitioner
    generateList: true
    expressionType: reference
@@ -132,13 +133,13 @@ abatementDateTime:
   valueOf: PRB.9
   expressionType: HL7Spec
 
-verificationStatus:
-  valueOf: datatype/CodeableConcept
-  generateList: true
-  expressionType: resource
-  specs: PRB.13
-  vars:
-    code: PRB.13
+#verificationStatus: Joel, should this one be deleted?
+#  valueOf: datatype/CodeableConcept
+#  generateList: true
+#  expressionType: resource
+#  specs: PRB.13
+#  vars:
+#    code: PRB.13
 
 onsetDateTime:
   type: DATE_TIME

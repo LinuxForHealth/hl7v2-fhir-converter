@@ -140,6 +140,7 @@ maritalStatus:
       coding: MARITAL_STATUS, PID.16
       text: String, PID.16.2
 generalPractitioner:
+   condition: PD1.4 NOT_NULL
    valueOf: resource/Practitioner
    generateList: true
    expressionType: reference

@@ -21,7 +21,6 @@ identifier:
       start: XCN.19 
       end: XCN.20
 name: 
-    required: true
     specs: XCN | XCN |CNN|NDL
     valueOf: datatype/HumanName
     generateList: true
