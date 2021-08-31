@@ -19,7 +19,7 @@ pull request so it can be tracked.
 
 ### Merge approval
 
-A pull request requires approval from at least two of the [maintainers](MAINTAINERS.md).
+A pull request requires approval from at least one of the [maintainers](MAINTAINERS.md).
 
 ## Legal
 
