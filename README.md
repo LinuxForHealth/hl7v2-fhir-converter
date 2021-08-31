@@ -33,7 +33,7 @@ The converter supports the following message segments:
 * RXR - Pharmacy/Treatment Route
 * SPM - Specimen
 
-If you need another message type/event . . .  contributions are welcome! We welcome [Pull Requests](https://github.com/LinuxForHealth/hl7v2-fhir-converter/pulls)!
+If you need another message type/event . . .  contributions are welcome! See [CONTRIBUTING.md](CONTRIBUTING.md)!
 
 ## Development Quickstart
 
