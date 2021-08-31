@@ -157,6 +157,12 @@ public class Hl7RelatedGeneralUtils {
 
         return result;
     }
+    public static String formatAsId(Object input)
+    {
+        String stringValue = Hl7DataHandlerUtil.getStringValue(input).trim();
+        stringValue.replaceAll("[^a-zA-Z0-9]", "."); 
+        return StringUtils.left(stringValue, 64);
+    }
 
     public static String getAddressUse(String xad7Type, String xad16Temp, String xad17Bad) {
         LOGGER.info("Calculating address Use from XAD.7 {}, XAD.16 {}, XAD.17 {}", xad7Type, xad16Temp, xad17Bad);

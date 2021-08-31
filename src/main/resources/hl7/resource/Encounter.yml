@@ -194,9 +194,14 @@ extension_1:
             valueCoding:
                valueOf: $coding
                specs: CWE
-               
             
-       
+serviceProvider:
+   condition: $id NOT_NULL
+   expressionType: reference
+   valueOf: resource/Organization_Simple
+   vars:
+      id: PV2.23.8 | PV1.3.4
+      name: PV2.23.1      
             
 
 
