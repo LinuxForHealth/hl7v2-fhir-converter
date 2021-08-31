@@ -212,7 +212,7 @@ String hl7message =
     HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
 
     String json = ftv.convert(hl7VUXmessageRep, OPTIONS);
-    System.out.print(json);
+
     FHIRContext context = new FHIRContext();
     IBaseResource bundleResource = context.getParser().parseResource(json);
     assertThat(bundleResource).isNotNull();
