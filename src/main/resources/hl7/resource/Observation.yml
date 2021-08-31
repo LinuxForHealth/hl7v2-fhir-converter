@@ -166,7 +166,7 @@ referenceRange:
      unit: OBX.6
 
 performer:
-   condition: $performerVal NOT_NULL
+   condition: $performerValue NOT_NULL
    valueOf: resource/Practitioner
    generateList: true
    expressionType: reference
