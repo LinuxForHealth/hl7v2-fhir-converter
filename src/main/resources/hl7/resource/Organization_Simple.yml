@@ -5,9 +5,20 @@
 #
 resourceType: Organization
 id:
-   type: STRING
-   valueOf: $id
+   expressionType: nested
    required: true
+   expressions:
+      -  condition: $idValue NOT_NULL
+         type: STRING
+         expressionType: JEXL
+         valueOf: 'GeneralUtils.formatAsId(input)'
+         vars:
+            input: $idValue
+         
+      -  condition: $id NOT_NULL
+         type: STRING
+         valueOf: $id
+   
    
 name:
    type: STRING

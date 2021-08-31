@@ -160,7 +160,7 @@ public class Hl7RelatedGeneralUtils {
     public static String formatAsId(Object input)
     {
         String stringValue = Hl7DataHandlerUtil.getStringValue(input).trim();
-        stringValue.replaceAll("[^a-zA-Z0-9]", "."); 
+        stringValue = stringValue.replaceAll("[^a-z_A-Z0-9]", ".");
         return StringUtils.left(stringValue, 64);
     }
 
