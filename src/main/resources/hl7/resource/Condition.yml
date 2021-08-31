@@ -117,10 +117,13 @@ evidence:
   useGroup: true
 
 asserter:
+   condition: $asserterVal NOT_NULL
    valueOf: resource/Practitioner
    generateList: true
    expressionType: reference
    specs: DG1.16
+   vars:
+     asserterVal: DG1.16
 
 recordedDate:
    type: DATE_TIME

@@ -165,10 +165,13 @@ referenceRange:
      type: OBX.10
      unit: OBX.6
 
-performer: 
+performer:
+   condition: $performerVal NOT_NULL
    valueOf: resource/Practitioner
    generateList: true
    expressionType: reference
    specs: OBX.16
+   vars:
+     performerValue: OBX.16
 
 
