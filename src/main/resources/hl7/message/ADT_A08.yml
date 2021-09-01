@@ -21,6 +21,7 @@ resources:
       isReferenced: true
       additionalSegments:
              - PD1
+             - MSH
 
     - resourceName: Encounter
       segment: PV1
@@ -38,16 +39,18 @@ resources:
       repeats: true
       isReferenced: true
       additionalSegments:
+             - MSH
       
     - resourceName: AllergyIntolerance
       segment: AL1
       resourcePath: resource/AllergyIntolerance
       repeats: true
       additionalSegments:
+             - MSH
 
     - resourceName: Condition
       segment: DG1
       resourcePath: resource/Condition
       repeats: true
       additionalSegments:
-        - MSH
+             - MSH

@@ -20,6 +20,7 @@ resources:
       repeats: false
       additionalSegments:
              - .PD1
+             - MSH
       
     - resourceName: Encounter
       segment: .PV1

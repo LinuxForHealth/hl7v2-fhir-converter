@@ -46,14 +46,11 @@ resources:
       resourcePath: resource/AllergyIntolerance
       repeats: true
       additionalSegments:
-<<<<<<< HEAD
              - MSH
-=======
 
     - resourceName: Condition
       segment: DG1
       resourcePath: resource/Condition
       repeats: true
       additionalSegments:
-        - MSH
->>>>>>> master
+             - MSH
