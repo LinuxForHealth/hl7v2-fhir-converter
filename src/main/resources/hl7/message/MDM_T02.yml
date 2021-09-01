@@ -45,4 +45,7 @@ resources:
       resourcePath: resource/DocumentReference
       repeats: true
       additionalSegments:
-             - MSH
+              - MSH
+              - PID
+              - ORC
+              - OBR

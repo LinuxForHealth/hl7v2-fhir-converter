@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 function_v1:
-   condition: $orderingProvide NOT_NULL
+   condition: $orderingProvider NOT_NULL
    valueOf: datatype/CodeableConcept_var
    expressionType: resource
    constants:
@@ -13,16 +13,19 @@ function_v1:
     text: 'Ordering Provider'
 
 function_v2:
-   condition: $orderingProvide NULL && $administeringProvide NOT_NULL
+   condition: $orderingProvider NULL && $administeringProvider NOT_NULL
    valueOf: datatype/CodeableConcept_var
    expressionType: resource
    constants:
     system: 'http://terminology.hl7.org/CodeSystem/v2-0443'
     code: AP
-    text: Administering Provide
+    text: Administering Provider
 actor:
+   condition: $actorVal NOT_NULL
    valueOf: resource/Practitioner
    expressionType: reference
    generateList: true
-   specs: $orderingProvide | $administeringProvide
+   specs: $orderingProvider | $administeringProvider
    required: true
+   vars:
+     actorVal: $orderingProvider | $administeringProvider

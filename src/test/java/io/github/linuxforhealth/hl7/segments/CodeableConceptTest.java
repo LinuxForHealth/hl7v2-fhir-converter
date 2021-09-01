@@ -8,7 +8,6 @@ package io.github.linuxforhealth.hl7.segments;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
-
 import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.Extension;
@@ -17,11 +16,18 @@ import org.hl7.fhir.r4.model.MedicationRequest;
 import org.hl7.fhir.r4.model.Condition;
 import org.junit.jupiter.api.Test;
 import io.github.linuxforhealth.core.terminology.UrlLookup;
+import io.github.linuxforhealth.hl7.ConverterOptions;
+import io.github.linuxforhealth.hl7.ConverterOptions.Builder;
+import io.github.linuxforhealth.hl7.segments.util.ResourceUtils;
 import io.github.linuxforhealth.hl7.segments.util.*;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 class CodeableConceptTest {
     private static final String V3_RACE_SYSTEM = "http://terminology.hl7.org/CodeSystem/v3-Race";
-
+    private static final ConverterOptions OPTIONS = new Builder().withPrettyPrint().build();
+    private static final Logger LOGGER = LoggerFactory.getLogger(Hl7PatientFHIRConversionTest.class);
 
     // These test cover all the paths to create codeableConcepts from CWEs.
     // 
@@ -237,7 +243,7 @@ class CodeableConceptTest {
         assertThat(coding.hasDisplay()).isTrue();
         assertThat(coding.hasCode()).isFalse();
         assertThat(coding.hasSystem()).isTrue();
-        assertThat(coding.getDisplay()).containsPattern("Invalid.*2186-5.*"+V3_RACE_SYSTEM);
+        assertThat(coding.getDisplay()).containsPattern("Invalid.*2186-5.*" + V3_RACE_SYSTEM);
         assertThat(coding.getSystem()).containsIgnoringCase(V3_RACE_SYSTEM);
     }
 
@@ -271,7 +277,7 @@ class CodeableConceptTest {
         assertThat(coding.hasDisplay()).isTrue();
         assertThat(coding.hasCode()).isFalse();
         assertThat(coding.hasSystem()).isTrue();
-        assertThat(coding.getDisplay()).containsPattern("Invalid.*2186-5.*"+V3_RACE_SYSTEM+".*hispan");
+        assertThat(coding.getDisplay()).containsPattern("Invalid.*2186-5.*" + V3_RACE_SYSTEM + ".*hispan");
         assertThat(coding.getSystem()).containsIgnoringCase(V3_RACE_SYSTEM);
 
     }
@@ -429,5 +435,33 @@ class CodeableConceptTest {
 
     }
 
+    @Test
+    public void checkICD10Coding() {
+
+        String hl7MessageiCD10Coding = "MSH|^~\\&|||||20040629164652|1|PPR^PC1|331|P|2.3.1||\r"
+                + "PID||||||||||||||||||||||||||||||\r"
+                + "PV1||I||||||||||||||||||||||||||||||||||||||||||\r"
+                + "PRB|AD|20170110074000|K80.00^Cholelithiasis^I10|53956|E1|1|20100907175347|20150907175347|20180310074000||||confirmed^Confirmed^http://terminology.hl7.org/CodeSystem/condition-ver-status|remission^Remission^http://terminology.hl7.org/CodeSystem/condition-clinical|20180310074000|20170102074000|textual representation of the time when the problem began|1^primary|ME^Medium|0.4|marginal|good|marginal|marginal|highly sensitive|some prb detail|\r";
+
+        Condition condition = ResourceUtils.getCondition(hl7MessageiCD10Coding);
+
+        assertThat(condition.hasCode()).isTrue();
+        CodeableConcept condCC = condition.getCode();
+        assertThat(condCC.hasText()).isTrue();
+        assertThat(condCC.getText()).isEqualTo("Cholelithiasis");
+        assertThat(condCC.hasCoding()).isTrue();
+        assertThat(condCC.getCoding().size()).isEqualTo(1);
+
+        Coding condCoding = condCC.getCoding().get(0);
+        assertThat(condCoding.hasSystem()).isTrue();
+        // change from http://hl7.org/fhir/sid/icd-10 to http://hl7.org/fhir/sid/icd-10-cm temporarily, see Issue #189
+        assertThat(condCoding.getSystem()).isEqualTo("http://hl7.org/fhir/sid/icd-10-cm");
+        assertThat(condCoding.hasCode()).isTrue();
+        assertThat(condCoding.getCode()).isEqualTo("K80.00");
+        assertThat(condCoding.hasDisplay()).isTrue();
+        assertThat(condCoding.getDisplay()).isEqualTo("Cholelithiasis");
+        assertThat(condCoding.hasVersion()).isFalse();
+
+    }
 
 }

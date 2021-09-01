@@ -27,11 +27,11 @@ public class ResourceUtils {
   private static final ConverterOptions OPTIONS =
     new Builder().withValidateResource().withPrettyPrint().build();
 
-  private static List<BundleEntryComponent> createHl7Segment(String inputSegment){
+  public static List<BundleEntryComponent> createHl7Segment(String inputSegment){
     HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
     String json = ftv.convert(inputSegment, OPTIONS);
-    System.out.println(json);
     assertThat(json).isNotBlank();
+    LOGGER.info("FHIR json result:\n" + json);
     FHIRContext context = new FHIRContext();
     IBaseResource bundleResource = context.getParser().parseResource(json);
     assertThat(bundleResource).isNotNull();

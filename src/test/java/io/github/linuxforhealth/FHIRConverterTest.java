@@ -8,10 +8,18 @@ package io.github.linuxforhealth;
 import static org.assertj.core.api.Assertions.assertThat;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import ca.uhn.hl7v2.HL7Exception;
+import ca.uhn.hl7v2.model.Message;
+import ca.uhn.hl7v2.util.Hl7InputStreamMessageStringIterator;
+import io.github.linuxforhealth.hl7.parsing.HL7DataExtractor;
+import io.github.linuxforhealth.hl7.parsing.HL7HapiParser;
+import org.apache.commons.io.IOUtils;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r4.model.*;
 import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
@@ -192,6 +200,26 @@ String hl7message =
     Assertions.assertThrows(IllegalArgumentException.class, () -> {
         ftv.convert(hl7message);
     });
+  }
+  @Test
+  public void test_adt_40_message() throws Exception {
+    Message hl7message = null;
+    String hl7messageString =
+            "MSH|^~\\&|REGADT|MCM|RSP1P8|MCM|200301051530|SEC|ADT^A40^ADT_A39|00000003|P|2.5\n" +
+            "PID|||MR1^^^XYZ||MAIDENNAME^EVE\n" +
+            "MRG|MR2^^^XYZ";
+
+    InputStream ins = IOUtils.toInputStream(hl7messageString, StandardCharsets.UTF_8);
+    Hl7InputStreamMessageStringIterator iterator = new Hl7InputStreamMessageStringIterator(ins);
+
+    if (iterator.hasNext()) {
+      HL7HapiParser hparser = new HL7HapiParser();
+      hl7message = hparser.getParser().parse(iterator.next());
+    }
+
+    String messageType = HL7DataExtractor.getMessageType(hl7message);
+
+    assertThat(messageType).isEqualTo("ADT_A40");
   }
 
   @Test
