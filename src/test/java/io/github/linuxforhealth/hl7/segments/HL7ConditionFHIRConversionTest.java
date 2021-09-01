@@ -12,6 +12,9 @@ import java.util.stream.Collectors;
 
 import org.hl7.fhir.r4.model.Base;
 import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
+import org.hl7.fhir.r4.model.Condition;
+import org.hl7.fhir.r4.model.CodeableConcept;
+import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.Property;
 import org.hl7.fhir.r4.model.Resource;
 import org.hl7.fhir.r4.model.ResourceType;
@@ -238,6 +241,24 @@ public class HL7ConditionFHIRConversionTest {
                 .filter(v -> ResourceType.Condition == v.getResource().getResourceType())
                 .map(BundleEntryComponent::getResource).collect(Collectors.toList());
         assertThat(conditionResource).hasSize(4);
+
+        Condition condition = (Condition) conditionResource.get(1);
+        assertThat(condition.hasCode()).isTrue();
+        CodeableConcept condCC = condition.getCode();
+        assertThat(condCC.hasText()).isTrue();
+        assertThat(condCC.getText()).isEqualTo("Tachycardia, unspecified");
+        assertThat(condCC.hasCoding()).isTrue();
+        assertThat(condCC.getCoding().size()).isEqualTo(1);
+
+        Coding condCoding = condCC.getCoding().get(0);
+        assertThat(condCoding.hasSystem()).isTrue();
+        // change from http://hl7.org/fhir/sid/icd-10 to http://hl7.org/fhir/sid/icd-10-cm temporarily, see Issue #189
+        assertThat(condCoding.getSystem()).isEqualTo("http://hl7.org/fhir/sid/icd-10-cm");
+        assertThat(condCoding.hasCode()).isTrue();
+        assertThat(condCoding.getCode()).isEqualTo("R00.0");
+        assertThat(condCoding.hasDisplay()).isTrue();
+        assertThat(condCoding.getDisplay()).isEqualTo("Tachycardia, unspecified");
+        assertThat(condCoding.hasVersion()).isFalse();
 
         // TODO: Each condition should have condition.reasonReference and condition.diagnosis values (use and rank)
         // including a reference to the condition. We can not add these now because of a defect that will be addressed soon (see internal bug 665)
