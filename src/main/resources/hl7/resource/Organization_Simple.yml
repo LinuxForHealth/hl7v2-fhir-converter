@@ -18,7 +18,15 @@ id:
       -  condition: $id NOT_NULL
          type: STRING
          valueOf: $id
-   
+         
+identifier:
+  condition: $idValue NOT_NULL
+  valueOf: datatype/Identifier_var
+  expressionType: resource
+  vars:
+    valueIn: $idValue
+  constants:
+    systemId: "urn:id:extID" 
    
 name:
    type: STRING
