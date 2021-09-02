@@ -26,6 +26,7 @@ identifier_2:
    expressionType: resource
    vars:
       valueIn: ORC.3.1 | OBR.3.1
+      systemCX: ORC.3.2 | OBR.3.2
    constants:
       system: "http://terminology.hl7.org/CodeSystem/v2-0203"
       code: "FILL"
@@ -38,6 +39,7 @@ identifier_3:
    expressionType: resource
    vars:
       valueIn: ORC.2.1 | OBR.2.1
+      systemCX: ORC.2.2 | OBR.2.2
    constants:
       system: "http://terminology.hl7.org/CodeSystem/v2-0203"
       code: "PLAC"

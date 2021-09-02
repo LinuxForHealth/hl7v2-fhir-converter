@@ -71,6 +71,8 @@ resources:
         - MSH
         - PID
         - PV1
+        - ORC
+        - OBR
 
     - resourceName: Condition
       segment: DG1
