@@ -81,7 +81,7 @@ public class HL7DataBasedResourceModel implements ResourceModel {
         String groupId = getGroupId(context);
         resources =
             new ResourceResult(new SimpleResourceValue(result.getResolveValues(), this.name),
-                result.getAdditionalResolveValues(), groupId);
+                result.getAdditionalResolveValues(), groupId, result.getPendingExpressions());
 
       }
 
