@@ -24,6 +24,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
 import ca.uhn.hl7v2.model.Structure;
 import io.github.linuxforhealth.api.EvaluationResult;
 import io.github.linuxforhealth.api.FHIRResourceTemplate;
@@ -138,7 +139,7 @@ public class HL7MessageEngine implements MessageEngine {
       ResourceEvaluationResult res =
           ExpressionUtility.evaluate(hl7DataInput, localContextValues, r.getPendingExpressions());
       r.getValue().getResource().putAll(res.getResolveValues());
-      addResourceToBundle(bundle, List.of(r));
+      addResourceToBundle(bundle, Lists.newArrayList(r));
     } catch (IllegalArgumentException | IllegalStateException e) {
       LOGGER.error("Exception during  resource {} generation", "PendingExpressions", e);
 
@@ -181,7 +182,7 @@ public class HL7MessageEngine implements MessageEngine {
   private void addResourceToBundle(Bundle bundle, List<ResourceResult> resourceResults) {
     if (resourceResults != null && !resourceResults.isEmpty()) {
       for (ResourceResult resReult : resourceResults) {
-        addToBundle(bundle, List.of(resReult.getValue()));
+        addToBundle(bundle, Lists.newArrayList(resReult.getValue()));
         addToBundle(bundle, resReult.getAdditionalResources());
       }
     }
