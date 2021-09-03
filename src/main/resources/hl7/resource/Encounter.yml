@@ -119,7 +119,6 @@ diagnosis:
         expressionType: resource
         specs: $Condition
         
-
      use: 
         valueOf: datatype/CodeableConcept
         expressionType: resource
