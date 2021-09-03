@@ -95,6 +95,7 @@ reasonCode:
 
 reasonReference:
     valueOf: datatype/Reference
+    evaluateLater: true
     generateList: true
     expressionType: resource
     specs: $Condition | $Observation
