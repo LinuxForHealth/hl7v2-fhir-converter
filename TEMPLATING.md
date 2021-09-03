@@ -221,6 +221,7 @@ The extraction logic for each field can be defined by using expressions. This co
   Generates an output list output for all values of the specification. If this value is false, then first valid value of spec would be used for evaluation.
 * Constants: DEFAULT - EMPTY<br>
   List of Constants (string values) which can be used during the extraction process.
+* evaluateLater:  DEFAULT: false, If evaluate latter is true then the resource that has this expression will be evaluated except for this expression and will re-evaluate this expression after all the other resources are evaluated. NOTE: this feature currently should only be used for expressions in main resource templates (example Patient, encounter, observation etc) and not in datatype templates (example: coding, Address etc). 
 
 
 ```yml

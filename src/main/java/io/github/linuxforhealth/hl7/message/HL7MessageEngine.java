@@ -41,6 +41,8 @@ import io.github.linuxforhealth.fhir.FHIRContext;
 import io.github.linuxforhealth.fhir.FHIRResourceMapper;
 import io.github.linuxforhealth.hl7.message.util.SegmentExtractorUtil;
 import io.github.linuxforhealth.hl7.message.util.SegmentGroup;
+import io.github.linuxforhealth.hl7.resource.ResourceEvaluationResult;
+import io.github.linuxforhealth.hl7.util.ExpressionUtility;
 
 /**
  * Implements Message engine for HL7 message data
@@ -93,6 +95,7 @@ public class HL7MessageEngine implements MessageEngine {
     HL7MessageData hl7DataInput = (HL7MessageData) dataInput;
     Bundle bundle = initBundle();
     Map<String, EvaluationResult> localContextValues = new HashMap<>(contextValues);
+    List<ResourceResult> resourceResultsWithEvalLater = new ArrayList<>();
     for (FHIRResourceTemplate genericTemplate : resources) {
       HL7FHIRResourceTemplate hl7ResourceTemplate = (HL7FHIRResourceTemplate) genericTemplate;
       ResourceModel rs = genericTemplate.getResource();
@@ -103,6 +106,17 @@ public class HL7MessageEngine implements MessageEngine {
             generateResources(hl7DataInput, hl7ResourceTemplate, localContextValues, bundle);
         if (results != null) {
           resourceResults.addAll(results);
+          results.stream()
+              .filter(
+                  r -> (r.getPendingExpressions() != null && !r.getPendingExpressions().isEmpty()))
+              .forEach(re -> resourceResultsWithEvalLater.add(re));
+          List<ResourceResult> resultsToAddToBundle = results.stream()
+              .filter(
+                  r -> (r.getPendingExpressions() == null || r.getPendingExpressions().isEmpty()))
+              .collect(Collectors.toList());
+
+          addResourceToBundle(bundle, resultsToAddToBundle);
+
         }
 
         resourceResults.removeIf(isEmpty());
@@ -119,6 +133,25 @@ public class HL7MessageEngine implements MessageEngine {
 
 
     }
+    for (ResourceResult r : resourceResultsWithEvalLater) {
+      MDC.put("Resource", "PendingExpressions");
+      try {
+      ResourceEvaluationResult res =
+          ExpressionUtility.evaluate(hl7DataInput, localContextValues, r.getPendingExpressions());
+      r.getValue().getResource().putAll(res.getResolveValues());
+      addResourceToBundle(bundle, Lists.newArrayList(r));
+    } catch (IllegalArgumentException | IllegalStateException e) {
+      LOGGER.error("Exception during  resource {} generation", "PendingExpressions", e);
+
+
+    } finally {
+      MDC.remove("Resource");
+    }
+
+    }
+
+
+
     LOGGER.info(
         "Successfully converted Message: {} , Message Control Id: {} to FHIR bundle resource with id {}",
         dataInput.getName(), dataInput.getId(), bundle.getId());
@@ -142,14 +175,17 @@ public class HL7MessageEngine implements MessageEngine {
 
     }
 
+
+    return resourceResults;
+  }
+
+  private void addResourceToBundle(Bundle bundle, List<ResourceResult> resourceResults) {
     if (resourceResults != null && !resourceResults.isEmpty()) {
       for (ResourceResult resReult : resourceResults) {
         addToBundle(bundle, Lists.newArrayList(resReult.getValue()));
         addToBundle(bundle, resReult.getAdditionalResources());
       }
     }
-
-    return resourceResults;
   }
 
   private static Predicate<ResourceResult> isEmpty() {
