@@ -21,11 +21,8 @@ function_v2:
     code: AP
     text: Administering Provider
 actor:
-   condition: $actorVal NOT_NULL
    valueOf: resource/Practitioner
    expressionType: reference
    generateList: true
    specs: $orderingProvider | $administeringProvider
    required: true
-   vars:
-     actorVal: $orderingProvider | $administeringProvider
