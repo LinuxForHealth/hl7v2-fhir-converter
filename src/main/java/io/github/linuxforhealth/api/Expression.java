@@ -85,5 +85,15 @@ public interface Expression {
     return new HashMap<>();
   }
 
+  /**
+   * 
+   * 
+   * @return true if the expression should be evaluated at the end after all resources are
+   *         generated. {@link boolean}
+   */
+  default boolean isEvaluateLater() {
+    return false;
+
+  }
 
 }
