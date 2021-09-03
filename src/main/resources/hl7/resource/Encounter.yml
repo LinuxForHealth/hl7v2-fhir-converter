@@ -109,13 +109,10 @@ subject:
     expressionType: resource
     specs: $Patient
 
-# Uncomment until we figure out to reference condition from encounter
-# diagnosis.condition is required
-#
-# diagnosis:
-#     valueOf: datatype/Diagnosis
-#     generateList: true
-#     expressionType: resource
-#     specs: DG1
-#     vars:
-#       Condition: $Condition
+diagnosis:
+    valueOf: datatype/Diagnosis
+    generateList: true
+    expressionType: resource
+    specs: DG1
+    vars:
+      Condition: $Condition
