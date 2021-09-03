@@ -44,8 +44,12 @@ subject:
 encounter:
     valueOf: datatype/Reference
     expressionType: resource
-    specs: $Encounter
-
+    specs: $Encounter 
+    vars:
+      resourceId: $encounterid
+      referenceResourceType: $resourceName
+    constants:
+      resourceName: 'Encounter'
 
 effectiveDateTime:
      type: DATE_TIME

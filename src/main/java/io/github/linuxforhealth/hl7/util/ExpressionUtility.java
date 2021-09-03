@@ -28,6 +28,10 @@ import io.github.linuxforhealth.hl7.resource.ResourceEvaluationResult;
 
 public class ExpressionUtility {
 
+  private static final String RESOURCE_TYPE_NAME = "resourceType";
+
+  private static final String ID_KEY_NAME = "id";
+
   private static final String KEY_NAME_SUFFIX = "KEY_NAME_SUFFIX";
 
   private static final String EVALUATING = "Evaluating {} {}";
@@ -55,8 +59,44 @@ public class ExpressionUtility {
       // initialize the map and list to collect values
       List<ResourceValue> additionalResolveValues = new ArrayList<>();
       Map<String, Object> resolveValues = new HashMap<>();
+      // Add id field from a resource generation so it can be referenced through out the
+      // resource
 
-      for (Entry<String, Expression> entry : expressionMap.entrySet()) {
+      Map<String, Expression> localexpressionMap = new HashMap<>(expressionMap);
+      localexpressionMap.remove(ID_KEY_NAME);
+
+      var resourceTypeExpression = expressionMap.get(RESOURCE_TYPE_NAME);
+      if (resourceTypeExpression != null) {
+
+        LOGGER.debug(EVALUATING, RESOURCE_TYPE_NAME, resourceTypeExpression);
+        EvaluationResult objResource =
+            resourceTypeExpression.evaluate(dataSource, localContext, baseValue);
+        if (objResource != null && !objResource.isEmpty()) {
+        resolveValues.put(RESOURCE_TYPE_NAME, objResource.getValue());
+        }
+        // remove from expression as its already evaluated
+        localexpressionMap.remove(RESOURCE_TYPE_NAME);
+
+
+        var idExpression = expressionMap.get(ID_KEY_NAME);
+        if (idExpression != null) {
+          LOGGER.debug(EVALUATING, ID_KEY_NAME, idExpression);
+          EvaluationResult objid = idExpression.evaluate(dataSource, localContext, baseValue);
+          if (objid != null && !objid.isEmpty()) {
+          resolveValues.put(ID_KEY_NAME, objid.getValue());
+          localContext.put(generateKey(ID_KEY_NAME, objResource.getValue()), objid);
+
+
+        }
+        // remove from expression as its already evaluated
+          localexpressionMap.remove(ID_KEY_NAME);
+        }
+
+      }
+
+
+
+      for (Entry<String, Expression> entry : localexpressionMap.entrySet()) {
 
         Expression exp = entry.getValue();
         LOGGER.debug(EVALUATING, entry.getKey(), entry.getValue());
@@ -68,6 +108,7 @@ public class ExpressionUtility {
           // Check if the key already exist in the HashMap, if found append, do not replace
           if (!resolveValues.containsKey(getKeyName(entry.getKey(), keyNameSuffix))) {
             resolveValues.put(getKeyName(entry.getKey(), keyNameSuffix), obj.getValue());
+
           } else {
             Object existing = resolveValues.get(getKeyName(entry.getKey(), keyNameSuffix));
             if (existing instanceof List) {
@@ -99,6 +140,10 @@ public class ExpressionUtility {
 
     }
 
+  }
+
+  private static String generateKey(String idKeyName, String resourceName) {
+    return StringUtils.joinWith("-", resourceName, idKeyName);
   }
 
   private static String getKeyName(String key, String suffix) {

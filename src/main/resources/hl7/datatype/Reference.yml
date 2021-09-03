@@ -4,6 +4,16 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 ---
-reference:
+reference_1:
+    condition: $referenceResourceType NULL || $resourceId NULL
     type: RELATIVE_REFERENCE
     valueOf:  $BASE_VALUE
+
+reference_2:
+    type: STRING
+    valueOf:  $var1
+    condition: $referenceResourceType NOT_NULL && $resourceId NOT_NULL
+    vars:
+       var1: '$referenceResourceType + $separator + $resourceId'
+    constants:
+       separator: '/'

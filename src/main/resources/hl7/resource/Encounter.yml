@@ -97,13 +97,16 @@ reasonCode:
     specs: EVN.4 | PV2.3
 
 reasonReference:
-    valueOf: datatype/Reference
-    expressionType: resource
-    specs: $Condition | $Observation
+    valueOf: resource/Observation
+    expressionType: reference
+    specs: OBX
+    vars:
+      encounterid: $Encounter-id
 
 hospitalization:
     valueOf: secondary/Hospitalization
     expressionType: resource
+    vars:
 
 subject:
     valueOf: datatype/Reference
