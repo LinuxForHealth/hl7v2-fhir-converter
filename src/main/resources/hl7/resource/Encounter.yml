@@ -113,7 +113,7 @@ text:
    condition: $text NOT_NULL
    valueOf: datatype/Narrative
    expressionType: resource
-   vars: 
+   vars:
       text: PV2.12
    constants:
       status: "additional"
@@ -166,9 +166,9 @@ extension_1:
    generateList: true
    expressionType: nested
    vars:
-      code: String, PV2.38.1 
-      displayLookup: ENCOUNTER_MODE_ARRIVAL_DISPLAY, PV2.38.1 
-   expressions:        
+      code: String, PV2.38.1
+      displayLookup: ENCOUNTER_MODE_ARRIVAL_DISPLAY, PV2.38.1
+   expressions:
       - condition: $code NOT_NULL && $displayLookup NOT_NULL
         expressionType: nested
         vars:
@@ -183,7 +183,7 @@ extension_1:
             valueCoding:
                valueOf: datatype/Coding
                expressionType: resource
-               
+
       - condition: $code NOT_NULL && $displayLookup NULL && $coding NOT_NULL
         expressionType: nested
         vars:
@@ -195,26 +195,25 @@ extension_1:
             valueCoding:
                valueOf: $coding
                specs: CWE
-            
+
 serviceProvider:
    condition: $idValue NOT_NULL
    expressionType: reference
    valueOf: resource/Organization_Simple
    vars:
       idValue: PV2.23.8 | PV1.3.4.1
-      name: PV2.23.1    
-            
+      name: PV2.23.1
+
 
 
 
 # Uncomment until we figure out to reference condition from encounter
 # diagnosis.condition is required
 #
-# diagnosis:
-#     valueOf: datatype/Diagnosis
-#     generateList: true
-#     expressionType: resource
-#     specs: DG1
-#     vars:
-#       Condition: $Condition
-
+ diagnosis:
+     valueOf: datatype/Diagnosis
+     generateList: true
+     expressionType: resource
+     specs: DG1
+     vars:
+       Condition: $Condition
