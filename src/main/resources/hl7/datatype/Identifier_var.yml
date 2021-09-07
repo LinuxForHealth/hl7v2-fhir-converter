@@ -20,7 +20,7 @@ system_1:
 
 system_2:
    condition: $systemCX NOT_NULL
-   type: STRING
+   type: NO_WHITE_SPACE
    valueOf: $join
    vars:
       join: $sys + $systemCX
