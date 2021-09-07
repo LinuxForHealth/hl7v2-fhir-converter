@@ -57,7 +57,11 @@ public abstract class AbstractExpression implements Expression {
     return this.attr;
   }
 
+  @Override
+  public boolean isEvaluateLater() {
+    return this.attr.isEvaluateLater();
 
+  }
 
   @Override
   public EvaluationResult getDefaultValue() {

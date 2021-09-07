@@ -85,10 +85,13 @@ issued:
    expressionType: HL7Spec
    
 resultsInterpreter:
+   condition: $interpreter NOT_NULL
    valueOf: resource/Practitioner
    generateList: true
    expressionType: reference
    specs: OBR.32
+   vars:
+      interpreter: OBR.32
 
 specimen:
    valueOf: datatype/Reference

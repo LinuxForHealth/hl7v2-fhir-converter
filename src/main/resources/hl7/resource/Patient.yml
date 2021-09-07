@@ -140,10 +140,13 @@ maritalStatus:
       coding: MARITAL_STATUS, PID.16
       text: String, PID.16.2
 generalPractitioner:
+   condition: $practitionerVal NOT_NULL
    valueOf: resource/Practitioner
    generateList: true
    expressionType: reference
    specs: PD1.4
+   vars:
+      practitionerVal: PD1.4
 extension:
    generateList: true
    expressionType: nested

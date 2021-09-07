@@ -21,7 +21,7 @@ public class SimpleCode {
    * @param code
    * @param system
    * @param display
-   * @param version
+   * 
    */
 
   public SimpleCode(String code, String system, String display) {
@@ -58,6 +58,7 @@ public class SimpleCode {
     this.version = version;
   }
 
+  @Override
   public String toString() {
     return ReflectionToStringBuilder.toString(this);
   }

@@ -8,6 +8,7 @@ package io.github.linuxforhealth.hl7.parsing;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
+import ca.uhn.hl7v2.model.v26.segment.MSH;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,7 +46,6 @@ public class HL7DataExtractor {
 
   public HL7DataExtractor(Message message) {
     this.message = message;
-
   }
 
 
@@ -337,12 +337,20 @@ public class HL7DataExtractor {
   }
 
   public static String getMessageType(Message message) {
-    return message.getName();
+    try {
+      MSH msh = (MSH) message.get("MSH");
+      String theActualMessageType = msh.getMessageType().getMsg1_MessageCode().getValue() + "_" + msh.getMessageType().getMsg2_TriggerEvent().getValue();
+      return theActualMessageType;
+    } catch (HL7Exception e){
+      // TODO Auto generated catch block
+      e.printStackTrace();
+    }
+    return null;
   }
 
 
   public String getMessageType() {
-    return message.getName();
+  return getMessageType(message);
   }
 
 
