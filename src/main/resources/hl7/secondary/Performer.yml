@@ -21,6 +21,7 @@ function_v2:
     code: AP
     text: Administering Provider
 actor:
+   condition: $orderingProvider || $administeringProvider
    valueOf: resource/Practitioner
    expressionType: reference
    generateList: true
