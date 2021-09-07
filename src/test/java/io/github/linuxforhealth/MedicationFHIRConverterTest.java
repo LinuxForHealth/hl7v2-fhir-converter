@@ -147,7 +147,8 @@ public class MedicationFHIRConverterTest {
 
     }
 
-    // Tests that onset[x] is correctly set to PRB.17 if we have no PRB.16
+    // Tests that we create a practitioner from the RXA segment in hl7 message.
+    // This uses the Performer resource (specifically actor)
     @Test
     public void practitonerCreatedForRXA() {
 
