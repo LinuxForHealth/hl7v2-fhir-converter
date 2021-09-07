@@ -10,13 +10,14 @@ id:
    expressionType: JEXL
 
 identifier_1:
-   valueOf: datatype/Identifier_var
+   valueOf: datatype/Identifier
    generateList: true
    expressionType: resource
    vars:
-      valueIn: PR1.19.1 | MSH.7
-      systemCX: PR1.19.2
-
+      system: SYSTEM_URL, $sys
+      value: PR1.19.1 | MSH.7
+   constants:
+      sys: "urn:id:extID"
 identifier_2:
    condition: $valueIn NOT_NULL
    valueOf: datatype/Identifier_var
@@ -24,7 +25,7 @@ identifier_2:
    expressionType: resource
    vars:
       valueIn: PV1.19.1 | PID.18.1 | MSH.7
-      systemCX: PV1.19.4 | PID.18.4
+      systemCX: NO_WHITE_SPACE, PV1.19.4 | PID.18.4
    constants:
       system: "http://terminology.hl7.org/CodeSystem/v2-0203"
       code: "VN"
