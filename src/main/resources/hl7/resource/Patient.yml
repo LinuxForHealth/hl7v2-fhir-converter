@@ -61,7 +61,7 @@ address:
    specs: PID.11
 telecom_1:
    condition: $pid14 NOT_NULL
-   valueOf: datatype/Telecom
+   valueOf: datatype/ContactPoint
    generateList: true
    expressionType: resource
    specs: PID.14
@@ -72,7 +72,7 @@ telecom_1:
 # The yaml is processed in reverse order, therefore
 telecom_2:
    condition: $pid13 NOT_NULL
-   valueOf: datatype/Telecom
+   valueOf: datatype/ContactPoint
    generateList: true
    expressionType: resource
    specs: PID.13

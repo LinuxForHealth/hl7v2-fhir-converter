@@ -116,6 +116,61 @@ public class Hl7RelatedGeneralUtilsTest {
   }
 
 
+  // ExtractHigh and ExtractLow assumes if there are two or more values, the first is low, the second is high,
+  // but if there is only one value, it is the high
+  @Test
+  public void testExtractHigh() {
+
+    String aString = "27.0-55.2";
+    String resultValue = Hl7RelatedGeneralUtils.extractHigh(aString);
+    assertThat(resultValue).isEqualTo("55.2");
+
+    aString = "47.47";
+    resultValue = Hl7RelatedGeneralUtils.extractHigh(aString);
+    assertThat(resultValue).isEqualTo("47.47");
+
+    aString = "<0.50 IU/mL";
+    resultValue = Hl7RelatedGeneralUtils.extractHigh(aString);
+    assertThat(resultValue).isEqualTo("0.50");
+
+    aString = "something111another222more333done";
+    resultValue = Hl7RelatedGeneralUtils.extractHigh(aString);
+    assertThat(resultValue).isEqualTo("222");
+
+    aString = "Normal";
+    resultValue = Hl7RelatedGeneralUtils.extractHigh(aString);
+    assertThat(resultValue).isNull();
+
+  }
+
+  // ExtractHigh and ExtractLow assumes if there are two or more values, the first is low, the second is high,
+  // but if there is only one value, it is the high
+  @Test
+  public void testExtractLow() {
+
+    String aString = "27.0-55.2";
+    String resultValue = Hl7RelatedGeneralUtils.extractLow(aString);
+    assertThat(resultValue).isEqualTo("27.0");
+
+    aString = "47.47";
+    resultValue = Hl7RelatedGeneralUtils.extractLow(aString);
+    assertThat(resultValue).isNull();
+
+    aString = "<0.50 IU/mL";
+    resultValue = Hl7RelatedGeneralUtils.extractLow(aString);
+    assertThat(resultValue).isNull();
+
+    aString = "something111another222more333done";
+    resultValue = Hl7RelatedGeneralUtils.extractLow(aString);
+    assertThat(resultValue).isEqualTo("111");
+
+    aString = "Normal";
+    resultValue = Hl7RelatedGeneralUtils.extractLow(aString);
+    assertThat(resultValue).isNull();
+
+  }
+
+
   @Test
   public void test_makeStringArray() {
     // Test for 2
