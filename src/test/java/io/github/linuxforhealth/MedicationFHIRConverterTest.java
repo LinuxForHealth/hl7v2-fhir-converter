@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.hl7.fhir.instance.model.api.IBaseResource;
+import org.hl7.fhir.r4.model.Base;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
 import org.hl7.fhir.r4.model.Bundle.BundleType;
@@ -148,7 +149,7 @@ public class MedicationFHIRConverterTest {
 
     // Tests that onset[x] is correctly set to PRB.17 if we have no PRB.16
     @Test
-    public void practitonerCreatedFor() {
+    public void practitonerCreatedForRXA() {
 
         String hl7message = "MSH|^~\\&|EHR|12345^SiteName|MIIS|99990|20140701041038||VXU^V04^VXU_V04|MSG.Valid_01|P|2.6|||\r"
         + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\r"
@@ -170,11 +171,21 @@ public class MedicationFHIRConverterTest {
         .filter(v -> ResourceType.Practitioner == v.getResource().getResourceType())
         .map(BundleEntryComponent::getResource).collect(Collectors.toList());
 
-        // Verify we have onw practitioner
+        // Verify we have one practitioner
         assertThat(practitionerResource).hasSize(1);
 
-        // // Get practitioner Resource
-        // Resource practitioner = practitionerResource.get(0);
+        // Get practitioner Resource
+        Resource practitioner = practitionerResource.get(0);
+
+        // Verify name text, family, and given are set correctly.
+        Base name = ResourceUtils.getValue(practitioner, "name");
+        assertThat(ResourceUtils.getValueAsString(name, "text")).isEqualTo("ClinicianFirstName LastName");
+        assertThat(ResourceUtils.getValueAsString(name, "family")).isEqualTo("LastName");
+        assertThat(ResourceUtils.getValueAsString(name, "given")).isEqualTo("ClinicianFirstName");
+
+        // Verify asserter identifier is set correctly.
+        Base identifier = ResourceUtils.getValue(practitioner, "identifier");
+        assertThat(ResourceUtils.getValueAsString(identifier, "value")).isEqualTo("NPI001");
 
     }
 
