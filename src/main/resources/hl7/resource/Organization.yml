@@ -15,7 +15,7 @@ identifier:
    vars:
       id: CWE.1 | XON.10 | XON.3
       system: CWE.3
-name_v2:
+name_v1:
    type: STRING
    condition: $idValue NULL
    valueOf: CWE.2 | XON.1
@@ -23,7 +23,7 @@ name_v2:
    expressionType: HL7Spec
    vars:
       idValue: CWE.1 | XON.10 | XON.3
-name_v1:
+name_v2:
    type: STRING
    condition: $idValue NOT_NULL
    valueOf: CWE.2 | XON.1

@@ -144,8 +144,9 @@ public class Hl7RelatedGeneralUtilsTest {
 
   }
 
-  // ExtractHigh and ExtractLow assumes if there are two or more values, the first is low, the second is high,
-  // but if there is only one value, it is the high
+  // ExtractHigh and ExtractLow assumes if there are two or more numbers (with or without decimal points), 
+  // the first is low, the second is high, but if there is only one value, it is the high
+  // See extensive notes near the methods. 
   @Test
   public void testExtractLow() {
 
