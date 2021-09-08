@@ -16,7 +16,6 @@ import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
 import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.Device;
-import org.hl7.fhir.r4.model.DiagnosticReport;
 import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Observation;
 import org.hl7.fhir.r4.model.Observation.ObservationReferenceRangeComponent;
@@ -58,10 +57,10 @@ public class DifferentObservationValueTest {
         private HL7MessageModel message = new HL7MessageModel("ADT", Lists.newArrayList(observation));
 
         @Test
-        public void test_observation_NM_result() throws IOException {
+        public void testObservationNmResult() throws IOException {
                 String hl7message = baseMessage + "OBX|1|NM|0135–4^TotalProtein||7.3|gm/dl|5.9-8.4|||R|F";
                 String json = message.convert(hl7message, engine);
-                System.out.println(json);
+
                 IBaseResource bundleResource = context.getParser().parseResource(json);
                 assertThat(bundleResource).isNotNull();
                 Bundle b = (Bundle) bundleResource;
@@ -90,7 +89,7 @@ public class DifferentObservationValueTest {
         }
 
         @Test
-        public void test_observation_TX_result() throws IOException {
+        public void testObservationTxResult() throws IOException {
                 String hl7message = baseMessage
                                 + "OBX|1|TX|^Type of protein feed^L||Fourth Line: HYPERDYNAMIC LV SYSTOLIC FUNCTION, VISUAL EF 80%||||||F||||Alex||";
                 String json = message.convert(hl7message, engine);
@@ -111,7 +110,7 @@ public class DifferentObservationValueTest {
         }
 
         @Test
-        public void test_observation_TX_multiple_parts_result() throws IOException {
+        public void testObservationTxMultiplePartsResult() throws IOException {
                 String hl7message = baseMessage
                                 + "OBX|1|TX|^Type of protein feed^L||HYPERDYNAMIC LV SYSTOLIC FUNCTION, VISUAL EF 80%~Fifth line, as part of a repeated field||||||F||";
                 String json = message.convert(hl7message, engine);
@@ -130,8 +129,9 @@ public class DifferentObservationValueTest {
                                 "HYPERDYNAMIC LV SYSTOLIC FUNCTION, VISUAL EF 80%. Fifth line, as part of a repeated field.");
         }
 
+        // NOTE that even though we are testing for it CE is not part of HL7 V2.6
         @Test
-        public void test_observation_CE_result_unknown_system() throws IOException {
+        public void testObservationCeResultUnknownSystem() throws IOException {
                 String hl7message = baseMessage
                                 + "OBX|1|CE|93000&CMP^LIN^CPT4|11|1305^No significant change was found^MEIECG";
                 String json = message.convert(hl7message, engine);
@@ -156,7 +156,7 @@ public class DifferentObservationValueTest {
         }
 
         @Test
-        public void test_observation_CE_result_known_system() throws IOException {
+        public void testObservationCeResultKnownSystem() throws IOException {
                 String hl7message = baseMessage
                                 + "OBX|1|CE|93000&CMP^LIN^CPT4|11|1305^No significant change was found^LN";
                 String json = message.convert(hl7message, engine);
@@ -181,11 +181,11 @@ public class DifferentObservationValueTest {
         }
 
         @Test
-        public void test_observation_ST_null_result() throws IOException {
+        public void testObservationStNullResult() throws IOException {
                 String hl7message = baseMessage
                                 + "OBX|1|ST|14151-5^HCO3 BldCo-sCnc^LN|TEST|||||||F|||20210311122016|||||20210311122153||||";
                 String json = message.convert(hl7message, engine);
-                System.out.println(json);
+
                 IBaseResource bundleResource = context.getParser().parseResource(json);
                 assertThat(bundleResource).isNotNull();
                 Bundle b = (Bundle) bundleResource;
@@ -218,7 +218,7 @@ public class DifferentObservationValueTest {
                                 + "OBX|1|CWE|DQW^Some text 1^SNM3|100|DQW^Other text 2^SNM3|mm^Text 3^SNM3|56-98|IND|25|ST|F|20210322153839|LKJ|20210320153850|N56|1111^ClinicianLastName^ClinicianFirstName^^^^Title|Manual^Text the 4th^SNM3|Device_1234567|20210322153925|Observation Site^Text 5^SNM3|Instance Identifier||Radiology^Radiological Services|467 Albany Hospital^^Albany^NY|Cardiology^ContactLastName^Jane^Q^^Dr.^MD\r";
 
                 String json = message.convert(hl7message, engine);
-                System.out.println(json);
+
                 IBaseResource bundleResource = context.getParser().parseResource(json);
                 assertThat(bundleResource).isNotNull();
                 Bundle b = (Bundle) bundleResource;
@@ -283,9 +283,13 @@ public class DifferentObservationValueTest {
                                 .map(BundleEntryComponent::getResource).collect(Collectors.toList());
                 assertThat(organizationResource).hasSize(1);
                 Organization org = getResourceOrganization(organizationResource.get(0));
-                assertThat(org.getName()).isEqualTo("Radiology");; // from OBX.23
+                assertThat(org.getName()).isEqualTo("Radiology"); // from OBX.23
+                assertThat(org.getAddress().get(0).getLine().get(0).getValueAsString()).isEqualTo("467 Albany Hospital"); // from OBX.24
                 assertThat(org.getAddress().get(0).getCity()).isEqualTo("Albany"); // from OBX.24
+                assertThat(org.getAddress().get(0).getState()).isEqualTo("NY"); // from OBX.24
                 assertThat(org.getContact().get(0).getName().getFamily()).isEqualTo("ContactLastName"); // from OBX.25
+                assertThat(org.getContact().get(0).getName().getGiven().get(0).getValueAsString()).isEqualTo("Jane"); // from OBX.25
+                assertThat(org.getContact().get(0).getName().getText()).isEqualTo("Dr. Jane Q ContactLastName"); // from OBX.25
 
                 // Check method  (OBX.17)
                 assertThat(obs.hasMethod()).isTrue();
