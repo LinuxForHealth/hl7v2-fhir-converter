@@ -1,0 +1,24 @@
+#
+# (C) Copyright IBM Corp. 2020, 2021
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+---
+resourceType: Device
+id:
+  type: STRING
+  valueOf: 'UUID.randomUUID()'
+  expressionType: JEXL
+
+# The FHIR Device resource doesn't have any required fields.
+# However we do not want empty Device resources.
+# Thefore wherever Device is referenced make sure to verify the value is NOT_NULL.
+identifier:
+    valueOf: datatype/Identifier_Gen
+    generateList: true
+    expressionType: resource
+    specs: OBX.18
+    vars:
+      id: OBX.18.1
+
+  

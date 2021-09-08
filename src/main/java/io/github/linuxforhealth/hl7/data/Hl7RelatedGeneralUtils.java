@@ -10,6 +10,9 @@ import java.time.temporal.Temporal;
 import java.time.temporal.UnsupportedTemporalTypeException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringTokenizer;
 import org.hl7.fhir.r4.model.codesystems.EncounterStatus;
@@ -26,23 +29,42 @@ public class Hl7RelatedGeneralUtils {
     private Hl7RelatedGeneralUtils() {
     }
 
-    public static String extractLow(Object var) {
-        String val = Hl7DataHandlerUtil.getStringValue(var);
+    // "When the observation quantifies the amount of a toxic substance, then the upper limit of the range identifies the toxic limit. 
+    // If the observation quantifies a drug, the lower limits identify the lower therapeutic bounds and the upper limits represent 
+    // the upper therapeutic bounds above which toxic side effects are common.
+    // We don't know if it's a toxic substance or a drug, but we understand that:
+    //  1. Two values means we have lower and upper limits.
+    //  2. One value means only the upper limit.
+    //
+
+    public static String extractLow(Object input) {
+        String val = Hl7DataHandlerUtil.getStringValue(input);
         if (StringUtils.isNotBlank(val)) {
-            StringTokenizer stk = new StringTokenizer(val, "-");
-            if (stk.hasNext())
-                return stk.next();
+            Pattern r = Pattern.compile("^\\D*?([\\d.]+)\\D*([\\d.]*).*");
+            Matcher m = r.matcher(val);
+
+            if (m.find() && !m.group(2).isEmpty()){
+                    return m.group(1);
+            } 
+            return null;
         }
         return null;
     }
 
-    public static String extractHigh(Object var) {
-        String val = Hl7DataHandlerUtil.getStringValue(var);
+    public static String extractHigh(Object input) {
+        String val = Hl7DataHandlerUtil.getStringValue(input);
         if (StringUtils.isNotBlank(val)) {
-            String[] values = val.split("-");
-            if (values.length == 2) {
-                return values[1];
+            Pattern r = Pattern.compile("^\\D*?([\\d.]+)\\D*([\\d.]*).*");
+            Matcher m = r.matcher(val);
+
+            if(m.find()) {
+                if (!m.group(2).isEmpty()){
+                    return m.group(2);
+                } else {
+                    return m.group(1);   
+                }
             }
+            return null;
         }
         return null;
     }
@@ -237,8 +259,8 @@ public class Hl7RelatedGeneralUtils {
 
 
 
-    // Takes all the pieces of telecom number from XTN, formats to a user friendly
-    // Telecom number based on rules documented in the steps
+    // Takes all the pieces of ContactPoint/telecom number from XTN, formats to a user friendly
+    // ContactPoint/Telecom number based on rules documented in the steps
     public static String getFormattedTelecomNumberValue(String xtn1Old, String xtn5Country, String xtn6Area,
             String xtn7Local, String xtn8Extension, String xtn12Unformatted) {
         String returnValue = "";
