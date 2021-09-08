@@ -19,7 +19,7 @@ resources:
       isReferenced: true
       repeats: false
       additionalSegments:
-             - .PD1
+             - PD1
              - MSH
       
     - resourceName: Encounter
