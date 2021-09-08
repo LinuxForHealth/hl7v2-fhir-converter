@@ -330,13 +330,31 @@ public class DifferentObservationValueTest {
                 Bundle b = (Bundle) bundleResource;
                 List<BundleEntryComponent> e = b.getEntry();
                 List<Resource> obsResource = e.stream()
-                        .filter(v -> ResourceType.Observation == v.getResource().getResourceType())
-                        .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+                                .filter(v -> ResourceType.Observation == v.getResource().getResourceType())
+                                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
                 assertThat(obsResource).hasSize(2);
                 Observation obs = (Observation) obsResource.get(0);
-                assertThat(obs.hasValueCodeableConcept()).isTrue();
-                 // Check the coding  (OBX.3)
-                assertThat(obs.hasCode()).isTrue();
+                assertThat(obs.hasReferenceRange()).isTrue();
+                assertThat(obs.getReferenceRange()).hasSize(1);
+                ObservationReferenceRangeComponent range = obs.getReferenceRangeFirstRep();
+                assertThat(range).isNotNull();
+                assertThat(range.hasHigh()).isFalse();
+                assertThat(range.hasLow()).isFalse();
+                assertThat(range.hasText()).isTrue();
+                assertThat(range.getText()).isEqualTo("Negative");
+
+                obs = (Observation) obsResource.get(1);
+                assertThat(obs.hasReferenceRange()).isTrue();
+                assertThat(obs.getReferenceRange()).hasSize(1);
+                range = obs.getReferenceRangeFirstRep();
+                assertThat(range).isNotNull();
+                assertThat(range.hasHigh()).isTrue();
+                assertThat(range.hasLow()).isFalse();
+                Quantity high = range.getHigh();
+                assertThat(high.getUnit()).isEqualTo("[IU]/mL");
+                assertThat(high.getValue().floatValue()).isEqualTo(0.5f);
+                assertThat(range.hasText()).isTrue();
+                assertThat(range.getText()).isEqualTo("<0.50 IU/mL");
 
         }
 
