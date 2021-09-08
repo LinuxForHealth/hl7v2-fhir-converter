@@ -53,7 +53,7 @@ public class ExpressionAttributes {
   private String toString;
   private List<ExpressionAttributes> expressions;
   private Map<String, ExpressionAttributes> expressionsMap;
-
+  private boolean isEvaluateLater;
 
 
   // if valueof attribute ends with * then list of values will be generated
@@ -71,6 +71,7 @@ public class ExpressionAttributes {
     this.name = exBuilder.name;
 
     this.isRequired = exBuilder.isRequired;
+    this.isEvaluateLater = exBuilder.isEvaluateLater;
     this.specs = getSpecList(exBuilder.rawSpecs, exBuilder.useGroup);
     if (StringUtils.isNotBlank(exBuilder.rawCondition)) {
       this.condition = ConditionUtil.createCondition(exBuilder.rawCondition);
@@ -253,6 +254,12 @@ public class ExpressionAttributes {
 
 
 
+  public boolean isEvaluateLater() {
+    return isEvaluateLater;
+  }
+
+
+
   public static class Builder {
 
 
@@ -274,6 +281,8 @@ public class ExpressionAttributes {
     private List<ExpressionAttributes> expressions;
 
     private Map<String, ExpressionAttributes> expressionsMap;
+    private boolean isEvaluateLater;
+
 
     public Builder() {}
 
@@ -303,6 +312,11 @@ public class ExpressionAttributes {
 
     public Builder withRequired(boolean isRequired) {
       this.isRequired = isRequired;
+      return this;
+    }
+
+    public Builder withEvaluateLater(boolean isEvaluateLater) {
+      this.isEvaluateLater = isEvaluateLater;
       return this;
     }
 

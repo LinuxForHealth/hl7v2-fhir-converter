@@ -24,6 +24,7 @@ import io.github.linuxforhealth.core.exception.DataExtractionException;
 import io.github.linuxforhealth.core.exception.RequiredConstraintFailureException;
 import io.github.linuxforhealth.core.expression.EmptyEvaluationResult;
 import io.github.linuxforhealth.core.expression.EvaluationResultFactory;
+import io.github.linuxforhealth.hl7.message.HL7MessageData;
 import io.github.linuxforhealth.hl7.resource.ResourceEvaluationResult;
 
 public class ExpressionUtility {
@@ -50,7 +51,7 @@ public class ExpressionUtility {
       Map<String, Expression> expressionMap) {
 
     try {
-
+      Map<String, Expression> expressionsToEvaluateLater = new HashMap<>();
       Map<String, EvaluationResult> localContext = new HashMap<>(context);
       // initialize the map and list to collect values
       List<ResourceValue> additionalResolveValues = new ArrayList<>();
@@ -60,33 +61,18 @@ public class ExpressionUtility {
 
         Expression exp = entry.getValue();
         LOGGER.debug(EVALUATING, entry.getKey(), entry.getValue());
-        EvaluationResult obj = exp.evaluate(dataSource, localContext, baseValue);
-        LOGGER.debug("Evaluated {} {} value returned {} ", entry.getKey(), entry.getValue(), obj);
-
-        if (obj != null && !obj.isEmpty()) {
-          String keyNameSuffix = getKeyNameSuffix(localContext);
-          // Check if the key already exist in the HashMap, if found append, do not replace
-          if (!resolveValues.containsKey(getKeyName(entry.getKey(), keyNameSuffix))) {
-            resolveValues.put(getKeyName(entry.getKey(), keyNameSuffix), obj.getValue());
-          } else {
-            Object existing = resolveValues.get(getKeyName(entry.getKey(), keyNameSuffix));
-            if (existing instanceof List) {
-              if (obj.getValue() instanceof List) {
-                ((List<Object>) existing).addAll(obj.getValue());
-              } else {
-                ((List<Object>) existing).add(obj.getValue());
-              }
-            }
-          }
-          if (obj.getAdditionalResources() != null && !obj.getAdditionalResources().isEmpty()) {
-            additionalResolveValues.addAll(obj.getAdditionalResources());
-          }
+        if (exp.isEvaluateLater()) {
+          expressionsToEvaluateLater.put(entry.getKey(), entry.getValue());
+        } else {
+          processExpression(dataSource, baseValue, localContext, additionalResolveValues,
+              resolveValues, entry);
         }
       }
-
       resolveValues.values().removeIf(Objects::isNull);
-
-      return new ResourceEvaluationResult(resolveValues, additionalResolveValues);
+      expressionsToEvaluateLater.entrySet()
+          .forEach(ent -> System.out.println("*************" + ent));
+      return new ResourceEvaluationResult(resolveValues, additionalResolveValues,
+          expressionsToEvaluateLater);
 
     } catch (RequiredConstraintFailureException e) {
       LOGGER.warn("Resource Constraint condition not satisfied , exception {}", e.getMessage());
@@ -99,6 +85,35 @@ public class ExpressionUtility {
 
     }
 
+  }
+
+  private static void processExpression(InputDataExtractor dataSource, EvaluationResult baseValue,
+      Map<String, EvaluationResult> localContext, List<ResourceValue> additionalResolveValues,
+      Map<String, Object> resolveValues, Entry<String, Expression> entry) {
+    EvaluationResult obj = entry.getValue().evaluate(dataSource, localContext, baseValue);
+    LOGGER.debug("Evaluated {} {} value returned {} ", entry.getKey(), entry.getValue(), obj);
+
+    if (obj != null && !obj.isEmpty()) {
+      String keyNameSuffix = getKeyNameSuffix(localContext);
+      // Check if the key already exist in the HashMap, if found append, do not replace
+      if (!resolveValues.containsKey(getKeyName(entry.getKey(), keyNameSuffix))) {
+        resolveValues.put(getKeyName(entry.getKey(), keyNameSuffix), obj.getValue());
+      } else {
+        Object existing = resolveValues.get(getKeyName(entry.getKey(), keyNameSuffix));
+        if (existing instanceof List) {
+          if (obj.getValue() instanceof List) {
+            ((List<Object>) existing).addAll(obj.getValue());
+          } else {
+            ((List<Object>) existing).add(obj.getValue());
+          }
+        }
+      }
+
+      if (obj.getAdditionalResources() != null && !obj.getAdditionalResources().isEmpty()
+          && additionalResolveValues != null) {
+        additionalResolveValues.addAll(obj.getAdditionalResources());
+      }
+    }
   }
 
   private static String getKeyName(String key, String suffix) {
@@ -133,6 +148,38 @@ public class ExpressionUtility {
       return EvaluationResultFactory.getEvaluationResult(resourceMap.get(fetch.getValue()));
     } else {
       return new EmptyEvaluationResult();
+    }
+  }
+
+  public static ResourceEvaluationResult evaluate(HL7MessageData dataSource,
+      Map<String, EvaluationResult> context, Map<String, Expression> expressionMap) {
+    try {
+
+      Map<String, EvaluationResult> localContext = new HashMap<>(context);
+      Map<String, Object> resolveValues = new HashMap<>();
+
+      for (Entry<String, Expression> entry : expressionMap.entrySet()) {
+
+
+        LOGGER.debug(EVALUATING, entry.getKey(), entry.getValue());
+
+        processExpression(dataSource, new EmptyEvaluationResult(), localContext, null,
+            resolveValues, entry);
+
+      }
+      resolveValues.values().removeIf(Objects::isNull);
+
+      return new ResourceEvaluationResult(resolveValues);
+
+    } catch (RequiredConstraintFailureException e) {
+      LOGGER.warn("Resource Constraint condition not satisfied , exception {}", e.getMessage());
+      LOGGER.debug("Resource Constraint condition not satisfied, exception", e);
+      return null;
+
+    } catch (IllegalArgumentException | IllegalStateException | DataExtractionException e) {
+      LOGGER.error("Exception during  resource evaluation reason ", e);
+      return null;
+
     }
   }
 

@@ -455,7 +455,7 @@ public class Hl7IdentifierFHIRConversionTest {
         // Filler and placer from ORC
         String diagnosticReport = "MSH|^~\\&|PROSLOV|MYHOSPITAL|WHIA|IBM|20170825010500||ORU^R01|MSGID22102712|T|2.6\n"
                 + "PID|||1234||DOE^JANE^|||F||||||||||||||||||||||\n"
-                + "ORC|NW|PON001|FON001|PGN001|SC|D|1||20170825010500|MS|MS||||20170825010500|\n"
+                + "ORC|NW|PON001^LE|FON001^OE PHIMS Stage|PGN001|SC|D|1||20170825010500|MS|MS||||20170825010500|\n"
                 + "OBR|1||CD_000000|2244^General Order|||20170825010500||||||Relevant Clinical Information|||||||002|||||F\n"
                 + "OBX|1|TX|||Impression: 1. Markedly intense metabolic activity corresponding with the area of nodular enhancement in the left oral cavity.||||||F|||20170825010500\n";
         DiagnosticReport report = ResourceUtils.getDiagnosticReport(diagnosticReport);
@@ -475,8 +475,8 @@ public class Hl7IdentifierFHIRConversionTest {
         identifier = report.getIdentifier().get(1);
         value = identifier.getValue();
         system = identifier.getSystem();
-        assertThat(value).isEqualTo("FON001"); // ORC-3
-        assertThat(system).isNull();
+        assertThat(value).isEqualTo("FON001"); // ORC-3.1
+        assertThat(system).isEqualTo("urn:id:OE-PHIMS-Stage"); // ORC-3.2 any whitespace gets replaced with Hyphens
         CodeableConcept type = identifier.getType();
         Coding coding = type.getCoding().get(0);
         assertThat(type.getText()).isNull();
@@ -489,8 +489,8 @@ public class Hl7IdentifierFHIRConversionTest {
         value = identifier.getValue();
         system = identifier.getSystem();
 
-        assertThat(value).isEqualTo("PON001"); // ORC-2
-        assertThat(system).isNull();
+        assertThat(value).isEqualTo("PON001"); // ORC-2.1
+        assertThat(system).isEqualTo("urn:id:LE"); // ORC-2.2
         type = identifier.getType();
         coding = type.getCoding().get(0);
         assertThat(type.getText()).isNull();
@@ -502,7 +502,7 @@ public class Hl7IdentifierFHIRConversionTest {
         diagnosticReport = "MSH|^~\\&|PROSLOV|MYHOSPITAL|WHIA|IBM|20170825010500||ORU^R01|MSGID22102712|T|2.6\n"
                 + "PID|||1234||DOE^JANE^|||F||||||||||||||||||||||\n"
                 + "ORC|NW|||PGN001|SC|D|1||20170825010500|MS|MS||||20170825010500|\n"
-                + "OBR|1|CC_000000|CD_000000|2244^General Order|||20170825010500||||||Relevant Clinical Information|||||||002|||||F\n"
+                + "OBR|1|CC_000000^OE PHIMS Stage|CD_000000|2244^General Order|||20170825010500||||||Relevant Clinical Information|||||||002|||||F\n"
                 + "OBX|1|TX|||Impression: 1. Markedly intense metabolic activity corresponding with the area of nodular enhancement in the left oral cavity.||||||F|||20170825010500\n";
         report = ResourceUtils.getDiagnosticReport(diagnosticReport);
 
@@ -521,8 +521,8 @@ public class Hl7IdentifierFHIRConversionTest {
         identifier = report.getIdentifier().get(1);
         value = identifier.getValue();
         system = identifier.getSystem();
-        assertThat(value).isEqualTo("CD_000000"); // OBR-3
-        assertThat(system).isNull();
+        assertThat(value).isEqualTo("CD_000000"); // OBR-3.1
+        assertThat(system).isNull(); // OBR-3.2 is empty
         type = identifier.getType();
         coding = type.getCoding().get(0);
         assertThat(type.getText()).isNull();
@@ -536,7 +536,7 @@ public class Hl7IdentifierFHIRConversionTest {
         system = identifier.getSystem();
 
         assertThat(value).isEqualTo("CC_000000"); // OBR-2
-        assertThat(system).isNull();
+        assertThat(system).isEqualTo("urn:id:OE-PHIMS-Stage"); // OBR-2.2
         type = identifier.getType();
         coding = type.getCoding().get(0);
         assertThat(type.getText()).isNull();
@@ -693,24 +693,22 @@ public class Hl7IdentifierFHIRConversionTest {
 
     @Test
     public void procedureIdentifierTest() {
-        // ExtID from OBR-44, filler and placer from ORC, visit number from PID-18
+        // with PR1 and PID segments used to create identifiers
         String procedureMsg = "MSH|^~\\&|HL7Soup|Instance1|MCM||200911021022|Security|ADT^A01^ADT_A01|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6|56789^NID^UID|MCM|CDP|^4086::132:2A57:3C28^IPV6|^4086::132:2A57:3C25^IPV6|\n"
                 + "PID|1||000054321^^^MRN|||||||||||||M|CAT|78654^^^ACME||||N\n"
-                + "ORC|NW|PON001|FON001|PGN001|SC|D|1||20170825010500|MS|MS||||20170825010500|\n"
-                + "OBR|1||CD_000000|2244^General Order|||20170825010500||||||Relevant Clinical Information|||||||002|||||F|||||||||||||||||||78654||\n"
                 + "ROL|5897|UP|AD||20210322133821|20210322133822|10||Hospital|ST||||USA\n"
                 + "PR1|1|ICD10|B45678|Fix break|20210322155008|A|75||V46|80|||32|1|D22|G45|1|G|P98|X|0|0\n";
         Procedure procedure = ResourceUtils.getProcedure(procedureMsg);
 
-        // Expect 4 identifiers
+        // Expect 2 identifiers
         assertThat(procedure.hasIdentifier()).isTrue();
-        assertThat(procedure.getIdentifier()).hasSize(4);
+        assertThat(procedure.getIdentifier()).hasSize(2);
 
-        // Identifier 1: ExtID from OBR-44
+        // Identifier 1: PR1.19
         Identifier identifier = procedure.getIdentifier().get(0);
         String value = identifier.getValue();
         String system = identifier.getSystem();
-        assertThat(value).isEqualTo("78654"); // OBR.44.1
+        assertThat(value).isEqualTo("P98"); // PR1.19.1
         assertThat(system).isEqualTo("urn:id:extID");
 
         // Identifier 2: Visit number from PID-18
@@ -726,50 +724,25 @@ public class Hl7IdentifierFHIRConversionTest {
         assertThat(coding.getCode()).isEqualTo("VN");
         assertThat(coding.getDisplay()).isEqualTo("Visit number");
 
-        // Identifier 3: Filler from ORC
-        identifier = procedure.getIdentifier().get(2);
-        value = identifier.getValue();
-        system = identifier.getSystem();
-        assertThat(value).isEqualTo("FON001"); // ORC.3.1
-        assertThat(system).isNull();
-        type = identifier.getType();
-        coding = type.getCoding().get(0);
-        assertThat(type.getText()).isNull();
-        assertThat(coding.getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/v2-0203");
-        assertThat(coding.getCode()).isEqualTo("FILL");
-        assertThat(coding.getDisplay()).isEqualTo("Filler Identifier");
 
-        // Identifier 4: Placer from ORC
-        identifier = procedure.getIdentifier().get(3);
-        value = identifier.getValue();
-        system = identifier.getSystem();
-        assertThat(value).isEqualTo("PON001"); // ORC.2.1
-        assertThat(system).isNull();
-        type = identifier.getType();
-        coding = type.getCoding().get(0);
-        assertThat(type.getText()).isNull();
-        assertThat(coding.getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/v2-0203");
-        assertThat(coding.getCode()).isEqualTo("PLAC");
-        assertThat(coding.getDisplay()).isEqualTo("Placer Identifier");
-
-        // Test: ExtID from OBR-45, filler and placer from OBR, visit number from PV1-19
-        String procedureOBR = "MSH|^~\\&|||MCM||200911021022|Security|ADT^A01^ADT_A01|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6||MCM|CDP|^4086::132:2A57:3C28^IPV6||\n"
-                + "PID|1||000054321^^^MRN|||||||||||||M|CAT|78654||||N\n"
-                + "OBR|1|PON001|CD_000000|2244^General Order|||20170825010500|||||||||||||002|||||F|||||||770600&Das770600&Surjya&P^^^6N^1234^A|||||||||||||7865||\n"
+        // Test: MSH.7 and PV1.19
+        String procedureMSH = "MSH|^~\\&||Instance1|MCM||200911021022|Security|ADT^A01^ADT_A01|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6|56789^NID^UID|MCM|CDP|^4086::132:2A57:3C28^IPV6|^4086::132:2A57:3C25^IPV6|\n"
+                + "PID|1||000054321^^^MRN|||||||||||||M|CAT|||||N\n"
                 + "PV1||I|6N^1234^A^GENERAL HOSPITAL2|||||||SUR||||||||S|8846511|A|||||||||||||||||||SF|K||||20170215080000\n"
                 + "ROL|5897|UP|AD||20210322133821|20210322133822|10||Hospital|ST||||USA\n"
-                + "PR1|1|ICD10|B45678|Fix break|20210322155008|A|75||V46|80|||32|1|D22|G45|1|G|P98|X|0|0\n";
-        procedure = ResourceUtils.getProcedure(procedureOBR); // Instead of ORC values we use OBR
+                + "PR1|1|ICD10|B45678|Fix break|20210322155008|A|75||V46|80|||32|1|D22|G45|1|G||X|0|0\n";
 
-        // Expect 4 identifiers
+        procedure = ResourceUtils.getProcedure(procedureMSH);
+
+        // Expect 2 identifiers
         assertThat(procedure.hasIdentifier()).isTrue();
-        assertThat(procedure.getIdentifier()).hasSize(4);
+        assertThat(procedure.getIdentifier()).hasSize(2);
 
-        // Identifier 1: ExtID from  OBR-45
+        // Identifier 1: PR1
         identifier = procedure.getIdentifier().get(0);
         value = identifier.getValue();
         system = identifier.getSystem();
-        assertThat(value).isEqualTo("7865"); // OBR.45.1
+        assertThat(value).isEqualTo("200911021022"); // MSH.7
         assertThat(system).isEqualTo("urn:id:extID");
 
         // Identifier 2: Visit number from PV1-19
@@ -777,156 +750,70 @@ public class Hl7IdentifierFHIRConversionTest {
         String valueOBR = identifier.getValue();
         system = identifier.getSystem();
         assertThat(valueOBR).isEqualTo("8846511"); // PV1.19.1
-        assertThat(system).isNull();
+        assertThat(system).isNull(); // No System PV1.19.2 DNE
         type = identifier.getType();
         coding = type.getCoding().get(0);
         assertThat(type.getText()).isNull();
         assertThat(coding.getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/v2-0203");
         assertThat(coding.getCode()).isEqualTo("VN");
         assertThat(coding.getDisplay()).isEqualTo("Visit number");
-
-        // Identifier 3: Filler from OBR
-        identifier = procedure.getIdentifier().get(2);
-        value = identifier.getValue();
-        system = identifier.getSystem();
-        assertThat(value).isEqualTo("CD_000000"); // OBR.3.1
-        assertThat(system).isNull();
-        type = identifier.getType();
-        coding = type.getCoding().get(0);
-        assertThat(type.getText()).isNull();
-        assertThat(coding.getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/v2-0203");
-        assertThat(coding.getCode()).isEqualTo("FILL");
-        assertThat(coding.getDisplay()).isEqualTo("Filler Identifier");
-
-        // Identifier 4: Placer from OBR
-        identifier = procedure.getIdentifier().get(3);
-        value = identifier.getValue();
-        system = identifier.getSystem();
-        assertThat(value).isEqualTo("PON001"); // OBR.2.1
-        assertThat(system).isNull();
-        type = identifier.getType();
-        coding = type.getCoding().get(0);
-        assertThat(type.getText()).isNull();
-        assertThat(coding.getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/v2-0203");
-        assertThat(coding.getCode()).isEqualTo("PLAC");
-        assertThat(coding.getDisplay()).isEqualTo("Placer Identifier");
-
-        // Test: ExtID from MSH-7, filler and placer from ORC, visit number from MSH-7
-        String procedureMSH = "MSH|^~\\&||Instance1|MCM||200911021022|Security|ADT^A01^ADT_A01|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6|56789^NID^UID|MCM|CDP|^4086::132:2A57:3C28^IPV6|^4086::132:2A57:3C25^IPV6|\n"
-                + "PID|1||000054321^^^MRN|||||||||||||M|CAT|||||N\n"
-                + "ORC|NW|PON001|FON001|PGN001|SC|D|1||20170825010500|MS|MS||||20170825010500|\n"
-                + "OBR|1|||2244^General Order|||20170825010500||||||Relevant Clinical Information||\n"
-                + "ROL|5897|UP|AD||20210322133821|20210322133822|10||Hospital|ST||||USA\n"
-                + "PR1|1|ICD10|B45678|Fix break|20210322155008|A|75||V46|80|||32|1|D22|G45|1|G|P98|X|0|0\n";
-
-        procedure = ResourceUtils.getProcedure(procedureMSH); // Instead of ORC values we use OBR
-
-        // Expect 4 identifiers
-        assertThat(procedure.hasIdentifier()).isTrue();
-        assertThat(procedure.getIdentifier()).hasSize(4);
-
-        // Identifier 1: ExtID from  MSH.7
-        identifier = procedure.getIdentifier().get(0);
-        value = identifier.getValue();
-        system = identifier.getSystem();
-        assertThat(value).isEqualTo("200911021022"); // MSH.7
-        assertThat(system).isEqualTo("urn:id:extID");
-
-        // Identifier 2: Visit number from MSH.7
-        identifier = procedure.getIdentifier().get(1);
-        String valueMSH = identifier.getValue();
-        system = identifier.getSystem();
-        assertThat(valueMSH).isEqualTo("200911021022"); // MSH.7
-        assertThat(system).isNull();
-        type = identifier.getType();
-        coding = type.getCoding().get(0);
-        assertThat(type.getText()).isNull();
-        assertThat(coding.getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/v2-0203");
-        assertThat(coding.getCode()).isEqualTo("VN");
-        assertThat(coding.getDisplay()).isEqualTo("Visit number");
-
-        // Identifier 3: Filler from ORC
-        identifier = procedure.getIdentifier().get(2);
-        value = identifier.getValue();
-        system = identifier.getSystem();
-        assertThat(value).isEqualTo("FON001"); // ORC.3.1
-        assertThat(system).isNull();
-        type = identifier.getType();
-        coding = type.getCoding().get(0);
-        assertThat(type.getText()).isNull();
-        assertThat(coding.getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/v2-0203");
-        assertThat(coding.getCode()).isEqualTo("FILL");
-        assertThat(coding.getDisplay()).isEqualTo("Filler Identifier");
-
-        // Identifier 4: Placer from ORC
-        identifier = procedure.getIdentifier().get(3);
-        value = identifier.getValue();
-        system = identifier.getSystem();
-        assertThat(value).isEqualTo("PON001"); // ORC.2.1
-        assertThat(system).isNull();
-        type = identifier.getType();
-        coding = type.getCoding().get(0);
-        assertThat(type.getText()).isNull();
-        assertThat(coding.getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/v2-0203");
-        assertThat(coding.getCode()).isEqualTo("PLAC");
-        assertThat(coding.getDisplay()).isEqualTo("Placer Identifier");
     }
 
 //      @Test //Test works, but message type is not configured yet
 //      public void documentReferenceIdentifierTest() {
-//         // Filler and placer from ORC, extId from MSH-7
-//        String documentReference =
-//                "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|MDM^T02^MDM_T02|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6|56789^NID^UID|MCM||||\n" +
-//                "PID|1||000054321^^^MRN|||||||||||||M|CAT|||||N\n" + // PID segment failing due to meta extension problem.
-//                "TXA|1||B45678||||||\n" +
-//                "ORC|NW|PON001|FON001|PGN001|SC|D|1||20170825010500|MS|MS||||20170825010500|\n" +
-//                "OBR|1||CD_000000|2244^General Order|||20170825010500||||||Relevant Clinical Information|||||||002|||||F|||550600^Tsadok550600^Janetary~660600^Merrit660600^Darren^F~770600^Das770600^Surjya^P~880600^Winter880600^Oscar^||||770600&Das770600&Surjya&P^^^6N^1234^A|\n";
-//       DocumentReference report = ResourceUtils.getDocumentReference(documentReference);
+//          // Filler and placer from ORC, extId from MSH-7
+//          String documentReference =
+//                  "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|MDM^T02^MDM_T02|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6|56789^NID^UID|MCM||||\n" +
+//                          "PID|1||000054321^^^MRN|||||||||||||M|CAT|||||N\n" +
+//                          "TXA|1||B45678||||||\n" +
+//                          "ORC|NW|PON001^LE|FON001^OE|PGN001|SC|D|1||20170825010500|MS|MS||||20170825010500|\n" +
+//                          "OBR|1||CD_000000^IE|2244^General Order|||20170825010500||||||Relevant Clinical Information|||||||002|||||F|||550600^Tsadok550600^Janetary~660600^Merrit660600^Darren^F~770600^Das770600^Surjya^P~880600^Winter880600^Oscar^||||770600&Das770600&Surjya&P^^^6N^1234^A|\n";
+//          DocumentReference report = ResourceUtils.getDocumentReference(documentReference);
 //
-//        // Expect 3 identifiers
-//        assertThat(report.hasIdentifier()).isTrue();
-//        assertThat(report.getIdentifier()).hasSize(3);
+//          // Expect 3 identifiers
+//          assertThat(report.hasIdentifier()).isTrue();
+//          assertThat(report.getIdentifier()).hasSize(3);
 //
-//        // Identifier 1: extID from MSH-7
-//        Identifier identifier = report.getIdentifier().get(0);
-//        String value = identifier.getValue();
-//        String system = identifier.getSystem();
-//        assertThat(value).isEqualTo("200911021022");  // MSH-7
-//        assertThat(system).isEqualTo("urn:id:extID");
+//          // Identifier 1: extID from MSH-7
+//          Identifier identifier = report.getIdentifier().get(0);
+//          String value = identifier.getValue();
+//          String system = identifier.getSystem();
+//          assertThat(value).isEqualTo("200911021022");  // MSH-7
+//          assertThat(system).isEqualTo("urn:id:extID");
 //
-//        // Identifier 2: Filler
-//        identifier = report.getIdentifier().get(1);
-//        value = identifier.getValue();
-//        system = identifier.getSystem();
-//        assertThat(value).isEqualTo("FON001"); //ORC.3
-//        assertThat(system).isNull();
-//        CodeableConcept type = identifier.getType();
-//        Coding coding = type.getCoding().get(0);
-//        assertThat(type.getText()).isNull();
-//        assertThat(coding.getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/v2-0203");
-//        assertThat(coding.getCode()).isEqualTo("FILL");
-//        assertThat(coding.getDisplay()).isEqualTo("Filler Identifier");
+//          // Identifier 2: Filler
+//          identifier = report.getIdentifier().get(1);
+//          value = identifier.getValue();
+//          system = identifier.getSystem();
+//          assertThat(value).isEqualTo("FON001"); //ORC.3.1
+//          assertThat(system).isEqualTo("urn:id:OE"); // ORC.3.2
+//          CodeableConcept type = identifier.getType();
+//          Coding coding = type.getCoding().get(0);
+//          assertThat(type.getText()).isNull();
+//          assertThat(coding.getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/v2-0203");
+//          assertThat(coding.getCode()).isEqualTo("FILL");
+//          assertThat(coding.getDisplay()).isEqualTo("Filler Identifier");
 //
-//        // Identifier 3: Placer
-//        Identifier identifier3 = report.getIdentifier().get(2);
-//        value = identifier3.getValue();
-//        system = identifier3.getSystem();
-//        assertThat(value).isEqualTo("PON001"); //ORC.2
-//        assertThat(system).isNull();
-//        type = identifier3.getType();
-//        coding = type.getCoding().get(0);
-//        assertThat(type.getText()).isNull();
-//        assertThat(coding.getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/v2-0203");
-//        assertThat(coding.getCode()).isEqualTo("PLAC");
-//        assertThat(coding.getDisplay()).isEqualTo("Placer Identifier");
+//          // Identifier 3: Placer
+//          Identifier identifier3 = report.getIdentifier().get(2);
+//          value = identifier3.getValue();
+//          system = identifier3.getSystem();
+//          assertThat(value).isEqualTo("PON001"); //ORC.2.1
+//          assertThat(system).isEqualTo("urn:id:LE"); // ORC.2.2
+//          type = identifier3.getType();
+//          coding = type.getCoding().get(0);
+//          assertThat(type.getText()).isNull();
+//          assertThat(coding.getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/v2-0203");
+//          assertThat(coding.getCode()).isEqualTo("PLAC");
+//          assertThat(coding.getDisplay()).isEqualTo("Placer Identifier");
 //
 //          // Filler from OBR, placer from TXA-14
 //          documentReference =
 //                  "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|MDM^T02^MDM_T02|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6|56789^NID^UID|MCM||||\n" +
 //                          "PID|1||000054321^^^MRN|||||||||||||M|CAT|||||N\n" +
-//                          "TXA|1||B45678|||||||||||PON001\n" +
+//                          "TXA|1||B45678|||||||||||PON001^IE||\n" +
 //                          "ORC|NW|||PGN001|SC|D|1||20170825010500|MS|MS||||20170825010500|\n" +
-//                          "OBR|1||CD_000000|2244^General Order|||20170825010500||||||Relevant Clinical Information|||||||002|||||F|||550600^Tsadok550600^Janetary~660600^Merrit660600^Darren^F~770600^Das770600^Surjya^P~880600^Winter880600^Oscar^||||770600&Das770600&Surjya&P^^^6N^1234^A|\n";
+//                          "OBR|1||CD_000000^OE|2244^General Order|||20170825010500||||||Relevant Clinical Information|||||||002|||||F|||550600^Tsadok550600^Janetary~660600^Merrit660600^Darren^F~770600^Das770600^Surjya^P~880600^Winter880600^Oscar^||||770600&Das770600&Surjya&P^^^6N^1234^A|";
 //          report = ResourceUtils.getDocumentReference(documentReference);
 //
 //          // Expect 3 identifiers
@@ -944,8 +831,8 @@ public class Hl7IdentifierFHIRConversionTest {
 //          identifier = report.getIdentifier().get(1);
 //          value = identifier.getValue();
 //          system = identifier.getSystem();
-//          assertThat(value).isEqualTo("CD_000000"); //OBR.3
-//          assertThat(system).isNull();
+//          assertThat(value).isEqualTo("CD_000000"); //OBR.3.1
+//          assertThat(system).isEqualTo("urn:id:OE"); // OBR.3.2
 //          type = identifier.getType();
 //          coding = type.getCoding().get(0);
 //          assertThat(type.getText()).isNull();
@@ -958,7 +845,7 @@ public class Hl7IdentifierFHIRConversionTest {
 //          value = identifier3.getValue();
 //          system = identifier3.getSystem();
 //          assertThat(value).isEqualTo("PON001"); // TXA-14.1
-//          assertThat(system).isNull();
+//          assertThat(system).isEqualTo("urn:id:IE"); // TXA.14.2
 //          type = identifier3.getType();
 //          coding = type.getCoding().get(0);
 //          assertThat(type.getText()).isNull();
@@ -970,9 +857,9 @@ public class Hl7IdentifierFHIRConversionTest {
 //          documentReference =
 //                  "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|MDM^T02^MDM_T02|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6|56789^NID^UID|MCM||||\n" +
 //                          "PID|1||000054321^^^MRN|||||||||||||M|CAT|||||N\n" +
-//                          "TXA|1||B45678||||||||||||PON001\n" +
+//                          "TXA|1||B45678||||||||||||PON001^IE\n" +
 //                          "ORC|NW|||PGN001|SC|D|1||20170825010500|MS|MS||||20170825010500|\n" +
-//                          "OBR|1|CD_000000||2244^General Order|||20170825010500||||||Relevant Clinical Information|||||||002|||||F|||550600^Tsadok550600^Janetary~660600^Merrit660600^Darren^F~770600^Das770600^Surjya^P~880600^Winter880600^Oscar^||||770600&Das770600&Surjya&P^^^6N^1234^A|\n";
+//                          "OBR|1|CD_000000^OE||2244^General Order|||20170825010500||||||Relevant Clinical Information|||||||002|||||F|||550600^Tsadok550600^Janetary~660600^Merrit660600^Darren^F~770600^Das770600^Surjya^P~880600^Winter880600^Oscar^||||770600&Das770600&Surjya&P^^^6N^1234^A|\n";
 //          report = ResourceUtils.getDocumentReference(documentReference);
 //
 //          // Expect 3 identifiers
@@ -990,7 +877,7 @@ public class Hl7IdentifierFHIRConversionTest {
 //          value = identifier3.getValue();
 //          system = identifier3.getSystem();
 //          assertThat(value).isEqualTo("PON001"); // TXA-15.1
-//          assertThat(system).isNull();
+//          assertThat(system).isEqualTo("urn:id:IE"); // TXA.15.2
 //          type = identifier3.getType();
 //          coding = type.getCoding().get(0);
 //          assertThat(type.getText()).isNull();
@@ -1002,8 +889,8 @@ public class Hl7IdentifierFHIRConversionTest {
 //          identifier = report.getIdentifier().get(2);
 //          value = identifier.getValue();
 //          system = identifier.getSystem();
-//          assertThat(value).isEqualTo("CD_000000"); //OBR.2
-//          assertThat(system).isNull();
+//          assertThat(value).isEqualTo("CD_000000"); //OBR.2.1
+//          assertThat(system).isEqualTo("urn:id:OE"); // OBR.2.2
 //          type = identifier.getType();
 //          coding = type.getCoding().get(0);
 //          assertThat(type.getText()).isNull();
@@ -1045,7 +932,7 @@ public class Hl7IdentifierFHIRConversionTest {
         value = identifier.getValue();
         system = identifier.getSystem();
         assertThat(value).isEqualTo("9999999"); // ORC.3.1
-        assertThat(system).isNull();
+        assertThat(system).isEqualTo("urn:id:RX"); // ORC.3.2
         type = identifier.getType();
         coding = type.getCoding().get(0);
         assertThat(type.getText()).isNull();
@@ -1058,7 +945,7 @@ public class Hl7IdentifierFHIRConversionTest {
         value = identifier.getValue();
         system = identifier.getSystem();
         assertThat(value).isEqualTo("1000"); // ORC.2.1
-        assertThat(system).isNull();
+        assertThat(system).isEqualTo("urn:id:OE"); // ORC.2.2
         type = identifier.getType();
         coding = type.getCoding().get(0);
         assertThat(type.getText()).isNull();
@@ -1073,7 +960,7 @@ public class Hl7IdentifierFHIRConversionTest {
                 "PID|1||000054321^^^MRN|||||||||||||M|CAT|78654||||N\n" +
                 "PRB|AD|200603150625|aortic stenosis|53692||2||200603150625\n" +
                 "ORC||||||E|^Q6H^D10^^^R\n" +
-                "OBR|1|CD150920001336|CD150920001336|||20150930000000|20150930164100|||||||||25055^MARCUSON^PATRICIA^L|||||||||F|||5755^DUNN^CHAD^B~25055^MARCUSON^PATRICIA^L|||WEAKNESS|DAS, SURJYA P||SHIELDS, SHARON A|||||||||";
+                "OBR|1|CD150920001336^OE|CD150920001336^IE|||20150930000000|20150930164100|||||||||25055^MARCUSON^PATRICIA^L|||||||||F|||5755^DUNN^CHAD^B~25055^MARCUSON^PATRICIA^L|||WEAKNESS|DAS, SURJYA P||SHIELDS, SHARON A|||||||||";
 
         serviceReq = ResourceUtils.getServiceRequest(serviceRequest);
 
@@ -1099,7 +986,7 @@ public class Hl7IdentifierFHIRConversionTest {
         value = identifier.getValue();
         system = identifier.getSystem();
         assertThat(value).isEqualTo("CD150920001336"); // OBR.3.1
-        assertThat(system).isNull();
+        assertThat(system).isEqualTo("urn:id:IE"); // OBR.3.2
         type = identifier.getType();
         coding = type.getCoding().get(0);
         assertThat(type.getText()).isNull();
@@ -1112,7 +999,7 @@ public class Hl7IdentifierFHIRConversionTest {
         value = identifier.getValue();
         system = identifier.getSystem();
         assertThat(value).isEqualTo("CD150920001336"); // OBR.2.1
-        assertThat(system).isNull();
+        assertThat(system).isEqualTo("urn:id:OE"); // OBR.2.2
         type = identifier.getType();
         coding = type.getCoding().get(0);
         assertThat(type.getText()).isNull();

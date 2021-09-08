@@ -349,7 +349,7 @@ public class Hl7PatientFHIRConversionTest {
     Coding codeNo = ccNoCode.getLanguage().getCodingFirstRep();
     assertThat(codeNo.getCode()).isEqualTo("ENG");
     assertThat(codeNo.getSystem()).isNull();
-    assertThat(codeNo.hasDisplay()).isFalse();
+    assertThat(codeNo.getDisplay()).isEqualTo("English");
 
     Patient patientObjCodeOnly = PatientUtils.createPatientFromHl7Segment(patientEnglishCodeOnly);
     assertThat(patientObjCodeOnly.hasCommunication()).isTrue();
@@ -361,7 +361,7 @@ public class Hl7PatientFHIRConversionTest {
     Coding coding = ccCodeOnly.getLanguage().getCodingFirstRep();
     assertThat(coding.getCode()).isEqualTo("ENG");
     assertThat(coding.getSystem()).isNull();
-    assertThat(codeNo.hasDisplay()).isFalse();
+    assertThat(coding.getDisplay()).isNull();
 
   }
 

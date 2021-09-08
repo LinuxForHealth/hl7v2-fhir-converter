@@ -15,10 +15,9 @@ identifier_1:
    expressionType: resource
    vars:
       system: SYSTEM_URL, $sys
-      value: OBR.44.1 | OBR.45.1 | MSH.7
+      value: PR1.19.1 | MSH.7
    constants:
       sys: "urn:id:extID"
-
 identifier_2:
    condition: $valueIn NOT_NULL
    valueOf: datatype/Identifier_var
@@ -31,30 +30,6 @@ identifier_2:
       system: "http://terminology.hl7.org/CodeSystem/v2-0203"
       code: "VN"
       display: "Visit number"
-
-identifier_3:
-   condition: $valueIn NOT_NULL
-   valueOf: datatype/Identifier_var
-   generateList: true
-   expressionType: resource
-   vars:
-      valueIn: ORC.3.1 | OBR.3.1
-   constants:
-      system: "http://terminology.hl7.org/CodeSystem/v2-0203"
-      code: "FILL"
-      display: "Filler Identifier"
-
-identifier_4:
-   condition: $valueIn NOT_NULL
-   valueOf: datatype/Identifier_var
-   generateList: true
-   expressionType: resource
-   vars:
-      valueIn: ORC.2.1 | OBR.2.1
-   constants:
-      system: "http://terminology.hl7.org/CodeSystem/v2-0203"
-      code: "PLAC"
-      display: "Placer Identifier"
 
 status:
    type: STRING
