@@ -476,6 +476,7 @@ public class SimpleDataValueResolver {
         return null;
     };
 
+
     public static final ValueExtractor<Object, SimpleCode> MESSAGE_REASON_ENCOUNTER = (Object value) -> {
         String val = Hl7DataHandlerUtil.getStringValue(value);
         String code = getFHIRCode(val, MessageReasonEncounter.class);

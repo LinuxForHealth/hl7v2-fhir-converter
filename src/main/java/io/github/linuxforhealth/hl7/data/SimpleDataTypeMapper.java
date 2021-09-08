@@ -57,7 +57,6 @@ public enum SimpleDataTypeMapper {
   MARITAL_STATUS(SimpleDataValueResolver.MARITAL_STATUS),
   BUILD_IDENTIFIER_FROM_CWE(SimpleDataValueResolver.BUILD_IDENTIFIER_FROM_CWE),
   MEDREQ_STATUS(SimpleDataValueResolver.MEDREQ_STATUS_CODE_FHIR);
-
   private ValueExtractor<Object, ?> valueResolver;
 
   SimpleDataTypeMapper(ValueExtractor<Object, ?> valueResolver) {
