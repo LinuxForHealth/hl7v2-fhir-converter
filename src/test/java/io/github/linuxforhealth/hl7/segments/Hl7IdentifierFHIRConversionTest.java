@@ -22,7 +22,7 @@ import org.hl7.fhir.r4.model.Observation;
 import org.hl7.fhir.r4.model.Patient;
 import org.hl7.fhir.r4.model.Procedure;
 import org.hl7.fhir.r4.model.ServiceRequest;
-import org.hl7.fhir.r4.model.DocumentReference;
+//import org.hl7.fhir.r4.model.DocumentReference;
 import org.junit.jupiter.api.Test;
 
 import io.github.linuxforhealth.hl7.segments.util.PatientUtils;
@@ -455,7 +455,7 @@ public class Hl7IdentifierFHIRConversionTest {
         // Filler and placer from ORC
         String diagnosticReport = "MSH|^~\\&|PROSLOV|MYHOSPITAL|WHIA|IBM|20170825010500||ORU^R01|MSGID22102712|T|2.6\n"
                 + "PID|||1234||DOE^JANE^|||F||||||||||||||||||||||\n"
-                + "ORC|NW|PON001^LE|FON001^OE|PGN001|SC|D|1||20170825010500|MS|MS||||20170825010500|\n"
+                + "ORC|NW|PON001^LE|FON001^OE PHIMS Stage|PGN001|SC|D|1||20170825010500|MS|MS||||20170825010500|\n"
                 + "OBR|1||CD_000000|2244^General Order|||20170825010500||||||Relevant Clinical Information|||||||002|||||F\n"
                 + "OBX|1|TX|||Impression: 1. Markedly intense metabolic activity corresponding with the area of nodular enhancement in the left oral cavity.||||||F|||20170825010500\n";
         DiagnosticReport report = ResourceUtils.getDiagnosticReport(diagnosticReport);
@@ -476,7 +476,7 @@ public class Hl7IdentifierFHIRConversionTest {
         value = identifier.getValue();
         system = identifier.getSystem();
         assertThat(value).isEqualTo("FON001"); // ORC-3.1
-        assertThat(system).isEqualTo("urn:id:OE"); // ORC-3.2
+        assertThat(system).isEqualTo("urn:id:OE-PHIMS-Stage"); // ORC-3.2 any whitespace gets replaced with Hyphens
         CodeableConcept type = identifier.getType();
         Coding coding = type.getCoding().get(0);
         assertThat(type.getText()).isNull();
@@ -502,7 +502,7 @@ public class Hl7IdentifierFHIRConversionTest {
         diagnosticReport = "MSH|^~\\&|PROSLOV|MYHOSPITAL|WHIA|IBM|20170825010500||ORU^R01|MSGID22102712|T|2.6\n"
                 + "PID|||1234||DOE^JANE^|||F||||||||||||||||||||||\n"
                 + "ORC|NW|||PGN001|SC|D|1||20170825010500|MS|MS||||20170825010500|\n"
-                + "OBR|1|CC_000000^OE|CD_000000|2244^General Order|||20170825010500||||||Relevant Clinical Information|||||||002|||||F\n"
+                + "OBR|1|CC_000000^OE PHIMS Stage|CD_000000|2244^General Order|||20170825010500||||||Relevant Clinical Information|||||||002|||||F\n"
                 + "OBX|1|TX|||Impression: 1. Markedly intense metabolic activity corresponding with the area of nodular enhancement in the left oral cavity.||||||F|||20170825010500\n";
         report = ResourceUtils.getDiagnosticReport(diagnosticReport);
 
@@ -536,7 +536,7 @@ public class Hl7IdentifierFHIRConversionTest {
         system = identifier.getSystem();
 
         assertThat(value).isEqualTo("CC_000000"); // OBR-2
-        assertThat(system).isEqualTo("urn:id:OE"); // OBR-2.2
+        assertThat(system).isEqualTo("urn:id:OE-PHIMS-Stage"); // OBR-2.2
         type = identifier.getType();
         coding = type.getCoding().get(0);
         assertThat(type.getText()).isNull();
