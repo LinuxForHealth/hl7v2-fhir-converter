@@ -112,7 +112,7 @@ Not this:
 ```yaml
 telecom_1:
     condition: PID.14 NOT_NULL    
-    valueOf: datatype/Telecom
+    valueOf: datatype/ContactPoint
     generateList: true
     expressionType: resource
     specs: PID.14
@@ -124,7 +124,7 @@ Do this:
 ```yaml
 telecom_1:
     condition: $pid14 NOT_NULL    
-    valueOf: datatype/Telecom
+    valueOf: datatype/ContactPoint
     generateList: true
     expressionType: resource
     specs: PID.14
