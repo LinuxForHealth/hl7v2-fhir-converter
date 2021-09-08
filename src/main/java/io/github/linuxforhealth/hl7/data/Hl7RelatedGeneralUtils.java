@@ -136,6 +136,17 @@ public class Hl7RelatedGeneralUtils {
         return null;
     }
 
+    public static String noWhiteSpace(Object input) {
+        String val = Hl7DataHandlerUtil.getStringValue(input);
+        if(val != null) {
+            String newVal = val.replaceAll("\\s", "-");
+            String system = "urn:id:" + newVal;
+
+            return system;
+        }
+        else return null;
+    }
+
     public static String concatenateWithChar(Object input, String delimiterChar) {
         // Engine converts the delimiter character to a String; need to fix escaped characters
         // as they become 2 separate characters rather than 1. 
