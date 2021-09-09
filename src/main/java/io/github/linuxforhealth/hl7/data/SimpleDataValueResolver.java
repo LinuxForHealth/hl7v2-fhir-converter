@@ -334,7 +334,7 @@ public class SimpleDataValueResolver {
         return value;
     };
 
-    // Special case of a SYSTEM V2.  Identifiers allow unkown codes.
+    // Special case of a SYSTEM V2.  Identifiers allow unknown codes.
     // When an unknown code is detected, return a null so that the text is displayed instead.
     // Only a known code returns a coding.
     public static final ValueExtractor<Object, SimpleCode> CODING_SYSTEM_V2_IDENTIFIER = (Object value) -> {
