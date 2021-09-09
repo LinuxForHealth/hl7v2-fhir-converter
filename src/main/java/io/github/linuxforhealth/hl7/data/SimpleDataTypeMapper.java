@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2020
+ * (C) Copyright IBM Corp. 2020, 2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -34,6 +34,7 @@ public enum SimpleDataTypeMapper {
   OBJECT(SimpleDataValueResolver.OBJECT),
   CODING_SYSTEM_V2(SimpleDataValueResolver.CODING_SYSTEM_V2),
   CODING_SYSTEM_V2_ALTERNATE(SimpleDataValueResolver.CODING_SYSTEM_V2_ALTERNATE),
+  CODING_SYSTEM_V2_IDENTIFIER(SimpleDataValueResolver.CODING_SYSTEM_V2_IDENTIFIER),
   SYSTEM_URL(SimpleDataValueResolver.SYSTEM_URL),
   SYSTEM_ID(SimpleDataValueResolver.SYSTEM_ID),
 
