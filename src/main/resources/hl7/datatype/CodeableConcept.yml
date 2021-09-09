@@ -19,7 +19,7 @@ coding_1:
 
 coding_2:
    condition: $code NOT_NULL && $coding NULL
-   type: CODING_SYSTEM_V2
+   type: CODING_SYSTEM_V2_IDENTIFIER
    valueOf: ID |IS |TX
    generateList: true
    expressionType: HL7Spec
@@ -49,10 +49,9 @@ coding_5:
    condition: $coding NOT_NULL
    generateList: true
    
-# If hideText is not passed by parent, the value is NULL, making it backward compatible with all other uses of CodeableConcept
-# Any value in hideText will cause the text to be hidden.  Used by Identifier_SystemID. 
+# Require available text, and the absense of an identifierCoding
 text:
-   condition: $hideText NULL && $displayText NOT_NULL
+   condition: $displayText NOT_NULL && identifierCoding NULL
    type: STRING
    valueOf: $displayText
    vars:

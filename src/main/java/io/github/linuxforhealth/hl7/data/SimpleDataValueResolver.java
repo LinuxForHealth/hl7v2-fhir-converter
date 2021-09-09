@@ -324,6 +324,25 @@ public class SimpleDataValueResolver {
         return value;
     };
 
+    // Special case of a SYSTEM V2.  Identifiers allow unkown codes.
+    // When an unknown code is detected, return a null so that the text is displayed instead.
+    // Only a known code returns a coding.
+    public static final ValueExtractor<Object, SimpleCode> CODING_SYSTEM_V2_IDENTIFIER = (Object value) -> {
+        value = checkForAndUnwrapVariesObject(value);
+        String table = Hl7DataHandlerUtil.getTableNumber(value);
+        String code = Hl7DataHandlerUtil.getStringValue(value);
+        if (table != null && code != null) {
+            // Found table and a code. Try looking it up.
+            SimpleCode coding = TerminologyLookup.lookup(table, code);
+            // A non-null, non-empty value in display means a good code from lookup.
+            if (coding != null && coding.getDisplay()!=null && !coding.getDisplay().isEmpty()) {
+                return coding;
+            }
+        }    
+        // All other situations return null.  
+        return null;
+    };
+
     public static final ValueExtractor<Object, SimpleCode> CODING_SYSTEM_V2_ALTERNATE = (Object value) -> {
         value = checkForAndUnwrapVariesObject(value);
         // ensure we have a CWE
