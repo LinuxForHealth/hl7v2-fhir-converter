@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import ca.uhn.hl7v2.model.v26.datatype.CWE;
+import ca.uhn.hl7v2.model.Varies;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -334,6 +335,7 @@ public class SimpleDataValueResolver {
     };
 
     public static final ValueExtractor<Object, SimpleCode> CODING_SYSTEM_V2_ALTERNATE = (Object value) -> {
+        value = checkForAndUnwrapVariesObject(value);
         // ensure we have a CWE
         if (value instanceof CWE) {
             CWE cwe = (CWE) value;
@@ -347,12 +349,22 @@ public class SimpleDataValueResolver {
     };
 
     public static final ValueExtractor<Object, SimpleCode> CODING_SYSTEM_V2 = (Object value) -> {
+        value = checkForAndUnwrapVariesObject(value);
         String table = Hl7DataHandlerUtil.getTableNumber(value);
         String code = Hl7DataHandlerUtil.getStringValue(value);
         String text = Hl7DataHandlerUtil.getOriginalDisplayText(value);
         String version = Hl7DataHandlerUtil.getVersion(value);
         return commonCodingSystemV2(table, code, text, version);
     };
+
+    // For OBX.5 and other dynamic encoded fields, the real class is wrapped in the Varies class, and must be extracted from data
+    private static final Object checkForAndUnwrapVariesObject(Object value) {
+        if (value instanceof Varies) {
+            Varies v = (Varies)value;
+            value = v.getData();
+        }
+        return value;    
+    }
 
     private static final SimpleCode commonCodingSystemV2 (String table, String code, String text, String version) {
         if (table != null && code != null) {

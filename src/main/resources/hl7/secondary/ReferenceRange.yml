@@ -1,16 +1,18 @@
 #
-# (C) Copyright IBM Corp. 2020
+# (C) Copyright IBM Corp. 2020, 2021
 #
 # SPDX-License-Identifier: Apache-2.0
 #
 ---
 low:
+   condition: value NOT_NULL
    valueOf: datatype/Quantity
    expressionType: resource
    vars:
      value: $low
      unit: $unit
 high:
+   condition: value NOT_NULL
    valueOf: datatype/Quantity
    expressionType: resource
    vars:
@@ -22,6 +24,7 @@ type:
 appliesTo:
     type: STRING
     valueOf: $appliesto
+
 text:
     type: STRING
-    valueOf: $text
+    valueOf: $textValue
