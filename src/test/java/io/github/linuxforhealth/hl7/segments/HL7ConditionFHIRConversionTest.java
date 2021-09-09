@@ -120,36 +120,32 @@ public class HL7ConditionFHIRConversionTest {
                 .map(BundleEntryComponent::getResource).collect(Collectors.toList());
         assertThat(encounterResource).hasSize(1);
 
-        // --- COMMENTED OUT THE REST UNTIL WE CAN REFERENCE CONDITION FROM ENCOUNTER ---
+        // Get the encounter resource
+        Base encounter = encounterResource.get(0);
 
-        // // Get the encounter resource
-        // Base encounter = encounterResource.get(0);
+        // Verify reasonReference to condition exists
+        Base reasonReference = ResourceUtils.getValue(encounter, "reasonReference");
+        assertThat(ResourceUtils.getValueAsString(reasonReference,"reference").substring(0, 10)).isEqualTo("Condition/");
 
-        // // Verify asserter reference to Practitioner exists
-        // assertThat(ResourceUtils.getValueAsString(encounter,
-        // "reasonReference").substring(0, 11)).isEqualTo("Condition/");
+        // Verify encounter diagnosis use is set correctly
+        Base diagnosis = ResourceUtils.getValue(encounter, "diagnosis");
+        Base use = ResourceUtils.getValue(diagnosis, "use");
+        assertThat(ResourceUtils.getValueAsString(use, "text")).isEqualTo("A");
+        Base diagCoding = ResourceUtils.getValue(use, "coding");
+        assertThat(ResourceUtils.getValueAsString(diagCoding, "system"))
+        .isEqualTo("UriType[http://terminology.hl7.org/CodeSystem/diagnosis-role]");
+        assertThat(ResourceUtils.getValueAsString(diagCoding,
+        "code")).isEqualTo("AD");
+        assertThat(ResourceUtils.getValueAsString(diagCoding,
+        "display")).isEqualTo("Admission diagnosis");
 
-        // // Verify encounter diagnosis use is set correctly
-        // Base diagnosis = ResourceUtils.getValue(encounter, "diagnosis");
-        // Base use = ResourceUtils.getValue(diagnosis, "use");
-        // assertThat(ResourceUtils.getValueAsString(use, "text")).isEqualTo("A");
-        // Base diagCoding = ResourceUtils.getValue(use, "coding");
-        // assertThat(ResourceUtils.getValueAsString(diagCoding, "system"))
-        // .isEqualTo("UriType[http://terminology.hl7.org/CodeSystem/diagnosis-role]");
-        // assertThat(ResourceUtils.getValueAsString(diagCoding,
-        // "code")).isEqualTo("AD");
-        // assertThat(ResourceUtils.getValueAsString(diagCoding,
-        // "display")).isEqualTo("Admission diagnosis");
+        // Verify encounter diagnosis rank is set correctly.
+        assertThat(ResourceUtils.getValueAsString(diagnosis,
+        "rank")).isEqualTo("PositiveIntType[1]");
 
-        // // Verify encounter diagnosis rank is set correctly.
-        // assertThat(ResourceUtils.getValueAsString(diagnosis,
-        // "rank")).isEqualTo("PositiveIntType[1]");
-
-        // // Diagnosis requires a reference to condition.
-        // assertThat(ResourceUtils.getValueAsString(diagnosis,
-        // "condition").substring(0, 11)).isEqualTo("Condition/");
-
-        // --------------------------------------------------------------------------------
+        // Diagnosis requires a reference to condition.
+        Base conditionRef = ResourceUtils.getValue(encounter, "reasonReference");
+        assertThat(ResourceUtils.getValueAsString(conditionRef,"reference").substring(0, 10)).isEqualTo("Condition/");
 
         // --- PRACTIONER TESTS ---
 
@@ -259,9 +255,6 @@ public class HL7ConditionFHIRConversionTest {
         assertThat(condCoding.hasDisplay()).isTrue();
         assertThat(condCoding.getDisplay()).isEqualTo("Tachycardia, unspecified");
         assertThat(condCoding.hasVersion()).isFalse();
-
-        // TODO: Each condition should have condition.reasonReference and condition.diagnosis values (use and rank)
-        // including a reference to the condition. We can not add these now because of a defect that will be addressed soon (see internal bug 665)
 
     }
 
