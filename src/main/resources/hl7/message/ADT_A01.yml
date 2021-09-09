@@ -23,6 +23,7 @@ resources:
       additionalSegments:
              - PD1
              - MSH
+             - MRG
 
     - resourceName: Encounter
       segment: PV1
