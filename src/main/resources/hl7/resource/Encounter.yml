@@ -108,6 +108,32 @@ subject:
     valueOf: datatype/Reference
     expressionType: resource
     specs: $Patient
+diagnosis:
+   expressionType: nested
+   evaluateLater: true
+   generateList: true
+   specs: DG1
+   expressionsMap:
+     condition:
+        valueOf: datatype/Reference
+        expressionType: resource
+        specs: $Condition
+
+
+     use:
+        valueOf: datatype/CodeableConcept
+        expressionType: resource
+        specs: DG1.6
+        vars:
+          coding: DIAGNOSIS_USE, DG1.6
+
+     rank:
+        type: STRING
+        valueOf: DG1.15
+        expressionType: HL7Spec
+
+
+
 
 text:
    condition: $text NOT_NULL
@@ -203,9 +229,6 @@ serviceProvider:
    vars:
       idValue: PV2.23.8 | PV1.3.4.1
       name: PV2.23.1
-
-
-
 
 # Uncomment until we figure out to reference condition from encounter
 # diagnosis.condition is required
