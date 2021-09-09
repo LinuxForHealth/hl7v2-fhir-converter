@@ -108,11 +108,28 @@ subject:
     valueOf: datatype/Reference
     expressionType: resource
     specs: $Patient
-
 diagnosis:
-    valueOf: datatype/Diagnosis
-    generateList: true
-    expressionType: resource
-    specs: DG1
-    vars:
-      Condition: $Condition
+   expressionType: nested
+   evaluateLater: true
+   generateList: true
+   specs: DG1
+   expressionsMap:
+     condition:
+        valueOf: datatype/Reference
+        expressionType: resource
+        specs: $Condition
+        
+
+     use: 
+        valueOf: datatype/CodeableConcept
+        expressionType: resource
+        specs: DG1.6
+        vars:
+          coding: DIAGNOSIS_USE, DG1.6
+
+     rank: 
+        type: STRING
+        valueOf: DG1.15
+        expressionType: HL7Spec
+    
+    
