@@ -119,6 +119,10 @@ diagnosis:
         expressionType: resource
         specs: $Condition
         
+<<<<<<< HEAD
+=======
+
+>>>>>>> d279c61 (updated to support generating diagnosis later)
      use: 
         valueOf: datatype/CodeableConcept
         expressionType: resource
