@@ -138,7 +138,7 @@
   description: "ICD-10"
   # change from http://hl7.org/fhir/sid/icd-10 to http://hl7.org/fhir/sid/icd-10-cm temporarily, see Issue #189
   url: "http://hl7.org/fhir/sid/icd-10-cm"
-  oid: "urn:oid:2.16.840.1.113883.6.3"  
+  oid: "urn:oid:2.16.840.1.113883.6.3"
 - id: "I10P"
   description: "ICD-10 Procedure Codes"
   url: "http://www.cms.gov/Medicare/Coding/ICD10"
@@ -4512,7 +4512,7 @@
 - id: "ConditionVerificationStatus"
   url: "http://hl7.org/fhir/ValueSet/condition-ver-status"
   oid: "urn:oid:2.16.840.1.113883.4.642.3.166"
-  
+
   # encounter extensions
 - id: "mode-of-arrival-system"
   url: "http://terminology.hl7.org/CodeSystem/v2-0430"

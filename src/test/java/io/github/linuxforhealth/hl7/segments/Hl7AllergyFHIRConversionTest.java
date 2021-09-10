@@ -49,7 +49,7 @@ public class Hl7AllergyFHIRConversionTest {
         Assertions.assertEquals(1, codings.size());
         Coding coding = codings.get(0);
         Assertions.assertEquals("00000741", coding.getCode());
-        Assertions.assertNull(coding.getDisplay());
+        Assertions.assertEquals("OXYCODONE",coding.getDisplay());
         assertThat(allergy.getReaction().get(0).getManifestation()).extracting(m -> m.getText())
                 .containsExactly("HYPOTENSION");
     }

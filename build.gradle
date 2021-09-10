@@ -3,7 +3,7 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  */
- 
+
 plugins {
     // Apply the java-library plugin to add support for Java Library
     id 'java-library'
@@ -19,49 +19,49 @@ ext.isReleaseVersion = !version.endsWith("SNAPSHOT")
 
 dependencies {
 // This dependency is exported to consumers, that is to say found on their compile classpath.
-api 'org.apache.commons:commons-math3:3.6.1'
+    api 'org.apache.commons:commons-math3:3.6.1'
 
 // This dependency is used internally, and not exposed to consumers on their own compile classpath.
-implementation 'com.google.guava:guava:23.0'
-implementation group: 'commons-io', name: 'commons-io', version: '2.6'
-implementation 'ca.uhn.hapi:hapi-base:2.3'
+    implementation 'com.google.guava:guava:23.0'
+    implementation group: 'commons-io', name: 'commons-io', version: '2.6'
+    implementation 'ca.uhn.hapi:hapi-base:2.3'
 
-implementation 'ca.uhn.hapi:hapi-structures-v26:2.3'
-implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.10.1'
-implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.10.1'
+    implementation 'ca.uhn.hapi:hapi-structures-v26:2.3'
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.10.1'
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.10.1'
 
-implementation group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-yaml', version: '2.10.1'
-    
-api 'com.fasterxml.jackson.core:jackson-databind:2.10.1' 
+    implementation group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-yaml', version: '2.10.1'
+
+    api 'com.fasterxml.jackson.core:jackson-databind:2.10.1'
     // https://mvnrepository.com/artifact/org.apache.commons/commons-text
-implementation group: 'org.apache.commons', name: 'commons-text', version: '1.8'
-    
+    implementation group: 'org.apache.commons', name: 'commons-text', version: '1.8'
+
 // https://mvnrepository.com/artifact/ca.uhn.hapi.fhir/hapi-fhir-structures-r4
-implementation group: 'ca.uhn.hapi.fhir', name: 'hapi-fhir-structures-r4', version: '5.1.0'
-implementation group: 'ca.uhn.hapi.fhir', name: 'hapi-fhir-structures-r5', version: '5.1.0'
+    implementation group: 'ca.uhn.hapi.fhir', name: 'hapi-fhir-structures-r4', version: '5.1.0'
+    implementation group: 'ca.uhn.hapi.fhir', name: 'hapi-fhir-structures-r5', version: '5.1.0'
 // https://mvnrepository.com/artifact/ca.uhn.hapi.fhir/hapi-fhir-validation
-implementation group: 'ca.uhn.hapi.fhir', name: 'hapi-fhir-validation', version: '5.1.0'
+    implementation group: 'ca.uhn.hapi.fhir', name: 'hapi-fhir-validation', version: '5.1.0'
 // https://mvnrepository.com/artifact/ca.uhn.hapi.fhir/hapi-fhir-validation
-implementation group: 'ca.uhn.hapi.fhir', name: 'hapi-fhir-validation-resources-r4', version: '5.1.0'
+    implementation group: 'ca.uhn.hapi.fhir', name: 'hapi-fhir-validation-resources-r4', version: '5.1.0'
 
 
 
-implementation group: 'org.apache.commons', name: 'commons-jexl3', version: '3.1'
+    implementation group: 'org.apache.commons', name: 'commons-jexl3', version: '3.1'
 
 
 // https://mvnrepository.com/artifact/org.apache.commons/commons-configuration2
-implementation group: 'org.apache.commons', name: 'commons-configuration2', version: '2.7'
+    implementation group: 'org.apache.commons', name: 'commons-configuration2', version: '2.7'
 // https://mvnrepository.com/artifact/org.apache.commons/commons-collections4
-implementation group: 'org.apache.commons', name: 'commons-collections4', version: '4.4'
-implementation group:'com.ibm.fhir', name:'fhir-registry', version:'4.9.0'
-implementation group:'com.ibm.fhir', name:'fhir-term', version:'4.9.0'
-implementation group: 'commons-beanutils', name: 'commons-beanutils', version: '1.9.4'
+    implementation group: 'org.apache.commons', name: 'commons-collections4', version: '4.4'
+    implementation group:'com.ibm.fhir', name:'fhir-registry', version:'4.9.0'
+    implementation group:'com.ibm.fhir', name:'fhir-term', version:'4.9.0'
+    implementation group: 'commons-beanutils', name: 'commons-beanutils', version: '1.9.4'
 
-testImplementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'
-testImplementation 'org.assertj:assertj-core:3.9.0'
-testImplementation "org.junit.jupiter:junit-jupiter-api:5.7.2"
-testImplementation "org.junit.jupiter:junit-jupiter-params:5.7.2"
-testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:5.7.2"
+    testImplementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'
+    testImplementation 'org.assertj:assertj-core:3.9.0'
+    testImplementation "org.junit.jupiter:junit-jupiter-api:5.7.2"
+    testImplementation "org.junit.jupiter:junit-jupiter-params:5.7.2"
+    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:5.7.2"
 
 }
 
@@ -69,7 +69,7 @@ testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:5.7.2"
 repositories {
 
     mavenCentral()
-   
+
 }
 
 test {
@@ -88,72 +88,87 @@ jacocoTestReport {
 
 publishing {
 
-  repositories {
-    maven {
-      name = "OSSRH"
-      def releaseRepo = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
-      def snapshotRepo = "https://oss.sonatype.org/content/repositories/snapshots/"
-      url = isReleaseVersion ? releaseRepo : snapshotRepo
-      
-      credentials {
-        username = System.getenv("MAVEN_USERNAME")
-        password = System.getenv("MAVEN_PASSWORD")
-      }
+    repositories {
+        maven {
+            name = "OSSRH"
+            def releaseRepo = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
+            def snapshotRepo = "https://oss.sonatype.org/content/repositories/snapshots/"
+            url = isReleaseVersion ? releaseRepo : snapshotRepo
+
+            credentials {
+                username = System.getenv("MAVEN_USERNAME")
+                password = System.getenv("MAVEN_PASSWORD")
+            }
+        }
     }
-  }
 }
 
-java { 
-	withSourcesJar()
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
 }
+
+javadoc.failOnError = false
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+    javadoc.options.addStringOption('Xdoclint:none', '-quiet')
+}
+
+artifacts {
+    archives sourcesJar
+    archives javadocJar
+}
+
 
 publishing {
     publications {
         mavenPublication(MavenPublication) {
             from components.java
-
             artifact sourcesJar {
                 classifier "sources"
             }
-
+            artifact javadocJar {
+                classifier "javadoc"
+            }
             groupId = group
             artifactId 'hl7v2-fhir-converter'
             version = version
-            
+
             pom {
-                    name = "hl7v2-fhir-converter"
-                    description = "FHIR converter is a Java based library that enables converting Hl7v2 messages to FHIR resources"
-                    url = "https://github.com/LinuxForHealth/hl7v2-fhir-converter"
-                    licenses {
-                      license {
+                name = "hl7v2-fhir-converter"
+                description = "FHIR converter is a Java based library that enables converting Hl7v2 messages to FHIR resources"
+                url = "https://github.com/LinuxForHealth/hl7v2-fhir-converter"
+                licenses {
+                    license {
                         name = "The Apache License, Version 2.0"
                         url = "http://www.apache.org/licenses/LICENSE-2.0.txt"
-                      }
                     }
-                    developers {
-                      developer {
+                }
+                developers {
+                    developer {
                         id = "pbhallam"
-                        
-                      }
+
                     }
-                    scm {
-                      url = "https://github.com/LinuxForHealth/hl7v2-fhir-converter.git"
-                     
-                    }
-                  }
-           
+                }
+                scm {
+                    url = "https://github.com/LinuxForHealth/hl7v2-fhir-converter.git"
+
+                }
+            }
+
         }
     }
 }
 
 
 signing {
-if (isReleaseVersion ) {
-    def signingKeyId = System.getenv("signingKeyId")
-    def signingKey = System.getenv("signingKey")
-    def signingPassword = System.getenv("signingPassword")
-    useInMemoryPgpKeys(signingKeyId, signingKey, signingPassword)
-    }   
+    if (isReleaseVersion ) {
+        def signingKeyId = System.getenv("signingKeyId")
+        def signingKey = System.getenv("signingKey")
+        def signingPassword = System.getenv("signingPassword")
+        useInMemoryPgpKeys(signingKeyId, signingKey, signingPassword)
+    }
     sign publishing.publications.mavenPublication
 }
 

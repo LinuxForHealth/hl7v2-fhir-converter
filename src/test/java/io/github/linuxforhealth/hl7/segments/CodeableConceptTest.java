@@ -341,7 +341,7 @@ class CodeableConceptTest {
 
         String conditionWithVersionedAlternateCodeableConcept = "MSH|^~\\&|||||20040629164652|1|PPR^PC1|331|P|2.3.1||\n"
                 + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
-                + "PRB|AD|2004062916460000|2148-5^CREATININE^LN^F-11380^CREATININE^I9^474747^22222||||20040629||||||ACTIVE|||20040629";
+                + "PRB|AD|2004062916460000|2148-5^CREATININE^LN^F-11380^CREATININE^I9^474747^22222||||20040629|||||||||20040629";
 
         Condition condition = ResourceUtils.getCondition(conditionWithVersionedAlternateCodeableConcept);
 

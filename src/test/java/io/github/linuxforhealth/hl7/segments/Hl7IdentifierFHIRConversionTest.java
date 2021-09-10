@@ -110,7 +110,7 @@ public class Hl7IdentifierFHIRConversionTest {
     @Test
     public void patientIdentifiersSpecialCasesTest() {
         String patientIdentifiersSpecialCases = "MSH|^~\\&|MIICEHRApplication|MIIC|MIIC|MIIC|201705130822||VXU^V04^VXU_V04|test1100|P|2.5.1|||AL|AL|||||Z22^CDCPHINVS|^^^^^MIIC^SR^^^MIIC|MIIC\n"
-                // First ID has blanks in the authority.  Second ID has no authority provided.  Third ID has an unknown CODE in the standard v2 table. 
+                // First ID has blanks in the authority.  Second ID has no authority provided.  Third ID has an unknown CODE in the standard v2 table.
                 + "PID|1||MRN12345678^^^Regional Health ID^MR~111223333^^^^SS~A100071402^^^^AnUnknownCode|ALTID|Moose^Mickey^J^III^^^||20060504|M||||||||||||||||||||||\n";
         Patient patient = PatientUtils.createPatientFromHl7Segment(patientIdentifiersSpecialCases);
 
@@ -161,7 +161,7 @@ public class Hl7IdentifierFHIRConversionTest {
         assertThat(identifier.hasType()).isTrue();
         cc = identifier.getType();
         assertThat(cc.hasText()).isTrue();
-        assertThat(cc.getText()).hasToString("AnUnknownCode");     
+        assertThat(cc.getText()).hasToString("AnUnknownCode");
         assertThat(cc.hasCoding()).isFalse();
     }
 
