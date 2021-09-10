@@ -31,8 +31,8 @@ implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.10.1'
 implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.10.1'
 
 implementation group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-yaml', version: '2.10.1'
-
-api 'com.fasterxml.jackson.core:jackson-databind:2.10.1'
+    
+api 'com.fasterxml.jackson.core:jackson-databind:2.10.1' 
     // https://mvnrepository.com/artifact/org.apache.commons/commons-text
 implementation group: 'org.apache.commons', name: 'commons-text', version: '1.8'
     
@@ -125,7 +125,6 @@ publishing {
     publications {
         mavenPublication(MavenPublication) {
             from components.java
-
             artifact sourcesJar {
                 classifier "sources"
             }
