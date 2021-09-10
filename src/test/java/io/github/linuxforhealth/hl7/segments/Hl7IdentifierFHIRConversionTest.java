@@ -492,7 +492,7 @@ public class Hl7IdentifierFHIRConversionTest {
         value = identifier.getValue();
         system = identifier.getSystem();
         assertThat(value).isEqualTo("FON001"); // ORC-3.1
-        assertThat(system).isEqualTo("urn:id:OE-PHIMS-Stage"); // ORC-3.2 any whitespace gets replaced with Hyphens
+        assertThat(system).isEqualTo("urn:id:OE_PHIMS_Stage"); // ORC-3.2 any whitespace gets replaced with underscores
         CodeableConcept type = identifier.getType();
         Coding coding = type.getCoding().get(0);
         assertThat(type.getText()).isNull();
@@ -552,7 +552,7 @@ public class Hl7IdentifierFHIRConversionTest {
         system = identifier.getSystem();
 
         assertThat(value).isEqualTo("CC_000000"); // OBR-2
-        assertThat(system).isEqualTo("urn:id:OE-PHIMS-Stage"); // OBR-2.2
+        assertThat(system).isEqualTo("urn:id:OE_PHIMS_Stage"); // OBR-2.2
         type = identifier.getType();
         coding = type.getCoding().get(0);
         assertThat(type.getText()).isNull();
