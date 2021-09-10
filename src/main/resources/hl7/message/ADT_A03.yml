@@ -23,12 +23,6 @@ resources:
              - PD1
              - MSH
 
-    - resourceName: Condition
-      segment: DG1
-      resourcePath: resource/Condition
-      repeats: true
-      additionalSegments:
-             - MSH
 
     - resourceName: Encounter
       segment: PV1
@@ -45,7 +39,7 @@ resources:
       resourcePath: resource/Condition
       repeats: true
       additionalSegments:
-             - MSH
+        - MSH
 
     - resourceName: Observation
       segment: OBX
