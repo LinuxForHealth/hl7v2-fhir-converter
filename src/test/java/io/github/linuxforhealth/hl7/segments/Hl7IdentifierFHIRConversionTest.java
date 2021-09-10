@@ -110,7 +110,7 @@ public class Hl7IdentifierFHIRConversionTest {
     @Test
     public void patientIdentifiersSpecialCasesTest() {
         String patientIdentifiersSpecialCases = "MSH|^~\\&|MIICEHRApplication|MIIC|MIIC|MIIC|201705130822||VXU^V04^VXU_V04|test1100|P|2.5.1|||AL|AL|||||Z22^CDCPHINVS|^^^^^MIIC^SR^^^MIIC|MIIC\n"
-                // First ID has blanks in the authority.  Second ID has no authority provided.  Third ID has an unknown CODE in the standard v2 table. 
+                // First ID has blanks in the authority.  Second ID has no authority provided.  Third ID has an unknown CODE in the standard v2 table.
                 + "PID|1||MRN12345678^^^Regional Health ID^MR~111223333^^^^SS~A100071402^^^^AnUnknownCode|ALTID|Moose^Mickey^J^III^^^||20060504|M||||||||||||||||||||||\n";
         Patient patient = PatientUtils.createPatientFromHl7Segment(patientIdentifiersSpecialCases);
 
@@ -161,7 +161,7 @@ public class Hl7IdentifierFHIRConversionTest {
         assertThat(identifier.hasType()).isTrue();
         cc = identifier.getType();
         assertThat(cc.hasText()).isTrue();
-        assertThat(cc.getText()).hasToString("AnUnknownCode");     
+        assertThat(cc.getText()).hasToString("AnUnknownCode");
         assertThat(cc.hasCoding()).isFalse();
     }
 
@@ -598,7 +598,7 @@ public class Hl7IdentifierFHIRConversionTest {
         assertThat(encounter.hasIdentifier()).isTrue();
         assertThat(encounter.getIdentifier()).hasSize(2);
 
-        // Identifier 1: 
+        // Identifier 1:
         identifier = encounter.getIdentifier().get(0);
         value = identifier.getValue();
         system = identifier.getSystem();
@@ -611,7 +611,7 @@ public class Hl7IdentifierFHIRConversionTest {
         assertThat(coding.getCode()).isEqualTo("VN");
         assertThat(coding.getDisplay()).isEqualTo("Visit number");
 
-        // Identifier 2: 
+        // Identifier 2:
         identifier = encounter.getIdentifier().get(1);
         value = identifier.getValue();
         system = identifier.getSystem();
@@ -969,7 +969,7 @@ public class Hl7IdentifierFHIRConversionTest {
         assertThat(coding.getCode()).isEqualTo("PLAC");
         assertThat(coding.getDisplay()).isEqualTo("Placer Identifier");
 
-        // Test 2: 
+        // Test 2:
         //  - Visit number with PID-18
         //  - filler and placer from OBR
         serviceRequest = "MSH|^~\\&|SendTest1|Sendfac1|Receiveapp1|Receivefac1|200603081747|security|PPR^PC1^PPR_PC1|1|P^I|2.6||||||ASCII||\n" +
@@ -1023,7 +1023,7 @@ public class Hl7IdentifierFHIRConversionTest {
         assertThat(coding.getCode()).isEqualTo("PLAC");
         assertThat(coding.getDisplay()).isEqualTo("Placer Identifier");
 
-        // Test 3: 
+        // Test 3:
         //  - Visit number with PV1-19
         //  - filler from OBR
         //  - placer from ORC
@@ -1175,7 +1175,7 @@ public class Hl7IdentifierFHIRConversionTest {
         assertThat(coding.getCode()).isEqualTo("VN");
         assertThat(coding.getDisplay()).isEqualTo("Visit number");
 
-        // Identifier 2: extID based on RXO-1.2 
+        // Identifier 2: extID based on RXO-1.2
         identifier = medReq.getIdentifier().get(1);
         value = identifier.getValue();
         system = identifier.getSystem();

@@ -15,21 +15,24 @@ resources:
              - EVN
    
     - resourceName: Patient
-      segment: PID
+      segment: .PID
       resourcePath: resource/Patient
-      repeats: false
       isReferenced: true
+      group: PATIENT
+      repeats: false
       additionalSegments:
-             - PD1
-      
+             - .PD1
+             - MSH
+
     - resourceName: Encounter
-      segment: PV1
+      segment: .PATIENT_VISIT.PV1
       resourcePath: resource/Encounter
-      repeats: false
       isReferenced: true
+      group: PATIENT
+      repeats: false
       additionalSegments:
-             - PV2
-             - EVN
+             - .PATIENT_VISIT.PV2
+             - MSH
 
     - resourceName: Observation
       segment: OBX
@@ -43,6 +46,7 @@ resources:
       resourcePath: resource/AllergyIntolerance
       repeats: true
       additionalSegments:
+             - MSH
 
     - resourceName: Condition
       segment: DG1

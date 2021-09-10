@@ -14,6 +14,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.text.StringEscapeUtils;
 import org.apache.commons.text.StringTokenizer;
 import org.hl7.fhir.r4.model.codesystems.EncounterStatus;
 import org.slf4j.Logger;
@@ -22,6 +23,7 @@ import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Segment;
 import ca.uhn.hl7v2.model.Type;
 import io.github.linuxforhealth.hl7.data.date.DateUtil;
+
 
 public class Hl7RelatedGeneralUtils {
     private static final Logger LOGGER = LoggerFactory.getLogger(Hl7RelatedGeneralUtils.class);
@@ -207,6 +209,12 @@ public class Hl7RelatedGeneralUtils {
 
         return result;
     }
+    public static String formatAsId(Object input)
+    {
+        String stringValue = Hl7DataHandlerUtil.getStringValue(input).trim();
+        stringValue = stringValue.replaceAll("[^a-zA-Z0-9\\-\\.]", ".");
+        return StringUtils.left(stringValue, 64);
+    }
 
     public static String getAddressUse(String xad7Type, String xad16Temp, String xad17Bad) {
         LOGGER.info("Calculating address Use from XAD.7 {}, XAD.16 {}, XAD.17 {}", xad7Type, xad16Temp, xad17Bad);
@@ -302,6 +310,13 @@ public class Hl7RelatedGeneralUtils {
         return returnValue;
     }
 
+
+    public static String getNarrativeDiv(String text) {
+
+    	String divText = "<div xmlns=\"http://www.w3.org/1999/xhtml\"><p>%s</p></div>";
+    	return String.format(divText, StringEscapeUtils.escapeHtml4(text).replace("~", "<br />"));    
+    }
+    
     // Private method to split and format the 7 digit local telecom number
     private static String formatLocalNumber(String localNumber) {
         // Split after the 3rd digit, add a space, add the rest of the number
@@ -324,5 +339,6 @@ public class Hl7RelatedGeneralUtils {
         }
         return returnValue;
     }
+    
 
 }

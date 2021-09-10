@@ -21,3 +21,20 @@ resources:
       isReferenced: true
       additionalSegments:
              - PD1
+             - MSH
+
+    - resourceName: Encounter
+      segment: PV1
+      resourcePath: resource/Encounter
+      repeats: false
+      isReferenced: true
+      additionalSegments:
+             - PV2
+             - EVN
+             - MSH
+
+    - resourceName: Condition
+      segment: DG1
+      resourcePath: resource/Condition
+      repeats: true
+      additionalSegments:

@@ -21,6 +21,18 @@ resources:
       isReferenced: true
       additionalSegments:
              - PD1
+             - MSH
+
+
+    - resourceName: Encounter
+      segment: PV1
+      resourcePath: resource/Encounter
+      repeats: false
+      isReferenced: true
+      additionalSegments:
+             - PV2
+             - EVN
+             - MSH
 
     - resourceName: Condition
       segment: DG1
@@ -28,16 +40,18 @@ resources:
       repeats: true
       additionalSegments:
         - MSH
-      
+
     - resourceName: Observation
       segment: OBX
       resourcePath: resource/Observation
       repeats: true
       isReferenced: true
       additionalSegments:
-      
+             - MSH
+
     - resourceName: AllergyIntolerance
       segment: AL1
       resourcePath: resource/AllergyIntolerance
       repeats: true
       additionalSegments:
+             - MSH

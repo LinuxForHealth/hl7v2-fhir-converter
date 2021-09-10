@@ -3,7 +3,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 #
-# FHIR Resources to extract from MDM_T08 message
+# FHIR Resources to extract from ADT_A03 message
 ---
 resources:
     - resourceName: MessageHeader
@@ -20,8 +20,9 @@ resources:
       repeats: false
       isReferenced: true
       additionalSegments:
+             - PD1
              - MSH
-      
+
     - resourceName: Encounter
       segment: PV1
       resourcePath: resource/Encounter
@@ -31,7 +32,7 @@ resources:
              - PV2
              - EVN
              - MSH
-
+      
     - resourceName: Observation
       segment: OBX
       resourcePath: resource/Observation
@@ -39,4 +40,10 @@ resources:
       isReferenced: true
       additionalSegments:
              - MSH
- 
+      
+    - resourceName: AllergyIntolerance
+      segment: AL1
+      resourcePath: resource/AllergyIntolerance
+      repeats: true
+      additionalSegments:
+             - MSH
