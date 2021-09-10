@@ -178,7 +178,7 @@ public class Hl7RelatedGeneralUtils {
     public static String noWhiteSpace(Object input) {
         String val = Hl7DataHandlerUtil.getStringValue(input);
         if(val != null) {
-            String newVal = val.replaceAll("\\s", "-");
+            String newVal = val.replaceAll("\\s", "_");
             String system = "urn:id:" + newVal;
 
             return system;
