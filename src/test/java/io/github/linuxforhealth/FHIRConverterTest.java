@@ -78,6 +78,7 @@ public class FHIRConverterTest {
 
     HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
     String json = ftv.convert(hl7message, OPTIONS);
+    System.out.println(json);
     verifyResult(json, Constants.DEFAULT_BUNDLE_TYPE, false);
 
   }
@@ -102,14 +103,11 @@ public class FHIRConverterTest {
 
   @Test
   public void test_valid_message_but_unsupported_message_throws_exception() throws IOException {
-    String hl7message = "MSH|^~\\&|SE050|050|PACS|050|20120912011230||ADT^A02|102|T|2.6|||AL|NE\r"
-        + "EVN||201209122222\r"
-        + "PID|0010||PID1234^5^M11^A^MR^HOSP~1234568965^^^USA^SS||DOE^JOHN^A^||19800202|F||W|111 TEST_STREET_NAME^^TEST_CITY^NY^111-1111^USA||(905)111-1111|||S|ZZ|12^^^124|34-13-312||||TEST_BIRTH_PLACE\r"
-        + "PV1|1|ff|yyy|EL|ABC||200^ATTEND_DOC_FAMILY_TEST^ATTEND_DOC_GIVEN_TEST|201^REFER_DOC_FAMILY_TEST^REFER_DOC_GIVEN_TEST|202^CONSULTING_DOC_FAMILY_TEST^CONSULTING_DOC_GIVEN_TEST|MED|||||B6|E|272^ADMITTING_DOC_FAMILY_TEST^ADMITTING_DOC_GIVEN_TEST||48390|||||||||||||||||||||||||201409122200|20150206031726\r"
-        + "OBX|1|TX|1234||ECHOCARDIOGRAPHIC REPORT||||||F|||||2740^TRDSE^Janetary~2913^MRTTE^Darren^F~3065^MGHOBT^Paul^J~4723^LOTHDEW^Robert^L|\r"
-        + "AL1|1|DRUG|00000741^OXYCODONE||HYPOTENSION\r"
-        + "AL1|2|DRUG|00001433^TRAMADOL||SEIZURES~VOMITING\r"
-        + "PRB|AD|200603150625|aortic stenosis|53692||2||200603150625";
+    String hl7message = "MSH|^~\\&|MESA_ADT|XYZ_ADMITTING|MESA_IS|XYZ_HOSPITAL|201612291501||ADT^A18^ADT_A18|101166|P|2.3.1\n"
+    		+ "EVN|A18|201604211000||||201604210950\n"
+    		+ "PID|1||000010004^^^ST01A^MR~000010014^^^ST01B^MR~000010024^^^ST01^MR~000029970^^^EHIS^PI~999999999^^^SSA^SS||SENTARA10004^PAT^L||19251008|F||Caucasian||||||Married|Protestant|1002523||||||||||||PV1|1|O|||||2740^Tsadok^Janetary|2913^Merrit^Darren^F|3065^Mahoney^Paul^J||||||||9052^Winter^Oscar^||1001918\n"
+    		+ "PV1|1|O|||||2741^Yung^Den|2914^Smith^John^F|3066^Mahr^Paul^J||||||||9053^Summer^Oscar^||1001200\n"
+    		+ "MRG|000010510^^^def^MR~000010765^^^ST01B^MR|||000010510^^^def|||WHITE^CHARLES";
 
     HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
 
@@ -269,7 +267,7 @@ String hl7message =
     assertThat(obsResource).hasSize(1);
     List<Resource> pracResource = e.stream().filter(v -> ResourceType.Practitioner == v.getResource().getResourceType())
         .map(BundleEntryComponent::getResource).collect(Collectors.toList());
-    assertThat(pracResource).hasSize(1);
+    assertThat(pracResource).hasSize(5);
 
     List<Resource> organizationRes = e.stream()
         .filter(v -> ResourceType.Organization == v.getResource().getResourceType())
@@ -368,7 +366,7 @@ String hl7message =
     assertThat(obsResource).hasSize(1);
     List<Resource> pracResource = e.stream().filter(v -> ResourceType.Practitioner == v.getResource().getResourceType())
         .map(BundleEntryComponent::getResource).collect(Collectors.toList());
-    assertThat(pracResource).hasSize(4);
+    assertThat(pracResource).hasSize(8);
 
     List<Resource> allergyResources = e.stream()
         .filter(v -> ResourceType.AllergyIntolerance == v.getResource().getResourceType())

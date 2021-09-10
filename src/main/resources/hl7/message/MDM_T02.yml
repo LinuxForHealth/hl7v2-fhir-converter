@@ -12,7 +12,7 @@ resources:
       repeats: false
       isReferenced: false
       additionalSegments: 
-             - EVN
+        - EVN
    
     - resourceName: Patient
       segment: PID
@@ -21,15 +21,16 @@ resources:
       isReferenced: true
       additionalSegments:
         - MSH
-      
+
     - resourceName: Encounter
       segment: PV1
       resourcePath: resource/Encounter
       repeats: false
       isReferenced: true
       additionalSegments:
-        - MSH
+        - PV2
         - EVN
+        - MSH
 
     - resourceName: Observation
       segment: OBX

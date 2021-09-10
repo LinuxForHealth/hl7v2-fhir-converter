@@ -67,6 +67,36 @@ public class Hl7PPRMessageTest {
 
   }
 
+  @Test
+  public void test_pprpc2_patient_encounter_present() throws IOException {
+	  String hl7message =
+		        "MSH|^~\\&|SendTest1|Sendfac1|Receiveapp1|Receivefac1|200603081747|security|PPR^PC2|1|P^I|2.6||||||ASCII||\r"
+		            + "PID|||555444222111^^^MPI&GenHosp&L^MR||james^anderson||19600614|M||C|99 Oakland #106^^qwerty^OH^44889||^^^^^626^5641111|^^^^^626^5647654|||||343132266|||N\r"
+		            + "PV1||I|6N^1234^A^GENHOS||||0100^ANDERSON^CARL|0148^ADDISON^JAMES||SUR|||||||0148^ANDERSON^CARL|S|1400|A|||||||||||||||||||SF|K||||199501102300\r"
+		            + "PRB|UP|200603150625|aortic stenosis|53692||2||200603150625\r"
+		            + "NTE|1|P|Problem Comments\r" + "VAR|varid1|200603150610\r"
+		            + "OBX|1|TX|^Type of protein feed^L||ECHOCARDIOGRAPHIC REPORT||||||F|||20150930164100|||\r"
+		            + "OBX|2|TX|^SOMEd^L||NORMAL LV CHAMBER SIZE WITH MILD CONCENTRIC LVH||||||F|||20150930165100|||";
+
+      HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
+      String json = ftv.convert(hl7message, OPTIONS);
+      assertThat(json).isNotBlank();
+      System.out.println(json);
+      IBaseResource bundleResource = context.getParser().parseResource(json);
+      assertThat(bundleResource).isNotNull();
+      Bundle b = (Bundle) bundleResource;
+      List<BundleEntryComponent> e = b.getEntry();
+      List<Resource> patientResource = e.stream()
+              .filter(v -> ResourceType.Patient == v.getResource().getResourceType())
+              .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+      assertThat(patientResource).hasSize(1);
+
+      List<Resource> encounterResource = e.stream()
+              .filter(v -> ResourceType.Encounter == v.getResource().getResourceType())
+              .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+      assertThat(encounterResource).hasSize(1);
+
+  }
 
 
 }

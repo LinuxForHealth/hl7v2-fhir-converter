@@ -21,3 +21,4 @@ resources:
       isReferenced: true
       additionalSegments:
              - PD1
+             - MSH

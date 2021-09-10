@@ -3,7 +3,7 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  */
- 
+
 plugins {
     // Apply the java-library plugin to add support for Java Library
     id 'java-library'
@@ -168,7 +168,7 @@ if (isReleaseVersion ) {
     def signingKey = System.getenv("signingKey")
     def signingPassword = System.getenv("signingPassword")
     useInMemoryPgpKeys(signingKeyId, signingKey, signingPassword)
-    }   
+    }
     sign publishing.publications.mavenPublication
 }
 

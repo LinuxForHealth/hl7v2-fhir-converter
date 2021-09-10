@@ -639,7 +639,7 @@ public class Hl7MessageTest {
     List<Resource> pracResource =
         e.stream().filter(v -> ResourceType.Practitioner == v.getResource().getResourceType())
             .map(BundleEntryComponent::getResource).collect(Collectors.toList());
-    assertThat(pracResource).hasSize(4);
+    assertThat(pracResource).hasSize(8);
 
     List<Resource> encounterResource =
         e.stream().filter(v -> ResourceType.Encounter == v.getResource().getResourceType())
