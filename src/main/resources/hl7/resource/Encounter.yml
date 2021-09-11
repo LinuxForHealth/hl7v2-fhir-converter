@@ -115,6 +115,7 @@ diagnosis:
    generateList: true
    specs: DG1
    expressionsMap:
+
      condition:
         valueOf: datatype/Reference
         expressionType: resource
@@ -224,4 +225,3 @@ serviceProvider:
    vars:
       idValue: PV2.23.8 | PV1.3.4.1
       name: PV2.23.1
-

@@ -258,6 +258,44 @@ public class HL7ConditionFHIRConversionTest {
 
     }
 
+        // Tests multiple DG1 segments to verify we get multiple conditions with
+    // references to the encounter.
+    @Test
+    public void validateEncounterMultipleDiagnosesTwo() {
+
+        String hl7message = "MSH|^~\\&|PROSOLV|SENTARA|WHIA|IBM|20151008111200|S1|ADT^A01^ADT_A01|MSGID000001|T|2.6|10092|PRPA008|AL|AL|100|8859/1|ENGLISH|ARM|ARM5007\r"
+        + "EVN|A04|20151008111200|20171013152901|O|OID1006|20171013153621|EVN1009\r"
+        + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\r"
+        + "PV1|1|O|SAN JOSE|A|10089|MILPITAS|2740^Torres^Callie|2913^Grey^Meredith^F|3065^Sloan^Mark^J|CAR|FOSTER CITY|AD|R|FR|A4|VI|9052^Shepeard^Derek^|AH|10019181|FIC1002|IC|CC|CR|CO|20161012034052|60000|6|AC|GHBR|20160926054052|AC5678|45000|15000|D|20161016154413|DCD|SAN FRANCISCO|VEG|RE|O|AV|FREMONT|CALIFORNIA|20161013154626|20161014154634|10000|14000|2000|4000|POL8009|V|PHY6007\r"
+        + "PV2|SAN BRUNO|AC4567|vomits|less equipped|purse|SAN MATEO|HO|20171014154626|20171018154634|4|3|DIAHHOREA|RSA456|20161013154626|Y|D|20191026001640|O|Y|1|F|Y|KAISER|AI|2|20161013154626|ED|20171018001900|20161013154626|10000|RR|Y|20171108002129|Y|Y|N|N|A^Ambulance^HL70430\r"
+        + "DG1|1|D1|V72.83^Other specified pre-operative examination^ICD-9^^^|Other specified pre-operative examination|20151008111200|A\r"
+        + "DG1|2|D2|R00.0^Tachycardia, unspecified^ICD-10^^^|Tachycardia, unspecified|20150725201300|A\r"
+        + "DG1|3|D3|R06.02^Shortness of breath^ICD-10^^^|Shortness of breath||A\r"
+        + "DG1|4|D4|Q99.9^Chromosomal abnormality, unspecified^ICD-10^^^|Chromosomal abnormality, unspecified||A\r"
+        + "DG1|5|D5|I34.8^Arteriosclerosis^ICD-10^^^|Arteriosclerosis||A\r"
+        + "DG1|6|D6|I34.0^Mitral valve regurgitation^ICD-10^^^|Mitral valve regurgitation||A\r"
+        + "DG1|6|D7|I05.9^Mitral valve disorder in childbirth^ICD-10^^^|Mitral valve disorder in childbirth||A\r"
+        + "DG1|7|D8|J45.909^Unspecified asthma, uncomplicated^ICD-10^^^|Unspecified asthma, uncomplicated||A\r";
+        
+        List<BundleEntryComponent> e =ResourceUtils.createHl7Segment(hl7message);
+
+        // Find the conditions from the FHIR bundle.
+        List<Resource> conditionResource = e.stream()
+                .filter(v -> ResourceType.Condition == v.getResource().getResourceType())
+                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        assertThat(conditionResource).hasSize(8);
+
+        // Find the encounter from the FHIR bundle.
+        List<Resource> encounterResource = e.stream()
+        .filter(v -> ResourceType.Encounter == v.getResource().getResourceType())
+                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        assertThat(encounterResource).hasSize(1);
+
+        // Get the encounter resource
+        Base encounter = encounterResource.get(0);
+
+    }
+
     // --------------------- PROBLEM UNIT TESTS (PRB) ---------------------
 
     // Tests the PRB segment (problem) with all supported message types. This tests all the fields in the happy path (PART 1).
