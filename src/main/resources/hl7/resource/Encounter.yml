@@ -108,17 +108,18 @@ subject:
     valueOf: datatype/Reference
     expressionType: resource
     specs: $Patient
+
 diagnosis:
    expressionType: nested
    evaluateLater: true
    generateList: true
    specs: DG1
    expressionsMap:
+
      condition:
         valueOf: datatype/Reference
         expressionType: resource
         specs: $Condition
-        
 
      use: 
         valueOf: datatype/CodeableConcept
@@ -131,5 +132,3 @@ diagnosis:
         type: STRING
         valueOf: DG1.15
         expressionType: HL7Spec
-    
-    
