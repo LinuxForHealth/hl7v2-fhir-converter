@@ -3,6 +3,6 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 #
-# meta:
-#    valueOf: extension/ExtensionMeta
-#    expressionType: resource
+meta:
+   valueOf: extension/ExtensionMeta
+   expressionType: resource
