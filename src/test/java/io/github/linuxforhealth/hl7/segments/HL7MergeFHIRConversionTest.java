@@ -6,17 +6,14 @@
 package io.github.linuxforhealth.hl7.segments;
 
 import static org.assertj.core.api.Assertions.assertThat;
-
 import java.util.List;
 import java.util.stream.Collectors;
-
 import org.hl7.fhir.r4.model.Base;
 import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
 import org.hl7.fhir.r4.model.Resource;
 import org.hl7.fhir.r4.model.ResourceType;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-
 import io.github.linuxforhealth.hl7.segments.util.ResourceUtils;
 
 /*** Tests the MRG segment ***/
