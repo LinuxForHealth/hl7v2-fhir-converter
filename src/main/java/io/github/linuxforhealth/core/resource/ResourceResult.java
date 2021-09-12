@@ -6,20 +6,18 @@
 package io.github.linuxforhealth.core.resource;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import com.google.common.base.Preconditions;
 import io.github.linuxforhealth.api.EvaluationResult;
-import io.github.linuxforhealth.api.Expression;
 import io.github.linuxforhealth.api.ResourceValue;
+import io.github.linuxforhealth.hl7.resource.PendingExpressionState;
 
 public class ResourceResult implements EvaluationResult {
 
   private String groupId;
   private ResourceValue resource;
   private List<ResourceValue> additionalResources;
-  private Map<String, Expression> pendingExpressions;
+  private PendingExpressionState pendingExpressions;
 
   public ResourceResult(ResourceValue resource, List<ResourceValue> additionalResources) {
     this(resource, additionalResources, null);
@@ -28,12 +26,13 @@ public class ResourceResult implements EvaluationResult {
 
   public ResourceResult(ResourceValue resource, List<ResourceValue> additionalResources,
       String groupId) {
-    this(resource, additionalResources, groupId, new HashMap<>());
+    this(resource, additionalResources, groupId,
+        PendingExpressionState.emptyPendingExpressionState());
   }
 
 
   public ResourceResult(ResourceValue resource, List<ResourceValue> additionalResources,
-      String groupId, Map<String, Expression> pendingExpressions) {
+      String groupId, PendingExpressionState pendingExpressions) {
     Preconditions.checkArgument(resource != null, "resources cannot be null.");
     Preconditions.checkArgument(additionalResources != null, "additionalResources cannot be null.");
     this.resource = resource;
@@ -77,7 +76,7 @@ public class ResourceResult implements EvaluationResult {
   }
 
 
-  public Map<String, Expression> getPendingExpressions() {
+  public PendingExpressionState getPendingExpressions() {
     return pendingExpressions;
   }
 }

@@ -657,6 +657,43 @@ public class Hl7MessageTest {
   }
 
 
+  @Test
+  public void test_patient_from_MRG_segment() throws IOException {
+    String hl7message =
+        "MSH|^~\\&|SENDING_APPLICATION|SENDING_FACILITY|RECEIVING_APPLICATION|RECEIVING_FACILITY|20110613122406637||ADT^A01|1965403220110613122406637|P|2.3||||\r"
+            + "EVN|A40|20110613122406637||01\r"
+            + "PID|1||1765431^^^^MR||McTavish^Henry^J||19700101|M|||117 W Main St^^Fort Wayne^IN^46808||(260)555-1234^^^^^|||M||1117112|999999999||||||||||||||||||||\r"
+            + "MRG|1765475^^^^MR||||||\r";
+
+
+    ResourceModel rsm = ResourceReader.getInstance().generateResourceModel("resource/Patient");
+
+    HL7FHIRResourceTemplateAttributes attributes = new HL7FHIRResourceTemplateAttributes.Builder()
+        .withResourceName("Patient").withResourceModel(rsm).withSegment("PID")
+        .withAdditionalSegments(Lists.newArrayList("MRG"))
+        .withIsReferenced(true).withRepeats(false).build();
+
+    HL7FHIRResourceTemplate patient = new HL7FHIRResourceTemplate(attributes);
+    HL7MessageModel message = new HL7MessageModel("ADT", Lists.newArrayList(patient));
+    String json = message.convert(hl7message, engine);
+    System.out.println(json);
+
+
+
+    IBaseResource bundleResource = context.getParser().parseResource(json);
+    assertThat(bundleResource).isNotNull();
+    Bundle b = (Bundle) bundleResource;
+    List<BundleEntryComponent> e = b.getEntry();
+
+    List<Resource> patientResource =
+        e.stream().filter(v -> ResourceType.Patient == v.getResource().getResourceType())
+            .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+    assertThat(patientResource).hasSize(2);
+
+
+
+  }
+
 
   private MessageHeader getResourceMessageHeader(Resource resource) {
     String s = context.getParser().encodeResourceToString(resource);

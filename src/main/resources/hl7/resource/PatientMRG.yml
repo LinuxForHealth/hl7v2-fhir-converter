@@ -1,0 +1,60 @@
+#
+# (C) Copyright IBM Corp. 2020, 2021
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+resourceType: Patient
+# Represents data that needs to be extracted for a Patient Resource in FHIR
+# reference: https://www.hl7.org/fhir/patient.html
+id:
+   type: STRING
+   valueOf: UUID.randomUUID()
+   expressionType: JEXL
+identifier:
+   required: true
+   valueOf: datatype/Identifier_SystemID
+   generateList: true
+   expressionType: resource
+   specs: MRG.1
+   vars:
+      assignerSystem: String, MRG.1.4
+
+name:
+   valueOf: datatype/HumanName
+   generateList: true
+   expressionType: resource
+   specs: MRG.7
+
+communication:
+   condition: $language NOT_NULL
+   valueOf: secondary/Communication
+   expressionType: resource
+   vars:
+      language: PID.15
+
+
+
+# For the MRG Patient
+active:
+   type: BOOLEAN  
+   valueOf: $isActive
+   constants:
+      isActive: false
+
+
+link:
+   generateList: true
+   expressionType: nested
+   condition: $Patient NOT_NULL
+   expressionsMap:
+         type:
+            type: STRING
+            valueOf: $type
+            constants:
+                type: 'replaced-by'
+         other:
+           required: true
+           valueOf: datatype/Reference
+           expressionType: resource
+           specs: $Patient
+
