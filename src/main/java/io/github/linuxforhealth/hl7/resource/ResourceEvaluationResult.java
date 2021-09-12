@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import io.github.linuxforhealth.api.Expression;
 import io.github.linuxforhealth.api.ResourceValue;
 
 public class ResourceEvaluationResult {
@@ -12,20 +11,21 @@ public class ResourceEvaluationResult {
 
   private List<ResourceValue> additionalResolveValues;
   private Map<String, Object> resolveValues;
-  private Map<String, Expression> pendingExpressions;
+  private PendingExpressionState pendingExpressions;
 
 
   public ResourceEvaluationResult(Map<String, Object> resolveValues) {
-    this(resolveValues, new ArrayList<>(), new HashMap<>());
+    this(resolveValues, new ArrayList<>(), null);
   }
 
   public ResourceEvaluationResult(Map<String, Object> resolveValues,
       List<ResourceValue> additionalResolveValues) {
-    this(resolveValues, additionalResolveValues, new HashMap<>());
+    this(resolveValues, additionalResolveValues,
+        PendingExpressionState.emptyPendingExpressionState());
   }
 
   public ResourceEvaluationResult(Map<String, Object> resolveValues,
-      List<ResourceValue> additionalResolveValues, Map<String, Expression> pendingExpressions) {
+      List<ResourceValue> additionalResolveValues, PendingExpressionState pendingExpressions) {
     this.additionalResolveValues = new ArrayList<>();
     this.additionalResolveValues.addAll(additionalResolveValues);
     this.resolveValues = new HashMap<>();
@@ -44,7 +44,7 @@ public class ResourceEvaluationResult {
     return resolveValues;
   }
 
-  public Map<String, Expression> getPendingExpressions() {
+  public PendingExpressionState getPendingExpressions() {
     return pendingExpressions;
   }
 

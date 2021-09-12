@@ -25,6 +25,7 @@ import io.github.linuxforhealth.core.exception.RequiredConstraintFailureExceptio
 import io.github.linuxforhealth.core.expression.EmptyEvaluationResult;
 import io.github.linuxforhealth.core.expression.EvaluationResultFactory;
 import io.github.linuxforhealth.hl7.message.HL7MessageData;
+import io.github.linuxforhealth.hl7.resource.PendingExpressionState;
 import io.github.linuxforhealth.hl7.resource.ResourceEvaluationResult;
 
 public class ExpressionUtility {
@@ -72,7 +73,7 @@ public class ExpressionUtility {
       expressionsToEvaluateLater.entrySet()
           .forEach(ent -> System.out.println("*************" + ent));
       return new ResourceEvaluationResult(resolveValues, additionalResolveValues,
-          expressionsToEvaluateLater);
+          new PendingExpressionState(expressionsToEvaluateLater, context));
 
     } catch (RequiredConstraintFailureException e) {
       LOGGER.warn("Resource Constraint condition not satisfied , exception {}", e.getMessage());
@@ -157,19 +158,21 @@ public class ExpressionUtility {
 
       Map<String, EvaluationResult> localContext = new HashMap<>(context);
       Map<String, Object> resolveValues = new HashMap<>();
-
+      List<ResourceValue> additionalResolveValues = new ArrayList<>();
       for (Entry<String, Expression> entry : expressionMap.entrySet()) {
 
 
         LOGGER.debug(EVALUATING, entry.getKey(), entry.getValue());
 
-        processExpression(dataSource, new EmptyEvaluationResult(), localContext, null,
+        processExpression(dataSource, new EmptyEvaluationResult(), localContext,
+            additionalResolveValues,
             resolveValues, entry);
+
 
       }
       resolveValues.values().removeIf(Objects::isNull);
 
-      return new ResourceEvaluationResult(resolveValues);
+      return new ResourceEvaluationResult(resolveValues, additionalResolveValues);
 
     } catch (RequiredConstraintFailureException e) {
       LOGGER.warn("Resource Constraint condition not satisfied , exception {}", e.getMessage());
