@@ -6,15 +6,12 @@
 package io.github.linuxforhealth.hl7.segments;
 
 import static org.assertj.core.api.Assertions.assertThat;
-
 import java.util.List;
 import java.util.stream.Collectors;
-
 import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
-import org.hl7.fhir.r4.model.ResourceType;
 import org.hl7.fhir.r4.model.Resource;
+import org.hl7.fhir.r4.model.ResourceType;
 import org.junit.jupiter.api.Test;
-
 import io.github.linuxforhealth.hl7.segments.util.ResourceUtils;
 
 public class HL7MergeFHIRConversionTest {
@@ -23,10 +20,11 @@ public class HL7MergeFHIRConversionTest {
     @Test
     public void validateMerge1() {
 
-        String hl7message = "MSH|^~\\&|SENDING_APPLICATION|SENDING_FACILITY|RECEIVING_APPLICATION|RECEIVING_FACILITY|20110613122406637||ADT^A01|1965403220110613122406637|P|2.3||||\r"
-        + "EVN|A40|20110613122406637||01\r"
-        + "PID|1||1765431^^^^MR||McTavish^Henry^J||19700101|M|||117 W Main St^^Fort Wayne^IN^46808||(260)555-1234^^^^^|||M||1117112|999999999||||||||||||||||||||\r"
-        + "MRG|1765475||||||\r";
+      String hl7message =
+          "MSH|^~\\&|SENDING_APPLICATION|SENDING_FACILITY|RECEIVING_APPLICATION|RECEIVING_FACILITY|20110613122406637||ADT^A01|1965403220110613122406637|P|2.3||||\r"
+              + "EVN|A40|20110613122406637||01\r"
+              + "PID|1||1765431^^^^MR||McTavish^Henry^J||19700101|M|||117 W Main St^^Fort Wayne^IN^46808||(260)555-1234^^^^^|||M||1117112|999999999||||||||||||||||||||\r"
+              + "MRG|1765475^^^^MR||||||\r";
 
         List<BundleEntryComponent> e =ResourceUtils.createHl7Segment(hl7message);
 

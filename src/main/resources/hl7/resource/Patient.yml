@@ -194,57 +194,28 @@ communication:
 
 # For the PID Patient
 active:
-   condition: $pidVar NOT_NULL && $mrg1 NOT_NULL
-   type: BOOLEAN
-   specs: PID
-   valueOf: true
-   vars:
-      mrg1: MRG.1
-      pidVar: PID.3.1
+   type: BOOLEAN  
+   valueOf: $isActive
+   constants:
+      isActive: true
 
-# For the MRG Patient
-active:
-   condition: $pidVar NOT_NULL && $mrg1 NOT_NULL
-   type: BOOLEAN
-   specs: MRG
-   valueOf: false
-   vars:
-      mrg1: MRG.1
-      pidVar: PID.3.1
 
-# For the PID Patient
 link:
    generateList: true
+   evaluateLater: true
    expressionType: nested
-   expressions:
-   -  condition: $pidVar NOT_NULL
-      valueOf: dataType/Link
-      expressionType: resource
-      specs: PID
-      constants:
-          type: 'replaces'
-      vars:
-          pidVar: PID.3.1
-   -  condition: $mrg1 NOT_NULL 
-      valueOf: dataType/Link
-      expressionType: resource
-      evaluateLater: true
-      specs: MRG
-      constants:
-          type: 'replaced-by'
-      vars:
-          mrg1: MRG.1
-
-# For the MRG Patient
-# link:
-#    condition: $pidVar NOT_NULL && $mrg1 NOT_NULL
-#    valueOf: dataType/Link
-#    expressionType: resource
-#    evaluateLater: true
-#    specs: MRG.1
-#    constants:
-#       type: 'replaced-by'
-#    vars:
-#       mrg1: MRG.1
-#       pidVar: PID.3.1
-
+   condition: mrgSegment NOT_NULL
+   vars: 
+      mrgSegment: MRG
+   expressionsMap:
+         type:
+            type: STRING
+            valueOf: $type
+            constants:
+                type: 'replaces'
+         other:
+           required: true
+           valueOf: resource/PatientMRG
+           expressionType: reference
+           specs: $Patient
+         
