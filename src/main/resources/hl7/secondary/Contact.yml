@@ -4,8 +4,16 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 ---
-  
+purpose:
+   valueOf: datatype/CodeableConcept_var
+   condition: $code NOT_NULL || $display NOT_NULL || $system_code NOT_NULL || text NOT_NULL
+   generateList: true
+   expressionType: resource
+   vars: 
+      system: SYSTEM_URL, $system_code
+
 name:
   valueOf: datatype/HumanName
   expressionType: resource
   specs: XCN | $contactNameXCN
+
