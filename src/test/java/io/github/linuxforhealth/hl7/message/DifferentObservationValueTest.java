@@ -284,12 +284,17 @@ public class DifferentObservationValueTest {
                 assertThat(organizationResource).hasSize(1);
                 Organization org = getResourceOrganization(organizationResource.get(0));
                 assertThat(org.getName()).isEqualTo("Radiology"); // from OBX.23
-                assertThat(org.getAddress().get(0).getLine().get(0).getValueAsString()).isEqualTo("467 Albany Hospital"); // from OBX.24
+                assertThat(org.getAddress().get(0).getLine().get(0).getValueAsString())
+                                .isEqualTo("467 Albany Hospital"); // from OBX.24
                 assertThat(org.getAddress().get(0).getCity()).isEqualTo("Albany"); // from OBX.24
                 assertThat(org.getAddress().get(0).getState()).isEqualTo("NY"); // from OBX.24
                 assertThat(org.getContact().get(0).getName().getFamily()).isEqualTo("ContactLastName"); // from OBX.25
                 assertThat(org.getContact().get(0).getName().getGiven().get(0).getValueAsString()).isEqualTo("Jane"); // from OBX.25
                 assertThat(org.getContact().get(0).getName().getText()).isEqualTo("Dr. Jane Q ContactLastName"); // from OBX.25
+                assertThat(org.getContact().get(0).hasPurpose()).isTrue(); // purpose added because of OBX.25
+                checkCommonCodeableConceptAssertions(org.getContact().get(0).getPurpose(), "ADMIN", "Administrative",
+                                "http://terminology.hl7.org/CodeSystem/contactentity-type",
+                                "Organization Medical Director");
 
                 // Check method  (OBX.17)
                 assertThat(obs.hasMethod()).isTrue();
@@ -382,8 +387,8 @@ public class DifferentObservationValueTest {
                 assertThat(obs.hasCategory()).isTrue();
                 assertThat(obs.getCategory()).hasSize(1);
                 checkCommonCodeableConceptAssertions(obs.getCategoryFirstRep(), "laboratory", "Laboratory",
-                "http://terminology.hl7.org/CodeSystem/observation-category", null);
- 
+                                "http://terminology.hl7.org/CodeSystem/observation-category", null);
+
         }
 
         // Common check for values of a codeable concept.  Null in any input indicates it should check False

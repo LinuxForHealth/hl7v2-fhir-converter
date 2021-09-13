@@ -46,3 +46,8 @@ contact:
    generateList: true
    expressionType: resource
    specs: $orgContactXCN
+   constants:
+      code: 'ADMIN'
+      system_code: 'contactentity-type'
+      display: 'Administrative'
+      text: 'Organization Medical Director'
