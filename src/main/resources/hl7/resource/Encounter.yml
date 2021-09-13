@@ -108,6 +108,7 @@ subject:
     valueOf: datatype/Reference
     expressionType: resource
     specs: $Patient
+    
 diagnosis:
    expressionType: nested
    evaluateLater: true
@@ -118,18 +119,20 @@ diagnosis:
         valueOf: datatype/Reference
         expressionType: resource
         specs: $Condition
+<<<<<<< HEAD
         
 <<<<<<< HEAD
 =======
 
 >>>>>>> d279c61 (updated to support generating diagnosis later)
+=======
+>>>>>>> e70f65a (rework spacing)
      use: 
         valueOf: datatype/CodeableConcept
         expressionType: resource
         specs: DG1.6
         vars:
           coding: DIAGNOSIS_USE, DG1.6
-
      rank: 
         type: STRING
         valueOf: DG1.15
