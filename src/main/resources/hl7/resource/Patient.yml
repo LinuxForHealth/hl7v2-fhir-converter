@@ -199,7 +199,6 @@ active:
    constants:
       isActive: true
 
-
 link:
    generateList: true
    evaluateLater: true
