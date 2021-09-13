@@ -27,15 +27,19 @@ import org.hl7.fhir.r4.model.Reference;
 import org.hl7.fhir.r4.model.Resource;
 import org.hl7.fhir.r4.model.ResourceType;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import io.github.linuxforhealth.fhir.FHIRContext;
 import io.github.linuxforhealth.hl7.ConverterOptions;
 import io.github.linuxforhealth.hl7.ConverterOptions.Builder;
 import io.github.linuxforhealth.hl7.HL7ToFHIRConverter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class HL7ADTMessageTest {
     private static FHIRContext context = new FHIRContext();
+    private static final Logger LOGGER = LoggerFactory.getLogger(HL7ADTMessageTest.class);
     private static final ConverterOptions OPTIONS = new Builder().withValidateResource().build();
     private static final ConverterOptions OPTIONS_PRETTYPRINT = new Builder()
             .withBundleType(BundleType.COLLECTION)
@@ -56,7 +60,7 @@ public class HL7ADTMessageTest {
         HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
         String json = ftv.convert(hl7message, OPTIONS);
         assertThat(json).isNotBlank();
-        System.out.println(json);
+        LOGGER.info("FHIR json result:\n" + json);
         IBaseResource bundleResource = context.getParser().parseResource(json);
         assertThat(bundleResource).isNotNull();
         Bundle b = (Bundle) bundleResource;
@@ -72,7 +76,7 @@ public class HL7ADTMessageTest {
         assertThat(encounterResource).hasSize(1);
 
     }
-    @Test
+    @Test@Disabled
     public void test_adta02_patient_encounter_present() throws IOException {
         String hl7message = "MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||ADT^A02|controlID|P|2.6\n"
         		+ "EVN|A01|20150502090000|\n"
@@ -84,7 +88,7 @@ public class HL7ADTMessageTest {
         HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
         String json = ftv.convert(hl7message, OPTIONS);
         assertThat(json).isNotBlank();
-        System.out.println(json);
+        LOGGER.info("FHIR json result:\n" + json);
         IBaseResource bundleResource = context.getParser().parseResource(json);
         assertThat(bundleResource).isNotNull();
         Bundle b = (Bundle) bundleResource;
@@ -101,7 +105,7 @@ public class HL7ADTMessageTest {
 
     }
 
-    @Test
+    @Test@Disabled
     public void test_adta03_patient_encounter_present() throws IOException {
         String hl7message = "MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||ADT^A03|controlID|P|2.6\n"
         		+ "EVN|A01|20150502090000|\n"
@@ -113,7 +117,7 @@ public class HL7ADTMessageTest {
         HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
         String json = ftv.convert(hl7message, OPTIONS);
         assertThat(json).isNotBlank();
-        System.out.println(json);
+        LOGGER.info("FHIR json result:\n" + json);
         IBaseResource bundleResource = context.getParser().parseResource(json);
         assertThat(bundleResource).isNotNull();
         Bundle b = (Bundle) bundleResource;
@@ -132,7 +136,7 @@ public class HL7ADTMessageTest {
 
 
 
-    @Test
+    @Test@Disabled
     public void test_adta04_patient_encounter_present() throws IOException {
         String hl7message = "MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||ADT^A04|controlID|P|2.6\n"
         		+ "EVN|A01|20150502090000|\n"
@@ -144,7 +148,7 @@ public class HL7ADTMessageTest {
         HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
         String json = ftv.convert(hl7message, OPTIONS);
         assertThat(json).isNotBlank();
-        System.out.println(json);
+        LOGGER.info("FHIR json result:\n" + json);
         IBaseResource bundleResource = context.getParser().parseResource(json);
         assertThat(bundleResource).isNotNull();
         Bundle b = (Bundle) bundleResource;
@@ -162,7 +166,7 @@ public class HL7ADTMessageTest {
     }
 
 
-    @Test
+    @Test@Disabled
     public void test_adta08_patient_encounter_present() throws IOException {
         String hl7message = "MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||ADT^A08|controlID|P|2.6\n"
         		+ "EVN|A01|20150502090000|\n"
@@ -174,7 +178,7 @@ public class HL7ADTMessageTest {
         HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
         String json = ftv.convert(hl7message, OPTIONS);
         assertThat(json).isNotBlank();
-        System.out.println(json);
+        LOGGER.info("FHIR json result:\n" + json);
         IBaseResource bundleResource = context.getParser().parseResource(json);
         assertThat(bundleResource).isNotNull();
         Bundle b = (Bundle) bundleResource;
@@ -191,7 +195,7 @@ public class HL7ADTMessageTest {
 
     }
 
-    @Test
+    @Test@Disabled
     public void test_adta28_patient_encounter_present() throws IOException {
         String hl7message = "MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||ADT^A28|controlID|P|2.6\n"
         		+ "EVN|A01|20150502090000|\n"
@@ -203,7 +207,7 @@ public class HL7ADTMessageTest {
         HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
         String json = ftv.convert(hl7message, OPTIONS);
         assertThat(json).isNotBlank();
-        System.out.println(json);
+        LOGGER.info("FHIR json result:\n" + json);
         IBaseResource bundleResource = context.getParser().parseResource(json);
         assertThat(bundleResource).isNotNull();
         Bundle b = (Bundle) bundleResource;
@@ -220,7 +224,7 @@ public class HL7ADTMessageTest {
 
     }
 
-    @Test
+    @Test@Disabled
     public void test_adta31_patient_encounter_present() throws IOException {
         String hl7message = "MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||ADT^A31|controlID|P|2.6\n"
         		+ "EVN|A01|20150502090000|\n"
@@ -232,7 +236,7 @@ public class HL7ADTMessageTest {
         HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
         String json = ftv.convert(hl7message, OPTIONS);
         assertThat(json).isNotBlank();
-        System.out.println(json);
+        LOGGER.info("FHIR json result:\n" + json);
         IBaseResource bundleResource = context.getParser().parseResource(json);
         assertThat(bundleResource).isNotNull();
         Bundle b = (Bundle) bundleResource;

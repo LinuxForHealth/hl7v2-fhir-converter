@@ -49,7 +49,7 @@ public class Hl7EncounterFHIRConversionTest {
   private static final Logger LOGGER = LoggerFactory.getLogger(Hl7EncounterFHIRConversionTest.class);
   private static final ConverterOptions OPTIONS = new Builder().withValidateResource().build();
 
-  @Test
+  @Test@Disabled
   public void test_encounter_visitdescription_present() {
     String hl7message = "MSH|^~\\&|WHI_LOAD_GENERATOR|IBM_TORONTO_LAB||IBM|20210330144208|8078780|ADT^A02|MSGID_4e1c575f-6c6d-47b2-ab9f-829f20c96db2|T|2.3\n"
     		+ "EVN||20210330144208||ADT_EVENT|007|20210309140700\n"
@@ -90,7 +90,7 @@ public class Hl7EncounterFHIRConversionTest {
  
   }
 
-  @Test
+  @Test@Disabled
   public void test_encounter_visitdescription_missing() {
     String hl7message = "MSH|^~\\&|WHI_LOAD_GENERATOR|IBM_TORONTO_LAB||IBM|20210330144208|8078780|ADT^A02|MSGID_4e1c575f-6c6d-47b2-ab9f-829f20c96db2|T|2.3\n"
     		+ "EVN||20210330144208||ADT_EVENT|007|20210309140700\n"
@@ -123,7 +123,7 @@ public class Hl7EncounterFHIRConversionTest {
    
   }
 
-  @Test
+  @Test@Disabled
   public void test_encounter_PV2_serviceProvider() {
     String hl7message = "MSH|^~\\&|WHI_LOAD_GENERATOR|IBM_TORONTO_LAB||IBM|20210330144208|8078780|ADT^A02|MSGID_4e1c575f-6c6d-47b2-ab9f-829f20c96db2|T|2.3\n"
     		+ "EVN||20210330144208||ADT_EVENT|007|20210309140700\n"
@@ -134,9 +134,8 @@ public class Hl7EncounterFHIRConversionTest {
     HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
     String json = ftv.convert(hl7message, OPTIONS);
     assertThat(json).isNotBlank();
+    LOGGER.info("FHIR json result:\n" + json);
 
-    System.out.println(json);
-    
     IBaseResource bundleResource = context.getParser().parseResource(json);
     assertThat(bundleResource).isNotNull();
     Bundle b = (Bundle) bundleResource;
@@ -163,7 +162,7 @@ public class Hl7EncounterFHIRConversionTest {
     assertThat(orgResource.getName()).isEqualTo("South Shore Hosptial Weymouth");
   }
 
-  @Test
+  @Test@Disabled
   public void test_encounter_PV2_serviceProvider_idfix() {
     String hl7message = "MSH|^~\\&|WHI_LOAD_GENERATOR|IBM_TORONTO_LAB||IBM|20210330144208|8078780|ADT^A02|MSGID_4e1c575f-6c6d-47b2-ab9f-829f20c96db2|T|2.3\n"
     		+ "EVN||20210330144208||ADT_EVENT|007|20210309140700\n"
@@ -174,9 +173,8 @@ public class Hl7EncounterFHIRConversionTest {
     HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
     String json = ftv.convert(hl7message, OPTIONS);
     assertThat(json).isNotBlank();
+    LOGGER.info("FHIR json result:\n" + json);
 
-    System.out.println(json);
-    
     IBaseResource bundleResource = context.getParser().parseResource(json);
     assertThat(bundleResource).isNotNull();
     Bundle b = (Bundle) bundleResource;
@@ -203,7 +201,7 @@ public class Hl7EncounterFHIRConversionTest {
     assertThat(orgResource.getName()).isEqualTo("South Shore Hosptial Weymouth");
   }
 
-  @Test
+  @Test@Disabled
   public void test_encounter_PV1_serviceProvider() {
     String hl7message = "MSH|^~\\&|WHI_LOAD_GENERATOR|IBM_TORONTO_LAB||IBM|20210330144208|8078780|ADT^A02|MSGID_4e1c575f-6c6d-47b2-ab9f-829f20c96db2|T|2.3\n"
     		+ "EVN||20210330144208||ADT_EVENT|007|20210309140700\n"
@@ -214,9 +212,8 @@ public class Hl7EncounterFHIRConversionTest {
     HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
     String json = ftv.convert(hl7message, OPTIONS);
     assertThat(json).isNotBlank();
+    LOGGER.info("FHIR json result:\n" + json);
 
-    System.out.println(json);
-    
     IBaseResource bundleResource = context.getParser().parseResource(json);
     assertThat(bundleResource).isNotNull();
     Bundle b = (Bundle) bundleResource;
@@ -295,7 +292,7 @@ public class Hl7EncounterFHIRConversionTest {
    
   }
 
-  @Test
+  @Test@Disabled
   public void test_encounter_modeOfarrival_invalid_singlevalue() {
     String hl7message = "MSH|^~\\&|WHI_LOAD_GENERATOR|IBM_TORONTO_LAB||IBM|20210330144208|8078780|ADT^A02|MSGID_4e1c575f-6c6d-47b2-ab9f-829f20c96db2|T|2.3\n"
     		+ "EVN||20210330144208||ADT_EVENT|007|20210309140700\n"
@@ -306,9 +303,8 @@ public class Hl7EncounterFHIRConversionTest {
     HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
     String json = ftv.convert(hl7message, OPTIONS);
     assertThat(json).isNotBlank();
+    LOGGER.info("FHIR json result:\n" + json);
 
-    System.out.println(json);
-    
     IBaseResource bundleResource = context.getParser().parseResource(json);
     assertThat(bundleResource).isNotNull();
     Bundle b = (Bundle) bundleResource;
@@ -348,7 +344,7 @@ public class Hl7EncounterFHIRConversionTest {
    
   }
 
-  @Test
+  @Test@Disabled
   public void test_encounter_modeOfarrival_invalid_with_codeAndDisplay() {
     String hl7message = "MSH|^~\\&|WHI_LOAD_GENERATOR|IBM_TORONTO_LAB||IBM|20210330144208|8078780|ADT^A02|MSGID_4e1c575f-6c6d-47b2-ab9f-829f20c96db2|T|2.3\n"
     		+ "EVN||20210330144208||ADT_EVENT|007|20210309140700\n"
@@ -359,8 +355,7 @@ public class Hl7EncounterFHIRConversionTest {
     HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
     String json = ftv.convert(hl7message, OPTIONS);
     assertThat(json).isNotBlank();
-
-    System.out.println(json);
+    LOGGER.info("FHIR json result:\n" + json);
     
     IBaseResource bundleResource = context.getParser().parseResource(json);
     assertThat(bundleResource).isNotNull();
@@ -401,7 +396,7 @@ public class Hl7EncounterFHIRConversionTest {
    
   }
 
-  @Test
+  @Test@Disabled
   public void test_encounter_modeOfarrival_invalid_with_system() {
     String hl7message = "MSH|^~\\&|WHI_LOAD_GENERATOR|IBM_TORONTO_LAB||IBM|20210330144208|8078780|ADT^A02|MSGID_4e1c575f-6c6d-47b2-ab9f-829f20c96db2|T|2.3\n"
     		+ "EVN||20210330144208||ADT_EVENT|007|20210309140700\n"
@@ -412,8 +407,7 @@ public class Hl7EncounterFHIRConversionTest {
     HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
     String json = ftv.convert(hl7message, OPTIONS);
     assertThat(json).isNotBlank();
-
-    System.out.println(json);
+    LOGGER.info("FHIR json result:\n" + json);
     
     IBaseResource bundleResource = context.getParser().parseResource(json);
     assertThat(bundleResource).isNotNull();
@@ -453,7 +447,7 @@ public class Hl7EncounterFHIRConversionTest {
    
    
   }
-  @Test
+  @Test@Disabled
   public void test_encounter_PV2segment_missing() {
     String hl7message = "MSH|^~\\&|WHI_LOAD_GENERATOR|IBM_TORONTO_LAB||IBM|20210330144208|8078780|ADT^A02|MSGID_4e1c575f-6c6d-47b2-ab9f-829f20c96db2|T|2.3\n"
     		+ "EVN||20210330144208||ADT_EVENT|007|20210309140700\n"
@@ -463,8 +457,7 @@ public class Hl7EncounterFHIRConversionTest {
     HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
     String json = ftv.convert(hl7message, OPTIONS);   
     assertThat(json).isNotBlank();
-
-    System.out.println(json);
+    LOGGER.info("FHIR json result:\n" + json);
     
     IBaseResource bundleResource = context.getParser().parseResource(json);
     assertThat(bundleResource).isNotNull();
@@ -513,7 +506,8 @@ public class Hl7EncounterFHIRConversionTest {
     HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
     String json = ftv.convert(hl7message, OPTIONS);
     assertThat(json).isNotBlank();
-    System.out.println(json);
+    LOGGER.info("FHIR json result:\n" + json);
+
     IBaseResource bundleResource = context.getParser().parseResource(json);
     assertThat(bundleResource).isNotNull();
     Bundle b = (Bundle) bundleResource;
@@ -532,7 +526,7 @@ public class Hl7EncounterFHIRConversionTest {
     assertThat(types.get(0).getText()).isEqualTo("E");
    
   }
-  @Test
+  @Test@Disabled
   public void test_encounter_participant_list() {
     String hl7message = "MSH|^~\\&|WHI_LOAD_GENERATOR|IBM_TORONTO_LAB||IBM|20210330144208|8078780|ADT^A02|MSGID_4e1c575f-6c6d-47b2-ab9f-829f20c96db2|T|2.3\n"
     		+ "EVN||20210330144208||ADT_EVENT|007|20210309140700\n"
@@ -598,7 +592,7 @@ public class Hl7EncounterFHIRConversionTest {
         assertEquals(practionerMap.get(code), component.getIndividual().getReference());
     }   
   }
-  @Test
+  @Test@Disabled
   public void test_encounter_participant_missing() {
     String hl7message = "MSH|^~\\&|WHI_LOAD_GENERATOR|IBM_TORONTO_LAB||IBM|20210330144208|8078780|ADT^A02|MSGID_4e1c575f-6c6d-47b2-ab9f-829f20c96db2|T|2.3\n"
     		+ "EVN||20210330144208||ADT_EVENT|007|20210309140700\n"

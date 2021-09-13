@@ -211,6 +211,7 @@ public class Hl7RelatedGeneralUtils {
     }
     public static String formatAsId(Object input)
     {
+        // This replaces any special character (letters, numbers, dashes, or periods) with a period
         String stringValue = Hl7DataHandlerUtil.getStringValue(input).trim();
         stringValue = stringValue.replaceAll("[^a-zA-Z0-9\\-\\.]", ".");
         return StringUtils.left(stringValue, 64);

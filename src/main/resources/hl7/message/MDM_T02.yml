@@ -28,7 +28,6 @@ resources:
       repeats: false
       isReferenced: true
       additionalSegments:
-        - PV2
         - EVN
         - MSH
 

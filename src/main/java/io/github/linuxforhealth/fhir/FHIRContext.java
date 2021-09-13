@@ -81,7 +81,6 @@ public class FHIRContext {
                   next.getSeverity());
         }
         if (!validationIssues.isEmpty()) {
-          System.out.println(this.parser.encodeResourceToString(bundle));
           throw new IllegalArgumentException(
               "Validation issues encountered. " + StringUtils.join(validationIssues, "|"));
         }

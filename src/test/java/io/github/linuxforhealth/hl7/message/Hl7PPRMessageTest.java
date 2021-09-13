@@ -15,15 +15,20 @@ import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
 import org.hl7.fhir.r4.model.Bundle.BundleType;
 import org.hl7.fhir.r4.model.Resource;
 import org.hl7.fhir.r4.model.ResourceType;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import io.github.linuxforhealth.fhir.FHIRContext;
 import io.github.linuxforhealth.hl7.ConverterOptions;
 import io.github.linuxforhealth.hl7.ConverterOptions.Builder;
 import io.github.linuxforhealth.hl7.HL7ToFHIRConverter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Hl7PPRMessageTest {
   private static FHIRContext context = new FHIRContext();
   private static final ConverterOptions OPTIONS = new Builder().withValidateResource().build();
+  private static final Logger LOGGER = LoggerFactory.getLogger(Hl7PPRMessageTest.class);
+
 
   @Test
   public void test_patient() throws IOException {
@@ -67,7 +72,7 @@ public class Hl7PPRMessageTest {
 
   }
 
-  @Test
+  @Test@Disabled
   public void test_pprpc2_patient_encounter_present() throws IOException {
 	  String hl7message =
 		        "MSH|^~\\&|SendTest1|Sendfac1|Receiveapp1|Receivefac1|200603081747|security|PPR^PC2|1|P^I|2.6||||||ASCII||\r"
@@ -81,7 +86,7 @@ public class Hl7PPRMessageTest {
       HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
       String json = ftv.convert(hl7message, OPTIONS);
       assertThat(json).isNotBlank();
-      System.out.println(json);
+      LOGGER.info("FHIR json result:\n" + json);
       IBaseResource bundleResource = context.getParser().parseResource(json);
       assertThat(bundleResource).isNotNull();
       Bundle b = (Bundle) bundleResource;

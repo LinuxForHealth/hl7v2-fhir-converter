@@ -1,17 +1,9 @@
 #
-# (C) Copyright IBM Corp. 2020
+# (C) Copyright IBM Corp. 2021
 #
 # SPDX-License-Identifier: Apache-2.0
 #
 
-#period:
-#   condition: $start NOT_NULL && $end NOT_NULL
-#   valueOf: datatype/Period
-#   expressionType: resource
-#   constants:
-#    system: 'http://terminology.hl7.org/CodeSystem/v2-0443'
-#    code: AP
-#    text: Administering Provide
     
 type:
    condition: codeableConceptCode NOT_NULL
