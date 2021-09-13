@@ -19,6 +19,7 @@ import ca.uhn.hl7v2.model.Message;
 import ca.uhn.hl7v2.util.Hl7InputStreamMessageStringIterator;
 import io.github.linuxforhealth.hl7.parsing.HL7DataExtractor;
 import io.github.linuxforhealth.hl7.parsing.HL7HapiParser;
+import io.github.linuxforhealth.hl7.segments.util.ResourceUtils;
 import org.apache.commons.io.IOUtils;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r4.model.*;
@@ -41,12 +42,16 @@ import io.github.linuxforhealth.fhir.FHIRContext;
 import io.github.linuxforhealth.hl7.ConverterOptions;
 import io.github.linuxforhealth.hl7.ConverterOptions.Builder;
 import io.github.linuxforhealth.hl7.HL7ToFHIRConverter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class FHIRConverterTest {
   private static final String HL7_FILE_UNIX_NEWLINE = "src/test/resources/sample_unix.hl7";
   private static final String HL7_FILE_WIN_NEWLINE = "src/test/resources/sample_win.hl7";
   private static final String HL7_FILE_WIN_NEWLINE_BATCH = "src/test/resources/sample_win_batch.hl7";
   private static final ConverterOptions OPTIONS = new Builder().withValidateResource().withPrettyPrint().build();
+  private static final Logger LOGGER = LoggerFactory.getLogger(FHIRConverterTest.class);
+
 
   @Test
   public void test_patient_encounter() throws IOException {
@@ -78,7 +83,7 @@ public class FHIRConverterTest {
 
     HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
     String json = ftv.convert(hl7message, OPTIONS);
-    System.out.println(json);
+    LOGGER.info("FHIR json result:\n" + json);
     verifyResult(json, Constants.DEFAULT_BUNDLE_TYPE, false);
 
   }
