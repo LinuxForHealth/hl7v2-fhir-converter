@@ -10,14 +10,26 @@ id:
    type: STRING
    valueOf: UUID.randomUUID()
    expressionType: JEXL
-identifier:
+identifier_1:
    required: true
    valueOf: datatype/Identifier_SystemID
    generateList: true
    expressionType: resource
    specs: MRG.1
    vars:
-      assignerSystem: String, MRG.1.4
+      assignerSystem: String, MRG.1
+identifier_2:
+   condition: $valueIn NOT_NULL
+   valueOf: datatype/Identifier_var
+   generateList: true
+   expressionType: resource
+   vars:
+      valueIn: String, MRG.1
+   constants:
+      system: http://terminology.hl7.org/CodeSystem/v2-0203
+      code: MR
+      display: Old
+      use: 'old'
 
 name:
    valueOf: datatype/HumanName

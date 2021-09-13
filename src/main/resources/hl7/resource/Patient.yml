@@ -44,6 +44,20 @@ identifier_3:
       code: DL
       display: Driver's license number
 # There is no text for PID.20
+identifier_4:
+   condition: $valueIn NOT_NULL
+   valueOf: datatype/Identifier_var
+   generateList: true
+   expressionType: resource
+   vars:
+      valueIn: String, MRG.1
+   constants:
+      system: http://terminology.hl7.org/CodeSystem/v2-0203
+      code: MR
+      display: Old
+      use: 'old'
+# Add the old MR # from the MRG segment
+
 name:
    valueOf: datatype/HumanName
    generateList: true
