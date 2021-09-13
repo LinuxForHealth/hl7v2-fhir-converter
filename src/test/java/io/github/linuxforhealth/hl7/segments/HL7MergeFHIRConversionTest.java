@@ -36,6 +36,8 @@ public class HL7MergeFHIRConversionTest {
         List<Resource> patientResource = e.stream()
         .filter(v -> ResourceType.Patient== v.getResource().getResourceType())
         .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+
+        // One for the PID segment and one for the MRG segment
         assertThat(patientResource).hasSize(2);
 
         // Get first patient
@@ -97,6 +99,8 @@ public class HL7MergeFHIRConversionTest {
         List<Resource> patientResource = e.stream()
         .filter(v -> ResourceType.Patient== v.getResource().getResourceType())
         .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+
+        // One for the PID segment and one for the MRG segment
         assertThat(patientResource).hasSize(2);
 
         // Get first patient
@@ -130,8 +134,8 @@ public class HL7MergeFHIRConversionTest {
         + "EVN|A40|200301051530\r"
         + "PID|||MR1^^^XYZ^MR||EVERYWOMAN^EVE|||||||||||||ACCT3\r"
         + "MRG|MR2^^^XYZ||ACCT1\r"
-        + "PID|||MR1^^^XYZ||EVERYWOMAN^EVE|||||||||||||ACCT4\r"
-        + "MRG|MR2^^^XYZ||ACCT2\r";
+        + "PID|||MR3^^^XYZ||EVERYWOMAN^EVE|||||||||||||ACCT4\r"
+        + "MRG|MR4^^^XYZ||ACCT2\r";
 
         List<BundleEntryComponent> e =ResourceUtils.createHl7Segment(hl7message);
 
@@ -139,7 +143,9 @@ public class HL7MergeFHIRConversionTest {
         List<Resource> patientResource = e.stream()
         .filter(v -> ResourceType.Patient== v.getResource().getResourceType())
         .map(BundleEntryComponent::getResource).collect(Collectors.toList());
-        assertThat(patientResource).hasSize(3);  // 1 for the PID and 1 each for the MRG
+
+        // One for each PID segment and one for each MRG segment
+        assertThat(patientResource).hasSize(4);
 
         // Get first patient
         Resource patientOne = patientResource.get(0);
