@@ -628,7 +628,7 @@ public class Hl7EncounterFHIRConversionTest {
     
     HashMap<String, String> practionerMap = new HashMap<String, String>();
     //Make sure that practitioners found are matching the HL7
-    List<String> practionerIds = Arrays.asList( "5755",  "59367");
+    List<String> practionerIds = Arrays.asList("59367");
     for(Resource r : practioners) {
     	Practitioner p = getResourcePractitioner(r);
     	assertThat(p.getIdentifier()).hasSize(1);
