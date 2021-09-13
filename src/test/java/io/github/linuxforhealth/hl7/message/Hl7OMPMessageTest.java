@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2020
+ * (C) Copyright IBM Corp. 2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -9,6 +9,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import io.github.linuxforhealth.hl7.segments.Hl7EncounterFHIRConversionTest;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
@@ -20,13 +22,17 @@ import io.github.linuxforhealth.fhir.FHIRContext;
 import io.github.linuxforhealth.hl7.ConverterOptions;
 import io.github.linuxforhealth.hl7.ConverterOptions.Builder;
 import io.github.linuxforhealth.hl7.HL7ToFHIRConverter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Hl7OMPMessageTest {
   private static FHIRContext context = new FHIRContext();
   private static final ConverterOptions OPTIONS = new Builder().withValidateResource().build();
+    private static final Logger LOGGER = LoggerFactory.getLogger(Hl7OMPMessageTest.class);
 
 
-  @Test
+
+    @Test
   public void test_OMPO09_patient_encounter_present() throws IOException {
 	  String hl7message =
 		        "MSH|^~\\&|WHI_LOAD_GENERATOR|IBM_TORONTO_LAB|MEDORDER|IBM|20210407191342|9022934|OMP^O09|MSGID_bae9ce6a-e35d-4ff5-8d50-c5dde19cc1aa|T|2.5.1\n"
@@ -40,7 +46,7 @@ public class Hl7OMPMessageTest {
       HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
       String json = ftv.convert(hl7message, OPTIONS);
       assertThat(json).isNotBlank();
-      System.out.println(json);
+      LOGGER.info("FHIR json result:\n" + json);
       IBaseResource bundleResource = context.getParser().parseResource(json);
       assertThat(bundleResource).isNotNull();
       Bundle b = (Bundle) bundleResource;
