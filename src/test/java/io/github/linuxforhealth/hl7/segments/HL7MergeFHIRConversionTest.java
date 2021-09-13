@@ -20,9 +20,10 @@ import io.github.linuxforhealth.hl7.segments.util.ResourceUtils;
 
 public class HL7MergeFHIRConversionTest {
 
-    // TBD
+    // Happy path testing for the MRG segment
+    // TODO: Turn this into an ADT_A34 message
     @Test
-    public void validateMerge() {
+    public void validateHappyPathADT_A34WithMRG() {
 
         String hl7message = "MSH|^~\\&|SENDING_APPLICATION|SENDING_FACILITY|RECEIVING_APPLICATION|RECEIVING_FACILITY|20110613122406637||ADT^A01|1965403220110613122406637|P|2.3||||\r"
         + "EVN|A40|20110613122406637||01\r"
@@ -51,11 +52,11 @@ public class HL7MergeFHIRConversionTest {
         //    }
         //  ]
 
-        assertThat(ResourceUtils.getValueAsString(patientOne, "active")).isEqualTo("true");
+        assertThat(ResourceUtils.getValueAsString(patientOne, "active")).isEqualTo("BooleanType[true]");
 
         Base linkOne = ResourceUtils.getValue(patientOne, "link");
-        assertThat(ResourceUtils.getValueAsString(linkOne, "type")).isEqualTo("replaces");
-        Base patientOneRef = ResourceUtils.getValue(patientOne, "other");
+        assertThat(ResourceUtils.getValueAsString(linkOne, "type")).isEqualTo("Enumeration[replaces]");
+        Base patientOneRef = ResourceUtils.getValue(linkOne, "other");
         assertThat(ResourceUtils.getValueAsString(patientOneRef, "reference").substring(0, 8)).isEqualTo("Patient/");
 
         // Get second patient
@@ -71,26 +72,78 @@ public class HL7MergeFHIRConversionTest {
         //      "type": "replaced-by"
         //    }
         //  ]
-        assertThat(ResourceUtils.getValueAsString(patientTwo, "active")).isEqualTo("false");
+        assertThat(ResourceUtils.getValueAsString(patientTwo, "active")).isEqualTo("BooleanType[false]");
 
         Base linkTwo = ResourceUtils.getValue(patientTwo, "link");
-        assertThat(ResourceUtils.getValueAsString(linkTwo, "type")).isEqualTo("replaced-by");
-        Base patientTwoRef = ResourceUtils.getValue(patientTwo, "other");
+        assertThat(ResourceUtils.getValueAsString(linkTwo, "type")).isEqualTo("Enumeration[replaced-by]");
+        Base patientTwoRef = ResourceUtils.getValue(linkTwo, "other");
         assertThat(ResourceUtils.getValueAsString(patientTwoRef, "reference").substring(0, 8)).isEqualTo("Patient/");
     
     }
 
-    // TODO: Add tests for this as well
-    // String hl7message = "MSH|^~\\&|REGADT|MCM|RSP1P8|MCM|200301051530|SEC|ADT^A01|00000003|P|2.5\r"
-    // + "EVN|A40|200301051530\r"
-    // + "PID|||MR1^^^XYZ^MR||MAIDENNAME^EVE\r"
-    // + "MRG|MR2^^^XYZ\r";
+    // More happy path testing for the MRG segment
+    // TODO: Turn this into an ADT_A40 message
+    @Test
+    public void validateHappyPathADT_A40WithMRG() {
 
-    // String hl7message = "MSH|^~\\&|REGADT|MCM|RSP1P8|MCM|200301051530|SEC|ADT^A01|00000003|P|2.5\r"
-    // + "EVN|A40|200301051530\r"
-    // + "PID|||MR1^^^XYZ^MR||EVERYWOMAN^EVE|||||||||||||ACCT3\r"
-    // + "MRG|MR2^^^XYZ||ACCT1\r"
-    // + "PID|||MR1^^^XYZ||EVERYWOMAN^EVE|||||||||||||ACCT4\r"
-    // + "MRG|MR2^^^XYZ||ACCT2\r";
+        String hl7message = "MSH|^~\\&|REGADT|MCM|RSP1P8|MCM|200301051530|SEC|ADT^A01|00000003|P|2.5\r"
+        + "EVN|A40|200301051530\r"
+        + "PID|||MR1^^^XYZ^MR||MAIDENNAME^EVE\r"
+        + "MRG|MR2^^^XYZ\r";
+
+        List<BundleEntryComponent> e =ResourceUtils.createHl7Segment(hl7message);
+
+        // Find the patient resources in the FHIR bundle.
+        List<Resource> patientResource = e.stream()
+        .filter(v -> ResourceType.Patient== v.getResource().getResourceType())
+        .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        assertThat(patientResource).hasSize(2);
+
+        // Get first patient
+        Resource patientOne = patientResource.get(0);
+
+        assertThat(ResourceUtils.getValueAsString(patientOne, "active")).isEqualTo("BooleanType[true]");
+
+        Base linkOne = ResourceUtils.getValue(patientOne, "link");
+        assertThat(ResourceUtils.getValueAsString(linkOne, "type")).isEqualTo("Enumeration[replaces]");
+        Base patientOneRef = ResourceUtils.getValue(linkOne, "other");
+        assertThat(ResourceUtils.getValueAsString(patientOneRef, "reference").substring(0, 8)).isEqualTo("Patient/");
+
+        // Get second patient
+        Resource patientTwo = patientResource.get(1);
+
+        assertThat(ResourceUtils.getValueAsString(patientTwo, "active")).isEqualTo("BooleanType[false]");
+
+        Base linkTwo = ResourceUtils.getValue(patientTwo, "link");
+        assertThat(ResourceUtils.getValueAsString(linkTwo, "type")).isEqualTo("Enumeration[replaced-by]");
+        Base patientTwoRef = ResourceUtils.getValue(linkTwo, "other");
+        assertThat(ResourceUtils.getValueAsString(patientTwoRef, "reference").substring(0, 8)).isEqualTo("Patient/");
+
+    }
+
+    // Test two MRG segments.
+    // TODO: Turn this into an ADT_A34 or ADT_A40  message
+    @Test
+    public void validateTwoMRGs() {
+
+        String hl7message = "MSH|^~\\&|REGADT|MCM|RSP1P8|MCM|200301051530|SEC|ADT^A01|00000003|P|2.5\r"
+        + "EVN|A40|200301051530\r"
+        + "PID|||MR1^^^XYZ^MR||EVERYWOMAN^EVE|||||||||||||ACCT3\r"
+        + "MRG|MR2^^^XYZ||ACCT1\r"
+        + "PID|||MR1^^^XYZ||EVERYWOMAN^EVE|||||||||||||ACCT4\r"
+        + "MRG|MR2^^^XYZ||ACCT2\r";
+
+        List<BundleEntryComponent> e =ResourceUtils.createHl7Segment(hl7message);
+
+        // Find the patient resources in the FHIR bundle.
+        List<Resource> patientResource = e.stream()
+        .filter(v -> ResourceType.Patient== v.getResource().getResourceType())
+        .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        assertThat(patientResource).hasSize(3);  // 1 for the PID and 1 each for the MRG
+
+        // Get first patient
+        Resource patientOne = patientResource.get(0);
+
+    }
 
   }

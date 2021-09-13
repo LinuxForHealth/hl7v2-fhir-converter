@@ -192,7 +192,6 @@ communication:
    vars:
       language: PID.15
 
-# For the PID Patient
 active:
    condition: $pidVar NOT_NULL && $mrg1 NOT_NULL
    type: BOOLEAN

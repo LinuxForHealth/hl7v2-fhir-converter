@@ -32,15 +32,11 @@ communication:
    vars:
       language: PID.15
 
-
-
-# For the MRG Patient
 active:
    type: BOOLEAN  
    valueOf: $isActive
    constants:
       isActive: false
-
 
 link:
    generateList: true
