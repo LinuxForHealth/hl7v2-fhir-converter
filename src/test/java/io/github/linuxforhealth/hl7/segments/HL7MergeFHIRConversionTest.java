@@ -84,7 +84,7 @@ public class HL7MergeFHIRConversionTest {
         //The second patient should NOT be active.
         assertThat(ResourceUtils.getValueAsString(patientTwo, "active")).isEqualTo("BooleanType[false]");
 
-        // We should have link.other.reference to the PID(1st) patient
+        // We should have link.other.reference to the PID (1st) patient
         Base linkTwo = ResourceUtils.getValue(patientTwo, "link");
         assertThat(ResourceUtils.getValueAsString(linkTwo, "type")).isEqualTo("Enumeration[replaced-by]");
         Base patientTwoRef = ResourceUtils.getValue(linkTwo, "other");
@@ -99,7 +99,7 @@ public class HL7MergeFHIRConversionTest {
 
         String hl7message = "MSH|^~\\&|REGADT|MCM|RSP1P8|MCM|200301051530|SEC|ADT^A01|00000003|P|2.5\r"
         + "EVN|A40|200301051530\r"
-        + "PID|||MR1^^^XYZ^MR||MAIDENNAME^EVE\r"
+        + "PID|||MR1^^^XYZ^MR||\r"
         + "MRG|MR2^^^XYZ\r";
 
         List<BundleEntryComponent> e =ResourceUtils.createHl7Segment(hl7message);
@@ -143,7 +143,7 @@ public class HL7MergeFHIRConversionTest {
         //The second patient should NOT be active.
         assertThat(ResourceUtils.getValueAsString(patientTwo, "active")).isEqualTo("BooleanType[false]");
 
-        // We should have link.other.reference to the PID(1st) patient
+        // We should have link.other.reference to the PID (1st) patient
         Base linkTwo = ResourceUtils.getValue(patientTwo, "link");
         assertThat(ResourceUtils.getValueAsString(linkTwo, "type")).isEqualTo("Enumeration[replaced-by]");
         Base patientTwoRef = ResourceUtils.getValue(linkTwo, "other");
@@ -158,10 +158,10 @@ public class HL7MergeFHIRConversionTest {
 
         String hl7message = "MSH|^~\\&|REGADT|MCM|RSP1P8|MCM|200301051530|SEC|ADT^A01|00000003|P|2.5\r"
         + "EVN|A40|200301051530\r"
-        + "PID|||MR1^^^XYZ^MR||EVERYWOMAN^EVE|||||||||||||ACCT1\r"
-        + "MRG|MR2^^^XYZ||ACCT1\r"
-        + "PID|||MR3^^^XYZ||EVERYWOMAN^EVE|||||||||||||ACCT2\r"
-        + "MRG|MR4^^^XYZ||ACCT2\r";
+        + "PID|||MR1^^^XYZ^MR|||||||||||||||\r"
+        + "MRG|MR2^^^XYZ||\r"
+        + "PID|||MR3^^^XYZ|||||||||||||||\r"
+        + "MRG|MR4^^^XYZ||\r";
 
         List<BundleEntryComponent> e =ResourceUtils.createHl7Segment(hl7message);
 
@@ -172,9 +172,6 @@ public class HL7MergeFHIRConversionTest {
 
         // One for each PID segment and one for each MRG segment
         assertThat(patientResource).hasSize(4);
-
-        // Get first patient
-        Resource patientOne = patientResource.get(0);
 
     }
 
