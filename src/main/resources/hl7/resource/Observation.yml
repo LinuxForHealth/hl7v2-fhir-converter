@@ -23,6 +23,15 @@ identifier_1: #joins filler | placer | MSH.7 with whatever gets returned from BU
       sys: "urn:id:extID"
       joinChar: '-'
 
+identifier_2:
+   condition: $valueIn NOT_NULL
+   valueOf: datatype/Identifier_var
+   generateList: true
+   expressionType: resource
+   vars:
+      valueIn: OBX.21.1 
+      systemCX: OBX.21.2  
+
 status:
    type: OBSERVATION_STATUS
    default: unknown
@@ -73,8 +82,9 @@ valueQuantity:
     condition: $obx2 EQUALS NM
     vars: 
       value: OBX.5
-      unit: OBX.6
+      unit: OBX.6.1
       obx2: STRING, OBX.2
+      resolvedSystem: SYSTEM_URL, OBX.6.3
 
 
 valueCodeableConcept:
@@ -139,6 +149,7 @@ note_1:
 note_2:
    valueOf: datatype/Annotation
    generateList: true
+   condition: NTE NOT_NULL
    expressionType: resource
    specs: NTE
 
@@ -195,3 +206,15 @@ device:
    vars:
      deviceValue: OBX.18
 
+category:
+   condition: $specimen NOT_NULL
+   valueOf: datatype/CodeableConcept_var
+   generateList: true
+   expressionType: resource
+   vars: 
+      system: SYSTEM_URL, $system_code
+      specimen: SPM.4
+   constants:
+      code: 'laboratory'
+      system_code: 'observation-category'
+      display: 'Laboratory'
