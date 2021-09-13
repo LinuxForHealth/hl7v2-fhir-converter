@@ -70,7 +70,7 @@ public class ImmunizationTest {
                 .isEqualTo("http://hl7.org/fhir/sid/cvx");
         assertThat(resource.getVaccineCode().getCoding().get(0).getCode()).isEqualTo("48");
         assertThat(resource.getVaccineCode().getText()).isEqualTo("HIB PRP-T");
-        assertThat(resource.getOccurrence().toString()).isEqualTo("DateTimeType[2013-05-31]");
+        assertThat(resource.getOccurrence()).hasToString("DateTimeType[2013-05-31]");
 
         assertThat(resource.getReportOrigin().getCoding().get(0).getSystem()).isEqualTo("urn:id:NIP001");
         assertThat(resource.getReportOrigin().getCoding().get(0).getCode()).isEqualTo("00");
