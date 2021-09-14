@@ -182,7 +182,6 @@ public class Hl7MessageTest {
     String json = message.convert(hl7message, engine);
     assertThat(json).isNotBlank();
 
-
     IBaseResource bundleResource = context.getParser().parseResource(json);
     assertThat(bundleResource).isNotNull();
     Bundle b = (Bundle) bundleResource;
