@@ -207,16 +207,6 @@ communication:
       language: PID.15
 
 active:
-   condition: $pidVar NOT_NULL && $mrg1 NOT_NULL
-   type: BOOLEAN
-   specs: PID
-   valueOf: true
-   vars:
-      mrg1: MRG.1
-      pidVar: PID.3.1
-
-# For the MRG Patient
-active:
    type: BOOLEAN  
    valueOf: $isActive
    constants:
