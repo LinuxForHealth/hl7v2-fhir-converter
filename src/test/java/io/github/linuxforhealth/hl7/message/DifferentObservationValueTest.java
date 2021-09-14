@@ -215,7 +215,7 @@ public class DifferentObservationValueTest {
         @Test
         public void extendedObservationCWEtest() throws IOException {
                 String hl7message = "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|ADT^A01^ADT_A01|||2.6||||||||2.6\r"
-                                + "OBX|1|CWE|DQW^Some text 1^SNM3|100|DQW^Other text 2^SNM3|mm^Text 3^SNM3|56-98|IND|25|ST|F|20210322153839|LKJ|20210320153850|N56|1111^ClinicianLastName^ClinicianFirstName^^^^Title|Manual^Text the 4th^SNM3|Device_1234567|20210322153925|Observation Site^Text 5^SNM3|Instance Identifier||Radiology^Radiological Services|467 Albany Hospital^^Albany^NY|Cardiology^ContactLastName^Jane^Q^^Dr.^MD\r";
+                                + "OBX|1|CWE|DQW^Some text 1^SNM3|100|DQW^Other text 2^SNM3|mm^Text 3^SNM3|56-98|IND|25|ST|F|20210322153839|LKJ|20210320153850|N56|1111^ClinicianLastName^ClinicianFirstName^^^^Title|Manual^Text the 4th^SNM3|Device_1234567|20210322153925|Observation Site^Text 5^SNM3|INST^Instance Identifier System||Radiology^Radiological Services|467 Albany Hospital^^Albany^NY|Cardiology^ContactLastName^Jane^Q^^Dr.^MD\r";
 
                 String json = message.convert(hl7message, engine);
 
@@ -284,12 +284,17 @@ public class DifferentObservationValueTest {
                 assertThat(organizationResource).hasSize(1);
                 Organization org = getResourceOrganization(organizationResource.get(0));
                 assertThat(org.getName()).isEqualTo("Radiology"); // from OBX.23
-                assertThat(org.getAddress().get(0).getLine().get(0).getValueAsString()).isEqualTo("467 Albany Hospital"); // from OBX.24
+                assertThat(org.getAddress().get(0).getLine().get(0).getValueAsString())
+                                .isEqualTo("467 Albany Hospital"); // from OBX.24
                 assertThat(org.getAddress().get(0).getCity()).isEqualTo("Albany"); // from OBX.24
                 assertThat(org.getAddress().get(0).getState()).isEqualTo("NY"); // from OBX.24
                 assertThat(org.getContact().get(0).getName().getFamily()).isEqualTo("ContactLastName"); // from OBX.25
                 assertThat(org.getContact().get(0).getName().getGiven().get(0).getValueAsString()).isEqualTo("Jane"); // from OBX.25
                 assertThat(org.getContact().get(0).getName().getText()).isEqualTo("Dr. Jane Q ContactLastName"); // from OBX.25
+                assertThat(org.getContact().get(0).hasPurpose()).isTrue(); // purpose added because of OBX.25
+                checkCommonCodeableConceptAssertions(org.getContact().get(0).getPurpose(), "ADMIN", "Administrative",
+                                "http://terminology.hl7.org/CodeSystem/contactentity-type",
+                                "Organization Medical Director");
 
                 // Check method  (OBX.17)
                 assertThat(obs.hasMethod()).isTrue();
@@ -311,19 +316,28 @@ public class DifferentObservationValueTest {
                 checkCommonCodeableConceptAssertions(obs.getBodySite(), "Observation Site", "Text 5",
                                 "http://terminology.hl7.org/CodeSystem/SNM3", "Text 5");
 
-                // OBX.23/OBX.24/OBX.25 went into Performer: Organization.  Checked above
+                // Check identifier  (OBX.21)
+                assertThat(obs.hasIdentifier()).isTrue();
+                assertThat(obs.getIdentifier()).hasSize(2);
+                assertThat(obs.getIdentifier().get(1).getValue()).isEqualTo("INST");
+                assertThat(obs.getIdentifier().get(1).getSystem()).isEqualTo("urn:id:Instance_Identifier_System");
 
+                // OBX.23/OBX.24/OBX.25 went into Performer: Organization.  Checked above.
+
+                // Check for ABSENCE of category (because no SPM)  Presence of category tested in extendedObservationUnusualRangesAndOtherTest
+                assertThat(obs.hasCategory()).isFalse();
         }
 
         // A companion test to extendedObservationCWEtest that looks for edge cases
         @Test
-        public void extendedObservationUnusualRangeTest() throws IOException {
+        public void extendedObservationUnusualRangesAndOtherTest() throws IOException {
                 String ORU_r01 = "MSH|^~\\&|NIST Test Lab APP|NIST Lab Facility||NIST EHR Facility|20150926140551||ORU^R01|NIST-LOI_5.0_1.1-NG|T|2.5.1|||AL|AL|||||\r"
                                 + "PID|1||||DOE^JANE||||||||||||\r"
                                 + "ORC|NW|ORD448811^NIST EHR|R-511^NIST Lab Filler||||||20120628070100|||5742200012^Radon^Nicholas^^^^^^NPI^L^^^NPI\r"
                                 + "OBR|1|ORD448811^NIST EHR|R-511^NIST Lab Filler|1000^Hepatitis A B C Panel^99USL|||20120628070100|||||||||5742200012^Radon^Nicholas^^^^^^NPI^L^^^NPI\r"
                                 + "OBX|1|CWE|22314-9^Hepatitis A virus IgM Ab [Presence] in Serum^LN^HAVM^Hepatitis A IgM antibodies (IgM anti-HAV)^L^2.52||260385009^Negative (qualifier value)^SCT^NEG^NEGATIVE^L^201509USEd^^Negative (qualifier value)||Negative|N|||F|||20150925|||||201509261400\r"
-                                + "OBX|2|NM|22316-4^Hepatitis B virus core Ab [Units/volume] in Serum^LN^HBcAbQ^Hepatitis B core antibodies (anti-HBVc) Quant^L^2.52||0.70|[IU]/mL^international unit per milliliter^UCUM^IU/ml^^L^1.9|<0.50 IU/mL|H|||F|||20150925|||||201509261400";
+                                + "OBX|2|NM|22316-4^Hepatitis B virus core Ab [Units/volume] in Serum^LN^HBcAbQ^Hepatitis B core antibodies (anti-HBVc) Quant^L^2.52||0.70|[IU]/mL^international unit per milliliter^UCUM^IU/ml^^L^1.9|<0.50 IU/mL|H|||F|||20150925|||||201509261400\r"
+                                + "SPM|1|SpecimenID||BLOOD^Blood^^87612001^BLOOD^SCT^^||||Cord Art^Blood, Cord Arterial^^^^^^^|||P||||||201110060535|201110060821||Y||||||1\r";
 
                 HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
                 String json = ftv.convert(ORU_r01, OPTIONS);
@@ -348,6 +362,15 @@ public class DifferentObservationValueTest {
                 assertThat(range.getText()).isEqualTo("Negative");
 
                 obs = (Observation) obsResource.get(1);
+                assertThat(obs.hasValueQuantity()).isTrue();
+                Quantity q = obs.getValueQuantity();
+                assertThat(q.hasUnit()).isTrue();
+                assertThat(q.getUnit()).isEqualTo("[IU]/mL");
+                assertThat(q.hasValue()).isTrue();
+                assertThat(q.getValue().floatValue()).isEqualTo(0.7f);
+                assertThat(q.hasSystem()).isTrue();
+                assertThat(q.getSystem()).isEqualTo("http://unitsofmeasure.org");
+
                 assertThat(obs.hasReferenceRange()).isTrue();
                 assertThat(obs.getReferenceRange()).hasSize(1);
                 range = obs.getReferenceRangeFirstRep();
@@ -359,6 +382,12 @@ public class DifferentObservationValueTest {
                 assertThat(high.getValue().floatValue()).isEqualTo(0.5f);
                 assertThat(range.hasText()).isTrue();
                 assertThat(range.getText()).isEqualTo("<0.50 IU/mL");
+
+                // Because there is an SPM record, there should be a category.  (Absence of SPM and category checkedin extendedObservationCWEtest)
+                assertThat(obs.hasCategory()).isTrue();
+                assertThat(obs.getCategory()).hasSize(1);
+                checkCommonCodeableConceptAssertions(obs.getCategoryFirstRep(), "laboratory", "Laboratory",
+                                "http://terminology.hl7.org/CodeSystem/observation-category", null);
 
         }
 

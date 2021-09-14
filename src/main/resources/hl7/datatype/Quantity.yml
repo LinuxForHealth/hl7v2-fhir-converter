@@ -14,9 +14,12 @@ comparator :
 unit : 
    type: String
    valueOf: $unit
-system : 
+system_1 : 
    type: URI
    valueOf: $system
+system_2: 
+   type: STRING
+   valueOf: $resolvedSystem   
 code : 
    type: String
    valueOf: $code

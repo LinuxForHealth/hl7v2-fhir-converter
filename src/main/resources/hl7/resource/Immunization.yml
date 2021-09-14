@@ -100,17 +100,7 @@ note:
    vars:
       obx3: STRING, OBX.3.1
       text: STRING, OBX.5
-reasonCode:
-   valueOf: datatype/CodeableConcept_var
-   expressionType: resource
-   generateList: true
-   condition: $obx3 EQUALS 59785-6
-   specs: OBX
-   vars:
-      obx3: STRING, OBX.3.1
-      code: STRING, OBX.5.1
-      text: STRING, OBX.5.2
-      system: STRING, OBX.5.3
+
       
 reasonReference:
    valueOf: datatype/Reference
