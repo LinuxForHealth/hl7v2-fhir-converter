@@ -154,7 +154,7 @@ public class Hl7MessageTest {
 
   // This test buids the encounter via code instead of using a message event. Helps with debugging.
   @Test
-  public void test_patient_multipe_diagnoses_only_not_using_message() throws IOException {
+  public void test_patient_multipe_diagnoses_not_using_message() throws IOException {
 
     ResourceModel encounter =
         ResourceReader.getInstance().generateResourceModel("resource/Encounter");
