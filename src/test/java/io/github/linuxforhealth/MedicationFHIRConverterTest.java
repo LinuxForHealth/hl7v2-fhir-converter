@@ -32,6 +32,7 @@ public class MedicationFHIRConverterTest {
     private static final ConverterOptions OPTIONS = new Builder().withValidateResource().withPrettyPrint().build();
 
     @Test
+    @Disabled("No longer creating Medication resource. Possibly need to obsolete this test class")
     public void test_OMP_O09_message() {
         String omp_msg = "MSH|^~\\&|SendTest1|Sendfac1|Receiveapp1|Receivefac1|200603081747|security|OMP^O09^OMP_O09|1|P^I|2.6|||AL|NE|764|ASCII||||||^4086::132:2A57:3C28^IPv6\r"
                 + "PID|||555444222111^^^MPI&GenHosp^MR||smith^john||19600614|M||C|99 Oakland #106^^Toronto^ON^44889||||||||343132266|||N\r"
@@ -59,6 +60,8 @@ public class MedicationFHIRConverterTest {
     }
 
     @Test
+
+    @Disabled("No longer creating Medication resource. Possibly need to obsolete this test class")
     public void test_RDE_O11_message() {
         String rde_msg = "MSH|^~\\&|PROSLOV|MYHOSPITAL|WHIA|IBM|20170215080000||RDE^O11^RDE_O11|MSGID005520|T|2.6|||AL|NE|764|ASCII||||||^4086::132:2A57:3C28^IPv6\r"
                 + "PID|1||000054321^^^MRN||COOPER^SHELDON^||19820512|M|||765 SOMESTREET RD UNIT 3A^^PASADENA^LA^|||||S||78654|\r"

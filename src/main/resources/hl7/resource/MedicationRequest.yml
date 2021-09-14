@@ -32,9 +32,14 @@ identifier_2:
   constants:
     sys: "urn:id:extID"
 
+subject:
+  valueOf: datatype/Reference
+  expressionType: resource
+  specs: $Patient
+  
 status:
   type: MEDREQ_STATUS
-  valueOf:  RXA.20
+  valueOf:  ORC.1
   expressionType: HL7Spec
 
 intent:
@@ -49,12 +54,4 @@ medicationCodeableConcept:
   expressionType: resource
   specs: RXE.2 | RXO.1 | RXC.2
 
-medicationReference:
-  valueOf: datatype/Reference
-  expressionType: resource
-  specs: $Medication
 
-subject:
-  valueOf: datatype/Reference
-  expressionType: resource
-  specs: $Patient

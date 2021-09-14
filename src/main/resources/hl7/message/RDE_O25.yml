@@ -31,17 +31,18 @@ resources:
       - .PATIENT_VISIT.PV2
       - MSH
 
-  - resourceName: Medication
+  - resourceName: MedicationRequest
     segment: .RXE
-    resourcePath: resource/Medication
+    resourcePath: resource/MedicationRequest
     isReferenced: true
     group: ORDER
     repeats: true
     additionalSegments:
+      - MSH
       - .ORC
       - .ORDER_DETAIL.RXO
-      - .RXC
-      - MSH
+      - PATIENT.PATIENT_VISIT.PV1
+      - PATIENT.PID
 
   - resourceName: AllergyIntolerance
     segment: AL1
