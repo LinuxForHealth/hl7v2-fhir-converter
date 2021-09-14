@@ -18,11 +18,12 @@ resources:
     - resourceName: Patient
       segment: PID
       resourcePath: resource/Patient
-      repeats: false
+      repeats: true
       isReferenced: true
       additionalSegments:
              - PD1
              - MSH
+             - MRG
 
     - resourceName: Encounter
       segment: PV1
