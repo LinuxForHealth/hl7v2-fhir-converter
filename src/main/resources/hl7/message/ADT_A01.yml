@@ -18,7 +18,7 @@ resources:
     - resourceName: Patient
       segment: PID
       resourcePath: resource/Patient
-      repeats: true
+      repeats: true #TODO: Turn to false when bug 684 is fixed
       isReferenced: true
       additionalSegments:
              - PD1

@@ -28,8 +28,8 @@ identifier_2:
    constants:
       system: http://terminology.hl7.org/CodeSystem/v2-0203
       code: MR
-      display: Old
-      use: 'old'
+      display: Medical Record
+      use: old
 
 name:
    valueOf: datatype/HumanName
