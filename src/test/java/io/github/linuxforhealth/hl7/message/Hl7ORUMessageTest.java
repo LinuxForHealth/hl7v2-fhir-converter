@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.TimeZone;
 import java.util.stream.Collectors;
 
+import io.github.linuxforhealth.hl7.segments.util.ResourceUtils;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r4.model.Attachment;
 import org.hl7.fhir.r4.model.Bundle;
@@ -33,9 +34,12 @@ import io.github.linuxforhealth.fhir.FHIRContext;
 import io.github.linuxforhealth.hl7.ConverterOptions;
 import io.github.linuxforhealth.hl7.ConverterOptions.Builder;
 import io.github.linuxforhealth.hl7.HL7ToFHIRConverter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Hl7ORUMessageTest {
     private static FHIRContext context = new FHIRContext();
+    private static final Logger LOGGER = LoggerFactory.getLogger(Hl7ORUMessageTest.class);
     private static final ConverterOptions OPTIONS = new Builder().withValidateResource().build();
     private static final ConverterOptions OPTIONS_PRETTYPRINT = new Builder()
             .withBundleType(BundleType.COLLECTION)
@@ -90,6 +94,34 @@ public class Hl7ORUMessageTest {
         assertThat(diag.getStatus().toCode()).isEqualTo("final");
         List<Reference> performerRef = diag.getResultsInterpreter();
         assertThat(performerRef.get(0).isEmpty()).isFalse();
+    }
+
+    @Test
+    public void test_orur01_patient_encounter_present() throws IOException {
+        String hl7message = "MSH|^~\\&|PROSLOV|MYHOSPITAL|WHIA|IBM|20180520230000||ORU^R01|MSGID006552|T|2.6\n"
+        		+ "PID|1||000065432^^^MRN^MR||ROSTENKOWSKI^BERNADETTE^||19840823|Female||1002-5|382 OTHERSTREET AVE^^PASADENA^LA^223343||4582143248||^French|S||53811||||U|||||||\n"
+        		+ "PV1|1|O|||||9905^Adams^John|9906^Yellow^William^F|9907^Blue^Oren^J||||||||9908^Green^Mircea^||2462201|||||||||||||||||||||||||20180520230000\n"
+        		+ "OBR|1||bbf1993ab|1122^Final Echocardiogram Report|||20180520230000|||||||||||||002|||||F|||550469^Tsadok550469^Janetary~660469^Merrit660469^Darren^F~770469^Das770469^Surjya^P~880469^Winter880469^Oscar^||||770469&Das770469&Surjya&P^^^6N^1234^A|\n"
+        		+ "OBX|1|NM|2552^HRTRTMON|1|115||||||F|||20180520230000|||\r";
+
+        HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
+        String json = ftv.convert(hl7message, OPTIONS);
+        assertThat(json).isNotBlank();
+        LOGGER.info("FHIR json result:\n" + json);
+        IBaseResource bundleResource = context.getParser().parseResource(json);
+        assertThat(bundleResource).isNotNull();
+        Bundle b = (Bundle) bundleResource;
+        List<BundleEntryComponent> e = b.getEntry();
+        List<Resource> patientResource = e.stream()
+                .filter(v -> ResourceType.Patient == v.getResource().getResourceType())
+                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        assertThat(patientResource).hasSize(1);
+
+        List<Resource> encounterResource = e.stream()
+                .filter(v -> ResourceType.Encounter == v.getResource().getResourceType())
+                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        assertThat(encounterResource).hasSize(1);
+
     }
 
     @Test

@@ -108,6 +108,7 @@ subject:
     valueOf: datatype/Reference
     expressionType: resource
     specs: $Patient
+
 diagnosis:
    expressionType: nested
    evaluateLater: true
@@ -118,18 +119,111 @@ diagnosis:
         valueOf: datatype/Reference
         expressionType: resource
         specs: $Condition
-        
 
-     use: 
+     use:
         valueOf: datatype/CodeableConcept
         expressionType: resource
         specs: DG1.6
         vars:
           coding: DIAGNOSIS_USE, DG1.6
 
-     rank: 
+     rank:
         type: STRING
         valueOf: DG1.15
         expressionType: HL7Spec
-    
-    
+
+text:
+   condition: $text NOT_NULL
+   valueOf: datatype/Narrative
+   expressionType: resource
+   vars:
+      text: PV2.12
+   constants:
+      status: "additional"
+
+participant_1:
+   condition: $practionerSpec NOT_NULL
+   valueOf: secondary/Participant
+   generateList: true
+   expressionType: resource
+   vars:
+      practionerSpec: PV1.7
+   constants:
+      codeableConceptCode: 'ATND'
+      codeableConceptText: 'attender'
+
+participant_2:
+   condition: $practionerSpec NOT_NULL
+   valueOf: secondary/Participant
+   generateList: true
+   expressionType: resource
+   vars:
+      practionerSpec: PV1.8
+   constants:
+      codeableConceptCode: 'REF'
+      codeableConceptText: 'referrer'
+
+participant_3:
+   condition: $practionerSpec NOT_NULL
+   valueOf: secondary/Participant
+   generateList: true
+   expressionType: resource
+   vars:
+      practionerSpec: PV1.9
+   constants:
+      codeableConceptCode: 'CON'
+      codeableConceptText: 'consultant'
+
+participant_4:
+   condition: $practionerSpec NOT_NULL
+   valueOf: secondary/Participant
+   generateList: true
+   expressionType: resource
+   vars:
+      practionerSpec: PV1.17
+   constants:
+      codeableConceptCode: 'ADM'
+      codeableConceptText: 'admitter'
+
+extension_1:
+   generateList: true
+   expressionType: nested
+   vars:
+      code: String, PV2.38.1
+      displayLookup: ENCOUNTER_MODE_ARRIVAL_DISPLAY, PV2.38.1
+   expressions:
+      - condition: $code NOT_NULL && $displayLookup NOT_NULL
+        expressionType: nested
+        vars:
+            system: SYSTEM_URL, $system_code
+            display: $displayLookup
+        constants:
+            system_code: 'mode-of-arrival-system'
+        expressionsMap:
+            url:
+               type: SYSTEM_URL
+               value: 'encounter-modeOfArrival-extension'
+            valueCoding:
+               valueOf: datatype/Coding
+               expressionType: resource
+
+      - condition: $code NOT_NULL && $displayLookup NULL && $coding NOT_NULL
+        expressionType: nested
+        vars:
+           coding: CODING_SYSTEM_V2, PV2.38
+        expressionsMap:
+            url:
+               type: SYSTEM_URL
+               value: 'encounter-modeOfArrival-extension'
+            valueCoding:
+               valueOf: $coding
+               specs: CWE
+
+serviceProvider:
+   condition: $idValue NOT_NULL
+   expressionType: reference
+   valueOf: resource/Organization_Simple
+   vars:
+      idValue: PV2.23.8 | PV1.3.4.1
+      name: PV2.23.1
+

@@ -63,7 +63,7 @@ category_x1:
    generateList: true
    expressionType: resource
    condition:  $source NOT_NULL
-   vars:     
+   vars:
      source: PRB.3
    constants:
      display: 'Problem List Item'
@@ -78,13 +78,13 @@ category_x2:
    generateList: true
    expressionType: resource
    condition:  $source NULL
-   vars:     
+   vars:
      source: PRB.3
    constants:
      display: 'Encounter Diagnosis'
      code: 'encounter-diagnosis'
      text: 'Encounter Diagnosis'
-     system: 'http://terminology.hl7.org/CodeSystem/condition-category' 
+     system: 'http://terminology.hl7.org/CodeSystem/condition-category'
      type: encounter-diagnosis
 
 severity:
@@ -98,7 +98,7 @@ code:
    generateList: true
    expressionType: resource
    specs: PRB.3 | DG1.3
-          
+
 encounter:
   valueOf: datatype/Reference
   expressionType: resource
@@ -147,7 +147,7 @@ onsetDateTime:
   type: DATE_TIME
   valueOf: PRB.16 | DG1.5
   expressionType: HL7Spec
-  
+
 onsetString:
   condition: $onsetDateTime NULL
   type: STRING
