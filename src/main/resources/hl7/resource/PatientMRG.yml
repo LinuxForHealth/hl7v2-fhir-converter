@@ -10,15 +10,8 @@ id:
    type: STRING
    valueOf: UUID.randomUUID()
    expressionType: JEXL
-identifier_1:
-   required: true
-   valueOf: datatype/Identifier_SystemID
-   generateList: true
-   expressionType: resource
-   specs: MRG.1
-   vars:
-      assignerSystem: String, MRG.1
-identifier_2:
+
+identifier:
    condition: $valueIn NOT_NULL
    valueOf: datatype/Identifier_var
    generateList: true
