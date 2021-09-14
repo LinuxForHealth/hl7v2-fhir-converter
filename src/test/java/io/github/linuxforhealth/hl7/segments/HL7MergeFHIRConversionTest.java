@@ -14,6 +14,7 @@ import org.hl7.fhir.r4.model.Base;
 import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
 import org.hl7.fhir.r4.model.Resource;
 import org.hl7.fhir.r4.model.ResourceType;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import io.github.linuxforhealth.hl7.segments.util.ResourceUtils;
@@ -151,29 +152,29 @@ public class HL7MergeFHIRConversionTest {
 
     }
 
-    // Commented out until internal bug #684 is fixed.
-    // // Test ADT_A40 message with 2 MRG segments.
-    // // TODO: When the internal bug #684 is fixed: convert this message into an ADT_A40 message.
-    // @Test
-    // public void validateTwoMRGs() {
+    // Test ADT_A40 message with 2 MRG segments.
+    // TODO: When the internal bug #684 is fixed: convert this message into an ADT_A40 message.
+    @Test
+    @Disabled  // disabled until bug 684 is fixed
+    public void validateTwoMRGs() {
 
-    //     String hl7message = "MSH|^~\\&|REGADT|MCM|RSP1P8|MCM|200301051530|SEC|ADT^A01|00000003|P|2.5\r"
-    //     + "EVN|A40|200301051530\r"
-    //     + "PID|||MR1^^^XYZ^MR|||||||||||||||\r"
-    //     + "MRG|MR2^^^XYZ||\r"
-    //     + "PID|||MR3^^^XYZ|||||||||||||||\r"
-    //     + "MRG|MR4^^^XYZ||\r";
+        String hl7message = "MSH|^~\\&|REGADT|MCM|RSP1P8|MCM|200301051530|SEC|ADT^A01|00000003|P|2.5\r"
+        + "EVN|A40|200301051530\r"
+        + "PID|||MR1^^^XYZ^MR|||||||||||||||\r"
+        + "MRG|MR2^^^XYZ||\r"
+        + "PID|||MR3^^^XYZ|||||||||||||||\r"
+        + "MRG|MR4^^^XYZ||\r";
 
-    //     List<BundleEntryComponent> e =ResourceUtils.createHl7Segment(hl7message);
+        List<BundleEntryComponent> e =ResourceUtils.createHl7Segment(hl7message);
 
-    //     // Find the patient resources in the FHIR bundle.
-    //     List<Resource> patientResource = e.stream()
-    //     .filter(v -> ResourceType.Patient== v.getResource().getResourceType())
-    //     .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        // Find the patient resources in the FHIR bundle.
+        List<Resource> patientResource = e.stream()
+        .filter(v -> ResourceType.Patient== v.getResource().getResourceType())
+        .map(BundleEntryComponent::getResource).collect(Collectors.toList());
 
-    //     // One for each PID segment and one for each MRG segment
-    //     assertThat(patientResource).hasSize(4);
+        // One for each PID segment and one for each MRG segment
+        assertThat(patientResource).hasSize(4);
 
-    // }
+    }
 
   }
