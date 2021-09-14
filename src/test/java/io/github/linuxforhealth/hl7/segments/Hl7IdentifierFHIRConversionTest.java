@@ -27,6 +27,7 @@ import org.junit.jupiter.api.Test;
 
 import io.github.linuxforhealth.hl7.segments.util.PatientUtils;
 import io.github.linuxforhealth.hl7.segments.util.ResourceUtils;
+import io.github.linuxforhealth.hl7.segments.util.DatatypeUtils;
 
 public class Hl7IdentifierFHIRConversionTest {
 
@@ -49,12 +50,7 @@ public class Hl7IdentifierFHIRConversionTest {
         assertThat(identifier.getValue()).hasToString("MRN12345678");
         assertThat(identifier.hasType()).isTrue();
         CodeableConcept cc = identifier.getType();
-        assertThat(cc.hasText()).isFalse();
-        assertThat(cc.hasCoding()).isTrue();
-        Coding coding = cc.getCodingFirstRep();
-        assertThat(coding.getSystem()).hasToString("http://terminology.hl7.org/CodeSystem/v2-0203");
-        assertThat(coding.getCode()).hasToString("MR");
-        assertThat(coding.getDisplay()).hasToString("Medical record number");
+        DatatypeUtils.checkCommonCodeableConceptAssertions(cc, "MR", "Medical record number", "http://terminology.hl7.org/CodeSystem/v2-0203", null);
 
         // Second identifier (SSN) medium check
         identifier = identifiers.get(1);
@@ -84,12 +80,7 @@ public class Hl7IdentifierFHIRConversionTest {
         assertThat(identifier.getValue()).hasToString("444556666");
         assertThat(identifier.hasType()).isTrue();
         cc = identifier.getType();
-        assertThat(cc.hasText()).isFalse();
-        assertThat(cc.hasCoding()).isTrue();
-        coding = cc.getCodingFirstRep();
-        assertThat(coding.getSystem()).hasToString("http://terminology.hl7.org/CodeSystem/v2-0203");
-        assertThat(coding.getCode()).hasToString("SS");
-        assertThat(coding.getDisplay()).hasToString("Social Security number");
+        DatatypeUtils.checkCommonCodeableConceptAssertions(cc, "SS", "Social Security number", "http://terminology.hl7.org/CodeSystem/v2-0203", null);
 
         // Deep check for fifth identifier, which is assembled from PID.20 DL
         identifier = identifiers.get(4);
@@ -99,12 +90,8 @@ public class Hl7IdentifierFHIRConversionTest {
         assertThat(identifier.getValue()).hasToString("D-12445889-Z");
         assertThat(identifier.hasType()).isTrue();
         cc = identifier.getType();
-        assertThat(cc.hasText()).isFalse();
-        assertThat(cc.hasCoding()).isTrue();
-        coding = cc.getCodingFirstRep();
-        assertThat(coding.getSystem()).hasToString("http://terminology.hl7.org/CodeSystem/v2-0203");
-        assertThat(coding.getCode()).hasToString("DL");
-        assertThat(coding.getDisplay()).hasToString("Driver's license number");
+        DatatypeUtils.checkCommonCodeableConceptAssertions(cc, "DL", "Driver's license number", "http://terminology.hl7.org/CodeSystem/v2-0203", null);
+
     }
 
     @Test
@@ -127,12 +114,7 @@ public class Hl7IdentifierFHIRConversionTest {
         assertThat(identifier.getValue()).hasToString("MRN12345678");
         assertThat(identifier.hasType()).isTrue();
         CodeableConcept cc = identifier.getType();
-        assertThat(cc.hasText()).isFalse();
-        assertThat(cc.hasCoding()).isTrue();
-        Coding coding = cc.getCodingFirstRep();
-        assertThat(coding.getSystem()).hasToString("http://terminology.hl7.org/CodeSystem/v2-0203");
-        assertThat(coding.getCode()).hasToString("MR");
-        assertThat(coding.getDisplay()).hasToString("Medical record number");
+        DatatypeUtils.checkCommonCodeableConceptAssertions(cc, "MR", "Medical record number", "http://terminology.hl7.org/CodeSystem/v2-0203", null);
 
         // Second identifier
         identifier = identifiers.get(1);
@@ -141,12 +123,7 @@ public class Hl7IdentifierFHIRConversionTest {
         assertThat(identifier.getValue()).hasToString("111223333");
         assertThat(identifier.hasType()).isTrue();
         cc = identifier.getType();
-        assertThat(cc.hasText()).isFalse();
-        assertThat(cc.hasCoding()).isTrue();
-        coding = cc.getCodingFirstRep();
-        assertThat(coding.getSystem()).hasToString("http://terminology.hl7.org/CodeSystem/v2-0203");
-        assertThat(coding.getCode()).hasToString("SS");
-        assertThat(coding.getDisplay()).hasToString("Social Security number");
+        DatatypeUtils.checkCommonCodeableConceptAssertions(cc, "SS", "Social Security number", "http://terminology.hl7.org/CodeSystem/v2-0203", null);
 
         // Third identifier - unknown code.  Create the following:
         // "identifier": [ {
@@ -240,12 +217,9 @@ public class Hl7IdentifierFHIRConversionTest {
         assertThat(value).isEqualTo("8846511"); // PV1.19.1
         assertThat(system).isEqualTo("urn:id:ACME"); // PV1.19.4
         CodeableConcept type = identifier.getType();
-        Coding coding = type.getCoding().get(0);
-        assertThat(type.getText()).isNull();
-        assertThat(coding.getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/v2-0203");
-        assertThat(coding.getCode()).isEqualTo("VN");
-        assertThat(coding.getDisplay()).isEqualTo("Visit number");
-        // Test with no PV1-19, but with PID-18 for visit number; PRB-4.1 and PRB-4.3
+        // Coding coding = type.getCoding().get(0);
+        DatatypeUtils.checkCommonCodeableConceptAssertions(type, "VN", "Visit number", "http://terminology.hl7.org/CodeSystem/v2-0203", null);
+
         String withPRB4 = "MSH|^~\\&|||||20040629164652|1|PPR^PC1|331|P|2.3.1||\n" +
                 "PID|1||000054321^^^MRN||||19820512|M||2106-3|||||EN^English|M|CAT|78654||||N\n" +
                 "PRB|AD|20170110074000|K80.00^Cholelithiasis^I10|53956|E1|1|20100907175347|20150907175347|20180310074000||||confirmed^Confirmed^http://terminology.hl7.org/CodeSystem/condition-ver-status|remission^Remission^http://terminology.hl7.org/CodeSystem/condition-clinical|20180310074000|20170102074000|textual representation of the time when the problem began|1^primary|ME^Medium|0.4|marginal|good|marginal|marginal|highly sensitive|some prb detail|\r";
@@ -262,11 +236,7 @@ public class Hl7IdentifierFHIRConversionTest {
         assertThat(value).isEqualTo("78654"); // PID.18.1
         assertThat(system).isNull();
         type = identifier.getType();
-        coding = type.getCoding().get(0);
-        assertThat(type.getText()).isNull();
-        assertThat(coding.getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/v2-0203");
-        assertThat(coding.getCode()).isEqualTo("VN");
-        assertThat(coding.getDisplay()).isEqualTo("Visit number");
+        DatatypeUtils.checkCommonCodeableConceptAssertions(type, "VN", "Visit number", "http://terminology.hl7.org/CodeSystem/v2-0203", null);
 
     }
 
@@ -290,11 +260,7 @@ public class Hl7IdentifierFHIRConversionTest {
         assertThat(value).isEqualTo("88654"); // PID.18.1
         assertThat(system).isNull(); // null because PV1.19.4 and PID18.4  are empty
         CodeableConcept type = identifier.getType();
-        Coding coding = type.getCoding().get(0);
-        assertThat(type.getText()).isNull();
-        assertThat(coding.getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/v2-0203");
-        assertThat(coding.getCode()).isEqualTo("VN");
-        assertThat(coding.getDisplay()).isEqualTo("Visit number");
+        DatatypeUtils.checkCommonCodeableConceptAssertions(type, "VN", "Visit number", "http://terminology.hl7.org/CodeSystem/v2-0203", null);
 
         // Identifier 2:  extID based on DG1-3.1 + DG1-3.3
         identifier = condition.getIdentifier().get(1);
@@ -322,11 +288,7 @@ public class Hl7IdentifierFHIRConversionTest {
         assertThat(value).isEqualTo("8846511"); // PV1.19.1
         assertThat(system).isEqualTo("urn:id:ACME"); // PV1.19.4
         type = identifier.getType();
-        coding = type.getCoding().get(0);
-        assertThat(type.getText()).isNull();
-        assertThat(coding.getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/v2-0203");
-        assertThat(coding.getCode()).isEqualTo("VN");
-        assertThat(coding.getDisplay()).isEqualTo("Visit number");
+        DatatypeUtils.checkCommonCodeableConceptAssertions(type, "VN", "Visit number", "http://terminology.hl7.org/CodeSystem/v2-0203", null);
 
         // Identifier 2: DG1.3.1
         identifier = condition.getIdentifier().get(1);
@@ -366,11 +328,7 @@ public class Hl7IdentifierFHIRConversionTest {
         assertThat(value).isEqualTo("201610015080000"); // MSH.7
         assertThat(system).isNull();
         type = identifier.getType();
-        coding = type.getCoding().get(0);
-        assertThat(type.getText()).isNull();
-        assertThat(coding.getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/v2-0203");
-        assertThat(coding.getCode()).isEqualTo("VN");
-        assertThat(coding.getDisplay()).isEqualTo("Visit number");
+        DatatypeUtils.checkCommonCodeableConceptAssertions(type, "VN", "Visit number", "http://terminology.hl7.org/CodeSystem/v2-0203", null);
 
         // Identifier 3: DG1.3.2
         identifier = condition.getIdentifier().get(1);
@@ -494,11 +452,7 @@ public class Hl7IdentifierFHIRConversionTest {
         assertThat(value).isEqualTo("FON001"); // ORC-3.1
         assertThat(system).isEqualTo("urn:id:OE_PHIMS_Stage"); // ORC-3.2 any whitespace gets replaced with underscores
         CodeableConcept type = identifier.getType();
-        Coding coding = type.getCoding().get(0);
-        assertThat(type.getText()).isNull();
-        assertThat(coding.getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/v2-0203");
-        assertThat(coding.getCode()).isEqualTo("FILL");
-        assertThat(coding.getDisplay()).isEqualTo("Filler Identifier");
+        DatatypeUtils.checkCommonCodeableConceptAssertions(type, "FILL", "Filler Identifier", "http://terminology.hl7.org/CodeSystem/v2-0203", null);
 
         // Identifier 3: Placer
         identifier = report.getIdentifier().get(2);
@@ -508,11 +462,7 @@ public class Hl7IdentifierFHIRConversionTest {
         assertThat(value).isEqualTo("PON001"); // ORC-2.1
         assertThat(system).isEqualTo("urn:id:LE"); // ORC-2.2
         type = identifier.getType();
-        coding = type.getCoding().get(0);
-        assertThat(type.getText()).isNull();
-        assertThat(coding.getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/v2-0203");
-        assertThat(coding.getCode()).isEqualTo("PLAC");
-        assertThat(coding.getDisplay()).isEqualTo("Placer Identifier");
+        DatatypeUtils.checkCommonCodeableConceptAssertions(type, "PLAC", "Placer Identifier", "http://terminology.hl7.org/CodeSystem/v2-0203", null);
 
         // Filler and placer from OBR
         diagnosticReport = "MSH|^~\\&|PROSLOV|MYHOSPITAL|WHIA|IBM|20170825010500||ORU^R01|MSGID22102712|T|2.6\n"
@@ -540,11 +490,7 @@ public class Hl7IdentifierFHIRConversionTest {
         assertThat(value).isEqualTo("CD_000000"); // OBR-3.1
         assertThat(system).isNull(); // OBR-3.2 is empty
         type = identifier.getType();
-        coding = type.getCoding().get(0);
-        assertThat(type.getText()).isNull();
-        assertThat(coding.getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/v2-0203");
-        assertThat(coding.getCode()).isEqualTo("FILL");
-        assertThat(coding.getDisplay()).isEqualTo("Filler Identifier");
+        DatatypeUtils.checkCommonCodeableConceptAssertions(type, "FILL", "Filler Identifier", "http://terminology.hl7.org/CodeSystem/v2-0203", null);
 
         // Identifier 3: Placer
         identifier = report.getIdentifier().get(2);
@@ -554,11 +500,7 @@ public class Hl7IdentifierFHIRConversionTest {
         assertThat(value).isEqualTo("CC_000000"); // OBR-2
         assertThat(system).isEqualTo("urn:id:OE_PHIMS_Stage"); // OBR-2.2
         type = identifier.getType();
-        coding = type.getCoding().get(0);
-        assertThat(type.getText()).isNull();
-        assertThat(coding.getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/v2-0203");
-        assertThat(coding.getCode()).isEqualTo("PLAC");
-        assertThat(coding.getDisplay()).isEqualTo("Placer Identifier");
+        DatatypeUtils.checkCommonCodeableConceptAssertions(type, "PLAC", "Placer Identifier", "http://terminology.hl7.org/CodeSystem/v2-0203", null);
     }
 
     @Test
@@ -734,11 +676,7 @@ public class Hl7IdentifierFHIRConversionTest {
         assertThat(value).isEqualTo("78654"); // PID.18.1
         assertThat(system).isEqualTo("urn:id:ACME"); // PID.18.4
         CodeableConcept type = identifier.getType();
-        Coding coding = type.getCoding().get(0);
-        assertThat(type.getText()).isNull();
-        assertThat(coding.getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/v2-0203");
-        assertThat(coding.getCode()).isEqualTo("VN");
-        assertThat(coding.getDisplay()).isEqualTo("Visit number");
+        DatatypeUtils.checkCommonCodeableConceptAssertions(type, "VN", "Visit number", "http://terminology.hl7.org/CodeSystem/v2-0203", null);
 
 
         // Test: MSH.7 and PV1.19
@@ -768,11 +706,7 @@ public class Hl7IdentifierFHIRConversionTest {
         assertThat(valueOBR).isEqualTo("8846511"); // PV1.19.1
         assertThat(system).isNull(); // No System PV1.19.2 DNE
         type = identifier.getType();
-        coding = type.getCoding().get(0);
-        assertThat(type.getText()).isNull();
-        assertThat(coding.getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/v2-0203");
-        assertThat(coding.getCode()).isEqualTo("VN");
-        assertThat(coding.getDisplay()).isEqualTo("Visit number");
+        DatatypeUtils.checkCommonCodeableConceptAssertions(type, "VN", "Visit number", "http://terminology.hl7.org/CodeSystem/v2-0203", null);
     }
 
 //      @Test //Test works, but message type is not configured yet
@@ -937,11 +871,7 @@ public class Hl7IdentifierFHIRConversionTest {
         assertThat(value).isEqualTo("200603081747"); // MSH.7
         assertThat(system).isNull();
         CodeableConcept type = identifier.getType();
-        Coding coding = type.getCoding().get(0);
-        assertThat(type.getText()).isNull();
-        assertThat(coding.getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/v2-0203");
-        assertThat(coding.getCode()).isEqualTo("VN");
-        assertThat(coding.getDisplay()).isEqualTo("Visit number");
+        DatatypeUtils.checkCommonCodeableConceptAssertions(type, "VN", "Visit number", "http://terminology.hl7.org/CodeSystem/v2-0203", null);
 
         // Identifier 2: filler
         identifier = serviceReq.getIdentifier().get(1);
@@ -950,11 +880,7 @@ public class Hl7IdentifierFHIRConversionTest {
         assertThat(value).isEqualTo("9999999"); // ORC.3.1
         assertThat(system).isEqualTo("urn:id:RX"); // ORC.3.2
         type = identifier.getType();
-        coding = type.getCoding().get(0);
-        assertThat(type.getText()).isNull();
-        assertThat(coding.getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/v2-0203");
-        assertThat(coding.getCode()).isEqualTo("FILL");
-        assertThat(coding.getDisplay()).isEqualTo("Filler Identifier");
+        DatatypeUtils.checkCommonCodeableConceptAssertions(type, "FILL", "Filler Identifier", "http://terminology.hl7.org/CodeSystem/v2-0203", null);
 
         // Identifier 3: placer
         identifier = serviceReq.getIdentifier().get(2);
@@ -963,11 +889,7 @@ public class Hl7IdentifierFHIRConversionTest {
         assertThat(value).isEqualTo("1000"); // ORC.2.1
         assertThat(system).isEqualTo("urn:id:OE"); // ORC.2.2
         type = identifier.getType();
-        coding = type.getCoding().get(0);
-        assertThat(type.getText()).isNull();
-        assertThat(coding.getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/v2-0203");
-        assertThat(coding.getCode()).isEqualTo("PLAC");
-        assertThat(coding.getDisplay()).isEqualTo("Placer Identifier");
+        DatatypeUtils.checkCommonCodeableConceptAssertions(type, "PLAC", "Placer Identifier", "http://terminology.hl7.org/CodeSystem/v2-0203", null);
 
         // Test 2:
         //  - Visit number with PID-18
@@ -991,11 +913,7 @@ public class Hl7IdentifierFHIRConversionTest {
         assertThat(value).isEqualTo("78654"); // PID.18
         assertThat(system).isNull();
         type = identifier.getType();
-        coding = type.getCoding().get(0);
-        assertThat(type.getText()).isNull();
-        assertThat(coding.getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/v2-0203");
-        assertThat(coding.getCode()).isEqualTo("VN");
-        assertThat(coding.getDisplay()).isEqualTo("Visit number");
+        DatatypeUtils.checkCommonCodeableConceptAssertions(type, "VN", "Visit number", "http://terminology.hl7.org/CodeSystem/v2-0203", null);
 
         // Identifier 2: filler
         identifier = serviceReq.getIdentifier().get(1);
@@ -1004,11 +922,7 @@ public class Hl7IdentifierFHIRConversionTest {
         assertThat(value).isEqualTo("CD150920001336"); // OBR.3.1
         assertThat(system).isEqualTo("urn:id:IE"); // OBR.3.2
         type = identifier.getType();
-        coding = type.getCoding().get(0);
-        assertThat(type.getText()).isNull();
-        assertThat(coding.getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/v2-0203");
-        assertThat(coding.getCode()).isEqualTo("FILL");
-        assertThat(coding.getDisplay()).isEqualTo("Filler Identifier");
+        DatatypeUtils.checkCommonCodeableConceptAssertions(type, "FILL", "Filler Identifier", "http://terminology.hl7.org/CodeSystem/v2-0203", null);
 
         //Identifier 3: placer
         identifier = serviceReq.getIdentifier().get(2);
@@ -1017,11 +931,7 @@ public class Hl7IdentifierFHIRConversionTest {
         assertThat(value).isEqualTo("CD150920001336"); // OBR.2.1
         assertThat(system).isEqualTo("urn:id:OE"); // OBR.2.2
         type = identifier.getType();
-        coding = type.getCoding().get(0);
-        assertThat(type.getText()).isNull();
-        assertThat(coding.getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/v2-0203");
-        assertThat(coding.getCode()).isEqualTo("PLAC");
-        assertThat(coding.getDisplay()).isEqualTo("Placer Identifier");
+        DatatypeUtils.checkCommonCodeableConceptAssertions(type, "PLAC", "Placer Identifier", "http://terminology.hl7.org/CodeSystem/v2-0203", null);
 
         // Test 3:
         //  - Visit number with PV1-19
@@ -1047,11 +957,7 @@ public class Hl7IdentifierFHIRConversionTest {
         assertThat(value).isEqualTo("8846511"); // PV1.19
         assertThat(system).isNull();
         type = identifier.getType();
-        coding = type.getCoding().get(0);
-        assertThat(type.getText()).isNull();
-        assertThat(coding.getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/v2-0203");
-        assertThat(coding.getCode()).isEqualTo("VN");
-        assertThat(coding.getDisplay()).isEqualTo("Visit number");
+        DatatypeUtils.checkCommonCodeableConceptAssertions(type, "VN", "Visit number", "http://terminology.hl7.org/CodeSystem/v2-0203", null);
 
         // Identifier 2: filler
         identifier = serviceReq.getIdentifier().get(1);
@@ -1060,11 +966,7 @@ public class Hl7IdentifierFHIRConversionTest {
         assertThat(value).isEqualTo("CD150920001336"); // OBR.3.1
         assertThat(system).isNull();
         type = identifier.getType();
-        coding = type.getCoding().get(0);
-        assertThat(type.getText()).isNull();
-        assertThat(coding.getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/v2-0203");
-        assertThat(coding.getCode()).isEqualTo("FILL");
-        assertThat(coding.getDisplay()).isEqualTo("Filler Identifier");
+        DatatypeUtils.checkCommonCodeableConceptAssertions(type, "FILL", "Filler Identifier", "http://terminology.hl7.org/CodeSystem/v2-0203", null);
 
         //Identifier 3: placer
         identifier = serviceReq.getIdentifier().get(2);
@@ -1073,11 +975,7 @@ public class Hl7IdentifierFHIRConversionTest {
         assertThat(value).isEqualTo("PON001"); // ORC.2.1
         assertThat(system).isNull();
         type = identifier.getType();
-        coding = type.getCoding().get(0);
-        assertThat(type.getText()).isNull();
-        assertThat(coding.getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/v2-0203");
-        assertThat(coding.getCode()).isEqualTo("PLAC");
-        assertThat(coding.getDisplay()).isEqualTo("Placer Identifier");
+        DatatypeUtils.checkCommonCodeableConceptAssertions(type, "PLAC", "Placer Identifier", "http://terminology.hl7.org/CodeSystem/v2-0203", null);
 
     }
 
@@ -1103,11 +1001,7 @@ public class Hl7IdentifierFHIRConversionTest {
         assertThat(value).isEqualTo("78654"); // PID.18.1, since no PV1.19.1 in this message
         assertThat(system).isNull();
         CodeableConcept type = identifier.getType();
-        Coding coding = type.getCoding().get(0);
-        assertThat(type.getText()).isNull();
-        assertThat(coding.getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/v2-0203");
-        assertThat(coding.getCode()).isEqualTo("VN");
-        assertThat(coding.getDisplay()).isEqualTo("Visit number");
+        DatatypeUtils.checkCommonCodeableConceptAssertions(type, "VN", "Visit number", "http://terminology.hl7.org/CodeSystem/v2-0203", null);
 
         // Identifier 2: extID based on RXO-1.1
         identifier = medReq.getIdentifier().get(1);
@@ -1136,11 +1030,7 @@ public class Hl7IdentifierFHIRConversionTest {
         assertThat(value).isEqualTo("789789"); // PV1.19
         assertThat(system).isNull();
         type = identifier.getType();
-        coding = type.getCoding().get(0);
-        assertThat(type.getText()).isNull();
-        assertThat(coding.getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/v2-0203");
-        assertThat(coding.getCode()).isEqualTo("VN");
-        assertThat(coding.getDisplay()).isEqualTo("Visit number");
+        DatatypeUtils.checkCommonCodeableConceptAssertions(type, "VN", "Visit number", "http://terminology.hl7.org/CodeSystem/v2-0203", null);
 
         // Identifier 2: extID based on RXO-1.1 and RX-O1.3
         identifier = medReq.getIdentifier().get(1);
@@ -1169,11 +1059,7 @@ public class Hl7IdentifierFHIRConversionTest {
         assertThat(value).isEqualTo("20170215080000"); // MSH-7
         assertThat(system).isNull();
         type = identifier.getType();
-        coding = type.getCoding().get(0);
-        assertThat(type.getText()).isNull();
-        assertThat(coding.getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/v2-0203");
-        assertThat(coding.getCode()).isEqualTo("VN");
-        assertThat(coding.getDisplay()).isEqualTo("Visit number");
+        DatatypeUtils.checkCommonCodeableConceptAssertions(type, "VN", "Visit number", "http://terminology.hl7.org/CodeSystem/v2-0203", null);
 
         // Identifier 2: extID based on RXO-1.2
         identifier = medReq.getIdentifier().get(1);
@@ -1202,11 +1088,7 @@ public class Hl7IdentifierFHIRConversionTest {
         assertThat(value).isEqualTo("20170215080000"); // MSH-7
         assertThat(system).isNull();
         type = identifier.getType();
-        coding = type.getCoding().get(0);
-        assertThat(type.getText()).isNull();
-        assertThat(coding.getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/v2-0203");
-        assertThat(coding.getCode()).isEqualTo("VN");
-        assertThat(coding.getDisplay()).isEqualTo("Visit number");
+        DatatypeUtils.checkCommonCodeableConceptAssertions(type, "VN", "Visit number", "http://terminology.hl7.org/CodeSystem/v2-0203", null);
     }
 
     @Test
