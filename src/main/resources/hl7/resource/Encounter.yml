@@ -91,7 +91,7 @@ reasonCode:
     valueOf: datatype/CodeableConcept
     generateList: true
     expressionType: resource
-    specs: EVN.4 | PV2.3
+    specs: EVN.4 | PV2.3 
 
 reasonReference:
     valueOf: datatype/Reference

@@ -60,14 +60,8 @@ class CodeableConceptTest {
         assertThat(extensions.size()).isEqualTo(1);
         assertThat(extensions.get(0).hasValue()).isTrue();
         CodeableConcept ccW = (CodeableConcept) extensions.get(0).getValue();
-        assertThat(ccW.hasCoding()).isTrue();
-        assertThat(ccW.getCoding().size()).isEqualTo(1);
-        assertThat(ccW.hasText()).isFalse();
-        Coding coding = ccW.getCodingFirstRep();
-        assertThat(coding.hasDisplay()).isFalse();
-        assertThat(coding.hasCode()).isTrue();
-        assertThat(coding.hasSystem()).isFalse();
-        assertThat(coding.getCode()).hasToString("W");
+        DatatypeUtils.checkCommonCodeableConceptAssertions(ccW, "W", null, null, null);
+
     }
 
     @Test
@@ -85,17 +79,7 @@ class CodeableConceptTest {
         assertThat(extensions.size()).isEqualTo(1);
         assertThat(extensions.get(0).hasValue()).isTrue();
         CodeableConcept ccW = (CodeableConcept) extensions.get(0).getValue();
-        assertThat(ccW.hasCoding()).isTrue();
-        assertThat(ccW.getCoding().size()).isEqualTo(1);
-        assertThat(ccW.hasText()).isTrue();
-        assertThat(ccW.getText()).hasToString("White");
-        Coding coding = ccW.getCodingFirstRep();
-        assertThat(coding.hasDisplay()).isTrue();
-        assertThat(coding.hasCode()).isTrue();
-        assertThat(coding.hasSystem()).isTrue();
-        assertThat(coding.getDisplay()).hasToString("White");
-        assertThat(coding.getCode()).hasToString("2106-3");
-        assertThat(coding.getSystem()).containsIgnoringCase(V3_RACE_SYSTEM);
+        DatatypeUtils.checkCommonCodeableConceptAssertions(ccW, "2106-3", "White", V3_RACE_SYSTEM, "White");
 
     }
 
@@ -124,17 +108,7 @@ class CodeableConceptTest {
         assertThat(extensions.size()).isEqualTo(1);
         assertThat(extensions.get(0).hasValue()).isTrue();
         CodeableConcept ccW = (CodeableConcept) extensions.get(0).getValue();
-        assertThat(ccW.hasText()).isTrue();
-        assertThat(ccW.getText()).hasToString("WHITE");
-        assertThat(ccW.hasCoding()).isTrue();
-        assertThat(ccW.getCoding().size()).isEqualTo(1);
-        Coding coding = ccW.getCodingFirstRep();
-        assertThat(coding.hasDisplay()).isTrue();
-        assertThat(coding.hasCode()).isTrue();
-        assertThat(coding.hasSystem()).isTrue();
-        assertThat(coding.getDisplay()).hasToString("White");
-        assertThat(coding.getCode()).hasToString("2106-3");
-        assertThat(coding.getSystem()).containsIgnoringCase("terminology.hl7.org/CodeSystem/v3-Race");
+        DatatypeUtils.checkCommonCodeableConceptAssertions(ccW, "2106-3", "White", V3_RACE_SYSTEM, "WHITE");
 
     }
 
@@ -163,17 +137,7 @@ class CodeableConceptTest {
         assertThat(extensions.size()).isEqualTo(1);
         assertThat(extensions.get(0).hasValue()).isTrue();
         CodeableConcept ccW = (CodeableConcept) extensions.get(0).getValue();
-        assertThat(ccW.hasText()).isTrue();
-        assertThat(ccW.getText()).hasToString("WHITE");
-        assertThat(ccW.hasCoding()).isTrue();
-        assertThat(ccW.getCoding().size()).isEqualTo(1);
-        Coding coding = ccW.getCodingFirstRep();
-        assertThat(coding.hasDisplay()).isTrue();
-        assertThat(coding.hasCode()).isTrue();
-        assertThat(coding.hasSystem()).isTrue();
-        assertThat(coding.getDisplay()).hasToString("WHITE");
-        assertThat(coding.getCode()).hasToString("White");
-        assertThat(coding.getSystem()).containsIgnoringCase("urn:id:L");
+        DatatypeUtils.checkCommonCodeableConceptAssertions(ccW, "White", "WHITE", "urn:id:L", "WHITE");
 
     }
 
@@ -201,16 +165,7 @@ class CodeableConceptTest {
         assertThat(extensions.size()).isEqualTo(1);
         assertThat(extensions.get(0).hasValue()).isTrue();
         CodeableConcept ccW = (CodeableConcept) extensions.get(0).getValue();
-        assertThat(ccW.hasCoding()).isTrue();
-        assertThat(ccW.hasText()).isFalse();
-        assertThat(ccW.getCoding().size()).isEqualTo(1);
-        Coding coding = ccW.getCodingFirstRep();
-        assertThat(coding.hasDisplay()).isTrue();
-        assertThat(coding.hasCode()).isTrue();
-        assertThat(coding.hasSystem()).isTrue();
-        assertThat(coding.getDisplay()).hasToString("White");
-        assertThat(coding.getCode()).hasToString("2106-3");
-        assertThat(coding.getSystem()).containsIgnoringCase("terminology.hl7.org/CodeSystem/v3-Race");
+        DatatypeUtils.checkCommonCodeableConceptAssertions(ccW, "2106-3", "White", V3_RACE_SYSTEM, null);
 
     }
 
@@ -302,20 +257,9 @@ class CodeableConceptTest {
                 + "RXE|^^^20180622230000^^R|73056-017^Test15 SODIUM 100 MG CAPSULE^NDC|100||mg|||||10||5\n";
 
         MedicationRequest medReq = ResourceUtils.getMedicationRequest(medicationRequestWithCodeableConcept);
-
         assertThat(medReq.hasMedicationCodeableConcept()).isTrue();
         CodeableConcept medCC = medReq.getMedicationCodeableConcept();
-        assertThat(medCC.hasText()).isTrue();
-        assertThat(medCC.getText()).isEqualTo("Test15 SODIUM 100 MG CAPSULE");
-        assertThat(medCC.hasCoding()).isTrue();
-
-        Coding medCoding = medCC.getCoding().get(0);
-        assertThat(medCoding.hasSystem()).isTrue();
-        assertThat(medCoding.getSystem()).isEqualTo("http://hl7.org/fhir/sid/ndc");
-        assertThat(medCoding.hasCode()).isTrue();
-        assertThat(medCoding.getCode()).isEqualTo("73056-017");
-        assertThat(medCoding.hasDisplay()).isTrue();
-        assertThat(medCoding.getDisplay()).isEqualTo("Test15 SODIUM 100 MG CAPSULE");
+        DatatypeUtils.checkCommonCodeableConceptAssertions(medCC, "73056-017", "Test15 SODIUM 100 MG CAPSULE", "http://hl7.org/fhir/sid/ndc", "Test15 SODIUM 100 MG CAPSULE");
 
     }
 
@@ -444,23 +388,9 @@ class CodeableConceptTest {
                 + "PRB|AD|20170110074000|K80.00^Cholelithiasis^I10|53956|E1|1|20100907175347|20150907175347|20180310074000||||confirmed^Confirmed^http://terminology.hl7.org/CodeSystem/condition-ver-status|remission^Remission^http://terminology.hl7.org/CodeSystem/condition-clinical|20180310074000|20170102074000|textual representation of the time when the problem began|1^primary|ME^Medium|0.4|marginal|good|marginal|marginal|highly sensitive|some prb detail|\r";
 
         Condition condition = ResourceUtils.getCondition(hl7MessageiCD10Coding);
-
         assertThat(condition.hasCode()).isTrue();
         CodeableConcept condCC = condition.getCode();
-        assertThat(condCC.hasText()).isTrue();
-        assertThat(condCC.getText()).isEqualTo("Cholelithiasis");
-        assertThat(condCC.hasCoding()).isTrue();
-        assertThat(condCC.getCoding().size()).isEqualTo(1);
-
-        Coding condCoding = condCC.getCoding().get(0);
-        assertThat(condCoding.hasSystem()).isTrue();
-        // change from http://hl7.org/fhir/sid/icd-10 to http://hl7.org/fhir/sid/icd-10-cm temporarily, see Issue #189
-        assertThat(condCoding.getSystem()).isEqualTo("http://hl7.org/fhir/sid/icd-10-cm");
-        assertThat(condCoding.hasCode()).isTrue();
-        assertThat(condCoding.getCode()).isEqualTo("K80.00");
-        assertThat(condCoding.hasDisplay()).isTrue();
-        assertThat(condCoding.getDisplay()).isEqualTo("Cholelithiasis");
-        assertThat(condCoding.hasVersion()).isFalse();
+        DatatypeUtils.checkCommonCodeableConceptAssertions(condCC, "K80.00", "Cholelithiasis", "http://hl7.org/fhir/sid/icd-10-cm", "Cholelithiasis");
 
     }
 
