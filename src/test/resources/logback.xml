@@ -10,8 +10,8 @@
 	</appender>
 	
 
-	<logger name="io.github.linuxforhealth" level="info" />
-	<root level="info">
+	<logger name="io.github.linuxforhealth" level="error" />
+	<root level="erro">
 		<appender-ref ref="Console" />
 	</root>
 
