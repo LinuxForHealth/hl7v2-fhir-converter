@@ -181,7 +181,7 @@ public class Hl7MessageTest {
     + "DG1|7|D8|J45.909^Unspecified asthma, uncomplicated^ICD-10^^^|Unspecified asthma, uncomplicated||A\r";
     String json = message.convert(hl7message, engine);
     assertThat(json).isNotBlank();
-    System.out.println(json);
+
 
     IBaseResource bundleResource = context.getParser().parseResource(json);
     assertThat(bundleResource).isNotNull();
