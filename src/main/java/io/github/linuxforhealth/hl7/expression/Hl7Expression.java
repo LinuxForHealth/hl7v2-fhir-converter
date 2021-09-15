@@ -41,7 +41,8 @@ public class Hl7Expression extends AbstractExpression {
   @JsonCreator
   public Hl7Expression(ExpressionAttributes expAttr) {
     super(expAttr);
-    this.valueof = ExpressionAttributes.getSpecList(expAttr.getValueOf(), expAttr.isUseGroup());
+    this.valueof = ExpressionAttributes.getSpecList(expAttr.getValueOf(), expAttr.isUseGroup(),
+        expAttr.isGenerateMultiple());
 
   }
 

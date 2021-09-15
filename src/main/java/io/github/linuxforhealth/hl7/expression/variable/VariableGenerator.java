@@ -7,13 +7,12 @@ package io.github.linuxforhealth.hl7.expression.variable;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import io.github.linuxforhealth.hl7.expression.ExpressionAttributes;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringTokenizer;
 import org.apache.commons.text.matcher.StringMatcherFactory;
 import com.google.common.base.Preconditions;
 import io.github.linuxforhealth.api.Variable;
+import io.github.linuxforhealth.hl7.expression.ExpressionAttributes;
 
 public class VariableGenerator {
 
@@ -27,13 +26,14 @@ public class VariableGenerator {
         "rawVariable string cannot be null");
 
     // Extract the modifiers such as '*' and '&' from the expression
-    ExpressionAttributes.ExpressionModifiers exp = ExpressionAttributes.extractExpressionModifiers(variableExpression);
+    ExpressionAttributes.ExpressionModifiers exp =
+        ExpressionAttributes.extractExpressionModifiers(variableExpression, false);
 
     String rawVariable = exp.expression;
     if (StringUtils.contains(rawVariable, "GeneralUtils")) {
       String[] values = rawVariable.split(",", 2);
       // Handle * in combination with GeneralUtils function
-      exp = ExpressionAttributes.extractExpressionModifiers(values[0]);
+      exp = ExpressionAttributes.extractExpressionModifiers(values[0], false);
       if (values.length == COMPONENT_LENGTH_FOR_VAR_EXPRESSION) {
         List<String> specs = getTokens(exp.expression);
         return new ExpressionVariable(varName, values[1], specs, exp.extractMultiple, exp.retainEmpty);
