@@ -143,7 +143,7 @@ public class HL7ConditionFHIRConversionTest {
         // Verify encounter diagnosis rank is set correctly.
         assertThat(ResourceUtils.getValueAsString(diagnosis, "rank")).isEqualTo("PositiveIntType[1]");
 
-        // Diagnosis requires a reference to condition.
+        // Encounter should have a reference to the conditions (only 1 in this unit test)
         Base conditionRef = ResourceUtils.getValue(encounter, "reasonReference");
         assertThat(ResourceUtils.getValueAsString(conditionRef, "reference").substring(0, 10)).isEqualTo("Condition/");
 
@@ -225,7 +225,7 @@ public class HL7ConditionFHIRConversionTest {
         String hl7message = "MSH|^~\\&||||||S1|ADT^A01^ADT_A01||T|2.6|||||||||\r"
                 + "EVN|A04|20151008111200|20171013152901|O|OID1006|20171013153621|EVN1009\r"
                 + "PID||||||||||||||||||||||||||||||\r"
-                + "PV2|||||||||||||||||||||||||||||||RR|Y|2|Y|Y|N|N|\r"
+                + "PV1|||||||||||||||||||||||||||||||RR|Y|2|Y|Y|N|N|\r"
                 + "DG1|1|D1|V72.83^Other specified pre-operative examination^ICD-9^^^|Other specified pre-operative examination|20151008111200|A\r"
                 + "DG1|2|D2|R00.0^Tachycardia, unspecified^ICD-10^^^|Tachycardia, unspecified|20150725201300|A\r"
                 + "DG1|3|D3|R06.02^Shortness of breath^ICD-10^^^|Shortness of breath||A\r"
@@ -351,8 +351,7 @@ public class HL7ConditionFHIRConversionTest {
                 + "PRB|AD|20170110074000|K80.00^Cholelithiasis^I10|53956|E1|1|20100907175347|20150907175347|20180310074000||||confirmed^Confirmed^http://terminology.hl7.org/CodeSystem/condition-ver-status|remission^Remission^http://terminology.hl7.org/CodeSystem/condition-clinical|20180310074000|20170102074000|textual representation of the time when the problem began|1^primary|ME^Medium|0.4|marginal|good|marginal|marginal|highly sensitive|some prb detail|\r";
 
         List<BundleEntryComponent> e = ResourceUtils.createHl7Segment(hl7message);
-        ;
-
+        
         // Find the condition from the FHIR bundle.
         List<Resource> conditionResource = e.stream()
                 .filter(v -> ResourceType.Condition == v.getResource().getResourceType())
