@@ -37,24 +37,23 @@ public class ExpressionAttributes {
 
   // Basic properties of an expression
   private String name;
-  private String type;
-  private String defaultValue;
-  private boolean isRequired;
-  private List<Specification> specs;
-  private List<Variable> variables;
-  private Condition condition; // filter is applies to the specs, spec values that pass the
+  private final String type;
+  private final String defaultValue;
+  private final boolean isRequired;
+  private final List<Specification> specs;
+  private final List<Variable> variables;
+  private final Condition condition; // filter is applies to the specs, spec values that pass the
                                // condition
   // are used for evaluating the expression.
-  private Map<String, String> constants;
-  private String value;
-  private String valueOf;
-  private boolean useGroup;
+  private final Map<String, String> constants;
+  private final String value;
+  private final String valueOf;
+  private final boolean useGroup;
   private ExpressionType expressionType;
   private String toString;
-  private List<ExpressionAttributes> expressions;
-  private Map<String, ExpressionAttributes> expressionsMap;
-  private boolean isEvaluateLater;
-
+  private final List<ExpressionAttributes> expressions;
+  private final Map<String, ExpressionAttributes> expressionsMap;
+  private final boolean isEvaluateLater;
 
   // if valueof attribute ends with * then list of values will be generated
   private boolean generateMultiple;
@@ -72,9 +71,14 @@ public class ExpressionAttributes {
 
     this.isRequired = exBuilder.isRequired;
     this.isEvaluateLater = exBuilder.isEvaluateLater;
-    this.specs = getSpecList(exBuilder.rawSpecs, exBuilder.useGroup);
+    this.generateMultiple = exBuilder.generateList;
+
+
+    this.specs = getSpecList(exBuilder.rawSpecs, exBuilder.useGroup, this.generateMultiple);
     if (StringUtils.isNotBlank(exBuilder.rawCondition)) {
       this.condition = ConditionUtil.createCondition(exBuilder.rawCondition);
+    } else {
+      this.condition = null;
     }
 
     this.constants = new HashMap<>();
@@ -91,7 +95,7 @@ public class ExpressionAttributes {
 
     this.value = exBuilder.value;
     this.valueOf = exBuilder.valueOf;
-    this.generateMultiple = exBuilder.generateList;
+
 
     this.expressionType = exBuilder.expressionType;
     this.useGroup = exBuilder.useGroup;
@@ -102,10 +106,14 @@ public class ExpressionAttributes {
 
     if (exBuilder.expressions != null) {
       this.expressions = exBuilder.expressions;
+    } else {
+      this.expressions = null;
     }
 
     if (exBuilder.expressionsMap != null) {
       this.expressionsMap = exBuilder.expressionsMap;
+    } else {
+      this.expressionsMap = null;
     }
 
   }
@@ -147,11 +155,11 @@ public class ExpressionAttributes {
   }
 
   public boolean isGenerateMultiple() {
-    return generateMultiple;
+    return this.generateMultiple;
   }
 
   public String getValue() {
-    return value;
+    return this.value;
   }
 
 
@@ -163,10 +171,7 @@ public class ExpressionAttributes {
     return valueOf;
   }
 
-  public void setName(String name) {
-    this.name = name;
 
-  }
 
   public String getName() {
     return name;
@@ -184,12 +189,14 @@ public class ExpressionAttributes {
    * retain empty (null) fields
    * 
    * @param inputString
+   * @param generateMultiple
    * @return ExpressionModifiers object with booleans indicating which modifiers were used and the
    *         expression after modifiers have been removed
    */
-  public static final ExpressionModifiers extractExpressionModifiers(String inputString) {
+  public static final ExpressionModifiers extractExpressionModifiers(String inputString,
+      boolean generateMultiple) {
 
-    boolean extractMultiple = false;
+    boolean extractMultiple = generateMultiple;
     boolean retainEmpty = false;
     String expression = inputString;
 
@@ -211,9 +218,10 @@ public class ExpressionAttributes {
     return new ExpressionModifiers(extractMultiple, retainEmpty, expression);
   }
 
-  public static List<Specification> getSpecList(String inputString, boolean useGroup) {
+  public static List<Specification> getSpecList(String inputString, boolean useGroup,
+      boolean generateMultiple) {
 
-    ExpressionModifiers exp = extractExpressionModifiers(inputString);
+    ExpressionModifiers exp = extractExpressionModifiers(inputString, generateMultiple);
 
     List<Specification> specs = new ArrayList<>();
     if (StringUtils.isNotBlank(exp.expression)) {
@@ -399,6 +407,11 @@ public class ExpressionAttributes {
       retainEmpty = theRetainEmpty;
       expression = theExpression;
     }
+  }
+
+  public void setName(String key) {
+    this.name = key;
+
   }
 }
 
