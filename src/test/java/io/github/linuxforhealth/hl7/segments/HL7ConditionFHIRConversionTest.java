@@ -475,7 +475,8 @@ public class HL7ConditionFHIRConversionTest {
     public void validateProblemWithInvalidValues() {
 
         String hl7message = "MSH|^~\\&|||||20040629164652|1|PPR^PC1|331|P|2.3.1||\r"
-                + "PID||||||||||||||||||||||||||||||\r" + "PV1||I||||||||||||||||||||||||||||||||||||||||||\r"
+                + "PID||||||||||||||||||||||||||||||\r"
+                + "PV1||I||||||||||||||||||||||||||||||||||||||||||\r"
                 + "PRB|AD|20170110074000|K80.00^Cholelithiasis^I10|53956|E1|1|20100907175347|20150907175347|||||BAD^Confirmed^http://terminology.hl7.org/CodeSystem/condition-ver-status|INVALID^Remission^http://terminology.hl7.org/CodeSystem/condition-clinical|20180310074000|20170102074000|textual representation of the time when the problem began|1^primary|ME^Medium|0.4|marginal|good|marginal|marginal|highly sensitive|some prb detail|\r";
 
         List<BundleEntryComponent> e = ResourceUtils.createHl7Segment(hl7message);
