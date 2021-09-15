@@ -15,7 +15,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest]
-        java: [1.8]
+        java: [11]
     name: HL7v2 FHIR Converter CI - OS ${{ matrix.os }} Java Version ${{ matrix.java }}
     steps:
       - uses: actions/checkout@v2
