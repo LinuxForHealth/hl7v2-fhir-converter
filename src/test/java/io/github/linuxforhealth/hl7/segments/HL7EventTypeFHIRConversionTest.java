@@ -67,7 +67,7 @@ public class HL7EventTypeFHIRConversionTest {
   }
 
   @Test
-  public void validate_evn_segment_no_period_override() throws IOException {
+  public void validate_evn_segment_no_period_override() {
 
     String hl7message = "MSH|^~\\&|||||||ADT^A01^ADT_A01|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6||||||\r"
         + "EVN||||7525||20210319134735|\r"
@@ -109,7 +109,7 @@ public class HL7EventTypeFHIRConversionTest {
   public void validateEVNsegmentWithOBXreference() {
     // When there is an OBX record, it should create a reason reference in the encounter segment
     String hl7message = "MSH|^~\\&|||||||ADT^A01^ADT_A01|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6||||||\r"
-        + "EVN||||7525||20210319134735|\r"
+        + "EVN||||7525|||\r"
         + "PV1|1|I||R|||||||||R|1||||||||||||||||||||||||||||||200603150624|200603150625|||||||\r"
         + "OBX|1|CWE|DQW^Some text 1^SNM3|||||||||||||||||||||\r";
 
