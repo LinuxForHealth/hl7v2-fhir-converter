@@ -47,6 +47,8 @@ public class FHIRConverterTest {
   private static final String HL7_FILE_WIN_NEWLINE = "src/test/resources/sample_win.hl7";
   private static final String HL7_FILE_WIN_NEWLINE_BATCH = "src/test/resources/sample_win_batch.hl7";
   private static final ConverterOptions OPTIONS = new Builder().withValidateResource().withPrettyPrint().build();
+  public static final ConverterOptions SIMPLE_OPTIONS = new Builder().build();
+
 
   @Test
   public void test_patient_encounter() throws IOException {
@@ -203,13 +205,16 @@ String hl7message =
         ftv.convert(hl7message);
     });
   }
+
   @Test
-  public void test_adt_40_message() throws Exception {
+  public void test_adt_40_message_with_adt_a39_structure_specified() throws Exception {
     Message hl7message = null;
+    // Test that an ADT A40 message with MSH-9.3 of 'ADT_A39' is successfully parsed and converted as an ADT A40 message.
+    // Note that ADT_A39 is the expected structure of an ADT_A40 message.
     String hl7messageString =
-            "MSH|^~\\&|REGADT|MCM|RSP1P8|MCM|200301051530|SEC|ADT^A40^ADT_A39|00000003|P|2.5\n" +
+            "MSH|^~\\&|REGADT|MCM|RSP1P8|MCM|200301051530|SEC|ADT^A40^ADT_A39|00000003|P|2.6\n" +
             "PID|||MR1^^^XYZ||MAIDENNAME^EVE\n" +
-            "MRG|MR2^^^XYZ";
+            "MRG|MR2^^^XYZ\n";
 
     InputStream ins = IOUtils.toInputStream(hl7messageString, StandardCharsets.UTF_8);
     Hl7InputStreamMessageStringIterator iterator = new Hl7InputStreamMessageStringIterator(ins);
@@ -222,6 +227,66 @@ String hl7message =
     String messageType = HL7DataExtractor.getMessageType(hl7message);
 
     assertThat(messageType).isEqualTo("ADT_A40");
+
+    // Convert and check for a patient resource
+    HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
+    String json = ftv.convert(hl7messageString, SIMPLE_OPTIONS);
+
+    FHIRContext context = new FHIRContext();
+    IBaseResource bundleResource = context.getParser().parseResource(json);
+    assertThat(bundleResource).isNotNull();
+
+    Bundle b = (Bundle) bundleResource;
+    assertThat(b.getType()).isEqualTo(BundleType.COLLECTION);
+    assertThat(b.getId()).isNotNull();
+    assertThat(b.getMeta().getLastUpdated()).isNotNull();
+
+    List<BundleEntryComponent> e = b.getEntry();
+    List<Resource> patientResource = e.stream().filter(v -> ResourceType.Patient == v.getResource().getResourceType())
+        .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+    assertThat(patientResource).hasSize(1);
+
+  }
+
+  @Test
+  public void test_adt_40_message() throws Exception {
+    Message hl7message = null;
+    // Test that an ADT A40 message with no MSH-9.3 is successfully parsed and converted.
+    String hl7messageString =
+            "MSH|^~\\&|REGADT|MCM|RSP1P8|MCM|200301051530|SEC|ADT^A40|00000003|P|2.6\n" +
+            "PID|||MR1^^^XYZ||MAIDENNAME^EVE\n" +
+            "MRG|MR2^^^XYZ\n";
+
+    InputStream ins = IOUtils.toInputStream(hl7messageString, StandardCharsets.UTF_8);
+    Hl7InputStreamMessageStringIterator iterator = new Hl7InputStreamMessageStringIterator(ins);
+
+    if (iterator.hasNext()) {
+      HL7HapiParser hparser = new HL7HapiParser();
+      hl7message = hparser.getParser().parse(iterator.next());
+    }
+
+    String messageType = HL7DataExtractor.getMessageType(hl7message);
+
+    assertThat(messageType).isEqualTo("ADT_A40");
+
+    // Convert and check for a patient resource
+    HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
+    String json = ftv.convert(hl7messageString, SIMPLE_OPTIONS);
+
+    FHIRContext context = new FHIRContext();
+    IBaseResource bundleResource = context.getParser().parseResource(json);
+    assertThat(bundleResource).isNotNull();
+
+    Bundle b = (Bundle) bundleResource;
+    assertThat(b.getType()).isEqualTo(BundleType.COLLECTION);
+    assertThat(b.getId()).isNotNull();
+    assertThat(b.getMeta().getLastUpdated()).isNotNull();
+
+    List<BundleEntryComponent> e = b.getEntry();
+    List<Resource> patientResource = e.stream().filter(v -> ResourceType.Patient == v.getResource().getResourceType())
+        .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+    assertThat(patientResource).hasSize(1);
+
   }
 
   @Test

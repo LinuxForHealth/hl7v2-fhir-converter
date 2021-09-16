@@ -45,6 +45,10 @@ bin/
 # Jetbrains IDEA
 .idea
 
+# VSCode
+.vscode/settings.json
+
 # Local History files
 .history
 AnnaConverterFolderTest.java
+AnnaConverterTest.java

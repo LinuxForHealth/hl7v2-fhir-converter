@@ -342,7 +342,6 @@ public class HL7DataExtractor {
       String theActualMessageType = msh.getMessageType().getMsg1_MessageCode().getValue() + "_" + msh.getMessageType().getMsg2_TriggerEvent().getValue();
       return theActualMessageType;
     } catch (HL7Exception e){
-      // TODO Auto generated catch block
       e.printStackTrace();
     }
     return null;
