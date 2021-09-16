@@ -1,0 +1,23 @@
+#
+# (C) Copyright IBM Corp. 2021
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+    
+type:
+   condition: codeableConceptCode NOT_NULL
+   valueOf: datatype/CodeableConcept_var
+   generateList: true
+   expressionType: resource
+   vars:
+      code: String, $codeableConceptCode 
+      text: String, $codeableConceptText
+   constants:
+      system: 'http://terminology.hl7.org/CodeSystem/v3-ParticipationType'
+      
+individual:
+   valueOf: resource/Practitioner
+   expressionType: reference
+   specs: $practionerSpec
+   required: true

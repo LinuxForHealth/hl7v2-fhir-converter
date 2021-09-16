@@ -41,6 +41,7 @@ resources:
       additionalSegments: 
           - .OBR
           - .OBSERVATION.NTE
+          - .SPECIMEN.SPM
           - MSH
         
     - resourceName: Specimen

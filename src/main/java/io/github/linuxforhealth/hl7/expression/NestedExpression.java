@@ -74,7 +74,8 @@ public class NestedExpression extends AbstractExpression {
       return EvaluationResultFactory.getEvaluationResult(null);
     } else {
       if (this.generateMap) {
-        return EvaluationResultFactory.getEvaluationResult(result.getResolveValues());
+        return EvaluationResultFactory.getEvaluationResult(result.getResolveValues(),
+            result.getAdditionalResolveValues());
       } else {
         List<Object> values = new ArrayList<>();
 

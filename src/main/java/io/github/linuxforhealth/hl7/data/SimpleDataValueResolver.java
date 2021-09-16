@@ -113,12 +113,12 @@ public class SimpleDataValueResolver {
     };
 
     public static final ValueExtractor<Object, String> MEDREQ_STATUS_CODE_FHIR = (Object value) -> {
-        String val = Hl7DataHandlerUtil.getStringValue(value);
-        String code = getFHIRCode(val, MedicationRequest.class);
+    	String val = Hl7DataHandlerUtil.getStringValue(value);
+        String code = getFHIRCode(val, "MedicationRequestStatus");
         if (code != null) {
             return code;
         }
-        else return "unknown"; // when the HL7 status codes get mapped in v2toFhirMapping, we will return code. "unknown" is being returned because the hl7 message is not mapped to fhir yet.
+        return "unknown"; // when the HL7 status codes get mapped in v2toFhirMapping, we will return code. "unknown" is being returned because the hl7 message is not mapped to fhir yet.
     };
 
     public static final ValueExtractor<Object, String> OBSERVATION_STATUS_CODE_FHIR = (Object value) -> {
@@ -258,6 +258,16 @@ public class SimpleDataValueResolver {
         }
     };
 
+
+    public static final ValueExtractor<Object, String> ENCOUNTER_MODE_ARRIVAL_DISPLAY = (Object value) -> {
+        String display = getFHIRCode(Hl7DataHandlerUtil.getStringValue(value), "EncounterModeOfArrivalDisplay");
+        if (display != null) {
+            return display;
+        } else {
+            return display;
+        }
+    };
+    
   public static final ValueExtractor<Object, SimpleCode> MARITAL_STATUS =
       (Object value) -> {
         String val = Hl7DataHandlerUtil.getStringValue(value);
@@ -401,7 +411,7 @@ public class SimpleDataValueResolver {
             }
         } else if (code != null) {
             // A code but no system: build a simple systemless code
-            return new SimpleCode(code, null, null);
+            return new SimpleCode(code, null, text);
         } else {
             return null;
         }
@@ -552,8 +562,12 @@ public class SimpleDataValueResolver {
     }
 
     private static String getFHIRCode(String hl7Value, Class<?> fhirConceptClassName) {
+    	return getFHIRCode(hl7Value,fhirConceptClassName.getSimpleName());
+    }
+
+    private static String getFHIRCode(String hl7Value, String fhirMappingConceptName) {
         if (hl7Value != null) {
-            Map<String, String> mapping = Hl7v2Mapping.getMapping(fhirConceptClassName.getSimpleName());
+            Map<String, String> mapping = Hl7v2Mapping.getMapping(fhirMappingConceptName);
             if (mapping != null && !mapping.isEmpty()) {
                 return mapping.get(StringUtils.upperCase(hl7Value, Locale.ENGLISH));
             } else {

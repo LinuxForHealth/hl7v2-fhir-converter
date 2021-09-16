@@ -14,11 +14,12 @@ id:
 # However we do not want empty Device resources.
 # Thefore wherever Device is referenced make sure to verify the value is NOT_NULL.
 identifier:
-    valueOf: datatype/Identifier_Gen
-    generateList: true
-    expressionType: resource
-    specs: OBX.18
-    vars:
-      id: OBX.18.1
+  valueOf: datatype/Identifier_var
+  generateList: true
+  expressionType: resource
+  specs: EI
+  vars:
+    valueIn: EI.1
+    systemCX:  EI.2
 
   
