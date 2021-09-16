@@ -32,19 +32,7 @@ resources:
       - .PID
       - .PATIENT_VISIT.PV2
       - MSH
-
-  - resourceName: Medication
-    segment: .RXE
-    resourcePath: resource/Medication
-    isReferenced: true
-    group: ORDER
-    repeats: true
-    additionalSegments:
-      - .ORC
-      - .ORDER_DETAIL.RXO
-      - .RXC
-      - MSH
-
+      
   - resourceName: AllergyIntolerance
     segment: AL1
     resourcePath: resource/AllergyIntolerance
@@ -59,6 +47,7 @@ resources:
     repeats: true
     additionalSegments:
       - MSH
+      - .ORC
       - PATIENT.PATIENT_VISIT.PV1
       - PATIENT.PID
       - .ORDER_DETAIL.RXO

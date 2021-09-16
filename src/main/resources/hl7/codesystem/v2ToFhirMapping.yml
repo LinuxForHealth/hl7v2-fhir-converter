@@ -288,3 +288,33 @@ V3ReligiousAffiliation:
 
 DiagnosisRole:
    A: AD
+
+MedicationRequestStatus:
+   AF: active
+   CA: cancelled
+   CR: cancelled
+   DC: stopped
+   DE: entered-in-error
+   DF: cancelled
+   DR: stopped
+   FU: active
+   HD: on-hold
+   HR: on-hold
+   NW: active
+   OC: cancelled
+   OD: stopped
+   OE: active
+   OF: active
+   OH: on-hold
+   OK: active
+   OP: active
+   OR: active
+   PY: active
+   RF: active
+   RL: active
+   RO: active
+   RP: active
+   RQ: active
+   RR: active
+   RU: active
+   
