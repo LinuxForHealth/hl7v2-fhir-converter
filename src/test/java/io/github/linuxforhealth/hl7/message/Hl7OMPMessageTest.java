@@ -32,7 +32,7 @@ public class Hl7OMPMessageTest {
 
 
 
-    @Test
+  @Test
   public void test_OMPO09_patient_encounter_present() throws IOException {
 	  String hl7message =
 		        "MSH|^~\\&|WHI_LOAD_GENERATOR|IBM_TORONTO_LAB|MEDORDER|IBM|20210407191342|9022934|OMP^O09|MSGID_bae9ce6a-e35d-4ff5-8d50-c5dde19cc1aa|T|2.5.1\n"
@@ -60,6 +60,31 @@ public class Hl7OMPMessageTest {
               .filter(v -> ResourceType.Encounter == v.getResource().getResourceType())
               .map(BundleEntryComponent::getResource).collect(Collectors.toList());
       assertThat(encounterResource).hasSize(1);
+
+  }
+
+
+  @Test
+  public void test_OMPO09_medrequest_present() throws IOException {
+	  String hl7message =
+		        "MSH|^~\\&|WHI_LOAD_GENERATOR|IBM_TORONTO_LAB|MEDORDER|IBM|20210407191342|9022934|OMP^O09|MSGID_bae9ce6a-e35d-4ff5-8d50-c5dde19cc1aa|T|2.5.1\n"
+				+ "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
+		        + "ORC|OP|ACCESSION_c977e88c-fd4b-47b6-a4bc-71d04618d1c4|ACCESSION_c977e88c-fd4b-47b6-a4bc-71d04618d1c4|6279|||^3 times daily^^20210401|381227400|20210407191342|2739^BY^ENTERED|2799^BY^VERIFIED|3122^PROVIDER^ORDERING||(696)901-1300|20210407191342||||||ORDERING FAC NAME|ADDR^^CITY^STATE^ZIP^USA|(515)-290-8888|9999^^CITY^STATE^ZIP^CAN\n"
+		        + "RXO|50111032701^hydrALAZINE HCl 25 MG Oral Tablet^NDC^^^^^^hydrALAZINE (APRESOLINE) 25 MG TABS||||||Take 1 tablet by mouth 3 (three) times daily.||G||120|tablet^tablet|0|FG5789740^GETREU^THOMAS^H.||||||||||^APRESOLINE\n";
+
+      HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
+      String json = ftv.convert(hl7message, OPTIONS);
+      assertThat(json).isNotBlank();
+      LOGGER.info("FHIR json result:\n" + json);
+      IBaseResource bundleResource = context.getParser().parseResource(json);
+      assertThat(bundleResource).isNotNull();
+      Bundle b = (Bundle) bundleResource;
+      List<BundleEntryComponent> e = b.getEntry();
+
+      List<Resource> resourceList = e.stream()
+              .filter(v -> ResourceType.MedicationRequest == v.getResource().getResourceType())
+              .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+      assertThat(resourceList).hasSize(1);
 
   }
 

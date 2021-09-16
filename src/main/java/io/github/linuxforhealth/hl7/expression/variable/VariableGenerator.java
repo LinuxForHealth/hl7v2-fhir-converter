@@ -27,13 +27,14 @@ public class VariableGenerator {
         "rawVariable string cannot be null");
 
     // Extract the modifiers such as '*' and '&' from the expression
-    ExpressionAttributes.ExpressionModifiers exp = ExpressionAttributes.extractExpressionModifiers(variableExpression);
+    ExpressionAttributes.ExpressionModifiers exp =
+        ExpressionAttributes.extractExpressionModifiers(variableExpression, false);
 
     String rawVariable = exp.expression;
     if (StringUtils.contains(rawVariable, "GeneralUtils")) {
       String[] values = rawVariable.split(",", 2);
       // Handle * in combination with GeneralUtils function
-      exp = ExpressionAttributes.extractExpressionModifiers(values[0]);
+      exp = ExpressionAttributes.extractExpressionModifiers(values[0], false);
       if (values.length == COMPONENT_LENGTH_FOR_VAR_EXPRESSION) {
         List<String> specs = getTokens(exp.expression);
         return new ExpressionVariable(varName, values[1], specs, exp.extractMultiple, exp.retainEmpty);

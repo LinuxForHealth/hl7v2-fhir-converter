@@ -36,6 +36,8 @@ import io.github.linuxforhealth.hl7.ConverterOptions;
 import io.github.linuxforhealth.hl7.ConverterOptions.Builder;
 import io.github.linuxforhealth.hl7.HL7ToFHIRConverter;
 
+import io.github.linuxforhealth.hl7.segments.util.DatatypeUtils;
+
 public class DifferentObservationValueTest {
         private static FHIRContext context = new FHIRContext();
         private static HL7MessageEngine engine = new HL7MessageEngine(context);
@@ -201,7 +203,7 @@ public class DifferentObservationValueTest {
 
                 // Check the coding  (OBX.3)
                 assertThat(obs.hasCode()).isTrue();
-                checkCommonCodeableConceptAssertions(obs.getCode(), "14151-5", "HCO3 BldCo-sCnc", "http://loinc.org",
+                DatatypeUtils.checkCommonCodeableConceptAssertions(obs.getCode(), "14151-5", "HCO3 BldCo-sCnc", "http://loinc.org",
                                 "HCO3 BldCo-sCnc");
 
                 // Check the effective Date Time  (OBX 14)
@@ -215,7 +217,7 @@ public class DifferentObservationValueTest {
         @Test
         public void extendedObservationCWEtest() throws IOException {
                 String hl7message = "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|ADT^A01^ADT_A01|||2.6||||||||2.6\r"
-                                + "OBX|1|CWE|DQW^Some text 1^SNM3|100|DQW^Other text 2^SNM3|mm^Text 3^SNM3|56-98|IND|25|ST|F|20210322153839|LKJ|20210320153850|N56|1111^ClinicianLastName^ClinicianFirstName^^^^Title|Manual^Text the 4th^SNM3|Device_1234567|20210322153925|Observation Site^Text 5^SNM3|INST^Instance Identifier System||Radiology^Radiological Services|467 Albany Hospital^^Albany^NY|Cardiology^ContactLastName^Jane^Q^^Dr.^MD\r";
+                                + "OBX|1|CWE|DQW^Some text 1^SNM3|100|DQW^Other text 2^SNM3|mm^Text 3^SNM3|56-98|IND|25|ST|F|20210322153839|LKJ|20210320153850|N56|1111^ClinicianLastName^ClinicianFirstName^^^^Title|Manual^Text the 4th^SNM3|Device_1234567^mySystem|20210322153925|Observation Site^Text 5^SNM3|INST^Instance Identifier System||Radiology^Radiological Services|467 Albany Hospital^^Albany^NY|Cardiology^ContactLastName^Jane^Q^^Dr.^MD\r";
 
                 String json = message.convert(hl7message, engine);
 
@@ -232,12 +234,12 @@ public class DifferentObservationValueTest {
 
                 // Check the coding  (OBX.3)
                 assertThat(obs.hasCode()).isTrue();
-                checkCommonCodeableConceptAssertions(obs.getCode(), "DQW", "Some text 1",
+                DatatypeUtils.checkCommonCodeableConceptAssertions(obs.getCode(), "DQW", "Some text 1",
                                 "http://terminology.hl7.org/CodeSystem/SNM3", "Some text 1");
 
                 // Check the value  (OBX.5)
                 assertThat(obs.hasValueCodeableConcept()).isTrue();
-                checkCommonCodeableConceptAssertions(obs.getValueCodeableConcept(), "DQW", "Other text 2",
+                DatatypeUtils.checkCommonCodeableConceptAssertions(obs.getValueCodeableConcept(), "DQW", "Other text 2",
                                 "http://terminology.hl7.org/CodeSystem/SNM3", "Other text 2");
 
                 // OBX.6 is ignored because the record can only have one valueX and this one is valueCodeableConcept. See test test_observation_NM_result.
@@ -257,7 +259,7 @@ public class DifferentObservationValueTest {
                 // Check interpretation (OBX.8)
                 assertThat(obs.hasInterpretation()).isTrue();
                 assertThat(obs.getInterpretation()).hasSize(1);
-                checkCommonCodeableConceptAssertions(obs.getInterpretationFirstRep(), "IND", "Indeterminate",
+                DatatypeUtils.checkCommonCodeableConceptAssertions(obs.getInterpretationFirstRep(), "IND", "Indeterminate",
                                 "http://terminology.hl7.org/CodeSystem/v2-0078", "IND");
 
                 // Check the effective Date Time  (OBX.14)
@@ -292,13 +294,13 @@ public class DifferentObservationValueTest {
                 assertThat(org.getContact().get(0).getName().getGiven().get(0).getValueAsString()).isEqualTo("Jane"); // from OBX.25
                 assertThat(org.getContact().get(0).getName().getText()).isEqualTo("Dr. Jane Q ContactLastName"); // from OBX.25
                 assertThat(org.getContact().get(0).hasPurpose()).isTrue(); // purpose added because of OBX.25
-                checkCommonCodeableConceptAssertions(org.getContact().get(0).getPurpose(), "ADMIN", "Administrative",
+                DatatypeUtils.checkCommonCodeableConceptAssertions(org.getContact().get(0).getPurpose(), "ADMIN", "Administrative",
                                 "http://terminology.hl7.org/CodeSystem/contactentity-type",
                                 "Organization Medical Director");
 
                 // Check method  (OBX.17)
                 assertThat(obs.hasMethod()).isTrue();
-                checkCommonCodeableConceptAssertions(obs.getMethod(), "Manual", "Text the 4th",
+                DatatypeUtils.checkCommonCodeableConceptAssertions(obs.getMethod(), "Manual", "Text the 4th",
                                 "http://terminology.hl7.org/CodeSystem/SNM3", "Text the 4th");
 
                 // Check device  (OBX.18)
@@ -310,10 +312,11 @@ public class DifferentObservationValueTest {
                 assertThat(deviceResource).hasSize(1);
                 Device device = getResourceDevice(deviceResource.get(0));
                 assertThat(device.getIdentifier().get(0).getValue()).isEqualTo("Device_1234567");
+                assertThat(device.getIdentifier().get(0).getSystem()).isEqualTo("urn:id:mySystem");
 
                 // Check bodySite  (OBX.20)
                 assertThat(obs.hasBodySite()).isTrue();
-                checkCommonCodeableConceptAssertions(obs.getBodySite(), "Observation Site", "Text 5",
+                DatatypeUtils.checkCommonCodeableConceptAssertions(obs.getBodySite(), "Observation Site", "Text 5",
                                 "http://terminology.hl7.org/CodeSystem/SNM3", "Text 5");
 
                 // Check identifier  (OBX.21)
@@ -386,46 +389,9 @@ public class DifferentObservationValueTest {
                 // Because there is an SPM record, there should be a category.  (Absence of SPM and category checkedin extendedObservationCWEtest)
                 assertThat(obs.hasCategory()).isTrue();
                 assertThat(obs.getCategory()).hasSize(1);
-                checkCommonCodeableConceptAssertions(obs.getCategoryFirstRep(), "laboratory", "Laboratory",
+                DatatypeUtils.checkCommonCodeableConceptAssertions(obs.getCategoryFirstRep(), "laboratory", "Laboratory",
                                 "http://terminology.hl7.org/CodeSystem/observation-category", null);
 
-        }
-
-        // Common check for values of a codeable concept.  Null in any input indicates it should check False
-        public static void checkCommonCodeableConceptAssertions(CodeableConcept cc, String code, String display,
-                        String system, String text) {
-                if (text == null) {
-                        assertThat(cc.hasText()).isFalse();
-                } else {
-                        assertThat(cc.hasText()).isTrue();
-                        assertThat(cc.getText()).isEqualTo(text);
-                }
-
-                if (code == null && display == null && system == null) {
-                        assertThat(cc.hasCoding()).isFalse();
-                } else {
-                        assertThat(cc.hasCoding()).isTrue();
-                        assertThat(cc.getCoding().size()).isEqualTo(1);
-                        Coding coding = cc.getCoding().get(0);
-                        if (code == null) {
-                                assertThat(coding.hasCode()).isFalse();
-                        } else {
-                                assertThat(coding.hasCode()).isTrue();
-                                assertThat(coding.getCode()).isEqualTo(code);
-                        }
-                        if (display == null) {
-                                assertThat(coding.hasDisplay()).isFalse();
-                        } else {
-                                assertThat(coding.hasDisplay()).isTrue();
-                                assertThat(coding.getDisplay()).isEqualTo(display);
-                        }
-                        if (system == null) {
-                                assertThat(coding.hasSystem()).isFalse();
-                        } else {
-                                assertThat(coding.hasSystem()).isTrue();
-                                assertThat(coding.getSystem()).isEqualTo(system);
-                        }
-                }
         }
 
         private static Practitioner getResourcePractitioner(Resource resource) {

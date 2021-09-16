@@ -127,14 +127,12 @@ diagnosis:
         valueOf: datatype/Reference
         expressionType: resource
         specs: $Condition
-
      use:
         valueOf: datatype/CodeableConcept
         expressionType: resource
         specs: DG1.6
         vars:
           coding: DIAGNOSIS_USE, DG1.6
-
      rank:
         type: STRING
         valueOf: DG1.15

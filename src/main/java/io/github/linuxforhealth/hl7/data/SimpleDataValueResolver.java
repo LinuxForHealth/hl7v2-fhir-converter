@@ -114,12 +114,12 @@ public class SimpleDataValueResolver {
     };
 
     public static final ValueExtractor<Object, String> MEDREQ_STATUS_CODE_FHIR = (Object value) -> {
-        String val = Hl7DataHandlerUtil.getStringValue(value);
-        String code = getFHIRCode(val, MedicationRequest.class);
+    	String val = Hl7DataHandlerUtil.getStringValue(value);
+        String code = getFHIRCode(val, "MedicationRequestStatus");
         if (code != null) {
             return code;
         }
-        else return "unknown"; // when the HL7 status codes get mapped in v2toFhirMapping, we will return code. "unknown" is being returned because the hl7 message is not mapped to fhir yet.
+        return "unknown"; // when the HL7 status codes get mapped in v2toFhirMapping, we will return code. "unknown" is being returned because the hl7 message is not mapped to fhir yet.
     };
 
     public static final ValueExtractor<Object, String> OBSERVATION_STATUS_CODE_FHIR = (Object value) -> {

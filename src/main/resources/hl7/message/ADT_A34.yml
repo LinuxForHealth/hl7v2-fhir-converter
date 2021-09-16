@@ -20,5 +20,6 @@ resources:
       repeats: false
       isReferenced: true
       additionalSegments:
-             - PD1 
-             - MSH     
+             - PD1
+             - MSH
+             - MRG
