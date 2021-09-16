@@ -97,13 +97,9 @@ public class Hl7RDEMessageTest {
 	  String hl7message =
 		        "MSH|^~\\&|WHI_LOAD_GENERATOR|IBM_TORONTO_LAB||IBM|20210407191342|25739|RDE^O11|MSGID_f209e83f-20db-474d-a7ae-82e5c3894273|T|2.6\n"
 		        + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
-		        + "PV1||I|^^^Toronto^^5642 Hilly Av||||2905^Doctor^Attending^M^IV^^M.D|5755^Doctor^Referring^^Sr|770542^Doctor^Consulting^Jr||||||||59367^Doctor^Admitting||Visit_0a4d960d-c528-45c9-bb10-7e9929968247|||||||||||||||||||||||||20210407191342\n"
 		        + "ORC|RE|ACCESSION_62fd10ea-522a-4261-837a-30381a5aa04a|ACCESSION_62fd10ea-522a-4261-837a-30381a5aa04a|3200|||^Every 24 hours&1500^^20210330150000^^ROU||20210407191342|2739^BY^ENTERED|2799^BY^VERIFIED|3122^PROVIDER^ORDERING||(696)901-1300|20210407191342||||||ORDERING FAC NAME|ADDR^^CITY^STATE^ZIP^USA|(515)-290-8888|9999^^CITY^STATE^ZIP^CAN|||||I\n"
 		        + "RXO|DEFAULTMED\n"
-		        + "RXE|^Q24H&0600^^20210407191342^^ROU|DEFAULTMED^cefTRIAXone (ROCEPHIN) 2 g in sodium chloride 0.9 % 50 mL IVPB|2||g||||||||12345^LNAME^FNAME\n"
-		        + "RXA|0|23|20210407191342|20210407191342|DEFAULTMED^cefTRIAXone (ROCEPHIN) 2 g in sodium chloride 0.9 % 50 mL IVPB|||||12345^LNAME^FNAME|BN6T3|100^mL/hr||||||||RateChange||20210407191342\n"
-		        + "ZXC||00409-7335-03^CEFTRIAXONE SODIUM 2 G IJ SOLR^REPNDC\n"
-		        + "ZCL|hcm-prod1862018998731\n";
+		        + "RXE|^Q24H&0600^^20210407191342^^ROU|DEFAULTMED^cefTRIAXone (ROCEPHIN) 2 g in sodium chloride 0.9 % 50 mL IVPB|2||g||||||||12345^LNAME^FNAME\n";
 
       HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
       String json = ftv.convert(hl7message, OPTIONS);
@@ -126,7 +122,6 @@ public class Hl7RDEMessageTest {
 	  String hl7message =
 		        "MSH|^~\\&|WHI_LOAD_GENERATOR|IBM_TORONTO_LAB||IBM|20210407191342|25739|RDE^O25|MSGID_f209e83f-20db-474d-a7ae-82e5c3894273|T|2.6\n"
 		        + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
-		        + "PV1||I|^^^Toronto^^5642 Hilly Av||||2905^Doctor^Attending^M^IV^^M.D|5755^Doctor^Referring^^Sr|770542^Doctor^Consulting^Jr||||||||59367^Doctor^Admitting||Visit_0a4d960d-c528-45c9-bb10-7e9929968247|||||||||||||||||||||||||20210407191342\n"
 		        + "ORC|RE|ACCESSION_62fd10ea-522a-4261-837a-30381a5aa04a|ACCESSION_62fd10ea-522a-4261-837a-30381a5aa04a|3200|||^Every 24 hours&1500^^20210330150000^^ROU||20210407191342|2739^BY^ENTERED|2799^BY^VERIFIED|3122^PROVIDER^ORDERING||(696)901-1300|20210407191342||||||ORDERING FAC NAME|ADDR^^CITY^STATE^ZIP^USA|(515)-290-8888|9999^^CITY^STATE^ZIP^CAN|||||I\n"
 		        + "RXO|DEFAULTMED\n"
 		        + "RXE|^Q24H&0600^^20210407191342^^ROU|DEFAULTMED^cefTRIAXone (ROCEPHIN) 2 g in sodium chloride 0.9 % 50 mL IVPB|2||g||||||||12345^LNAME^FNAME\n";
