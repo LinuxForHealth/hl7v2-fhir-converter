@@ -50,7 +50,6 @@ public class FHIRConverterTest {
   private static final String HL7_FILE_WIN_NEWLINE = "src/test/resources/sample_win.hl7";
   private static final String HL7_FILE_WIN_NEWLINE_BATCH = "src/test/resources/sample_win_batch.hl7";
   private static final ConverterOptions OPTIONS = new Builder().withValidateResource().withPrettyPrint().build();
-  public static final ConverterOptions SIMPLE_OPTIONS = new Builder().build();
   private static final Logger LOGGER = LoggerFactory.getLogger(FHIRConverterTest.class);
 
 
@@ -232,7 +231,7 @@ String hl7message =
 
     // Convert and check for a patient resource
     HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
-    String json = ftv.convert(hl7messageString, SIMPLE_OPTIONS);
+    String json = ftv.convert(hl7messageString, ConverterOptions.SIMPLE_OPTIONS);
 
     FHIRContext context = new FHIRContext();
     IBaseResource bundleResource = context.getParser().parseResource(json);
@@ -273,7 +272,7 @@ String hl7message =
 
     // Convert and check for a patient resource
     HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
-    String json = ftv.convert(hl7messageString, SIMPLE_OPTIONS);
+    String json = ftv.convert(hl7messageString, ConverterOptions.SIMPLE_OPTIONS);
 
     FHIRContext context = new FHIRContext();
     IBaseResource bundleResource = context.getParser().parseResource(json);
