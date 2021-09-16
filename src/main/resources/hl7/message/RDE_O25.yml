@@ -49,3 +49,13 @@ resources:
     repeats: true
     additionalSegments:
       - MSH
+
+  - resourceName: Observation
+    segment: .OBSERVATION.OBX
+    group: ORDER
+    resourcePath: resource/Observation
+    repeats: true
+    isReferenced: true
+    additionalSegments:
+      - .ORC
+      - MSH

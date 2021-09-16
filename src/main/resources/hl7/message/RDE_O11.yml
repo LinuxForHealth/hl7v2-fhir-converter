@@ -62,3 +62,13 @@ resources:
       - PATIENT.PATIENT_VISIT.PV1
       - PATIENT.PID
       - .ORDER_DETAIL.RXO
+
+  - resourceName: Observation
+    segment: .OBSERVATION.OBX
+    group: ORDER
+    resourcePath: resource/Observation
+    repeats: true
+    isReferenced: true
+    additionalSegments:
+      - .ORC
+      - MSH
