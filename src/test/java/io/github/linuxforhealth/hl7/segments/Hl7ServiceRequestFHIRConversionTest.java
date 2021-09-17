@@ -43,15 +43,13 @@ public class Hl7ServiceRequestFHIRConversionTest {
     String hl7message =
         "MSH|^~\\&|SendTest1|Sendfac1|Receiveapp1|Receivefac1|202101010000|security|PPR^PC1^PPR_PC1|1|P^I|2.6||||||ASCII||\n"
     		+ "PID|||1234^^^^MR||DOE^JANE^|||F|||||||||||||||||||||\n"
-            + "PV1||I|6N^1234^A^GENHOS|||||||SUR|||||||0148^ANDERSON^CARL|S|1400|A|||||||||||||||||||SF|K||||199501102300\n"
+            + "PV1||I|6N^1234^A^GENHOS|||||||SUR||||||||S||||||||||||||||||||||||||\n"
             + "PRB|AD||202101010000|aortic stenosis|53692||2|||202101010000\n"
             + "OBX|1|NM|111^TotalProtein||7.5|gm/dl|5.9-8.4||||W\n"
-            + "NTE|1|P|Problem Comments\n"
             + "ORC|NW|1000^OE|9999999^RX|||E|^Q6H^D10^^^R\n"
             + "OBR|1|TESTID|TESTID|||202101010000|202101010000||||||||||||||||||F||||||WEAKNESS||||||||||||\n"
             + "OBX|1|TX|||ECHOCARDIOGRAPHIC REPORT||||||F|||202101010000|||\n"
-            + "OBX|2|TX|||NORMAL LV CHAMBER SIZE WITH MILD CONCENTRIC LVH||||||F|||202101010000|||\n"
-            + "OBX|3|TX|||HYPERDYNAMIC LV SYSTOLIC FUNCTION, VISUAL EF 80%||||||F|||202101010000|||\n";
+            + "OBX|2|TX|||NORMAL LV CHAMBER SIZE WITH MILD CONCENTRIC LVH||||||F|||202101010000|||\n";
     
     HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
     String json = ftv.convert(hl7message, OPTIONS);
@@ -83,9 +81,8 @@ public class Hl7ServiceRequestFHIRConversionTest {
     String hl7message =
         "MSH|^~\\&|SendTest1|Sendfac1|Receiveapp1|Receivefac1|202101010000|security|PPR^PC1^PPR_PC1|1|P^I|2.6||||||ASCII||\n"
     		+ "PID|||1234^^^^MR||DOE^JANE^|||F|||||||||||||||||||||\n"
-            + "PV1||I|6N^1234^A^GENHOS|||||||SUR|||||||0148^ANDERSON^CARL|S|1400|A|||||||||||||||||||SF|K||||199501102300\n"
+            + "PV1||I|6N^1234^A^GENHOS|||||||SUR||||||||S||||||||||||||||||||||||||\n"
             + "PRB|AD||202101010000|aortic stenosis|53692||2|||202101010000\n"
-            + "NTE|1|P|Problem Comments\n"
             + "ORC|NW|1000^OE|9999999^RX|||E|^Q6H^D10^^^R\n";
     
     HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();

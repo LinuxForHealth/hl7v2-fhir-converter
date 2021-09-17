@@ -63,10 +63,10 @@ public class Hl7OMPMessageTest {
     @Test
     public void test_OMPO09_patient_observation_present() throws IOException {
   	  String hl7message =
-  		        "MSH|^~\\&|WHI_LOAD_GENERATOR|IBM_TORONTO_LAB|MEDORDER|IBM|20210407191342|9022934|OMP^O09|MSGID_bae9ce6a-e35d-4ff5-8d50-c5dde19cc1aa|T|2.5.1\n"
-  		        + "PID|1||0a3be81e-144b-4885-9b4e-c5cd33c8f038^^^MRN||Patient^Load^Generator||19690720|M|Patient^Alias^Generator|C|9999^^CITY^STATE^ZIP^CAN|COUNTY|(866)845-0900||ENGLISH^ENGLISH|Married|Baptist|Account_0a3be81e-144b-4885-9b4e-c5cd33c8f038|123-456-7890|||N|BIRTH PLACE\n"
-   		        + "ORC|OP|ACCESSION_c977e88c-fd4b-47b6-a4bc-71d04618d1c4|ACCESSION_c977e88c-fd4b-47b6-a4bc-71d04618d1c4|6279|||^3 times daily^^20210401|381227400|20210407191342|2739^BY^ENTERED|2799^BY^VERIFIED|3122^PROVIDER^ORDERING||(696)901-1300|20210407191342||||||ORDERING FAC NAME|ADDR^^CITY^STATE^ZIP^USA|(515)-290-8888|9999^^CITY^STATE^ZIP^CAN\n"
-  		        + "RXO|50111032701^hydrALAZINE HCl 25 MG Oral Tablet^NDC^^^^^^hydrALAZINE (APRESOLINE) 25 MG TABS||||||Take 1 tablet by mouth 3 (three) times daily.||G||120|tablet^tablet|0|FG5789740^GETREU^THOMAS^H.||||||||||^APRESOLINE\n"
+  		        "MSH|^~\\&|WHI_LOAD_GENERATOR|IBM_TORONTO_LAB|MEDORDER|IBM|20210407191342|9022934|OMP^O09|MSGID_bae9ce6a-e35d-4ff5-8d50-c5dde19cc1aa|T|2.6\n"
+  			    + "PID|||1234^^^^MR||DOE^JANE^|||F|||||||||||||||||||||\n"
+   		        + "ORC|OP|111|111|6279|||^3 times daily^^20210401|381227400|20210407191342||||||20210407191342||||||ORDERING FAC NAME|ADDR^^CITY^STATE^ZIP^USA||\n"
+  		        + "RXO|50111032701^hydrALAZINE HCl 25 MG Oral Tablet^NDC^^^^^^hydrALAZINE (APRESOLINE) 25 MG TABS||||||Take 1 tablet by mouth 3 (three) times daily.||G||120|tablet^tablet|0|||||||||||\n"
   		        + "RXR|PO^Oral\n"
   		        + "OBX|1|NM|Most Current Weight^Most current measured weight (actual)||90|kg";
 
