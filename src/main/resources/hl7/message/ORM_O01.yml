@@ -12,7 +12,6 @@ resources:
       repeats: false
       isReferenced: false
       additionalSegments: 
-             - EVN
    
     - resourceName: Patient
       segment: .PID
@@ -35,22 +34,25 @@ resources:
              - MSH
 
     - resourceName: Observation
-      segment: OBX
+      segment: .ORDER_DETAIL.OBSERVATION.OBX
       resourcePath: resource/Observation
+      group: ORDER
       repeats: true
       isReferenced: true
       additionalSegments:
       
     - resourceName: AllergyIntolerance
-      segment: AL1
+      segment: .AL1
       resourcePath: resource/AllergyIntolerance
+      group: PATIENT
       repeats: true
       additionalSegments:
              - MSH
 
     - resourceName: Condition
-      segment: DG1
+      segment: .ORDER_DETAIL.DG1
       resourcePath: resource/Condition
+      group: ORDER
       repeats: true
       additionalSegments:
         - MSH
