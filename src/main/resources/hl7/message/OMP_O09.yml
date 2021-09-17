@@ -61,6 +61,7 @@ resources:
       - MSH
       - PATIENT.PID
       - PATIENT.PATIENT_VISIT.PV1
+      - .OBSERVATION.OBX
 
   - resourceName: Observation
     segment: .OBSERVATION.OBX
