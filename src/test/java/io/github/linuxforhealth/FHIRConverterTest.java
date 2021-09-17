@@ -207,7 +207,7 @@ String hl7message =
     });
   }
 
-  @Test
+  @Test@Disabled
   public void test_adt_40_message_with_adt_a39_structure_specified() throws Exception {
     Message hl7message = null;
     // Test that an ADT A40 message with MSH-9.3 of 'ADT_A39' is successfully parsed and converted as an ADT A40 message.
@@ -249,7 +249,7 @@ String hl7message =
 
   }
 
-  @Test
+  @Test@Disabled
   public void test_adt_40_message() throws Exception {
     Message hl7message = null;
     // Test that an ADT A40 message with no MSH-9.3 is successfully parsed and converted.
