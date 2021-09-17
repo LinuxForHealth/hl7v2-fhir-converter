@@ -10,6 +10,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.UUID;
 import org.hl7.fhir.r4.model.Observation.ObservationStatus;
+import org.hl7.fhir.r4.model.ServiceRequest.ServiceRequestStatus;
 import org.hl7.fhir.r4.model.Specimen.SpecimenStatus;
 import org.hl7.fhir.r4.model.codesystems.V3MaritalStatus;
 import org.hl7.fhir.r4.model.codesystems.V3Race;
@@ -144,6 +145,20 @@ public class SimpleDataValueResolverTest {
     String theSystem = ObservationStatus.CANCELLED.getSystem();
     assertThat(code.getSystem()).isEqualTo(theSystem); 
     assertThat(code.getDisplay()).containsPattern("Invalid.*ZZZ.*"+theSystem);    
+  }
+
+  @Test
+  public void get_service_request_status_value_valid() {
+    String gen = "f";
+    assertThat(SimpleDataValueResolver.SERVICE_REQUEST_STATUS.apply(gen))
+		.isEqualTo(ServiceRequestStatus.COMPLETED.toCode());
+  }
+
+  
+  @Test
+  public void get_service_request_status_value_invalid() {
+    String gen = "z";
+    assertThat(SimpleDataValueResolver.SERVICE_REQUEST_STATUS.apply(gen)).isNull();
   }
 
 
