@@ -50,7 +50,7 @@ identifier_4:
    generateList: true
    expressionType: resource
    vars:
-      valueIn: String, MRG.1
+      valueIn: String, MRG.1.1
    constants:
       system: http://terminology.hl7.org/CodeSystem/v2-0203
       code: MR
@@ -208,9 +208,7 @@ communication:
 
 active:
    type: BOOLEAN  
-   valueOf: $isActive
-   constants:
-      isActive: true
+   valueOf: true
 
 link:
    generateList: true
@@ -222,9 +220,7 @@ link:
    expressionsMap:
          type:
             type: STRING
-            valueOf: $type
-            constants:
-                type: 'replaces'
+            valueOf: 'replaces'
          other:
            required: true
            valueOf: resource/PatientMRG
