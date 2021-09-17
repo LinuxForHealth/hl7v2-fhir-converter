@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2020
+ * (C) Copyright IBM Corp. 2020, 2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -31,7 +31,7 @@ public class Hl7PPRMessageTest {
 
 
   @Test
-  public void test_patient() throws IOException {
+  public void test_ppr_pc1() throws IOException {
     String hl7message =
         "MSH|^~\\&|SendTest1|Sendfac1|Receiveapp1|Receivefac1|200603081747|security|PPR^PC1^PPR_PC1|1|P^I|2.6||||||ASCII||\r"
             + "PID|||555444222111^^^MPI&GenHosp&L^MR||james^anderson||19600614|M||C|99 Oakland #106^^qwerty^OH^44889||^^^^^626^5641111|^^^^^626^5647654|||||343132266|||N\r"
@@ -69,11 +69,63 @@ public class Hl7PPRMessageTest {
         e.stream().filter(v -> ResourceType.Condition == v.getResource().getResourceType())
             .map(BundleEntryComponent::getResource).collect(Collectors.toList());
     assertThat(conditionresource).hasSize(1);
-
   }
 
+  @Test
+  public void test_ppr_pc1_service_request_present() throws IOException {
+    String hl7message =
+        "MSH|^~\\&|SendTest1|Sendfac1|Receiveapp1|Receivefac1|202101010000|security|PPR^PC1^PPR_PC1|1|P^I|2.6||||||ASCII||\n"
+    		+ "PID|||1234^^^^MR||DOE^JANE^|||F|||||||||||||||||||||\n"
+            + "PV1||I|6N^1234^A^GENHOS|||||||SUR|||||||0148^ANDERSON^CARL|S|1400|A|||||||||||||||||||SF|K||||199501102300\n"
+            + "PRB|AD||202101010000|aortic stenosis|53692||2|||202101010000\n"
+            + "OBX|1|NM|111^TotalProtein||7.5|gm/dl|5.9-8.4||||F\n"
+            + "NTE|1|P|Problem Comments\n"
+            + "ORC|NW|1000^OE|9999999^RX|||E|^Q6H^D10^^^R\n"
+            + "OBR|1|TESTID|TESTID|||202101010000|202101010000||||||||||||||||||F||||||WEAKNESS||||||||||||\n"
+            + "OBX|1|TX|||ECHOCARDIOGRAPHIC REPORT||||||F|||202101010000|||\n"
+            + "OBX|2|TX|||NORMAL LV CHAMBER SIZE WITH MILD CONCENTRIC LVH||||||F|||202101010000|||\n"
+            + "OBX|3|TX|||HYPERDYNAMIC LV SYSTOLIC FUNCTION, VISUAL EF 80%||||||F|||202101010000|||\n";
+    
+    HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
+    String json = ftv.convert(hl7message, OPTIONS);
+    assertThat(json).isNotBlank();
+    IBaseResource bundleResource = context.getParser().parseResource(json);
+    assertThat(bundleResource).isNotNull();
+    Bundle b = (Bundle) bundleResource;
+    assertThat(b.getType()).isEqualTo(BundleType.COLLECTION);
+    List<BundleEntryComponent> e = b.getEntry();
+    List<Resource> patientResource =
+        e.stream().filter(v -> ResourceType.Patient == v.getResource().getResourceType())
+            .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+    assertThat(patientResource).hasSize(1);
+    
+    //OBX under PRB (the PROBLEM.PROBLEM_OBSERVATION.OBSERVATION) creates an Observation resource
+    List<Resource> obsResource =
+            e.stream().filter(v -> ResourceType.Observation == v.getResource().getResourceType())
+                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        assertThat(obsResource).hasSize(1);
+
+    List<Resource> encounterResource =
+        e.stream().filter(v -> ResourceType.Encounter == v.getResource().getResourceType())
+            .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+    assertThat(encounterResource).hasSize(1);
+
+    List<Resource> serviceRequestResource =
+            e.stream().filter(v -> ResourceType.ServiceRequest == v.getResource().getResourceType())
+                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        assertThat(serviceRequestResource).hasSize(1);
+
+    //TODO: uncomment once documentRef is enabled for PPR
+    //    List<Resource> documentRefResource =
+    //		e.stream().filter(v -> ResourceType.DocumentReference == v.getResource().getResourceType())
+    //            .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+    //    assertThat(documentRefResource).hasSize(1);
+
+  }
+  
+  
   @Test@Disabled
-  public void test_pprpc2_patient_encounter_present() throws IOException {
+  public void test_ppr_pc2_patient_encounter_present() throws IOException {
 	  String hl7message =
 		        "MSH|^~\\&|SendTest1|Sendfac1|Receiveapp1|Receivefac1|200603081747|security|PPR^PC2|1|P^I|2.6||||||ASCII||\r"
 		            + "PID|||555444222111^^^MPI&GenHosp&L^MR||james^anderson||19600614|M||C|99 Oakland #106^^qwerty^OH^44889||^^^^^626^5641111|^^^^^626^5647654|||||343132266|||N\r"
@@ -103,5 +155,108 @@ public class Hl7PPRMessageTest {
 
   }
 
+
+  @Test
+  @Disabled("PPR_PC2 not supported yet")
+  public void test_ppr_pc2_service_request_present() throws IOException {
+    String hl7message =
+            "MSH|^~\\&|SendTest1|Sendfac1|Receiveapp1|Receivefac1|202101010000|security|PPR^PC2^PPR_PC1|1|P^I|2.6||||||ASCII||\n"
+        		+ "PID|||1234^^^^MR||DOE^JANE^|||F|||||||||||||||||||||\n"
+                + "PV1||I|6N^1234^A^GENHOS|||||||SUR|||||||0148^ANDERSON^CARL|S|1400|A|||||||||||||||||||SF|K||||199501102300\n"
+                + "PRB|AD||202101010000|aortic stenosis|53692||2|||202101010000\n"
+                + "NTE|1|P|Problem Comments\n"
+                + "ORC|NW|1000^OE|9999999^RX|||E|^Q6H^D10^^^R\n"
+                + "OBR|1|TESTID|TESTID|||202101010000|202101010000||||||||||||||||||F||||||WEAKNESS||||||||||||\n"
+                + "OBX|1|TX|||ECHOCARDIOGRAPHIC REPORT||||||F|||202101010000|||\n"
+                + "OBX|2|TX|||NORMAL LV CHAMBER SIZE WITH MILD CONCENTRIC LVH||||||F|||202101010000|||\n"
+                + "OBX|3|TX|||HYPERDYNAMIC LV SYSTOLIC FUNCTION, VISUAL EF 80%||||||F|||202101010000|||\n";
+        
+        HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
+        String json = ftv.convert(hl7message, OPTIONS);
+
+        assertThat(json).isNotBlank();
+        IBaseResource bundleResource = context.getParser().parseResource(json);
+        assertThat(bundleResource).isNotNull();
+        Bundle b = (Bundle) bundleResource;
+        assertThat(b.getType()).isEqualTo(BundleType.COLLECTION);
+        List<BundleEntryComponent> e = b.getEntry();
+        List<Resource> patientResource =
+            e.stream().filter(v -> ResourceType.Patient == v.getResource().getResourceType())
+                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        assertThat(patientResource).hasSize(1);
+
+        //TODO: uncomment once documentRef is enabled for PPR
+        //    List<Resource> documentRefResource =
+        //		e.stream().filter(v -> ResourceType.DocumentReference == v.getResource().getResourceType())
+        //            .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        //    assertThat(documentRefResource).hasSize(1);
+      
+        List<Resource> obsResource =
+                e.stream().filter(v -> ResourceType.Observation == v.getResource().getResourceType())
+                    .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+            assertThat(obsResource).hasSize(0);
+
+        List<Resource> encounterResource =
+            e.stream().filter(v -> ResourceType.Encounter == v.getResource().getResourceType())
+                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        assertThat(encounterResource).hasSize(1);
+
+        List<Resource> serviceRequestResource =
+                e.stream().filter(v -> ResourceType.ServiceRequest == v.getResource().getResourceType())
+                    .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+            assertThat(serviceRequestResource).hasSize(1);
+      }
+
+
+  @Test
+  @Disabled("PPR_PC3 not supported yet")
+  public void test_ppr_pc3_service_request_present() throws IOException {
+	    String hl7message =
+	        "MSH|^~\\&|SendTest1|Sendfac1|Receiveapp1|Receivefac1|202101010000|security|PPR^PC3^PPR_PC1|1|P^I|2.6||||||ASCII||\n"
+	    		+ "PID|||1234^^^^MR||DOE^JANE^|||F|||||||||||||||||||||\n"
+	            + "PV1||I|6N^1234^A^GENHOS|||||||SUR|||||||0148^ANDERSON^CARL|S|1400|A|||||||||||||||||||SF|K||||199501102300\n"
+	            + "PRB|AD||202101010000|aortic stenosis|53692||2|||202101010000\n"
+	            + "NTE|1|P|Problem Comments\n"
+	            + "ORC|NW|1000^OE|9999999^RX|||E|^Q6H^D10^^^R\n"
+	            + "OBR|1|TESTID|TESTID|||202101010000|202101010000||||||||||||||||||F||||||WEAKNESS||||||||||||\n"
+	            + "OBX|1|TX|||ECHOCARDIOGRAPHIC REPORT||||||F|||202101010000|||\n"
+	            + "OBX|2|TX|||NORMAL LV CHAMBER SIZE WITH MILD CONCENTRIC LVH||||||F|||202101010000|||\n"
+		        + "OBX|3|TX|||HYPERDYNAMIC LV SYSTOLIC FUNCTION, VISUAL EF 80%||||||F|||202101010000|||\n";
+		    
+		    HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
+		    String json = ftv.convert(hl7message, OPTIONS);
+
+		    assertThat(json).isNotBlank();
+		    IBaseResource bundleResource = context.getParser().parseResource(json);
+		    assertThat(bundleResource).isNotNull();
+		    Bundle b = (Bundle) bundleResource;
+		    assertThat(b.getType()).isEqualTo(BundleType.COLLECTION);
+		    List<BundleEntryComponent> e = b.getEntry();
+		    List<Resource> patientResource =
+		        e.stream().filter(v -> ResourceType.Patient == v.getResource().getResourceType())
+		            .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+		    assertThat(patientResource).hasSize(1);
+
+		    //TODO: uncomment once documentRef is enabled for PPR
+		    //    List<Resource> documentRefResource =
+		    //		e.stream().filter(v -> ResourceType.DocumentReference == v.getResource().getResourceType())
+		    //            .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+		    //    assertThat(documentRefResource).hasSize(1);
+		  
+		    List<Resource> obsResource =
+		            e.stream().filter(v -> ResourceType.Observation == v.getResource().getResourceType())
+		                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+		        assertThat(obsResource).hasSize(0);
+
+		    List<Resource> encounterResource =
+		        e.stream().filter(v -> ResourceType.Encounter == v.getResource().getResourceType())
+		            .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+		    assertThat(encounterResource).hasSize(1);
+
+		    List<Resource> serviceRequestResource =
+		            e.stream().filter(v -> ResourceType.ServiceRequest == v.getResource().getResourceType())
+		                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+		        assertThat(serviceRequestResource).hasSize(1);
+		  }
 
 }
