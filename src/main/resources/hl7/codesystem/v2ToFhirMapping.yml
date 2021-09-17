@@ -22,6 +22,11 @@ ObservationStatus:
    I: registered
    P: preliminary
    W: entered-in-error
+ServiceRequestStatus:
+   # Only mapped a subset as there was not a clear mapping for the rest, they will default to unknown
+   F: completed	
+   U: completed
+   W: entered-in-error	
 AdministrativeGender:
    A: other
    F: female
