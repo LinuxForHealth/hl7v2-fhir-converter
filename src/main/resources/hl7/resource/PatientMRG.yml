@@ -1,11 +1,13 @@
 #
-# (C) Copyright IBM Corp. 2020, 2021
+# (C) Copyright IBM Corp. 2021
 #
 # SPDX-License-Identifier: Apache-2.0
 #
 resourceType: Patient
 # Represents data that needs to be extracted for a Patient Resource in FHIR
 # reference: https://www.hl7.org/fhir/patient.html
+
+# This patient resource is used to create patient resources generated from MRG segments.
 id:
    type: STRING
    valueOf: UUID.randomUUID()
@@ -17,7 +19,7 @@ identifier:
    generateList: true
    expressionType: resource
    vars:
-      valueIn: String, MRG.1
+      valueIn: String, MRG.1.1
    constants:
       system: http://terminology.hl7.org/CodeSystem/v2-0203
       code: MR
@@ -30,18 +32,9 @@ name:
    expressionType: resource
    specs: MRG.7
 
-communication:
-   condition: $language NOT_NULL
-   valueOf: secondary/Communication
-   expressionType: resource
-   vars:
-      language: PID.15
-
 active:
    type: BOOLEAN  
-   valueOf: $isActive
-   constants:
-      isActive: false
+   valueOf: false
 
 link:
    generateList: true
@@ -50,9 +43,7 @@ link:
    expressionsMap:
          type:
             type: STRING
-            valueOf: $type
-            constants:
-                type: 'replaced-by'
+            valueOf: 'replaced-by'
          other:
            required: true
            valueOf: datatype/Reference

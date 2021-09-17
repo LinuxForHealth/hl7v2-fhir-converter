@@ -225,7 +225,7 @@ public class HL7ConditionFHIRConversionTest {
         String hl7message = "MSH|^~\\&||||||S1|ADT^A01^ADT_A01||T|2.6|||||||||\r"
                 + "EVN|A04|20151008111200|20171013152901|O|OID1006|20171013153621|EVN1009\r"
                 + "PID||||||||||||||||||||||||||||||\r"
-                + "PV1|||||||||||||||||||||||||||||||RR|Y|2|Y|Y|N|N|\r"
+                + "PV1||I|||||||||||||||||1400|||||||||||||||||||||||||\r"
                 + "DG1|1|D1|V72.83^Other specified pre-operative examination^ICD-9^^^|Other specified pre-operative examination|20151008111200|A\r"
                 + "DG1|2|D2|R00.0^Tachycardia, unspecified^ICD-10^^^|Tachycardia, unspecified|20150725201300|A\r"
                 + "DG1|3|D3|R06.02^Shortness of breath^ICD-10^^^|Shortness of breath||A\r"
@@ -237,6 +237,8 @@ public class HL7ConditionFHIRConversionTest {
         List<Resource> conditionResource = e.stream()
                 .filter(v -> ResourceType.Condition == v.getResource().getResourceType())
                 .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+
+        //Verify we have 4 conditions. 1 for each DG1.
         assertThat(conditionResource).hasSize(4);
 
         Condition condition = (Condition) conditionResource.get(1);
@@ -257,6 +259,34 @@ public class HL7ConditionFHIRConversionTest {
         assertThat(condCoding.hasDisplay()).isTrue();
         assertThat(condCoding.getDisplay()).isEqualTo("Tachycardia, unspecified");
         assertThat(condCoding.hasVersion()).isFalse();
+
+        // Verify encounter reference exists
+        Base encounterProp = ResourceUtils.getValue(condition, "encounter");
+        assertThat(ResourceUtils.getValueAsString(encounterProp, "reference").substring(0, 10)).isEqualTo("Encounter/");
+        
+        //------------------------------------------------------//
+
+        // Find the encounter from the FHIR bundle.
+        List<Resource> encounterResource = e.stream()
+        .filter(v -> ResourceType.Encounter == v.getResource().getResourceType())
+        .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+
+        //Verify we only have 1 encounter
+        assertThat(encounterResource).hasSize(1);
+
+        // Get the encounter resource
+        Base encounter = encounterResource.get(0);
+
+        // Verify encounter.reasonReference has a reference for each condition.
+        List<Base> reasonReferences = encounter.getNamedProperty("reasonReference").getValues();
+        // Therefore there should be 4.
+        assertThat(reasonReferences).hasSize(4);
+
+        // And the references should be referencing conditions
+        for (Base reasonReference : reasonReferences) {
+            assertThat(ResourceUtils.getValueAsString(reasonReference, "reference").substring(0, 10))
+                    .isEqualTo("Condition/");
+        }
 
     }
 
@@ -292,6 +322,8 @@ public class HL7ConditionFHIRConversionTest {
         List<Resource> encounterResource = e.stream()
                 .filter(v -> ResourceType.Encounter == v.getResource().getResourceType())
                 .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+
+        //Verify we only have 1 encounter
         assertThat(encounterResource).hasSize(1);
 
         // Get the encounter resource

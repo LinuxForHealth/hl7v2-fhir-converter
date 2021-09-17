@@ -95,7 +95,7 @@ public class HL7MessageEngine implements MessageEngine {
     Preconditions.checkArgument(resources != null, "resources cannot be null");
 
     HL7MessageData hl7DataInput = (HL7MessageData) dataInput;
-    var bundle = initBundle();
+    Bundle bundle = initBundle();
     Map<String, EvaluationResult> localContextValues = new HashMap<>(contextValues);
     List<ResourceResult> resourceResultsWithEvalLater = new ArrayList<>();
     for (FHIRResourceTemplate genericTemplate : resources) {
@@ -177,7 +177,7 @@ public class HL7MessageEngine implements MessageEngine {
   private List<ResourceResult> generateResources(HL7MessageData hl7DataInput,
       HL7FHIRResourceTemplate template, Map<String, EvaluationResult> contextValues) {
 
-    var resourceModel = template.getResource();
+    ResourceModel resourceModel = template.getResource();
     List<String> segmentGroup = template.getAttributes().getSegment().getGroup();
     String segment = template.getAttributes().getSegment().getSegment();
     List<ResourceResult> resourceResults = null;
