@@ -124,7 +124,8 @@ public class Hl7PPRMessageTest {
   }
   
   
-  @Test@Disabled
+  @Test
+  @Disabled("PPR_PC2 not supported yet")
   public void test_ppr_pc2_patient_encounter_present() throws IOException {
 	  String hl7message =
 		        "MSH|^~\\&|SendTest1|Sendfac1|Receiveapp1|Receivefac1|200603081747|security|PPR^PC2|1|P^I|2.6||||||ASCII||\r"
@@ -162,14 +163,11 @@ public class Hl7PPRMessageTest {
     String hl7message =
             "MSH|^~\\&|SendTest1|Sendfac1|Receiveapp1|Receivefac1|202101010000|security|PPR^PC2^PPR_PC1|1|P^I|2.6||||||ASCII||\n"
         		+ "PID|||1234^^^^MR||DOE^JANE^|||F|||||||||||||||||||||\n"
-                + "PV1||I|6N^1234^A^GENHOS|||||||SUR|||||||0148^ANDERSON^CARL|S|1400|A|||||||||||||||||||SF|K||||199501102300\n"
                 + "PRB|AD||202101010000|aortic stenosis|53692||2|||202101010000\n"
-                + "NTE|1|P|Problem Comments\n"
                 + "ORC|NW|1000^OE|9999999^RX|||E|^Q6H^D10^^^R\n"
                 + "OBR|1|TESTID|TESTID|||202101010000|202101010000||||||||||||||||||F||||||WEAKNESS||||||||||||\n"
                 + "OBX|1|TX|||ECHOCARDIOGRAPHIC REPORT||||||F|||202101010000|||\n"
-                + "OBX|2|TX|||NORMAL LV CHAMBER SIZE WITH MILD CONCENTRIC LVH||||||F|||202101010000|||\n"
-                + "OBX|3|TX|||HYPERDYNAMIC LV SYSTOLIC FUNCTION, VISUAL EF 80%||||||F|||202101010000|||\n";
+                + "OBX|2|TX|||NORMAL LV CHAMBER SIZE WITH MILD CONCENTRIC LVH||||||F|||202101010000|||\n";
         
         HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
         String json = ftv.convert(hl7message, OPTIONS);
@@ -185,11 +183,10 @@ public class Hl7PPRMessageTest {
                 .map(BundleEntryComponent::getResource).collect(Collectors.toList());
         assertThat(patientResource).hasSize(1);
 
-        //TODO: uncomment once documentRef is enabled for PPR
-        //    List<Resource> documentRefResource =
-        //		e.stream().filter(v -> ResourceType.DocumentReference == v.getResource().getResourceType())
-        //            .map(BundleEntryComponent::getResource).collect(Collectors.toList());
-        //    assertThat(documentRefResource).hasSize(1);
+        List<Resource> documentRefResource =
+        	e.stream().filter(v -> ResourceType.DocumentReference == v.getResource().getResourceType())
+                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        assertThat(documentRefResource).hasSize(1);
       
         List<Resource> obsResource =
                 e.stream().filter(v -> ResourceType.Observation == v.getResource().getResourceType())
@@ -202,9 +199,9 @@ public class Hl7PPRMessageTest {
         assertThat(encounterResource).hasSize(1);
 
         List<Resource> serviceRequestResource =
-                e.stream().filter(v -> ResourceType.ServiceRequest == v.getResource().getResourceType())
-                    .map(BundleEntryComponent::getResource).collect(Collectors.toList());
-            assertThat(serviceRequestResource).hasSize(1);
+            e.stream().filter(v -> ResourceType.ServiceRequest == v.getResource().getResourceType())
+                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        assertThat(serviceRequestResource).hasSize(1);
       }
 
 
@@ -214,15 +211,12 @@ public class Hl7PPRMessageTest {
 	    String hl7message =
 	        "MSH|^~\\&|SendTest1|Sendfac1|Receiveapp1|Receivefac1|202101010000|security|PPR^PC3^PPR_PC1|1|P^I|2.6||||||ASCII||\n"
 	    		+ "PID|||1234^^^^MR||DOE^JANE^|||F|||||||||||||||||||||\n"
-	            + "PV1||I|6N^1234^A^GENHOS|||||||SUR|||||||0148^ANDERSON^CARL|S|1400|A|||||||||||||||||||SF|K||||199501102300\n"
 	            + "PRB|AD||202101010000|aortic stenosis|53692||2|||202101010000\n"
-	            + "NTE|1|P|Problem Comments\n"
 	            + "ORC|NW|1000^OE|9999999^RX|||E|^Q6H^D10^^^R\n"
 	            + "OBR|1|TESTID|TESTID|||202101010000|202101010000||||||||||||||||||F||||||WEAKNESS||||||||||||\n"
 	            + "OBX|1|TX|||ECHOCARDIOGRAPHIC REPORT||||||F|||202101010000|||\n"
-	            + "OBX|2|TX|||NORMAL LV CHAMBER SIZE WITH MILD CONCENTRIC LVH||||||F|||202101010000|||\n"
-		        + "OBX|3|TX|||HYPERDYNAMIC LV SYSTOLIC FUNCTION, VISUAL EF 80%||||||F|||202101010000|||\n";
-		    
+	            + "OBX|2|TX|||NORMAL LV CHAMBER SIZE WITH MILD CONCENTRIC LVH||||||F|||202101010000|||\n";
+	    
 		    HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
 		    String json = ftv.convert(hl7message, OPTIONS);
 
@@ -237,16 +231,15 @@ public class Hl7PPRMessageTest {
 		            .map(BundleEntryComponent::getResource).collect(Collectors.toList());
 		    assertThat(patientResource).hasSize(1);
 
-		    //TODO: uncomment once documentRef is enabled for PPR
-		    //    List<Resource> documentRefResource =
-		    //		e.stream().filter(v -> ResourceType.DocumentReference == v.getResource().getResourceType())
-		    //            .map(BundleEntryComponent::getResource).collect(Collectors.toList());
-		    //    assertThat(documentRefResource).hasSize(1);
+		    List<Resource> documentRefResource =
+		    	e.stream().filter(v -> ResourceType.DocumentReference == v.getResource().getResourceType())
+		        	.map(BundleEntryComponent::getResource).collect(Collectors.toList());
+		    assertThat(documentRefResource).hasSize(1);
 		  
 		    List<Resource> obsResource =
 		            e.stream().filter(v -> ResourceType.Observation == v.getResource().getResourceType())
 		                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
-		        assertThat(obsResource).hasSize(0);
+		    assertThat(obsResource).hasSize(0);
 
 		    List<Resource> encounterResource =
 		        e.stream().filter(v -> ResourceType.Encounter == v.getResource().getResourceType())
@@ -256,7 +249,7 @@ public class Hl7PPRMessageTest {
 		    List<Resource> serviceRequestResource =
 		            e.stream().filter(v -> ResourceType.ServiceRequest == v.getResource().getResourceType())
 		                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
-		        assertThat(serviceRequestResource).hasSize(1);
+		    assertThat(serviceRequestResource).hasSize(1);
 		  }
 
 }
