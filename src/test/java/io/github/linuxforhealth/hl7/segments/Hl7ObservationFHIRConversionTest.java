@@ -3,7 +3,7 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  */
-package io.github.linuxforhealth.hl7.message;
+package io.github.linuxforhealth.hl7.segments;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -38,11 +38,15 @@ import io.github.linuxforhealth.fhir.FHIRContext;
 import io.github.linuxforhealth.hl7.resource.ResourceReader;
 import io.github.linuxforhealth.hl7.ConverterOptions;
 import io.github.linuxforhealth.hl7.ConverterOptions.Builder;
+import io.github.linuxforhealth.hl7.message.HL7FHIRResourceTemplate;
+import io.github.linuxforhealth.hl7.message.HL7FHIRResourceTemplateAttributes;
+import io.github.linuxforhealth.hl7.message.HL7MessageEngine;
+import io.github.linuxforhealth.hl7.message.HL7MessageModel;
 import io.github.linuxforhealth.hl7.HL7ToFHIRConverter;
 
 import io.github.linuxforhealth.hl7.segments.util.DatatypeUtils;
 
-public class DifferentObservationValueTest {
+public class Hl7ObservationFHIRConversionTest {
     private static FHIRContext context = new FHIRContext();
     private static HL7MessageEngine engine = new HL7MessageEngine(context);
     private static final ConverterOptions OPTIONS = new Builder().withValidateResource().withPrettyPrint().build();
@@ -95,7 +99,7 @@ public class DifferentObservationValueTest {
     }
 
     /**
-     * Testing Observation.yml valueQuantity_2
+     * Testing Observation.yml valueQuantity_2 with a valid comparator
      * 
      * @throws IOException
      */
@@ -125,7 +129,9 @@ public class DifferentObservationValueTest {
     }
 
     /**
-     * Testing Observation.yml valueQuantity_2
+     * Testing Observation.yml valueQuantity_2 with a comparator that FHIR does not support
+     * 
+     * Also tests referenceRange and interpretation fields
      * 
      * @throws IOException
      */

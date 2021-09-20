@@ -10,6 +10,7 @@ value :
    valueOf: $value
 comparator : 
    type: String
+   # Hl7 supports an equal sign as a comparator that FHIR does not, making sure its a supported comparator.
    condition: $comparator EQUALS_STRING '<' || $comparator EQUALS_STRING '<=' || $comparator EQUALS_STRING '>=' || $comparator EQUALS_STRING '>'
    valueOf: $comparator
 unit : 
