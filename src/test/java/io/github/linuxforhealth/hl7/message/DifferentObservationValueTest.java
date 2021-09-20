@@ -148,7 +148,7 @@ public class DifferentObservationValueTest {
         //Check valueQuantity
         assertNotNull(obs.getValueQuantity());
         Quantity q = obs.getValueQuantity();
-        assertEquals("Cells/uL", q.getCode()); //code for unit
+        assertEquals("{Cells}/uL", q.getCode()); //code for unit
         assertEquals("cells per microliter", q.getUnit()); //human readable unit
         assertEquals("http://unitsofmeasure.org", q.getSystem());  //system for unit
         assertEquals(440f, q.getValue().floatValue());
@@ -182,7 +182,7 @@ public class DifferentObservationValueTest {
     @Test
     public void testObservationSN_valueQuantity_notnull_separator_result() throws IOException {
         String hl7message = baseMessage
-                + "OBX|1|SN|24467-3^CD3+CD4+ (T4 helper) cells [#/volume] in Blood^LN||=^440^.|Cells/uL^cells per microliter^UCUM|||||F";
+                + "OBX|1|SN|24467-3^CD3+CD4+ (T4 helper) cells [#/volume] in Blood^LN||=^440^.|{Cells}/uL^cells per microliter^UCUM|||||F";
         HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
         String json = ftv.convert(hl7message, OPTIONS);
         
@@ -198,7 +198,7 @@ public class DifferentObservationValueTest {
         assertNotNull(obs.getValueQuantity());
         //Check valueQuantity
         Quantity q = obs.getValueQuantity();
-        assertEquals("Cells/uL", q.getCode()); //code for unit
+        assertEquals("{Cells}/uL", q.getCode()); //code for unit
         assertEquals("cells per microliter", q.getUnit()); //human readable unit
         assertEquals("http://unitsofmeasure.org", q.getSystem());  //system for unit
         assertEquals(440f, q.getValue().floatValue());
@@ -261,8 +261,8 @@ public class DifferentObservationValueTest {
         Observation obs = (Observation) obsResource.get(0);
         assertTrue(obs.hasValueRatio());
         Ratio r = obs.getValueRatio();
-        assertEquals("2", r.getNumerator().getValue());
-        assertEquals("3", r.getDenominator().getValue());
+        assertEquals(2f, r.getNumerator().getValue().floatValue());
+        assertEquals(3f, r.getDenominator().getValue().floatValue());
     }
 
     @Test
@@ -282,8 +282,8 @@ public class DifferentObservationValueTest {
         Observation obs = (Observation) obsResource.get(0);
         assertTrue(obs.hasValueRatio());
         Ratio r = obs.getValueRatio();
-        assertEquals("2", r.getNumerator().getValue());
-        assertEquals("3", r.getDenominator().getValue());    
+        assertEquals(2f, r.getNumerator().getValue().floatValue());
+        assertEquals(3f, r.getDenominator().getValue().floatValue());
     }
 
     @Test
