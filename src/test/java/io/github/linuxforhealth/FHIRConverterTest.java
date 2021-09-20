@@ -14,12 +14,10 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Message;
 import ca.uhn.hl7v2.util.Hl7InputStreamMessageStringIterator;
 import io.github.linuxforhealth.hl7.parsing.HL7DataExtractor;
 import io.github.linuxforhealth.hl7.parsing.HL7HapiParser;
-import io.github.linuxforhealth.hl7.segments.util.ResourceUtils;
 import org.apache.commons.io.IOUtils;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r4.model.*;
@@ -36,7 +34,6 @@ import org.hl7.fhir.r4.model.ResourceType;
 import org.hl7.fhir.exceptions.FHIRException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.Disabled;
 
 import io.github.linuxforhealth.core.Constants;
 import io.github.linuxforhealth.fhir.FHIRContext;
@@ -208,7 +205,7 @@ String hl7message =
     });
   }
 
-  @Test@Disabled //Enable this test when ADT_A40 and MRG work is completed.
+  @Test
   public void test_adt_40_message_with_adt_a39_structure_specified() throws Exception {
     Message hl7message = null;
     // Test that an ADT A40 message with MSH-9.3 of 'ADT_A39' is successfully parsed and converted as an ADT A40 message.
@@ -246,11 +243,11 @@ String hl7message =
     List<BundleEntryComponent> e = b.getEntry();
     List<Resource> patientResource = e.stream().filter(v -> ResourceType.Patient == v.getResource().getResourceType())
         .map(BundleEntryComponent::getResource).collect(Collectors.toList());
-    assertThat(patientResource).hasSize(1);
+    assertThat(patientResource).hasSize(2);
 
   }
 
-  @Test@Disabled //Enable this test when ADT_A40 and MRG work is completed.
+  @Test
   public void test_adt_40_message() throws Exception {
     Message hl7message = null;
     // Test that an ADT A40 message with no MSH-9.3 is successfully parsed and converted.
@@ -287,7 +284,7 @@ String hl7message =
     List<BundleEntryComponent> e = b.getEntry();
     List<Resource> patientResource = e.stream().filter(v -> ResourceType.Patient == v.getResource().getResourceType())
         .map(BundleEntryComponent::getResource).collect(Collectors.toList());
-    assertThat(patientResource).hasSize(1);
+    assertThat(patientResource).hasSize(2);
 
   }
 

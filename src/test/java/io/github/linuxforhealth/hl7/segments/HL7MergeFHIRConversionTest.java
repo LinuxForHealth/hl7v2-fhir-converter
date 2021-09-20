@@ -25,11 +25,10 @@ import io.github.linuxforhealth.hl7.segments.util.ResourceUtils;
 public class HL7MergeFHIRConversionTest {
 
     // Test ADT_A34 with one MRG segment (the most it supports).
-    // TODO: When the internal bug #684 is fixed: convert this message into an ADT_A34 message.
     @Test
     public void validateHappyPathADT_A34WithMRG() {
 
-        String hl7message = "MSH|^~\\&|SENDING_APPLICATION|SENDING_FACILITY|RECEIVING_APPLICATION|RECEIVING_FACILITY|||ADT^A01||P|2.3||||\r"
+        String hl7message = "MSH|^~\\&|SENDING_APPLICATION|SENDING_FACILITY|RECEIVING_APPLICATION|RECEIVING_FACILITY|||ADT^A34||P|2.3||||\r"
         + "EVN|A40|20110613122406637||01\r"
         + "PID|1||123^^^^MR||||||||||||||||||||||||||||||||||||\r"
         + "MRG|456||||||\r";
@@ -158,12 +157,12 @@ public class HL7MergeFHIRConversionTest {
     
     }
 
-    // TESTs ADT_A40 with one MRG segment.
-    // TODO: When the internal bug #684 is fixed: convert this message into an ADT_A40 message.
+    // Test ADT_A40 with one MRG segment.
     @Test
+    @Disabled  // Disabled until bug 684 is fixed
     public void validateHappyPathADT_A40WithMRG() {
 
-        String hl7message = "MSH|^~\\&|REGADT|MCM|RSP1P8|MCM|200301051530|SEC|ADT^A01|00000003|P|2.5\r"
+        String hl7message = "MSH|^~\\&|REGADT|MCM|RSP1P8|MCM|200301051530|SEC|ADT^A40^ADT_A39|00000003|P|2.5\r"
         + "EVN|A40|200301051530\r"
         + "PID|||MR1^^^XYZ^MR||\r"
         + "MRG|MR2^^^XYZ\r";
@@ -233,9 +232,8 @@ public class HL7MergeFHIRConversionTest {
     }
 
     // Tests ADT_A40 message with 2 MRG segments.
-    // TODO: When the internal bug #684 is fixed: convert this message into an ADT_A40 message.
     @Test
-    @Disabled  // disabled until bug 684 is fixed
+    @Disabled  // Disabled until bug 684 is fixed
     public void validateTwoMRGs() {
 
         String hl7message = "MSH|^~\\&|REGADT|MCM|RSP1P8|MCM|200301051530|SEC|ADT^A40^ADT_A39|00000003|P|2.5\r"
