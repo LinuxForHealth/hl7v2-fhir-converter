@@ -132,7 +132,7 @@ public class DifferentObservationValueTest {
     @Test
     public void testObservationSN_valueQuantity_equals_comparator_result() throws IOException {
         String hl7message = baseMessage
-                + "OBX|1|SN|24467-3^CD3+CD4+ (T4 helper) cells [#/volume] in Blood^LN||=^440|Cells/uL^cells per microliter^UCUM|649-1346 cells/mcL|L|||F";
+                + "OBX|1|SN|24467-3^CD3+CD4+ (T4 helper) cells [#/volume] in Blood^LN||=^440|{Cells}/uL^cells per microliter^UCUM|649-1346 cells/mcL|L|||F";
 
         HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
         String json = ftv.convert(hl7message, OPTIONS);
