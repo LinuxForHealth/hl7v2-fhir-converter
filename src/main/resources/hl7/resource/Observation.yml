@@ -83,6 +83,7 @@ valueQuantity_1:
     vars: 
       value: OBX.5
       unit: OBX.6.1
+      code: OBX.6.1
       obx2: STRING, OBX.2
       resolvedSystem: SYSTEM_URL, OBX.6.3
 
@@ -92,8 +93,8 @@ valueQuantity_2:
     condition: $obx2 EQUALS SN && $separator NULL 
     vars: 
       value: OBX.5.2
-      unit: OBX.6.2  #human readable unit
-      code: OBX.6.1  #code for unit
+      unit: OBX.6.1 
+      code: OBX.6.1 
       comparator: OBX.5.1
       obx2: STRING, OBX.2
       separator: STRING, OBX.5.3
@@ -105,8 +106,8 @@ valueQuantity_3:
     condition: $obx2 EQUALS SN && $separator NOT_NULL && $separator NOT_EQUALS ':' && $separator NOT_EQUALS '/' 
     vars: 
       value: OBX.5.2
-      unit: OBX.6.2  #human readable unit
-      code: OBX.6.1  #code for unit
+      unit: OBX.6.1 
+      code: OBX.6.1
       comparator: OBX.5.1
       obx2: STRING, OBX.2
       separator: STRING, OBX.5.3

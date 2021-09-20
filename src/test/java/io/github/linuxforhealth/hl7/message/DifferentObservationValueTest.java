@@ -118,10 +118,10 @@ public class DifferentObservationValueTest {
         assertNotNull(obs.getValueQuantity());
         Quantity q = obs.getValueQuantity();
         assertEquals("ug/mL", q.getCode()); //code for unit
-        assertNull(q.getUnit()); //no human readable unit
+        assertEquals("ug/mL", q.getUnit()); //setting unit to OBX.6.1
         assertEquals("http://unitsofmeasure.org", q.getSystem());  //system for unit
         assertEquals(0.06f, q.getValue().floatValue());
-        assertEquals("<", q.getComparator());
+        assertEquals("<", q.getComparator().toCode());
     }
 
     /**
@@ -149,7 +149,7 @@ public class DifferentObservationValueTest {
         assertNotNull(obs.getValueQuantity());
         Quantity q = obs.getValueQuantity();
         assertEquals("{Cells}/uL", q.getCode()); //code for unit
-        assertEquals("cells per microliter", q.getUnit()); //human readable unit
+        assertEquals("{Cells}/uL", q.getUnit()); //unit units to OBX.6.1
         assertEquals("http://unitsofmeasure.org", q.getSystem());  //system for unit
         assertEquals(440f, q.getValue().floatValue());
         assertNull(q.getComparator()); // = is not put in comparator
@@ -199,7 +199,7 @@ public class DifferentObservationValueTest {
         //Check valueQuantity
         Quantity q = obs.getValueQuantity();
         assertEquals("{Cells}/uL", q.getCode()); //code for unit
-        assertEquals("cells per microliter", q.getUnit()); //human readable unit
+        assertEquals("{Cells}/uL", q.getUnit()); //set units to OBX.6.1
         assertEquals("http://unitsofmeasure.org", q.getSystem());  //system for unit
         assertEquals(440f, q.getValue().floatValue());
         assertNull(q.getComparator()); // = is not put in comparator       
@@ -223,8 +223,8 @@ public class DifferentObservationValueTest {
         //Check valueQuantity
         assertNotNull(obs.getValueQuantity());
         Quantity q = obs.getValueQuantity();
-        assertEquals("mg/dl", q.getCode()); //code for unit
-        assertNull(q.getUnit());
+        assertNull(q.getCode()); //code only set if system exists
+        assertEquals("mg/dl", q.getUnit());
         assertNull(q.getSystem());  
         assertEquals(182, q.getValue().floatValue());
         assertNull(q.getComparator()); // no comparator passed in
