@@ -161,10 +161,10 @@ public class DifferentObservationValueTest {
         assertTrue(range.hasHigh());
         assertTrue(range.hasLow());
         Quantity high = range.getHigh();
-        assertEquals("Cells/uL", high.getUnit()); //uses OBX.6.1 for units not text in string
+        assertEquals("{Cells}/uL", high.getUnit()); //uses OBX.6.1 for units not text in string
         assertEquals(1346f, high.getValue().floatValue());
         Quantity low = range.getLow();
-        assertEquals("Cells/uL", low.getUnit()); //uses OBX.6.1 for units not text in string
+        assertEquals("{Cells}/uL", low.getUnit()); //uses OBX.6.1 for units not text in string
         assertEquals(649f, low.getValue().floatValue());
         assertEquals("649-1346 cells/mcL", range.getText());
         //Check interpretation (OBX.8)
