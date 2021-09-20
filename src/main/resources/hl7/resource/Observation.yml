@@ -64,7 +64,7 @@ effectiveDateTime:
 
 issued:
      type: DATE_TIME
-     valueOf: OBR.22 | MSH.7| OBX.19
+     valueOf: OBR.22 | OBX.19
      expressionType: HL7Spec
 
 

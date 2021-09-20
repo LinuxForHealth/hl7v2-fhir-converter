@@ -93,12 +93,21 @@ reasonCode:
     expressionType: resource
     specs: EVN.4 | PV2.3 
 
-reasonReference:
-    valueOf: datatype/Reference
-    evaluateLater: true
-    generateList: true
-    expressionType: resource
-    specs: $Condition | $Observation
+reasonReference_1:
+   valueOf: datatype/Reference
+   condition: $Condition NOT_NULL 
+   evaluateLater: true
+   generateList: true
+   expressionType: resource
+   specs: $Condition
+
+reasonReference_2:
+   valueOf: datatype/Reference
+   condition: $Observation NOT_NULL
+   evaluateLater: true
+   generateList: true
+   expressionType: resource
+   specs: $Observation    
 
 hospitalization:
     valueOf: secondary/Hospitalization
