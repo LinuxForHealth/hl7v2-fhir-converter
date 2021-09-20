@@ -36,17 +36,35 @@ active:
    type: BOOLEAN  
    valueOf: false
 
-link:
+link_1:
    generateList: true
    expressionType: nested
-   condition: $Patient NOT_NULL
+   condition: $triggerEvent EQUALS A34
+   vars: 
+      triggerEvent: STRING, MSH.9.2
    expressionsMap:
-         type:
-            type: STRING
-            valueOf: 'replaced-by'
-         other:
-           required: true
-           valueOf: datatype/Reference
-           expressionType: resource
-           specs: $Patient
+      type:
+        type: STRING
+        valueOf: 'replaced-by'
+      other:
+        required: true
+        valueOf: datatype/Reference
+        expressionType: resource
+        specs: $Patient
+link_2:
+   generateList: true
+   expressionType: nested
+   condition: $triggerEvent EQUALS A40
+   vars: 
+      triggerEvent: STRING, MSH.9.2
+   expressionsMap:
+      type:
+        type: STRING
+        valueOf: 'replaced-by'
+      other:
+        required: true
+        valueOf: datatype/Reference
+        expressionType: resource
+        specs: $Patient
+        useGroup: true
 

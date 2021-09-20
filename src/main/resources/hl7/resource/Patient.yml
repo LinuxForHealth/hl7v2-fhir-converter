@@ -210,20 +210,20 @@ active:
    type: BOOLEAN  
    valueOf: true
 
+
 link:
    generateList: true
    evaluateLater: true
    expressionType: nested
-   condition: mrgSegment NOT_NULL
+   condition: $mrgSegment NOT_NULL
    vars: 
       mrgSegment: MRG
    expressionsMap:
-         type:
-            type: STRING
-            valueOf: 'replaces'
-         other:
-           required: true
-           valueOf: resource/PatientMRG
-           expressionType: reference
-           specs: $Patient
+      type:
+        type: STRING
+        valueOf: 'replaces'
+      other:
+        required: true
+        valueOf: resource/PatientMRG
+        expressionType: reference
 
