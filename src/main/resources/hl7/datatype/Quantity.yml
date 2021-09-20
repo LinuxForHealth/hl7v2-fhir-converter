@@ -10,7 +10,7 @@ value :
    valueOf: $value
 comparator : 
    type: String
-   condition: $comparator EQUALS '<' || $comparator EQUALS '<=' || $comparator EQUALS '>=' || $comparator EQUALS '>'
+   condition: $comparator EQUALS_STRING '<' || $comparator EQUALS_STRING '<=' || $comparator EQUALS_STRING '>=' || $comparator EQUALS_STRING '>'
    valueOf: $comparator
 unit : 
    type: String
@@ -22,5 +22,6 @@ system_2:
    type: STRING
    valueOf: $resolvedSystem   
 code : 
+   condition: $system NOT_NULL || $resolvedSystem NOT_NULL
    type: String
    valueOf: $code
