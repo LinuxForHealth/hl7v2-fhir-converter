@@ -30,6 +30,7 @@ resources:
       additionalSegments:
              - EVN
              - MSH
+             - OBSERVATION.OBX
 
     - resourceName: Observation
       segment: .OBX
