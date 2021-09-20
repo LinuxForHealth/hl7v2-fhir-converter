@@ -17,6 +17,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 
 import java.util.List;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.stream.Collectors;
@@ -27,10 +28,13 @@ import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.Encounter;
 import org.hl7.fhir.r4.model.Encounter.EncounterParticipantComponent;
+import org.hl7.fhir.r4.model.Observation.ObservationReferenceRangeComponent;
 import org.hl7.fhir.r4.model.Narrative;
+import org.hl7.fhir.r4.model.Observation;
 import org.hl7.fhir.r4.model.Organization;
 import org.hl7.fhir.r4.model.Patient;
 import org.hl7.fhir.r4.model.Practitioner;
+import org.hl7.fhir.r4.model.Quantity;
 import org.hl7.fhir.r4.model.Reference;
 import org.hl7.fhir.r4.model.Resource;
 import org.hl7.fhir.r4.model.ResourceType;
@@ -40,6 +44,8 @@ import io.github.linuxforhealth.fhir.FHIRContext;
 import io.github.linuxforhealth.hl7.ConverterOptions;
 import io.github.linuxforhealth.hl7.HL7ToFHIRConverter;
 import io.github.linuxforhealth.hl7.ConverterOptions.Builder;
+import io.github.linuxforhealth.hl7.segments.util.DatatypeUtils;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -658,6 +664,74 @@ public class Hl7EncounterFHIRConversionTest {
         assertEquals(practionerMap.get(code), component.getIndividual().getReference());
     }   
   }
+  
+  /**
+   * Testing Encounter correctly references Observation
+   * 
+   * @throws IOException
+   */
+  @Test
+  public void testEncounter_references_Observation() throws IOException {
+      String hl7message = "MSH|^~\\&|hl7Integration|hl7Integration|||||ADT^A01|||2.6|\n"
+              + "PID|||1234^^^^MR||DOE^JANE^|||F|||||||||||||||||||||\n"
+              + "PV1|1||Location||||||||||||||||261938_6_201306171546|||||||||||||||||||||||||20130617134644|||||||||\n"
+              + "OBX|1|SN|24467-3^CD3+CD4+ (T4 helper) cells [#/volume] in Blood^LN||=^440|Cells/uL^cells per microliter^UCUM|649-1346 cells/mcL|L|||F";
+
+      HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
+      String json = ftv.convert(hl7message, OPTIONS);
+      System.out.println(json);
+      IBaseResource bundleResource = context.getParser().parseResource(json);
+      assertThat(bundleResource).isNotNull();
+      Bundle b = (Bundle) bundleResource;
+      List<BundleEntryComponent> e = b.getEntry();
+      List<Resource> obsResource = e.stream()
+              .filter(v -> ResourceType.Observation == v.getResource().getResourceType())
+              .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+      assertThat(obsResource).hasSize(1);
+      
+      List<Resource> encounterResource = e.stream()
+              .filter(v -> ResourceType.Encounter == v.getResource().getResourceType())
+              .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+      assertThat(encounterResource).hasSize(1);
+
+      
+      
+      
+      
+      
+      
+//      Observation obs = (Observation) obsResource.get(0);
+//      //Check valueQuantity
+//      assertNotNull(obs.getValueQuantity());
+//      Quantity q = obs.getValueQuantity();
+//      assertEquals("Cells/uL", q.getCode()); //code for unit
+//      assertEquals("cells per microliter", q.getUnit()); //human readable unit
+//      assertEquals("http://unitsofmeasure.org", q.getSystem());  //system for unit
+//      assertEquals(440f, q.getValue().floatValue());
+//      assertNull(q.getComparator()); // = is not put in comparator
+//      //Check referenceRange
+//      assertTrue(obs.hasReferenceRange());
+//      assertThat(obs.getReferenceRange()).hasSize(1);
+//      ObservationReferenceRangeComponent range = obs.getReferenceRangeFirstRep();
+//      assertNotNull(range);
+//      assertTrue(range.hasHigh());
+//      assertTrue(range.hasLow());
+//      Quantity high = range.getHigh();
+//      assertEquals("Cells/uL", high.getUnit()); //uses OBX.6.1 for units not text in string
+//      assertEquals(1346f, high.getValue().floatValue());
+//      Quantity low = range.getLow();
+//      assertEquals("Cells/uL", low.getUnit()); //uses OBX.6.1 for units not text in string
+//      assertEquals(649f, low.getValue().floatValue());
+//      assertEquals("649-1346 cells/mcL", range.getText());
+//      //Check interpretation (OBX.8)
+//      assertTrue(obs.hasInterpretation());
+//      assertThat(obs.getInterpretation()).hasSize(1);
+//      DatatypeUtils.checkCommonCodeableConceptAssertions(obs.getInterpretation().get(0), "L", "Low",
+//              "http://terminology.hl7.org/CodeSystem/v2-0078", "L");
+  }
+
+  
+  
   private Encounter getResourceEncounter(Resource resource) {
 	    String s = context.getParser().encodeResourceToString(resource);
 	    Class<? extends IBaseResource> klass = Encounter.class;
