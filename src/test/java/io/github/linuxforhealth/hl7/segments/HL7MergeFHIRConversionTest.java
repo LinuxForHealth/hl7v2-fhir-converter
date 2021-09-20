@@ -15,7 +15,6 @@ import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
 import org.hl7.fhir.r4.model.Resource;
 import org.hl7.fhir.r4.model.Property;
 import org.hl7.fhir.r4.model.ResourceType;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import io.github.linuxforhealth.hl7.segments.util.ResourceUtils;
@@ -159,10 +158,9 @@ public class HL7MergeFHIRConversionTest {
 
     // Test ADT_A40 with one MRG segment.
     @Test
-    @Disabled  // Disabled until bug 684 is fixed
     public void validateHappyPathADT_A40WithMRG() {
 
-        String hl7message = "MSH|^~\\&|REGADT|MCM|RSP1P8|MCM|200301051530|SEC|ADT^A40^ADT_A39|00000003|P|2.5\r"
+        String hl7message = "MSH|^~\\&|REGADT|MCM|RSP1P8|MCM|200301051530|SEC|ADT^A40^ADT_A39|00000003|P|2.6\r"
         + "EVN|A40|200301051530\r"
         + "PID|||MR1^^^XYZ^MR||\r"
         + "MRG|MR2^^^XYZ\r";
@@ -233,10 +231,9 @@ public class HL7MergeFHIRConversionTest {
 
     // Tests ADT_A40 message with 2 MRG segments.
     @Test
-    @Disabled  // Disabled until bug 684 is fixed
     public void validateTwoMRGs() {
 
-        String hl7message = "MSH|^~\\&|REGADT|MCM|RSP1P8|MCM|200301051530|SEC|ADT^A40^ADT_A39|00000003|P|2.5\r"
+        String hl7message = "MSH|^~\\&|REGADT|MCM|RSP1P8|MCM|200301051530|SEC|ADT^A40^ADT_A39|00000003|P|2.6\r"
         + "EVN|A40|200301051530\r"
         + "PID|||MR1^^^XYZ^MR|||||||||||||||\r"
         + "MRG|MR2^^^XYZ||\r"
@@ -253,6 +250,110 @@ public class HL7MergeFHIRConversionTest {
         // One for each PID segment and one for each MRG segment
         assertThat(patientResource).hasSize(4);
 
+        // Get first patient and associated indentifiers and id.
+        Resource patientOne = patientResource.get(0);
+        String patientOneId = patientOne.getId();
+        Property patientOneIdentifierProperty = patientOne.getNamedProperty("identifier");            
+        List<Base> patientOneIdentifierList = patientOneIdentifierProperty.getValues();;
+        
+        // Get second patient and associated indentifiers and id.
+        Resource patientTwo = patientResource.get(1);
+        String patientTwoId = patientTwo.getId();
+        Property patientTwoIdentifierProperty = patientTwo.getNamedProperty("identifier");            
+        List<Base> patientTwoIdentifierList = patientTwoIdentifierProperty.getValues();
+
+        // Get third patient and associated indentifiers and id.
+        Resource patientThree = patientResource.get(2);
+        String patientThreeId = patientThree.getId();
+        Property patientThreeIdentifierProperty = patientThree.getNamedProperty("identifier");            
+        List<Base> patientThreeIdentifierList = patientThreeIdentifierProperty.getValues();;
+
+        // Get fourth patient and associated indentifiers and id.
+        Resource patientFour = patientResource.get(3);
+        String patientFourId = patientFour.getId();
+        Property patientFourIdentifierProperty = patientFour.getNamedProperty("identifier");            
+        List<Base> patientFourIdentifierList = patientFourIdentifierProperty.getValues();;
+
+         /*-----------Verify Patient One-----------*/
+
+        // Verify the patient has two identifiers
+        assertThat(patientOneIdentifierList).hasSize(2);
+
+        // Verify the identifier values
+        assertThat(ResourceUtils.getValueAsString(patientOneIdentifierList.get(0), "value")).isEqualTo("MR1");
+        assertThat(ResourceUtils.getValueAsString(patientOneIdentifierList.get(1), "value")).isEqualTo("MR2");
+
+        // Verify the second identifier is marked as old
+        assertThat(ResourceUtils.getValueAsString(patientOneIdentifierList.get(1), "use")).isEqualTo("Enumeration[old]");
+
+        // The first patient should be active.
+        assertThat(ResourceUtils.getValueAsString(patientOne, "active")).isEqualTo("BooleanType[true]");
+
+        // We should have link.other.reference to the MRG (2nd) patient
+        Base linkOne = ResourceUtils.getValue(patientOne, "link");
+        assertThat(ResourceUtils.getValueAsString(linkOne, "type")).isEqualTo("Enumeration[replaces]");
+        Base patientOneRef = ResourceUtils.getValue(linkOne, "other");
+        assertThat(ResourceUtils.getValueAsString(patientOneRef, "reference")).isEqualTo(patientTwoId);
+
+        /*-----------Verify Patient Two-----------*/
+
+       // Verify patient has only 1 identifier
+       assertThat(patientTwoIdentifierList).hasSize(1);
+
+       // Verify the patient two identifier value
+       assertThat(ResourceUtils.getValueAsString(patientTwoIdentifierList.get(0), "value")).isEqualTo("MR2");
+       // Verify the patient two identifier value is marked as old
+       assertThat(ResourceUtils.getValueAsString(patientTwoIdentifierList.get(0), "use")).isEqualTo("Enumeration[old]");
+
+       //The second patient should NOT be active.
+       assertThat(ResourceUtils.getValueAsString(patientTwo, "active")).isEqualTo("BooleanType[false]");
+
+       // We should have link.other.reference to the PID (1st) patient
+       Base linkTwo = ResourceUtils.getValue(patientTwo, "link");
+       assertThat(ResourceUtils.getValueAsString(linkTwo, "type")).isEqualTo("Enumeration[replaced-by]");
+       Base patientTwoRef = ResourceUtils.getValue(linkTwo, "other");
+       assertThat(ResourceUtils.getValueAsString(patientTwoRef, "reference")).isEqualTo(patientOneId);
+
+        /*-----------Verify Patient Three-----------*/
+
+        // Verify the patient has two identifiers
+        assertThat(patientOneIdentifierList).hasSize(2);
+
+        // Verify the identifier values
+        assertThat(ResourceUtils.getValueAsString(patientThreeIdentifierList.get(0), "value")).isEqualTo("MR3");
+        assertThat(ResourceUtils.getValueAsString(patientThreeIdentifierList.get(1), "value")).isEqualTo("MR4");
+
+        // Verify the second identifier is marked as old
+        assertThat(ResourceUtils.getValueAsString(patientThreeIdentifierList.get(1), "use")).isEqualTo("Enumeration[old]");
+
+        // The third patient should be active.
+        assertThat(ResourceUtils.getValueAsString(patientThree, "active")).isEqualTo("BooleanType[true]");
+
+        // We should have link.other.reference to the MRG (4th) patient
+        Base linkThree = ResourceUtils.getValue(patientThree, "link");
+        assertThat(ResourceUtils.getValueAsString(linkThree, "type")).isEqualTo("Enumeration[replaces]");
+        Base patientThreeRef = ResourceUtils.getValue(linkThree, "other");
+        assertThat(ResourceUtils.getValueAsString(patientThreeRef, "reference")).isEqualTo(patientFourId);
+
+        /*-----------Verify Patient Four-----------*/
+
+       // Verify patient has only 1 identifier
+       assertThat(patientFourIdentifierList).hasSize(1);
+
+       // Verify the patient four identifier value
+       assertThat(ResourceUtils.getValueAsString(patientFourIdentifierList.get(0), "value")).isEqualTo("MR4");
+       // Verify the patient four identifier value is marked as old
+       assertThat(ResourceUtils.getValueAsString(patientFourIdentifierList.get(0), "use")).isEqualTo("Enumeration[old]");
+
+       //The fourth patient should NOT be active.
+       assertThat(ResourceUtils.getValueAsString(patientFour, "active")).isEqualTo("BooleanType[false]");
+
+       // We should have link.other.reference to the PID (3r) patient
+       Base linkFour = ResourceUtils.getValue(patientFour, "link");
+       assertThat(ResourceUtils.getValueAsString(linkFour, "type")).isEqualTo("Enumeration[replaced-by]");
+       Base patientFourRef = ResourceUtils.getValue(linkFour, "other");
+       assertThat(ResourceUtils.getValueAsString(patientFourRef, "reference")).isEqualTo(patientThreeId);
+       
     }
 
   }
