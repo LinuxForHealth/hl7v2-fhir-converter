@@ -348,7 +348,7 @@ public class HL7MergeFHIRConversionTest {
        //The fourth patient should NOT be active.
        assertThat(ResourceUtils.getValueAsString(patientFour, "active")).isEqualTo("BooleanType[false]");
 
-       // We should have link.other.reference to the PID (3r) patient
+       // We should have link.other.reference to the PID (3rd) patient
        Base linkFour = ResourceUtils.getValue(patientFour, "link");
        assertThat(ResourceUtils.getValueAsString(linkFour, "type")).isEqualTo("Enumeration[replaced-by]");
        Base patientFourRef = ResourceUtils.getValue(linkFour, "other");
