@@ -21,6 +21,7 @@ resources:
     additionalSegments:
       - .PD1
       - MSH
+      - ORDER.OBSERVATION.OBX
 
   - resourceName: Encounter
     segment: .PATIENT_VISIT.PV1

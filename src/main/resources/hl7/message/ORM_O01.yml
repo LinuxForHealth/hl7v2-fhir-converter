@@ -32,6 +32,7 @@ resources:
       additionalSegments:
              - .PATIENT_VISIT.PV2
              - MSH
+             - ORDER_DETAIL.OBSERVATION.OBX
 
     - resourceName: Observation
       segment: .ORDER_DETAIL.OBSERVATION.OBX

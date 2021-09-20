@@ -33,6 +33,7 @@ resources:
       - .PID
       - .PATIENT_VISIT.PV2
       - MSH
+      - ORDER_DETAIL.OBSERVATION.OBX
 
   - resourceName: MedicationRequest
     segment: .RXO

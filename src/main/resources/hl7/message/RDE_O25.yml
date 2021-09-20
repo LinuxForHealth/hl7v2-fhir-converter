@@ -30,6 +30,7 @@ resources:
     additionalSegments:
       - .PATIENT_VISIT.PV2
       - MSH
+      - ORDER.OBSERVATION.OBX
 
   - resourceName: MedicationRequest
     segment: .RXE
