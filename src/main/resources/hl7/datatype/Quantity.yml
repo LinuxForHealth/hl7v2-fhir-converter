@@ -10,6 +10,7 @@ value :
    valueOf: $value
 comparator : 
    type: String
+   condition: $comparator EQUALS '<' || $comparator EQUALS '<=' || $comparator EQUALS '>=' || $comparator EQUALS '>'
    valueOf: $comparator
 unit : 
    type: String

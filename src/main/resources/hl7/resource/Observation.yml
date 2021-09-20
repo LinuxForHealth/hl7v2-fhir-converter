@@ -76,7 +76,7 @@ valueString:
     vars: 
       obx2: STRING, OBX.2
       
-valueQuantity:
+valueQuantity_1:
     valueOf: datatype/Quantity
     expressionType: resource
     condition: $obx2 EQUALS NM
@@ -86,6 +86,31 @@ valueQuantity:
       obx2: STRING, OBX.2
       resolvedSystem: SYSTEM_URL, OBX.6.3
 
+valueQuantity_2:
+    valueOf: datatype/Quantity
+    expressionType: resource
+    condition: $obx2 EQUALS SN && $separator NULL 
+    vars: 
+      value: OBX.5.2
+      unit: OBX.6.2  #human readable unit
+      code: OBX.6.1  #code for unit
+      comparator: OBX.5.1
+      obx2: STRING, OBX.2
+      separator: STRING, OBX.5.3
+      resolvedSystem: SYSTEM_URL, OBX.6.3
+
+valueQuantity_3:
+    valueOf: datatype/Quantity
+    expressionType: resource
+    condition: $obx2 EQUALS SN && $separator NOT_NULL && $separator NOT_EQUALS ':' && $separator NOT_EQUALS '/' 
+    vars: 
+      value: OBX.5.2
+      unit: OBX.6.2  #human readable unit
+      code: OBX.6.1  #code for unit
+      comparator: OBX.5.1
+      obx2: STRING, OBX.2
+      separator: STRING, OBX.5.3
+      resolvedSystem: SYSTEM_URL, OBX.6.3
 
 valueCodeableConcept:
      condition:  $obx2 EQUALS  CF || $obx2 EQUALS CNE || $obx2 EQUALS CWE || $obx2 EQUALS CE
@@ -120,8 +145,8 @@ valueTime:
    vars:
      obx2: STRING, OBX.2
 
-valueRatio:
-   condition: $obx2 EQUALS SN && $obx5.3 EQUALS ':'
+valueRatio_1:
+   condition: $obx2 EQUALS SN && $separator NOT_NULL && $separator EQUALS ':'
    valueOf: datatype/Ratio
    expressionType: resource
    specs: OBX.5
@@ -129,8 +154,18 @@ valueRatio:
      numerator: SN.2
      denominator: SN.4
      obx2: STRING, OBX.2
-     obx5.3: STRING, OBX.5.3
-       
+     separator: STRING, SN.3
+
+valueRatio_2:
+   condition: $obx2 EQUALS SN && $separator NOT_NULL && $separator EQUALS '/'
+   valueOf: datatype/Ratio
+   expressionType: resource
+   specs: OBX.5
+   vars:
+     numerator: SN.2
+     denominator: SN.4
+     obx2: STRING, OBX.2
+     separator: STRING, SN.3
 
 interpretation: 
    valueOf: datatype/CodeableConcept
