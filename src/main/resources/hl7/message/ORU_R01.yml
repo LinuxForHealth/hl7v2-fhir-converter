@@ -14,7 +14,8 @@ resources:
       additionalSegments:
    
     - resourceName: Patient
-      segment: PATIENT_RESULT.PATIENT.PID
+      segment: .PID
+      group: PATIENT_RESULT.PATIENT
       resourcePath: resource/Patient
       isReferenced: true
       repeats: false

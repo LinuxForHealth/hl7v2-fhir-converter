@@ -32,8 +32,9 @@ resources:
              - MSH
              
     - resourceName: Observation
-      segment: OBX
+      segment: .OBX
       resourcePath: resource/Observation
+      group: OBSERVATION
       repeats: true
       isReferenced: true
       additionalSegments:

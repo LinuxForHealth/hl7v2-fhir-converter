@@ -34,7 +34,7 @@ resources:
       - MSH
       
   - resourceName: AllergyIntolerance
-    segment: AL1
+    segment: PATIENT.AL1
     resourcePath: resource/AllergyIntolerance
     repeats: true
     additionalSegments:

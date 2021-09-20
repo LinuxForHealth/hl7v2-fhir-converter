@@ -13,7 +13,6 @@ resources:
       isReferenced: false
       additionalSegments: 
              - EVN
-             - MSH
 
     - resourceName: Patient
       segment: PID
@@ -52,7 +51,6 @@ resources:
       repeats: true
       isReferenced: true
       additionalSegments:
-        - ORC
         - MSH
 
     - resourceName: AllergyIntolerance
@@ -72,5 +70,3 @@ resources:
         - MSH
         - PID
         - PV1
-        - ORC
-        - OBR
