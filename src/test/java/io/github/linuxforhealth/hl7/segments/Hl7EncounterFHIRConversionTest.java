@@ -671,11 +671,11 @@ public class Hl7EncounterFHIRConversionTest {
    * @throws IOException
    */
   @Test
-  public void testEncounter_references_Observation() throws IOException {
+  public void testEncounterReferencesObservation() throws IOException {
       String hl7message = "MSH|^~\\&|hl7Integration|hl7Integration|||||ADT^A01|||2.6|\n"
               + "PID|||1234^^^^MR||DOE^JANE^|||F|||||||||||||||||||||\n"
               + "PV1|1|O|Location||||||||||||||||261938_6_201306171546|||||||||||||||||||||||||20130617134644|||||||||\n"
-              + "OBX|1|SN|24467-3^CD3+CD4+ (T4 helper) cells [#/volume] in Blood^LN||=^440|{Cells}/uL^cells per microliter^UCUM|649-1346 cells/mcL|L|||F";
+              + "OBX|1|SN|24467-3^CD3+CD4+ (T4 helper) cells [#/volume] in Blood^LN||=^440|{Cells}/uL^cells per microliter^UCUM|649-1346 cells/mcL|L|||F\r";
 
       HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
       String json = ftv.convert(hl7message, OPTIONS);
@@ -699,6 +699,49 @@ public class Hl7EncounterFHIRConversionTest {
       assertTrue(reasonRefs.get(0).getReference().contains("Observation"));
   }
 
+  /**
+   * Testing Encounter correctly references Observation AND Diagnosis when both are present.
+   * 
+   * @throws IOException
+   */
+  @Test
+  public void testEncounterReferencesObservationAndDiagnosis() throws IOException {
+      String hl7message = "MSH|^~\\&|hl7Integration|hl7Integration|||||ADT^A01|||2.6|\n"
+              + "PID|||1234^^^^MR||DOE^JANE^|||F|||||||||||||||||||||\n"
+              + "PV1|1|O|Location||||||||||||||||261938_6_201306171546|||||||||||||||||||||||||20130617134644|||||||||\n"
+              + "OBX|1|SN|24467-3^CD3+CD4+ (T4 helper) cells [#/volume] in Blood^LN||=^440|{Cells}/uL^cells per microliter^UCUM|649-1346 cells/mcL|L|||F\r"
+              + "DG1|1|ICD10|^Ovarian Cancer|||||||||||||||||||||\r";
+
+      HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
+      String json = ftv.convert(hl7message, OPTIONS);
+      IBaseResource bundleResource = context.getParser().parseResource(json);
+      assertThat(bundleResource).isNotNull();
+      Bundle b = (Bundle) bundleResource;
+      List<BundleEntryComponent> e = b.getEntry();
+      List<Resource> obsResource = e.stream()
+              .filter(v -> ResourceType.Observation == v.getResource().getResourceType())
+              .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+      assertThat(obsResource).hasSize(1);
+      
+      List<Resource> encounterResource = e.stream()
+              .filter(v -> ResourceType.Encounter == v.getResource().getResourceType())
+              .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+      assertThat(encounterResource).hasSize(1);
+      
+      Encounter enc = (Encounter) encounterResource.get(0);
+      List<Reference> reasonRefs = enc.getReasonReference();
+      assertEquals(2, reasonRefs.size());
+      // Guess at the order of the references
+      Reference refObservation = reasonRefs.get(0);
+      Reference refCondition = reasonRefs.get(1);
+      // If guessed wrong, reverse them
+      if (!refObservation.getReference().contains("Observation")){
+        refObservation = reasonRefs.get(1);
+        refCondition = reasonRefs.get(0);   
+      }
+      assertTrue(refObservation.getReference().contains("Observation"));
+      assertTrue(refCondition.getReference().contains("Condition"));
+  }
   
   
   private Encounter getResourceEncounter(Resource resource) {
