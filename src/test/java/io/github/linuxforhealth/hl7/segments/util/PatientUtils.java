@@ -46,7 +46,7 @@ public class PatientUtils  {
     return getPatientFromResource(patients.get(0));
   }  
 
-  private static Patient getPatientFromResource(Resource resource) {
+  public static Patient getPatientFromResource(Resource resource) {
     String s = context.getParser().encodeResourceToString(resource);
     Class<? extends IBaseResource> klass = Patient.class;
     return (Patient) context.getParser().parseResource(klass, s);
