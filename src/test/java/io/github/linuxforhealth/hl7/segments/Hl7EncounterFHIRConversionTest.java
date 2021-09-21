@@ -6,6 +6,7 @@
 package io.github.linuxforhealth.hl7.segments;
 
 import io.github.linuxforhealth.hl7.segments.util.ResourceUtils;
+import org.hl7.fhir.r4.model.*;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -17,25 +18,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.stream.Collectors;
 import org.hl7.fhir.instance.model.api.IBaseResource;
-import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
-import org.hl7.fhir.r4.model.CodeableConcept;
-import org.hl7.fhir.r4.model.Coding;
-import org.hl7.fhir.r4.model.Encounter;
 import org.hl7.fhir.r4.model.Encounter.EncounterParticipantComponent;
-import org.hl7.fhir.r4.model.Narrative;
-import org.hl7.fhir.r4.model.Organization;
-import org.hl7.fhir.r4.model.Patient;
-import org.hl7.fhir.r4.model.Practitioner;
-import org.hl7.fhir.r4.model.Reference;
-import org.hl7.fhir.r4.model.Resource;
-import org.hl7.fhir.r4.model.ResourceType;
-import org.hl7.fhir.r4.model.Extension;
 
 import io.github.linuxforhealth.fhir.FHIRContext;
 import io.github.linuxforhealth.hl7.ConverterOptions;
@@ -246,9 +236,7 @@ public class Hl7EncounterFHIRConversionTest {
       String hl7message = "MSH|^~\\&|PROSOLV|SENTARA|WHIA|IBM|20151008111200|S1|ADT^A01^ADT_A01|MSGID000001|T|2.6|10092|PRPA008|AL|AL|100|8859/1|ENGLISH|ARM|ARM5007\n"
               + "EVN|A04|20151008111200|20171013152901|O|OID1006|20171013153621|EVN1009\n"
               + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
-              + "PV1|1|E|SAN JOSE|A|10089|MILPITAS|2740^Torres^Callie|2913^Grey^Meredith^F|3065^Sloan^Mark^J|CAR|FOSTER CITY|AD|R|1|A4|VI|9052^Shepeard^Derek^|AH|10019181|FIC1002|IC|CC|CR|CO|20161012034052|60000|6|AC|GHBR|20160926054052|AC5678|45000|15000|D|20161016154413|DCD|SAN FRANCISCO|VEG|RE|O|AV|FREMONT|CALIFORNIA|20161013154626|20161014154634|10000|14000|2000|4000|POL8009|V|PHY6007\n"
-              + "PV2|SAN BRUNO|AC4567|vomits|less equipped|purse|SAN MATEO|HO|20171014154626|20171018154634|4|3|DIAHHOREA|RSA456|20161013154626|Y|D|20191026001640|O|Y|1|F|Y|KAISER|AI|2|20161013154626|ED|20171018001900|20161013154626|10000|RR|Y|20171108002129|Y|Y|N|N|C^Car^HL70430\n";
-
+              + "PV1|1|E|SAN JOSE|A|10089|MILPITAS|2740^Torres^Callie|2913^Grey^Meredith^F|3065^Sloan^Mark^J|CAR|FOSTER CITY|AD|R|1|A4|VI|9052^Shepeard^Derek^|AH|10019181|FIC1002|IC|CC|CR|CO|20161012034052|60000|6|AC|GHBR|20160926054052|AC5678|45000|15000|D|20161016154413|DCD|SAN FRANCISCO|VEG|RE|O|AV|FREMONT|CALIFORNIA|20161013154626|20161014154634|10000|14000|2000|4000|POL8009|V|PHY6007\n";
       Encounter encounter = ResourceUtils.getEncounter(hl7message);
 
       assertThat(encounter.hasClass_()).isTrue();
@@ -262,9 +250,7 @@ public class Hl7EncounterFHIRConversionTest {
       hl7message = "MSH|^~\\&|PROSOLV|SENTARA|WHIA|IBM|20151008111200|S1|ADT^A01^ADT_A01|MSGID000001|T|2.6|10092|PRPA008|AL|AL|100|8859/1|ENGLISH|ARM|ARM5007\n"
               + "EVN|A04|20151008111200|20171013152901|O|OID1006|20171013153621|EVN1009\n"
               + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
-              + "PV1|1|L|SAN JOSE|A|10089|MILPITAS|2740^Torres^Callie|2913^Grey^Meredith^F|3065^Sloan^Mark^J|CAR|FOSTER CITY|AD|R|1|A4|VI|9052^Shepeard^Derek^|AH|10019181|FIC1002|IC|CC|CR|CO|20161012034052|60000|6|AC|GHBR|20160926054052|AC5678|45000|15000|D|20161016154413|DCD|SAN FRANCISCO|VEG|RE|O|AV|FREMONT|CALIFORNIA|20161013154626|20161014154634|10000|14000|2000|4000|POL8009|V|PHY6007\n"
-              + "PV2|SAN BRUNO|AC4567|vomits|less equipped|purse|SAN MATEO|HO|20171014154626|20171018154634|4|3|DIAHHOREA|RSA456|20161013154626|Y|D|20191026001640|O|Y|1|F|Y|KAISER|AI|2|20161013154626|ED|20171018001900|20161013154626|10000|RR|Y|20171108002129|Y|Y|N|N|C^Car^HL70430\n";
-
+              + "PV1|1|L|SAN JOSE|A|10089|MILPITAS|2740^Torres^Callie|2913^Grey^Meredith^F|3065^Sloan^Mark^J|CAR|FOSTER CITY|AD|R|1|A4|VI|9052^Shepeard^Derek^|AH|10019181|FIC1002|IC|CC|CR|CO|20161012034052|60000|6|AC|GHBR|20160926054052|AC5678|45000|15000|D|20161016154413|DCD|SAN FRANCISCO|VEG|RE|O|AV|FREMONT|CALIFORNIA|20161013154626|20161014154634|10000|14000|2000|4000|POL8009|V|PHY6007\n";
       encounter = ResourceUtils.getEncounter(hl7message);
 
       assertThat(encounter.hasClass_()).isTrue();
@@ -287,7 +273,7 @@ public class Hl7EncounterFHIRConversionTest {
 
       Encounter encounter = ResourceUtils.getEncounter(hl7message);
 
-      assertThat(encounter.hasClass_()).isTrue();
+      assertThat(encounter.hasReasonCode()).isTrue();
       CodeableConcept encounterReason = encounter.getReasonCodeFirstRep();
       Coding encounterReasonCoding = encounterReason.getCodingFirstRep();
       assertThat(encounterReasonCoding.getCode()).isEqualTo("O");
@@ -314,6 +300,37 @@ public class Hl7EncounterFHIRConversionTest {
 
   }
 
+    @Test
+    public void test_encounter_length() {
+        //When length between encounters is a day or more apart the units should be "Days"
+        String hl7message = "MSH|^~\\&|PROSOLV|SENTARA|WHIA|IBM|20151008111200|S1|ADT^A01^ADT_A01|MSGID000001|T|2.6|10092|PRPA008|AL|AL|100|8859/1|ENGLISH|ARM|ARM5007\n"
+                + "EVN|A04|20151008111200|20171013152901|O|OID1006|20171013153621|EVN1009\n"
+                + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
+                + "PV1|1|E|SAN JOSE|A|10089|MILPITAS|2740^Torres^Callie|2913^Grey^Meredith^F|3065^Sloan^Mark^J|CAR|FOSTER CITY|AD|R|1|A4|VI|9052^Shepeard^Derek^|AH|10019181|FIC1002|IC|CC|CR|CO|20161012034052|60000|6|AC|GHBR|20160926054052|AC5678|45000|15000|D|20161016154413|DCD|SAN FRANCISCO|VEG|RE|O|AV|FREMONT|CALIFORNIA|20161013154626|20161014154634|10000|14000|2000|4000|POL8009|V|PHY6007\n";
+
+        Encounter encounter = ResourceUtils.getEncounter(hl7message);
+
+        assertThat(encounter.hasLength()).isTrue();
+        Duration encounterLength = encounter.getLength();
+        assertThat(encounterLength.getValue()).isEqualTo((BigDecimal.valueOf(1)));
+        assertThat(encounterLength.getUnit()).isEqualTo("Days");
+
+
+        //When length between encounters is a less than a apart the units should be "Minutes" and test PV2 segment
+        hl7message = "MSH|^~\\&|PROSOLV|SENTARA|WHIA|IBM|20151008111200|S1|ADT^A01^ADT_A01|MSGID000001|T|2.6|10092|PRPA008|AL|AL|100|8859/1|ENGLISH|ARM|ARM5007\n"
+                + "EVN|A04|20151008111200|20171013152901||OID1006|20171013153621|EVN1009\n"
+                + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
+                + "PV1|1|L|SAN JOSE|A|10089|MILPITAS|2740^Torres^Callie|2913^Grey^Meredith^F|3065^Sloan^Mark^J|CAR|FOSTER CITY|AD|R|1|A4|VI|9052^Shepeard^Derek^|AH|10019181|FIC1002|IC|CC|CR|CO|20161012034052|60000|6|AC|GHBR|20160926054052|AC5678|45000|15000|D|20161016154413|DCD|SAN FRANCISCO|VEG|RE|O|AV|FREMONT|CALIFORNIA||20171018154634|10000|14000|2000|4000|POL8009|V|PHY6007\n"
+                + "PV2|SAN BRUNO|AC4567|vomits|less equipped|purse|SAN MATEO|HO|20171014154626|20171018154634|4|3|DIAHHOREA|RSA456|20161013154626|Y|D|20191026001640|O|Y|1|F|Y|KAISER|AI|2|20161013154626|ED|20171018001900|20161013154626|10000|RR|Y|20171108002129|Y|Y|N|N|C^Car^HL70430\n";
+
+        encounter = ResourceUtils.getEncounter(hl7message);
+
+        assertThat(encounter.hasLength()).isTrue();
+        encounterLength = encounter.getLength();
+        assertThat(encounterLength.getValue()).isEqualTo((BigDecimal.valueOf(3)));
+        assertThat(encounterLength.getUnit()).isEqualTo("Days");
+
+    }
 
   @Test
   public void test_encounter_modeOfarrival() {

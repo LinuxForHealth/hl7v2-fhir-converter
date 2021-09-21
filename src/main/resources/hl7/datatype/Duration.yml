@@ -4,13 +4,39 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 ---
-value:
+value_1:
+    condition: $time1 NOT_NULL
     valueOf: 'GeneralUtils.diffDateDay(var1,var2)'
     expressionType: JEXL
     vars: 
       var1: $time1
       var2: $time2
+      var3: $time3
+
+value_2:
+  condition: $var3 NOT_NULL && $var1 NULL
+  valueOf: $var3
+  expressionType: HL7Spec
+  vars:
+    var1: $time1
+    var2: $time2
+    var3: $time3
       
-unit:
-   type: String
-   value:  "Days"
+unit_1:
+   condition: $var1 NOT_NULL
+   expressionType: JEXL
+   valueOf: 'GeneralUtils.getTimeUnit(var1,var2)'
+   vars:
+     var1: $time1
+     var2: $time2
+
+unit_2:
+  condition: $var3 NOT_NULL && $var1 NULL
+  expressionType: HL7Spec
+  specs: $day
+  vars:
+    var1: $time1
+    var2: $time2
+    var3: $time3
+  constants:
+    day: "Days"
