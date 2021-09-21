@@ -92,10 +92,12 @@ EncounterModeOfArrivalDisplay:
   P: Public Transport
   U: Unknown
 
+#Using Actcode for encounter.class
 V3ActCode:
   E: EMER
   I: IMP
   P: PRENC
+  O: AMB
 
 V3MaritalStatus:
   A: A

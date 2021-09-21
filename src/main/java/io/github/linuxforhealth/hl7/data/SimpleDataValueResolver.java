@@ -248,7 +248,7 @@ public class SimpleDataValueResolver {
             V3ActCode act = V3ActCode.fromCode(code);
             return new SimpleCode( code , act.getSystem(), act.getDisplay(), version);
         } else {
-            // If code is null, it means the code wasn't known in our table, and can't be looked up.
+            // defaults to unknown
             // Make a message in the display.
             return new SimpleCode("unknown", null,  null);
         }

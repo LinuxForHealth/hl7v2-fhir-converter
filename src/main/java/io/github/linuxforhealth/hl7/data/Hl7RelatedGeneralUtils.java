@@ -164,18 +164,16 @@ public class Hl7RelatedGeneralUtils {
         return null;
     }
 
-    public static Long diffDateDay(Object start, Object end) {
+    public static Long getTimeDiff(Object start, Object end) {
         LOGGER.info("Generating time diff in min  from var1 {}, var2 {}", start, end);
         try {
             Temporal date1 = DateUtil.getTemporal(Hl7DataHandlerUtil.getStringValue(start));
             Temporal date2 = DateUtil.getTemporal(Hl7DataHandlerUtil.getStringValue(end));
             LOGGER.info("temporal dates start: {} , end: {} ", date1, date2);
-
             if (date1 != null && date2 != null) {
                 long days = ChronoUnit.DAYS.between(date1, date2);
                 if (days >= 1) {
                     return days;
-
                 }
                 else
                     return ChronoUnit.MINUTES.between(date1,date2);
