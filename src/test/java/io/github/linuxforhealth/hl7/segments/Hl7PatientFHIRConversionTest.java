@@ -443,6 +443,7 @@ public class Hl7PatientFHIRConversionTest {
     HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
     String json = ftv.convert(hl7message , PatientUtils.OPTIONS);
     assertThat(json).isNotBlank();
+    LOGGER.info(json);
 
     IBaseResource bundleResource = context.getParser().parseResource(json);
     assertThat(bundleResource).isNotNull();
