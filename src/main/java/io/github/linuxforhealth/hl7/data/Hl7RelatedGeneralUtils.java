@@ -173,7 +173,6 @@ public class Hl7RelatedGeneralUtils {
 
             if (date1 != null && date2 != null) {
                 long days = ChronoUnit.DAYS.between(date1, date2);
-                System.out.println(days);
                 if (days >= 1) {
                     return days;
 
