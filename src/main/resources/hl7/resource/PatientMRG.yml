@@ -23,7 +23,7 @@ identifier:
    constants:
       system: http://terminology.hl7.org/CodeSystem/v2-0203
       code: MR
-      display: Medical Record
+      display: Medical record number
       use: old
 
 name:
