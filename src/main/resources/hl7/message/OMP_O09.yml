@@ -14,7 +14,8 @@ resources:
     additionalSegments:
 
   - resourceName: Patient
-    segment: PATIENT.PID
+    segment: .PID
+    group: PATIENT
     resourcePath: resource/Patient
     isReferenced: true
     repeats: false
@@ -32,6 +33,7 @@ resources:
       - .PID
       - .PATIENT_VISIT.PV2
       - MSH
+      - ORDER_DETAIL.OBSERVATION.OBX
 
   - resourceName: MedicationRequest
     segment: .RXO
@@ -45,7 +47,7 @@ resources:
       - MSH
 
   - resourceName: AllergyIntolerance
-    segment: AL1
+    segment: PATIENT.AL1
     resourcePath: resource/AllergyIntolerance
     repeats: true
     additionalSegments:
@@ -60,3 +62,13 @@ resources:
       - MSH
       - PATIENT.PID
       - PATIENT.PATIENT_VISIT.PV1
+
+  - resourceName: Observation
+    segment: .OBSERVATION.OBX
+    group: ORDER
+    resourcePath: resource/Observation
+    repeats: true
+    isReferenced: true
+    additionalSegments:
+      - .ORC
+      - MSH

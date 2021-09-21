@@ -83,5 +83,26 @@ public class ConditionUtilTest {
 
   }
 
+  @Test
+  public void simpleQuotedCharactersParsing() {
+    String condition = "$var1 EQUALS ':'";
+    SimpleBiCondition simplecondition =
+        (SimpleBiCondition) ConditionUtil.createCondition(condition);
+    assertThat(simplecondition).isNotNull();
+    assertThat(simplecondition.getVar1()).isEqualTo("$var1");
+    assertThat(simplecondition.getVar2()).isEqualTo(":");
+    assertThat(simplecondition.getConditionOperator()).isEqualTo("EQUALS");
+  }
+
+  @Test
+  public void simpleQuotedCharactersParsing2() {
+    String condition = "$var1 EQUALS '/'";
+    SimpleBiCondition simplecondition =
+        (SimpleBiCondition) ConditionUtil.createCondition(condition);
+    assertThat(simplecondition).isNotNull();
+    assertThat(simplecondition.getVar1()).isEqualTo("$var1");
+    assertThat(simplecondition.getVar2()).isEqualTo("/");
+    assertThat(simplecondition.getConditionOperator()).isEqualTo("EQUALS");
+  }
 
 }

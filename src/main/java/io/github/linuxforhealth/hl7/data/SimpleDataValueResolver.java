@@ -27,6 +27,7 @@ import org.hl7.fhir.r4.model.Enumerations.AdministrativeGender;
 import org.hl7.fhir.r4.model.Immunization.ImmunizationStatus;
 import org.hl7.fhir.r4.model.MedicationRequest;
 import org.hl7.fhir.r4.model.Observation.ObservationStatus;
+import org.hl7.fhir.r4.model.ServiceRequest.ServiceRequestStatus;
 import org.hl7.fhir.r4.model.Specimen.SpecimenStatus;
 import org.hl7.fhir.r4.model.codesystems.V3ActCode;
 import org.hl7.fhir.r4.model.codesystems.V3MaritalStatus;
@@ -132,7 +133,7 @@ public class SimpleDataValueResolver {
         }
 
     };
-
+   
     public static final ValueExtractor<Object, SimpleCode> OBSERVATION_STATUS_FHIR = (Object value) -> {
         String val = Hl7DataHandlerUtil.getStringValue(value);
         String code = getFHIRCode(val, ObservationStatus.class);
@@ -144,6 +145,16 @@ public class SimpleDataValueResolver {
             // Make a message in the display.
             String theSystem = ObservationStatus.REGISTERED.getSystem();  
             return new SimpleCode(null, theSystem, String.format(INVALID_CODE_MESSAGE_SHORT, val, theSystem));
+        }
+    };
+    
+    public static final ValueExtractor<Object, String> SERVICE_REQUEST_STATUS = (Object value) -> {
+        String val = Hl7DataHandlerUtil.getStringValue(value);
+        String code = getFHIRCode(val, ServiceRequestStatus.class);
+        if (code != null) {
+            return code;
+        } else {
+            return null;
         }
     };
 

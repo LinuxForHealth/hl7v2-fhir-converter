@@ -10,11 +10,9 @@ import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import io.github.linuxforhealth.hl7.segments.Hl7EncounterFHIRConversionTest;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
-import org.hl7.fhir.r4.model.Bundle.BundleType;
 import org.hl7.fhir.r4.model.Resource;
 import org.hl7.fhir.r4.model.ResourceType;
 import org.junit.jupiter.api.Test;
@@ -60,8 +58,36 @@ public class Hl7OMPMessageTest {
               .filter(v -> ResourceType.Encounter == v.getResource().getResourceType())
               .map(BundleEntryComponent::getResource).collect(Collectors.toList());
       assertThat(encounterResource).hasSize(1);
-
   }
+    
+    @Test
+    public void test_OMPO09_patient_observation_present() throws IOException {
+  	  String hl7message =
+  		        "MSH|^~\\&|WHI_LOAD_GENERATOR|IBM_TORONTO_LAB|MEDORDER|IBM|20210407191342|9022934|OMP^O09|MSGID_bae9ce6a-e35d-4ff5-8d50-c5dde19cc1aa|T|2.6\n"
+  			    + "PID|||1234^^^^MR||DOE^JANE^|||F|||||||||||||||||||||\n"
+   		        + "ORC|OP|111|111|6279|||^3 times daily^^20210401|381227400|20210407191342||||||20210407191342||||||ORDERING FAC NAME|ADDR^^CITY^STATE^ZIP^USA||\n"
+  		        + "RXO|50111032701^hydrALAZINE HCl 25 MG Oral Tablet^NDC^^^^^^hydrALAZINE (APRESOLINE) 25 MG TABS||||||Take 1 tablet by mouth 3 (three) times daily.||G||120|tablet^tablet|0|||||||||||\n"
+  		        + "RXR|PO^Oral\n"
+  		        + "OBX|1|NM|Most Current Weight^Most current measured weight (actual)||90|kg";
+
+        HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
+        String json = ftv.convert(hl7message, OPTIONS);
+        assertThat(json).isNotBlank();
+        LOGGER.info("FHIR json result:\n" + json);
+        IBaseResource bundleResource = context.getParser().parseResource(json);
+        assertThat(bundleResource).isNotNull();
+        Bundle b = (Bundle) bundleResource;
+        List<BundleEntryComponent> e = b.getEntry();
+        List<Resource> patientResource = e.stream()
+                .filter(v -> ResourceType.Patient == v.getResource().getResourceType())
+                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        assertThat(patientResource).hasSize(1);
+    
+        List<Resource> observationResource = e.stream()
+                .filter(v -> ResourceType.Observation == v.getResource().getResourceType())
+                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        assertThat(observationResource).hasSize(1);
+    }
 
 
   @Test

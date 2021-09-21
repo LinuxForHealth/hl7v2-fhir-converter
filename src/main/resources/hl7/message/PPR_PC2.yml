@@ -19,7 +19,6 @@ resources:
       isReferenced: true
       repeats: false
       additionalSegments:
-             - PD1
              - MSH
       
     - resourceName: Encounter
@@ -32,6 +31,7 @@ resources:
              - .PV2
              - PID
              - MSH
+             - PROBLEM.PROBLEM_OBSERVATION.OBX
       
     - resourceName: Observation
       segment: .PROBLEM_OBSERVATION.OBX
@@ -51,3 +51,15 @@ resources:
         - MSH
         - PID
         - PATIENT_VISIT.PV1
+
+    - resourceName: ServiceRequest
+      segment: .ORDER.ORC
+      group: PROBLEM
+      resourcePath: resource/ServiceRequest
+      repeats: true
+      additionalSegments:
+        - .ORDER.ORDER_DETAIL.OBR
+        - .ORDER.ORDER_DETAIL.ORDER_OBSERVATION.OBX
+        - PATIENT_VISIT.PV1
+        - MSH
+        - PID

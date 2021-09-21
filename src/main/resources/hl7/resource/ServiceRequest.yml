@@ -49,11 +49,10 @@ identifier_3:
       display: "Placer Identifier"
 
 status:
-   type: STRING
-   valueOf: $default
+   type: SERVICE_REQUEST_STATUS
+   default: "unknown"
+   valueOf: OBX.11
    expressionType: HL7Spec
-   constants:
-      default: "unknown"
 
 intent:
    type: STRING

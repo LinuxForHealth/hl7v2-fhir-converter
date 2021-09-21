@@ -33,6 +33,7 @@ resources:
              - PV2
              - EVN
              - MSH
+             - OBX
 
     - resourceName: Condition
       segment: DG1

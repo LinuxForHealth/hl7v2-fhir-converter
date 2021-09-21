@@ -10,7 +10,7 @@ jobs:
       - name: Set up Java
         uses: actions/setup-java@v1
         with:
-          java-version: 11
+          java-version: 1.8
       - name: Set env
         run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
       - name: Test

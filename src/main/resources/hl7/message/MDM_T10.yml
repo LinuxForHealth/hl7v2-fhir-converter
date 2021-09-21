@@ -30,9 +30,11 @@ resources:
       additionalSegments:
              - EVN
              - MSH
+             - OBSERVATION.OBX
 
     - resourceName: Observation
-      segment: OBX
+      segment: .OBX
+      group: OBSERVATION
       resourcePath: resource/Observation
       repeats: true
       isReferenced: true
