@@ -8,7 +8,29 @@ id:
    type: STRING
    valueOf: 'UUID.randomUUID()'
    expressionType: JEXL
-   
+
+masterIdentifier_1:
+   condition: $txa NOT_NULL
+   valueOf: datatype/Identifier_var
+   generateList: true
+   expressionType: resource
+   vars:
+      valueIn: TXA.12.1 | TXA.12.3
+      systemCX: TXA.12.2
+      txa: TXA.12.2
+
+masterIdentifier_2:
+   condition: $txa NULL
+   valueOf: datatype/Identifier
+   generateList: true
+   expressionType: resource
+   vars:
+      value: TXA.12.1 | TXA.12.3
+      system: SYSTEM_URL, $sys
+      txa: TXA.12.2
+   constants:
+      sys: "urn:id:extID"
+
 identifier_1:
    valueOf: datatype/Identifier
    generateList: true
@@ -46,11 +68,13 @@ identifier_3:
       display: "Placer Identifier"
    
 status:
-   type: STRING
-   valueOf: $default
+   type: DOC_REF_STATUS
+   valueOf: TXA.19
    expressionType: HL7Spec
-   constants:
-      default: "current"
+
+docStatus:
+   type: DOC_REF_DOC_STATUS
+   valueOf: TXA.2
 
 content:
    valueOf: secondary/Content

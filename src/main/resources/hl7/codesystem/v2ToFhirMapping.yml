@@ -100,6 +100,12 @@ V3MaritalStatus:
   U: U
   W: W
 
+DocumentReferenceStatus:
+  AV: current
+  CA: entered-in-error
+  OB: superseded
+  UN: current
+
 V3Race:
   # American Indian or Alaska Native	
   1002-5: 1002-5
