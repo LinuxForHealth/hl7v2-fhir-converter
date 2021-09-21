@@ -29,6 +29,7 @@ import org.hl7.fhir.r4.model.MedicationRequest;
 import org.hl7.fhir.r4.model.Observation.ObservationStatus;
 import org.hl7.fhir.r4.model.ServiceRequest.ServiceRequestStatus;
 import org.hl7.fhir.r4.model.Specimen.SpecimenStatus;
+import org.hl7.fhir.r4.model.codesystems.V3ActCode;
 import org.hl7.fhir.r4.model.codesystems.V3MaritalStatus;
 import org.hl7.fhir.r4.model.codesystems.ConditionCategory;
 import org.hl7.fhir.r4.model.codesystems.MessageReasonEncounter;
@@ -236,6 +237,20 @@ public class SimpleDataValueResolver {
             return new SimpleCode(val, use.getSystem(), use.getDisplay());
         } else { // otherwise we don't want the code at all
             return null;
+        }
+    };
+
+    public static final ValueExtractor<Object, SimpleCode> ACT_ENCOUNTER_CODE_FHIR = (Object value) -> {
+        String val = Hl7DataHandlerUtil.getStringValue(value);
+        String code = getFHIRCode(val, V3ActCode.class);
+        String version = Hl7DataHandlerUtil.getVersion(value);
+        if(code != null){
+            V3ActCode act = V3ActCode.fromCode(code);
+            return new SimpleCode( code , act.getSystem(), act.getDisplay(), version);
+        } else {
+            // defaults to unknown
+            // Make a message in the display.
+            return new SimpleCode("unknown", null,  null);
         }
     };
 

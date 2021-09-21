@@ -84,13 +84,20 @@ NameUse:
   BAD: old
    
 EncounterModeOfArrivalDisplay:
-   A: Ambulance	
-   C: Car	
-   F: On foot	
-   H: Helicopter	
-   O: Other	
-   P: Public Transport	
-   U: Unknown
+  A: Ambulance
+  C: Car
+  F: On foot
+  H: Helicopter
+  O: Other
+  P: Public Transport
+  U: Unknown
+
+#Using Actcode for encounter.class
+V3ActCode:
+  E: EMER
+  I: IMP
+  P: PRENC
+  O: AMB
 
 V3MaritalStatus:
   A: A

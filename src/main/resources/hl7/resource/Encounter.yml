@@ -46,11 +46,9 @@ status:
       vars3: String, PV2.16
 
 class:
-    valueOf: datatype/Coding
-    required: true
-    expressionType: resource
-    vars:
-       code: PV1.2
+    type: ACT_ENCOUNTER
+    specs: PV1.2
+    expressionType: HL7Spec
 
 type:
    valueOf: datatype/CodeableConcept
@@ -86,12 +84,23 @@ length:
     vars: 
       time1: DATE_TIME, PV1.44
       time2: DATE_TIME, PV1.45
+      time3: STRING, PV2.11
 
-reasonCode:
+reasonCode_1:
     valueOf: datatype/CodeableConcept
     generateList: true
     expressionType: resource
-    specs: EVN.4 | PV2.3 
+    specs: EVN.4
+
+reasonCode_2:
+  condition: $code NOT_NULL && $evn NULL
+  valueOf: datatype/CodeableConcept
+  generateList: true
+  expressionType: resource
+  specs: PV2.3
+  vars:
+    code: PV2.3
+    evn: EVN.4
 
 reasonReference_1:
    valueOf: datatype/Reference
@@ -128,13 +137,13 @@ diagnosis:
         valueOf: datatype/Reference
         expressionType: resource
         specs: $Condition
-     use: 
+     use:
         valueOf: datatype/CodeableConcept
         expressionType: resource
         specs: DG1.6
         vars:
           coding: DIAGNOSIS_USE, DG1.6
-     rank: 
+     rank:
         type: STRING
         valueOf: DG1.15
         expressionType: HL7Spec
