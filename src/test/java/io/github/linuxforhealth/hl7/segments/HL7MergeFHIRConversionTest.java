@@ -254,7 +254,7 @@ public class HL7MergeFHIRConversionTest {
         
         // Get second patient and associated indentifiers and id.
         Patient patientTwo = PatientUtils.getPatientFromResource(patientResources.get(1));
-        String patientTwoId = patientTwo.getId();         
+        String patientTwoId = patientTwo.getId();
         List<Identifier> patientTwoIdentifierList = patientTwo.getIdentifier();
 
         // Get third patient and associated indentifiers and id.
@@ -343,6 +343,83 @@ public class HL7MergeFHIRConversionTest {
        assertThat(linkFour.getType()).isEqualTo(Patient.LinkType.REPLACEDBY);
        assertThat(linkFour.getOther().getReference()).isEqualTo(patientThreeId);
        
+    }
+
+    // Tests MRG and PID segments that have a system / namespace value in the identifier.
+    @Test
+    public void validateMRGWithIdentifierSystems() {
+
+        String hl7message = "MSH|^~\\&|REGADT|MCM|RSP1P8|MCM|200301051530|SEC|ADT^A40|00000003|P|2.5\r"
+        + "EVN|A40|200301051530\r"
+        + "PID|||MR1^^^XYZ^MR||MAIDENNAME^EVE\r"
+        + "MRG|MR2^^^XYZ\r";
+
+        // Convert hl7 message
+        List<BundleEntryComponent> e =ResourceUtils.createHl7Segment(hl7message);
+
+        // Find the patient resources in the FHIR bundle.
+        List<Resource> patientResources = e.stream()
+        .filter(v -> ResourceType.Patient== v.getResource().getResourceType())
+        .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+
+        // There should be 4 - One for each PID segment and one for each MRG segment
+        assertThat(patientResources).hasSize(2);
+
+        // Get first patient and associated indentifiers and id.
+        Patient patientOne = PatientUtils.getPatientFromResource(patientResources.get(0));
+        String patientOneId = patientOne.getId();
+        List<Identifier> patientOneIdentifierList = patientOne.getIdentifier();
+        
+        // Get second patient and associated indentifiers and id.
+        Patient patientTwo = PatientUtils.getPatientFromResource(patientResources.get(1));
+        String patientTwoId = patientTwo.getId();         
+        List<Identifier> patientTwoIdentifierList = patientTwo.getIdentifier();
+
+        /*-----------Verify Patient One-----------*/
+
+        // Verify the patient has two identifiers
+        assertThat(patientOneIdentifierList).hasSize(2);
+
+        // Verify the identifier values
+        assertThat(patientOneIdentifierList.get(0).getValue()).isEqualTo("MR1");
+        assertThat(patientOneIdentifierList.get(1).getValue()).isEqualTo("MR2");
+
+        // Verify the system is set correctly for both identifiers
+        assertThat(patientOneIdentifierList.get(0).getSystem()).isEqualTo("urn:id:XYZ");
+        assertThat(patientOneIdentifierList.get(1).getSystem()).isEqualTo("urn:id:XYZ");
+
+        // Verify the second identifier is marked as old
+        assertThat(patientOneIdentifierList.get(1).getUse()).isEqualTo(Identifier.IdentifierUse.OLD);
+
+        // The first patient should be active.
+        assertThat(patientOne.getActive()).isTrue();
+
+        // Verify link.other.reference references the MRG (2nd) patient with of a type of 'replaces'
+        PatientLinkComponent linkOne = patientOne.getLink().get(0);
+        assertThat(linkOne.getType()).isEqualTo(Patient.LinkType.REPLACES);
+        assertThat(linkOne.getOther().getReference()).isEqualTo(patientTwoId);
+
+        /*-----------Verify Patient Two-----------*/
+
+        // Verify patient two has only 1 identifier
+        assertThat(patientTwoIdentifierList).hasSize(1);
+
+        // Verify the patient two identifier value
+        assertThat(patientTwoIdentifierList.get(0).getValue()).isEqualTo("MR2");
+
+        // Verify the identifier system is set correctly.
+        assertThat(patientTwoIdentifierList.get(0).getSystem()).isEqualTo("urn:id:XYZ");
+
+        // Verify the patient two identifier value is marked as old
+        assertThat(patientTwoIdentifierList.get(0).getUse()).isEqualTo(Identifier.IdentifierUse.OLD);
+
+        //The second patient should NOT be active.
+        assertThat(patientTwo.getActive()).isFalse();
+
+        // We should have link.other.reference to the PID (1st) patient with a type of 'replaced-by'
+        PatientLinkComponent linkTwo = patientTwo.getLink().get(0);
+        assertThat(linkTwo.getType()).isEqualTo(Patient.LinkType.REPLACEDBY);
+        assertThat(linkTwo.getOther().getReference()).isEqualTo(patientOneId);
     }
 
   }

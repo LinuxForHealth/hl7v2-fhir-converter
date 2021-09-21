@@ -20,6 +20,7 @@ identifier:
    expressionType: resource
    vars:
       valueIn: String, MRG.1.1
+      systemCX: MRG.1.4
    constants:
       system: http://terminology.hl7.org/CodeSystem/v2-0203
       code: MR
