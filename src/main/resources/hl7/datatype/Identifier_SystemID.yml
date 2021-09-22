@@ -34,3 +34,9 @@ period:
     vars: 
        start: CX.7 | CWE.7
        end: CX.8 | CWE.8
+
+use:
+   condition: $mrgUse NOT_NULL
+   value: $mrgUse
+   vars:
+      mrgUse: $use

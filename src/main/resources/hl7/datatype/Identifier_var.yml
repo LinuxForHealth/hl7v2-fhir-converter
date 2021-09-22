@@ -23,9 +23,3 @@ system_2:
    valueOf: $join
    vars:
       join: $systemCX, GeneralUtils.noWhiteSpace(join)
-
-use:
-   condition: $mrgUse NOT_NULL
-   value: $mrgUse
-   vars:
-      mrgUse: $use

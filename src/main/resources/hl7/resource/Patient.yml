@@ -45,18 +45,14 @@ identifier_3:
       display: Driver's license number
 # There is no text for PID.20
 identifier_4:
-   condition: $valueIn NOT_NULL
-   valueOf: datatype/Identifier_var
+   condition: $mrgIdentifier NOT_NULL
+   valueOf: datatype/Identifier_SystemID
    generateList: true
    expressionType: resource
-   vars:
-      valueIn: String, MRG.1.1
-      systemCX: MRG.1.4
+   specs: MRG.1
    constants:
-      system: http://terminology.hl7.org/CodeSystem/v2-0203
-      code: MR
-      display: Medical record number
       use: old
+      mrgIdentifier: MRG.1
 # Add the old MR # from the MRG segment
 
 name:
