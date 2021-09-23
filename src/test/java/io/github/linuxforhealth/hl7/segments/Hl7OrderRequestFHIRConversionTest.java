@@ -100,7 +100,6 @@ public class Hl7OrderRequestFHIRConversionTest {
     // ORC.12 should create an ServiceRequest.requester reference
     assertThat(serviceRequest.hasRequester()).isTrue();
     String requesterRef = serviceRequest.getRequester().getReference();
-    // assertThat(serviceRequest.getOccurrenceDateTimeType().toString()).containsPattern("2017-09-17T15:17:17");
 
     // Find the practitioner resources from the FHIR bundle.
     List<Resource> practitioners = e.stream()
