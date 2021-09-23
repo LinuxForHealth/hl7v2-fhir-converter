@@ -93,6 +93,15 @@ resultsInterpreter:
    vars:
       interpreter: OBR.32
 
+basedOn:
+   condition: $basedOnORC NOT_NULL
+   valueOf: resource/ServiceRequest
+   generateList: true
+   expressionType: reference
+   specs: ORC
+   vars:
+      basedOnORC: ORC      
+
 specimen:
    valueOf: datatype/Reference
    generateList: true

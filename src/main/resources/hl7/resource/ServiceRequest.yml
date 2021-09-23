@@ -65,3 +65,39 @@ subject:
    valueOf: datatype/Reference
    expressionType: resource
    specs: $Patient
+
+requisition:
+   valueOf: datatype/Identifier_var
+   expressionType: resource
+   specs: ORC.4
+   vars:
+      valueIn: ORC.4.1
+      systemCX:  ORC.4.2
+
+authoredOn:
+   type: DATE_TIME
+   valueOf: ORC.9 | OBR.6
+   expressionType: HL7Spec
+
+occurrenceDateTime:   
+   type: DATE_TIME
+   valueOf: ORC.15 | OBR.7 | OBR.27.4
+   expressionType: HL7Spec
+
+requester:
+   condition: $request NOT_NULL 
+   valueOf: resource/Practitioner
+   generateList: true
+   expressionType: reference
+   specs: ORC.12 | OBR.16
+   vars:
+      request: ORC.12 | OBR.16
+
+reasonCode:
+   condition: $reasonCWE NOT_NULL 
+   valueOf: datatype/CodeableConcept
+   generateList: true
+   expressionType: resource
+   specs: OBR.31 | ORC.16  
+   vars:
+      reasonCWE: OBR.31 | ORC.16      
