@@ -329,8 +329,8 @@ public class Hl7EncounterFHIRConversionTest {
 
         assertThat(encounter.hasLength()).isTrue();
         Duration encounterLength = encounter.getLength();
-        assertThat(encounterLength.getValue()).isEqualTo((BigDecimal.valueOf(1)));
-        assertThat(encounterLength.getUnit()).isEqualTo("Days");
+        assertThat(encounterLength.getValue()).isEqualTo((BigDecimal.valueOf(1440)));
+        assertThat(encounterLength.getUnit()).isEqualTo("Minutes");
 
 
         //When length between encounters is a less than a apart the units should be "Minutes"

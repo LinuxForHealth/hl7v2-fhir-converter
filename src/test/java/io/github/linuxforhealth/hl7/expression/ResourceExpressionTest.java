@@ -276,7 +276,7 @@ public class ResourceExpressionTest {
         new SimpleEvaluationResult(s));
 
     List<Map<String, Object>> result = (List<Map<String, Object>>) value.getValue();
-    assertThat(result.get(0).get("text")).isEqualTo("AA");
+    assertThat(result.get(0).get("text")).isNull();
     assertThat(result.get(0).get("coding")).isNotNull();
     List<SimpleCode> scs = (List<SimpleCode>) result.get(0).get("coding");
     SimpleCode sc = scs.get(0);

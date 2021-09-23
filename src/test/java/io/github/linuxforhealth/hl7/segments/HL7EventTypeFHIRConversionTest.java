@@ -53,11 +53,6 @@ public class HL7EventTypeFHIRConversionTest {
         .collect(Collectors.toList());
     assertThat(encounterResource).hasSize(1);
 
-    // ENV.4 is used for reasonCode
-    String reasonCode = encounterResource.get(0).getNamedProperty("reasonCode").getValues().get(0)
-        .getNamedProperty("text").getValues().get(0).toString();
-    assertThat(reasonCode).isEqualTo("851");
-
     Base period = encounterResource.get(0).getNamedProperty("period").getValues().get(0);
     // EVN.6 is used for start period (with no end) if there is no PV1.44
     String startPeriod = period.getNamedProperty("start").getValues().get(0).toString();
@@ -88,11 +83,6 @@ public class HL7EventTypeFHIRConversionTest {
         .filter(v -> ResourceType.Encounter == v.getResource().getResourceType()).map(BundleEntryComponent::getResource)
         .collect(Collectors.toList());
     assertThat(encounterResource).hasSize(1);
-
-    // ENV.4 is used for reasonCode
-    String reasonCode = encounterResource.get(0).getNamedProperty("reasonCode").getValues().get(0)
-        .getNamedProperty("text").getValues().get(0).toString();
-    assertThat(reasonCode).isEqualTo("7525");
 
     Base period = encounterResource.get(0).getNamedProperty("period").getValues().get(0);
     // EVN.6 is used for start period if there is no PV1.44 but since we have a
