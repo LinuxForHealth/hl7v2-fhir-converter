@@ -87,7 +87,6 @@ occurrenceDateTime:
 requester:
    condition: $request NOT_NULL 
    valueOf: resource/Practitioner
-   generateList: true
    expressionType: reference
    specs: ORC.12 | OBR.16
    vars:
@@ -101,3 +100,11 @@ reasonCode:
    specs: OBR.31 | ORC.16  
    vars:
       reasonCWE: OBR.31 | ORC.16      
+
+code:
+   condition: $codeCWE NOT_NULL 
+   valueOf: datatype/CodeableConcept
+   expressionType: resource
+   specs: OBR.4
+   vars:
+      codeCWE: OBR.4       

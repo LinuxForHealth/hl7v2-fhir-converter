@@ -57,6 +57,7 @@ category:
    specs: OBR.24
    vars:
       code: OBR.24
+      
 code:
    valueOf: datatype/CodeableConcept
    expressionType: resource
@@ -64,6 +65,7 @@ code:
    required: true
    vars:
       code: OBR.4
+
 encounter:
    valueOf: datatype/Reference
    expressionType: resource
