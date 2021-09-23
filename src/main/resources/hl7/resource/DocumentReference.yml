@@ -74,10 +74,61 @@ status:
 
 docStatus:
    type: DOC_REF_DOC_STATUS
-   valueOf: TXA.2
+   valueOf: TXA.17 | OBX.11
+   expressionType: HL7Spec
+
+type:
+   valueOf: datatype/CodeableConcept
+   expressionType: resource
+   specs: TXA.2
+
+subject:
+   valueOf: datatype/Reference
+   expressionType: resource
+   specs: $Patient
+
+date:
+   type: INSTANT
+   valueOf: TXA.6
+   expressionType: HL7Spec
+
+author:
+   expressionType: reference
+   valueOf: resource/Practitioner
+   specs: TXA.9
+
+authenticator:
+   expressionType: reference
+   valueOf: resource/Practitioner
+   specs: TXA.22 | TXA.10
 
 content:
    valueOf: secondary/Content
    expressionType: resource
-   constants:
-      value: "attachment"
+   vars:
+      value1: TXA.3 | OBX.2
+      value2: TXA.7
+
+relatesTo:
+   condition: $value1 NOT_NULL
+   valueOf: secondary/RelatesTo
+   expressionType: resource
+   vars:
+      value1: TXA.13
+
+description:
+   type: STRING
+   expressionType: HL7Spec
+   valueOf: TXA.16
+
+securityLabel:
+   valueOf: datatype/CodeableConcept
+   expressionType: resource
+   specs: TXA.18
+
+context:
+   valueOf: secondary/Context
+   expressionType: resource
+   vars:
+      value1: TXA.4
+      value2: TXA.5

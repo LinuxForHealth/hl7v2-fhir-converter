@@ -106,6 +106,21 @@ DocumentReferenceStatus:
   OB: superseded
   UN: current
 
+CompositionStatus:
+  AU: final
+  DI: preliminary
+  DO: preliminary
+  IN: preliminary
+  IP: preliminary
+  PA: preliminary
+  LA: final
+  NU: entered-in-error
+  F: preliminary
+  P: preliminary
+  U: preliminary
+  S: preliminary
+  C: final
+
 V3Race:
   # American Indian or Alaska Native	
   1002-5: 1002-5

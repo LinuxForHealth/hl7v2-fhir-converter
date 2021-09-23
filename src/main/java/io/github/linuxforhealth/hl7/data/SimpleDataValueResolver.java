@@ -28,14 +28,7 @@ import org.hl7.fhir.r4.model.Immunization.ImmunizationStatus;
 import org.hl7.fhir.r4.model.MedicationRequest;
 import org.hl7.fhir.r4.model.Observation.ObservationStatus;
 import org.hl7.fhir.r4.model.Specimen.SpecimenStatus;
-import org.hl7.fhir.r4.model.codesystems.V3MaritalStatus;
-import org.hl7.fhir.r4.model.codesystems.ConditionCategory;
-import org.hl7.fhir.r4.model.codesystems.MessageReasonEncounter;
-import org.hl7.fhir.r4.model.codesystems.NameUse;
-import org.hl7.fhir.r4.model.codesystems.V3ReligiousAffiliation;
-import org.hl7.fhir.r4.model.codesystems.DiagnosisRole;
-import org.hl7.fhir.r4.model.codesystems.ConditionClinical;
-import org.hl7.fhir.r4.model.codesystems.ConditionVerStatus;
+import org.hl7.fhir.r4.model.codesystems.*;
 import org.hl7.fhir.r5.model.Enumerations;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -248,15 +241,24 @@ public class SimpleDataValueResolver {
             return null;
         }
     };
+
     public static final ValueExtractor<Object, String> DOC_REF_STATUS_CODE_FHIR = (Object value) -> {
         String val = Hl7DataHandlerUtil.getStringValue(value);
         String code = getFHIRCode(val, Enumerations.DocumentReferenceStatus.class);
-        System.out.println(code);
-
         if (code != null) {
             return code;
         } else {
             return "current";
+        }
+    };
+
+    public static final ValueExtractor<Object, String> DOC_REF_DOC_STATUS_CODE_FHIR = (Object value) -> {
+        String val = Hl7DataHandlerUtil.getStringValue(value);
+        String code = getFHIRCode(val, CompositionStatus.class);
+        if (code != null) {
+            return code;
+        } else {
+            return null;
         }
     };
 
