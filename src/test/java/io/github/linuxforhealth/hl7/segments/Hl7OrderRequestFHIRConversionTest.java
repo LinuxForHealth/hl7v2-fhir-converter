@@ -26,6 +26,7 @@ import io.github.linuxforhealth.fhir.FHIRContext;
 import io.github.linuxforhealth.hl7.HL7ToFHIRConverter;
 import io.github.linuxforhealth.hl7.segments.util.PatientUtils;
 import io.github.linuxforhealth.hl7.segments.util.DatatypeUtils;
+import io.github.linuxforhealth.hl7.segments.util.ResourceUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,8 +65,8 @@ public class Hl7OrderRequestFHIRConversionTest {
 
     IBaseResource bundleResource = context.getParser().parseResource(json);
     assertThat(bundleResource).isNotNull();
-    Bundle b = (Bundle) bundleResource;
-    List<BundleEntryComponent> e = b.getEntry();
+    Bundle bundle = (Bundle) bundleResource;
+    List<BundleEntryComponent> e = bundle.getEntry();
 
     List<Resource> serviceRequestList = e.stream()
         .filter(v -> ResourceType.ServiceRequest == v.getResource().getResourceType())
@@ -101,22 +102,9 @@ public class Hl7OrderRequestFHIRConversionTest {
     assertThat(serviceRequest.hasRequester()).isTrue();
     String requesterRef = serviceRequest.getRequester().getReference();
 
-    // Find the practitioner resources from the FHIR bundle.
-    List<Resource> practitioners = e.stream()
-        .filter(v -> ResourceType.Practitioner == v.getResource().getResourceType())
-        .map(BundleEntryComponent::getResource).collect(Collectors.toList());
-    assertThat(practitioners.size()).isPositive(); // Confirm there is at least one practitioner
-    // Find all practitioners with matching Id's in the list of practitioners.
-    List<Resource> matchingPractitioners = new ArrayList<Resource>();
-    for (int i = 0; i < practitioners.size(); i++) {
-      if (practitioners.get(i).getId().equalsIgnoreCase(requesterRef)) {
-        matchingPractitioners.add(practitioners.get(i));
-      }
-    }
-    assertThat(matchingPractitioners).hasSize(1); // Count must be exactly 1.  
+    Practitioner pract = ResourceUtils.getSpecificPractitionerFromBundle(bundle, requesterRef);
     // Confirm that the matching practitioner by ID has the correct content (simple validation)
     // Should be ORC.12.1 and NOT OBR.16.1
-    Practitioner pract = (Practitioner) matchingPractitioners.get(0);
     assertThat(pract.getIdentifierFirstRep().getValue()).isEqualTo("5742200012");
 
     // Get the DiagnosticReport and see that it's basedOn cross-references to the ServiceRequest object
@@ -150,7 +138,8 @@ public class Hl7OrderRequestFHIRConversionTest {
         //  4. Leave ORC.12 empty so OBR.16 is used for Practitioner reference
         //  5. ORC.16 is set to a reason code (but it is ignored because it is secondary to OBR.31, which is present in this case and therefore overrides ORC.16)
         + "ORC|RE|248648498^|248648498^|ML18267-C00001^Beaker||||||||||(781)849-2400^^^^^781^8492400||042^Human immunodeficiency virus [HIV] disease [42]^I9CDX^^^^29|||||ATRIUS HEALTH, INC^D^^^^POCFULL^XX^^^1020|P.O. BOX 415432^^BOSTON^MA^02241-5432^^B|898-7980^^8^^^800^8987980|111 GROSSMAN DRIVE^^BRAINTREE^MA^02184^USA^C^^NORFOLK|||||||\n"
-        + "OBR|1|248648498^|248648498^|83036E^HEMOGLOBIN A1C^PACSEAP^^^^^^HEMOGLOBIN A1C||20120606120606|20170707150707||||L||E11.9^Type 2 diabetes mellitus without complications^ICD-10-CM^^^^^^Type 2 diabetes mellitus without complications|||54321678^SCHMIDT^FRIEDA^^MD^^^^^^^^^NPISER|(781)849-2400^^^^^781^8492400|||||20180924152900|||F||^^^20120613071200||||HIV^HIV/Aids^L^^^^V1|&Roache&Gerard&&||||||||||||||||||\n"
+        //  10. OBR.32 will be turned into a Practioner and referenced and the DiagnositicReport.resultsInterpreter
+        + "OBR|1|248648498^|248648498^|83036E^HEMOGLOBIN A1C^PACSEAP^^^^^^HEMOGLOBIN A1C||20120606120606|20170707150707||||L||E11.9^Type 2 diabetes mellitus without complications^ICD-10-CM^^^^^^Type 2 diabetes mellitus without complications|||54321678^SCHMIDT^FRIEDA^^MD^^^^^^^^^NPISER|(781)849-2400^^^^^781^8492400|||||20180924152900|||F||^^^20120613071200||||HIV^HIV/Aids^L^^^^V1|323232^Mahoney^Paul^J||||||||||||||||||\n"
         + "TQ1|1||||||20180924152721|20180924235959|R\n"
         + "OBX|1|NM|17985^GLYCOHEMOGLOBIN HGB A1C^LRR^^^^^^GLYCOHEMOGLOBIN HGB A1C||5.6|%|<6.0||||F|||20180924152700||9548^ROACHE^GERARD^^|||20180924152903||||HVMA DEPARTMENT OF PATHOLOGY AND LAB MEDICINE^D|152 SECOND AVE^^NEEDHAM^MA^02494-2809^^B|\n"
         + "SPM|1|||^^^^^^^^Blood|||||||||||||20180924152700|20180924152755||||||\n";
@@ -161,8 +150,8 @@ public class Hl7OrderRequestFHIRConversionTest {
 
     IBaseResource bundleResource = context.getParser().parseResource(json);
     assertThat(bundleResource).isNotNull();
-    Bundle b = (Bundle) bundleResource;
-    List<BundleEntryComponent> e = b.getEntry();
+    Bundle bundle = (Bundle) bundleResource;
+    List<BundleEntryComponent> e = bundle.getEntry();
 
     List<Resource> serviceRequestList = e.stream()
         .filter(v -> ResourceType.ServiceRequest == v.getResource().getResourceType())
@@ -190,23 +179,9 @@ public class Hl7OrderRequestFHIRConversionTest {
     // OBR.22 should create an ServiceRequest.requester reference
     assertThat(serviceRequest.hasRequester()).isTrue();
     String requesterRef = serviceRequest.getRequester().getReference();
-
-    // Find the practitioner resources from the FHIR bundle.
-    List<Resource> practitioners = e.stream()
-        .filter(v -> ResourceType.Practitioner == v.getResource().getResourceType())
-        .map(BundleEntryComponent::getResource).collect(Collectors.toList());
-    assertThat(practitioners.size()).isPositive(); // Confirm there is at least one practitioner
-    // Find all practitioners with matching Id's in the list of practitioners.
-    List<Resource> matchingPractitioners = new ArrayList<Resource>();
-    for (int i = 0; i < practitioners.size(); i++) {
-      if (practitioners.get(i).getId().equalsIgnoreCase(requesterRef)) {
-        matchingPractitioners.add(practitioners.get(i));
-      }
-    }
-    assertThat(matchingPractitioners).hasSize(1); // Count must be exactly 1.  
+    Practitioner pract = ResourceUtils.getSpecificPractitionerFromBundle(bundle, requesterRef);
     // Confirm that the matching practitioner by ID has the correct content (simple validation)
     // Should be OBR.16.1 because ORC.12 is empty.
-    Practitioner pract = (Practitioner) matchingPractitioners.get(0);
     assertThat(pract.getIdentifierFirstRep().getValue()).isEqualTo("54321678");
 
     List<Resource> diagnosticReportList = e.stream()
@@ -221,6 +196,15 @@ public class Hl7OrderRequestFHIRConversionTest {
     // Check for issued instant of OBR.22
     assertThat(diagnosticReport.hasIssued()).isTrue();
     assertThat(diagnosticReport.getIssued().toInstant().toString()).contains("2018-09-24T07:29:00Z");
+
+    // Get the diagnosticReport.resultsInterpreter, which should match the Practitioner from OBR.32
+    assertThat(diagnosticReport.hasResultsInterpreter()).isTrue();
+    assertThat(diagnosticReport.getResultsInterpreter()).hasSize(1);
+    String resultsInterpreterRef = diagnosticReport.getResultsInterpreter().get(0).getReference();
+    pract = ResourceUtils.getSpecificPractitionerFromBundle(bundle, resultsInterpreterRef);
+    // Confirm that the matching practitioner by ID has the correct content (simple validation)
+    // Should be OBR.32
+    assertThat(pract.getIdentifierFirstRep().getValue()).isEqualTo("323232");
   }
 
   @Test
@@ -245,8 +229,8 @@ public class Hl7OrderRequestFHIRConversionTest {
 
     IBaseResource bundleResource = context.getParser().parseResource(json);
     assertThat(bundleResource).isNotNull();
-    Bundle b = (Bundle) bundleResource;
-    List<BundleEntryComponent> e = b.getEntry();
+    Bundle bundle = (Bundle) bundleResource;
+    List<BundleEntryComponent> e = bundle.getEntry();
 
     List<Resource> serviceRequestList = e.stream()
         .filter(v -> ResourceType.ServiceRequest == v.getResource().getResourceType())
