@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2020
+ * (C) Copyright IBM Corp. 2020, 2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -74,6 +74,8 @@ repositories {
 
 test {
     useJUnitPlatform()
+    // Use parallel processing as possible
+    maxParallelForks = (int) (Runtime.runtime.availableProcessors() / 2 + 1)
     finalizedBy jacocoTestReport // report is always generated after tests run
 }
 

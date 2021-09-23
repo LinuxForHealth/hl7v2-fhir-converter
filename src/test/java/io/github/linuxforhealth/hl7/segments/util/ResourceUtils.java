@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+import java.util.ArrayList;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -208,5 +209,26 @@ public class ResourceUtils {
     Class<? extends IBaseResource> klass = MedicationAdministration.class;
 
     return (MedicationAdministration) context.getParser().parseResource(klass, s);
+  }
+
+  // Given a bundle and practioner reference, returns the matching referenced Practitioner from the bundle
+  // Asserts that there is at least one practitioner in the bundle and exactly one match for the reference
+  public static Practitioner getSpecificPractitionerFromBundle(Bundle bundle, String practitionerRef) {
+    List<BundleEntryComponent> entries = bundle.getEntry();
+    // Find the practitioner resources from the FHIR bundle.
+    List<Resource> practitioners = entries.stream()
+        .filter(v -> ResourceType.Practitioner == v.getResource().getResourceType())
+        .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+    assertThat(practitioners.size()).isPositive(); // Confirm there is at least one practitioner
+    // Find all practitioners with matching Id's in the list of practitioners.
+    List<Resource> matchingPractitioners = new ArrayList<Resource>();
+    for (int i = 0; i < practitioners.size(); i++) {
+      if (practitioners.get(i).getId().equalsIgnoreCase(practitionerRef)) {
+        matchingPractitioners.add(practitioners.get(i));
+      }
+    }
+    assertThat(matchingPractitioners).hasSize(1); // Count must be exactly 1.  
+    Practitioner pract = (Practitioner) matchingPractitioners.get(0);
+    return pract;
   }
 }
