@@ -263,7 +263,7 @@ public class Hl7EncounterFHIRConversionTest {
       assertThat(encounterClass.getDisplay()).isEqualTo("emergency");
       assertThat(encounterClass.getVersion()).isNull();
 
-      // Should return "unknown"  if not a mapped value
+      // Should return hl7Code if not a mapped value
       hl7message = "MSH|^~\\&|PROSOLV|SENTARA|WHIA|IBM|20151008111200|S1|ADT^A01^ADT_A01|MSGID000001|T|2.6|10092|PRPA008|AL|AL|100|8859/1|ENGLISH|ARM|ARM5007\n"
               + "EVN|A04|20151008111200|20171013152901|O|OID1006|20171013153621|EVN1009\n"
               + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
@@ -272,7 +272,7 @@ public class Hl7EncounterFHIRConversionTest {
 
       assertThat(encounter.hasClass_()).isTrue();
       encounterClass = encounter.getClass_();
-      assertThat(encounterClass.getCode()).isEqualTo("unknown");
+      assertThat(encounterClass.getCode()).isEqualTo("L");
       assertThat(encounterClass.getSystem()).isNull();
       assertThat(encounterClass.getDisplay()).isNull();
       assertThat(encounterClass.getVersion()).isNull();

@@ -250,7 +250,7 @@ public class SimpleDataValueResolver {
         } else {
             // defaults to unknown
             // Make a message in the display.
-            return new SimpleCode("unknown", null,  null);
+            return new SimpleCode(val, null,  null);
         }
     };
 
