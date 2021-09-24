@@ -35,6 +35,11 @@ The converter supports the following message segments:
 
 If you need another message type/event . . .  contributions are welcome! See [CONTRIBUTING.md](CONTRIBUTING.md)!
 
+## Additional Documentation
+* [Templating Configuration](./TEMPLATING.md)
+* [Development Guide](./DEVELOPMENT.md)
+* [HL7 to FHIR Conversion Design](./HL7FHIR.md)
+
 ## Development Quickstart
 
 The FHIR Converter has the following dependencies:
@@ -103,7 +108,3 @@ The config.properties file location is searched in the following order:
    ``` -Dhl7converter.config.home=/opt/converter/config_home_folder/```
 
 * Lastly, the local classpath resource folder will be searched for config.properties
-
-## Additional Documentation
-* [Templating Configuration](./TEMPLATING.md)
-* [Development Guide](./DEVELOPMENT.md)
