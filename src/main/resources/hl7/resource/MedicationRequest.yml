@@ -50,12 +50,12 @@ intent:
     default: "order"
 
 medicationCodeableConcept_1:
-  condition: $rxC NOT_NULL
+  condition: $rxO NOT_NULL
   valueOf: datatype/CodeableConcept
   expressionType: resource
-  specs: RXC.2
+  specs: RXO.1
   vars:
-    rxC: RXC.2
+    rxO: RXO.1
 medicationCodeableConcept_2:
   condition: $rxE NOT_NULL 
   valueOf: datatype/CodeableConcept
@@ -64,12 +64,12 @@ medicationCodeableConcept_2:
   vars:
     rxE: RXE.2
 medicationCodeableConcept_3:
-  condition: $rxO NOT_NULL
+  condition: $rxC NOT_NULL
   valueOf: datatype/CodeableConcept
   expressionType: resource
-  specs: RXO.1
+  specs: RXC.2
   vars:
-    rxO: RXO.1
+    rxC: RXC.2
 
 authoredOn:
   type: DATE_TIME

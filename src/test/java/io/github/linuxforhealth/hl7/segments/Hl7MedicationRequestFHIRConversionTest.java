@@ -176,7 +176,7 @@ public class Hl7MedicationRequestFHIRConversionTest {
     @ValueSource(strings = 
     { 
     "MSH|^~\\&||||||S1|RDE^O11||T|2.6|||||||||\r",
-    // "MSH|^~\\&||||||S1|RDE^O25||T|2.6|||||||||\r",
+    "MSH|^~\\&||||||S1|RDE^O25||T|2.6|||||||||\r",
     })
     public void test_medicationCodeableConcept_authoredOn_and_intent_in_rde_with_rxO_with_rxe(String msh) {
 
