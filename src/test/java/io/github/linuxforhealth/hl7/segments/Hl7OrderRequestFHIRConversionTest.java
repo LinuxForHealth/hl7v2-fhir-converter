@@ -43,7 +43,7 @@ public class Hl7OrderRequestFHIRConversionTest {
         "MSH|^~\\&|Epic|ATRIUS|||20180924152907|34001|ORU^R01^ORU_R01|213|T|2.6|||||||||PHLabReport-Ack^^2.16.840.1.114222.4.10.3^ISO||\n"
             + "SFT|Epic Systems Corporation^L^^^^ANSI&1.2.840&ISO^XX^^^1.2.840.114350|Epic 2015 |Bridges|8.2.2.0||20160605043244\n"
             + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
-            + "PV1|1|||||||||||||||||||||||||||||||||||||||||||20180924152707|\n"
+            + "PV1|1|E||||||||||||||||||||||||||||||||||||||||||20180924152707|\n"
             //  NOTE: ORC is optional; OBR is required.
             //  Key input data set up:
             //  1. Checking fields ORC.4 to ServiceRequest.requisition
@@ -129,7 +129,7 @@ public class Hl7OrderRequestFHIRConversionTest {
     String hl7message = "MSH|^~\\&|Epic|ATRIUS|||20180924152907|34001|ORU^R01^ORU_R01|213|T|2.6|||||||||PHLabReport-Ack^^2.16.840.1.114222.4.10.3^ISO||\n"
         + "SFT|Epic Systems Corporation^L^^^^ANSI&1.2.840&ISO^XX^^^1.2.840.114350|Epic 2015 |Bridges|8.2.2.0||20160605043244\n"
         + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
-        + "PV1|1|||||||||||||||||||||||||||||||||||||||||||20180924152707|\n"
+        + "PV1|1|E||||||||||||||||||||||||||||||||||||||||||20180924152707|\n"
         //  NOTE: ORC is optional; OBR is required.
         //  Key input data set up:
         //  1. ORC.15 is empty, so OBR.7 used as ServiceRequest.occurrenceDateTime
@@ -226,7 +226,7 @@ public class Hl7OrderRequestFHIRConversionTest {
         "MSH|^~\\&|Epic|ATRIUS|||20180924152907|34001|ORU^R01^ORU_R01|213|T|2.6|||||||||PHLabReport-Ack^^2.16.840.1.114222.4.10.3^ISO||\n"
             + "SFT|Epic Systems Corporation^L^^^^ANSI&1.2.840&ISO^XX^^^1.2.840.114350|Epic 2015 |Bridges|8.2.2.0||20160605043244\n"
             + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
-            + "PV1|1|||||||||||||||||||||||||||||||||||||||||||20180924152707|\n"
+            + "PV1|1|E||||||||||||||||||||||||||||||||||||||||||20180924152707|\n"
             //  ORC.15 is empty, OBR.7 is empty, so use OBR-27[0].4 as ServiceRequest.occurrenceDateTime
             + "ORC|RE|248648498^|248648498^|ML18267-C00001^Beaker|||||20120628071200|||1457352338^TEITLEMAN^CHRISTOPHER^A^MD^^^^^^^^^NPISER||(781)849-2400^^^^^781^8492400|||||||ATRIUS HEALTH, INC^D^^^^POCFULL^XX^^^1020|P.O. BOX 415432^^BOSTON^MA^02241-5432^^B|898-7980^^8^^^800^8987980|111 GROSSMAN DRIVE^^BRAINTREE^MA^02184^USA^C^^NORFOLK|||||||\n"
             + "OBR|1|248648498^|248648498^|83036E^HEMOGLOBIN A1C^PACSEAP^^^^^^HEMOGLOBIN A1C|||||||L||E11.9^Type 2 diabetes mellitus without complications^ICD-10-CM^^^^^^Type 2 diabetes mellitus without complications|||1457352338^TEITLEMAN^CHRISTOPHER^A^MD^^^^^^^^^NPISER|(781)849-2400^^^^^781^8492400|||||20180924152900|||F||^^^20120606120606|||||&Roache&Gerard&&||||||||||||||||||\n";
