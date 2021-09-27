@@ -149,9 +149,9 @@ public class SimpleDataValueResolverTest {
 
   @Test
   public void get_service_request_status_value_valid() {
-    String gen = "f";
+    String gen = "SC";
     assertThat(SimpleDataValueResolver.SERVICE_REQUEST_STATUS.apply(gen))
-		.isEqualTo(ServiceRequestStatus.COMPLETED.toCode());
+		.isEqualTo(ServiceRequestStatus.ACTIVE.toCode());
   }
 
   

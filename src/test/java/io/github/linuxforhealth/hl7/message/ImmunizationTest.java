@@ -23,6 +23,7 @@ import io.github.linuxforhealth.hl7.ConverterOptions;
 import io.github.linuxforhealth.hl7.HL7ToFHIRConverter;
 import io.github.linuxforhealth.hl7.ConverterOptions.Builder;
 import io.github.linuxforhealth.hl7.resource.ResourceReader;
+import io.github.linuxforhealth.hl7.segments.util.ResourceUtils;
 
 public class ImmunizationTest {
     private static FHIRContext context = new FHIRContext(true, false);
@@ -101,7 +102,7 @@ public class ImmunizationTest {
         List<Resource> immu = e.stream().filter(v -> ResourceType.Immunization == v.getResource().getResourceType())
                 .map(BundleEntryComponent::getResource).collect(Collectors.toList());
         assertThat(immu).hasSize(1);
-        Immunization resource = getResource(immu.get(0));
+        Immunization resource = ResourceUtils.getResourceImmunization(immu.get(0),context);
         assertThat(resource).isNotNull();
 
         assertThat(resource.getStatus().getDisplay()).isEqualTo("completed");
@@ -129,12 +130,12 @@ public class ImmunizationTest {
 
         assertThat(resource.getManufacturer().isEmpty()).isFalse();
 
-    }
+        // Test that a ServiceRequest is not created for VXU_V04
+        List<Resource> serviceRequestList = e.stream()
+        .filter(v -> ResourceType.ServiceRequest == v.getResource().getResourceType())
+        .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        // Confirm that a serviceRequest was not created.      
+        assertThat(serviceRequestList).isEmpty();
 
-    private static Immunization getResource(Resource resource) {
-        String s = context.getParser().encodeResourceToString(resource);
-        Class<? extends IBaseResource> klass = Immunization.class;
-        return (Immunization) context.getParser().parseResource(klass, s);
     }
-
 }

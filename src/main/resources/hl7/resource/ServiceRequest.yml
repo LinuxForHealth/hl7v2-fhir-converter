@@ -51,8 +51,8 @@ identifier_3:
 status:
    type: SERVICE_REQUEST_STATUS
    default: "unknown"
-   valueOf: OBX.11
-   expressionType: HL7Spec
+   valueOf: ORC.5
+   expressionType: HL7Spec   
 
 intent:
    type: STRING

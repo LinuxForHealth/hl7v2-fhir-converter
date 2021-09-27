@@ -40,23 +40,23 @@ public class Hl7OrderRequestFHIRConversionTest {
 
     String hl7message =
 
-        "MSH|^~\\&|Epic|ATRIUS|||20180924152907|34001|ORU^R01^ORU_R01|213|T|2.6|||||||||PHLabReport-Ack^^2.16.840.1.114222.4.10.3^ISO||\n"
-            + "SFT|Epic Systems Corporation^L^^^^ANSI&1.2.840&ISO^XX^^^1.2.840.114350|Epic 2015 |Bridges|8.2.2.0||20160605043244\n"
+        "MSH|^~\\&|||||20180924152907|34001|ORU^R01^ORU_R01|213|T|2.6|||||||||||\n"
             + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
-            + "PV1|1|E||||||||||||||||||||||||||||||||||||||||||20180924152707|\n"
+            + "PV1|1|E|||||||||||||||||||||||||||||||||||||||||||\n"
             //  NOTE: ORC is optional; OBR is required.
             //  Key input data set up:
             //  1. Checking fields ORC.4 to ServiceRequest.requisition
+            //  1b. ORC.5 to ServiceRequest.status 
             //  2. ORC.9 to ServiceRequest.authoredOn (overrides secondary OBR.6)
             //  3. ORC.12 to ServiceRequest.requester AND Practitioner object and reference to Practictioner
             //  4. ORC.15 to ServiceRequest.occurrenceDateTime (overrides secondary OBR.7)
             //  5. ORC.16 is set to a reason code (secondary to OBR.31, which is purposely not present in this case)
-            + "ORC|RE|248648498^|248648498^|ML18267-C00001^Beaker|||||20120628071200|||5742200012^Radon^Nicholas^^^^^^NPI^L^^^NPI||(781)849-2400^^^^^781^8492400|20170917151717|042^Human immunodeficiency virus [HIV] disease [42]^I9CDX^^^^29|||||ATRIUS HEALTH, INC^D^^^^POCFULL^XX^^^1020|P.O. BOX 415432^^BOSTON^MA^02241-5432^^B|898-7980^^8^^^800^8987980|111 GROSSMAN DRIVE^^BRAINTREE^MA^02184^USA^C^^NORFOLK|||||||\n"
+            + "ORC|RE|248648498^|248648498^|ML18267-C00001^Beaker|SC||||20120628071200|||5742200012^Radon^Nicholas^^^^^^NPI^L^^^NPI|||20170917151717|042^Human immunodeficiency virus [HIV] disease [42]^I9CDX^^^^29|||||||||||||||\n"
             //  10. OBR.16 is here as a test to show that it is ignored as Practitioner because ORC.12 has priority 
             //  11. OBR.31 is omitted purposely so the ORC.16 is used for the reason code
             //  12. OBR.6 is purposely present, but will be ignored because ORC.9 has a value and is preferred.
             //  13. OBR.7 is purposely present, but will be ignored because ORC.15 has a value and is preferred.
-            + "OBR|1|248648498^|248648498^|83036E^HEMOGLOBIN A1C^PACSEAP^^^^^^HEMOGLOBIN A1C||20120606120606|20120606120606||||L||E11.9^Type 2 diabetes mellitus without complications^ICD-10-CM^^^^^^Type 2 diabetes mellitus without complications|||54321678^SCHMIDT^FRIEDA^^MD^^^^^^^^^NPI|(781)849-2400^^^^^781^8492400|||||20180924152900|||F||^^^20120613071200|||||&Roache&Gerard&&||||||||||||||||||\n";
+            + "OBR|1|248648498^|248648498^|83036E^HEMOGLOBIN A1C^PACSEAP^^^^^^HEMOGLOBIN A1C||20120606120606|20120606120606||||L|||||54321678^SCHMIDT^FRIEDA^^MD^^^^^^^^^NPI||||||20180924152900|||F||^^^20120613071200|||||||||||||||||||||||\n";
 
     HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
     String json = ftv.convert(hl7message, PatientUtils.OPTIONS);
@@ -72,8 +72,7 @@ public class Hl7OrderRequestFHIRConversionTest {
         .map(BundleEntryComponent::getResource).collect(Collectors.toList());
     // Important that we have exactly one service request (no duplication).  OBR creates it as a reference.        
     assertThat(serviceRequestList).hasSize(1);
-    ServiceRequest serviceRequest = getServiceRequest(serviceRequestList.get(0));
-    assertThat(serviceRequest.hasStatus()).isTrue();
+    ServiceRequest serviceRequest = ResourceUtils.getResourceServiceRequest(serviceRequestList.get(0), context);
 
     // ORC.4 should create a requisition in the serviceRequest.
     assertThat(serviceRequest.hasRequisition()).isTrue();
@@ -81,6 +80,10 @@ public class Hl7OrderRequestFHIRConversionTest {
     assertThat(serviceRequest.getRequisition().getSystem()).isEqualToIgnoringCase("urn:id:Beaker");
     assertThat(serviceRequest.getRequisition().hasValue()).isTrue();
     assertThat(serviceRequest.getRequisition().getValue()).isEqualToIgnoringCase("ML18267-C00001");
+
+    // // ORC.5 creates the serviceRequest.status()
+    assertThat(serviceRequest.hasStatus()).isTrue();
+    assertThat(serviceRequest.getStatusElement().getCode()).isEqualTo("active");   
 
     // ORC.9 should create an serviceRequest.authoredOn date 
     assertThat(serviceRequest.hasAuthoredOn()).isTrue();
@@ -112,7 +115,7 @@ public class Hl7OrderRequestFHIRConversionTest {
         .filter(v -> ResourceType.DiagnosticReport == v.getResource().getResourceType())
         .map(BundleEntryComponent::getResource).collect(Collectors.toList());
     assertThat(diagnosticReportList).hasSize(1);
-    DiagnosticReport diagnosticReport = getDiagnosticReport(diagnosticReportList.get(0));
+    DiagnosticReport diagnosticReport = ResourceUtils.getResourceDiagnosticReport(diagnosticReportList.get(0), context);
 
     assertThat(diagnosticReport.hasBasedOn()).isTrue();
     assertThat(diagnosticReport.getBasedOn()).hasSize(1);
@@ -126,22 +129,24 @@ public class Hl7OrderRequestFHIRConversionTest {
   @Test
   public void testBroadORCPlusOBRFields() {
 
-    String hl7message = "MSH|^~\\&|Epic|ATRIUS|||20180924152907|34001|ORU^R01^ORU_R01|213|T|2.6|||||||||PHLabReport-Ack^^2.16.840.1.114222.4.10.3^ISO||\n"
-        + "SFT|Epic Systems Corporation^L^^^^ANSI&1.2.840&ISO^XX^^^1.2.840.114350|Epic 2015 |Bridges|8.2.2.0||20160605043244\n"
+    String hl7message = "MSH|^~\\&|||||20180924152907|34001|ORU^R01^ORU_R01|213|T|2.6|||||||||||\n"
         + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
-        + "PV1|1|E||||||||||||||||||||||||||||||||||||||||||20180924152707|\n"
+        + "PV1|1|E|||||||||||||||||||||||||||||||||||||||||||\n"
         //  NOTE: ORC is optional; OBR is required.
         //  Key input data set up:
-        //  1. ORC.15 is empty, so OBR.7 used as ServiceRequest.occurrenceDateTime
-        //  2. Leave ORC.9 empty so that OBR.6 is used for ServiceRequest.authoredOn
-        //  3. OBR.22 used and DiagnosticReport.issued
-        //  4. Leave ORC.12 empty so OBR.16 is used for Practitioner reference
-        //  5. ORC.16 is set to a reason code (but it is ignored because it is secondary to OBR.31, which is present in this case and therefore overrides ORC.16)
-        + "ORC|RE|248648498^|248648498^|ML18267-C00001^Beaker||||||||||(781)849-2400^^^^^781^8492400||042^Human immunodeficiency virus [HIV] disease [42]^I9CDX^^^^29|||||ATRIUS HEALTH, INC^D^^^^POCFULL^XX^^^1020|P.O. BOX 415432^^BOSTON^MA^02241-5432^^B|898-7980^^8^^^800^8987980|111 GROSSMAN DRIVE^^BRAINTREE^MA^02184^USA^C^^NORFOLK|||||||\n"
+        //  1. Map OBR.7 to ServiceRequest.occurrenceDateTime, because ORC.15 is empty
+        //  2.  Map OBR.7 to DiagnosticReport.effectiveDateTime 
+        //  3. Leave ORC.9 empty so that OBR.6 is used for ServiceRequest.authoredOn
+        //  4. OBR.22 used and DiagnosticReport.issued
+        //  5. Leave ORC.12 empty so OBR.16 is used for Practitioner reference
+        //  6. ORC.16 is set to a reason code (but it is ignored because it is secondary to OBR.31, which is present in this case and therefore overrides ORC.16)
+        + "ORC|RE|248648498^|248648498^|||||||||||||042^Human immunodeficiency virus [HIV] disease [42]^I9CDX^^^^29|||||||||||||||\n"
         //  10. OBR.32 will be turned into a Practioner and referenced and the DiagnositicReport.resultsInterpreter
         //  11. OBR.4 maps to both ServiceRequest.code and DiagnosticReport.code
         //  12. OBR.16 creates a ServiceRequest.requester reference
-        + "OBR|1|248648498^|248648498^|83036E^HEMOGLOBIN A1C^PACSEAP^^^^^^HEMOGLOBIN A1C||20120606120606|20170707150707||||L||E11.9^Type 2 diabetes mellitus without complications^ICD-10-CM^^^^^^Type 2 diabetes mellitus without complications|||54321678^SCHMIDT^FRIEDA^^MD^^^^^^^^^NPISER|(781)849-2400^^^^^781^8492400|||||20180924152900|||F||^^^20120613071200||||HIV^HIV/Aids^L^^^^V1|323232^Mahoney^Paul^J||||||||||||||||||\n";
+        //  13. OBR.22 creates a DiagnosticReport.status 
+        //  14. OBR.6 creates ServiceRequest.authoredOn
+        + "OBR|1|248648498^|248648498^|83036E^HEMOGLOBIN A1C^PACSEAP^^^^^^HEMOGLOBIN A1C||20120606120606|20170707150707||||L|||||54321678^SCHMIDT^FRIEDA^^MD^^^^^^^^^NPISER||||||20180924152900|||F||||||HIV^HIV/Aids^L^^^^V1|323232^Mahoney^Paul^J||||||||||||||||||\n";
 
     HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
     String json = ftv.convert(hl7message, PatientUtils.OPTIONS);
@@ -157,7 +162,7 @@ public class Hl7OrderRequestFHIRConversionTest {
         .map(BundleEntryComponent::getResource).collect(Collectors.toList());
     // Important that we have exactly one service request (no duplication).  OBR creates it as a reference.        
     assertThat(serviceRequestList).hasSize(1);
-    ServiceRequest serviceRequest = getServiceRequest(serviceRequestList.get(0));
+    ServiceRequest serviceRequest = ResourceUtils.getResourceServiceRequest(serviceRequestList.get(0), context);
     assertThat(serviceRequest.hasStatus()).isTrue();
 
     // ORC.4 checked in testBroadORCFields
@@ -192,7 +197,7 @@ public class Hl7OrderRequestFHIRConversionTest {
         .filter(v -> ResourceType.DiagnosticReport == v.getResource().getResourceType())
         .map(BundleEntryComponent::getResource).collect(Collectors.toList());
     assertThat(diagnosticReportList).hasSize(1);
-    DiagnosticReport diagnosticReport = getDiagnosticReport(diagnosticReportList.get(0));
+    DiagnosticReport diagnosticReport = ResourceUtils.getResourceDiagnosticReport(diagnosticReportList.get(0), context);
 
     // OBR.4 ALSO maps to DiagnosticReport.code.  Verify resulting CodeableConcept.
     assertThat(diagnosticReport.hasCode()).isTrue();
@@ -202,7 +207,11 @@ public class Hl7OrderRequestFHIRConversionTest {
     assertThat(diagnosticReport.hasBasedOn()).isTrue();
     assertThat(diagnosticReport.getBasedOn()).hasSize(1);
 
-    // Check for issued instant of OBR.22
+    // OBR.7 maps to create an DiagnosticReport.effectiveDateTime
+    assertThat(diagnosticReport.hasEffectiveDateTimeType()).isTrue();
+    assertThat(diagnosticReport.getEffectiveDateTimeType().toString()).containsPattern("2017-07-07T15:07:07");
+
+    // Check for DiagnosticReport.issued instant of OBR.22
     assertThat(diagnosticReport.hasIssued()).isTrue();
     // NOTE: The data is kept as an InstantType, and is extracted with .toInstant
     // thus results in a different format than other time stamps that are based on DateTimeType
@@ -216,20 +225,22 @@ public class Hl7OrderRequestFHIRConversionTest {
     // Confirm that the matching practitioner by ID has the correct content (simple validation)
     // Should be the value OBR.32
     assertThat(pract.getIdentifierFirstRep().getValue()).isEqualTo("323232");
+
+    // Check for OBR.25 mapped to DiagnosticReport.status
+    assertThat(diagnosticReport.hasStatus()).isTrue();
+    assertThat(diagnosticReport.getStatusElement().getCode()).isEqualTo("final");   
   }
 
   @Test
   public void testBroadORCPlusOBRFields2() {
 
-    String hl7message =
-
-        "MSH|^~\\&|Epic|ATRIUS|||20180924152907|34001|ORU^R01^ORU_R01|213|T|2.6|||||||||PHLabReport-Ack^^2.16.840.1.114222.4.10.3^ISO||\n"
-            + "SFT|Epic Systems Corporation^L^^^^ANSI&1.2.840&ISO^XX^^^1.2.840.114350|Epic 2015 |Bridges|8.2.2.0||20160605043244\n"
+    String hl7message = "MSH|^~\\&|||||20180924152907|34001|ORU^R01^ORU_R01|213|T|2.6|||||||||||\n"
             + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
-            + "PV1|1|E||||||||||||||||||||||||||||||||||||||||||20180924152707|\n"
+            + "PV1|1|E|||||||||||||||||||||||||||||||||||||||||||\n"
             //  ORC.15 is empty, OBR.7 is empty, so use OBR-27[0].4 as ServiceRequest.occurrenceDateTime
-            + "ORC|RE|248648498^|248648498^|ML18267-C00001^Beaker|||||20120628071200|||1457352338^TEITLEMAN^CHRISTOPHER^A^MD^^^^^^^^^NPISER||(781)849-2400^^^^^781^8492400|||||||ATRIUS HEALTH, INC^D^^^^POCFULL^XX^^^1020|P.O. BOX 415432^^BOSTON^MA^02241-5432^^B|898-7980^^8^^^800^8987980|111 GROSSMAN DRIVE^^BRAINTREE^MA^02184^USA^C^^NORFOLK|||||||\n"
-            + "OBR|1|248648498^|248648498^|83036E^HEMOGLOBIN A1C^PACSEAP^^^^^^HEMOGLOBIN A1C|||||||L||E11.9^Type 2 diabetes mellitus without complications^ICD-10-CM^^^^^^Type 2 diabetes mellitus without complications|||1457352338^TEITLEMAN^CHRISTOPHER^A^MD^^^^^^^^^NPISER|(781)849-2400^^^^^781^8492400|||||20180924152900|||F||^^^20120606120606|||||&Roache&Gerard&&||||||||||||||||||\n";
+            //  ORC.5 with purposely bad code to see that 'unknown' is result
+            + "ORC|RE|248648498^|248648498^||ZZ||||20120628071200||||||||||||||||||||||\n"
+            + "OBR|1|248648498^|248648498^|83036E^HEMOGLOBIN A1C^PACSEAP^^^^^^HEMOGLOBIN A1C|||||||L||||||||||||||F||^^^20120606120606|||||||||||||||||||||||\n";
 
     HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
     String json = ftv.convert(hl7message, PatientUtils.OPTIONS);
@@ -245,25 +256,49 @@ public class Hl7OrderRequestFHIRConversionTest {
         .map(BundleEntryComponent::getResource).collect(Collectors.toList());
     // Important that we have exactly one service request (no duplication).  OBR creates it as a reference.        
     assertThat(serviceRequestList).hasSize(1);
-    ServiceRequest serviceRequest = getServiceRequest(serviceRequestList.get(0));
+    ServiceRequest serviceRequest = ResourceUtils.getResourceServiceRequest(serviceRequestList.get(0), context);
     assertThat(serviceRequest.hasStatus()).isTrue();
 
     // OBR.27[0].4 should create an ServiceRequest.occurrenceDateTime date
     assertThat(serviceRequest.hasOccurrenceDateTimeType()).isTrue();
     assertThat(serviceRequest.getOccurrenceDateTimeType().toString()).containsPattern("2012-06-06T12:06:06");
 
+    // // ORC.5 creates the serviceRequest.status() purposely an unknown code
+    assertThat(serviceRequest.hasStatus()).isTrue();
+    assertThat(serviceRequest.getStatusElement().getCode()).isEqualTo("unknown");   
   }
 
-  private static ServiceRequest getServiceRequest(Resource resource) {
-    String s = context.getParser().encodeResourceToString(resource);
-    Class<? extends IBaseResource> klass = ServiceRequest.class;
-    return (ServiceRequest) context.getParser().parseResource(klass, s);
-  }
+  @Test
+  public void testAdditionalOBRFields() {
 
-  private static DiagnosticReport getDiagnosticReport(Resource resource) {
-    String s = context.getParser().encodeResourceToString(resource);
-    Class<? extends IBaseResource> klass = DiagnosticReport.class;
-    return (DiagnosticReport) context.getParser().parseResource(klass, s);
+    String hl7message =
+
+        "MSH|^~\\&|Epic|ATRIUS|||20180924152907|34001|ORU^R01^ORU_R01|213|T|2.6|||||||||PHLabReport-Ack^^2.16.840.1.114222.4.10.3^ISO||\n"
+        + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
+        + "PV1|1|E|||||||||||||||||||||||||||||||||||||||||||\n"
+        //  ORC not needed for this OBR test
+        //  1. Map OBR.7 and OBR.8 together to DiagnosticReport.effectivePeriod
+        + "OBR|1|248648498^|248648498^|83036E^HEMOGLOBIN A1C^PACSEAP^^^^^^HEMOGLOBIN A1C|||20170707120707|20180808120808|||||||||||||||||F|||||||||||||||||||||||||\n";
+
+    HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
+    String json = ftv.convert(hl7message, PatientUtils.OPTIONS);
+    assertThat(json).isNotBlank();
+
+    IBaseResource bundleResource = context.getParser().parseResource(json);
+    assertThat(bundleResource).isNotNull();
+    Bundle bundle = (Bundle) bundleResource;
+    List<BundleEntryComponent> e = bundle.getEntry();
+
+    List<Resource> diagnosticReportList = e.stream()
+        .filter(v -> ResourceType.DiagnosticReport == v.getResource().getResourceType())
+        .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+    assertThat(diagnosticReportList).hasSize(1);
+    DiagnosticReport diagnosticReport = ResourceUtils.getResourceDiagnosticReport(diagnosticReportList.get(0), context);
+
+    // OBR.7 and OBR.8 together map to DiagnosticReport.effectivePeriod
+    assertThat(diagnosticReport.hasEffectivePeriod()).isTrue();
+    assertThat(diagnosticReport.getEffectivePeriod().getStartElement().toString()).containsPattern("2017-07-07T12:07:07");
+    assertThat(diagnosticReport.getEffectivePeriod().getEndElement().toString()).containsPattern("2018-08-08T12:08:08");
   }
 
 }

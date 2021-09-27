@@ -53,15 +53,7 @@ resources:
     additionalSegments:
       - MSH
 
-  - resourceName: ServiceRequest
-    segment: .ORC
-    resourcePath: resource/ServiceRequest
-    group: ORDER
-    repeats: true
-    additionalSegments:
-      - MSH
-      - PATIENT.PID
-      - PATIENT.PATIENT_VISIT.PV1
+
 
   - resourceName: Observation
     segment: .OBSERVATION.OBX

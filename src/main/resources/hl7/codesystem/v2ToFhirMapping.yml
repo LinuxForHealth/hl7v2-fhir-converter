@@ -22,11 +22,17 @@ ObservationStatus:
    I: registered
    P: preliminary
    W: entered-in-error
+
 ServiceRequestStatus:
-   # Only mapped a subset as there was not a clear mapping for the rest, they will default to unknown
-   F: completed	
-   U: completed
-   W: entered-in-error	
+   A: active
+   CA: revoked
+   CM: completed
+   DC: revoked
+   ER: entered-in-error
+   HD: on-hold
+   IP: active
+   SC: active
+      
 AdministrativeGender:
    A: other
    F: female
@@ -34,15 +40,16 @@ AdministrativeGender:
    N: unknown
    O: other
    U: unknown
+
 DiagnosticReportStatus:
    A: partial
    C: corrected
    F: final
-   I: unknown
-   O: unknown
+   I: registered
+   O: registered
    P: preliminary
-   R: registered
-   S: unknown
+   R: partial
+   S: registered
    X: cancelled
    Y: unknown
    Z: unknown
@@ -329,4 +336,4 @@ MedicationRequestStatus:
    RQ: active
    RR: active
    RU: active
-   
+
