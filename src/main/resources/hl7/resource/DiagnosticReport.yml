@@ -57,6 +57,7 @@ category:
    specs: OBR.24
    vars:
       code: OBR.24
+      
 code:
    valueOf: datatype/CodeableConcept
    expressionType: resource
@@ -64,6 +65,7 @@ code:
    required: true
    vars:
       code: OBR.4
+
 encounter:
    valueOf: datatype/Reference
    expressionType: resource
@@ -92,6 +94,15 @@ resultsInterpreter:
    specs: OBR.32
    vars:
       interpreter: OBR.32
+
+basedOn:
+   condition: $basedOnORC NOT_NULL
+   valueOf: resource/ServiceRequest
+   generateList: true
+   expressionType: reference
+   specs: ORC
+   vars:
+      basedOnORC: ORC      
 
 specimen:
    valueOf: datatype/Reference

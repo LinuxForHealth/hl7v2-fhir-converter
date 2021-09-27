@@ -6,6 +6,7 @@
 package io.github.linuxforhealth.hl7.segments;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -89,8 +90,6 @@ public class HL7ConditionFHIRConversionTest {
 
         // Verify code coding is set correctly.
         Base coding = ResourceUtils.getValue(code, "coding");
-        // change from http://hl7.org/fhir/sid/icd-10 to
-        // http://hl7.org/fhir/sid/icd-10-cm temporarily, see Issue #189
         assertThat(ResourceUtils.getValueAsString(coding, "system"))
                 .isEqualTo("UriType[http://hl7.org/fhir/sid/icd-10-cm]");
         assertThat(ResourceUtils.getValueAsString(coding, "code")).isEqualTo("C56.9");
@@ -250,8 +249,6 @@ public class HL7ConditionFHIRConversionTest {
 
         Coding condCoding = condCC.getCoding().get(0);
         assertThat(condCoding.hasSystem()).isTrue();
-        // change from http://hl7.org/fhir/sid/icd-10 to
-        // http://hl7.org/fhir/sid/icd-10-cm temporarily, see Issue #189
         assertThat(condCoding.getSystem()).isEqualTo("http://hl7.org/fhir/sid/icd-10-cm");
         assertThat(condCoding.hasCode()).isTrue();
         assertThat(condCoding.getCode()).isEqualTo("R00.0");
@@ -363,6 +360,34 @@ public class HL7ConditionFHIRConversionTest {
                     .isEqualTo("Condition/");
         }
 
+    }
+    
+    /**
+     * ICD-10-CM system for diagnosis 
+     */
+    @Test
+    public void validateConditionICD10CM() {
+
+        String hl7message = "MSH|^~\\&||||||S1|ADT^A01^ADT_A01||T|2.6|||||||||\r"
+                + "EVN|A01||||||\r"
+                + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\r"
+                + "PV1||I|||||||||||||||||1492|||||||||||||||||||||||||\r"
+                + "DG1|1|ICD-10-CM|M54.5^Low back pain^ICD-10-CM|Low back pain|20210407191342|A\r";
+        
+        List<BundleEntryComponent> e = ResourceUtils.createHl7Segment(hl7message);
+
+        // Find the conditions from the FHIR bundle.
+        List<Resource> conditionResource = e.stream()
+                .filter(v -> ResourceType.Condition == v.getResource().getResourceType())
+                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+
+        // We should have 1 condition for each diagnosis therefore 1 for this message.
+        assertThat(conditionResource).hasSize(1);
+
+       Condition c = (Condition) conditionResource.get(0);
+       assertEquals("M54.5", c.getCode().getCoding().get(0).getCode());
+       assertEquals("Low back pain", c.getCode().getCoding().get(0).getDisplay());
+       assertEquals("http://hl7.org/fhir/sid/icd-10-cm", c.getCode().getCoding().get(0).getSystem());
     }
 
     // --------------------- PROBLEM UNIT TESTS (PRB) ---------------------
@@ -478,8 +503,6 @@ public class HL7ConditionFHIRConversionTest {
 
         // Verify code coding fields are set correctly.
         Base codeCoding = ResourceUtils.getValue(code, "coding");
-        // change from http://hl7.org/fhir/sid/icd-10 to
-        // http://hl7.org/fhir/sid/icd-10-cm temporarily, see Issue #189
         assertThat(ResourceUtils.getValueAsString(codeCoding, "system"))
                 .isEqualTo("UriType[http://hl7.org/fhir/sid/icd-10-cm]");
         assertThat(ResourceUtils.getValueAsString(codeCoding, "code")).isEqualTo("K80.00");
