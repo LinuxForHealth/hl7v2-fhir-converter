@@ -211,11 +211,11 @@ public class Hl7MedicationRequestFHIRConversionTest {
         TimeZone timeZone = TimeZone.getTimeZone(zone);
         c.setTimeZone(timeZone);
         Date authoredOnDateTest = c.getTime();
-        // assertThat(authoredOnDate).isEqualTo(authoredOnDateTest);
+        assertThat(authoredOnDate).isEqualTo(authoredOnDateTest);
 
-        // //Verify intent is set correctly
-        // String intent = medicationRequest.getIntent().toString();
-        // assertThat(intent).isEqualTo("ORDER");
+        //Verify intent is set correctly
+        String intent = medicationRequest.getIntent().toString();
+        assertThat(intent).isEqualTo("ORDER");
 
         //Very medicationCodeableConcept is set correctly
         assertThat(medicationRequest.hasMedicationCodeableConcept()).isTrue();
