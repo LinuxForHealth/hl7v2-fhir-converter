@@ -291,8 +291,8 @@ public class Hl7MedicationRequestFHIRConversionTest {
     // With just the RXO segment -- these message types don't support RXE.
     @ParameterizedTest
     @ValueSource(strings = 
-    { 
-    "MSH|^~\\&||||||S1|OMP^O09||T|2.6|||||||||\r",    
+    {
+    "MSH|^~\\&||||||S1|OMP^O09||T|2.6|||||||||\r",
     // --UNCOMMENT BELOW WHEN CONVERTER SUPPORTS THIS MESSAGE TYPE-- 
     // "MSH|^~\\&||||||S1|ORM^O01||T|2.6|||||||||\r",
     })
