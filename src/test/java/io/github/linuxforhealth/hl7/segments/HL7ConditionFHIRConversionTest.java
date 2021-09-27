@@ -132,7 +132,6 @@ public class HL7ConditionFHIRConversionTest {
         // Verify encounter diagnosis use is set correctly
         Base diagnosis = ResourceUtils.getValue(encounter, "diagnosis");
         Base use = ResourceUtils.getValue(diagnosis, "use");
-        assertThat(ResourceUtils.getValueAsString(use, "text")).isEqualTo("A");
         Base diagCoding = ResourceUtils.getValue(use, "coding");
         assertThat(ResourceUtils.getValueAsString(diagCoding, "system"))
                 .isEqualTo("UriType[http://terminology.hl7.org/CodeSystem/diagnosis-role]");
@@ -346,7 +345,6 @@ public class HL7ConditionFHIRConversionTest {
         for (Base diagnosis : diagnosises) {
 
             Base use = ResourceUtils.getValue(diagnosis, "use");
-            assertThat(ResourceUtils.getValueAsString(use, "text")).isEqualTo("A");
             Base diagCoding = ResourceUtils.getValue(use, "coding");
             assertThat(ResourceUtils.getValueAsString(diagCoding, "system"))
                     .isEqualTo("UriType[http://terminology.hl7.org/CodeSystem/diagnosis-role]");

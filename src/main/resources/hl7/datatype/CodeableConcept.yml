@@ -55,4 +55,4 @@ text:
    type: STRING
    valueOf: $displayText
    vars:
-      displayText: $text | CWE.2 | CWE.9 | CE.2 | CNE.2| ST | TX | ID | IS | CWE.5
+      displayText: $text | CWE.2 | CWE.9 | CE.2 | CNE.2| ST | TX | ID | CWE.5

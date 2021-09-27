@@ -263,7 +263,7 @@ public class Hl7EncounterFHIRConversionTest {
       assertThat(encounterClass.getDisplay()).isEqualTo("emergency");
       assertThat(encounterClass.getVersion()).isNull();
 
-      // Should return "unknown"  if not a mapped value
+      // Should return hl7Code if not a mapped value
       hl7message = "MSH|^~\\&|PROSOLV|SENTARA|WHIA|IBM|20151008111200|S1|ADT^A01^ADT_A01|MSGID000001|T|2.6|10092|PRPA008|AL|AL|100|8859/1|ENGLISH|ARM|ARM5007\n"
               + "EVN|A04|20151008111200|20171013152901|O|OID1006|20171013153621|EVN1009\n"
               + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
@@ -272,7 +272,7 @@ public class Hl7EncounterFHIRConversionTest {
 
       assertThat(encounter.hasClass_()).isTrue();
       encounterClass = encounter.getClass_();
-      assertThat(encounterClass.getCode()).isEqualTo("unknown");
+      assertThat(encounterClass.getCode()).isEqualTo("L");
       assertThat(encounterClass.getSystem()).isNull();
       assertThat(encounterClass.getDisplay()).isNull();
       assertThat(encounterClass.getVersion()).isNull();
@@ -286,17 +286,17 @@ public class Hl7EncounterFHIRConversionTest {
               + "EVN|A04|20151008111200|20171013152901|O|OID1006|20171013153621|EVN1009\n"
               + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
               + "PV1|1|E|SAN JOSE|A|10089|MILPITAS|2740^Torres^Callie|2913^Grey^Meredith^F|3065^Sloan^Mark^J|CAR|FOSTER CITY|AD|R|1|A4|VI|9052^Shepeard^Derek^|AH|10019181|FIC1002|IC|CC|CR|CO|20161012034052|60000|6|AC|GHBR|20160926054052|AC5678|45000|15000|D|20161016154413|DCD|SAN FRANCISCO|VEG|RE|O|AV|FREMONT|CALIFORNIA|20161013154626|20161014154634|10000|14000|2000|4000|POL8009|V|PHY6007\n"
-              + "PV2|SAN BRUNO|AC4567|vomits|less equipped|purse|SAN MATEO|HO|20171014154626|20171018154634|4|3|DIAHHOREA|RSA456|20161013154626|Y|D|20191026001640|O|Y|1|F|Y|KAISER|AI|2|20161013154626|ED|20171018001900|20161013154626|10000|RR|Y|20171108002129|Y|Y|N|N|C^Car^HL70430\n";
+              + "PV2|SAN BRUNO|AC4567||less equipped|purse|SAN MATEO|HO|20171014154626|20171018154634|4|3|DIAHHOREA|RSA456|20161013154626|Y|D|20191026001640|O|Y|1|F|Y|KAISER|AI|2|20161013154626|ED|20171018001900|20161013154626|10000|RR|Y|20171108002129|Y|Y|N|N|C^Car^HL70430\n";
 
       Encounter encounter = ResourceUtils.getEncounter(hl7message);
 
       assertThat(encounter.hasReasonCode()).isTrue();
       CodeableConcept encounterReason = encounter.getReasonCodeFirstRep();
-      Coding encounterReasonCoding = encounterReason.getCodingFirstRep();
-      assertThat(encounterReasonCoding.getCode()).isEqualTo("O");
-      assertThat(encounterReasonCoding.getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/v2-0062");
-      assertThat(encounterReasonCoding.getDisplay()).isEqualTo("Other");
-      assertThat(encounterReasonCoding.getVersion()).isNull();
+      List <org.hl7.fhir.r4.model.Coding> encounterReasonCoding = encounterReason.getCoding();
+      assertThat(encounterReasonCoding.get(0).getCode()).isEqualTo("O");
+      assertThat(encounterReasonCoding.get(0).getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/v2-0062");
+      assertThat(encounterReasonCoding.get(0).getDisplay()).isEqualTo("Other");
+      assertThat(encounterReasonCoding.get(0).getVersion()).isNull();
 
       //Checks PV2.3 for reason code
       hl7message = "MSH|^~\\&|PROSOLV|SENTARA|WHIA|IBM|20151008111200|S1|ADT^A01^ADT_A01|MSGID000001|T|2.6|10092|PRPA008|AL|AL|100|8859/1|ENGLISH|ARM|ARM5007\n"
@@ -309,11 +309,11 @@ public class Hl7EncounterFHIRConversionTest {
 
       assertThat(encounter.hasReasonCode()).isTrue();
       encounterReason = encounter.getReasonCodeFirstRep();
-      encounterReasonCoding = encounterReason.getCodingFirstRep();
-      assertThat(encounterReasonCoding.getCode()).isEqualTo("vomits");
-      assertThat(encounterReasonCoding.getSystem()).isNull();
-      assertThat(encounterReasonCoding.getDisplay()).isNull();
-      assertThat(encounterReasonCoding.getVersion()).isNull();
+      Coding encounterReasonCodings = encounterReason.getCodingFirstRep();
+      assertThat(encounterReasonCodings.getCode()).isEqualTo("vomits");
+      assertThat(encounterReasonCodings.getSystem()).isNull();
+      assertThat(encounterReasonCodings.getDisplay()).isNull();
+      assertThat(encounterReasonCodings.getVersion()).isNull();
 
   }
 
@@ -329,8 +329,8 @@ public class Hl7EncounterFHIRConversionTest {
 
         assertThat(encounter.hasLength()).isTrue();
         Duration encounterLength = encounter.getLength();
-        assertThat(encounterLength.getValue()).isEqualTo((BigDecimal.valueOf(1)));
-        assertThat(encounterLength.getUnit()).isEqualTo("Days");
+        assertThat(encounterLength.getValue()).isEqualTo((BigDecimal.valueOf(1440)));
+        assertThat(encounterLength.getUnit()).isEqualTo("Minutes");
 
 
         //When length between encounters is a less than a apart the units should be "Minutes"

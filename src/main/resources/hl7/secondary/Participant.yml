@@ -12,7 +12,7 @@ type:
    expressionType: resource
    vars:
       code: String, $codeableConceptCode 
-      text: String, $codeableConceptText
+      display: String, $codeableConceptText
    constants:
       system: 'http://terminology.hl7.org/CodeSystem/v3-ParticipationType'
       

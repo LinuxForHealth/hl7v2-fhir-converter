@@ -55,7 +55,7 @@ public class Hl7ObservationFHIRConversionTest {
             + "EVN|A01|20130617154644\r"
             + "PID|1|465 306 5961|000010016^^^MR~000010017^^^MR~000010018^^^MR|407623|Wood^Patrick^^Sr^MR||19700101|female|||High Street^^Oxford^^Ox1 4DP~George St^^Oxford^^Ox1 5AP|||||||\r"
             + "NK1|1|Wood^John^^^MR|Father||999-9999\r" + "NK1|2|Jones^Georgie^^^MSS|MOTHER||999-9999\r"
-            + "PV1|1||Location||||||||||||||||261938_6_201306171546|||||||||||||||||||||||||20130617134644|||||||||\r";
+            + "PV1|1|TEXT|Location||||||||||||||||261938_6_201306171546|||||||||||||||||||||||||20130617134644|||||||||\r";
 
     private ResourceModel rsm = ResourceReader.getInstance().generateResourceModel("resource/Observation");
 
@@ -177,7 +177,7 @@ public class Hl7ObservationFHIRConversionTest {
         assertTrue(obs.hasInterpretation());
         assertThat(obs.getInterpretation()).hasSize(1);
         DatatypeUtils.checkCommonCodeableConceptAssertions(obs.getInterpretation().get(0), "L", "Low",
-                "http://terminology.hl7.org/CodeSystem/v2-0078", "L");
+                "http://terminology.hl7.org/CodeSystem/v2-0078", null);
     }
     
     /**
@@ -463,7 +463,7 @@ public class Hl7ObservationFHIRConversionTest {
         assertThat(obs.hasInterpretation()).isTrue();
         assertThat(obs.getInterpretation()).hasSize(1);
         DatatypeUtils.checkCommonCodeableConceptAssertions(obs.getInterpretationFirstRep(), "IND", "Indeterminate",
-                "http://terminology.hl7.org/CodeSystem/v2-0078", "IND");
+                "http://terminology.hl7.org/CodeSystem/v2-0078", null);
 
         // Check the effective Date Time  (OBX.14)
         assertThat(obs.hasEffective()).isTrue();
