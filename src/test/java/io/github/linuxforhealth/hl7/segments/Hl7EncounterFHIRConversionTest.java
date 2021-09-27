@@ -292,11 +292,11 @@ public class Hl7EncounterFHIRConversionTest {
 
       assertThat(encounter.hasReasonCode()).isTrue();
       CodeableConcept encounterReason = encounter.getReasonCodeFirstRep();
-      Coding encounterReasonCoding = encounterReason.getCodingFirstRep();
-      assertThat(encounterReasonCoding.getCode()).isEqualTo("O");
-      assertThat(encounterReasonCoding.getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/v2-0062");
-      assertThat(encounterReasonCoding.getDisplay()).isEqualTo("Other");
-      assertThat(encounterReasonCoding.getVersion()).isNull();
+      List <org.hl7.fhir.r4.model.Coding> encounterReasonCoding = encounterReason.getCoding();
+      assertThat(encounterReasonCoding.get(0).getCode()).isEqualTo("O");
+      assertThat(encounterReasonCoding.get(0).getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/v2-0062");
+      assertThat(encounterReasonCoding.get(0).getDisplay()).isEqualTo("Other");
+      assertThat(encounterReasonCoding.get(0).getVersion()).isNull();
 
       //Checks PV2.3 for reason code
       hl7message = "MSH|^~\\&|PROSOLV|SENTARA|WHIA|IBM|20151008111200|S1|ADT^A01^ADT_A01|MSGID000001|T|2.6|10092|PRPA008|AL|AL|100|8859/1|ENGLISH|ARM|ARM5007\n"
@@ -309,11 +309,11 @@ public class Hl7EncounterFHIRConversionTest {
 
       assertThat(encounter.hasReasonCode()).isTrue();
       encounterReason = encounter.getReasonCodeFirstRep();
-      encounterReasonCoding = encounterReason.getCodingFirstRep();
-      assertThat(encounterReasonCoding.getCode()).isEqualTo("vomits");
-      assertThat(encounterReasonCoding.getSystem()).isNull();
-      assertThat(encounterReasonCoding.getDisplay()).isNull();
-      assertThat(encounterReasonCoding.getVersion()).isNull();
+      Coding encounterReasonCodings = encounterReason.getCodingFirstRep();
+      assertThat(encounterReasonCodings.getCode()).isEqualTo("vomits");
+      assertThat(encounterReasonCodings.getSystem()).isNull();
+      assertThat(encounterReasonCodings.getDisplay()).isNull();
+      assertThat(encounterReasonCodings.getVersion()).isNull();
 
   }
 

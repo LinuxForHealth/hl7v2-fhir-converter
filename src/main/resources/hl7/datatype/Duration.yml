@@ -12,10 +12,9 @@ value_1:
       var2: $time2
 
 value_2:
-  condition: $var1 NOT_NULL && $time1 NULL
-  valueOf: $var1
-  vars:
-    var1: $time3
+  condition: $time3 NOT_NULL && $time1 NULL
+  valueOf: $time3
+
 
 unit_1:
   condition: $time1 NOT_NULL

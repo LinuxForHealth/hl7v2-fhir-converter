@@ -15,6 +15,8 @@ import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
 import org.hl7.fhir.r4.model.Base;
+import org.hl7.fhir.r4.model.Coding;
+import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Encounter;
 import org.hl7.fhir.r4.model.Observation;
 import org.hl7.fhir.r4.model.Resource;
@@ -34,7 +36,7 @@ public class HL7EventTypeFHIRConversionTest {
   public void validate_evn_segment() {
 
     String hl7message = "MSH|^~\\&|||||||ADT^A01^ADT_A01|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6||||||\r"
-        + "EVN||||851||20210319134735|\r" 
+        + "EVN||||O||20210319134735|\r"
         + "PV1|1|I||R|||||||||R|1||||||||||||||||||||||||||||||||||||||";
 
     HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
@@ -52,6 +54,13 @@ public class HL7EventTypeFHIRConversionTest {
         .filter(v -> ResourceType.Encounter == v.getResource().getResourceType()).map(BundleEntryComponent::getResource)
         .collect(Collectors.toList());
     assertThat(encounterResource).hasSize(1);
+    String s = context.getParser().encodeResourceToString(encounterResource.get(0));
+    Class<? extends IBaseResource> klass = Encounter.class;
+    Encounter encounter = (Encounter) context.getParser().parseResource(klass, s);
+
+    CodeableConcept encReason = encounter.getReasonCodeFirstRep();
+    Coding coding = encReason.getCodingFirstRep();
+    assertThat(coding.getCode()).isEqualTo("O");
 
     Base period = encounterResource.get(0).getNamedProperty("period").getValues().get(0);
     // EVN.6 is used for start period (with no end) if there is no PV1.44
@@ -65,14 +74,13 @@ public class HL7EventTypeFHIRConversionTest {
   public void validate_evn_segment_no_period_override() {
 
     String hl7message = "MSH|^~\\&|||||||ADT^A01^ADT_A01|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6||||||\r"
-        + "EVN||||7525||20210319134735|\r"
+        + "EVN||||O||20210319134735|\r"
         + "PV1|1|I||R|||||||||R|1||||||||||||||||||||||||||||||200603150624|200603150625|||||||";
 
     HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
     String json = ftv.convert(hl7message, OPTIONS);
     assertThat(json).isNotBlank();
-
-    FHIRContext context = new FHIRContext(true, false);
+    FHIRContext context = new FHIRContext();
     IBaseResource bundleResource = context.getParser().parseResource(json);
     assertThat(bundleResource).isNotNull();
     Bundle b = (Bundle) bundleResource;
@@ -83,6 +91,13 @@ public class HL7EventTypeFHIRConversionTest {
         .filter(v -> ResourceType.Encounter == v.getResource().getResourceType()).map(BundleEntryComponent::getResource)
         .collect(Collectors.toList());
     assertThat(encounterResource).hasSize(1);
+    String s = context.getParser().encodeResourceToString(encounterResource.get(0));
+    Class<? extends IBaseResource> klass = Encounter.class;
+    Encounter encounter = (Encounter) context.getParser().parseResource(klass, s);
+
+    CodeableConcept encReason = encounter.getReasonCodeFirstRep();
+    Coding coding = encReason.getCodingFirstRep();
+    assertThat(coding.getCode()).isEqualTo("O");
 
     Base period = encounterResource.get(0).getNamedProperty("period").getValues().get(0);
     // EVN.6 is used for start period if there is no PV1.44 but since we have a

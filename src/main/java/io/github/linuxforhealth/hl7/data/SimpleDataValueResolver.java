@@ -247,11 +247,10 @@ public class SimpleDataValueResolver {
         if(code != null){
             V3ActCode act = V3ActCode.fromCode(code);
             return new SimpleCode( code , act.getSystem(), act.getDisplay(), version);
-        } else {
-            // defaults to unknown
-            // Make a message in the display.
+        } else if (val != null) { // if code does not map but is present, use the "val" as the code
             return new SimpleCode(val, null,  null);
         }
+        else return null;
     };
 
     public static final ValueExtractor<Object, String> IMMUNIZATION_STATUS_CODES = (Object value) -> {

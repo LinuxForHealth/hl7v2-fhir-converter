@@ -93,14 +93,12 @@ reasonCode_1:
     specs: EVN.4
 
 reasonCode_2:
-  condition: $code NOT_NULL && $evn NULL
   valueOf: datatype/CodeableConcept
   generateList: true
   expressionType: resource
   specs: PV2.3
   vars:
     code: PV2.3
-    evn: EVN.4
 
 reasonReference_1:
    valueOf: datatype/Reference
@@ -240,6 +238,6 @@ serviceProvider:
    expressionType: reference
    valueOf: resource/Organization_Simple
    vars:
-      idValue: PV2.23.8 | PV1.3.4.1
+      idValue: PV2.23.8 | PV1.3.4.1 | PV1.39
       name: PV2.23.1
 
