@@ -6,55 +6,67 @@
 # FHIR Resources to extract from ORM_O01 message
 ---
 resources:
-    - resourceName: MessageHeader
-      segment: MSH
-      resourcePath: resource/MessageHeader
-      repeats: false
-      isReferenced: false
-      additionalSegments: 
-   
-    - resourceName: Patient
-      segment: .PID
-      resourcePath: resource/Patient
-      isReferenced: true
-      group: PATIENT
-      repeats: false
-      additionalSegments:
-             - .PD1
-             - MSH
+  - resourceName: MessageHeader
+    segment: MSH
+    resourcePath: resource/MessageHeader
+    repeats: false
+    isReferenced: false
+    additionalSegments: 
+  
+  - resourceName: Patient
+    segment: .PID
+    resourcePath: resource/Patient
+    isReferenced: true
+    group: PATIENT
+    repeats: false
+    additionalSegments:
+            - .PD1
+            - MSH
 
-    - resourceName: Encounter
-      segment: .PATIENT_VISIT.PV1
-      resourcePath: resource/Encounter
-      isReferenced: true
-      group: PATIENT
-      repeats: false
-      additionalSegments:
-             - .PATIENT_VISIT.PV2
-             - MSH
-             - ORDER_DETAIL.OBSERVATION.OBX
+  - resourceName: Encounter
+    segment: .PATIENT_VISIT.PV1
+    resourcePath: resource/Encounter
+    isReferenced: true
+    group: PATIENT
+    repeats: false
+    additionalSegments:
+            - .PATIENT_VISIT.PV2
+            - MSH
+            - ORDER_DETAIL.OBSERVATION.OBX
 
-    - resourceName: Observation
-      segment: .ORDER_DETAIL.OBSERVATION.OBX
-      resourcePath: resource/Observation
-      group: ORDER
-      repeats: true
-      isReferenced: true
-      additionalSegments:
-             - MSH
-      
-    - resourceName: AllergyIntolerance
-      segment: .AL1
-      resourcePath: resource/AllergyIntolerance
-      group: PATIENT
-      repeats: true
-      additionalSegments:
-             - MSH
+  - resourceName: Observation
+    segment: .ORDER_DETAIL.OBSERVATION.OBX
+    resourcePath: resource/Observation
+    group: ORDER
+    repeats: true
+    isReferenced: true
+    additionalSegments:
+            - MSH
+    
+  - resourceName: AllergyIntolerance
+    segment: .AL1
+    resourcePath: resource/AllergyIntolerance
+    group: PATIENT
+    repeats: true
+    additionalSegments:
+            - MSH
 
-    - resourceName: Condition
-      segment: .ORDER_DETAIL.DG1
-      resourcePath: resource/Condition
-      group: ORDER
-      repeats: true
-      additionalSegments:
-        - MSH
+  - resourceName: Condition
+    segment: .ORDER_DETAIL.DG1
+    resourcePath: resource/Condition
+    group: ORDER
+    repeats: true
+    additionalSegments:
+      - MSH
+
+  - resourceName: MedicationRequest
+    segment: .ORDER_DETAIL.RXO
+    resourcePath: resource/MedicationRequest
+    isReferenced: true
+    group: ORDER
+    repeats: true
+    additionalSegments:
+      - MSH
+      - .ORC
+      - PATIENT.PATIENT_VISIT.PV1
+      - PATIENT.PID
