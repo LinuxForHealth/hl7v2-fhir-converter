@@ -172,7 +172,7 @@ public class Hl7MedicationRequestFHIRConversionTest {
     
     // Tests medication request fields MedicationCodeableConcept, Authored On, and Intent.
     // Tests with supported message types RDE-O11, RDE-O25.
-    // With both RX0 and RXE segments.
+    // With both RXO and RXE segments.
     @ParameterizedTest
     @ValueSource(strings = 
     { 
@@ -180,13 +180,13 @@ public class Hl7MedicationRequestFHIRConversionTest {
     "MSH|^~\\&||||||S1|RDE^O25||T|2.6|||||||||\r",
     })
     @Disabled
-    public void test_medicationreq_authoredOn_and_intent_in_rde_with_rx0_with_rxe(String msh) {
+    public void test_medicationCodeableConcept_authoredOn_and_intent_in_rde_with_rxO_with_rxe(String msh) {
 
         String hl7message = msh
                 + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
                 + "ORC|NW|F800006^OE|P800006^RX|||E|10^BID^D4^^^R||20180622230000\n"
-                + "RXE|^Q24H&0600^^20210330144208^^ROU|DUONEB3INH^3 ML PLAS CONT : IPRATROPIUM-ALBUTEROL 0.5-2.5 (3) MG/3ML IN SOLN^ADS^^^^^^ipratropium-albuterol (DUONEB) nebulizer solution 3 mL|3||mL|47||||1|PC||||||||||||||||||||^DUONEB|20180622230000||||||||\n"
-                + "RXO|RX800006^Test15 SODIUM 100 MG CAPSULE^NDC||100||mg|||||G||10||5\n";
+                + "RXO|RX800006^Test15 SODIUM 100 MG CAPSULE^NDC||100||mg|||||G||10||5\n"
+                + "RXE|^Q24H&0600^^20210330144208^^ROU|DUONEB3INH^3 ML PLAS CONT : IPRATROPIUM-ALBUTEROL 0.5-2.5 (3) MG/3ML IN SOLN^ADS^^^^^^ipratropium-albuterol (DUONEB) nebulizer solution 3 mL|3||mL|47||||1|PC||||||||||||||||||||^DUONEB|20180622230000||||||||\n";
 
         HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
         String json = ftv.convert(hl7message, PatientUtils.OPTIONS);
@@ -227,65 +227,7 @@ public class Hl7MedicationRequestFHIRConversionTest {
         assertThat(medCC.getCoding().get(0).getCode()).isEqualTo("RX800006");
         assertThat(medCC.getCoding().get(0).getDisplay()).isEqualTo("Test15 SODIUM 100 MG CAPSULE");
 
-    }
-
-    // // Tests medication request fields MedicationCodeableConcept, Authored On, and Intent.
-    // // Tests with supported message types RDE-O11, RDE-O25.
-    // // With just the RXO segment.
-    // @ParameterizedTest
-    // @ValueSource(strings = 
-    // { 
-    // "MSH|^~\\&||||||S1|RDE^O11||T|2.6|||||||||\r",
-    // "MSH|^~\\&||||||S1|RDE^O25||T|2.6|||||||||\r",
-    // })
-    // public void test_medicationreq_authoredOn_and_intent_in_rde_with_just_rxe(String msh) {
-
-    //     // ORC.1 = NW -> Expected medication status = ACTIVE
-    //     String hl7message = msh
-    //             + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
-    //             + "ORC|NW|F800006^OE|P800006^RX|||E|10^BID^D4^^^R||20180622230000\n"
-    //             + "RXO|RX800006^Test15 SODIUM 100 MG CAPSULE^NDC||100||mg|||||G||10||5\n";
-
-    //     HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
-    //     String json = ftv.convert(hl7message, PatientUtils.OPTIONS);
-    //     assertThat(json).isNotBlank();
-    //     LOGGER.info("FHIR json result:\n" + json);
-
-    //     IBaseResource bundleResource = context.getParser().parseResource(json);
-    //     assertThat(bundleResource).isNotNull();
-    //     Bundle b = (Bundle) bundleResource;
-    //     List<BundleEntryComponent> e = b.getEntry();
-
-    //     List<Resource> medicationRequestList = e.stream()
-    //             .filter(v -> ResourceType.MedicationRequest == v.getResource().getResourceType())
-    //             .map(BundleEntryComponent::getResource).collect(Collectors.toList());
-    //     assertThat(medicationRequestList).hasSize(1);
-    //     MedicationRequest medicationRequest = getResourceMedicationRequest(medicationRequestList.get(0));
-        
-    //     // Verify Authored On date is correct.
-    //     Date authoredOnDate = medicationRequest.getAuthoredOn();      
-    //     Calendar c = Calendar.getInstance();
-    //     c.clear();
-    //     c.set(2018, 5, 22, 23, 0); // 2018 06 22 23 00 00   -- june is 05
-    //     ZoneId zone = ConverterConfiguration.getInstance().getZoneId();
-    //     TimeZone timeZone = TimeZone.getTimeZone(zone);
-    //     c.setTimeZone(timeZone);
-    //     Date authoredOnDateTest = c.getTime();
-    //     assertThat(authoredOnDate).isEqualTo(authoredOnDateTest);
-
-    //     //Verify intent is set correctly
-    //     String intent = medicationRequest.getIntent().toString();
-    //     assertThat(intent).isEqualTo("ORDER");
-
-    //     //Very medicationCodeableConcept is set correctly
-    //     assertThat(medicationRequest.hasMedicationCodeableConcept()).isTrue();
-    //     CodeableConcept medCC = medicationRequest.getMedicationCodeableConcept();
-    //     assertThat(medCC.getText()).isEqualTo("3 ML PLAS CONT : IPRATROPIUM-ALBUTEROL 0.5-2.5 (3) MG/3ML IN SOLN");
-    //     assertThat(medCC.getCoding().get(0).getSystem()).isEqualTo("urn:id:ADS");
-    //     assertThat(medCC.getCoding().get(0).getCode()).isEqualTo("DUONEB3INH");
-    //     assertThat(medCC.getCoding().get(0).getDisplay()).isEqualTo("3 ML PLAS CONT : IPRATROPIUM-ALBUTEROL 0.5-2.5 (3) MG/3ML IN SOLN");
-
-    // }
+    }   
 
     // Tests medication request fields MedicationCodeableConcept, Authored On, and Intent.
     // Tests with supported message types RDE-O11, RDE-O25.
@@ -296,9 +238,8 @@ public class Hl7MedicationRequestFHIRConversionTest {
     "MSH|^~\\&||||||S1|RDE^O11||T|2.6|||||||||\r",
     "MSH|^~\\&||||||S1|RDE^O25||T|2.6|||||||||\r",
     })
-    public void test_medicationreq_authoredOn_and_intent_in_rde_with_just_rxo(String msh) {
+    public void test_medicationCodeableConcept_authoredOn_and_intent_in_rde_with_just_rxe(String msh) {
 
-        // ORC.1 = NW -> Expected medication status = ACTIVE
         String hl7message = msh
                 + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
                 + "ORC|NW|F800006^OE|P800006^RX|||E|10^BID^D4^^^R||20180622230000\n"
@@ -347,15 +288,15 @@ public class Hl7MedicationRequestFHIRConversionTest {
 
     // Tests medication request fields MedicationCodeableConcept and Intent.
     // Tests with supported message types ORM-O01, OMP-O09.
-    // With just the RX0 segment -- these message types don't support RXE.
+    // With just the RXO segment -- these message types don't support RXE.
     @ParameterizedTest
     @ValueSource(strings = 
-    { 
+    {
     "MSH|^~\\&||||||S1|OMP^O09||T|2.6|||||||||\r",
     // --UNCOMMENT BELOW WHEN CONVERTER SUPPORTS THIS MESSAGE TYPE-- 
     // "MSH|^~\\&||||||S1|ORM^O01||T|2.6|||||||||\r",
     })
-    public void test_authoredOn_and_intent_in_OMP_and_ORM(String msh) {
+    public void test_medicationCodeableConcept_and_intent_in_OMP_and_ORM(String msh) {
 
         String hl7message = msh
                 + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
@@ -372,12 +313,14 @@ public class Hl7MedicationRequestFHIRConversionTest {
         Bundle b = (Bundle) bundleResource;
         List<BundleEntryComponent> e = b.getEntry();
 
-        //2018 06 22 23 00 00
         List<Resource> medicationRequestList = e.stream()
                 .filter(v -> ResourceType.MedicationRequest == v.getResource().getResourceType())
                 .map(BundleEntryComponent::getResource).collect(Collectors.toList());
         assertThat(medicationRequestList).hasSize(1);
         MedicationRequest medicationRequest = getResourceMedicationRequest(medicationRequestList.get(0));
+
+        // Verify authored on is not present
+        assertThat(medicationRequest.getAuthoredOn()).isNull();
         
         //Verify intent is set correctly
         String intent = medicationRequest.getIntent().toString();
@@ -395,7 +338,7 @@ public class Hl7MedicationRequestFHIRConversionTest {
 
     // Tests medication request fields MedicationCodeableConcept and Intent.
     // Tests with supported message types PPR-PC1, PPR-PC2, PPR-PC3
-    // With just the RX0 segment -- these message types don't support RXE.
+    // With just the RXO segment -- these message types don't support RXE.
     @ParameterizedTest
     @ValueSource(strings = 
     { 
@@ -404,9 +347,8 @@ public class Hl7MedicationRequestFHIRConversionTest {
     // "MSH|^~\\&||||||S1|PPR^PC2||T|2.6|||||||||\r",
     // "MSH|^~\\&||||||S1|PPR^PC3||T|2.6|||||||||\r",
     })
-    public void test_authoredOn_and_intent_in_PPR(String msh) {
+    public void test_medicationCodeableConcept_and_intent_in_PPR(String msh) {
 
-        // ORC.1 = NW -> Expected medication status = ACTIVE
         String hl7message = msh
                 + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
                 + "PRB|AD|20140610234741|^oxygenase|Problem_000054321_20190606193536||20140610234741\n"
@@ -424,12 +366,14 @@ public class Hl7MedicationRequestFHIRConversionTest {
         Bundle b = (Bundle) bundleResource;
         List<BundleEntryComponent> e = b.getEntry();
 
-        //2018 06 22 23 00 00
         List<Resource> medicationRequestList = e.stream()
                 .filter(v -> ResourceType.MedicationRequest == v.getResource().getResourceType())
                 .map(BundleEntryComponent::getResource).collect(Collectors.toList());
         assertThat(medicationRequestList).hasSize(1);
         MedicationRequest medicationRequest = getResourceMedicationRequest(medicationRequestList.get(0));
+
+        // Verify authored on is not present
+        assertThat(medicationRequest.getAuthoredOn()).isNull();
         
         //Verify intent is set correctly
         String intent = medicationRequest.getIntent().toString();
