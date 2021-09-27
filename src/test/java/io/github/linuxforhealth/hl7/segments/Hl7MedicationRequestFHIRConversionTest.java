@@ -351,9 +351,9 @@ public class Hl7MedicationRequestFHIRConversionTest {
     @ParameterizedTest
     @ValueSource(strings = 
     { 
-    "MSH|^~\\&||||||S1|ORM^O01||T|2.6|||||||||\r",
+    "MSH|^~\\&||||||S1|OMP^O09||T|2.6|||||||||\r",
     // --UNCOMMENT BELOW WHEN CONVERTER SUPPORTS THIS MESSAGE TYPE-- 
-    // "MSH|^~\\&||||||S1|OMP^O09||T|2.6|||||||||\r",
+    // "MSH|^~\\&||||||S1|ORM^O01||T|2.6|||||||||\r",
     })
     public void test_authoredOn_and_intent_in_OMP_and_ORM(String msh) {
 
