@@ -46,11 +46,9 @@ status:
       vars3: String, PV2.16
 
 class:
-    valueOf: datatype/Coding
-    required: true
-    expressionType: resource
-    vars:
-       code: PV1.2
+    type: ACT_ENCOUNTER
+    specs: PV1.2
+    expressionType: HL7Spec
 
 type:
    valueOf: datatype/CodeableConcept
@@ -86,19 +84,37 @@ length:
     vars: 
       time1: DATE_TIME, PV1.44
       time2: DATE_TIME, PV1.45
+      time3: STRING, PV2.11
 
-reasonCode:
+reasonCode_1:
     valueOf: datatype/CodeableConcept
     generateList: true
     expressionType: resource
-    specs: EVN.4 | PV2.3 
+    specs: EVN.4
 
-reasonReference:
-    valueOf: datatype/Reference
-    evaluateLater: true
-    generateList: true
-    expressionType: resource
-    specs: $Condition | $Observation
+reasonCode_2:
+  valueOf: datatype/CodeableConcept
+  generateList: true
+  expressionType: resource
+  specs: PV2.3
+  vars:
+    code: PV2.3
+
+reasonReference_1:
+   valueOf: datatype/Reference
+   condition: $Condition NOT_NULL 
+   evaluateLater: true
+   generateList: true
+   expressionType: resource
+   specs: $Condition
+
+reasonReference_2:
+   valueOf: datatype/Reference
+   condition: $Observation NOT_NULL
+   evaluateLater: true
+   generateList: true
+   expressionType: resource
+   specs: $Observation    
 
 hospitalization:
     valueOf: secondary/Hospitalization
@@ -119,13 +135,13 @@ diagnosis:
         valueOf: datatype/Reference
         expressionType: resource
         specs: $Condition
-     use: 
+     use:
         valueOf: datatype/CodeableConcept
         expressionType: resource
         specs: DG1.6
         vars:
           coding: DIAGNOSIS_USE, DG1.6
-     rank: 
+     rank:
         type: STRING
         valueOf: DG1.15
         expressionType: HL7Spec
@@ -222,6 +238,6 @@ serviceProvider:
    expressionType: reference
    valueOf: resource/Organization_Simple
    vars:
-      idValue: PV2.23.8 | PV1.3.4.1
+      idValue: PV2.23.8 | PV1.3.4.1 | PV1.39
       name: PV2.23.1
 

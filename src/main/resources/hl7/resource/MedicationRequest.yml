@@ -47,11 +47,33 @@ intent:
   valueOf: $default
   expressionType: HL7Spec
   constants:
-    default: "filler-order"
+    default: "order"
 
-medicationCodeableConcept:
+medicationCodeableConcept_1:
+  condition: $rxO NOT_NULL
   valueOf: datatype/CodeableConcept
   expressionType: resource
-  specs: RXE.2 | RXO.1 | RXC.2
+  specs: RXO.1
+  vars:
+    rxO: RXO.1
+medicationCodeableConcept_2:
+  condition: $rxE NOT_NULL 
+  valueOf: datatype/CodeableConcept
+  expressionType: resource
+  specs: RXE.2
+  vars:
+    rxE: RXE.2
+medicationCodeableConcept_3:
+  condition: $rxC NOT_NULL
+  valueOf: datatype/CodeableConcept
+  expressionType: resource
+  specs: RXC.2
+  vars:
+    rxC: RXC.2
+
+authoredOn:
+  type: DATE_TIME
+  valueOf: RXE.32
+  expressionType: HL7Spec
 
 

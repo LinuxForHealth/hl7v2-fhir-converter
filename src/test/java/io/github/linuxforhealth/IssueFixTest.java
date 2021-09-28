@@ -40,7 +40,7 @@ public class IssueFixTest {
             + "PD1|||BRAINTREE-ATRIUS HEALTH^^06|1457352338^TEITLEMAN^CHRISTOPHER^A MD^^^^^^^^^NPISER||||||||||||||\n"
             + "NK1|1|TILLMAN^FRANCES^^|SISTER||(617)436-7319^^7^^^617^4367319|||||||||||||||||||||||||||\n"
             + "NK1|2|EDWARDS^SOYINI^^|DAUGHTER||(213)270-3770^^7^^^213^2703770|||||||||||||||||||||||||||\n"
-            + "PV1|1|||||||||||||||||||||||||||||||||||||||||||20180924152707|\n"
+            + "PV1|1|I||||||||||||||||||||||||||||||||||||||||||20180924152707|\n"
             + "ORC|RE|248648498^|248648498^|ML18267-C00001^Beaker||||||||1457352338^TEITLEMAN^CHRISTOPHER^A MD^^^^^^^^^NPISER||(781)849-2400^^^^^781^8492400|||||||ATRIUS HEALTH, INC^D^^^^POCFULL^XX^^^1020|P.O. BOX 415432^^BOSTON^MA^02241-5432^^B|898-7980^^8^^^800^8987980|111 GROSSMAN DRIVE^^BRAINTREE^MA^02184^USA^C^^NORFOLK|||||||\n"
             + "OBR|1|248648498^|248648498^|83036E^HEMOGLOBIN A1C^PACSEAP^^^^^^HEMOGLOBIN A1C|||20180924152700||||NORM||E11.9^Type 2 diabetes mellitus without complications^ICD-10-CM^^^^^^Type 2 diabetes mellitus without complications|||1457352338^TEITLEMAN^CHRISTOPHER^A MD^^^^^^^^^NPISER|(781)849-2400^^^^^781^8492400|||||20180924152900|||F|||||||&Roache&Gerard&&||||||||||||||||||\n"
             + "TQ1|1||||||20180924152721|20180924235959|R\n"

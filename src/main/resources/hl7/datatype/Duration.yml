@@ -4,13 +4,24 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 ---
-value:
+value_1:
     valueOf: 'GeneralUtils.diffDateMin(var1,var2)'
     expressionType: JEXL
-    vars: 
+    vars:
       var1: $time1
       var2: $time2
-      
-unit:
-   type: String
-   value:  "Minutes"
+
+value_2:
+  condition: $time3 NOT_NULL && $time1 NULL
+  valueOf: $time3
+
+
+unit_1:
+  condition: $time1 NOT_NULL
+  type: String
+  value:  "Minutes"
+
+unit_2:
+  condition: $time3 NOT_NULL
+  type: String
+  valueOf: "Days"

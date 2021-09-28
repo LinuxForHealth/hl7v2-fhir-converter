@@ -6,6 +6,7 @@
 package io.github.linuxforhealth.hl7.segments;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -28,8 +29,8 @@ public class HL7ConditionFHIRConversionTest {
 
     // --------------------- DIAGNOSIS UNIT TESTS (DG1) ---------------------
 
-    // Tests the DG1 segment (diagnosis) with all supported message types. This
-    // tests all the fields in the happy path.
+    // Tests the DG1 segment (diagnosis) with all supported message types.
+    // This tests all the fields in the happy path.
     @ParameterizedTest
     @ValueSource(strings = { "MSH|^~\\&|||||||ADT^A01^ADT_A01|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6||||||\r",
     // "MSH|^~\\&|||||||ADT^A03|64322|P|2.4|123|456|ER|AL|USA|ASCII|en|2.4||||||\r",
@@ -89,8 +90,6 @@ public class HL7ConditionFHIRConversionTest {
 
         // Verify code coding is set correctly.
         Base coding = ResourceUtils.getValue(code, "coding");
-        // change from http://hl7.org/fhir/sid/icd-10 to
-        // http://hl7.org/fhir/sid/icd-10-cm temporarily, see Issue #189
         assertThat(ResourceUtils.getValueAsString(coding, "system"))
                 .isEqualTo("UriType[http://hl7.org/fhir/sid/icd-10-cm]");
         assertThat(ResourceUtils.getValueAsString(coding, "code")).isEqualTo("C56.9");
@@ -133,7 +132,6 @@ public class HL7ConditionFHIRConversionTest {
         // Verify encounter diagnosis use is set correctly
         Base diagnosis = ResourceUtils.getValue(encounter, "diagnosis");
         Base use = ResourceUtils.getValue(diagnosis, "use");
-        assertThat(ResourceUtils.getValueAsString(use, "text")).isEqualTo("A");
         Base diagCoding = ResourceUtils.getValue(use, "coding");
         assertThat(ResourceUtils.getValueAsString(diagCoding, "system"))
                 .isEqualTo("UriType[http://terminology.hl7.org/CodeSystem/diagnosis-role]");
@@ -225,7 +223,7 @@ public class HL7ConditionFHIRConversionTest {
         String hl7message = "MSH|^~\\&||||||S1|ADT^A01^ADT_A01||T|2.6|||||||||\r"
                 + "EVN|A04|20151008111200|20171013152901|O|OID1006|20171013153621|EVN1009\r"
                 + "PID||||||||||||||||||||||||||||||\r"
-                + "PV1|||||||||||||||||||||||||||||||RR|Y|2|Y|Y|N|N|\r"
+                + "PV1||I|||||||||||||||||1400|||||||||||||||||||||||||\r"
                 + "DG1|1|D1|V72.83^Other specified pre-operative examination^ICD-9^^^|Other specified pre-operative examination|20151008111200|A\r"
                 + "DG1|2|D2|R00.0^Tachycardia, unspecified^ICD-10^^^|Tachycardia, unspecified|20150725201300|A\r"
                 + "DG1|3|D3|R06.02^Shortness of breath^ICD-10^^^|Shortness of breath||A\r"
@@ -237,6 +235,8 @@ public class HL7ConditionFHIRConversionTest {
         List<Resource> conditionResource = e.stream()
                 .filter(v -> ResourceType.Condition == v.getResource().getResourceType())
                 .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+
+        //Verify we have 4 conditions. 1 for each DG1.
         assertThat(conditionResource).hasSize(4);
 
         Condition condition = (Condition) conditionResource.get(1);
@@ -249,14 +249,40 @@ public class HL7ConditionFHIRConversionTest {
 
         Coding condCoding = condCC.getCoding().get(0);
         assertThat(condCoding.hasSystem()).isTrue();
-        // change from http://hl7.org/fhir/sid/icd-10 to
-        // http://hl7.org/fhir/sid/icd-10-cm temporarily, see Issue #189
         assertThat(condCoding.getSystem()).isEqualTo("http://hl7.org/fhir/sid/icd-10-cm");
         assertThat(condCoding.hasCode()).isTrue();
         assertThat(condCoding.getCode()).isEqualTo("R00.0");
         assertThat(condCoding.hasDisplay()).isTrue();
         assertThat(condCoding.getDisplay()).isEqualTo("Tachycardia, unspecified");
         assertThat(condCoding.hasVersion()).isFalse();
+
+        // Verify encounter reference exists
+        Base encounterProp = ResourceUtils.getValue(condition, "encounter");
+        assertThat(ResourceUtils.getValueAsString(encounterProp, "reference").substring(0, 10)).isEqualTo("Encounter/");
+        
+        //------------------------------------------------------//
+
+        // Find the encounter from the FHIR bundle.
+        List<Resource> encounterResource = e.stream()
+        .filter(v -> ResourceType.Encounter == v.getResource().getResourceType())
+        .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+
+        //Verify we only have 1 encounter
+        assertThat(encounterResource).hasSize(1);
+
+        // Get the encounter resource
+        Base encounter = encounterResource.get(0);
+
+        // Verify encounter.reasonReference has a reference for each condition.
+        List<Base> reasonReferences = encounter.getNamedProperty("reasonReference").getValues();
+        // Therefore there should be 4.
+        assertThat(reasonReferences).hasSize(4);
+
+        // And the references should be referencing conditions
+        for (Base reasonReference : reasonReferences) {
+            assertThat(ResourceUtils.getValueAsString(reasonReference, "reference").substring(0, 10))
+                    .isEqualTo("Condition/");
+        }
 
     }
 
@@ -292,6 +318,8 @@ public class HL7ConditionFHIRConversionTest {
         List<Resource> encounterResource = e.stream()
                 .filter(v -> ResourceType.Encounter == v.getResource().getResourceType())
                 .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+
+        //Verify we only have 1 encounter
         assertThat(encounterResource).hasSize(1);
 
         // Get the encounter resource
@@ -317,7 +345,6 @@ public class HL7ConditionFHIRConversionTest {
         for (Base diagnosis : diagnosises) {
 
             Base use = ResourceUtils.getValue(diagnosis, "use");
-            assertThat(ResourceUtils.getValueAsString(use, "text")).isEqualTo("A");
             Base diagCoding = ResourceUtils.getValue(use, "coding");
             assertThat(ResourceUtils.getValueAsString(diagCoding, "system"))
                     .isEqualTo("UriType[http://terminology.hl7.org/CodeSystem/diagnosis-role]");
@@ -333,6 +360,34 @@ public class HL7ConditionFHIRConversionTest {
                     .isEqualTo("Condition/");
         }
 
+    }
+    
+    /**
+     * ICD-10-CM system for diagnosis 
+     */
+    @Test
+    public void validateConditionICD10CM() {
+
+        String hl7message = "MSH|^~\\&||||||S1|ADT^A01^ADT_A01||T|2.6|||||||||\r"
+                + "EVN|A01||||||\r"
+                + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\r"
+                + "PV1||I|||||||||||||||||1492|||||||||||||||||||||||||\r"
+                + "DG1|1|ICD-10-CM|M54.5^Low back pain^ICD-10-CM|Low back pain|20210407191342|A\r";
+        
+        List<BundleEntryComponent> e = ResourceUtils.createHl7Segment(hl7message);
+
+        // Find the conditions from the FHIR bundle.
+        List<Resource> conditionResource = e.stream()
+                .filter(v -> ResourceType.Condition == v.getResource().getResourceType())
+                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+
+        // We should have 1 condition for each diagnosis therefore 1 for this message.
+        assertThat(conditionResource).hasSize(1);
+
+       Condition c = (Condition) conditionResource.get(0);
+       assertEquals("M54.5", c.getCode().getCoding().get(0).getCode());
+       assertEquals("Low back pain", c.getCode().getCoding().get(0).getDisplay());
+       assertEquals("http://hl7.org/fhir/sid/icd-10-cm", c.getCode().getCoding().get(0).getSystem());
     }
 
     // --------------------- PROBLEM UNIT TESTS (PRB) ---------------------
@@ -448,8 +503,6 @@ public class HL7ConditionFHIRConversionTest {
 
         // Verify code coding fields are set correctly.
         Base codeCoding = ResourceUtils.getValue(code, "coding");
-        // change from http://hl7.org/fhir/sid/icd-10 to
-        // http://hl7.org/fhir/sid/icd-10-cm temporarily, see Issue #189
         assertThat(ResourceUtils.getValueAsString(codeCoding, "system"))
                 .isEqualTo("UriType[http://hl7.org/fhir/sid/icd-10-cm]");
         assertThat(ResourceUtils.getValueAsString(codeCoding, "code")).isEqualTo("K80.00");

@@ -27,8 +27,18 @@ import org.hl7.fhir.r4.model.Enumerations.AdministrativeGender;
 import org.hl7.fhir.r4.model.Immunization.ImmunizationStatus;
 import org.hl7.fhir.r4.model.MedicationRequest;
 import org.hl7.fhir.r4.model.Observation.ObservationStatus;
+import org.hl7.fhir.r4.model.ServiceRequest.ServiceRequestStatus;
 import org.hl7.fhir.r4.model.Specimen.SpecimenStatus;
-import org.hl7.fhir.r4.model.codesystems.*;
+import org.hl7.fhir.r4.model.codesystems.V3ActCode;
+import org.hl7.fhir.r4.model.codesystems.V3MaritalStatus;
+import org.hl7.fhir.r4.model.codesystems.ConditionCategory;
+import org.hl7.fhir.r4.model.codesystems.MessageReasonEncounter;
+import org.hl7.fhir.r4.model.codesystems.NameUse;
+import org.hl7.fhir.r4.model.codesystems.V3ReligiousAffiliation;
+import org.hl7.fhir.r4.model.codesystems.DiagnosisRole;
+import org.hl7.fhir.r4.model.codesystems.ConditionClinical;
+import org.hl7.fhir.r4.model.codesystems.ConditionVerStatus;
+import org.hl7.fhir.r4.model.codesystems.CompositionStatus;
 import org.hl7.fhir.r5.model.Enumerations;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -140,6 +150,16 @@ public class SimpleDataValueResolver {
         }
     };
 
+    public static final ValueExtractor<Object, String> SERVICE_REQUEST_STATUS = (Object value) -> {
+        String val = Hl7DataHandlerUtil.getStringValue(value);
+        String code = getFHIRCode(val, ServiceRequestStatus.class);
+        if (code != null) {
+            return code;
+        } else {
+            return null;
+        }
+    };
+
     public static final ValueExtractor<Object, SimpleCode> CONDITION_CATEGORY_CODES = (Object value) -> {
         String val = Hl7DataHandlerUtil.getStringValue(value);
         if (val != null) {
@@ -220,6 +240,19 @@ public class SimpleDataValueResolver {
         } else { // otherwise we don't want the code at all
             return null;
         }
+    };
+
+    public static final ValueExtractor<Object, SimpleCode> ACT_ENCOUNTER_CODE_FHIR = (Object value) -> {
+        String val = Hl7DataHandlerUtil.getStringValue(value);
+        String code = getFHIRCode(val, V3ActCode.class);
+        String version = Hl7DataHandlerUtil.getVersion(value);
+        if(code != null){
+            V3ActCode act = V3ActCode.fromCode(code);
+            return new SimpleCode( code , act.getSystem(), act.getDisplay(), version);
+        } else if (val != null) { // if code does not map but is present, use the "val" as the code
+            return new SimpleCode(val, null,  null);
+        }
+        else return null;
     };
 
     public static final ValueExtractor<Object, String> IMMUNIZATION_STATUS_CODES = (Object value) -> {

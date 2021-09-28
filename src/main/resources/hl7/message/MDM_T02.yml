@@ -30,9 +30,10 @@ resources:
       additionalSegments:
         - EVN
         - MSH
+        - OBSERVATION.OBX
 
     - resourceName: Observation
-      segment: OBX
+      segment: OBSERVATION.OBX
       resourcePath: resource/Observation
       repeats: true
       isReferenced: true
@@ -46,5 +47,5 @@ resources:
       additionalSegments:
         - MSH
         - PID
-        - ORC
-        - OBR
+        - COMMON_ORDER.ORC
+        - COMMON_ORDER.OBR

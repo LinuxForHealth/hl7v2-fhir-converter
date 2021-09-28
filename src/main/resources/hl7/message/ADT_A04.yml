@@ -32,6 +32,7 @@ resources:
              - PV2
              - EVN
              - MSH
+             - OBX
 
     - resourceName: Observation
       segment: OBX

@@ -22,6 +22,11 @@ ObservationStatus:
    I: registered
    P: preliminary
    W: entered-in-error
+ServiceRequestStatus:
+   # Only mapped a subset as there was not a clear mapping for the rest, they will default to unknown
+   F: completed	
+   U: completed
+   W: entered-in-error	
 AdministrativeGender:
    A: other
    F: female
@@ -79,13 +84,20 @@ NameUse:
   BAD: old
    
 EncounterModeOfArrivalDisplay:
-   A: Ambulance	
-   C: Car	
-   F: On foot	
-   H: Helicopter	
-   O: Other	
-   P: Public Transport	
-   U: Unknown
+  A: Ambulance
+  C: Car
+  F: On foot
+  H: Helicopter
+  O: Other
+  P: Public Transport
+  U: Unknown
+
+#Using Actcode for encounter.class
+V3ActCode:
+  E: EMER
+  I: IMP
+  P: PRENC
+  O: AMB
 
 V3MaritalStatus:
   A: A

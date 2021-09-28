@@ -6,62 +6,73 @@
 # FHIR Resources to extract from PPR_PC1 message
 ---
 resources:
-    - resourceName: MessageHeader
-      segment: MSH
-      resourcePath: resource/MessageHeader
-      repeats: false
-      isReferenced: false
-      additionalSegments:
-   
-    - resourceName: Patient
-      segment: PID
-      resourcePath: resource/Patient
-      isReferenced: true
-      repeats: false
-      additionalSegments:
-             - PD1
-             - MSH
-      
-    - resourceName: Encounter
-      segment: .PV1
-      group: PATIENT_VISIT
-      resourcePath: resource/Encounter
-      isReferenced: true
-      repeats: false
-      additionalSegments:
-             - .PV2
-             - MSH
-             - PID
-      
-    - resourceName: Observation
-      segment: .PROBLEM_OBSERVATION.OBX
-      group: PROBLEM
-      resourcePath: resource/Observation
-      repeats: true
-      isReferenced: true
-      additionalSegments:
-        - .ORDER.ORC
-        - .ORDER.ORDER_DETAIL.OBR
-        - MSH
+  - resourceName: MessageHeader
+    segment: MSH
+    resourcePath: resource/MessageHeader
+    repeats: false
+    isReferenced: false
+    additionalSegments:
+  
+  - resourceName: Patient
+    segment: PID
+    resourcePath: resource/Patient
+    isReferenced: true
+    repeats: false
+    additionalSegments:
+            - MSH
+    
+  - resourceName: Encounter
+    segment: .PV1
+    group: PATIENT_VISIT
+    resourcePath: resource/Encounter
+    isReferenced: true
+    repeats: false
+    additionalSegments:
+            - .PV2
+            - MSH
+            - PID
+            - PROBLEM.PROBLEM_OBSERVATION.OBX
+    
+  - resourceName: Observation
+    segment: .PROBLEM_OBSERVATION.OBX
+    group: PROBLEM
+    resourcePath: resource/Observation
+    repeats: true
+    isReferenced: true
+    additionalSegments:
+      - .ORDER.ORC
+      - .ORDER.ORDER_DETAIL.OBR
+      - MSH
 
-    - resourceName: Condition
-      segment: .PRB
-      group: PROBLEM
-      resourcePath: resource/Condition
-      repeats: true
-      additionalSegments:
-        - MSH
-        - PID
-        - PATIENT_VISIT.PV1
+  - resourceName: Condition
+    segment: .PRB
+    group: PROBLEM
+    resourcePath: resource/Condition
+    repeats: true
+    additionalSegments:
+      - MSH
+      - PID
+      - PATIENT_VISIT.PV1
 
-    - resourceName: ServiceRequest
-      segment: .ORDER.ORC
-      group: PROBLEM
-      resourcePath: resource/ServiceRequest
-      repeats: true
-      additionalSegments:
-        - .ORDER.ORDER_DETAIL.OBR
-        - .PROBLEM_OBSERVATION.OBX
-        - PATIENT_VISIT.PV1
-        - MSH
-        - PID
+  - resourceName: ServiceRequest
+    segment: .ORDER.ORC
+    group: PROBLEM
+    resourcePath: resource/ServiceRequest
+    repeats: true
+    additionalSegments:
+      - .ORDER.ORDER_DETAIL.OBR
+      - .ORDER.ORDER_DETAIL.ORDER_OBSERVATION.OBX
+      - PATIENT_VISIT.PV1
+      - MSH
+      - PID
+
+  - resourceName: MedicationRequest
+    segment: .ORDER_DETAIL.RXO
+    group: PROBLEM.ORDER
+    resourcePath: resource/MedicationRequest
+    repeats: true
+    additionalSegments:
+      - MSH
+      - .ORC
+      - PATIENT.PATIENT_VISIT.PV1
+      - PATIENT.PID

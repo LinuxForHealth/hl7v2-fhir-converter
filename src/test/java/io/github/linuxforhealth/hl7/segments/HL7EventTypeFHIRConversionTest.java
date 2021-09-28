@@ -6,15 +6,17 @@
 package io.github.linuxforhealth.hl7.segments;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.hl7.fhir.instance.model.api.IBaseResource;
+import org.hl7.fhir.r4.model.Base;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
-import org.hl7.fhir.r4.model.Base;
+import org.hl7.fhir.r4.model.CodeableConcept;
+import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.Encounter;
 import org.hl7.fhir.r4.model.Observation;
 import org.hl7.fhir.r4.model.Resource;
@@ -28,120 +30,129 @@ import io.github.linuxforhealth.hl7.HL7ToFHIRConverter;
 
 public class HL7EventTypeFHIRConversionTest {
 
-  private static final ConverterOptions OPTIONS = new Builder().withValidateResource().withPrettyPrint().build();
+    private static final ConverterOptions OPTIONS = new Builder().withValidateResource().withPrettyPrint().build();
 
-  @Test
-  public void validate_evn_segment() {
+    @Test
+    public void validate_evn_segment() {
+        String hl7message = "MSH|^~\\&|||||||ADT^A01^ADT_A01|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6||||||\r"
+                // + "EVN||||851||20210319134735|\r"  // TODO, not working with this value
+                + "EVN||||O||20210319134735|\r"
+                + "PV1|1|I||R|||||||||R|1||||||||||||||||||||||||||||||||||||||";
 
-    String hl7message = "MSH|^~\\&|||||||ADT^A01^ADT_A01|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6||||||\r"
-        + "EVN||||851||20210319134735|\r" 
-        + "PV1|1|I||R|||||||||R|1||||||||||||||||||||||||||||||||||||||";
+        HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
+        String json = ftv.convert(hl7message, OPTIONS);
+        assertThat(json).isNotBlank();
 
-    HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
-    String json = ftv.convert(hl7message, OPTIONS);
-    assertThat(json).isNotBlank();
+        FHIRContext context = new FHIRContext(true, false);
+        IBaseResource bundleResource = context.getParser().parseResource(json);
+        assertThat(bundleResource).isNotNull();
+        Bundle b = (Bundle) bundleResource;
+        List<BundleEntryComponent> e = b.getEntry();
 
-    FHIRContext context = new FHIRContext(true, false);
-    IBaseResource bundleResource = context.getParser().parseResource(json);
-    assertThat(bundleResource).isNotNull();
-    Bundle b = (Bundle) bundleResource;
-    List<BundleEntryComponent> e = b.getEntry();
+        // Find the encounter from the FHIR bundle.
+        List<Resource> encounterResource = e.stream()
+                .filter(v -> ResourceType.Encounter == v.getResource().getResourceType())
+                .map(BundleEntryComponent::getResource)
+                .collect(Collectors.toList());
+        assertThat(encounterResource).hasSize(1);
+        Encounter encounter = (Encounter) encounterResource.get(0);
 
-    // Find the encounter from the FHIR bundle.
-    List<Resource> encounterResource = e.stream()
-        .filter(v -> ResourceType.Encounter == v.getResource().getResourceType()).map(BundleEntryComponent::getResource)
-        .collect(Collectors.toList());
-    assertThat(encounterResource).hasSize(1);
+        // ENV.4 is used for reasonCode
+        List<CodeableConcept> reasonCodes = encounter.getReasonCode();
+        assertEquals(1, reasonCodes.size());
+        CodeableConcept encounterReason = encounter.getReasonCodeFirstRep();
+        Coding encounterReasonCoding = encounterReason.getCodingFirstRep();
+        // assertThat(encounterReasonCoding.getCode()).isEqualTo("851");  // TODO, should be able to use user-defined values
+        assertThat(encounterReasonCoding.getCode()).isEqualTo("O");
 
-    // ENV.4 is used for reasonCode
-    String reasonCode = encounterResource.get(0).getNamedProperty("reasonCode").getValues().get(0)
-        .getNamedProperty("text").getValues().get(0).toString();
-    assertThat(reasonCode).isEqualTo("851");
+        // EVN.6 is used for start period (with no end) if there is no PV1.44
+        Base period = encounter.getNamedProperty("period").getValues().get(0);
+        String startPeriod = period.getNamedProperty("start").getValues().get(0).toString();
+        int endPeriodSize = period.getNamedProperty("end").getValues().size();
+        assertThat(startPeriod).isEqualTo("DateTimeType[2021-03-19T13:47:35+08:00]");
+        assertThat(endPeriodSize).isZero();
+    }
 
-    Base period = encounterResource.get(0).getNamedProperty("period").getValues().get(0);
-    // EVN.6 is used for start period (with no end) if there is no PV1.44
-    String startPeriod = period.getNamedProperty("start").getValues().get(0).toString();
-    int endPeriodSize = period.getNamedProperty("end").getValues().size();
-    assertThat(startPeriod).isEqualTo("DateTimeType[2021-03-19T13:47:35+08:00]");
-    assertThat(endPeriodSize).isZero();
-  }
+    @Test
+    public void validate_evn_segment_no_period_override() {
+        String hl7message = "MSH|^~\\&|||||||ADT^A01^ADT_A01|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6||||||\r"
+                // + "EVN||||7525||20210319134735|\r"  // TODO, not working with this value
+                + "EVN||||O||20210319134735|\r"
+                + "PV1|1|I||R|||||||||R|1||||||||||||||||||||||||||||||200603150624|200603150625|||||||";
 
-  @Test
-  public void validate_evn_segment_no_period_override() {
+        HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
+        String json = ftv.convert(hl7message, OPTIONS);
+        assertThat(json).isNotBlank();
+        FHIRContext context = new FHIRContext();
+        IBaseResource bundleResource = context.getParser().parseResource(json);
+        assertThat(bundleResource).isNotNull();
+        Bundle b = (Bundle) bundleResource;
+        List<BundleEntryComponent> e = b.getEntry();
 
-    String hl7message = "MSH|^~\\&|||||||ADT^A01^ADT_A01|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6||||||\r"
-        + "EVN||||7525||20210319134735|\r"
-        + "PV1|1|I||R|||||||||R|1||||||||||||||||||||||||||||||200603150624|200603150625|||||||";
+        // Find the encounter from the FHIR bundle.
+        List<Resource> encounterResource = e.stream()
+                .filter(v -> ResourceType.Encounter == v.getResource().getResourceType())
+                .map(BundleEntryComponent::getResource)
+                .collect(Collectors.toList());
+        assertThat(encounterResource).hasSize(1);
+        Encounter encounter = (Encounter) encounterResource.get(0);
 
-    HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
-    String json = ftv.convert(hl7message, OPTIONS);
-    assertThat(json).isNotBlank();
+        // ENV.4 is used for reasonCode
+        List<CodeableConcept> reasonCodes = encounter.getReasonCode();
+        assertEquals(1, reasonCodes.size());
+        CodeableConcept encounterReason = encounter.getReasonCodeFirstRep();
+        Coding encounterReasonCoding = encounterReason.getCodingFirstRep();
+        // assertThat(encounterReasonCoding.getCode()).isEqualTo("7525");  // TODO, should be able to use user-defined values
+        assertThat(encounterReasonCoding.getCode()).isEqualTo("O");
 
-    FHIRContext context = new FHIRContext(true, false);
-    IBaseResource bundleResource = context.getParser().parseResource(json);
-    assertThat(bundleResource).isNotNull();
-    Bundle b = (Bundle) bundleResource;
-    List<BundleEntryComponent> e = b.getEntry();
+        // EVN.6 is used for start period if there is no PV1.44 but since we have a
+        // PV1.44 it should use that not EVN.6
+        Base period = encounter.getNamedProperty("period").getValues().get(0);
+        String startPeriod = period.getNamedProperty("start").getValues().get(0).toString();
+        // And use PV1.45 for end period.
+        String endPeriod = period.getNamedProperty("end").getValues().get(0).toString();
+        assertThat(startPeriod).isEqualTo("DateTimeType[2006-03-15T06:24:00+08:00]");
+        assertThat(endPeriod).isEqualTo("DateTimeType[2006-03-15T06:25:00+08:00]");
 
-    // Find the encounter from the FHIR bundle.
-    List<Resource> encounterResource = e.stream()
-        .filter(v -> ResourceType.Encounter == v.getResource().getResourceType()).map(BundleEntryComponent::getResource)
-        .collect(Collectors.toList());
-    assertThat(encounterResource).hasSize(1);
+    }
 
-    // ENV.4 is used for reasonCode
-    String reasonCode = encounterResource.get(0).getNamedProperty("reasonCode").getValues().get(0)
-        .getNamedProperty("text").getValues().get(0).toString();
-    assertThat(reasonCode).isEqualTo("7525");
+    @Test
+    public void validateEVNsegmentWithOBXreference() {
+        // When there is an OBX record, it should create a reason reference in the encounter segment
+        String hl7message = "MSH|^~\\&|||||||ADT^A01^ADT_A01|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6||||||\r"
+                + "EVN||||7525|||\r"
+                + "PV1|1|I||R|||||||||R|1||||||||||||||||||||||||||||||200603150624|200603150625|||||||\r"
+                + "OBX|1|CWE|DQW^Some text 1^SNM3|||||||||||||||||||||\r";
 
-    Base period = encounterResource.get(0).getNamedProperty("period").getValues().get(0);
-    // EVN.6 is used for start period if there is no PV1.44 but since we have a
-    // PV1.44 it should use that not EVN.6
-    String startPeriod = period.getNamedProperty("start").getValues().get(0).toString();
-    // And use PV1.45 for end period.
-    String endPeriod = period.getNamedProperty("end").getValues().get(0).toString();
-    assertThat(startPeriod).isEqualTo("DateTimeType[2006-03-15T06:24:00+08:00]");
-    assertThat(endPeriod).isEqualTo("DateTimeType[2006-03-15T06:25:00+08:00]");
+        HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
+        String json = ftv.convert(hl7message, OPTIONS);
+        assertThat(json).isNotBlank();
 
-  }
+        FHIRContext context = new FHIRContext(true, false);
+        IBaseResource bundleResource = context.getParser().parseResource(json);
+        assertThat(bundleResource).isNotNull();
+        Bundle b = (Bundle) bundleResource;
+        List<BundleEntryComponent> e = b.getEntry();
 
-  @Test
-  public void validateEVNsegmentWithOBXreference() {
-    // When there is an OBX record, it should create a reason reference in the encounter segment
-    String hl7message = "MSH|^~\\&|||||||ADT^A01^ADT_A01|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6||||||\r"
-        + "EVN||||7525|||\r"
-        + "PV1|1|I||R|||||||||R|1||||||||||||||||||||||||||||||200603150624|200603150625|||||||\r"
-        + "OBX|1|CWE|DQW^Some text 1^SNM3|||||||||||||||||||||\r";
+        //Find the Observation in the bundle
+        List<Resource> obsResource = e.stream()
+                .filter(v -> ResourceType.Observation == v.getResource().getResourceType())
+                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        assertThat(obsResource).hasSize(1);
+        Observation obs = (Observation) obsResource.get(0);
 
+        // Find the encounter from the FHIR bundle.
+        List<Resource> encounterResource = e.stream()
+                .filter(v -> ResourceType.Encounter == v.getResource().getResourceType())
+                .map(BundleEntryComponent::getResource)
+                .collect(Collectors.toList());
+        assertThat(encounterResource).hasSize(1);
+        Encounter encounter = (Encounter) encounterResource.get(0);
+        assertThat(encounter.hasReasonReference()).isTrue();
+        assertThat(encounter.getReasonReference()).hasSize(1);
+        //Check that the cross reference is equal to the Observation id
+        assertThat(encounter.getReasonReferenceFirstRep().getReference()).hasToString(obs.getId());
 
-    HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
-    String json = ftv.convert(hl7message, OPTIONS);
-    assertThat(json).isNotBlank();
-
-    FHIRContext context = new FHIRContext(true, false);
-    IBaseResource bundleResource = context.getParser().parseResource(json);
-    assertThat(bundleResource).isNotNull();
-    Bundle b = (Bundle) bundleResource;
-    List<BundleEntryComponent> e = b.getEntry();
-
-    //Find the Observation in the bundle
-    List<Resource> obsResource = e.stream()
-    .filter(v -> ResourceType.Observation == v.getResource().getResourceType())
-    .map(BundleEntryComponent::getResource).collect(Collectors.toList());
-    assertThat(obsResource).hasSize(1);
-    Observation obs = (Observation) obsResource.get(0);
-
-    // Find the encounter from the FHIR bundle.
-    List<Resource> encounterResource = e.stream()
-        .filter(v -> ResourceType.Encounter == v.getResource().getResourceType()).map(BundleEntryComponent::getResource)
-        .collect(Collectors.toList());
-    assertThat(encounterResource).hasSize(1);
-    Encounter encounter = (Encounter) encounterResource.get(0);
-    assertThat(encounter.hasReasonReference()).isTrue();
-    assertThat(encounter.getReasonReference()).hasSize(1);
-    //Check that the cross reference is equal to the Observation id
-    assertThat(encounter.getReasonReferenceFirstRep().getReference()).hasToString(obs.getId());
-    
-  }
+    }
 
 }

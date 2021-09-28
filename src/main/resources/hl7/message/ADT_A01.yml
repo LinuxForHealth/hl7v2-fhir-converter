@@ -13,17 +13,15 @@ resources:
       isReferenced: false
       additionalSegments: 
              - EVN
-             - MSH
 
     - resourceName: Patient
       segment: PID
       resourcePath: resource/Patient
-      repeats: true #TODO: Turn to false when bug 684 is fixed
+      repeats: false
       isReferenced: true
       additionalSegments:
              - PD1
              - MSH
-             - MRG
 
     - resourceName: Encounter
       segment: PV1
@@ -35,6 +33,7 @@ resources:
              - EVN
              - MSH
              - DG1
+             - OBX
 
     - resourceName: Condition
       segment: DG1
@@ -52,7 +51,6 @@ resources:
       repeats: true
       isReferenced: true
       additionalSegments:
-        - ORC
         - MSH
 
     - resourceName: AllergyIntolerance
@@ -72,5 +70,3 @@ resources:
         - MSH
         - PID
         - PV1
-        - ORC
-        - OBR

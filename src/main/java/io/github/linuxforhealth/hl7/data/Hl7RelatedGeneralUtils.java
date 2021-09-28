@@ -164,7 +164,6 @@ public class Hl7RelatedGeneralUtils {
         return null;
     }
 
-
     public static String split(Object input, String delimitter, int index) {
         String stringRepVal = Hl7DataHandlerUtil.getStringValue(input);
         if (StringUtils.isNotBlank(stringRepVal)) {

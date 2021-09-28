@@ -45,17 +45,14 @@ identifier_3:
       display: Driver's license number
 # There is no text for PID.20
 identifier_4:
-   condition: $valueIn NOT_NULL
-   valueOf: datatype/Identifier_var
+   condition: $mrgIdentifier NOT_NULL
+   valueOf: datatype/Identifier_SystemID
    generateList: true
    expressionType: resource
-   vars:
-      valueIn: String, MRG.1
+   specs: MRG.1
    constants:
-      system: http://terminology.hl7.org/CodeSystem/v2-0203
-      code: MR
-      display: Medical Record
       use: old
+      mrgIdentifier: MRG.1
 # Add the old MR # from the MRG segment
 
 name:
@@ -208,26 +205,22 @@ communication:
 
 active:
    type: BOOLEAN  
-   valueOf: $isActive
-   constants:
-      isActive: true
+   valueOf: true
+
 
 link:
    generateList: true
    evaluateLater: true
    expressionType: nested
-   condition: mrgSegment NOT_NULL
+   condition: $mrgSegment NOT_NULL
    vars: 
       mrgSegment: MRG
    expressionsMap:
-         type:
-            type: STRING
-            valueOf: $type
-            constants:
-                type: 'replaces'
-         other:
-           required: true
-           valueOf: resource/PatientMRG
-           expressionType: reference
-           specs: $Patient
+      type:
+        type: STRING
+        valueOf: 'replaces'
+      other:
+        required: true
+        valueOf: resource/PatientMRG
+        expressionType: reference
 
