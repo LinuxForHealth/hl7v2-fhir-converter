@@ -25,7 +25,6 @@ import org.hl7.fhir.r4.model.AllergyIntolerance.AllergyIntoleranceCriticality;
 import org.hl7.fhir.r4.model.DiagnosticReport.DiagnosticReportStatus;
 import org.hl7.fhir.r4.model.Enumerations.AdministrativeGender;
 import org.hl7.fhir.r4.model.Immunization.ImmunizationStatus;
-import org.hl7.fhir.r4.model.MedicationRequest;
 import org.hl7.fhir.r4.model.Observation.ObservationStatus;
 import org.hl7.fhir.r4.model.ServiceRequest.ServiceRequestStatus;
 import org.hl7.fhir.r4.model.Specimen.SpecimenStatus;
@@ -125,13 +124,7 @@ public class SimpleDataValueResolver {
 
     public static final ValueExtractor<Object, String> OBSERVATION_STATUS_CODE_FHIR = (Object value) -> {
         String val = Hl7DataHandlerUtil.getStringValue(value);
-        String code = getFHIRCode(val, ObservationStatus.class);
-        if (code != null) {
-            return code;
-        } else {
-            return null;
-        }
-
+        return getFHIRCode(val, ObservationStatus.class);
     };
    
     public static final ValueExtractor<Object, SimpleCode> OBSERVATION_STATUS_FHIR = (Object value) -> {
@@ -150,12 +143,7 @@ public class SimpleDataValueResolver {
     
     public static final ValueExtractor<Object, String> SERVICE_REQUEST_STATUS = (Object value) -> {
         String val = Hl7DataHandlerUtil.getStringValue(value);
-        String code = getFHIRCode(val, ServiceRequestStatus.class);
-        if (code != null) {
-            return code;
-        } else {
-            return null;
-        }
+        return getFHIRCode(val, ServiceRequestStatus.class);
     };
 
     public static final ValueExtractor<Object, SimpleCode> CONDITION_CATEGORY_CODES = (Object value) -> {
@@ -167,7 +155,6 @@ public class SimpleDataValueResolver {
             return null;
         }
     };
-
 
     public static final ValueExtractor<Object, SimpleCode> RELIGIOUS_AFFILIATION_FHIR_CC =
         (Object value) -> {
@@ -255,42 +242,22 @@ public class SimpleDataValueResolver {
 
     public static final ValueExtractor<Object, String> IMMUNIZATION_STATUS_CODES = (Object value) -> {
         String val = Hl7DataHandlerUtil.getStringValue(value);
-        String code = getFHIRCode(val, ImmunizationStatus.class);
-        if (code != null) {
-            return code;
-        } else {
-            return null;
-        }
+        return getFHIRCode(val, ImmunizationStatus.class);
     };
 
     public static final ValueExtractor<Object, String> SPECIMEN_STATUS_CODE_FHIR = (Object value) -> {
         String val = Hl7DataHandlerUtil.getStringValue(value);
-        String code = getFHIRCode(val, SpecimenStatus.class);
-        if (code != null) {
-            return code;
-        } else {
-            return null;
-        }
+        return getFHIRCode(val, SpecimenStatus.class);
     };
 
     public static final ValueExtractor<Object, String> NAME_USE_CODE_FHIR = (Object value) -> {
         String val = Hl7DataHandlerUtil.getStringValue(value);
-        String code = getFHIRCode(val, NameUse.class);
-        if (code != null) {
-            return code;
-        } else {
-            return null;
-        }
+        return getFHIRCode(val, NameUse.class);
     };
 
 
     public static final ValueExtractor<Object, String> ENCOUNTER_MODE_ARRIVAL_DISPLAY = (Object value) -> {
-        String display = getFHIRCode(Hl7DataHandlerUtil.getStringValue(value), "EncounterModeOfArrivalDisplay");
-        if (display != null) {
-            return display;
-        } else {
-            return display;
-        }
+        return getFHIRCode(Hl7DataHandlerUtil.getStringValue(value), "EncounterModeOfArrivalDisplay");
     };
     
   public static final ValueExtractor<Object, SimpleCode> MARITAL_STATUS =
@@ -471,12 +438,7 @@ public class SimpleDataValueResolver {
 
     public static final ValueExtractor<Object, String> ALLERGY_INTOLERANCE_CATEGORY_CODE_FHIR = (Object value) -> {
         String val = Hl7DataHandlerUtil.getStringValue(value);
-        String code = getFHIRCode(val, AllergyIntoleranceCategory.class);
-        if (code != null) {
-            return code;
-        } else {
-            return null;
-        }
+        return getFHIRCode(val, AllergyIntoleranceCategory.class);
     };
 
     public static final ValueExtractor<Object, String> SYSTEM_URL = (Object value) -> {
@@ -602,5 +564,4 @@ public class SimpleDataValueResolver {
             return null;
         }
     }
-
 }
