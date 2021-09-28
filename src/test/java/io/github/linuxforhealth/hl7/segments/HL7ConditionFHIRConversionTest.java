@@ -29,8 +29,8 @@ public class HL7ConditionFHIRConversionTest {
 
     // --------------------- DIAGNOSIS UNIT TESTS (DG1) ---------------------
 
-    // Tests the DG1 segment (diagnosis) with all supported message types. This
-    // tests all the fields in the happy path.
+    // Tests the DG1 segment (diagnosis) with all supported message types.
+    // This tests all the fields in the happy path.
     @ParameterizedTest
     @ValueSource(strings = { "MSH|^~\\&|||||||ADT^A01^ADT_A01|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6||||||\r",
     // "MSH|^~\\&|||||||ADT^A03|64322|P|2.4|123|456|ER|AL|USA|ASCII|en|2.4||||||\r",
