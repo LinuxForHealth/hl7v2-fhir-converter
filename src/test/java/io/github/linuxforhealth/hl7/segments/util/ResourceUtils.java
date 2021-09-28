@@ -231,4 +231,34 @@ public class ResourceUtils {
     Practitioner pract = (Practitioner) matchingPractitioners.get(0);
     return pract;
   }
+ 
+  public static ServiceRequest getResourceServiceRequest(Resource resource, FHIRContext context ) {
+    String s = context.getParser().encodeResourceToString(resource);
+    Class<? extends IBaseResource> klass = ServiceRequest.class;
+    return (ServiceRequest) context.getParser().parseResource(klass, s);
+  }
+
+  public static DiagnosticReport getResourceDiagnosticReport(Resource resource, FHIRContext context) {
+    String s = context.getParser().encodeResourceToString(resource);
+    Class<? extends IBaseResource> klass = DiagnosticReport.class;
+    return (DiagnosticReport) context.getParser().parseResource(klass, s);
+  }
+
+  public static MedicationRequest getResourceMedicationRequest(Resource resource, FHIRContext context) {
+    String s = context.getParser().encodeResourceToString(resource);
+    Class<? extends IBaseResource> klass = MedicationRequest.class;
+    return (MedicationRequest) context.getParser().parseResource(klass, s);
+  }
+
+  public static Patient getResourcePatient(Resource resource, FHIRContext context) {
+    String s = context.getParser().encodeResourceToString(resource);
+    Class<? extends IBaseResource> klass = Patient.class;
+    return (Patient) context.getParser().parseResource(klass, s);
+  }
+
+  public static Immunization getResourceImmunization(Resource resource, FHIRContext context) {
+    String s = context.getParser().encodeResourceToString(resource);
+    Class<? extends IBaseResource> klass = Immunization.class;
+    return (Immunization) context.getParser().parseResource(klass, s);
+}
 }

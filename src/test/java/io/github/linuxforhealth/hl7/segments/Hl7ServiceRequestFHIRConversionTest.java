@@ -46,7 +46,7 @@ public class Hl7ServiceRequestFHIRConversionTest {
             + "PV1||I|6N^1234^A^GENHOS|||||||SUR||||||||S||||||||||||||||||||||||||\n"
             + "PRB|AD||202101010000|aortic stenosis|53692||2|||202101010000\n"
             + "OBX|1|NM|111^TotalProtein||7.5|gm/dl|5.9-8.4||||W\n"
-            + "ORC|NW|1000^OE|9999999^RX|||E|^Q6H^D10^^^R\n"
+            + "ORC|NW|1000^OE|9999999^RX||SC|E|^Q6H^D10^^^R\n"
             + "OBR|1|TESTID|TESTID|||202101010000|202101010000||||||||||||||||||F||||||WEAKNESS||||||||||||\n"
             + "OBX|1|TX|||ECHOCARDIOGRAPHIC REPORT||||||F|||202101010000|||\n"
             + "OBX|2|TX|||NORMAL LV CHAMBER SIZE WITH MILD CONCENTRIC LVH||||||F|||202101010000|||\n";
@@ -73,7 +73,7 @@ public class Hl7ServiceRequestFHIRConversionTest {
                 .map(BundleEntryComponent::getResource).collect(Collectors.toList());
     ServiceRequest sr = (ServiceRequest) serviceRequestResource.get(0);
    
-    assertEquals("Completed", sr.getStatus().getDisplay()); //From OBX.11 'F'
+    assertEquals("Active", sr.getStatus().getDisplay()); //From ORC.5 'SC'
   }
   
   @Test
