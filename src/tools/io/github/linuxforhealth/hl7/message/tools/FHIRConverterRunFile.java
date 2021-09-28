@@ -24,7 +24,7 @@ import io.github.linuxforhealth.hl7.HL7ToFHIRConverter;
  * The resulting JSON is printed to System.out.
  * This class uses a main() method; run as a Java application.
  */
-public class FHIRConverterRunFromFile {
+public class FHIRConverterRunFile {
 
     public static void main(String[] args) throws IOException {
         String filename = System.getProperty("hl7.filename");
