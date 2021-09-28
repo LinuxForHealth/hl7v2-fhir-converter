@@ -263,7 +263,7 @@ public class Hl7MedicationRequestFHIRConversionTest {
                 .filter(v -> ResourceType.MedicationRequest == v.getResource().getResourceType())
                 .map(BundleEntryComponent::getResource).collect(Collectors.toList());
         assertThat(medicationRequestList).hasSize(1);
-        MedicationRequest medicationRequest = getResourceMedicationRequest(medicationRequestList.get(0));
+        MedicationRequest medicationRequest = ResourceUtils.getResourceMedicationRequest(medicationRequestList.get(0), context);
         
         // Verify Authored On date is correct.
         Date authoredOnDate = medicationRequest.getAuthoredOn();      
@@ -320,7 +320,7 @@ public class Hl7MedicationRequestFHIRConversionTest {
                 .filter(v -> ResourceType.MedicationRequest == v.getResource().getResourceType())
                 .map(BundleEntryComponent::getResource).collect(Collectors.toList());
         assertThat(medicationRequestList).hasSize(1);
-        MedicationRequest medicationRequest = getResourceMedicationRequest(medicationRequestList.get(0));
+        MedicationRequest medicationRequest = ResourceUtils.getResourceMedicationRequest(medicationRequestList.get(0), context);
         
         // Verify Authored On date is correct.
         Date authoredOnDate = medicationRequest.getAuthoredOn();      
@@ -378,7 +378,7 @@ public class Hl7MedicationRequestFHIRConversionTest {
                 .filter(v -> ResourceType.MedicationRequest == v.getResource().getResourceType())
                 .map(BundleEntryComponent::getResource).collect(Collectors.toList());
         assertThat(medicationRequestList).hasSize(1);
-        MedicationRequest medicationRequest = getResourceMedicationRequest(medicationRequestList.get(0));
+        MedicationRequest medicationRequest = ResourceUtils.getResourceMedicationRequest(medicationRequestList.get(0), context);
 
         // Verify authored on is not present
         assertThat(medicationRequest.getAuthoredOn()).isNull();
@@ -431,7 +431,7 @@ public class Hl7MedicationRequestFHIRConversionTest {
                 .filter(v -> ResourceType.MedicationRequest == v.getResource().getResourceType())
                 .map(BundleEntryComponent::getResource).collect(Collectors.toList());
         assertThat(medicationRequestList).hasSize(1);
-        MedicationRequest medicationRequest = getResourceMedicationRequest(medicationRequestList.get(0));
+        MedicationRequest medicationRequest = ResourceUtils.getResourceMedicationRequest(medicationRequestList.get(0), context);
 
         // Verify authored on is not present
         assertThat(medicationRequest.getAuthoredOn()).isNull();
@@ -450,15 +450,4 @@ public class Hl7MedicationRequestFHIRConversionTest {
 
     }
 
-
-    private MedicationRequest getResourceMedicationRequest(Resource resource) {
-        String s = context.getParser().encodeResourceToString(resource);
-        Class<? extends IBaseResource> klass = MedicationRequest.class;
-        return (MedicationRequest) context.getParser().parseResource(klass, s);
-    }
-
-    private static Patient getResourcePatient(Resource resource) {
-        String s = context.getParser().encodeResourceToString(resource);
-        Class<? extends IBaseResource> klass = Patient.class;
-        return (Patient) context.getParser().parseResource(klass, s);
-    }
+}
