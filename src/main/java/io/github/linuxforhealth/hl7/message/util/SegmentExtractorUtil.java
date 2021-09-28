@@ -24,7 +24,7 @@ import io.github.linuxforhealth.hl7.parsing.result.ParsingResult;
 
 public class SegmentExtractorUtil {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(HL7DataExtractor.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(SegmentExtractorUtil.class);
 
   private SegmentExtractorUtil() {}
 

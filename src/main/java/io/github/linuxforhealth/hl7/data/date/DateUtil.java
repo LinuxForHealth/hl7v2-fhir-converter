@@ -27,8 +27,6 @@ public class DateUtil {
 
   private DateUtil() {}
 
-
-
   public static String formatToDate(String input) {
     DateTimeFormatter format = null;
 
@@ -38,7 +36,6 @@ public class DateUtil {
         format = pattern.getValue();
         break;
       }
-
     }
     try {
       LocalDate ldt = LocalDate.parse(input, DateFormats.getFormatterInstance());
@@ -49,24 +46,17 @@ public class DateUtil {
     }
   }
 
-
   public static String formatToDateTimeWithZone(String input) {
-
-
     String returnValue = getLocalDate(input);
     if (returnValue == null) {
       returnValue = getZonedDate(input);
     }
-
     if (returnValue == null) {
       returnValue = getLocalDateTimeWithDefaultZone(input);
-
     }
-
+    
     return returnValue;
   }
-
-
 
   private static String getLocalDateTimeWithDefaultZone(String input) {
     String returnValue;
@@ -83,41 +73,12 @@ public class DateUtil {
             input);
         return null;
       }
-
     } catch (DateTimeParseException e) {
       LOGGER.warn("Date parsing failure for value \'{}\'   reason {}", input, e.getMessage());
       LOGGER.debug("Date parsing exception for value {}", input, e);
       return null;
     }
   }
-
-
-
-  private static String getLocalDateTime(String input) {
-    String returnValue;
-    DateTimeFormatter format = null;
-
-    for (Entry<Pattern, DateTimeFormatter> pattern : DateFormats.getDateTimePatternsInstance()
-        .entrySet()) {
-      if (pattern.getKey().matcher(input).matches()) {
-        format = pattern.getValue();
-        break;
-      }
-
-    }
-    try {
-      LocalDateTime ldt = LocalDateTime.parse(input, DateFormats.getFormatterInstance());
-      returnValue = ldt.format(format);
-      return returnValue;
-    } catch (DateTimeParseException e) {
-      LOGGER.warn("Input value cannot be formatted to LocalDateTime \'{}\'   reason {}", input,
-          e.getMessage());
-      LOGGER.debug("Input value cannot be formatted to LocalDateTime {}", input, e);
-      return null;
-    }
-  }
-
-
 
   private static String getLocalDate(String input) {
     DateTimeFormatter format = null;
@@ -127,7 +88,6 @@ public class DateUtil {
         format = pattern.getValue();
         break;
       }
-
     }
     if (format != null) {
       try {
@@ -143,7 +103,6 @@ public class DateUtil {
     return null;
   }
 
-
   private static String getZonedDate(String input) {
     DateTimeFormatter format = null;
     for (Entry<Pattern, DateTimeFormatter> pattern : DateFormats.getDatePatternsWithZoneInstance()
@@ -152,7 +111,6 @@ public class DateUtil {
         format = pattern.getValue();
         break;
       }
-
     }
     if (format != null) {
       try {
@@ -168,8 +126,6 @@ public class DateUtil {
     return null;
   }
 
-
-
   public static Temporal getTemporal(String dateString) {
     Map<String, DateTimeParseException> warnings = new HashMap<>();
     if (dateString == null) {
@@ -181,7 +137,6 @@ public class DateUtil {
       LOGGER.info("Date parsed for instant {}", dateString);
     } catch (DateTimeParseException e) {
       warnings.put("Input value cannot be parsed to  instant " + dateString, e);
-
     }
     if (temporal == null) {
       try {
@@ -189,9 +144,7 @@ public class DateUtil {
         LOGGER.info("Date parsed for ZonedDateTime {}", dateString);
       } catch (DateTimeParseException e) {
         warnings.put("Input value cannot be parsed to ZonedDateTime " + dateString, e);
-
       }
-
     }
     if (temporal == null) {
       try {
@@ -202,39 +155,28 @@ public class DateUtil {
       }
     }
     if (temporal == null) {
-
       try {
         temporal = LocalDate.parse(dateString, DateTimeFormatter.ISO_LOCAL_DATE);
         LOGGER.info("Date parsed for LocalDate {}", dateString);
       } catch (DateTimeParseException e) {
         warnings.put("Input value cannot be parsed to LocalDate " + dateString, e);
-
-
       }
     }
-
     if (temporal == null && !warnings.isEmpty()) {
       LOGGER.warn("Attempt to parse input value {} to temporal failed ", dateString);
       for (Entry<String, DateTimeParseException> entry : warnings.entrySet()) {
         LOGGER.warn("{} reason {}", entry.getKey(), entry.getValue().getMessage());
         LOGGER.debug("{} reason {}", entry.getKey(), entry.getValue().toString());
-
       }
-
     }
     return temporal;
-
   }
-
-
 
   public static String formatToZonedDateTime(String input) {
     String zoned = getZonedDate(input);
     if (zoned == null) {
       zoned = formatToDateTimeWithZone(input);
-
     }
     return zoned;
   }
 }
-

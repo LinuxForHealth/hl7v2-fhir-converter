@@ -263,14 +263,8 @@ public class HL7DataExtractor {
           e.getMessage());
 
       return new Hl7ParsingTypeResult(new ArrayList<>());
-
-
     }
-
-
   }
-
-
 
   public ParsingResult<Type> getComponent(Type inputType, int component) {
     try {
@@ -325,11 +319,8 @@ public class HL7DataExtractor {
           inputType, component, subComponent, e.getMessage());
 
       return new Hl7ParsingTypeResult(new ArrayList<>());
-
     }
   }
-
-
 
   private Terser getTerser() {
     Message unmodifiableMessage = Unmodifiable.unmodifiableMessage(message);
@@ -342,17 +333,14 @@ public class HL7DataExtractor {
       String theActualMessageType = msh.getMessageType().getMsg1_MessageCode().getValue() + "_" + msh.getMessageType().getMsg2_TriggerEvent().getValue();
       return theActualMessageType;
     } catch (HL7Exception e){
-      e.printStackTrace();
+      LOGGER.warn("Cannot extract actual message type, reason {}", e.getMessage());
     }
     return null;
   }
 
-
   public String getMessageType() {
   return getMessageType(message);
   }
-
-
 
   /**
    * 
@@ -374,8 +362,6 @@ public class HL7DataExtractor {
           e.getMessage());
 
       return new Hl7ParsingStringResult(null);
-
-
     }
   }
 
@@ -397,8 +383,6 @@ public class HL7DataExtractor {
       Preconditions.checkArgument(struct != null, "struct cannot be null ");
       Preconditions.checkArgument(StringUtils.isNotBlank(segment), SEGMENT_CANNOT_BE_NULL_OR_EMPTY);
 
-
-
       if (struct instanceof Group) {
         Group gp = (Group) struct;
 
@@ -417,8 +401,6 @@ public class HL7DataExtractor {
           e.getMessage());
 
       return new Hl7ParsingStructureResult(new ArrayList<>());
-
     }
   }
-
 }

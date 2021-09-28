@@ -104,7 +104,7 @@ public class Hl7RelatedGeneralUtils {
     }
 
     public static String generateName(Object prefix, Object first, Object middle, Object family, Object suffix) {
-        LOGGER.info("Generating name from  from prefix {}, first {}, family {} ,suffix {}", prefix, first, middle,
+        LOGGER.info("Generating name from  from prefix {}, first {}, middle {}, family {} ,suffix {}", prefix, first, middle,
                 family, suffix);
         StringBuilder sb = new StringBuilder();
         String valprefix = Hl7DataHandlerUtil.getStringValue(prefix);
@@ -200,7 +200,7 @@ public class Hl7RelatedGeneralUtils {
     }
 
     public static List<String> makeStringArray(String... strs) {
-        List<String> result = new ArrayList<String>();
+        List<String> result = new ArrayList<>();
 
         for (String str : strs)
             if (str != null)

@@ -30,21 +30,21 @@ public class VariableGenerator {
     ExpressionAttributes.ExpressionModifiers exp =
         ExpressionAttributes.extractExpressionModifiers(variableExpression, false);
 
-    String rawVariable = exp.expression;
+    String rawVariable = exp.getExpression();
     if (StringUtils.contains(rawVariable, "GeneralUtils")) {
       String[] values = rawVariable.split(",", 2);
       // Handle * in combination with GeneralUtils function
       exp = ExpressionAttributes.extractExpressionModifiers(values[0], false);
       if (values.length == COMPONENT_LENGTH_FOR_VAR_EXPRESSION) {
-        List<String> specs = getTokens(exp.expression);
-        return new ExpressionVariable(varName, values[1], specs, exp.extractMultiple, exp.retainEmpty);
+        List<String> specs = getTokens(exp.getExpression());
+        return new ExpressionVariable(varName, values[1], specs, exp.getExtractMultiple(), exp.getRetainEmpty());
       }
       throw new IllegalArgumentException("rawVariable not in correct format ");
     } else if (StringUtils.contains(rawVariable, ",")) {
       String[] values = rawVariable.split(",", 2);
       if (values.length == COMPONENT_LENGTH_FOR_VAR_EXPRESSION) {
         List<String> specs = getTokens(values[1]);
-        return new DataTypeVariable(varName, values[0], specs, exp.extractMultiple);
+        return new DataTypeVariable(varName, values[0], specs, exp.getExtractMultiple());
       }
       throw new IllegalArgumentException("rawVariable not in correct format ");
     } else {
@@ -53,7 +53,7 @@ public class VariableGenerator {
         combineValues = true;
       }
       List<String> specs = getTokens(rawVariable);
-      return new SimpleVariable(varName, specs, exp.extractMultiple, combineValues, exp.retainEmpty);
+      return new SimpleVariable(varName, specs, exp.getExtractMultiple(), combineValues, exp.getRetainEmpty());
     }
   }
 
