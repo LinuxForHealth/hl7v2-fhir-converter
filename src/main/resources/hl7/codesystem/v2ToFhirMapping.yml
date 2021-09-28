@@ -45,11 +45,11 @@ DiagnosticReportStatus:
    A: partial
    C: corrected
    F: final
-   I: registered
-   O: registered
+   I: unknown
+   O: unknown
    P: preliminary
    R: partial
-   S: registered
+   S: unknown
    X: cancelled
    Y: unknown
    Z: unknown
