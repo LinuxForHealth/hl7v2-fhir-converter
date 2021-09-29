@@ -282,9 +282,12 @@ public class SegmentExtractorUtil {
             "Primary segment is not from a group, so additional segements cannot be from relative group.   ");
 
       } else if (!seg.getGroup().isEmpty()) {
-        throw new IllegalStateException(
-            "Additional segements cannot be from a group if primary segment is not defined to be from same group. ");
-
+        //extracts data from segment that is in a group outside of the primary group for that specific resource
+        List<Structure> parentSegments = getChildStructures(seg.getGroup(), dataExtractor);
+        values = new ArrayList<>();
+        for (Structure par : parentSegments) {
+          values.addAll(getStructures(par, seg.getSegment(), dataExtractor));
+        }
       } else {
         ParsingResult<Structure> result = dataExtractor.getAllStructures(seg.getSegment());
         values = result.getValues();
