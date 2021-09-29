@@ -1,0 +1,71 @@
+#
+# (C) Copyright IBM Corp. 2020
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+# FHIR Resources to extract from OML_O21 message
+---
+resources:
+    - resourceName: MessageHeader
+      segment: MSH
+      resourcePath: resource/MessageHeader
+      repeats: false
+      isReferenced: false
+      additionalSegments:
+   
+    - resourceName: Patient
+      segment: PATIENT.PID
+      resourcePath: resource/Patient
+      isReferenced: true
+      repeats: false
+      additionalSegments:
+          - .PD1
+          - MSH
+      
+    - resourceName: Encounter
+      segment: .PV1
+      group: PATIENT_VISIT
+      resourcePath: resource/Encounter
+      isReferenced: true
+      repeats: false
+      additionalSegments:
+          - .PV2
+          - MSH
+      
+    - resourceName: DiagnosticReport
+      segment: .OBR
+      group: ORDER.OBSERVATION_REQUEST
+      resourcePath: resource/DiagnosticReport
+      repeats: true
+      additionalSegments:
+          - .ORC
+          - .NTE
+          - .SPECIMEN.SPM
+          - .DG1
+          - MSH
+    
+    - resourceName: ServiceRequest
+      segment: .ORC
+      group: ORDER
+      resourcePath: resource/ServiceRequest
+      repeats: true
+      additionalSegments:
+          - MSH
+
+    - resourceName: Condition
+      segment: .DG1
+      group: ORDER.OBSERVATION_REQUEST
+      resourcePath: resource/Condition
+      repeats: true
+      additionalSegments:
+          - .OBR
+          - MSH
+
+    - resourceName: Specimen
+      segment: .SPM
+      group: ORDER.OBSERVATION_REQUEST.SPECIMEN
+      resourcePath: resource/Specimen
+      repeats: true
+      additionalSegments:
+          - .OBR
+          - MSH
