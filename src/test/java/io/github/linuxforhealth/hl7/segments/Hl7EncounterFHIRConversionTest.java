@@ -234,7 +234,7 @@ public class Hl7EncounterFHIRConversionTest {
         Reference serviceProvider = encounter.getServiceProvider();
         assertThat(serviceProvider).isNotNull();
         String providerString = serviceProvider.getReference();
-        assertThat(providerString).isEqualTo("Organization/Toronto_East"); // Also verify underscore replacement for Utility.formatAsId
+        assertThat(providerString).isEqualTo("Organization/Toronto.East"); // Also verify underscore replacement for Utility.formatAsId
 
         List<Resource> organizations = e.stream()
                 .filter(v -> ResourceType.Organization == v.getResource().getResourceType())
@@ -274,7 +274,7 @@ public class Hl7EncounterFHIRConversionTest {
         Reference serviceProvider = encounter.getServiceProvider();
         assertThat(serviceProvider).isNotNull();
         String providerString = serviceProvider.getReference();
-        assertThat(providerString).isEqualTo("Organization/Toronto_West"); // Also verify underscore replacement for Utility.formatAsId
+        assertThat(providerString).isEqualTo("Organization/Toronto.West"); // Also verify underscore replacement for Utility.formatAsId
 
         List<Resource> organizations = e.stream()
                 .filter(v -> ResourceType.Organization == v.getResource().getResourceType())
@@ -424,51 +424,60 @@ public class Hl7EncounterFHIRConversionTest {
     }
 
     @Test
-    public void test_encounter_length() {
-        //When length between encounters is a day or more apart the units should be "Days"
-        String hl7message = "MSH|^~\\&|PROSOLV|SENTARA|WHIA|IBM|20151008111200|S1|ADT^A01^ADT_A01|MSGID000001|T|2.6|10092|PRPA008|AL|AL|100|8859/1|ENGLISH|ARM|ARM5007\n"
-                + "EVN|A04|20151008111200|20171013152901|O|OID1006|20171013153621|EVN1009\n"
+    public void testEncounterLength() {
+
+        // Both start PV1.44 and end PV1.45 must be present to use either value as part of length
+        // When both are present, the calculation value is provided in "Minutes"
+        String hl7message = "MSH|^~\\&|PROSOLV||||20151008111200||ADT^A01^ADT_A01|MSGID000001|T|2.6|||||||||\n"
+                + "EVN|A04|20151008111200|||||\n"
                 + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
-                + "PV1|1|E|SAN JOSE|A|10089|MILPITAS|2740^Torres^Callie|2913^Grey^Meredith^F|3065^Sloan^Mark^J|CAR|FOSTER CITY|AD|R|1|A4|VI|9052^Shepeard^Derek^|AH|10019181|FIC1002|IC|CC|CR|CO|20161012034052|60000|6|AC|GHBR|20160926054052|AC5678|45000|15000|D|20161016154413|DCD|SAN FRANCISCO|VEG|RE|O|AV|FREMONT|CALIFORNIA|20161013154626|20161014154634|10000|14000|2000|4000|POL8009|V|PHY6007\n";
+                // PV1.44 present; PV1.45 present
+                + "PV1|1|E||||||||||||||||||||||||||||||||||||||||||20161013154626|20161014154634|||||||\n";
 
         Encounter encounter = ResourceUtils.getEncounter(hl7message);
 
         assertThat(encounter.hasLength()).isTrue();
         Duration encounterLength = encounter.getLength();
         assertThat(encounterLength.getValue()).isEqualTo((BigDecimal.valueOf(1440)));
-        assertThat(encounterLength.getUnit()).isEqualTo("Minutes");
+        assertThat(encounterLength.getUnit()).isEqualTo("minutes");
+        assertThat(encounterLength.getCode()).isEqualTo("min");
+        assertThat(encounterLength.getSystem()).isEqualTo("http://unitsofmeasure.org");
 
-        //When length between encounters is a less than a apart the units should be "Minutes"
-        hl7message = "MSH|^~\\&|PROSOLV|SENTARA|WHIA|IBM|20151008111200|S1|ADT^A01^ADT_A01|MSGID000001|T|2.6|10092|PRPA008|AL|AL|100|8859/1|ENGLISH|ARM|ARM5007\n"
-                + "EVN|A04|20151008111200|20171013152901|O|OID1006|20171013153621|EVN1009\n"
+        // If PV1.44 or PV1.45 are missing, PV2.11 is used as back-up length; assumes "Days" for unit
+        hl7message = "MSH|^~\\&|PROSOLV||||20151008111200||ADT^A01^ADT_A01|MSGID000001|T|2.6|||||||||\n"
+                + "EVN|A04|20151008111200|||||\n"
                 + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
-                + "PV1|1|E|SAN JOSE|A|10089|MILPITAS|2740^Torres^Callie|2913^Grey^Meredith^F|3065^Sloan^Mark^J|CAR|FOSTER CITY|AD|R|1|A4|VI|9052^Shepeard^Derek^|AH|10019181|FIC1002|IC|CC|CR|CO|20161012034052|60000|6|AC|GHBR|20160926054052|AC5678|45000|15000|D|20161016154413|DCD|SAN FRANCISCO|VEG|RE|O|AV|FREMONT|CALIFORNIA|20161013154626|20161013155626|10000|14000|2000|4000|POL8009|V|PHY6007\n";
-
-        encounter = ResourceUtils.getEncounter(hl7message);
-
-        assertThat(encounter.hasLength()).isTrue();
-        encounterLength = encounter.getLength();
-        assertThat(encounterLength.getValue()).isEqualTo((BigDecimal.valueOf(10)));
-        assertThat(encounterLength.getUnit()).isEqualTo("Minutes");
-
-        //back-up PV2.11 defaults to days for unit
-        hl7message = "MSH|^~\\&|PROSOLV|SENTARA|WHIA|IBM|20151008111200|S1|ADT^A01^ADT_A01|MSGID000001|T|2.6|10092|PRPA008|AL|AL|100|8859/1|ENGLISH|ARM|ARM5007\n"
-                + "EVN|A04|20151008111200|20171013152901||OID1006|20171013153621|EVN1009\n"
-                + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
-                + "PV1|1|L|SAN JOSE|A|10089|MILPITAS|2740^Torres^Callie|2913^Grey^Meredith^F|3065^Sloan^Mark^J|CAR|FOSTER CITY|AD|R|1|A4|VI|9052^Shepeard^Derek^|AH|10019181|FIC1002|IC|CC|CR|CO|20161012034052|60000|6|AC|GHBR|20160926054052|AC5678|45000|15000|D|20161016154413|DCD|SAN FRANCISCO|VEG|RE|O|AV|FREMONT|CALIFORNIA||20171018154634|10000|14000|2000|4000|POL8009|V|PHY6007\n"
-                + "PV2|SAN BRUNO|AC4567|vomits|less equipped|purse|SAN MATEO|HO|20171014154626|20171018154634|4|3|DIAHHOREA|RSA456|20161013154626|Y|D|20191026001640|O|Y|1|F|Y|KAISER|AI|2|20161013154626|ED|20171018001900|20161013154626|10000|RR|Y|20171108002129|Y|Y|N|N|C^Car^HL70430\n";
+                // PV1.44 empty; PV1.45 present
+                + "PV1|1|E|||||||||||||||||||||||||||||||||||||||||||20171018154634|||||||\n"
+                // PV2.11 present
+                + "PV2|||||||||||3|||||||||||||||||||||||||||||||||||||||||||||||\n";
 
         encounter = ResourceUtils.getEncounter(hl7message);
 
         assertThat(encounter.hasLength()).isTrue();
         encounterLength = encounter.getLength();
         assertThat(encounterLength.getValue()).isEqualTo((BigDecimal.valueOf(3)));
-        assertThat(encounterLength.getUnit()).isEqualTo("Days");
+        assertThat(encounterLength.getUnit()).isEqualTo("days");  
+        assertThat(encounterLength.getCode()).isEqualTo("d");
+        assertThat(encounterLength.getSystem()).isEqualTo("http://unitsofmeasure.org");
+
+        // If PV1.44 or PV1.45 are missing, and there is no PV2.11 for back-up, no length is created
+        hl7message = "MSH|^~\\&|PROSOLV||||20151008111200||ADT^A01^ADT_A01|MSGID000001|T|2.6|||||||||\n"
+                + "EVN|A04|20151008111200|||||\n"
+                + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
+                // PV1.44 empty; PV1.45 present
+                + "PV1|1|E|||||||||||||||||||||||||||||||||||||||||||20171018154634|||||||\n"
+                // PV2.11 empty
+                + "PV2|||vomits|||||||||||||||||||||||||||||||||||||||||||||||||||||||\n";
+        
+        encounter = ResourceUtils.getEncounter(hl7message);
+
+        assertThat(encounter.hasLength()).isFalse();
 
     }
 
     @Test
-    public void test_encounter_modeOfarrival() {
+    public void testEncounterModeOfArrival() {
         String hl7message = "MSH|^~\\&|PROSOLV|SENTARA|WHIA|IBM|20151008111200|S1|ADT^A01^ADT_A01|MSGID000001|T|2.6|10092|PRPA008|AL|AL|100|8859/1|ENGLISH|ARM|ARM5007\n"
                 + "EVN|A04|20151008111200|20171013152901|O|OID1006|20171013153621|EVN1009\n"
                 + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
