@@ -4,6 +4,7 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 ---
+# value_1 is calculated wnen time1 and time2 are present 
 value_1:
     valueOf: 'GeneralUtils.diffDateMin(var1,var2)'
     expressionType: JEXL
@@ -11,13 +12,18 @@ value_1:
       var1: $time1
       var2: $time2
 
+# value_2 or _3 comes from $time3 if either $time1 or $time2 is missing
 value_2:
   condition: $time3 NOT_NULL && $time1 NULL
   valueOf: $time3
 
-
+# (near duplicate of value_2 to handle complex boolean) 
+value_3:
+  condition: $time3 NOT_NULL && $time2 NULL
+  valueOf: $time3  
+  
 unit_1:
-  condition: $time1 NOT_NULL
+  condition: $time1 NOT_NULL && $time2 NOT_NULL
   type: String
   value:  "Minutes"
 
