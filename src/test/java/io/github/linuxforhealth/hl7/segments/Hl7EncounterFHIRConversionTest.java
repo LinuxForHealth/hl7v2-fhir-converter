@@ -425,8 +425,9 @@ public class Hl7EncounterFHIRConversionTest {
 
     @Test
     public void testEncounterLength() {
-        // When length between encounters is a day or more apart the units should be "Days"
-        // Both start PV1.44 and end PV1.45 must be present to use either value as part of lengthh
+
+        // Both start PV1.44 and end PV1.45 must be present to use either value as part of length
+        // When both are present, the calculation value is provided in "Minutes"
         String hl7message = "MSH|^~\\&|PROSOLV||||20151008111200||ADT^A01^ADT_A01|MSGID000001|T|2.6|||||||||\n"
                 + "EVN|A04|20151008111200|||||\n"
                 + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
@@ -440,22 +441,7 @@ public class Hl7EncounterFHIRConversionTest {
         assertThat(encounterLength.getValue()).isEqualTo((BigDecimal.valueOf(1440)));
         assertThat(encounterLength.getUnit()).isEqualTo("Minutes");
 
-        // When length between encounters is a less than a apart the units should be "Minutes"
-        // Both start PV1.44 and end PV1.45 must be present to use either value as part of length
-        hl7message = "MSH|^~\\&|PROSOLV||||20151008111200||ADT^A01^ADT_A01|MSGID000001|T|2.6|||||||||\n"
-                + "EVN|A04|20151008111200|||||\n"
-                + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
-                // PV1.44 present; PV1.45 present
-                + "PV1|1|E||||||||||||||||||||||||||||||||||||||||||20161013154626|20161013155626|||||||\n";
-
-        encounter = ResourceUtils.getEncounter(hl7message);
-
-        assertThat(encounter.hasLength()).isTrue();
-        encounterLength = encounter.getLength();
-        assertThat(encounterLength.getValue()).isEqualTo((BigDecimal.valueOf(10)));
-        assertThat(encounterLength.getUnit()).isEqualTo("Minutes");
-
-        // If PV1.44 or PV1.45 are missing, PV2.11 is used as back-up length; defaults to days for unit
+        // If PV1.44 or PV1.45 are missing, PV2.11 is used as back-up length; assumes "Days" for unit
         hl7message = "MSH|^~\\&|PROSOLV||||20151008111200||ADT^A01^ADT_A01|MSGID000001|T|2.6|||||||||\n"
                 + "EVN|A04|20151008111200|||||\n"
                 + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
