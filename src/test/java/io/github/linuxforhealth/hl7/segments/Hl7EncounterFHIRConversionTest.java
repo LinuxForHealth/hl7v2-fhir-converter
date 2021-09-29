@@ -213,7 +213,7 @@ public class Hl7EncounterFHIRConversionTest {
         String hl7message =  "MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||ADT^A01|controlID|P|2.6\n"
                 +"EVN|A01|20150502090000|\n"
                 +"PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
-                // PV1-3.4 required for serviceProvider reference
+                // PV1-3.4 used for serviceProvider reference; used for both id and name
                 +"PV1||I|INT^0001^02^Toronto East|||||||SUR||||||||S|VisitNumber^^^Toronto North|A|||||||||||||||||||Toronto West||||||\n";
  
         HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();

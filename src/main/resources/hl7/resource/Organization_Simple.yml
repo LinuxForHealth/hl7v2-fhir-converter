@@ -7,7 +7,7 @@ resourceType: Organization
 
 # The FHIR organization resource doesn't have any required fields.
 # However we do not want empty organization resources.
-# Thefore wherever organization is referenced make sure to verify the value is NOT_NULL.
+# Thefore wherever organization is referenced make sure to verify the id or name is set
 id:
    condition: $idValue NOT_NULL || $name NOT_NULL
    expressionType: nested
