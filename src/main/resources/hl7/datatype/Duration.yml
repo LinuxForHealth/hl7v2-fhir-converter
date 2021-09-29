@@ -25,9 +25,31 @@ value_3:
 unit_1:
   condition: $time1 NOT_NULL && $time2 NOT_NULL
   type: String
-  value:  "Minutes"
+  value:  "minutes"
 
 unit_2:
   condition: $time3 NOT_NULL
   type: String
-  valueOf: "Days"
+  valueOf: "days"
+
+code_1:
+  condition: $time1 NOT_NULL && $time2 NOT_NULL
+  type: String
+  value:  "min"
+
+code_2:
+  condition: $time3 NOT_NULL
+  type: String
+  valueOf: "d"  
+
+# system is hardcoded to UCUM, but must only show if other values show
+system_1:
+  condition: $time1 NOT_NULL && $time2 NOT_NULL
+  type: SYSTEM_URL
+  value: 'UCUM'
+
+# (near duplicate of system_1 to handle complex boolean) 
+system_2:
+  condition: $time3 NOT_NULL
+  type: SYSTEM_URL
+  value: 'UCUM'

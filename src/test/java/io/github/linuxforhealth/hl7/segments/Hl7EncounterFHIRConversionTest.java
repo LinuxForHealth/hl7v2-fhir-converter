@@ -439,7 +439,9 @@ public class Hl7EncounterFHIRConversionTest {
         assertThat(encounter.hasLength()).isTrue();
         Duration encounterLength = encounter.getLength();
         assertThat(encounterLength.getValue()).isEqualTo((BigDecimal.valueOf(1440)));
-        assertThat(encounterLength.getUnit()).isEqualTo("Minutes");
+        assertThat(encounterLength.getUnit()).isEqualTo("minutes");
+        assertThat(encounterLength.getCode()).isEqualTo("min");
+        assertThat(encounterLength.getSystem()).isEqualTo("http://unitsofmeasure.org");
 
         // If PV1.44 or PV1.45 are missing, PV2.11 is used as back-up length; assumes "Days" for unit
         hl7message = "MSH|^~\\&|PROSOLV||||20151008111200||ADT^A01^ADT_A01|MSGID000001|T|2.6|||||||||\n"
@@ -455,7 +457,9 @@ public class Hl7EncounterFHIRConversionTest {
         assertThat(encounter.hasLength()).isTrue();
         encounterLength = encounter.getLength();
         assertThat(encounterLength.getValue()).isEqualTo((BigDecimal.valueOf(3)));
-        assertThat(encounterLength.getUnit()).isEqualTo("Days");  
+        assertThat(encounterLength.getUnit()).isEqualTo("days");  
+        assertThat(encounterLength.getCode()).isEqualTo("d");
+        assertThat(encounterLength.getSystem()).isEqualTo("http://unitsofmeasure.org");
 
         // If PV1.44 or PV1.45 are missing, and there is no PV2.11 for back-up, no length is created
         hl7message = "MSH|^~\\&|PROSOLV||||20151008111200||ADT^A01^ADT_A01|MSGID000001|T|2.6|||||||||\n"
