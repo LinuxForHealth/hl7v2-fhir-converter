@@ -260,5 +260,23 @@ public class ResourceUtils {
     String s = context.getParser().encodeResourceToString(resource);
     Class<? extends IBaseResource> klass = Immunization.class;
     return (Immunization) context.getParser().parseResource(klass, s);
-}
+  }
+
+  public static Encounter getResourceEncounter(Resource resource, FHIRContext context) {
+      String s = context.getParser().encodeResourceToString(resource);
+      Class<? extends IBaseResource> klass = Encounter.class;
+      return (Encounter) context.getParser().parseResource(klass, s);
+  }
+
+  public static Practitioner getResourcePractitioner(Resource resource, FHIRContext context) {
+      String s = context.getParser().encodeResourceToString(resource);
+      Class<? extends IBaseResource> klass = Practitioner.class;
+      return (Practitioner) context.getParser().parseResource(klass, s);
+  }
+
+  public static Organization getResourceOrganization(Resource resource, FHIRContext context) {
+      String s = context.getParser().encodeResourceToString(resource);
+      Class<? extends IBaseResource> klass = Organization.class;
+      return (Organization) context.getParser().parseResource(klass, s);
+  }
 }

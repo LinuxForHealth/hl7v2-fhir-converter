@@ -76,7 +76,7 @@ public class Hl7EncounterFHIRConversionTest {
                 .map(BundleEntryComponent::getResource).collect(Collectors.toList());
         assertThat(encounterResource).hasSize(1);
 
-        Encounter encounter = getResourceEncounter(encounterResource.get(0));
+        Encounter encounter = ResourceUtils.getResourceEncounter(encounterResource.get(0), context);
 
         //
         // "text": {
@@ -120,7 +120,7 @@ public class Hl7EncounterFHIRConversionTest {
                 .map(BundleEntryComponent::getResource).collect(Collectors.toList());
         assertThat(encounterResource).hasSize(1);
 
-        Encounter encounter = getResourceEncounter(encounterResource.get(0));
+        Encounter encounter = ResourceUtils.getResourceEncounter(encounterResource.get(0), context);
 
         Narrative encText = encounter.getText();
         assertNull(encText.getStatus());
@@ -151,7 +151,7 @@ public class Hl7EncounterFHIRConversionTest {
                 .map(BundleEntryComponent::getResource).collect(Collectors.toList());
         assertThat(encounterResource).hasSize(1);
 
-        Encounter encounter = getResourceEncounter(encounterResource.get(0));
+        Encounter encounter = ResourceUtils.getResourceEncounter(encounterResource.get(0), context);
         Reference serviceProvider = encounter.getServiceProvider();
         assertThat(serviceProvider).isNotNull();
         String providerString = serviceProvider.getReference();
@@ -162,7 +162,7 @@ public class Hl7EncounterFHIRConversionTest {
                 .map(BundleEntryComponent::getResource).collect(Collectors.toList());
         assertThat(organizations).hasSize(1);
 
-        Organization orgResource = getResourceOrganization(organizations.get(0));
+        Organization orgResource = ResourceUtils.getResourceOrganization(organizations.get(0),context);
         assertThat(orgResource.getId()).isEqualTo(providerString);
         assertThat(orgResource.getName()).isEqualTo("South Shore Hosptial Weymouth");
     }
@@ -190,7 +190,7 @@ public class Hl7EncounterFHIRConversionTest {
                 .map(BundleEntryComponent::getResource).collect(Collectors.toList());
         assertThat(encounterResource).hasSize(1);
 
-        Encounter encounter = getResourceEncounter(encounterResource.get(0));
+        Encounter encounter = ResourceUtils.getResourceEncounter(encounterResource.get(0), context);
         Reference serviceProvider = encounter.getServiceProvider();
         assertThat(serviceProvider).isNotNull();
         String providerString = serviceProvider.getReference();
@@ -201,10 +201,91 @@ public class Hl7EncounterFHIRConversionTest {
                 .map(BundleEntryComponent::getResource).collect(Collectors.toList());
         assertThat(organizations).hasSize(1);
 
-        Organization orgResource = getResourceOrganization(organizations.get(0));
+        Organization orgResource = ResourceUtils.getResourceOrganization(organizations.get(0),context);
         assertThat(orgResource.getId()).isEqualTo(providerString);
         assertThat(orgResource.getName()).isEqualTo("South Shore Hosptial Weymouth");
     }
+
+
+    // Test for serviceProvider reference in ADT_A01 message with only a PV1 segment
+    @Test
+    public void testEncounterADTA01PV1onlyServiceProvider() {
+        String hl7message =  "MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||ADT^A01|controlID|P|2.6\n"
+                +"EVN|A01|20150502090000|\n"
+                +"PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
+                // PV1-3.4 used for serviceProvider reference; used for both id and name
+                +"PV1||I|INT^0001^02^Toronto East|||||||SUR||||||||S|VisitNumber^^^Toronto North|A|||||||||||||||||||Toronto West||||||\n";
+ 
+        HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
+        String json = ftv.convert(hl7message, OPTIONS);
+        assertThat(json).isNotBlank();
+        LOGGER.info("FHIR json result:\n" + json);
+
+        IBaseResource bundleResource = context.getParser().parseResource(json);
+        assertThat(bundleResource).isNotNull();
+        Bundle b = (Bundle) bundleResource;
+        List<BundleEntryComponent> e = b.getEntry();
+        List<Resource> encounterResource = e.stream()
+                .filter(v -> ResourceType.Encounter == v.getResource().getResourceType())
+                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        assertThat(encounterResource).hasSize(1);
+
+        Encounter encounter = ResourceUtils.getResourceEncounter(encounterResource.get(0), context);
+        Reference serviceProvider = encounter.getServiceProvider();
+        assertThat(serviceProvider).isNotNull();
+        String providerString = serviceProvider.getReference();
+        assertThat(providerString).isEqualTo("Organization/Toronto_East"); // Also verify underscore replacement for Utility.formatAsId
+
+        List<Resource> organizations = e.stream()
+                .filter(v -> ResourceType.Organization == v.getResource().getResourceType())
+                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        assertThat(organizations).hasSize(1);
+
+        Organization orgResource = ResourceUtils.getResourceOrganization(organizations.get(0),context);
+        assertThat(orgResource.getId()).isEqualTo(providerString);
+        assertThat(orgResource.getName()).isEqualTo("Toronto East");
+    }
+
+    // Test for serviceProvider reference in ADT_A01 message with only a PV1 segment,
+    // Part 2: alternate serviceProvider ID
+    @Test
+    public void testEncounterADTA01PV1onlyServiceProvider2() {
+        String hl7message =  "MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||ADT^A01|controlID|P|2.6\n"
+                +"EVN|A01|20150502090000|\n"
+                +"PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
+                // PV1-3.4 empty and PV1-39 used for serviceProvider reference
+                +"PV1||I||||||||SUR||||||||S|VisitNumber^^^Toronto North|A|||||||||||||||||||Toronto West||||||\n";
+ 
+        HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
+        String json = ftv.convert(hl7message, OPTIONS);
+        assertThat(json).isNotBlank();
+        LOGGER.info("FHIR json result:\n" + json);
+
+        IBaseResource bundleResource = context.getParser().parseResource(json);
+        assertThat(bundleResource).isNotNull();
+        Bundle b = (Bundle) bundleResource;
+        List<BundleEntryComponent> e = b.getEntry();
+        List<Resource> encounterResource = e.stream()
+                .filter(v -> ResourceType.Encounter == v.getResource().getResourceType())
+                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        assertThat(encounterResource).hasSize(1);
+
+        Encounter encounter = ResourceUtils.getResourceEncounter(encounterResource.get(0), context);
+        Reference serviceProvider = encounter.getServiceProvider();
+        assertThat(serviceProvider).isNotNull();
+        String providerString = serviceProvider.getReference();
+        assertThat(providerString).isEqualTo("Organization/Toronto_West"); // Also verify underscore replacement for Utility.formatAsId
+
+        List<Resource> organizations = e.stream()
+                .filter(v -> ResourceType.Organization == v.getResource().getResourceType())
+                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        assertThat(organizations).hasSize(1);
+
+        Organization orgResource = ResourceUtils.getResourceOrganization(organizations.get(0),context);
+        assertThat(orgResource.getId()).isEqualTo(providerString);
+        assertThat(orgResource.getName()).isNull(); // No name when using PV1-39
+    }
+
 
     @Test
     @Disabled
@@ -229,7 +310,7 @@ public class Hl7EncounterFHIRConversionTest {
                 .map(BundleEntryComponent::getResource).collect(Collectors.toList());
         assertThat(encounterResource).hasSize(1);
 
-        Encounter encounter = getResourceEncounter(encounterResource.get(0));
+        Encounter encounter = ResourceUtils.getResourceEncounter(encounterResource.get(0), context);
         Reference serviceProvider = encounter.getServiceProvider();
         assertThat(serviceProvider).isNotNull();
         String providerString = serviceProvider.getReference();
@@ -240,7 +321,7 @@ public class Hl7EncounterFHIRConversionTest {
                 .map(BundleEntryComponent::getResource).collect(Collectors.toList());
         assertThat(organizations).hasSize(1);
 
-        Organization orgResource = getResourceOrganization(organizations.get(0));
+        Organization orgResource = ResourceUtils.getResourceOrganization(organizations.get(0),context);
         assertThat(orgResource.getId()).isEqualTo(providerString);
         assertThat(orgResource.getName()).isEqualTo("South Shore Hosptial Weymouth");
     }
@@ -586,7 +667,7 @@ public class Hl7EncounterFHIRConversionTest {
                 .map(BundleEntryComponent::getResource).collect(Collectors.toList());
         assertThat(encounterResource).hasSize(1);
 
-        Encounter encounter = getResourceEncounter(encounterResource.get(0));
+        Encounter encounter = ResourceUtils.getResourceEncounter(encounterResource.get(0), context);
 
         List<EncounterParticipantComponent> encParticipantList = encounter.getParticipant();
         assertThat(encParticipantList).hasSize(4);
@@ -600,7 +681,7 @@ public class Hl7EncounterFHIRConversionTest {
         //Make sure that practitioners found are matching the HL7
         List<String> practionerIds = Arrays.asList("2905", "5755", "770542", "59367");
         for (Resource r : practioners) {
-            Practitioner p = getResourcePractitioner(r);
+            Practitioner p = ResourceUtils.getResourcePractitioner(r, context);
             assertThat(p.getIdentifier()).hasSize(1);
             String value = p.getIdentifier().get(0).getValue();
             assertThat(practionerIds).contains(value);
@@ -652,7 +733,7 @@ public class Hl7EncounterFHIRConversionTest {
                 .map(BundleEntryComponent::getResource).collect(Collectors.toList());
         assertThat(encounterResource).hasSize(1);
 
-        Encounter encounter = getResourceEncounter(encounterResource.get(0));
+        Encounter encounter = ResourceUtils.getResourceEncounter(encounterResource.get(0), context);
 
         List<EncounterParticipantComponent> encParticipantList = encounter.getParticipant();
         assertThat(encParticipantList).hasSize(1);
@@ -666,7 +747,7 @@ public class Hl7EncounterFHIRConversionTest {
         //Make sure that practitioners found are matching the HL7
         List<String> practionerIds = Arrays.asList("59367");
         for (Resource r : practioners) {
-            Practitioner p = getResourcePractitioner(r);
+            Practitioner p = ResourceUtils.getResourcePractitioner(r, context);
             assertThat(p.getIdentifier()).hasSize(1);
             String value = p.getIdentifier().get(0).getValue();
             assertThat(practionerIds).contains(value);
@@ -771,21 +852,4 @@ public class Hl7EncounterFHIRConversionTest {
         assertTrue(refCondition.getReference().contains("Condition"));
     }
 
-    private Encounter getResourceEncounter(Resource resource) {
-        String s = context.getParser().encodeResourceToString(resource);
-        Class<? extends IBaseResource> klass = Encounter.class;
-        return (Encounter) context.getParser().parseResource(klass, s);
-    }
-
-    private Practitioner getResourcePractitioner(Resource resource) {
-        String s = context.getParser().encodeResourceToString(resource);
-        Class<? extends IBaseResource> klass = Practitioner.class;
-        return (Practitioner) context.getParser().parseResource(klass, s);
-    }
-
-    private Organization getResourceOrganization(Resource resource) {
-        String s = context.getParser().encodeResourceToString(resource);
-        Class<? extends IBaseResource> klass = Organization.class;
-        return (Organization) context.getParser().parseResource(klass, s);
-    }
 }
