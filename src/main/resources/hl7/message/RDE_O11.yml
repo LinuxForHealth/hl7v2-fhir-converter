@@ -51,6 +51,7 @@ resources:
       - .ORC
       - PATIENT.PATIENT_VISIT.PV1
       - PATIENT.PID
+      # RXO not included on purpose, only want to use RXE for RDE messages
 
   - resourceName: Observation
     segment: .OBSERVATION.OBX
