@@ -699,7 +699,7 @@ public class Hl7EncounterFHIRConversionTest {
             String value = p.getIdentifier().get(0).getValue();
             assertThat(practionerIds).contains(value);
             // In map, first value is Participant Id, second is Participant Value
-            List<String> values = List.of(p.getId(), value);
+            List<String> values = Arrays.asList(p.getId(), value);
             switch (value) {
                 case "2905":
                     practionerMap.put("ATND", values);
@@ -774,7 +774,7 @@ public class Hl7EncounterFHIRConversionTest {
             String value = p.getIdentifier().get(0).getValue();
             assertThat(practionerIds).contains(value);
             // In map, first value is Participant Id, second is Participant Value
-            List<String> values = List.of(p.getId(), value);
+            List<String> values = Arrays.asList(p.getId(), value);
             switch (value) {
                 case "2905":
                     practionerMap.put("ATND", values);
