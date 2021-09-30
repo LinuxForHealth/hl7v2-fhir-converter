@@ -8,12 +8,12 @@ period:
   valueOf: datatype/Period
   expressionType: resource
   vars:
-    start: $value1
+    start: $timestamp
 
 related:
   valueOf: resource/Practitioner
   expressionType: reference
-  specs: $value2
+  specs: $providerCode
 
 
 

@@ -112,13 +112,24 @@ V3MaritalStatus:
   U: U
   W: W
 
-DocumentReferenceStatus:
+DocumentReferenceStatus: #DocumenReference Status
+  #TXA.19
   AV: current
   CA: entered-in-error
   OB: superseded
   UN: current
+  #OBR.25
+  A: current
+  C: current
+  F: current
+  O: current
+  R: current
+  P: superseded
+  S: current
+  X: entered-in-error
 
-CompositionStatus:
+CompositionStatus: #DocumenReference docStatus
+  #TXA.17
   AU: final
   DI: preliminary
   DO: preliminary
@@ -127,11 +138,14 @@ CompositionStatus:
   PA: preliminary
   LA: final
   NU: entered-in-error
-  F: preliminary
+  #OBX.11
+  F: final
   P: preliminary
-  U: preliminary
   S: preliminary
   C: final
+  U: final
+  R: preliminary
+  W: entered-in-error
 
 V3Race:
   # American Indian or Alaska Native	

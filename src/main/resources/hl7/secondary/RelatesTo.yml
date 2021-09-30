@@ -13,7 +13,7 @@ code:
 target:
   valueOf: resource/Practitioner
   expressionType: reference
-  specs: $value1
+  specs: $relatesRef
 
 
 

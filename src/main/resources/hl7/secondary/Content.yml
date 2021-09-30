@@ -8,8 +8,8 @@ attachment:
   valueOf: datatype/Attachment
   expressionType: resource
   vars:
-    mime: $value1
-    date: $value2
+    mime: $contentType
+    data: BASE64_BINARY, $createtionDate
 
 
 

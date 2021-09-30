@@ -49,3 +49,4 @@ resources:
         - PID
         - COMMON_ORDER.ORC
         - COMMON_ORDER.OBR
+        - OBSERVATION.OBX

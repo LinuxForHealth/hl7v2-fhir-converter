@@ -32,7 +32,7 @@ resources:
       additionalSegments:
           - .PV2
           - MSH
-          - .OBSERVATION.OBX
+          - ORDER_OBSERVATION.OBSERVATION.OBX
       
     - resourceName: Observation
       segment: .OBSERVATION.OBX

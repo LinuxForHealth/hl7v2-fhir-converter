@@ -25,7 +25,6 @@ import org.hl7.fhir.r4.model.AllergyIntolerance.AllergyIntoleranceCriticality;
 import org.hl7.fhir.r4.model.DiagnosticReport.DiagnosticReportStatus;
 import org.hl7.fhir.r4.model.Enumerations.AdministrativeGender;
 import org.hl7.fhir.r4.model.Immunization.ImmunizationStatus;
-import org.hl7.fhir.r4.model.MedicationRequest;
 import org.hl7.fhir.r4.model.Observation.ObservationStatus;
 import org.hl7.fhir.r4.model.ServiceRequest.ServiceRequestStatus;
 import org.hl7.fhir.r4.model.Specimen.SpecimenStatus;
@@ -278,6 +277,7 @@ public class SimpleDataValueResolver {
     public static final ValueExtractor<Object, String> DOC_REF_STATUS_CODE_FHIR = (Object value) -> {
         String val = Hl7DataHandlerUtil.getStringValue(value);
         String code = getFHIRCode(val, Enumerations.DocumentReferenceStatus.class);
+
         if (code != null) {
             return code;
         } else {
@@ -287,12 +287,7 @@ public class SimpleDataValueResolver {
 
     public static final ValueExtractor<Object, String> DOC_REF_DOC_STATUS_CODE_FHIR = (Object value) -> {
         String val = Hl7DataHandlerUtil.getStringValue(value);
-        String code = getFHIRCode(val, CompositionStatus.class);
-        if (code != null) {
-            return code;
-        } else {
-            return null;
-        }
+        return getFHIRCode(val, CompositionStatus.class);
     };
 
     public static final ValueExtractor<Object, String> NAME_USE_CODE_FHIR = (Object value) -> {

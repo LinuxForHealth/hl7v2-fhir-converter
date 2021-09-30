@@ -10,22 +10,19 @@ id:
    expressionType: JEXL
 
 masterIdentifier_1:
-   condition: $txa NOT_NULL
+   condition: $valueIn NOT_NULL && $systemCX NOT_NULL
    valueOf: datatype/Identifier_var
-   generateList: true
    expressionType: resource
    vars:
-      valueIn: TXA.12.1 | TXA.12.3
+      valueIn: TXA.12.1
       systemCX: TXA.12.2
-      txa: TXA.12.2
 
 masterIdentifier_2:
-   condition: $txa NULL
+   condition: $txa NULL && $value NOT_NULL
    valueOf: datatype/Identifier
-   generateList: true
    expressionType: resource
    vars:
-      value: TXA.12.1 | TXA.12.3
+      value: TXA.12.1
       system: SYSTEM_URL, $sys
       txa: TXA.12.2
    constants:
@@ -69,7 +66,7 @@ identifier_3:
    
 status:
    type: DOC_REF_STATUS
-   valueOf: TXA.19
+   valueOf: TXA.19 | OBR.25
    expressionType: HL7Spec
 
 docStatus:
@@ -93,6 +90,7 @@ date:
    expressionType: HL7Spec
 
 author:
+   generateList: true
    expressionType: reference
    valueOf: resource/Practitioner
    specs: TXA.9
@@ -104,17 +102,12 @@ authenticator:
 
 content:
    valueOf: secondary/Content
+   generateList: true
    expressionType: resource
    vars:
-      value1: TXA.3 | OBX.2
-      value2: TXA.7
+      contentType: TXA.3 | OBX.2
+      createtionDate: TXA.7
 
-relatesTo:
-   condition: $value1 NOT_NULL
-   valueOf: secondary/RelatesTo
-   expressionType: resource
-   vars:
-      value1: TXA.13
 
 description:
    type: STRING
@@ -122,13 +115,16 @@ description:
    valueOf: TXA.16
 
 securityLabel:
+   condition: $txa NOT_NULL
    valueOf: datatype/CodeableConcept
    expressionType: resource
    specs: TXA.18
+   vars:
+      txa: TXA.18
 
 context:
    valueOf: secondary/Context
    expressionType: resource
    vars:
-      value1: TXA.4
-      value2: TXA.5
+      timestamp: TXA.4
+      providerCode: TXA.5
