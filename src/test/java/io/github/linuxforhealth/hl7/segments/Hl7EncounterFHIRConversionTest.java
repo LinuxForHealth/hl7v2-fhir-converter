@@ -13,6 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -661,7 +662,7 @@ public class Hl7EncounterFHIRConversionTest {
                 + "EVN||20210330144208||||\n"
                 + "PID|1||ABC12345^^^MRN||DOE^JANE|||||||||||||||\n"
                 // Key fields are PV1.7, PV1.8, PV1.9, and PV1.17
-                + "PV1||I|||||2905^Doctor^Attending^M^IV^^M.D|5755^Doctor^Referring^^Sr|770542^Doctor^Consulting^Jr||||||||59367^Doctor^Admitting|||||||||||||||||||||||||||\n";
+                + "PV1||I|||||2905^Doctor^Attending^M^IV^^MD|5755^Doctor^Referring^^Sr|770542^Doctor^Consulting^^Jr||||||||59367^Doctor^Admitting|||||||||||||||||||||||||||\n";
 
         HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
         String json = ftv.convert(hl7message, OPTIONS);
@@ -699,18 +700,23 @@ public class Hl7EncounterFHIRConversionTest {
             String value = p.getIdentifier().get(0).getValue();
             assertThat(practionerIds).contains(value);
             // In map, first value is Participant Id, second is Participant Value
-            List<String> values = Arrays.asList(p.getId(), value);
+            List<String> values = new ArrayList<String>();
+            values.add(p.getId());
             switch (value) {
                 case "2905":
+                    values.add("Attending M Doctor IV MD");
                     practionerMap.put("ATND", values);
                     break;
                 case "5755":
+                    values.add("Referring Doctor Sr");
                     practionerMap.put("REF", values);
                     break;
                 case "770542":
+                    values.add("Consulting Doctor Jr");
                     practionerMap.put("CON", values);
                     break;
                 case "59367":
+                    values.add("Admitting Doctor");
                     practionerMap.put("ADM", values);
                     break;
             }
@@ -774,18 +780,23 @@ public class Hl7EncounterFHIRConversionTest {
             String value = p.getIdentifier().get(0).getValue();
             assertThat(practionerIds).contains(value);
             // In map, first value is Participant Id, second is Participant Value
-            List<String> values = Arrays.asList(p.getId(), value);
+            List<String> values = new ArrayList<String>();
+            values.add(p.getId());
             switch (value) {
                 case "2905":
+                    values.add("Attending M Doctor IV MD");
                     practionerMap.put("ATND", values);
                     break;
                 case "5755":
+                    values.add("Referring Doctor Sr");
                     practionerMap.put("REF", values);
                     break;
                 case "770542":
+                    values.add("Consulting Doctor Jr");
                     practionerMap.put("CON", values);
                     break;
                 case "59367":
+                    values.add("Admitting Doctor");
                     practionerMap.put("ADM", values);
                     break;
             }
@@ -800,7 +811,6 @@ public class Hl7EncounterFHIRConversionTest {
             assertEquals(practionerMap.get(code).get(1), component.getIndividual().getDisplay());
         }
     }
-
     /**
      * Testing Encounter correctly references Observation
      * 
