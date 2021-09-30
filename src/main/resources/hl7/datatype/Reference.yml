@@ -7,3 +7,12 @@
 reference:
     type: RELATIVE_REFERENCE
     valueOf:  $BASE_VALUE
+    required: true
+
+
+# Some references have an associated display. (Example Encounter.participant.individual)
+# Optionally provide a value to have display added.    
+display:
+    condition: $referenceDisplay NOT_NULL
+    type: STRING
+    valueOf:  $referenceDisplay
