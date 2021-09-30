@@ -10,14 +10,7 @@ import io.github.linuxforhealth.hl7.HL7ToFHIRConverter;
 import io.github.linuxforhealth.hl7.segments.util.PatientUtils;
 import io.github.linuxforhealth.hl7.segments.util.ResourceUtils;
 import org.hl7.fhir.instance.model.api.IBaseResource;
-import org.hl7.fhir.r4.model.DocumentReference;
-import org.hl7.fhir.r4.model.Bundle;
-import org.hl7.fhir.r4.model.Resource;
-import org.hl7.fhir.r4.model.ResourceType;
-import org.hl7.fhir.r4.model.Practitioner;
-import org.hl7.fhir.r4.model.CodeableConcept;
-import org.hl7.fhir.r4.model.Identifier;
-import org.hl7.fhir.r4.model.Enumerations;
+import org.hl7.fhir.r4.model.*;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
@@ -153,7 +146,7 @@ public class Hl7DocumentReferenceFHIRConversionTest {
         Practitioner practBundle = ResourceUtils.getSpecificPractitionerFromBundle(bundle, requesterRef);
 
         DocumentReference.DocumentReferenceContextComponent context =documentReference.getContext();
-        assertThat(context.getPeriod().getStart()).isEqualTo("2018-01-17T01:42:00+08:00");
+        assertThat(context.getPeriod().getStartElement().toString()).containsPattern("2018-01-17T14:42:00");
         assertThat(context.hasRelated()).isTrue();
         assertThat(practBundle.getIdentifierFirstRep().getValue()).isEqualTo("5566"); //Value passed to Context(TXA.5) is used as Identifier value in practitioner
     }
@@ -168,8 +161,8 @@ public class Hl7DocumentReferenceFHIRConversionTest {
                         "OBR|1||||||20170825010500|||||||||||||002|||||F||||||||\n";
         DocumentReference report = ResourceUtils.getDocumentReference(documentReferenceMessage);
 
-        Date date = report.getDate();
-        assertThat(date).isEqualTo("2018-01-17T01:42:00.000"); //TXA.6
+        InstantType date = report.getDateElement();
+        assertThat(date.toString()).containsPattern("2018-01-17T14:42"); //TXA.6
     }
 
     @Test
