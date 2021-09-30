@@ -62,9 +62,7 @@ public enum SimpleDataTypeMapper {
   ACT_ENCOUNTER(SimpleDataValueResolver.ACT_ENCOUNTER_CODE_FHIR),
   ENCOUNTER_MODE_ARRIVAL_DISPLAY(SimpleDataValueResolver.ENCOUNTER_MODE_ARRIVAL_DISPLAY),
   DOC_REF_DOC_STATUS(SimpleDataValueResolver.DOC_REF_DOC_STATUS_CODE_FHIR),
-  DOC_REF_STATUS(SimpleDataValueResolver.DOC_REF_STATUS_CODE_FHIR),
-  CODE_SYSTEM_V2_IDENTIFIER(SimpleDataValueResolver.CODE_SYSTEM_V2_IDENTIFIER);
-
+  DOC_REF_STATUS(SimpleDataValueResolver.DOC_REF_STATUS_CODE_FHIR);
   private ValueExtractor<Object, ?> valueResolver;
 
   SimpleDataTypeMapper(ValueExtractor<Object, ?> valueResolver) {
