@@ -77,9 +77,21 @@ subject:
    specs: $Patient
    
 effectiveDateTime:
+   condition: $start NOT_NULL && $end NULL
    type: DATE_TIME
    valueOf: OBR.7
    expressionType: HL7Spec
+   vars:
+      start: OBR.7
+      end: OBR.8
+
+effectivePeriod:
+   valueOf: datatype/Period
+   condition: $start NOT_NULL && $end NOT_NULL
+   expressionType: resource
+   vars:
+      start: OBR.7
+      end: OBR.8
 
 issued:
    type: INSTANT

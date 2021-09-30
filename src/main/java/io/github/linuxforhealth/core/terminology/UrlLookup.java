@@ -26,10 +26,10 @@ import io.github.linuxforhealth.hl7.resource.ResourceReader;
  */
 public class UrlLookup {
 
-    static Map<String, Map<String, CodingSystem>> urlMaps = new HashMap<String, Map<String, CodingSystem>>(); // key is urlType
+    static Map<String, Map<String, CodingSystem>> urlMaps = new HashMap<>(); // key is urlType
     static Map<String, String> urlMappingPaths; // key=urlType, value=resource mapping path
     static {
-        urlMappingPaths = new HashMap<String, String>();
+        urlMappingPaths = new HashMap<>();
         urlMappingPaths.put(Constants.CODING_SYSTEM_MAPPING, Constants.CODING_SYSTEM_MAPPING_PATH);
         urlMappingPaths.put(Constants.EXTENSION_URL_MAPPING, Constants.EXTENSION_URL_MAPPING_PATH);
     }

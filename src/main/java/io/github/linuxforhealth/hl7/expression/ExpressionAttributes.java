@@ -234,23 +234,6 @@ public class ExpressionAttributes {
     return specs;
   }
 
-  private static ImmutablePair<String, String> getPair(String tok) {
-    if (StringUtils.isNotBlank(tok)) {
-      String[] token = tok.split(":");
-      if (token.length == 2) {
-        return new ImmutablePair<>(VariableUtils.getVarName(token[0]), token[1]);
-      } else if (token.length == 1) {
-        return new ImmutablePair<>(Constants.BASE_VALUE_NAME, token[0]);
-      } else {
-
-        throw new IllegalArgumentException(
-            "fetch token not in correct format, expected format $varName:key, input" + tok);
-      }
-    } else {
-      return null;
-    }
-  }
-
   @Override
   public String toString() {
     if (this.toString == null) {
@@ -398,14 +381,26 @@ public class ExpressionAttributes {
   // modifiers have been removed and
   // booleans indicating which modifiers were in the expression.
   public static class ExpressionModifiers {
-    public boolean extractMultiple = false; // true when * is used in the expression
-    public boolean retainEmpty = false; // true when & is used in the expression
-    public String expression = ""; // resulting expression after the modifiers have been removed
+    private boolean extractMultiple = false; // true when * is used in the expression
+    private boolean retainEmpty = false; // true when & is used in the expression
+    private String expression = ""; // resulting expression after the modifiers have been removed
 
     ExpressionModifiers(boolean theExtractMultiple, boolean theRetainEmpty, String theExpression) {
       extractMultiple = theExtractMultiple;
       retainEmpty = theRetainEmpty;
       expression = theExpression;
+    }
+    
+    public boolean getExtractMultiple() {
+        return extractMultiple;
+    }
+    
+    public boolean getRetainEmpty() {
+        return retainEmpty;
+    }
+    
+    public String getExpression() {
+        return expression;
     }
   }
 

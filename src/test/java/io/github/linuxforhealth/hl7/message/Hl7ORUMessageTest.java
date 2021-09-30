@@ -34,6 +34,7 @@ import io.github.linuxforhealth.fhir.FHIRContext;
 import io.github.linuxforhealth.hl7.ConverterOptions;
 import io.github.linuxforhealth.hl7.ConverterOptions.Builder;
 import io.github.linuxforhealth.hl7.HL7ToFHIRConverter;
+import io.github.linuxforhealth.hl7.segments.util.ResourceUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -82,7 +83,7 @@ public class Hl7ORUMessageTest {
                 .map(BundleEntryComponent::getResource).collect(Collectors.toList());
         assertThat(diagnosticresource).hasSize(1);
 
-        DiagnosticReport diag = getResource(diagnosticresource.get(0));
+        DiagnosticReport diag = ResourceUtils.getResourceDiagnosticReport(diagnosticresource.get(0), context);
         Reference patRef = diag.getSubject();
         assertThat(patRef.isEmpty()).isFalse();
         List<Reference> obsRef = diag.getResult();
@@ -164,8 +165,8 @@ public class Hl7ORUMessageTest {
                 .map(BundleEntryComponent::getResource).collect(Collectors.toList());
         assertThat(diagnosticresource).hasSize(2);
 
-        DiagnosticReport enc = getResource(diagnosticresource.get(0));
-        Reference ref = enc.getSubject();
+        DiagnosticReport diag = ResourceUtils.getResourceDiagnosticReport(diagnosticresource.get(0), context);
+        Reference ref = diag.getSubject();
         assertThat(ref.isEmpty()).isFalse();
     }
 
@@ -190,7 +191,7 @@ public class Hl7ORUMessageTest {
                 .map(BundleEntryComponent::getResource).collect(Collectors.toList());
         assertThat(diagnosticresource).hasSize(1);
 
-        DiagnosticReport diag = getResource(diagnosticresource.get(0));
+        DiagnosticReport diag = ResourceUtils.getResourceDiagnosticReport(diagnosticresource.get(0), context);
         List<Reference> spmRef = diag.getSpecimen();
         assertThat(spmRef.isEmpty()).isFalse();
         assertThat(spmRef).hasSize(1);
@@ -229,9 +230,8 @@ public class Hl7ORUMessageTest {
         List<Resource> organizationResource = e.stream()
                 .filter(v -> ResourceType.Organization == v.getResource().getResourceType())
                 .map(BundleEntryComponent::getResource).collect(Collectors.toList());
-        // Patient organizations use a system urn:id reference for the organization, 
-        // so we expect no organization resources to be generated.      
-        assertThat(organizationResource).isEmpty();
+        // We expect an organization created from an Encounter.serviceProvider reference 
+        assertThat(organizationResource).hasSize(1);
 
         List<Resource> messageHeader = e.stream()
                 .filter(v -> ResourceType.MessageHeader == v.getResource().getResourceType())
@@ -250,7 +250,7 @@ public class Hl7ORUMessageTest {
                 .map(BundleEntryComponent::getResource).collect(Collectors.toList());
         assertThat(reportResource).hasSize(1);
 
-        DiagnosticReport report = (DiagnosticReport) reportResource.get(0);
+        DiagnosticReport report = ResourceUtils.getResourceDiagnosticReport(reportResource.get(0), context);
 
         List<Attachment> attachments = report.getPresentedForm();
         Assertions.assertTrue(attachments.size() == 1, "Unexpected number of attachments");
@@ -307,9 +307,8 @@ public class Hl7ORUMessageTest {
         List<Resource> organizationResource = e.stream()
                 .filter(v -> ResourceType.Organization == v.getResource().getResourceType())
                 .map(BundleEntryComponent::getResource).collect(Collectors.toList());
-        // Patient organizations use a system urn:id reference for the organization, 
-        // so we expect no organization resources to be generated. 
-        assertThat(organizationResource).isEmpty();
+        // We expect an organization created from an Encounter.serviceProvider reference 
+        assertThat(organizationResource).hasSize(1);
 
         List<Resource> messageHeader = e.stream()
                 .filter(v -> ResourceType.MessageHeader == v.getResource().getResourceType())
@@ -328,16 +327,12 @@ public class Hl7ORUMessageTest {
                 .map(BundleEntryComponent::getResource).collect(Collectors.toList());
         assertThat(reportResource).hasSize(1);
 
-        DiagnosticReport report = (DiagnosticReport) reportResource.get(0);
+        DiagnosticReport report = ResourceUtils.getResourceDiagnosticReport(reportResource.get(0), context);
 
         //No attachment created since OBX with TX and no id is not first
         List<Attachment> attachments = report.getPresentedForm();
         Assertions.assertTrue(attachments.size() == 0, "Unexpected number of attachments");
     }
 
-    private static DiagnosticReport getResource(Resource resource) {
-        String s = context.getParser().encodeResourceToString(resource);
-        Class<? extends IBaseResource> klass = DiagnosticReport.class;
-        return (DiagnosticReport) context.getParser().parseResource(klass, s);
-    }
+
 }

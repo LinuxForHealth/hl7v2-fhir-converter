@@ -234,10 +234,10 @@ extension_1:
                specs: CWE
 
 serviceProvider:
-   condition: $idValue NOT_NULL
-   expressionType: reference
-   valueOf: resource/Organization_Simple
-   vars:
-      idValue: PV2.23.8 | PV1.3.4.1 | PV1.39
-      name: PV2.23.1
+      condition: $idValue NOT_NULL
+      valueOf: resource/Organization_Simple
+      expressionType: reference
+      vars:
+            idValue: PV2.23.8 | PV1.3.4.1 | PV1.39
+            name: PV2.23.1 | PV1.3.4.1
 

@@ -33,7 +33,7 @@ resources:
         - OBSERVATION.OBX
 
     - resourceName: Observation
-      segment: OBSERVATION.OBX
+      segment: OBX
       resourcePath: resource/Observation
       repeats: true
       isReferenced: true
