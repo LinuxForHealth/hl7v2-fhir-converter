@@ -16,8 +16,27 @@ type:
    constants:
       system: 'http://terminology.hl7.org/CodeSystem/v3-ParticipationType'
       
+# individual:
+#    valueOf: resource/Practitioner
+#    expressionType: reference
+#    specs: $practionerSpec
+#    required: true
+
+
 individual:
-   valueOf: resource/Practitioner
-   expressionType: reference
-   specs: $practionerSpec
-   required: true
+   # generateList: true
+   # evaluateLater: true
+   expressionType: nested
+   vars: 
+      bjc: String, $practionerSpec
+      specLike: $practionerSpec
+   expressionsMap:
+      display:
+         type: STRING
+         valueOf: $bjc
+      reference:
+         required: true
+         valueOf: resource/Practitioner
+         expressionType: reference 
+         specs: $specLike 
+

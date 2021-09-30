@@ -358,6 +358,39 @@ public class Hl7EncounterFHIRConversionTest {
 
     }
 
+//     For following test, Participant members should look like this:
+//     {
+//         "type": [ {
+//           "coding": [ {
+//             "system": "http://terminology.hl7.org/CodeSystem/v3-ParticipationType",
+//             "code": "REF",
+//             "display": "referrer"
+//           } ]
+//         } ],
+//         "individual": {
+//           "reference": "Practitioner/f3b6242c-8964-48ab-bc8c-ddbe2e4bd4c7",
+//           "display": "2913"
+//         }
+
+    @Test
+    public void test_encounter_participant_individual_reference_and_display() {
+        // PV1.2 has mapped value and should returned fhir value
+        String hl7message = "MSH|^~\\&|PROSOLV|SENTARA|WHIA|IBM|20151008111200|S1|ADT^A01^ADT_A01|MSGID000001|T|2.6|10092|PRPA008|AL|AL|100|8859/1|ENGLISH|ARM|ARM5007\n"
+                + "EVN|A04|20151008111200|20171013152901|O|OID1006|20171013153621|EVN1009\n"
+                + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
+                + "PV1|1|E|SAN JOSE|A|10089|MILPITAS|2740^Torres^Callie|2913^Grey^Meredith^F|3065^Sloan^Mark^J|CAR|FOSTER CITY|AD|R|1|A4|VI|9052^Shepeard^Derek^|AH|10019181|FIC1002|IC|CC|CR|CO|20161012034052|60000|6|AC|GHBR|20160926054052|AC5678|45000|15000|D|20161016154413|DCD|SAN FRANCISCO|VEG|RE|O|AV|FREMONT|CALIFORNIA|20161013154626|20161014154634|10000|14000|2000|4000|POL8009|V|PHY6007\n";
+        Encounter encounter = ResourceUtils.getEncounter(hl7message);
+
+        assertThat(encounter.hasParticipant()).isTrue();
+        EncounterParticipantComponent epc = encounter.getParticipantFirstRep();
+        assertThat(epc.hasType()).isTrue();
+        assertThat(epc.hasIndividual()).isTrue();
+        Reference indv = epc.getIndividual();
+        assertThat(indv.hasDisplay()).isTrue();
+        assertThat(indv.hasReference()).isTrue();  // This is the problem
+
+    }
+
     @Test
     public void test_encounter_reason_code() {
         // EVN.4 for reasonCode
