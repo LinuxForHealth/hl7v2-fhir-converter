@@ -32,6 +32,18 @@ identifier_2:
   constants:
     sys: "urn:id:extID"
 
+identifier_3:
+  valueOf: datatype/Identifier
+  condition: $rxo1 NULL
+  generateList: true
+  expressionType: resource
+  vars:
+    system: SYSTEM_URL, $sys
+    value: BUILD_IDENTIFIER_FROM_CWE, RXE.2
+    rxo1: RXO.1
+  constants:
+    sys: "urn:id:extID"
+
 subject:
   valueOf: datatype/Reference
   expressionType: resource

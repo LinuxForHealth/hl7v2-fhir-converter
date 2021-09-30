@@ -51,7 +51,6 @@ resources:
       - .ORC
       - PATIENT.PATIENT_VISIT.PV1
       - PATIENT.PID
-      - .ORDER_DETAIL.RXO
 
   - resourceName: Observation
     segment: .OBSERVATION.OBX
