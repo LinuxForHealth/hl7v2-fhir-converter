@@ -953,12 +953,11 @@ public class Hl7IdentifierFHIRConversionTest {
     @Test
     public void medicationRequestIdentifierTest() {
         // Visit number from PID-18, extID from RXO-1.1
-        String medicationRequest = "MSH|^~\\&|PROSLOV|MYHOSPITAL|WHIA|IBM|20170215080000||RDE^O11^RDE_O11|MSGID005520|T|2.6|||AL|NE|764|ASCII||||||^4086::132:2A57:3C28^IPv6\r"
+        String medicationRequest = "MSH|^~\\&|PROSLOV|MYHOSPITAL|WHIA|IBM|20170215080000||OMP^O09|MSGID005520|T|2.6|||AL|NE|764|ASCII||||||^4086::132:2A57:3C28^IPv6\r"
                 + "PID|1||000054321^^^MRN|||||||||||||||78654\r"
                 + "PV1||I||||||||SUR||||||||S||A|||||||||||||||||||SF|K||||20170215080000\r"
                 + "ORC|NW|PON001^OE|CD2017071101^RX|||E|10^BID^D4^^^R||20170215080000\r"
-                + "RXO|RX700001^DOCUSATE SODIUM 100 MG CAPSULE|100||mg|||||G||10||5|\r"
-                + "RXE|^^^20170923230000^^R|999^Ampicillin 250 MG TAB^NDC|100||mg|123^test^ABC||||10||5|";
+                + "RXO|RX700001^DOCUSATE SODIUM 100 MG CAPSULE|100||mg|||||G||10||5|\r";
         MedicationRequest medReq = ResourceUtils.getMedicationRequest(medicationRequest);
 
         // Expect 2 identifiers
@@ -982,12 +981,11 @@ public class Hl7IdentifierFHIRConversionTest {
         assertThat(system).isEqualTo("urn:id:extID");
 
         // Test: Visit number from PV1-19, extID from RXO-1.1 and RXO-1.3
-        medicationRequest = "MSH|^~\\&|PROSLOV|MYHOSPITAL|WHIA|IBM|20170215080000||RDE^O11^RDE_O11|MSGID005520|T|2.6|||AL|NE|764|ASCII||||||^4086::132:2A57:3C28^IPv6\r"
+        medicationRequest = "MSH|^~\\&|PROSLOV|MYHOSPITAL|WHIA|IBM|20170215080000||OMP^O09|MSGID005520|T|2.6|||AL|NE|764|ASCII||||||^4086::132:2A57:3C28^IPv6\r"
                 + "PID|1||000054321^^^MRN|||||||||||||||78654\r"
                 + "PV1||I|||||||||||||||||789789\r"
                 + "ORC|NW|PON001^OE|CD2017071101^RX|||E|10^BID^D4^^^R||20170215080000\r"
-                + "RXO|RX700001^DOCUSATE SODIUM 100 MG CAPSULE^ABC|100||mg|||||G||10||5|\r"
-                + "RXE|^^^20170923230000^^R|999^Ampicillin 250 MG TAB^NDC|100||mg|123^test^ABC||||10||5|";
+                + "RXO|RX700001^DOCUSATE SODIUM 100 MG CAPSULE^ABC|100||mg|||||G||10||5|\r";
         medReq = ResourceUtils.getMedicationRequest(medicationRequest);
 
         // Expect 2 identifiers
@@ -1010,13 +1008,12 @@ public class Hl7IdentifierFHIRConversionTest {
         assertThat(value).isEqualTo("RX700001-ABC"); // RXO-1.1 and RXO-1.3
         assertThat(system).isEqualTo("urn:id:extID");
 
-        // Test: Visit number from MSH-7, extID from RXO-2
-        medicationRequest = "MSH|^~\\&|PROSLOV|MYHOSPITAL|WHIA|IBM|20170215080000||RDE^O11^RDE_O11|MSGID005520|T|2.6|||AL|NE|764|ASCII||||||^4086::132:2A57:3C28^IPv6\r"
+        // Test: Visit number from MSH-7, extID from RXE-2
+        medicationRequest = "MSH|^~\\&|PROSLOV|MYHOSPITAL|WHIA|IBM|20170215080000||OMP^O09|MSGID005520|T|2.6|||AL|NE|764|ASCII||||||^4086::132:2A57:3C28^IPv6\r"
                 + "PID|1||000054321^^^MRN\r"
                 + "PV1||I||||||||SUR||||||||S||A|||||||||||||||||||SF|K||||20170215080000\r"
                 + "ORC|NW|PON001^OE|CD2017071101^RX|||E|10^BID^D4^^^R||20170215080000\r"
-                + "RXO|^DOCUSATE SODIUM 100 MG CAPSULE|100||mg|||||G||10||5|\r"
-                + "RXE|^^^20170923230000^^R|999^Ampicillin 250 MG TAB^NDC|100||mg|123^test^ABC||||10||5|";
+                + "RXO|^DOCUSATE SODIUM 100 MG CAPSULE|100||mg|||||G||10||5|\r";
         medReq = ResourceUtils.getMedicationRequest(medicationRequest);
 
         // Expect 2 identifiers
@@ -1036,7 +1033,7 @@ public class Hl7IdentifierFHIRConversionTest {
         identifier = medReq.getIdentifier().get(1);
         value = identifier.getValue();
         system = identifier.getSystem();
-        assertThat(value).isEqualTo("DOCUSATE SODIUM 100 MG CAPSULE"); // RXO1.2
+        assertThat(value).isEqualTo("DOCUSATE SODIUM 100 MG CAPSULE"); // RXO-1.2
         assertThat(system).isEqualTo("urn:id:extID");
 
         // Test: Visit number from MSH-7, no RXO-1
@@ -1048,9 +1045,9 @@ public class Hl7IdentifierFHIRConversionTest {
                 + "RXE|^^^20170923230000^^R|999^Ampicillin 250 MG TAB^NDC|100||mg|123^test^ABC||||10||5|";
         medReq = ResourceUtils.getMedicationRequest(medicationRequest);
 
-        // Expect 1 identifier
+        // Expect 2 identifier
         assertThat(medReq.hasIdentifier()).isTrue();
-        assertThat(medReq.getIdentifier()).hasSize(1);
+        assertThat(medReq.getIdentifier()).hasSize(2);
 
         // Identifier 1: Visit number
         identifier = medReq.getIdentifier().get(0);
@@ -1060,6 +1057,42 @@ public class Hl7IdentifierFHIRConversionTest {
         assertThat(system).isNull();
         type = identifier.getType();
         DatatypeUtils.checkCommonCodeableConceptAssertions(type, "VN", "Visit number", "http://terminology.hl7.org/CodeSystem/v2-0203", null);
+        
+        // Identifier 2: extID based on RXE-2.1 and RXE-2.3
+        identifier = medReq.getIdentifier().get(1);
+        value = identifier.getValue();
+        system = identifier.getSystem();
+        assertThat(value).isEqualTo("999-NDC"); // RXE-2.1 and RXE-2.3
+        assertThat(system).isEqualTo("urn:id:extID");
+        
+        // Test: Visit number from PV1-19, extID from RXE-2.1 and RXE-2.3
+        medicationRequest = "MSH|^~\\&|PROSLOV|MYHOSPITAL|WHIA|IBM|20170215080000||RDE^O11^RDE_O11|MSGID005520|T|2.6|||AL|NE|764|ASCII||||||^4086::132:2A57:3C28^IPv6\r"
+                + "PID|1||000054321^^^MRN|||||||||||||||78654\r"
+                + "PV1||I|||||||||||||||||789789\r"
+                + "ORC|NW|PON001^OE|CD2017071101^RX|||E|10^BID^D4^^^R||20170215080000\r"
+                + "RXE|^^^20170923230000^^R|999^Ampicillin 250 MG TAB^NDC|100||mg|123^test^ABC||||10||5|";
+        medReq = ResourceUtils.getMedicationRequest(medicationRequest);
+
+        // Expect 2 identifiers
+        assertThat(medReq.hasIdentifier()).isTrue();
+        assertThat(medReq.getIdentifier()).hasSize(2);
+
+        // Identifier 1: Visit number
+        identifier = medReq.getIdentifier().get(0);
+        value = identifier.getValue();
+        system = identifier.getSystem();
+        assertThat(value).isEqualTo("789789"); // PV1.19
+        assertThat(system).isNull();
+        type = identifier.getType();
+        DatatypeUtils.checkCommonCodeableConceptAssertions(type, "VN", "Visit number", "http://terminology.hl7.org/CodeSystem/v2-0203", null);
+
+        // Identifier 2: extID based on RXE-2.1 and RXE-2.3
+        identifier = medReq.getIdentifier().get(1);
+        value = identifier.getValue();
+        system = identifier.getSystem();
+        assertThat(value).isEqualTo("999-NDC"); // RXE-2.1 and RXE-2.3
+        assertThat(system).isEqualTo("urn:id:extID");
+
     }
 
     @Test

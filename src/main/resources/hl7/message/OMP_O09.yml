@@ -45,6 +45,8 @@ resources:
       - .ORC
       - .COMPONENT.RXC
       - MSH
+      - PATIENT.PATIENT_VISIT.PV1
+      - PATIENT.PID
 
   - resourceName: AllergyIntolerance
     segment: PATIENT.AL1

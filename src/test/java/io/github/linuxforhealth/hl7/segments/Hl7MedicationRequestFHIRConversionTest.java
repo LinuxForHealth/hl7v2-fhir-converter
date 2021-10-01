@@ -234,7 +234,7 @@ public class Hl7MedicationRequestFHIRConversionTest {
     
     // Tests medication request fields MedicationCodeableConcept, Authored On, and Intent.
     // Tests with supported message types RDE-O11, RDE-O25.
-    // With both RXO and RXE segments.
+    // With both RXO and RXE segments, only RXE will be used.
     @ParameterizedTest
     @ValueSource(strings = 
     { 
@@ -283,10 +283,10 @@ public class Hl7MedicationRequestFHIRConversionTest {
         //Very medicationCodeableConcept is set correctly
         assertThat(medicationRequest.hasMedicationCodeableConcept()).isTrue();
         CodeableConcept medCC = medicationRequest.getMedicationCodeableConcept();
-        assertThat(medCC.getText()).isEqualTo("Test15 SODIUM 100 MG CAPSULE");
-        assertThat(medCC.getCoding().get(0).getSystem()).isEqualTo("http://hl7.org/fhir/sid/ndc");
-        assertThat(medCC.getCoding().get(0).getCode()).isEqualTo("RX800006");
-        assertThat(medCC.getCoding().get(0).getDisplay()).isEqualTo("Test15 SODIUM 100 MG CAPSULE");
+        assertThat(medCC.getText()).isEqualTo("3 ML PLAS CONT : IPRATROPIUM-ALBUTEROL 0.5-2.5 (3) MG/3ML IN SOLN");
+        assertThat(medCC.getCoding().get(0).getSystem()).isEqualTo("urn:id:ADS");
+        assertThat(medCC.getCoding().get(0).getCode()).isEqualTo("DUONEB3INH");
+        assertThat(medCC.getCoding().get(0).getDisplay()).isEqualTo("3 ML PLAS CONT : IPRATROPIUM-ALBUTEROL 0.5-2.5 (3) MG/3ML IN SOLN");
 
     }   
 
