@@ -1022,11 +1022,11 @@ public class Hl7IdentifierFHIRConversionTest {
         type = identifier.getType();
         DatatypeUtils.checkCommonCodeableConceptAssertions(type, "VN", "Visit number", "http://terminology.hl7.org/CodeSystem/v2-0203", null);
 
-        // Identifier 2: extID based on RXO1.1
+        // Identifier 2: extID based on RXO-1.2
         identifier = medReq.getIdentifier().get(1);
         value = identifier.getValue();
         system = identifier.getSystem();
-        assertThat(value).isEqualTo("DOCUSATE SODIUM 100 MG CAPSULE"); // RXO1.1
+        assertThat(value).isEqualTo("DOCUSATE SODIUM 100 MG CAPSULE"); // RXO-1.2
         assertThat(system).isEqualTo("urn:id:extID");
 
         // Test: Visit number from MSH-7, no RXO-1
@@ -1038,7 +1038,7 @@ public class Hl7IdentifierFHIRConversionTest {
                 + "RXE|^^^20170923230000^^R|999^Ampicillin 250 MG TAB^NDC|100||mg|123^test^ABC||||10||5|";
         medReq = ResourceUtils.getMedicationRequest(medicationRequest);
 
-        // Expect 1 identifier
+        // Expect 2 identifier
         assertThat(medReq.hasIdentifier()).isTrue();
         assertThat(medReq.getIdentifier()).hasSize(2);
 
@@ -1051,11 +1051,11 @@ public class Hl7IdentifierFHIRConversionTest {
         type = identifier.getType();
         DatatypeUtils.checkCommonCodeableConceptAssertions(type, "VN", "Visit number", "http://terminology.hl7.org/CodeSystem/v2-0203", null);
         
-        // Identifier 2: extID based on RXE-1.1 and RXE-1.3
+        // Identifier 2: extID based on RXE-2.1 and RXE-2.3
         identifier = medReq.getIdentifier().get(1);
         value = identifier.getValue();
         system = identifier.getSystem();
-        assertThat(value).isEqualTo("999-NDC"); // RXE-1.1 and RXE-1.3
+        assertThat(value).isEqualTo("999-NDC"); // RXE-2.1 and RXE-2.3
         assertThat(system).isEqualTo("urn:id:extID");
         
         // Test: Visit number from PV1-19, extID from RXE-2.1 and RXE-2.3
@@ -1079,11 +1079,11 @@ public class Hl7IdentifierFHIRConversionTest {
         type = identifier.getType();
         DatatypeUtils.checkCommonCodeableConceptAssertions(type, "VN", "Visit number", "http://terminology.hl7.org/CodeSystem/v2-0203", null);
 
-        // Identifier 2: extID based on RXO-1.1 and RX-O1.3
+        // Identifier 2: extID based on RXE-2.1 and RXE-2.3
         identifier = medReq.getIdentifier().get(1);
         value = identifier.getValue();
         system = identifier.getSystem();
-        assertThat(value).isEqualTo("999-NDC"); // RXO-1.1 and RXO-1.3
+        assertThat(value).isEqualTo("999-NDC"); // RXE-2.1 and RXE-2.3
         assertThat(system).isEqualTo("urn:id:extID");
 
     }
