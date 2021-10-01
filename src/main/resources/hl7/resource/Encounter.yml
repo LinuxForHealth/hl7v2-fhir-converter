@@ -82,9 +82,8 @@ length:
     valueOf: datatype/Duration
     expressionType: resource
     vars: 
-      time1: DATE_TIME, PV1.44
-      time2: DATE_TIME, PV1.45
-      time3: STRING, PV2.11
+      pv2time: STRING, PV2.11
+      pv1length: PV1_DURATION_LENGTH, PV1
 
 reasonCode_1:
     valueOf: datatype/CodeableConcept
