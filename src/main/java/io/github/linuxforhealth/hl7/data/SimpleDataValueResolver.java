@@ -45,6 +45,8 @@ import org.hl7.fhir.r4.model.codesystems.V3ReligiousAffiliation;
 import org.hl7.fhir.r4.model.codesystems.DiagnosisRole;
 import org.hl7.fhir.r4.model.codesystems.ConditionClinical;
 import org.hl7.fhir.r4.model.codesystems.ConditionVerStatus;
+import org.hl7.fhir.r4.model.codesystems.CompositionStatus;
+import org.hl7.fhir.r5.model.Enumerations;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -99,7 +101,7 @@ public class SimpleDataValueResolver {
     // Special extractor only for use with PV1 records.
     // Extract the admit and discharge time and calculate duration length.
     // Returns null if for any reason the data is not usable, which
-    // allows use of secondary values or to stop display.  
+    // allows use of secondary values or to stop display.
     public static final ValueExtractor<Object, String> PV1_DURATION_LENGTH = (Object value) -> {
         if (value instanceof PV1) {
             PV1 pv1 = (PV1) value;
@@ -169,8 +171,8 @@ public class SimpleDataValueResolver {
             String name = sb.toString();
             if (StringUtils.isNotBlank(name)) {
                 return name.trim();
-            } 
-        } 
+            }
+        }
         return null;
     };
 
@@ -321,6 +323,22 @@ public class SimpleDataValueResolver {
     public static final ValueExtractor<Object, String> SPECIMEN_STATUS_CODE_FHIR = (Object value) -> {
         String val = Hl7DataHandlerUtil.getStringValue(value);
         return getFHIRCode(val, SpecimenStatus.class);
+    };
+
+    public static final ValueExtractor<Object, String> DOC_REF_STATUS_CODE_FHIR = (Object value) -> {
+        String val = Hl7DataHandlerUtil.getStringValue(value);
+        String code = getFHIRCode(val, Enumerations.DocumentReferenceStatus.class);
+
+        if (code != null) {
+            return code;
+        } else {
+            return "current";
+        }
+    };
+
+    public static final ValueExtractor<Object, String> DOC_REF_DOC_STATUS_CODE_FHIR = (Object value) -> {
+        String val = Hl7DataHandlerUtil.getStringValue(value);
+        return getFHIRCode(val, CompositionStatus.class);
     };
 
     public static final ValueExtractor<Object, String> NAME_USE_CODE_FHIR = (Object value) -> {

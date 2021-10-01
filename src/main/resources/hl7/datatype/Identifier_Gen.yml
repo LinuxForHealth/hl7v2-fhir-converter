@@ -23,7 +23,7 @@ period:
        end: $end
        
 assigner:
-   valueOf: resource/Organization_Simple
+   valueOf: resource/Organization_ServiceProvider
    expressionType: reference
    vars:
      name: 'Assigning Authority'

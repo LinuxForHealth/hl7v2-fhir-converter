@@ -8,7 +8,26 @@ id:
    type: STRING
    valueOf: 'UUID.randomUUID()'
    expressionType: JEXL
-   
+
+masterIdentifier_1:
+   condition: $valueIn NOT_NULL && $systemCX NOT_NULL
+   valueOf: datatype/Identifier_var
+   expressionType: resource
+   vars:
+      valueIn: TXA.12.1
+      systemCX: TXA.12.2
+
+masterIdentifier_2:
+   condition: $txa NULL && $value NOT_NULL
+   valueOf: datatype/Identifier
+   expressionType: resource
+   vars:
+      value: TXA.12.1
+      system: SYSTEM_URL, $sys
+      txa: TXA.12.2
+   constants:
+      sys: "urn:id:extID"
+
 identifier_1:
    valueOf: datatype/Identifier
    generateList: true
@@ -46,14 +65,69 @@ identifier_3:
       display: "Placer Identifier"
    
 status:
-   type: STRING
-   valueOf: $default
+   type: DOC_REF_STATUS
+   default: "current"
+   valueOf: TXA.19 | OBR.25 
    expressionType: HL7Spec
-   constants:
-      default: "current"
+
+docStatus:
+   type: DOC_REF_DOC_STATUS
+   valueOf: TXA.17 | OBX.11
+   expressionType: HL7Spec
+
+type:
+   valueOf: datatype/CodeableConcept
+   expressionType: resource
+   specs: TXA.2
+
+subject:
+   valueOf: datatype/Reference
+   expressionType: resource
+   specs: $Patient
+
+date:
+   type: INSTANT
+   valueOf: TXA.6
+   expressionType: HL7Spec
+
+author:
+   generateList: true
+   expressionType: reference
+   valueOf: resource/Practitioner
+   specs: TXA.9
+
+authenticator:
+   expressionType: reference
+   valueOf: resource/Practitioner
+   specs: TXA.22 | TXA.10
 
 content:
    valueOf: secondary/Content
+   generateList: true
    expressionType: resource
-   constants:
-      value: "attachment"
+   vars:
+      # TODO: in future, if other than plain text, create a mapping
+      # contentType: TXA.3 | OBX.2
+      creationDate: TXA.7
+   constants: 
+      contentType: "text/plain"   
+
+description:
+   type: STRING
+   expressionType: HL7Spec
+   valueOf: TXA.16
+
+securityLabel:
+   condition: $txa NOT_NULL
+   valueOf: datatype/CodeableConcept
+   expressionType: resource
+   specs: TXA.18
+   vars:
+      txa: TXA.18
+
+context:
+   valueOf: secondary/Context
+   expressionType: resource
+   vars:
+      timestamp: TXA.4
+      providerCode: TXA.5

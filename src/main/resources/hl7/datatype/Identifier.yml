@@ -29,7 +29,7 @@ period:
        end: CX.8 | CWE.8
 
 assigner:
-   valueOf: resource/Organization_Simple
+   valueOf: resource/Organization_ServiceProvider
    expressionType: reference
    vars:
      name: $assigningAuth

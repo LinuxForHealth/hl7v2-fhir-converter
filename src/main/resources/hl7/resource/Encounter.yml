@@ -238,7 +238,7 @@ extension_1:
 
 serviceProvider:
       condition: $idValue NOT_NULL
-      valueOf: resource/Organization_Simple
+      valueOf: resource/Organization_ServiceProvider
       expressionType: reference
       vars:
             idValue: PV2.23.8 | PV1.3.4.1 | PV1.39

@@ -722,7 +722,7 @@ public class Hl7IdentifierFHIRConversionTest {
                          "TXA|1||B45678||||||\n";
 
 
- 
+
         DocumentReference report = ResourceUtils.getDocumentReference(documentReference);
 
          // Expect 3 identifiers
