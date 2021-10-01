@@ -312,7 +312,7 @@ public class Hl7RelatedGeneralUtilsTest {
   }
 
   @Test
-  public void test_getFormatAsId() {
+  public void testGetFormatAsId() {
    
     // Inputs are any string
     assertThat(Hl7RelatedGeneralUtils.formatAsId("Mayo Clinic")).isEqualTo("mayo.clinic");
