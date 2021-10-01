@@ -21,11 +21,5 @@ period:
     vars: 
        start: $start
        end: $end
-       
-assigner:
-   valueOf: resource/Organization_ServiceProvider
-   expressionType: reference
-   vars:
-     name: 'Assigning Authority'
-     id: $assigner
+
 
