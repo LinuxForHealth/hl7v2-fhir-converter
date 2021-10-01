@@ -480,7 +480,7 @@ public class Hl7EncounterFHIRConversionTest {
         hl7message = "MSH|^~\\&|PROSOLV||||20151008111200||ADT^A01^ADT_A01|MSGID000001|T|2.6|||||||||\n"
         + "EVN|A04|20151008111200|||||\n"
         + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
-        // PV1.44 present; PV1.45 present SAME VALUE
+        // PV1.44 present; PV1.45 present; but they have no minutes, so they will not be used
         + "PV1|1|E||||||||||||||||||||||||||||||||||||||||||20161014|20161015|||||||\n";
 
         encounter = ResourceUtils.getEncounter(hl7message);

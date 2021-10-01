@@ -120,7 +120,6 @@ public class SimpleDataValueResolver {
             } catch (UnsupportedTemporalTypeException e) {
                 LOGGER.warn("Cannot evaluate time difference for start: {} , end: {} reason {} ", start, end,
                         e.getMessage());
-                LOGGER.debug("Cannot evaluate time difference for start: {} , end: {} ", start, end, e);
                 return null;
             }
         }

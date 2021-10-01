@@ -316,17 +316,22 @@ public class SimpleDataValueResolverTest {
     assertThat(SimpleDataValueResolver.PV1_DURATION_LENGTH.apply(pv1)).isNull();
 
     // Admit set, but Discharge not yet set
-    pv1.getAdmitDateTime().setValue("20161013154626"); //20161013154626|20161014154634
+    pv1.getAdmitDateTime().setValue("20161013154626"); 
     assertThat(SimpleDataValueResolver.PV1_DURATION_LENGTH.apply(pv1)).isNull();
 
     // Admit and Discharge set to valid values
-    pv1.getAdmitDateTime().setValue("20161013154626"); //20161013154626|20161014154634
-    pv1.getDischargeDateTime().setValue("20161013164626"); //20161013154626|20161014154634
+    pv1.getAdmitDateTime().setValue("20161013154626"); 
+    pv1.getDischargeDateTime().setValue("20161013164626"); 
     assertThat(SimpleDataValueResolver.PV1_DURATION_LENGTH.apply(pv1)).isEqualTo("60");
 
+    // Admit and Discharge set to valid values less that one minute apart
+    pv1.getAdmitDateTime().setValue("20161013154626"); 
+    pv1.getDischargeDateTime().setValue("20161013154628"); 
+    assertThat(SimpleDataValueResolver.PV1_DURATION_LENGTH.apply(pv1)).isEqualTo("0");
+
     // Admit and Discharge set to insufficient detail values (have no minutes) return null
-    pv1.getAdmitDateTime().setValue("20161013"); //20161013154626|20161014154634
-    pv1.getDischargeDateTime().setValue("20161013"); //20161013154626|20161014154634
+    pv1.getAdmitDateTime().setValue("20161013"); 
+    pv1.getDischargeDateTime().setValue("20161013"); 
     assertThat(SimpleDataValueResolver.PV1_DURATION_LENGTH.apply(pv1)).isNull();
 
     // Other input types, such as a string, are not valid and null is returned

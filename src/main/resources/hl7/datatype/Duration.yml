@@ -4,39 +4,43 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 ---
-# value_1 is calculated when time1 and time2 are present 
+# value_1 is shown when a pv1length can be calculated from pv1-44 and pv1-45
 value_1:
   condition: $pv1length NOT_NULL
   valueOf: $pv1length
   type: STRING
-
-# value_2 or _3 comes from $pv2time if either $time1 or $time2 is missing
+# value_2 comes from $pv2time if pv1length cannot be calculated, 
+# which can happen if pv1-44 or pv1-45 are missing or have no minutes.
 value_2:
-  # required: true
   condition: $pv2time NOT_NULL && $pv1length NULL
   valueOf: $pv2time
-  
+
+# 
+# NOTE: unit_N and code_N are shown corresponding to presence of value_N 
+# 
+# shown with value_1
 unit_1:
   condition: $pv1length NOT_NULL
   type: String
   value:  "minutes"
-
+# shown with value_2  
 unit_2:
-  condition: $pv2time NOT_NULL && pv1length NULL
+  condition: $pv1length NULL && $pv2time NOT_NULL
   type: String
   value: "days"
 
+# shown with value_1 and unit_1
 code_1:
   condition: $pv1length NOT_NULL
   type: String
   value:  "min"
-
+# shown with  value_2 and unit_2  
 code_2:
-  condition: $pv2time NOT_NULL && $pv1length NULL
+  condition: $pv1length NULL && $pv2time NOT_NULL
   type: String
   value: "d"  
 
-# # system is hardcoded to UCUM, but must only show if other values show
+# system is hardcoded to UCUM, but must only show if other values show
 system:
   condition: $pv1length NOT_NULL || $pv2time NOT_NULL
   type: SYSTEM_URL
