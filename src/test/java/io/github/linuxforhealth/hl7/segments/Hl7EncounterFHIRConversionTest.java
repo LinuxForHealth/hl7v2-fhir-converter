@@ -475,6 +475,18 @@ public class Hl7EncounterFHIRConversionTest {
 
         assertThat(encounter.hasLength()).isFalse();
 
+        // If PV1.44 and PV1.45 are present with a date only (no minutes time), and there is no PV2.11 then nothing  
+        // Because dates can't be evaluated to minutes
+        hl7message = "MSH|^~\\&|PROSOLV||||20151008111200||ADT^A01^ADT_A01|MSGID000001|T|2.6|||||||||\n"
+        + "EVN|A04|20151008111200|||||\n"
+        + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
+        // PV1.44 present; PV1.45 present SAME VALUE
+        + "PV1|1|E||||||||||||||||||||||||||||||||||||||||||20161014|20161015|||||||\n";
+
+        encounter = ResourceUtils.getEncounter(hl7message);
+
+        assertThat(encounter.hasLength()).isFalse();
+
     }
 
     @Test
