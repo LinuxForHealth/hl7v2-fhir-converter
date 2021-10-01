@@ -103,7 +103,7 @@ public class SimpleDataValueResolver {
     };
 
     // Creates a display name; currently only handles XCN as input
-    public static final ValueExtractor<Object, String> DISPLAY_NAME = (Object value) -> {
+    public static final ValueExtractor<Object, String> PERSON_DISPLAY_NAME = (Object value) -> {
         if (value instanceof XCN) {
             XCN xcn = (XCN) value;
             StringBuilder sb = new StringBuilder();
@@ -112,7 +112,6 @@ public class SimpleDataValueResolver {
             String valmiddle = Hl7DataHandlerUtil.getStringValue(xcn.getSecondAndFurtherGivenNamesOrInitialsThereof());
             String valfamily = Hl7DataHandlerUtil.getStringValue(xcn.getFamilyName());
             String valsuffix = Hl7DataHandlerUtil.getStringValue(xcn.getSuffixEgJRorIII());
-            String valdegree = Hl7DataHandlerUtil.getStringValue(xcn.getDegreeEgMD());
 
             if (valprefix != null) {
                 sb.append(valprefix).append(" ");
@@ -129,15 +128,10 @@ public class SimpleDataValueResolver {
             if (valsuffix != null) {
                 sb.append(valsuffix).append(" ");
             }
-            if (valdegree != null) {
-                sb.append(valdegree).append(" ");
-            }
             String name = sb.toString();
             if (StringUtils.isNotBlank(name)) {
                 return name.trim();
-            } else {
-                return null;
-            }
+            } 
         } 
         return null;
     };

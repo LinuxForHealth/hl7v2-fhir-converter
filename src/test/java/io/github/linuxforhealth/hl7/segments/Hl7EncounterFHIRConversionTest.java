@@ -704,7 +704,7 @@ public class Hl7EncounterFHIRConversionTest {
             values.add(p.getId());
             switch (value) {
                 case "2905":
-                    values.add("Attending M Doctor IV MD");
+                    values.add("Attending M Doctor IV");
                     practionerMap.put("ATND", values);
                     break;
                 case "5755":
@@ -784,7 +784,7 @@ public class Hl7EncounterFHIRConversionTest {
             values.add(p.getId());
             switch (value) {
                 case "2905":
-                    values.add("Attending M Doctor IV MD");
+                    values.add("Attending M Doctor IV");
                     practionerMap.put("ATND", values);
                     break;
                 case "5755":

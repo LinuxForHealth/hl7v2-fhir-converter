@@ -281,9 +281,8 @@ public class SimpleDataValueResolverTest {
     xcn.getSecondAndFurtherGivenNamesOrInitialsThereof().setValue("Q");
     xcn.getFamilyName().getSurname().setValue("Johnson");
     xcn.getSuffixEgJRorIII().setValue("III");
-    xcn.getDegreeEgMD().setValue("MD");
  
-    assertThat(SimpleDataValueResolver.DISPLAY_NAME.apply(xcn)).isEqualTo("Dr Joe Q Johnson III MD");
+    assertThat(SimpleDataValueResolver.PERSON_DISPLAY_NAME.apply(xcn)).isEqualTo("Dr Joe Q Johnson III");
   }
 
   @Test
@@ -294,9 +293,9 @@ public class SimpleDataValueResolverTest {
     cwe.getCwe2_Text().setValue("Asian");
   
     // CWE is not a valid input and should return null
-    assertThat(SimpleDataValueResolver.DISPLAY_NAME.apply(cwe)).isNull();
+    assertThat(SimpleDataValueResolver.PERSON_DISPLAY_NAME.apply(cwe)).isNull();
     // String is not a valid input and should return null
-    assertThat(SimpleDataValueResolver.DISPLAY_NAME.apply("Bogus String")).isNull();
+    assertThat(SimpleDataValueResolver.PERSON_DISPLAY_NAME.apply("Bogus String")).isNull();
 
   }
 
