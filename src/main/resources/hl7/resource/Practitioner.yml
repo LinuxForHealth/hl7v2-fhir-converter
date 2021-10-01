@@ -17,14 +17,14 @@ identifier:
     valueOf: datatype/Identifier_Gen
     generateList: true
     expressionType: resource
-    specs: XCN | CNN|NDL | PPN
+    specs: XCN | CNN| NDL | PPN
     vars:
-      system: XCN.9 |CNN.9|NDL.9 | PPN.9
-      id: XCN.1 | CNN.1|NDL.1 |PPN.1
+      system: XCN.9 | CNN.9 | NDL.9 | PPN.9
+      id: XCN.1 | CNN.1 | NDL.1 | PPN.1
       start: XCN.19 
       end: XCN.20
 name: 
-    specs: XCN | XCN |CNN|NDL | PPN
+    specs: XCN | XCN | CNN | NDL | PPN
     valueOf: datatype/HumanName
     generateList: true
     expressionType: resource

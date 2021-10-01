@@ -9,7 +9,7 @@ attachment:
   expressionType: resource
   vars:
     mime: $contentType
-    data: BASE64_BINARY, $createtionDate
+    date: $creationDate
 
 
 

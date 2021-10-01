@@ -11,7 +11,7 @@ code:
     val: "appends"
 
 target:
-  valueOf: resource/Practitioner
+  valueOf: resource/DocumentReference
   expressionType: reference
   specs: $relatesRef
 

@@ -26,11 +26,11 @@ given:
     generateList: true
     expressionType: JEXL
     vars:
-      first: String, XPN.2 |XCN.3 |CNN.3 |NDL.3 | PPN.3
-      middle: String, XPN.3 |XCN.4 |CNN.4 |NDL.4 | PPN.4
+      first: String, XPN.2 | XCN.3 | CNN.3 | NDL.3 | PPN.3
+      middle: String, XPN.3 | XCN.4 | CNN.4 | NDL.4 | PPN.4
 prefix:
      type: STRING
-     valueOf: XPN.5 |XCN.6 |CNN.6 |NDL.6 | PPN.6
+     valueOf: XPN.5 | XCN.6 | CNN.6 |  NDL.6 | PPN.6
      expressionType: HL7Spec
 use:
     type: NAME_USE
@@ -39,13 +39,13 @@ use:
 
 suffix: 
      type: STRING
-     valueOf: XPN.4 |XCN.5 |CNN.5 |NDL.5 | PPN.5
+     valueOf: XPN.4 | XCN.5 | CNN.5 | NDL.5 | PPN.5
      expressionType: HL7Spec
      
 period:
     valueOf: datatype/Period
     expressionType: resource
     vars:
-       start: XPN.12 |XCN.19
-       end: XPN.13 |XCN.20
+       start: XPN.12 | XCN.19
+       end: XPN.13 | XCN.20
      

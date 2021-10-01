@@ -99,8 +99,7 @@ public class Hl7DocumentReferenceFHIRConversionTest {
 
         DocumentReference.DocumentReferenceContentComponent content = report.getContentFirstRep();
         assertThat(content.getAttachment().getContentType()).isEqualTo("TEXT"); //TXA.3
-        byte data[] = {77, 106, 65, 120, 79, 68, 65, 120, 77, 84, 103, 119, 77, 122, 81, 50};
-        assertThat(content.getAttachment().getData()).isEqualTo(data); //TXA.7 date gets encoded
+        assertThat(content.getAttachment().getCreationElement().toString()).containsPattern("2018-01-18T03:46:00"); //TXA.7 date
 
         documentReferenceMessage =
                 "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|MDM^T02^MDM_T02|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6|56789^NID^UID|MCM||||\n" +
@@ -113,7 +112,7 @@ public class Hl7DocumentReferenceFHIRConversionTest {
 
         content = report.getContentFirstRep();
         assertThat(content.getAttachment().getContentType()).isEqualTo("SN"); //OBX.2 is the backup for content type
-        assertThat(content.getAttachment().getData()).isEqualTo(data);
+        assertThat(content.getAttachment().getCreationElement().toString()).containsPattern("2018-01-18T03:46:00"); //TXA.7 date
 
     }
 

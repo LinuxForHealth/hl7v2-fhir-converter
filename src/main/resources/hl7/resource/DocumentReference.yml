@@ -106,7 +106,7 @@ content:
    expressionType: resource
    vars:
       contentType: TXA.3 | OBX.2
-      createtionDate: TXA.7
+      creationDate: TXA.7
 
 
 description:
