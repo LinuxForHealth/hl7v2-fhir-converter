@@ -67,12 +67,14 @@ resources:
       - PID
 
   - resourceName: MedicationRequest
-    segment: .ORDER_DETAIL.RXO
-    group: PROBLEM.ORDER
+    segment: .ORDER.ORDER_DETAIL.RXO
+    #segment: .ORDER.RXO
+    group: PROBLEM
     resourcePath: resource/MedicationRequest
     repeats: true
     additionalSegments:
       - MSH
-      - .ORC
-      - PATIENT.PATIENT_VISIT.PV1
-      - PATIENT.PID
+      - PID
+      - .ORDER.ORC
+      - PATIENT_VISIT.PV1
+
