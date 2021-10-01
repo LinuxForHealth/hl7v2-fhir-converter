@@ -129,9 +129,10 @@ DocumentReferenceStatus: #DocumenReference Status
   A: current
   C: current
   F: current
+  I: current
   O: current
-  R: current
   P: superseded
+  R: current
   S: current
   X: entered-in-error
 
@@ -144,15 +145,16 @@ CompositionStatus: #DocumenReference docStatus
   IP: preliminary
   PA: preliminary
   LA: final
-  NU: entered-in-error
   #OBX.11
-  F: final
-  P: preliminary
-  S: preliminary
   C: final
-  U: final
+  F: final
+  I: preliminary
+  P: preliminary
   R: preliminary
+  S: preliminary
+  U: final
   W: entered-in-error
+  # We are not mapping D,N,O,X - those values will result in this field not being set
 
 V3Race:
   # American Indian or Alaska Native	
