@@ -13,6 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -651,13 +652,17 @@ public class Hl7EncounterFHIRConversionTest {
 
     }
 
+    /**
+     * Test Encounter correctly creates and references Practitioners as Participants.
+     * Four participants in various roles are created.
+     */
     @Test
-    @Disabled
-    public void test_encounter_participant_list() {
-        String hl7message = "MSH|^~\\&|WHI_LOAD_GENERATOR|IBM_TORONTO_LAB||IBM|20210330144208|8078780|ADT^A02|MSGID_4e1c575f-6c6d-47b2-ab9f-829f20c96db2|T|2.3\n"
-                + "EVN||20210330144208||ADT_EVENT|007|20210309140700\n"
-                + "PID|1||0a8a1752-e336-43e1-bf7f-0c8f6f437ca3^^^MRN||Patient^Load^Generator||19690720|M|Patient^Alias^Generator|AA|9999^^CITY^STATE^ZIP^CAN|COUNTY|(866)845-0900||ENGLISH^ENGLISH|SIN|NONE|Account_0a8a1752-e336-43e1-bf7f-0c8f6f437ca3|123-456-7890|||N|BIRTH PLACE|N||||||N\n"
-                + "PV1||I|^^^Toronto^^5642 Hilly Av||||2905^Doctor^Attending^M^IV^^M.D|5755^Doctor^Referring^^Sr|770542^Doctor^Consulting^Jr||||||||59367^Doctor^Admitting||Visit_0a3be81e-144b-4885-9b4e-c5cd33c8f038|||||||||||||||||||||||||20210407191342\n";
+    public void testEncounterParticipantList() {
+        String hl7message = "MSH|^~\\&|WHI_LOAD_GENERATOR||||20210330144208||ADT^A01|MSGID_4e1c575f-6c6d-47b2-ab9f-829f20c96db2|T|2.3\n"
+                + "EVN||20210330144208||||\n"
+                + "PID|1||ABC12345^^^MRN||DOE^JANE|||||||||||||||\n"
+                // Key fields are PV1.7, PV1.8, PV1.9, and PV1.17
+                + "PV1||I|||||2905^Doctor^Attending^M^IV^^MD|5755^Doctor^Referring^^Sr|770542^Doctor^Consulting^^Jr||||||||59367^Doctor^Admitting|||||||||||||||||||||||||||\n";
 
         HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
         String json = ftv.convert(hl7message, OPTIONS);
@@ -686,7 +691,7 @@ public class Hl7EncounterFHIRConversionTest {
                 .map(BundleEntryComponent::getResource).collect(Collectors.toList());
         assertThat(practioners).hasSize(4);
 
-        HashMap<String, String> practionerMap = new HashMap<String, String>();
+        HashMap<String, List<String>> practionerMap = new HashMap<String, List<String>>();
         //Make sure that practitioners found are matching the HL7
         List<String> practionerIds = Arrays.asList("2905", "5755", "770542", "59367");
         for (Resource r : practioners) {
@@ -694,18 +699,25 @@ public class Hl7EncounterFHIRConversionTest {
             assertThat(p.getIdentifier()).hasSize(1);
             String value = p.getIdentifier().get(0).getValue();
             assertThat(practionerIds).contains(value);
+            // In map, first value is Participant Id, second is Participant Value
+            List<String> values = new ArrayList<String>();
+            values.add(p.getId());
             switch (value) {
                 case "2905":
-                    practionerMap.put("ATND", p.getId());
+                    values.add("Attending M Doctor IV");
+                    practionerMap.put("ATND", values);
                     break;
                 case "5755":
-                    practionerMap.put("REF", p.getId());
+                    values.add("Referring Doctor Sr");
+                    practionerMap.put("REF", values);
                     break;
                 case "770542":
-                    practionerMap.put("CON", p.getId());
+                    values.add("Consulting Doctor Jr");
+                    practionerMap.put("CON", values);
                     break;
                 case "59367":
-                    practionerMap.put("ADM", p.getId());
+                    values.add("Admitting Doctor");
+                    practionerMap.put("ADM", values);
                     break;
             }
         }
@@ -713,17 +725,24 @@ public class Hl7EncounterFHIRConversionTest {
         //Make sure that practitioners are correctly mapped within the Encounter
         for (EncounterParticipantComponent component : encParticipantList) {
             String code = component.getType().get(0).getCoding().get(0).getCode();
-            assertEquals(practionerMap.get(code), component.getIndividual().getReference());
+            // See the Encounter mapping has both the right Id reference and Display
+            // In map, first value is Participant Id, second is Participant Value
+            assertEquals(practionerMap.get(code).get(0), component.getIndividual().getReference());
+            assertEquals(practionerMap.get(code).get(1), component.getIndividual().getDisplay());
         }
     }
 
+    /**
+     * Test Encounter correctly creates and references Practitioners as Participants.
+     * Sparse data test. Only one participant is are created.
+     */
     @Test
-    @Disabled
-    public void test_encounter_participant_missing() {
-        String hl7message = "MSH|^~\\&|WHI_LOAD_GENERATOR|IBM_TORONTO_LAB||IBM|20210330144208|8078780|ADT^A02|MSGID_4e1c575f-6c6d-47b2-ab9f-829f20c96db2|T|2.3\n"
-                + "EVN||20210330144208||ADT_EVENT|007|20210309140700\n"
-                + "PID|1||0a8a1752-e336-43e1-bf7f-0c8f6f437ca3^^^MRN||Patient^Load^Generator||19690720|M|Patient^Alias^Generator|AA|9999^^CITY^STATE^ZIP^CAN|COUNTY|(866)845-0900||ENGLISH^ENGLISH|SIN|NONE|Account_0a8a1752-e336-43e1-bf7f-0c8f6f437ca3|123-456-7890|||N|BIRTH PLACE|N||||||N\n"
-                + "PV1||I|^^^Toronto^^5642 Hilly Av||||||||||||||59367^Doctor^Admitting||Visit_0a3be81e-144b-4885-9b4e-c5cd33c8f038|||||||||||||||||||||||||20210407191342\n";
+    public void testEncounterParticipantMissing() {
+        String hl7message = "MSH|^~\\&|WHI_LOAD_GENERATOR||||20210330144208||ADT^A01|MSGID_4e1c575f-6c6d-47b2-ab9f-829f20c96db2|T|2.3\n"
+                + "EVN||20210330144208||||\n"
+                + "PID|1||ABC12345^^^MRN||DOE^JANE|||||||||||||||\n"
+                // Key field is PV1.17; note that PV1.7, PV1.8, PV1.9 are purposely empty.  See companion test testEncounterParticipantList
+                + "PV1||I|||||||||||||||59367^Doctor^Admitting|||||||||||||||||||||||||||\n";
 
         HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
         String json = ftv.convert(hl7message, OPTIONS);
@@ -752,7 +771,7 @@ public class Hl7EncounterFHIRConversionTest {
                 .map(BundleEntryComponent::getResource).collect(Collectors.toList());
         assertThat(practioners).hasSize(1);
 
-        HashMap<String, String> practionerMap = new HashMap<String, String>();
+        HashMap<String, List<String>> practionerMap = new HashMap<String, List<String>>();
         //Make sure that practitioners found are matching the HL7
         List<String> practionerIds = Arrays.asList("59367");
         for (Resource r : practioners) {
@@ -760,18 +779,25 @@ public class Hl7EncounterFHIRConversionTest {
             assertThat(p.getIdentifier()).hasSize(1);
             String value = p.getIdentifier().get(0).getValue();
             assertThat(practionerIds).contains(value);
+            // In map, first value is Participant Id, second is Participant Value
+            List<String> values = new ArrayList<String>();
+            values.add(p.getId());
             switch (value) {
                 case "2905":
-                    practionerMap.put("ATND", p.getId());
+                    values.add("Attending M Doctor IV");
+                    practionerMap.put("ATND", values);
                     break;
                 case "5755":
-                    practionerMap.put("REF", p.getId());
+                    values.add("Referring Doctor Sr");
+                    practionerMap.put("REF", values);
                     break;
                 case "770542":
-                    practionerMap.put("CON", p.getId());
+                    values.add("Consulting Doctor Jr");
+                    practionerMap.put("CON", values);
                     break;
                 case "59367":
-                    practionerMap.put("ADM", p.getId());
+                    values.add("Admitting Doctor");
+                    practionerMap.put("ADM", values);
                     break;
             }
         }
@@ -779,10 +805,12 @@ public class Hl7EncounterFHIRConversionTest {
         //Make sure that practitioners are correctly mapped within the Encounter
         for (EncounterParticipantComponent component : encParticipantList) {
             String code = component.getType().get(0).getCoding().get(0).getCode();
-            assertEquals(practionerMap.get(code), component.getIndividual().getReference());
+            // See the Encounter mapping has both the right Id reference and Display
+            // In map, first value is Participant Id, second is Participant Value
+            assertEquals(practionerMap.get(code).get(0), component.getIndividual().getReference());
+            assertEquals(practionerMap.get(code).get(1), component.getIndividual().getDisplay());
         }
     }
-
     /**
      * Testing Encounter correctly references Observation
      * 

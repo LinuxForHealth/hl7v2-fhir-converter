@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import ca.uhn.hl7v2.model.v26.datatype.CWE;
+import ca.uhn.hl7v2.model.v26.datatype.XCN;
 import ca.uhn.hl7v2.model.Varies;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -99,6 +100,40 @@ public class SimpleDataValueResolver {
             LOGGER.warn("Value not valid URI, value: {}", value, e);
             return null;
         }
+    };
+
+    // Creates a display name; currently only handles XCN as input
+    public static final ValueExtractor<Object, String> PERSON_DISPLAY_NAME = (Object value) -> {
+        if (value instanceof XCN) {
+            XCN xcn = (XCN) value;
+            StringBuilder sb = new StringBuilder();
+            String valprefix = Hl7DataHandlerUtil.getStringValue(xcn.getPrefixEgDR());
+            String valfirst = Hl7DataHandlerUtil.getStringValue(xcn.getGivenName());
+            String valmiddle = Hl7DataHandlerUtil.getStringValue(xcn.getSecondAndFurtherGivenNamesOrInitialsThereof());
+            String valfamily = Hl7DataHandlerUtil.getStringValue(xcn.getFamilyName());
+            String valsuffix = Hl7DataHandlerUtil.getStringValue(xcn.getSuffixEgJRorIII());
+
+            if (valprefix != null) {
+                sb.append(valprefix).append(" ");
+            }
+            if (valfirst != null) {
+                sb.append(valfirst).append(" ");
+            }
+            if (valmiddle != null) {
+                sb.append(valmiddle).append(" ");
+            }
+            if (valfamily != null) {
+                sb.append(valfamily).append(" ");
+            }
+            if (valsuffix != null) {
+                sb.append(valsuffix).append(" ");
+            }
+            String name = sb.toString();
+            if (StringUtils.isNotBlank(name)) {
+                return name.trim();
+            } 
+        } 
+        return null;
     };
 
     public static final ValueExtractor<Object, String> ADMINISTRATIVE_GENDER_CODE_FHIR = (Object value) -> {

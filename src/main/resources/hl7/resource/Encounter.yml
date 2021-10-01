@@ -1,5 +1,5 @@
 #
-# (C) Copyright IBM Corp. 2020
+# (C) Copyright IBM Corp. 2020, 2021
 #
 # SPDX-License-Identifier: Apache-2.0
 #
@@ -162,6 +162,7 @@ participant_1:
    expressionType: resource
    vars:
       practionerSpec: PV1.7
+      referenceDisplay: PERSON_DISPLAY_NAME, PV1.7
    constants:
       codeableConceptCode: 'ATND'
       codeableConceptText: 'attender'
@@ -173,6 +174,7 @@ participant_2:
    expressionType: resource
    vars:
       practionerSpec: PV1.8
+      referenceDisplay: PERSON_DISPLAY_NAME, PV1.8
    constants:
       codeableConceptCode: 'REF'
       codeableConceptText: 'referrer'
@@ -184,6 +186,7 @@ participant_3:
    expressionType: resource
    vars:
       practionerSpec: PV1.9
+      referenceDisplay: PERSON_DISPLAY_NAME, PV1.9
    constants:
       codeableConceptCode: 'CON'
       codeableConceptText: 'consultant'
@@ -195,6 +198,7 @@ participant_4:
    expressionType: resource
    vars:
       practionerSpec: PV1.17
+      referenceDisplay: PERSON_DISPLAY_NAME, PV1.17
    constants:
       codeableConceptCode: 'ADM'
       codeableConceptText: 'admitter'

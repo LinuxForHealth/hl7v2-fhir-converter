@@ -18,6 +18,7 @@ import org.hl7.fhir.r4.model.codesystems.V3ReligiousAffiliation;
 import org.junit.jupiter.api.Test;
 import ca.uhn.hl7v2.model.DataTypeException;
 import ca.uhn.hl7v2.model.v26.datatype.CWE;
+import ca.uhn.hl7v2.model.v26.datatype.XCN;
 import ca.uhn.hl7v2.model.v26.datatype.TX;
 import ca.uhn.hl7v2.model.v26.message.ORU_R01;
 import io.github.linuxforhealth.core.terminology.SimpleCode;
@@ -270,6 +271,32 @@ public class SimpleDataValueResolverTest {
     assertThat(SimpleDataValueResolver.SYSTEM_ID.apply("A B C")).isEqualTo("urn:id:A_B_C");
     assertThat(SimpleDataValueResolver.SYSTEM_ID.apply("")).isNull();
     assertThat(SimpleDataValueResolver.SYSTEM_ID.apply(null)).isNull();
+  }
+
+  @Test
+  public void getDisplayNameValid() throws DataTypeException {
+    XCN xcn = new XCN(null);
+    xcn.getPrefixEgDR().setValue("Dr");
+    xcn.getGivenName().setValue("Joe");
+    xcn.getSecondAndFurtherGivenNamesOrInitialsThereof().setValue("Q");
+    xcn.getFamilyName().getSurname().setValue("Johnson");
+    xcn.getSuffixEgJRorIII().setValue("III");
+ 
+    assertThat(SimpleDataValueResolver.PERSON_DISPLAY_NAME.apply(xcn)).isEqualTo("Dr Joe Q Johnson III");
+  }
+
+  @Test
+  public void getDisplayNameNotValid() throws DataTypeException {
+    CWE cwe = new CWE(null);
+    cwe.getCwe3_NameOfCodingSystem().setValue("HL70005");
+    cwe.getCwe1_Identifier().setValue("2028-9");
+    cwe.getCwe2_Text().setValue("Asian");
+  
+    // CWE is not a valid input and should return null
+    assertThat(SimpleDataValueResolver.PERSON_DISPLAY_NAME.apply(cwe)).isNull();
+    // String is not a valid input and should return null
+    assertThat(SimpleDataValueResolver.PERSON_DISPLAY_NAME.apply("Bogus String")).isNull();
+
   }
 
 }
