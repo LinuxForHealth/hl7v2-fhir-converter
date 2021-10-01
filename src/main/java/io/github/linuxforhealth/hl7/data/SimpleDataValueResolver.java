@@ -14,7 +14,15 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.Temporal;
+import java.time.temporal.UnsupportedTemporalTypeException;
+
 import ca.uhn.hl7v2.model.v26.datatype.CWE;
+import ca.uhn.hl7v2.model.v26.datatype.XCN;
+import ca.uhn.hl7v2.model.v26.segment.PV1;
+import ca.uhn.hl7v2.model.v26.datatype.DTM;
+
 import ca.uhn.hl7v2.model.Varies;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -39,6 +47,7 @@ import org.hl7.fhir.r4.model.codesystems.ConditionClinical;
 import org.hl7.fhir.r4.model.codesystems.ConditionVerStatus;
 import org.hl7.fhir.r4.model.codesystems.CompositionStatus;
 import org.hl7.fhir.r5.model.Enumerations;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -89,6 +98,36 @@ public class SimpleDataValueResolver {
         return null;
     };
 
+    // Special extractor only for use with PV1 records.
+    // Extract the admit and discharge time and calculate duration length.
+    // Returns null if for any reason the data is not usable, which
+    // allows use of secondary values or to stop display.
+    public static final ValueExtractor<Object, String> PV1_DURATION_LENGTH = (Object value) -> {
+        if (value instanceof PV1) {
+            PV1 pv1 = (PV1) value;
+            DTM start = pv1.getAdmitDateTime();
+            DTM end = pv1.getDischargeDateTime();
+
+            try {
+                String sdate1 = Hl7DataHandlerUtil.getStringValue(start);
+                String sdate2 = Hl7DataHandlerUtil.getStringValue(end);
+                if (sdate1 != null && sdate2 != null) {
+                    Temporal date1 = DateUtil.getTemporal(DateUtil.formatToDateTimeWithZone(sdate1));
+                    Temporal date2 = DateUtil.getTemporal(DateUtil.formatToDateTimeWithZone(sdate2));
+                    LOGGER.info("temporal dates start: {} , end: {} ", date1, date2);
+                    if (date1 != null && date2 != null) {
+                        return String.valueOf(ChronoUnit.MINUTES.between(date1, date2));
+                    }
+                }
+            } catch (UnsupportedTemporalTypeException e) {
+                LOGGER.warn("Cannot evaluate time difference for start: {} , end: {} reason {} ", start, end,
+                        e.getMessage());
+                return null;
+            }
+        }
+        return null;
+    };
+
     public static final ValueExtractor<Object, URI> URI_VAL = (Object value) -> {
         try {
             String val = Hl7DataHandlerUtil.getStringValue(value);
@@ -101,6 +140,40 @@ public class SimpleDataValueResolver {
             LOGGER.warn("Value not valid URI, value: {}", value, e);
             return null;
         }
+    };
+
+    // Creates a display name; currently only handles XCN as input
+    public static final ValueExtractor<Object, String> PERSON_DISPLAY_NAME = (Object value) -> {
+        if (value instanceof XCN) {
+            XCN xcn = (XCN) value;
+            StringBuilder sb = new StringBuilder();
+            String valprefix = Hl7DataHandlerUtil.getStringValue(xcn.getPrefixEgDR());
+            String valfirst = Hl7DataHandlerUtil.getStringValue(xcn.getGivenName());
+            String valmiddle = Hl7DataHandlerUtil.getStringValue(xcn.getSecondAndFurtherGivenNamesOrInitialsThereof());
+            String valfamily = Hl7DataHandlerUtil.getStringValue(xcn.getFamilyName());
+            String valsuffix = Hl7DataHandlerUtil.getStringValue(xcn.getSuffixEgJRorIII());
+
+            if (valprefix != null) {
+                sb.append(valprefix).append(" ");
+            }
+            if (valfirst != null) {
+                sb.append(valfirst).append(" ");
+            }
+            if (valmiddle != null) {
+                sb.append(valmiddle).append(" ");
+            }
+            if (valfamily != null) {
+                sb.append(valfamily).append(" ");
+            }
+            if (valsuffix != null) {
+                sb.append(valsuffix).append(" ");
+            }
+            String name = sb.toString();
+            if (StringUtils.isNotBlank(name)) {
+                return name.trim();
+            }
+        }
+        return null;
     };
 
     public static final ValueExtractor<Object, String> ADMINISTRATIVE_GENDER_CODE_FHIR = (Object value) -> {
@@ -128,7 +201,7 @@ public class SimpleDataValueResolver {
         String val = Hl7DataHandlerUtil.getStringValue(value);
         return getFHIRCode(val, ObservationStatus.class);
     };
-
+   
     public static final ValueExtractor<Object, SimpleCode> OBSERVATION_STATUS_FHIR = (Object value) -> {
         String val = Hl7DataHandlerUtil.getStringValue(value);
         String code = getFHIRCode(val, ObservationStatus.class);
@@ -142,7 +215,7 @@ public class SimpleDataValueResolver {
             return new SimpleCode(null, theSystem, String.format(INVALID_CODE_MESSAGE_SHORT, val, theSystem));
         }
     };
-
+    
     public static final ValueExtractor<Object, String> SERVICE_REQUEST_STATUS = (Object value) -> {
         String val = Hl7DataHandlerUtil.getStringValue(value);
         return getFHIRCode(val, ServiceRequestStatus.class);
