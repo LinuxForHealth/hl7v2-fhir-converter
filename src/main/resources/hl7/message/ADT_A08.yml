@@ -32,8 +32,17 @@ resources:
              - PV2
              - EVN
              - MSH
-             - OBX
 
+    - resourceName: Condition
+      segment: DG1
+      resourcePath: resource/Condition
+      isReferenced: true
+      repeats: true
+      additionalSegments:
+             - MSH
+             - PID
+             - PV1
+             
     - resourceName: Observation
       segment: OBX
       resourcePath: resource/Observation
@@ -45,13 +54,6 @@ resources:
     - resourceName: AllergyIntolerance
       segment: AL1
       resourcePath: resource/AllergyIntolerance
-      repeats: true
-      additionalSegments:
-             - MSH
-
-    - resourceName: Condition
-      segment: DG1
-      resourcePath: resource/Condition
       repeats: true
       additionalSegments:
              - MSH
