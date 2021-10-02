@@ -67,7 +67,7 @@ identifier_3:
 status:
    type: DOC_REF_STATUS
    default: "current"
-   valueOf: TXA.19 | OBR.25 
+   valueOf: TXA.19 | OBR.25
    expressionType: HL7Spec
 
 docStatus:
