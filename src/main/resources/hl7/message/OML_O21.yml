@@ -14,24 +14,45 @@ resources:
       additionalSegments:
    
     - resourceName: Patient
-      segment: PATIENT.PID
+      segment: .PID
+      group: PATIENT
       resourcePath: resource/Patient
       isReferenced: true
       repeats: false
       additionalSegments:
           - .PD1
           - MSH
-      
+    
     - resourceName: Encounter
       segment: .PV1
-      group: PATIENT_VISIT
+      group: PATIENT.PATIENT_VISIT
       resourcePath: resource/Encounter
       isReferenced: true
       repeats: false
       additionalSegments:
           - .PV2
           - MSH
-      
+    
+    - resourceName: Specimen
+      segment: .SPECIMEN.SPM
+      group: ORDER.OBSERVATION_REQUEST
+      resourcePath: resource/Specimen
+      repeats: true
+      isReferenced: true
+      additionalSegments:
+          - .OBR
+          - MSH
+
+    - resourceName: Condition
+      segment: .DG1
+      group: ORDER.OBSERVATION_REQUEST
+      resourcePath: resource/Condition
+      repeats: true
+      isReferenced: true
+      additionalSegments:
+          - .OBR
+          - MSH
+
     - resourceName: DiagnosticReport
       segment: .OBR
       group: ORDER.OBSERVATION_REQUEST
@@ -51,21 +72,6 @@ resources:
       repeats: true
       additionalSegments:
           - MSH
+    
 
-    - resourceName: Condition
-      segment: .DG1
-      group: ORDER.OBSERVATION_REQUEST
-      resourcePath: resource/Condition
-      repeats: true
-      additionalSegments:
-          - .OBR
-          - MSH
-
-    - resourceName: Specimen
-      segment: .SPM
-      group: ORDER.OBSERVATION_REQUEST.SPECIMEN
-      resourcePath: resource/Specimen
-      repeats: true
-      additionalSegments:
-          - .OBR
-          - MSH
+    
