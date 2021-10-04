@@ -35,6 +35,8 @@ import org.hl7.fhir.r4.model.Resource;
 import org.hl7.fhir.r4.model.ResourceType;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -128,10 +130,20 @@ public class Hl7EncounterFHIRConversionTest {
 
     }
 
-    @Test
-    @Disabled
-    public void test_encounter_PV2_serviceProvider() {
-        String hl7message = "MSH|^~\\&|WHI_LOAD_GENERATOR|IBM_TORONTO_LAB||IBM|20210330144208|8078780|ADT^A02|MSGID_4e1c575f-6c6d-47b2-ab9f-829f20c96db2|T|2.3\n"
+    // Test for serviceProvider reference in ADT messages with both PV1 and PV2 segments
+    // Part 1: use serviceProvider from PV2.23 subfields
+    @ParameterizedTest
+    @ValueSource(strings = { "MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||ADT^A01|controlID|P|2.6\r",
+     //"MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||ADT^A02|controlID|P|2.6\r",
+     //"MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||ADT^A03|controlID|P|2.6\r",
+     //"MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||ADT^A04|controlID|P|2.6\r",
+     "MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||ADT^A08|controlID|P|2.6\r",
+     //"MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||ADT^A28|controlID|P|2.6\r",
+     //"MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||ADT^A31|controlID|P|2.6\r"
+     // ADT_A34 and ADT_A40 do not create encounters so they do not need to be tested here
+    })
+    public void test_encounter_with_serviceProvider_from_PV2(String msh) {
+        String hl7message = msh //"MSH|^~\\&|WHI_LOAD_GENERATOR|IBM_TORONTO_LAB||IBM|20210330144208|8078780|ADT^A02|MSGID_4e1c575f-6c6d-47b2-ab9f-829f20c96db2|T|2.3\n"
                 + "EVN||20210330144208||ADT_EVENT|007|20210309140700\n"
                 + "PID|1||0a8a1752-e336-43e1-bf7f-0c8f6f437ca3^^^MRN||Patient^Load^Generator||19690720|M|Patient^Alias^Generator|AA|9999^^CITY^STATE^ZIP^CAN|COUNTY|(866)845-0900||ENGLISH^ENGLISH|SIN|NONE|Account_0a8a1752-e336-43e1-bf7f-0c8f6f437ca3|123-456-7890|||N|BIRTH PLACE|N||||||N\n"
                 + "PV1||I|^^^Toronto^^5642 Hilly Av||||2905^Doctor^Attending^M^IV^^M.D|5755^Doctor^Referring^^Sr|770542^Doctor^Consulting^Jr||||||||59367^Doctor^Admitting||Visit_0a3be81e-144b-4885-9b4e-c5cd33c8f038|||||||||||||||||||||||||20210407191342\n"
@@ -167,14 +179,24 @@ public class Hl7EncounterFHIRConversionTest {
         assertThat(orgResource.getName()).isEqualTo("South Shore Hosptial Weymouth");
     }
 
-    @Test
-    @Disabled
-    public void test_encounter_PV2_serviceProvider_idfix() {
-        String hl7message = "MSH|^~\\&|WHI_LOAD_GENERATOR|IBM_TORONTO_LAB||IBM|20210330144208|8078780|ADT^A02|MSGID_4e1c575f-6c6d-47b2-ab9f-829f20c96db2|T|2.3\n"
-                + "EVN||20210330144208||ADT_EVENT|007|20210309140700\n"
-                + "PID|1||0a8a1752-e336-43e1-bf7f-0c8f6f437ca3^^^MRN||Patient^Load^Generator||19690720|M|Patient^Alias^Generator|AA|9999^^CITY^STATE^ZIP^CAN|COUNTY|(866)845-0900||ENGLISH^ENGLISH|SIN|NONE|Account_0a8a1752-e336-43e1-bf7f-0c8f6f437ca3|123-456-7890|||N|BIRTH PLACE|N||||||N\n"
-                + "PV1||I|^^^Toronto^^5642 Hilly Av||||2905^Doctor^Attending^M^IV^^M.D|5755^Doctor^Referring^^Sr|770542^Doctor^Consulting^Jr||||||||59367^Doctor^Admitting||Visit_0a3be81e-144b-4885-9b4e-c5cd33c8f038|||||||||||||||||||||||||20210407191342\n"
-                + "PV2||TEL||||X-5546||20210330144208|20210309||||||||||||n|N|South Shore Hosptial Weymouth^SSHW^^^^^^SSH*WEYMOUTH WEST_BUILD-7.F|||||||||N||||||\n";
+    // Test for serviceProvider reference in ADT messages with both PV1 and PV2 segments
+    // Part 2: Field PV2.23 is provided but no PV2.23.8; serviceProvider id should use backup field PV1.3.4.1
+    @ParameterizedTest
+    @ValueSource(strings = { "MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||ADT^A01|controlID|P|2.6\r",
+     //"MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||ADT^A02|controlID|P|2.6\r",
+     //"MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||ADT^A03|controlID|P|2.6\r",
+     //"MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||ADT^A04|controlID|P|2.6\r",
+     "MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||ADT^A08|controlID|P|2.6\r",
+     //"MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||ADT^A28|controlID|P|2.6\r",
+     //"MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||ADT^A31|controlID|P|2.6\r"
+     // ADT_A34 and ADT_A40 do not create encounters so they do not need to be tested here
+    })
+    public void test_encounter_PV1_serviceProvider(String msh) {
+        String hl7message = msh
+                + "EVN||20210330144208||ADT_EVENT|007|20210309140700\r"
+                + "PID|1||0a8a1752-e336-43e1-bf7f-0c8f6f437ca3^^^MRN||Patient^Load^Generator||19690720|M|Patient^Alias^Generator|AA|9999^^CITY^STATE^ZIP^CAN|COUNTY|(866)845-0900||ENGLISH^ENGLISH|SIN|NONE|Account_0a8a1752-e336-43e1-bf7f-0c8f6f437ca3|123-456-7890|||N|BIRTH PLACE|N||||||N\r"
+                + "PV1||I|^^^Toronto^^5642 Hilly Av||||2905^Doctor^Attending^M^IV^^M.D|5755^Doctor^Referring^^Sr|770542^Doctor^Consulting^Jr||||||||59367^Doctor^Admitting||Visit_0a3be81e-144b-4885-9b4e-c5cd33c8f038|||||||||||||||||||||||||20210407191342\r"
+                + "PV2||TEL||||X-5546||20210330144208|20210309||||||||||||n|N|South Shore Hosptial Weymouth|||||||||N||||||\r";
 
         HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
         String json = ftv.convert(hl7message, OPTIONS);
@@ -194,7 +216,7 @@ public class Hl7EncounterFHIRConversionTest {
         Reference serviceProvider = encounter.getServiceProvider();
         assertThat(serviceProvider).isNotNull();
         String providerString = serviceProvider.getReference();
-        assertThat(providerString).isEqualTo("Organization/SSH.WEYMOUTH.WEST.BUILD-7.F");
+        assertThat(providerString).isEqualTo("Organization/Toronto");
 
         List<Resource> organizations = e.stream()
                 .filter(v -> ResourceType.Organization == v.getResource().getResourceType())
@@ -206,15 +228,24 @@ public class Hl7EncounterFHIRConversionTest {
         assertThat(orgResource.getName()).isEqualTo("South Shore Hosptial Weymouth");
     }
 
-
-    // Test for serviceProvider reference in ADT_A01 message with only a PV1 segment
-    @Test
-    public void testEncounterADTA01PV1onlyServiceProvider() {
-        String hl7message =  "MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||ADT^A01|controlID|P|2.6\n"
-                +"EVN|A01|20150502090000|\n"
-                +"PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
+    // Test for serviceProvider reference in ADT messages with PV1 segment and no PV2 segment
+    // Part 1: serviceProvider from PV1-3.4.1
+    @ParameterizedTest
+    @ValueSource(strings = { "MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||ADT^A01|controlID|P|2.6\r",
+     //"MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||ADT^A02|controlID|P|2.6\r",
+     //"MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||ADT^A03|controlID|P|2.6\r",
+     //"MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||ADT^A04|controlID|P|2.6\r",
+     "MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||ADT^A08|controlID|P|2.6\r",
+     //"MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||ADT^A28|controlID|P|2.6\r",
+     //"MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||ADT^A31|controlID|P|2.6\r"
+     // ADT_A34 and ADT_A40 do not create encounters so they do not need to be tested here
+    })
+    public void test_encounter_with_serviceProvider_from_PV1_3_4(String msh) {
+        String hl7message =  msh
+                +"EVN|A01|20150502090000|\r"
+                +"PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\r"
                 // PV1-3.4 used for serviceProvider reference; used for both id and name
-                +"PV1||I|INT^0001^02^Toronto East|||||||SUR||||||||S|VisitNumber^^^Toronto North|A|||||||||||||||||||Toronto West||||||\n";
+                +"PV1||I|INT^0001^02^Toronto East|||||||SUR||||||||S|VisitNumber^^^Toronto North|A|||||||||||||||||||Toronto West||||||\r";
  
         HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
         String json = ftv.convert(hl7message, OPTIONS);
@@ -246,11 +277,20 @@ public class Hl7EncounterFHIRConversionTest {
         assertThat(orgResource.getName()).isEqualTo("Toronto East");
     }
 
-    // Test for serviceProvider reference in ADT_A01 message with only a PV1 segment,
-    // Part 2: alternate serviceProvider ID
-    @Test
-    public void testEncounterADTA01PV1onlyServiceProvider2() {
-        String hl7message =  "MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||ADT^A01|controlID|P|2.6\n"
+    // Test for serviceProvider reference in ADT messages with PV1 segment and no PV2 segment
+    // Part 2: alternate serviceProvider ID from PV1.39
+    @ParameterizedTest
+    @ValueSource(strings = { "MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||ADT^A01|controlID|P|2.6\r",
+     //"MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||ADT^A02|controlID|P|2.6\r",
+     //"MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||ADT^A03|controlID|P|2.6\r",
+     //"MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||ADT^A04|controlID|P|2.6\r",
+     "MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||ADT^A08|controlID|P|2.6\r",
+     //"MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||ADT^A28|controlID|P|2.6\r",
+     //"MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||ADT^A31|controlID|P|2.6\r"
+     // ADT_A34 and ADT_A40 do not create encounters so they do not need to be tested here
+    })
+    public void test_encounter_with_serviceProvider_from_PV1_39(String msh) {
+        String hl7message =  msh
                 +"EVN|A01|20150502090000|\n"
                 +"PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
                 // PV1-3.4 empty and PV1-39 used for serviceProvider reference
@@ -286,15 +326,13 @@ public class Hl7EncounterFHIRConversionTest {
         assertThat(orgResource.getName()).isNull(); // No name when using PV1-39
     }
 
-
     @Test
-    @Disabled
-    public void test_encounter_PV1_serviceProvider() {
-        String hl7message = "MSH|^~\\&|WHI_LOAD_GENERATOR|IBM_TORONTO_LAB||IBM|20210330144208|8078780|ADT^A02|MSGID_4e1c575f-6c6d-47b2-ab9f-829f20c96db2|T|2.3\n"
+    public void test_encounter_PV2_serviceProvider_idfix() {
+        String hl7message = "MSH|^~\\&|WHI_LOAD_GENERATOR|IBM_TORONTO_LAB||IBM|20210330144208|8078780|ADT^A01|MSGID_4e1c575f-6c6d-47b2-ab9f-829f20c96db2|T|2.3\n"
                 + "EVN||20210330144208||ADT_EVENT|007|20210309140700\n"
                 + "PID|1||0a8a1752-e336-43e1-bf7f-0c8f6f437ca3^^^MRN||Patient^Load^Generator||19690720|M|Patient^Alias^Generator|AA|9999^^CITY^STATE^ZIP^CAN|COUNTY|(866)845-0900||ENGLISH^ENGLISH|SIN|NONE|Account_0a8a1752-e336-43e1-bf7f-0c8f6f437ca3|123-456-7890|||N|BIRTH PLACE|N||||||N\n"
                 + "PV1||I|^^^Toronto^^5642 Hilly Av||||2905^Doctor^Attending^M^IV^^M.D|5755^Doctor^Referring^^Sr|770542^Doctor^Consulting^Jr||||||||59367^Doctor^Admitting||Visit_0a3be81e-144b-4885-9b4e-c5cd33c8f038|||||||||||||||||||||||||20210407191342\n"
-                + "PV2||TEL||||X-5546||20210330144208|20210309||||||||||||n|N|South Shore Hosptial Weymouth|||||||||N||||||\n";
+                + "PV2||TEL||||X-5546||20210330144208|20210309||||||||||||n|N|South Shore Hosptial Weymouth^SSHW^^^^^^SSH*WEYMOUTH WEST_BUILD-7.F|||||||||N||||||\n";
 
         HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
         String json = ftv.convert(hl7message, OPTIONS);
@@ -314,7 +352,7 @@ public class Hl7EncounterFHIRConversionTest {
         Reference serviceProvider = encounter.getServiceProvider();
         assertThat(serviceProvider).isNotNull();
         String providerString = serviceProvider.getReference();
-        assertThat(providerString).isEqualTo("Organization/Toronto");
+        assertThat(providerString).isEqualTo("Organization/SSH.WEYMOUTH.WEST.BUILD-7.F");
 
         List<Resource> organizations = e.stream()
                 .filter(v -> ResourceType.Organization == v.getResource().getResourceType())
