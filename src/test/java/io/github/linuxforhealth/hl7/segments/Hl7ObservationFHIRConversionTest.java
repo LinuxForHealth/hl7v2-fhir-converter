@@ -30,6 +30,8 @@ import org.hl7.fhir.r4.model.Resource;
 import org.hl7.fhir.r4.model.ResourceType;
 import org.hl7.fhir.r4.model.StringType;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import com.google.common.collect.Lists;
 
@@ -417,9 +419,25 @@ public class Hl7ObservationFHIRConversionTest {
     }
 
     // Tests most fields of OBX
-    @Test
-    public void extendedObservationCWEtest() throws IOException {
-        String hl7message = "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|ADT^A01^ADT_A01|||2.6||||||||2.6\r"
+    @ParameterizedTest
+    @ValueSource(strings = { 
+        "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|ADT^A01|||2.6||||||||2.6\r",
+        "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|ADT^A03|||2.6||||||||2.6\r",
+        "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|ADT^A04|||2.6||||||||2.6\r",
+        "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|ADT^A08|||2.6||||||||2.6\r",
+        "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|ADT^A28|||2.6||||||||2.6\r",
+        "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|ADT^A31|||2.6||||||||2.6\r",
+        "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|OMP^O09|||2.6||||||||2.6\r",
+        //"MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|ORM^O01|||2.6||||||||2.6\r",
+        "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|ORU^R01|||2.6||||||||2.6\r",
+        "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|PPR^PC1|||2.6||||||||2.6\r",
+        //"MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|PPR^PC2|||2.6||||||||2.6\r",
+        //"MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|PPR^PC3|||2.6||||||||2.6\r",
+        "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|RDE^O11|||2.6||||||||2.6\r",
+        "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|RDE^O25|||2.6||||||||2.6\r"
+    })
+    public void extendedObservationCWEtest(String msh) throws IOException {
+        String hl7message = msh
                 + "OBX|1|CWE|DQW^Some text 1^SNM3|100|DQW^Other text 2^SNM3|mm^Text 3^SNM3|56-98|IND|25|ST|F|20210322153839|LKJ|20210320153850|N56|1111^ClinicianLastName^ClinicianFirstName^^^^Title|Manual^Text the 4th^SNM3|Device_1234567^mySystem|20210322153925|Observation Site^Text 5^SNM3|INST^Instance Identifier System||Radiology^Radiological Services|467 Albany Hospital^^Albany^NY|Cardiology^ContactLastName^Jane^Q^^Dr.^MD\r";
 
         String json = message.convert(hl7message, engine);
