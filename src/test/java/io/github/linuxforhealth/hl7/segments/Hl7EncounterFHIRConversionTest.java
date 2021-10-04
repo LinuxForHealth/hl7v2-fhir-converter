@@ -674,7 +674,8 @@ public class Hl7EncounterFHIRConversionTest {
                 + "EVN||20210330144208||||\n"
                 + "PID|1||ABC12345^^^MRN||DOE^JANE|||||||||||||||\n"
                 // Key fields are PV1.7, PV1.8, PV1.9, and PV1.17
-                + "PV1||I|||||2905^Doctor^Attending^M^IV^^MD|5755^Doctor^Referring^^Sr|770542^Doctor^Consulting^^Jr||||||||59367^Doctor^Admitting|||||||||||||||||||||||||||\n";
+                // These fields each have multiple XCNs to test they work with repeating values
+                + "PV1||I|||||2905^DoctorA^Attending^M^IV^^MD~2905-2^DoctorA2^Attending2^M2|5755^DoctorB^Referring^^Sr~5755-2^DoctorB2^Referring2^^Sr2|770542^DoctorC^Consulting^^Jr~770542-2^DoctorC2^Consulting2^^Sr||||||||59367^DoctorD^Admitting~59367-2^DoctorD2^Admitting2|||||||||||||||||||||||||||\n";
 
         HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
         String json = ftv.convert(hl7message, OPTIONS);
@@ -696,57 +697,73 @@ public class Hl7EncounterFHIRConversionTest {
         Encounter encounter = ResourceUtils.getResourceEncounter(encounterResource.get(0), context);
 
         List<EncounterParticipantComponent> encParticipantList = encounter.getParticipant();
-        assertThat(encParticipantList).hasSize(4);
+        assertThat(encParticipantList).hasSize(8);
 
         List<Resource> practioners = e.stream()
                 .filter(v -> ResourceType.Practitioner == v.getResource().getResourceType())
                 .map(BundleEntryComponent::getResource).collect(Collectors.toList());
-        assertThat(practioners).hasSize(4);
+        assertThat(practioners).hasSize(8);
 
         HashMap<String, List<String>> practionerMap = new HashMap<String, List<String>>();
-        //Make sure that practitioners found are matching the HL7
-        List<String> practionerIds = Arrays.asList("2905", "5755", "770542", "59367");
+        //Make sure that practitioners found are matching the HL7 by using known ID as check
+        List<String> practionerIds = Arrays.asList("2905", "2905-2", "5755", "5755-2", "770542", "770542-2", "59367", "59367-2");
         for (Resource r : practioners) {
             Practitioner p = ResourceUtils.getResourcePractitioner(r, context);
             assertThat(p.getIdentifier()).hasSize(1);
             String value = p.getIdentifier().get(0).getValue();
             assertThat(practionerIds).contains(value);
-            // In map, first value is Participant Id, second is Participant Value
+            // Make a map where key is the Participant ID <GUID>, first value is Participant name, second is Participant Code
             List<String> values = new ArrayList<String>();
-            values.add(p.getId());
             switch (value) {
                 case "2905":
-                    values.add("Attending M Doctor IV");
-                    practionerMap.put("ATND", values);
+                    values.add("Attending M DoctorA IV");
+                    values.add("ATND");
+                    break;
+                case "2905-2":
+                    values.add("Attending2 M2 DoctorA2");
+                    values.add("ATND");
                     break;
                 case "5755":
-                    values.add("Referring Doctor Sr");
-                    practionerMap.put("REF", values);
+                    values.add("Referring DoctorB Sr");
+                    values.add("REF");
                     break;
+                case "5755-2":
+                    values.add("Referring2 DoctorB2 Sr2");
+                    values.add("REF");
+                    break;    
                 case "770542":
-                    values.add("Consulting Doctor Jr");
-                    practionerMap.put("CON", values);
+                    values.add("Consulting DoctorC Jr");
+                    values.add("CON");
                     break;
+                case "770542-2":
+                    values.add("Consulting2 DoctorC2 Sr");
+                    values.add("CON");
+                    break;    
                 case "59367":
-                    values.add("Admitting Doctor");
-                    practionerMap.put("ADM", values);
+                    values.add("Admitting DoctorD");
+                    values.add("ADM");
                     break;
+                case "59367-2":
+                    values.add("Admitting2 DoctorD2");
+                    values.add("ADM");
+                    break;    
             }
+            practionerMap.put(p.getId(), values);
         }
 
-        //Make sure that practitioners are correctly mapped within the Encounter
-        for (EncounterParticipantComponent component : encParticipantList) {
-            String code = component.getType().get(0).getCoding().get(0).getCode();
-            // See the Encounter mapping has both the right Id reference and Display
-            // In map, first value is Participant Id, second is Participant Value
-            assertEquals(practionerMap.get(code).get(0), component.getIndividual().getReference());
-            assertEquals(practionerMap.get(code).get(1), component.getIndividual().getDisplay());
+        //Make sure that each practitioner is correctly mapped within the Encounter
+        for (EncounterParticipantComponent participantComponent : encParticipantList) {
+            String id = participantComponent.getIndividual().getReference();
+            // Use the Id to look up the expected Participant name and Participant code
+            // In map, first value is Participant name , second is Participant code
+            assertEquals(practionerMap.get(id).get(0), participantComponent.getIndividual().getDisplay());
+            assertEquals(practionerMap.get(id).get(1), participantComponent.getType().get(0).getCoding().get(0).getCode());
         }
     }
 
     /**
      * Test Encounter correctly creates and references Practitioners as Participants.
-     * Sparse data test. Only one participant is are created.
+     * Sparse data test. Only one participant is  created.
      */
     @Test
     public void testEncounterParticipantMissing() {
@@ -774,54 +791,21 @@ public class Hl7EncounterFHIRConversionTest {
         assertThat(encounterResource).hasSize(1);
 
         Encounter encounter = ResourceUtils.getResourceEncounter(encounterResource.get(0), context);
-
         List<EncounterParticipantComponent> encParticipantList = encounter.getParticipant();
         assertThat(encParticipantList).hasSize(1);
+        EncounterParticipantComponent participantComponent = encParticipantList.get(0);
 
         List<Resource> practioners = e.stream()
                 .filter(v -> ResourceType.Practitioner == v.getResource().getResourceType())
                 .map(BundleEntryComponent::getResource).collect(Collectors.toList());
         assertThat(practioners).hasSize(1);
+        Practitioner practitioner = ResourceUtils.getResourcePractitioner(practioners.get(0), context);
 
-        HashMap<String, List<String>> practionerMap = new HashMap<String, List<String>>();
-        //Make sure that practitioners found are matching the HL7
-        List<String> practionerIds = Arrays.asList("59367");
-        for (Resource r : practioners) {
-            Practitioner p = ResourceUtils.getResourcePractitioner(r, context);
-            assertThat(p.getIdentifier()).hasSize(1);
-            String value = p.getIdentifier().get(0).getValue();
-            assertThat(practionerIds).contains(value);
-            // In map, first value is Participant Id, second is Participant Value
-            List<String> values = new ArrayList<String>();
-            values.add(p.getId());
-            switch (value) {
-                case "2905":
-                    values.add("Attending M Doctor IV");
-                    practionerMap.put("ATND", values);
-                    break;
-                case "5755":
-                    values.add("Referring Doctor Sr");
-                    practionerMap.put("REF", values);
-                    break;
-                case "770542":
-                    values.add("Consulting Doctor Jr");
-                    practionerMap.put("CON", values);
-                    break;
-                case "59367":
-                    values.add("Admitting Doctor");
-                    practionerMap.put("ADM", values);
-                    break;
-            }
-        }
+        // With one practitioner and one participant, confirm the ID's match, the code and name are expected.
+        assertThat( participantComponent.getIndividual().getReference()).isEqualTo(practitioner.getId());
+        assertThat( participantComponent.getType().get(0).getCoding().get(0).getCode()).isEqualTo("ADM");
+        assertThat( participantComponent.getIndividual().getDisplay()).isEqualTo("Admitting Doctor");
 
-        //Make sure that practitioners are correctly mapped within the Encounter
-        for (EncounterParticipantComponent component : encParticipantList) {
-            String code = component.getType().get(0).getCoding().get(0).getCode();
-            // See the Encounter mapping has both the right Id reference and Display
-            // In map, first value is Participant Id, second is Participant Value
-            assertEquals(practionerMap.get(code).get(0), component.getIndividual().getReference());
-            assertEquals(practionerMap.get(code).get(1), component.getIndividual().getDisplay());
-        }
     }
     /**
      * Testing Encounter correctly references Observation
