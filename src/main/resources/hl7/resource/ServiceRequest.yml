@@ -59,7 +59,7 @@ intent:
    valueOf: $default
    expressionType: HL7Spec
    constants:
-      default: "filler-order"
+      default: "order"
 
 subject:
    valueOf: datatype/Reference
