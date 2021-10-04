@@ -68,7 +68,6 @@ resources:
 
   - resourceName: MedicationRequest
     segment: .ORDER.ORDER_DETAIL.RXO
-    #segment: .ORDER.RXO
     group: PROBLEM
     resourcePath: resource/MedicationRequest
     repeats: true

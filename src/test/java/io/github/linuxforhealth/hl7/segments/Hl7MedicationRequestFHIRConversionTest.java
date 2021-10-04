@@ -450,47 +450,4 @@ public class Hl7MedicationRequestFHIRConversionTest {
 
     }
 
-    @Test
-    public void testMedicationRequestInPPRWithAPatientVisit() {
-
-        String hl7message = "MSH|^~\\&||||||S1|PPR^PC1||T|2.6|||||||||\r"
-                + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
-                + "PV1||I|6N^1234^A^GENHOS||||0100^ANDERSON^CARL|0148^ADDISON^JAMES||SUR|||||||0148^ANDERSON^CARL|S|1400|A|||||||||||||||||||SF|K||||199501102300\r"
-                + "PRB|AD|20141015103243|15777000^Prediabetes (disorder)^SNM|654321^^OtherSoftware.ProblemOID|||20120101||\n"
-                + "ORC|NW|F800006^OE|P800006^RX|||E|10^BID^D4^^^R||20180622230000\n"
-                + "RXO|65862-063-01^METOPROLOL TARTRATE^NDC||||Tablet||||||||2|2|AP1234567||||325|mg\n";
-
-        HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
-        String json = ftv.convert(hl7message, PatientUtils.OPTIONS);
-        assertThat(json).isNotBlank();
-        LOGGER.info("FHIR json result:\n" + json);
-
-        IBaseResource bundleResource = context.getParser().parseResource(json);
-        assertThat(bundleResource).isNotNull();
-        Bundle b = (Bundle) bundleResource;
-        List<BundleEntryComponent> e = b.getEntry();
-
-        List<Resource> medicationRequestList = e.stream()
-                .filter(v -> ResourceType.MedicationRequest == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
-        assertThat(medicationRequestList).hasSize(1);
-        MedicationRequest medicationRequest = ResourceUtils.getResourceMedicationRequest(medicationRequestList.get(0), context);
-
-        // Verify authored on is not present
-        assertThat(medicationRequest.getAuthoredOn()).isNull();
-
-        //Verify intent is set correctly
-        String intent = medicationRequest.getIntent().toString();
-        assertThat(intent).isEqualTo("ORDER");
-
-        //Very medicationCodeableConcept is set correctly
-        assertThat(medicationRequest.hasMedicationCodeableConcept()).isTrue();
-        CodeableConcept medCC = medicationRequest.getMedicationCodeableConcept();
-        assertThat(medCC.getText()).isEqualTo("METOPROLOL TARTRATE");
-        assertThat(medCC.getCoding().get(0).getSystem()).isEqualTo("http://hl7.org/fhir/sid/ndc");
-        assertThat(medCC.getCoding().get(0).getCode()).isEqualTo("65862-063-01");
-        assertThat(medCC.getCoding().get(0).getDisplay()).isEqualTo("METOPROLOL TARTRATE");
-
-    }
-
 }
