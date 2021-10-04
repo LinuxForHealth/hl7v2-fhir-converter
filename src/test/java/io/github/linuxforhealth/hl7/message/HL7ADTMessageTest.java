@@ -39,7 +39,7 @@ public class HL7ADTMessageTest {
                 String hl7message = "MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||ADT^A01|controlID|P|2.6\n"
                                 + "EVN|A01|20150502090000|\n"
                                 + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
-                                + "PV1||I|INT^0001^02^ACME||||0100^ANDERSON^CARL|0148^SMITH^JAMES||SUR|||||||0148^ANDERSON^CARL|S|VisitNumber^^^ACME|A|||||||||||||||||||ACME|||||20150502090000|\n";
+                                + "PV1||I||||||||SUR||||||||S|VisitNumber^^^ACME|A||||||||||||||||||||||||20150502090000|\n";
 
                 HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
                 String json = ftv.convert(hl7message, OPTIONS);
@@ -49,6 +49,9 @@ public class HL7ADTMessageTest {
                 assertThat(bundleResource).isNotNull();
                 Bundle b = (Bundle) bundleResource;
                 List<BundleEntryComponent> e = b.getEntry();
+
+                // Expecting 2 resources: 1 Encounter, 1 Patient
+                assertThat(e.size()).isEqualTo(2);
 
                 List<Resource> patientResource = e.stream()
                                 .filter(v -> ResourceType.Patient == v.getResource().getResourceType())
@@ -66,10 +69,11 @@ public class HL7ADTMessageTest {
                 String hl7message = "MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||ADT^A01|controlID|P|2.6\n"
                                 + "EVN|A01|20150502090000|\n"
                                 + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
-                                + "PV1||I|INT^0001^02^ACME||||0100^ANDERSON^CARL|0148^SMITH^JAMES||SUR|||||||0148^ANDERSON^CARL|S|VisitNumber^^^ACME|A|||||||||||||||||||ACME|||||20150502090000|\n"
+                                + "PV1||I||||||||SUR||||||||S|VisitNumber^^^ACME|A||||||||||||||||||||||||20150502090000|\n"
                                 + "PV2|||||||||||||||||||||||||AI|||||||||||||C|\n"
                                 + "OBX|1|TX|1234^some text^SCT||First line: ECHOCARDIOGRAPHIC REPORT||||||F||\n"
-                                + "AL1|1|DA|1605^acetaminophen^L|MO|Muscle Pain~hair loss\r" + "DG1|1||B45678|||A|\n";
+                                + "AL1|1|DA|1605^acetaminophen^L|MO|Muscle Pain~hair loss\r" 
+                                + "DG1|1||B45678|||A|\n";
 
                 HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
                 String json = ftv.convert(hl7message, OPTIONS);
@@ -79,6 +83,9 @@ public class HL7ADTMessageTest {
                 assertThat(bundleResource).isNotNull();
                 Bundle b = (Bundle) bundleResource;
                 List<BundleEntryComponent> e = b.getEntry();
+
+                // Expecting 5 resources: Encounter, Patient, Observation, AllergyIntolerance, and Condition
+                assertThat(e.size()).isEqualTo(5);
 
                 List<Resource> patientResource = e.stream()
                                 .filter(v -> ResourceType.Patient == v.getResource().getResourceType())
@@ -112,7 +119,7 @@ public class HL7ADTMessageTest {
                                 + "EVN|A01|20150502090000|\n"
                                 + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
                                 + "NK1|1|Kennedy^Joe|FTH|||+44 201 12345678||\n"
-                                + "PV1||I|INT^0001^02^ACME||||0100^ANDERSON^CARL|0148^SMITH^JAMES||SUR|||||||0148^ANDERSON^CARL|S|VisitNumber^^^ACME|A|||||||||||||||||||ACME|||||20150502090000|\n"
+                                + "PV1||I||||||||SUR||||||||S|VisitNumber^^^ACME|A||||||||||||||||||||||||20150502090000|\n"
                                 + "AL1|1|DA|1605^acetaminophen^L|MO|Muscle Pain~hair loss\r";
 
                 HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
@@ -123,6 +130,9 @@ public class HL7ADTMessageTest {
                 assertThat(bundleResource).isNotNull();
                 Bundle b = (Bundle) bundleResource;
                 List<BundleEntryComponent> e = b.getEntry();
+
+                // Expecting 2 total resources
+                assertThat(e.size()).isEqualTo(2);
 
                 List<Resource> patientResource = e.stream()
                                 .filter(v -> ResourceType.Patient == v.getResource().getResourceType())
@@ -142,18 +152,20 @@ public class HL7ADTMessageTest {
                                 + "EVN|A01|20150502090000|\n"
                                 + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
                                 + "NK1|1|Kennedy^Joe|FTH|||+44 201 12345678||\n"
-                                + "PV1||I|INT^0001^02^ACME||||0100^ANDERSON^CARL|0148^SMITH^JAMES||SUR|||||||0148^ANDERSON^CARL|S|VisitNumber^^^ACME|A|||||||||||||||||||ACME|||||20150502090000|\n"
-                                + "AL1|1|DA|1605^acetaminophen^L|MO|Muscle Pain~hair loss\r";
+                                + "PV1||I||||||||SUR||||||||S|VisitNumber^^^ACME|A||||||||||||||||||||||||20150502090000|\n";
 
                 HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
-                String json = ftv.convert(hl7message, OPTIONS);
+                String json = ftv.convert(hl7message, OPTIONS_PRETTYPRINT);
                 assertThat(json).isNotBlank();
                 LOGGER.info("FHIR json result:\n" + json);
                 IBaseResource bundleResource = context.getParser().parseResource(json);
                 assertThat(bundleResource).isNotNull();
-                Bundle b = (Bundle) bundleResource;
-                
+                Bundle b = (Bundle) bundleResource;                
                 List<BundleEntryComponent> e = b.getEntry();
+
+                // Expecting 2 total resources
+                assertThat(e.size()).isEqualTo(2);
+
                 List<Resource> patientResource = e.stream()
                                 .filter(v -> ResourceType.Patient == v.getResource().getResourceType())
                                 .map(BundleEntryComponent::getResource).collect(Collectors.toList());
@@ -174,17 +186,19 @@ public class HL7ADTMessageTest {
                                 + "EVN|A01|20150502090000|\n"
                                 + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
                                 + "NK1|1|Kennedy^Joe|FTH|||+44 201 12345678||\n"
-                                + "PV1||I|INT^0001^02^ACME||||0100^ANDERSON^CARL|0148^SMITH^JAMES||SUR|||||||0148^ANDERSON^CARL|S|VisitNumber^^^ACME|A|||||||||||||||||||ACME|||||20150502090000|\n"
-                                + "AL1|1|DA|1605^acetaminophen^L|MO|Muscle Pain~hair loss\r";
+                                + "PV1||I||||||||SUR||||||||S|VisitNumber^^^ACME|A||||||||||||||||||||||||20150502090000|\n";
 
                 HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
-                String json = ftv.convert(hl7message, OPTIONS);
+                String json = ftv.convert(hl7message, OPTIONS_PRETTYPRINT);
                 assertThat(json).isNotBlank();
                 LOGGER.info("FHIR json result:\n" + json);
                 IBaseResource bundleResource = context.getParser().parseResource(json);
                 assertThat(bundleResource).isNotNull();
                 Bundle b = (Bundle) bundleResource;
                 List<BundleEntryComponent> e = b.getEntry();
+
+                // Expecting 2 total resources
+                assertThat(e.size()).isEqualTo(2);
 
                 List<Resource> patientResource = e.stream()
                                 .filter(v -> ResourceType.Patient == v.getResource().getResourceType())
@@ -203,7 +217,7 @@ public class HL7ADTMessageTest {
                 String hl7message = "MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||ADT^A08|controlID|P|2.6\n"
                                 + "EVN|A01|20150502090000|\n"
                                 + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
-                                + "PV1||I|INT^0001^02^ACME||||0100^ANDERSON^CARL|0148^SMITH^JAMES||SUR|||||||0148^ANDERSON^CARL|S|VisitNumber^^^ACME|A|||||||||||||||||||ACME|||||20150502090000|\n";
+                                + "PV1||I||||||||SUR||||||||S|VisitNumber^^^ACME|A||||||||||||||||||||||||20150502090000|\n";
 
                 HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
                 String json = ftv.convert(hl7message, OPTIONS);
@@ -212,8 +226,11 @@ public class HL7ADTMessageTest {
                 IBaseResource bundleResource = context.getParser().parseResource(json);
                 assertThat(bundleResource).isNotNull();
                 Bundle b = (Bundle) bundleResource;
-
                 List<BundleEntryComponent> e = b.getEntry();
+
+                // Expecting 2 resources: Patient and Encounter
+                assertThat(e.size()).isEqualTo(2);
+                
                 List<Resource> patientResource = e.stream()
                                 .filter(v -> ResourceType.Patient == v.getResource().getResourceType())
                                 .map(BundleEntryComponent::getResource).collect(Collectors.toList());
@@ -231,10 +248,11 @@ public class HL7ADTMessageTest {
                 String hl7message = "MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||ADT^A08|controlID|P|2.6\n"
                                 + "EVN|A01|20150502090000|\n"
                                 + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
-                                + "PV1||I|INT^0001^02^ACME||||0100^ANDERSON^CARL|0148^SMITH^JAMES||SUR|||||||0148^ANDERSON^CARL|S|VisitNumber^^^ACME|A|||||||||||||||||||ACME|||||20150502090000|\n"
+                                + "PV1||I||||||||SUR||||||||S|VisitNumber^^^ACME|A||||||||||||||||||||||||20150502090000|\n"
                                 + "PV2|||||||||||||||||||||||||AI|||||||||||||C|\n"
                                 + "OBX|1|TX|1234^some text^SCT||First line: ECHOCARDIOGRAPHIC REPORT||||||F||\n"
-                                + "AL1|1|DA|1605^acetaminophen^L|MO|Muscle Pain~hair loss\n" + "DG1|1||B45678|||A|\r";
+                                + "AL1|1|DA|1605^acetaminophen^L|MO|Muscle Pain~hair loss\n" 
+                                + "DG1|1||B45678|||A|\r";
 
                 HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
                 String json = ftv.convert(hl7message, OPTIONS);
@@ -245,6 +263,9 @@ public class HL7ADTMessageTest {
                 Bundle b = (Bundle) bundleResource;
                 List<BundleEntryComponent> e = b.getEntry();
 
+                // Expecting 5 total resources
+                assertThat(e.size()).isEqualTo(5);
+                
                 List<Resource> patientResource = e.stream()
                                 .filter(v -> ResourceType.Patient == v.getResource().getResourceType())
                                 .map(BundleEntryComponent::getResource).collect(Collectors.toList());
@@ -278,11 +299,10 @@ public class HL7ADTMessageTest {
                                 + "EVN|A01|20150502090000|\n"
                                 + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
                                 + "NK1|1|Kennedy^Joe|FTH|||+44 201 12345678||\n"
-                                + "PV1||I|INT^0001^02^ACME||||0100^ANDERSON^CARL|0148^SMITH^JAMES||SUR|||||||0148^ANDERSON^CARL|S|VisitNumber^^^ACME|A|||||||||||||||||||ACME|||||20150502090000|\n"
-                                + "AL1|1|DA|1605^acetaminophen^L|MO|Muscle Pain~hair loss\r";
+                                + "PV1||I||||||||SUR||||||||S|VisitNumber^^^ACME|A||||||||||||||||||||||||20150502090000|\n";
 
                 HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
-                String json = ftv.convert(hl7message, OPTIONS);
+                String json = ftv.convert(hl7message, OPTIONS_PRETTYPRINT);
                 assertThat(json).isNotBlank();
                 LOGGER.info("FHIR json result:\n" + json);
                 IBaseResource bundleResource = context.getParser().parseResource(json);
@@ -290,6 +310,9 @@ public class HL7ADTMessageTest {
                 Bundle b = (Bundle) bundleResource;
                 List<BundleEntryComponent> e = b.getEntry();
 
+                // Expecting 2 total resources
+                assertThat(e.size()).isEqualTo(2);
+                                
                 List<Resource> patientResource = e.stream()
                                 .filter(v -> ResourceType.Patient == v.getResource().getResourceType())
                                 .map(BundleEntryComponent::getResource).collect(Collectors.toList());
@@ -308,8 +331,7 @@ public class HL7ADTMessageTest {
                                 + "EVN|A01|20150502090000|\n"
                                 + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
                                 + "NK1|1|Kennedy^Joe|FTH|||+44 201 12345678||\n"
-                                + "PV1||I|INT^0001^02^ACME||||0100^ANDERSON^CARL|0148^SMITH^JAMES||SUR|||||||0148^ANDERSON^CARL|S|VisitNumber^^^ACME|A|||||||||||||||||||ACME|||||20150502090000|\n"
-                                + "AL1|1|DA|1605^acetaminophen^L|MO|Muscle Pain~hair loss\r";
+                                + "PV1||I||||||||SUR||||||||S|VisitNumber^^^ACME|A||||||||||||||||||||||||20150502090000|\n";
 
                 HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
                 String json = ftv.convert(hl7message, OPTIONS);
@@ -320,6 +342,9 @@ public class HL7ADTMessageTest {
                 Bundle b = (Bundle) bundleResource;
                 List<BundleEntryComponent> e = b.getEntry();
                 
+                // Expecting 2 total resources
+                assertThat(e.size()).isEqualTo(2);
+                                
                 List<Resource> patientResource = e.stream()
                                 .filter(v -> ResourceType.Patient == v.getResource().getResourceType())
                                 .map(BundleEntryComponent::getResource).collect(Collectors.toList());
@@ -348,6 +373,9 @@ public class HL7ADTMessageTest {
                 Bundle b = (Bundle) bundleResource;
                 List<BundleEntryComponent> e = b.getEntry();
 
+                // Expecting 2 total resources
+                assertThat(e.size()).isEqualTo(2);
+                                
                 // There should be two patient resources, the PID patient and the MRG patient.
                 List<Resource> patientResource = e.stream()
                                 .filter(v -> ResourceType.Patient == v.getResource().getResourceType())
@@ -379,6 +407,9 @@ public class HL7ADTMessageTest {
                 Bundle b = (Bundle) bundleResource;
                 List<BundleEntryComponent> e = b.getEntry();
 
+                // Expecting 2 total resources
+                assertThat(e.size()).isEqualTo(2);
+                                
                 // There should be two patient resources, the PID patient and the MRG patient.
                 List<Resource> patientResource = e.stream()
                                 .filter(v -> ResourceType.Patient == v.getResource().getResourceType())
