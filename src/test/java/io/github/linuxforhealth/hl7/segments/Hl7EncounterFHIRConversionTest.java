@@ -673,22 +673,6 @@ public class Hl7EncounterFHIRConversionTest {
 
     }
 
-    @Disabled("type is not yet implmemented. tracking down issue")
-    @Test
-    public void test_encounter_type_PV1_4() {
-        String hl7message = "MSH|^~\\\\&|SE050|050|PACS|050|20120912011230||ADT^A01|102|T|2.6|||AL|NE|764|||||||^4086::132:2A57:3C28^IPv6\n"
-                + "PID|0010||PID1234^5^M11^A^MR^HOSP~1234568965^^^USA^SS||DOE^JOHN^A^||19800202|F||W|111 TEST_STREET_NAME^^TEST_CITY^NY^111-1111^USA||(905)111-1111|||S|ZZ|12^^^124|34-13-312||||TEST_BIRTH_PLACE\n"
-                + "PV1|1|ff|yyy|EL|ABC||200^ATTEND_DOC_FAMILY_TEST^ATTEND_DOC_GIVEN_TEST|201^REFER_DOC_FAMILY_TEST^REFER_DOC_GIVEN_TEST|202^CONSULTING_DOC_FAMILY_TEST^CONSULTING_DOC_GIVEN_TEST|MED|||||B6|E|272^ADMITTING_DOC_FAMILY_TEST^ADMITTING_DOC_GIVEN_TEST||48390|||||||||||||||||||||||||201409122200|";
-
-        Encounter encounter = ResourceUtils.getEncounter(hl7message);
-
-        List<CodeableConcept> types = encounter.getType();
-        assertThat(types).hasSize(1);
-
-        assertThat(types.get(0).getText()).isEqualTo("E");
-
-    }
-
     @Test
     @Disabled
     public void test_encounter_participant_list() {
