@@ -109,6 +109,7 @@ content:
       # TODO: in future, if other than plain text, create a mapping
       # contentType: TXA.3 | OBX.2
       creationDate: TXA.7
+      contentData: OBX.5
    constants: 
       contentType: "text/plain"   
 
