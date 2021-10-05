@@ -22,6 +22,8 @@ import org.hl7.fhir.r4.model.Resource;
 import org.hl7.fhir.r4.model.ResourceType;
 import org.hl7.fhir.r4.model.Specimen;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import com.google.common.collect.Lists;
 import io.github.linuxforhealth.api.ResourceModel;
 import io.github.linuxforhealth.fhir.FHIRContext;
@@ -30,6 +32,7 @@ import io.github.linuxforhealth.hl7.resource.ResourceReader;
 public class Hl7MessageTest {
   private static FHIRContext context = new FHIRContext(true, false);
   private static HL7MessageEngine engine = new HL7MessageEngine(context);
+  private static final Logger LOGGER = LoggerFactory.getLogger(Hl7MessageTest.class);
 
   @Test
   public void test_patient() throws IOException {
@@ -627,7 +630,7 @@ public class Hl7MessageTest {
             + "AL1|1|DRUG|00000741^OXYCODONE||HYPOTENSION\r"
             + "AL1|2|DRUG|00001433^TRAMADOL||SEIZURES~VOMITING\r";
     String json = message.convert(hl7message, engine);
-    System.out.println(json);
+    LOGGER.info(json);
     IBaseResource bundleResource = context.getParser().parseResource(json);
     assertThat(bundleResource).isNotNull();
     Bundle b = (Bundle) bundleResource;

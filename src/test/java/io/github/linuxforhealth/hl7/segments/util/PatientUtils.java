@@ -17,6 +17,9 @@ import org.hl7.fhir.r4.model.Resource;
 import org.hl7.fhir.r4.model.ResourceType;
 import org.hl7.fhir.r4.model.Patient;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import io.github.linuxforhealth.fhir.FHIRContext;
 import io.github.linuxforhealth.hl7.ConverterOptions;
 import io.github.linuxforhealth.hl7.ConverterOptions.Builder;
@@ -24,6 +27,7 @@ import io.github.linuxforhealth.hl7.HL7ToFHIRConverter;
 
 public class PatientUtils  {
 
+  private static final Logger LOGGER = LoggerFactory.getLogger(PatientUtils.class);
   private static FHIRContext context = new FHIRContext();
   public static final ConverterOptions OPTIONS =
     new Builder().withValidateResource().withPrettyPrint().build();
@@ -31,7 +35,7 @@ public class PatientUtils  {
   public static Patient createPatientFromHl7Segment(String inputSegment){
     HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
     String json = ftv.convert(inputSegment, OPTIONS);
-    System.out.println(json);
+    LOGGER.info(json);
     assertThat(json).isNotBlank();
     FHIRContext context = new FHIRContext();
     IBaseResource bundleResource = context.getParser().parseResource(json);
