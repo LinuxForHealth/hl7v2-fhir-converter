@@ -48,5 +48,5 @@ resources:
         - MSH
         - PID
         - COMMON_ORDER.ORC
-        - OBR
+        - COMMON_ORDER.OBR
         - OBSERVATION.OBX
