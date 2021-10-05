@@ -113,7 +113,7 @@ public class HL7ADTMessageTest {
                 assertThat(conditionResource).hasSize(1);
         }
 
-        @Test@Disabled
+        @Test@Disabled("adt-a02 not yet supported")
         public void test_adta02_patient_encounter_present() throws IOException {
                 String hl7message = "MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||ADT^A02|controlID|P|2.6\n"
                                 + "EVN|A01|20150502090000|\n"
@@ -146,7 +146,7 @@ public class HL7ADTMessageTest {
 
         }
 
-        @Test@Disabled
+        @Test@Disabled("adt-a03 not yet supported")
         public void test_adta03_patient_encounter_present() throws IOException {
                 String hl7message = "MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||ADT^A03|controlID|P|2.6\n"
                                 + "EVN|A01|20150502090000|\n"
@@ -180,7 +180,7 @@ public class HL7ADTMessageTest {
 
 
 
-        @Test@Disabled
+        @Test@Disabled("adt-a04 not yet supported")
         public void test_adta04_patient_encounter_present() throws IOException {
                 String hl7message = "MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||ADT^A04|controlID|P|2.6\n"
                                 + "EVN|A01|20150502090000|\n"
@@ -293,7 +293,7 @@ public class HL7ADTMessageTest {
 
         }
 
-        @Test@Disabled
+        @Test@Disabled("adt-a28 not yet supported")
         public void test_adta28_patient_encounter_present() throws IOException {
                 String hl7message = "MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||ADT^A28|controlID|P|2.6\n"
                                 + "EVN|A01|20150502090000|\n"
@@ -325,7 +325,7 @@ public class HL7ADTMessageTest {
 
         }
 
-        @Test@Disabled
+        @Test@Disabled("adt-a31 not yet supported")
         public void test_adta31_patient_encounter_present() throws IOException {
                 String hl7message = "MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||ADT^A31|controlID|P|2.6\n"
                                 + "EVN|A01|20150502090000|\n"

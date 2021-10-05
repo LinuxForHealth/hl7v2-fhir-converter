@@ -143,7 +143,7 @@ public class Hl7EncounterFHIRConversionTest {
      // ADT_A34 and ADT_A40 do not create encounters so they do not need to be tested here
     })
     public void test_encounter_with_serviceProvider_from_PV2(String msh) {
-        String hl7message = msh //"MSH|^~\\&|WHI_LOAD_GENERATOR|IBM_TORONTO_LAB||IBM|20210330144208|8078780|ADT^A02|MSGID_4e1c575f-6c6d-47b2-ab9f-829f20c96db2|T|2.3\n"
+        String hl7message = msh
                 + "EVN||20210330144208||ADT_EVENT|007|20210309140700\n"
                 + "PID|1||0a8a1752-e336-43e1-bf7f-0c8f6f437ca3^^^MRN||Patient^Load^Generator||19690720|M|Patient^Alias^Generator|AA|9999^^CITY^STATE^ZIP^CAN|COUNTY|(866)845-0900||ENGLISH^ENGLISH|SIN|NONE|Account_0a8a1752-e336-43e1-bf7f-0c8f6f437ca3|123-456-7890|||N|BIRTH PLACE|N||||||N\n"
                 + "PV1||I|^^^Toronto^^5642 Hilly Av||||2905^Doctor^Attending^M^IV^^M.D|5755^Doctor^Referring^^Sr|770542^Doctor^Consulting^Jr||||||||59367^Doctor^Admitting||Visit_0a3be81e-144b-4885-9b4e-c5cd33c8f038|||||||||||||||||||||||||20210407191342\n"
