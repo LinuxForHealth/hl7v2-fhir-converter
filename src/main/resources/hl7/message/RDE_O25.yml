@@ -41,9 +41,9 @@ resources:
     additionalSegments:
       - MSH
       - .ORC
-      - .ORDER_DETAIL.RXO
       - PATIENT.PATIENT_VISIT.PV1
       - PATIENT.PID
+      # RXO not included on purpose, only want to use RXE for RDE messages
 
   - resourceName: AllergyIntolerance
     segment: PATIENT.AL1

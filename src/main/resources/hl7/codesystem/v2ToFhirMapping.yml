@@ -119,6 +119,43 @@ V3MaritalStatus:
   U: U
   W: W
 
+DocumentReferenceStatus: #DocumenReference Status
+  #TXA.19
+  AV: current
+  CA: entered-in-error
+  OB: superseded
+  UN: current
+  #OBR.25
+  A: current
+  C: current
+  F: current
+  I: current
+  O: current
+  P: current
+  R: current
+  S: current
+  X: entered-in-error
+
+CompositionStatus: #DocumenReference docStatus
+  #TXA.17
+  AU: final
+  DI: preliminary
+  DO: preliminary
+  IN: preliminary
+  IP: preliminary
+  PA: preliminary
+  LA: final
+  #OBX.11
+  C: final
+  F: final
+  I: preliminary
+  P: preliminary
+  R: preliminary
+  S: preliminary
+  U: final
+  W: entered-in-error
+  # We are not mapping D,N,O,X - those values will result in this field not being set
+
 V3Race:
   # American Indian or Alaska Native	
   1002-5: 1002-5

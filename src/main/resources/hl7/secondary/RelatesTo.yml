@@ -1,0 +1,19 @@
+#
+# (C) Copyright IBM Corp. 2021
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+---
+code:
+  type: STRING
+  valueOf: $val
+  constants:
+    val: "appends"
+
+target:
+  valueOf: resource/DocumentReference
+  expressionType: reference
+  specs: $relatesRef
+
+
+

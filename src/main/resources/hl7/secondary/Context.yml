@@ -1,0 +1,19 @@
+#
+# (C) Copyright IBM Corp. 2021
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+---
+period:
+  valueOf: datatype/Period
+  expressionType: resource
+  vars:
+    start: $timestamp
+
+related:
+  valueOf: resource/Practitioner
+  expressionType: reference
+  specs: $providerCode
+
+
+

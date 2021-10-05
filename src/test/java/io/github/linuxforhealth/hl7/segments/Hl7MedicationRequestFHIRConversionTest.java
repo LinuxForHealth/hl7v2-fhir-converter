@@ -234,7 +234,7 @@ public class Hl7MedicationRequestFHIRConversionTest {
     
     // Tests medication request fields MedicationCodeableConcept, Authored On, and Intent.
     // Tests with supported message types RDE-O11, RDE-O25.
-    // With both RXO and RXE segments.
+    // With both RXO and RXE segments, only RXE will be used.
     @ParameterizedTest
     @ValueSource(strings = 
     { 
@@ -283,10 +283,10 @@ public class Hl7MedicationRequestFHIRConversionTest {
         //Very medicationCodeableConcept is set correctly
         assertThat(medicationRequest.hasMedicationCodeableConcept()).isTrue();
         CodeableConcept medCC = medicationRequest.getMedicationCodeableConcept();
-        assertThat(medCC.getText()).isEqualTo("Test15 SODIUM 100 MG CAPSULE");
-        assertThat(medCC.getCoding().get(0).getSystem()).isEqualTo("http://hl7.org/fhir/sid/ndc");
-        assertThat(medCC.getCoding().get(0).getCode()).isEqualTo("RX800006");
-        assertThat(medCC.getCoding().get(0).getDisplay()).isEqualTo("Test15 SODIUM 100 MG CAPSULE");
+        assertThat(medCC.getText()).isEqualTo("3 ML PLAS CONT : IPRATROPIUM-ALBUTEROL 0.5-2.5 (3) MG/3ML IN SOLN");
+        assertThat(medCC.getCoding().get(0).getSystem()).isEqualTo("urn:id:ADS");
+        assertThat(medCC.getCoding().get(0).getCode()).isEqualTo("DUONEB3INH");
+        assertThat(medCC.getCoding().get(0).getDisplay()).isEqualTo("3 ML PLAS CONT : IPRATROPIUM-ALBUTEROL 0.5-2.5 (3) MG/3ML IN SOLN");
 
     }   
 
@@ -414,7 +414,7 @@ public class Hl7MedicationRequestFHIRConversionTest {
                 + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
                 + "PRB|AD|20140610234741|^oxygenase|Problem_000054321_20190606193536||20140610234741\n"
                 + "ORC|NW|F800006^OE|P800006^RX|||E|10^BID^D4^^^R||20180622230000\n"
-                + "OBR|1|CD150920001336|CD150920001336|||20150930000000|20150930164100|||||||||25055^MARCUSON^PATRICIA^L|||||||||F|||5755^DUNN^CHAD^B~25055^MARCUSON^PATRICIA^L|||WEAKNESS|DAS, SURJYA P||SHIELDS, SHARON A|||||||||\n"
+                + "OBR|1|||555|||20170825010500||||||||||||||||||F\r"
                 + "RXO|RX800006^Test15 SODIUM 100 MG CAPSULE^NDC||100||mg|||||G||10||5\n";
 
         HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
@@ -447,6 +447,61 @@ public class Hl7MedicationRequestFHIRConversionTest {
         assertThat(medCC.getCoding().get(0).getSystem()).isEqualTo("http://hl7.org/fhir/sid/ndc");
         assertThat(medCC.getCoding().get(0).getCode()).isEqualTo("RX800006");
         assertThat(medCC.getCoding().get(0).getDisplay()).isEqualTo("Test15 SODIUM 100 MG CAPSULE");
+
+    }
+
+    // Another test for medication request fields MedicationCodeableConcept and Intent 
+    // in a PPR_PCx message. Slightly different message (has a PV segment).
+    // Tests with supported message types PPR-PC1, PPR-PC2, PPR-PC3
+    // With just the RXO segment -- these message types don't support RXE.
+    @ParameterizedTest
+    @ValueSource(strings = 
+    { 
+    "MSH|^~\\&||||||S1|PPR^PC1||T|2.6|||||||||\r",
+    // --UNCOMMENT BELOW WHEN CONVERTER SUPPORTS THIS MESSAGE TYPE--
+    // "MSH|^~\\&||||||S1|PPR^PC2||T|2.6|||||||||\r",
+    // "MSH|^~\\&||||||S1|PPR^PC3||T|2.6|||||||||\r",
+    })
+    public void testMedicationRequestInPPRWithAPatientVisit() {
+
+        String hl7message = "MSH|^~\\&||||||S1|PPR^PC1||T|2.6|||||||||\r"
+                + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\r"
+                + "PV1||I|6N^1234^A^GENHOS||||0100^ANDERSON^CARL|0148^ADDISON^JAMES||SUR|||||||0148^ANDERSON^CARL|S|1400|A|||||||||||||||||||SF|K||||199501102300\r"
+                + "PRB|AD|20141015103243|15777000^Prediabetes (disorder)^SNM|654321^^OtherSoftware.ProblemOID|||20120101||\r"
+                + "ORC|NW|F800006^OE|P800006^RX|||E|10^BID^D4^^^R||20180622230000\r"
+                + "OBR|1|||555|||20170825010500||||||||||||||||||F\r"
+                + "RXO|65862-063-01^METOPROLOL TARTRATE^NDC||||Tablet||||||||2|2|AP1234567||||325|mg\r";
+
+        HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
+        String json = ftv.convert(hl7message, PatientUtils.OPTIONS);
+        assertThat(json).isNotBlank();
+        LOGGER.info("FHIR json result:\n" + json);
+
+        IBaseResource bundleResource = context.getParser().parseResource(json);
+        assertThat(bundleResource).isNotNull();
+        Bundle b = (Bundle) bundleResource;
+        List<BundleEntryComponent> e = b.getEntry();
+
+        List<Resource> medicationRequestList = e.stream()
+                .filter(v -> ResourceType.MedicationRequest == v.getResource().getResourceType())
+                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        assertThat(medicationRequestList).hasSize(1);
+        MedicationRequest medicationRequest = ResourceUtils.getResourceMedicationRequest(medicationRequestList.get(0), context);
+
+        // Verify authored on is not present
+        assertThat(medicationRequest.getAuthoredOn()).isNull();
+
+        //Verify intent is set correctly
+        String intent = medicationRequest.getIntent().toString();
+        assertThat(intent).isEqualTo("ORDER");
+
+        //Very medicationCodeableConcept is set correctly
+        assertThat(medicationRequest.hasMedicationCodeableConcept()).isTrue();
+        CodeableConcept medCC = medicationRequest.getMedicationCodeableConcept();
+        assertThat(medCC.getText()).isEqualTo("METOPROLOL TARTRATE");
+        assertThat(medCC.getCoding().get(0).getSystem()).isEqualTo("http://hl7.org/fhir/sid/ndc");
+        assertThat(medCC.getCoding().get(0).getCode()).isEqualTo("65862-063-01");
+        assertThat(medCC.getCoding().get(0).getDisplay()).isEqualTo("METOPROLOL TARTRATE");
 
     }
 
