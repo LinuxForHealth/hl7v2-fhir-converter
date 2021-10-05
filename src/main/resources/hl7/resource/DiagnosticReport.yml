@@ -114,7 +114,7 @@ basedOn:
    expressionType: reference
    specs: ORC
    vars:
-      basedOnORC: ORC      
+      basedOnORC: ORC
 
 specimen:
    valueOf: datatype/Reference
