@@ -228,7 +228,7 @@ public class Hl7EncounterFHIRConversionTest {
     }
 
     // Test for serviceProvider reference in ADT messages with PV1 segment and no PV2 segment
-    // Part 1: serviceProvider from PV1-3.4.1
+    // Use serviceProvider from PV1-3.4.1
     @ParameterizedTest
     @ValueSource(strings = { "MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||ADT^A01|controlID|P|2.6\r",
      //"MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||ADT^A02|controlID|P|2.6\r",
@@ -264,7 +264,7 @@ public class Hl7EncounterFHIRConversionTest {
         Reference serviceProvider = encounter.getServiceProvider();
         assertThat(serviceProvider).isNotNull();
         String providerString = serviceProvider.getReference();
-        assertThat(providerString).isEqualTo("Organization/Toronto.East"); // Also verify underscore replacement for Utility.formatAsId
+        assertThat(providerString).isEqualTo("Organization/toronto.east"); // Also verify underscore replacement for Utility.formatAsId
 
         List<Resource> organizations = e.stream()
                 .filter(v -> ResourceType.Organization == v.getResource().getResourceType())
@@ -276,54 +276,6 @@ public class Hl7EncounterFHIRConversionTest {
         assertThat(orgResource.getName()).isEqualTo("Toronto East");
     }
 
-    // Test for serviceProvider reference in ADT messages with PV1 segment and no PV2 segment
-    // Part 2: alternate serviceProvider ID from PV1.39
-    @ParameterizedTest
-    @ValueSource(strings = { "MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||ADT^A01|controlID|P|2.6\r",
-     //"MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||ADT^A02|controlID|P|2.6\r",
-     //"MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||ADT^A03|controlID|P|2.6\r",
-     //"MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||ADT^A04|controlID|P|2.6\r",
-     "MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||ADT^A08|controlID|P|2.6\r",
-     //"MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||ADT^A28|controlID|P|2.6\r",
-     //"MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||ADT^A31|controlID|P|2.6\r"
-     // ADT_A34 and ADT_A40 do not create encounters so they do not need to be tested here
-    })
-    public void test_encounter_with_serviceProvider_from_PV1_39(String msh) {
-        String hl7message =  msh
-                +"EVN|A01|20150502090000|\n"
-                +"PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
-                // PV1-3.4 empty and PV1-39 used for serviceProvider reference
-                +"PV1||I||||||||SUR||||||||S|VisitNumber^^^Toronto North|A|||||||||||||||||||Toronto West||||||\n";
- 
-        HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
-        String json = ftv.convert(hl7message, OPTIONS);
-        assertThat(json).isNotBlank();
-        LOGGER.info("FHIR json result:\n" + json);
-
-        IBaseResource bundleResource = context.getParser().parseResource(json);
-        assertThat(bundleResource).isNotNull();
-        Bundle b = (Bundle) bundleResource;
-        List<BundleEntryComponent> e = b.getEntry();
-        List<Resource> encounterResource = e.stream()
-                .filter(v -> ResourceType.Encounter == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
-        assertThat(encounterResource).hasSize(1);
-
-        Encounter encounter = ResourceUtils.getResourceEncounter(encounterResource.get(0), context);
-        Reference serviceProvider = encounter.getServiceProvider();
-        assertThat(serviceProvider).isNotNull();
-        String providerString = serviceProvider.getReference();
-        assertThat(providerString).isEqualTo("Organization/toronto.east"); // Also verify use of Utility.formatAsId
-
-        List<Resource> organizations = e.stream()
-                .filter(v -> ResourceType.Organization == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
-        assertThat(organizations).hasSize(1);
-
-        Organization orgResource = ResourceUtils.getResourceOrganization(organizations.get(0), context);
-        assertThat(orgResource.getId()).isEqualTo(providerString);
-        assertThat(orgResource.getName()).isEqualTo("Toronto East");
-    }
 
     @Test
     public void test_encounter_PV2_serviceProvider_idfix() {
