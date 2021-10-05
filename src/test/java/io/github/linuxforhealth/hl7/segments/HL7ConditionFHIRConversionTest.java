@@ -33,12 +33,13 @@ public class HL7ConditionFHIRConversionTest {
     // This tests all the fields in the happy path.
     @ParameterizedTest
     @ValueSource(strings = { "MSH|^~\\&|||||||ADT^A01^ADT_A01|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6||||||\r",
-    // "MSH|^~\\&|||||||ADT^A03|64322|P|2.4|123|456|ER|AL|USA|ASCII|en|2.4||||||\r",
-    // "MSH|^~\\&|||||||ADT^A04|64322|P|2.4|123|456|ER|AL|USA|ASCII|en|2.4||||||\r",
-    // "MSH|^~\\&|||||||ADT^A08|64322|P|2.4|123|456|ER|AL|USA|ASCII|en|2.4||||||\r",
-    // "MSH|^~\\&|||||||ADT^A28^ADT^A28|64322|P|2.4|123|456|ER|AL|USA|ASCII|en|2.4||||||\r",
-    // "MSH|^~\\&|||||||ADT^A31|64322|P|2.4|123|456|ER|AL|USA|ASCII|en|2.4||||||\r",
-    // "MSH|^~\\&|||||||ORM^O01|64322|P|2.4|123|456|ER|AL|USA|ASCII|en|2.4||||||\r"
+    // "MSH|^~\\&|||||||ADT^A03|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6||||||\r",
+    // "MSH|^~\\&|||||||ADT^A04|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6||||||\r",
+    "MSH|^~\\&|||||||ADT^A08|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6||||||\r",
+    // "MSH|^~\\&|||||||ADT^A28^ADT^A28|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6||||||\r",
+    // "MSH|^~\\&|||||||ADT^A31|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6||||||\r",
+    // "MSH|^~\\&|||||||ORM^O01|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6||||||\r"
+    // PPR_PC1, PPR_PC2, and PPR_PC3 create Conditions but they don't have a DG1 segment so they are tested in a different testcase.
     })
     public void validateDiagnosis(String msh) {
 
