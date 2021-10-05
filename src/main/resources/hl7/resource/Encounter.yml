@@ -241,6 +241,6 @@ serviceProvider:
       valueOf: resource/Organization_ServiceProvider
       expressionType: reference
       vars:
-            idValue: PV2.23.8 | PV1.3.4.1 | PV1.39
+            idValue: PV2.23.8 | PV1.3.4.1
             name: PV2.23.1 | PV1.3.4.1
 

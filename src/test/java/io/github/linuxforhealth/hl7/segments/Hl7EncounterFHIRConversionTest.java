@@ -92,7 +92,6 @@ public class Hl7EncounterFHIRConversionTest {
         assertEquals(
                 "<div xmlns=\"http://www.w3.org/1999/xhtml\"><p>&lt;This field&gt; should be found &quot;Encounter.text&quot; &amp; formatted as xhtml with correct escaped characters.<br/>HL7 newline should be processed as well</p></div>",
                 encText.getDivAsString());
-
     }
 
     @Test
@@ -126,7 +125,6 @@ public class Hl7EncounterFHIRConversionTest {
         Narrative encText = encounter.getText();
         assertNull(encText.getStatus());
         assertThat(encText.getDiv().getChildNodes()).isEmpty();
-
     }
 
     @Test
@@ -163,7 +161,7 @@ public class Hl7EncounterFHIRConversionTest {
                 .map(BundleEntryComponent::getResource).collect(Collectors.toList());
         assertThat(organizations).hasSize(1);
 
-        Organization orgResource = ResourceUtils.getResourceOrganization(organizations.get(0),context);
+        Organization orgResource = ResourceUtils.getResourceOrganization(organizations.get(0), context);
         assertThat(orgResource.getId()).isEqualTo(providerString);
         assertThat(orgResource.getName()).isEqualTo("South Shore Hosptial Weymouth");
     }
@@ -202,21 +200,20 @@ public class Hl7EncounterFHIRConversionTest {
                 .map(BundleEntryComponent::getResource).collect(Collectors.toList());
         assertThat(organizations).hasSize(1);
 
-        Organization orgResource = ResourceUtils.getResourceOrganization(organizations.get(0),context);
+        Organization orgResource = ResourceUtils.getResourceOrganization(organizations.get(0), context);
         assertThat(orgResource.getId()).isEqualTo(providerString);
         assertThat(orgResource.getName()).isEqualTo("South Shore Hosptial Weymouth");
     }
 
-
     // Test for serviceProvider reference in ADT_A01 message with only a PV1 segment
     @Test
     public void testEncounterADTA01PV1onlyServiceProvider() {
-        String hl7message =  "MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||ADT^A01|controlID|P|2.6\n"
-                +"EVN|A01|20150502090000|\n"
-                +"PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
+        String hl7message = "MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||ADT^A01|controlID|P|2.6\n"
+                + "EVN|A01|20150502090000|\n"
+                + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
                 // PV1-3.4 used for serviceProvider reference; used for both id and name
-                +"PV1||I|INT^0001^02^Toronto East|||||||SUR||||||||S|VisitNumber^^^Toronto North|A|||||||||||||||||||Toronto West||||||\n";
- 
+                + "PV1||I|INT^0001^02^Toronto East|||||||SUR||||||||S|VisitNumber^^^Toronto North|A|||||||||||||||||||Toronto West||||||\n";
+
         HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
         String json = ftv.convert(hl7message, OPTIONS);
         assertThat(json).isNotBlank();
@@ -242,51 +239,10 @@ public class Hl7EncounterFHIRConversionTest {
                 .map(BundleEntryComponent::getResource).collect(Collectors.toList());
         assertThat(organizations).hasSize(1);
 
-        Organization orgResource = ResourceUtils.getResourceOrganization(organizations.get(0),context);
+        Organization orgResource = ResourceUtils.getResourceOrganization(organizations.get(0), context);
         assertThat(orgResource.getId()).isEqualTo(providerString);
         assertThat(orgResource.getName()).isEqualTo("Toronto East");
     }
-
-    // Test for serviceProvider reference in ADT_A01 message with only a PV1 segment,
-    // Part 2: alternate serviceProvider ID
-    @Test
-    public void testEncounterADTA01PV1onlyServiceProvider2() {
-        String hl7message =  "MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||ADT^A01|controlID|P|2.6\n"
-                +"EVN|A01|20150502090000|\n"
-                +"PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
-                // PV1-3.4 empty and PV1-39 used for serviceProvider reference
-                +"PV1||I||||||||SUR||||||||S|VisitNumber^^^Toronto North|A|||||||||||||||||||Toronto West||||||\n";
- 
-        HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
-        String json = ftv.convert(hl7message, OPTIONS);
-        assertThat(json).isNotBlank();
-        LOGGER.info("FHIR json result:\n" + json);
-
-        IBaseResource bundleResource = context.getParser().parseResource(json);
-        assertThat(bundleResource).isNotNull();
-        Bundle b = (Bundle) bundleResource;
-        List<BundleEntryComponent> e = b.getEntry();
-        List<Resource> encounterResource = e.stream()
-                .filter(v -> ResourceType.Encounter == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
-        assertThat(encounterResource).hasSize(1);
-
-        Encounter encounter = ResourceUtils.getResourceEncounter(encounterResource.get(0), context);
-        Reference serviceProvider = encounter.getServiceProvider();
-        assertThat(serviceProvider).isNotNull();
-        String providerString = serviceProvider.getReference();
-        assertThat(providerString).isEqualTo("Organization/toronto.west"); // Also verify use of Utility.formatAsId
-
-        List<Resource> organizations = e.stream()
-                .filter(v -> ResourceType.Organization == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
-        assertThat(organizations).hasSize(1);
-
-        Organization orgResource = ResourceUtils.getResourceOrganization(organizations.get(0),context);
-        assertThat(orgResource.getId()).isEqualTo(providerString);
-        assertThat(orgResource.getName()).isNull(); // No name when using PV1-39
-    }
-
 
     @Test
     @Disabled
@@ -322,7 +278,7 @@ public class Hl7EncounterFHIRConversionTest {
                 .map(BundleEntryComponent::getResource).collect(Collectors.toList());
         assertThat(organizations).hasSize(1);
 
-        Organization orgResource = ResourceUtils.getResourceOrganization(organizations.get(0),context);
+        Organization orgResource = ResourceUtils.getResourceOrganization(organizations.get(0), context);
         assertThat(orgResource.getId()).isEqualTo(providerString);
         assertThat(orgResource.getName()).isEqualTo("South Shore Hosptial Weymouth");
     }
@@ -356,7 +312,6 @@ public class Hl7EncounterFHIRConversionTest {
         assertThat(encounterClass.getSystem()).isNull();
         assertThat(encounterClass.getDisplay()).isNull();
         assertThat(encounterClass.getVersion()).isNull();
-
     }
 
     @Test
@@ -434,9 +389,7 @@ public class Hl7EncounterFHIRConversionTest {
                 + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
                 // PV1.44 present; PV1.45 present
                 + "PV1|1|E||||||||||||||||||||||||||||||||||||||||||20161013154626|20161014154634|||||||\n";
-
         Encounter encounter = ResourceUtils.getEncounter(hl7message);
-
         assertThat(encounter.hasLength()).isTrue();
         Duration encounterLength = encounter.getLength();
         assertThat(encounterLength.getValue()).isEqualTo((BigDecimal.valueOf(1440)));
@@ -452,13 +405,11 @@ public class Hl7EncounterFHIRConversionTest {
                 + "PV1|1|E|||||||||||||||||||||||||||||||||||||||||||20171018154634|||||||\n"
                 // PV2.11 present
                 + "PV2|||||||||||3|||||||||||||||||||||||||||||||||||||||||||||||\n";
-
         encounter = ResourceUtils.getEncounter(hl7message);
-
         assertThat(encounter.hasLength()).isTrue();
         encounterLength = encounter.getLength();
         assertThat(encounterLength.getValue()).isEqualTo((BigDecimal.valueOf(3)));
-        assertThat(encounterLength.getUnit()).isEqualTo("days");  
+        assertThat(encounterLength.getUnit()).isEqualTo("days");
         assertThat(encounterLength.getCode()).isEqualTo("d");
         assertThat(encounterLength.getSystem()).isEqualTo("http://unitsofmeasure.org");
 
@@ -470,23 +421,18 @@ public class Hl7EncounterFHIRConversionTest {
                 + "PV1|1|E|||||||||||||||||||||||||||||||||||||||||||20171018154634|||||||\n"
                 // PV2.11 empty
                 + "PV2|||vomits|||||||||||||||||||||||||||||||||||||||||||||||||||||||\n";
-        
         encounter = ResourceUtils.getEncounter(hl7message);
-
         assertThat(encounter.hasLength()).isFalse();
 
         // If PV1.44 and PV1.45 are present with a date only (no minutes time), and there is no PV2.11 then nothing  
         // Because dates can't be evaluated to minutes
         hl7message = "MSH|^~\\&|PROSOLV||||20151008111200||ADT^A01^ADT_A01|MSGID000001|T|2.6|||||||||\n"
-        + "EVN|A04|20151008111200|||||\n"
-        + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
-        // PV1.44 present; PV1.45 present; but they have no minutes, so they will not be used
-        + "PV1|1|E||||||||||||||||||||||||||||||||||||||||||20161014|20161015|||||||\n";
-
+                + "EVN|A04|20151008111200|||||\n"
+                + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
+                // PV1.44 present; PV1.45 present; but they have no minutes, so they will not be used
+                + "PV1|1|E||||||||||||||||||||||||||||||||||||||||||20161014|20161015|||||||\n";
         encounter = ResourceUtils.getEncounter(hl7message);
-
         assertThat(encounter.hasLength()).isFalse();
-
     }
 
     @Test
@@ -496,30 +442,24 @@ public class Hl7EncounterFHIRConversionTest {
                 + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
                 + "PV1|1|E|SAN JOSE|A|10089|MILPITAS|2740^Torres^Callie|2913^Grey^Meredith^F|3065^Sloan^Mark^J|CAR|FOSTER CITY|AD|R|1|A4|VI|9052^Shepeard^Derek^|AH|10019181|FIC1002|IC|CC|CR|CO|20161012034052|60000|6|AC|GHBR|20160926054052|AC5678|45000|15000|D|20161016154413|DCD|SAN FRANCISCO|VEG|RE|O|AV|FREMONT|CALIFORNIA|20161013154626|20161014154634|10000|14000|2000|4000|POL8009|V|PHY6007\n"
                 + "PV2|SAN BRUNO|AC4567|vomits|less equipped|purse|SAN MATEO|HO|20171014154626|20171018154634|4|3|DIAHHOREA|RSA456|20161013154626|Y|D|20191026001640|O|Y|1|F|Y|KAISER|AI|2|20161013154626|ED|20171018001900|20161013154626|10000|RR|Y|20171108002129|Y|Y|N|N|C^Car^HL70430\n";
-
         Encounter encounter = ResourceUtils.getEncounter(hl7message);
 
         List<Extension> extensionList = encounter.getExtension();
         assertNotNull(extensionList);
         assertThat(extensionList).hasSize(1);
-
         boolean extFound = false;
         for (Extension ext : extensionList) {
             if (ext.getUrl().equals("http://hl7.org/fhir/StructureDefinition/encounter-modeOfArrival")) {
                 extFound = true;
                 assertTrue(ext.getValue() instanceof Coding);
-
                 Coding valueCoding = (Coding) ext.getValue();
-
                 assertThat(valueCoding.getCode()).isEqualTo("C");
                 assertThat(valueCoding.getDisplay()).isEqualTo("Car");
                 assertThat(valueCoding.getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/v2-0430");
-
                 break;
             }
         }
         assertTrue(extFound, "modeOfArrival extension not found");
-
     }
 
     @Test
@@ -530,9 +470,7 @@ public class Hl7EncounterFHIRConversionTest {
                 + "PID|1||0a8a1752-e336-43e1-bf7f-0c8f6f437ca3^^^MRN||Patient^Load^Generator||19690720|M|Patient^Alias^Generator|AA|9999^^CITY^STATE^ZIP^CAN|COUNTY|(866)845-0900||ENGLISH^ENGLISH|SIN|NONE|Account_0a8a1752-e336-43e1-bf7f-0c8f6f437ca3|123-456-7890|||N|BIRTH PLACE|N||||||N\n"
                 + "PV1||I|^^^Toronto^^5642 Hilly Av||||2905^Doctor^Attending^M^IV^^M.D|5755^Doctor^Referring^^Sr|770542^Doctor^Consulting^Jr||||||||59367^Doctor^Admitting||Visit_0a3be81e-144b-4885-9b4e-c5cd33c8f038|||||||||||||||||||||||||20210407191342\n"
                 + "PV2||TEL||||X-5546||20210330144208|20210309||||||||||||n|N|South Shore Hosptial Weymouth^SSHW^^^^^^SSH-WEYMOUTH|||||||||N||||||AMBULATORY\n";
-
         Encounter encounter = ResourceUtils.getEncounter(hl7message);
-
         List<Extension> extensionList = encounter.getExtension();
         assertNotNull(extensionList);
         assertThat(extensionList).isNotEmpty();
@@ -542,18 +480,14 @@ public class Hl7EncounterFHIRConversionTest {
             if (ext.getUrl().equals("http://hl7.org/fhir/StructureDefinition/encounter-modeOfArrival")) {
                 extFound = true;
                 assertTrue(ext.getValue() instanceof Coding);
-
                 Coding valueCoding = (Coding) ext.getValue();
-
                 assertThat(valueCoding.getCode()).isEqualTo("AMBULATORY");
                 assertThat(valueCoding.getDisplay()).isNull();
                 assertThat(valueCoding.getSystem()).isNull();
-
                 break;
             }
         }
         assertTrue(extFound, "modeOfArrival extension not found");
-
     }
 
     @Test
@@ -564,30 +498,23 @@ public class Hl7EncounterFHIRConversionTest {
                 + "PID|1||0a8a1752-e336-43e1-bf7f-0c8f6f437ca3^^^MRN||Patient^Load^Generator||19690720|M|Patient^Alias^Generator|AA|9999^^CITY^STATE^ZIP^CAN|COUNTY|(866)845-0900||ENGLISH^ENGLISH|SIN|NONE|Account_0a8a1752-e336-43e1-bf7f-0c8f6f437ca3|123-456-7890|||N|BIRTH PLACE|N||||||N\n"
                 + "PV1||I|^^^Toronto^^5642 Hilly Av||||2905^Doctor^Attending^M^IV^^M.D|5755^Doctor^Referring^^Sr|770542^Doctor^Consulting^Jr||||||||59367^Doctor^Admitting||Visit_0a3be81e-144b-4885-9b4e-c5cd33c8f038|||||||||||||||||||||||||20210407191342\n"
                 + "PV2||TEL||||X-5546||20210330144208|20210309||||||||||||n|N|South Shore Hosptial Weymouth^SSHW^^^^^^SSH-WEYMOUTH|||||||||N||||||AMB^AMBULATORY\n";
-
         Encounter encounter = ResourceUtils.getEncounter(hl7message);
-
         List<Extension> extensionList = encounter.getExtension();
         assertNotNull(extensionList);
         assertThat(extensionList).isNotEmpty();
-
         boolean extFound = false;
         for (Extension ext : extensionList) {
             if (ext.getUrl().equals("http://hl7.org/fhir/StructureDefinition/encounter-modeOfArrival")) {
                 extFound = true;
                 assertTrue(ext.getValue() instanceof Coding);
-
                 Coding valueCoding = (Coding) ext.getValue();
-
                 assertThat(valueCoding.getCode()).isEqualTo("AMB");
                 assertThat(valueCoding.getDisplay()).isEqualTo("AMBULATORY");
                 assertThat(valueCoding.getSystem()).isNull();
-
                 break;
             }
         }
         assertTrue(extFound, "modeOfArrival extension not found");
-
     }
 
     @Test
@@ -598,30 +525,23 @@ public class Hl7EncounterFHIRConversionTest {
                 + "PID|1||0a8a1752-e336-43e1-bf7f-0c8f6f437ca3^^^MRN||Patient^Load^Generator||19690720|M|Patient^Alias^Generator|AA|9999^^CITY^STATE^ZIP^CAN|COUNTY|(866)845-0900||ENGLISH^ENGLISH|SIN|NONE|Account_0a8a1752-e336-43e1-bf7f-0c8f6f437ca3|123-456-7890|||N|BIRTH PLACE|N||||||N\n"
                 + "PV1||I|^^^Toronto^^5642 Hilly Av||||2905^Doctor^Attending^M^IV^^M.D|5755^Doctor^Referring^^Sr|770542^Doctor^Consulting^Jr||||||||59367^Doctor^Admitting||Visit_0a3be81e-144b-4885-9b4e-c5cd33c8f038|||||||||||||||||||||||||20210407191342\n"
                 + "PV2||TEL||||X-5546||20210330144208|20210309||||||||||||n|N|South Shore Hosptial Weymouth^SSHW^^^^^^SSH-WEYMOUTH|||||||||N||||||AMB^AMBULATORY^FUNKY\n";
-
         Encounter encounter = ResourceUtils.getEncounter(hl7message);
-
         List<Extension> extensionList = encounter.getExtension();
         assertNotNull(extensionList);
         assertThat(extensionList).isNotEmpty();
-
         boolean extFound = false;
         for (Extension ext : extensionList) {
             if (ext.getUrl().equals("http://hl7.org/fhir/StructureDefinition/encounter-modeOfArrival")) {
                 extFound = true;
                 assertTrue(ext.getValue() instanceof Coding);
-
                 Coding valueCoding = (Coding) ext.getValue();
-
                 assertThat(valueCoding.getCode()).isEqualTo("AMB");
                 assertThat(valueCoding.getDisplay()).isEqualTo("AMBULATORY");
                 assertThat(valueCoding.getSystem()).isEqualTo("urn:id:FUNKY");
-
                 break;
             }
         }
         assertTrue(extFound, "modeOfArrival extension not found");
-
     }
 
     @Test
@@ -631,21 +551,16 @@ public class Hl7EncounterFHIRConversionTest {
                 + "EVN||20210330144208||ADT_EVENT|007|20210309140700\n"
                 + "PID|1||0a8a1752-e336-43e1-bf7f-0c8f6f437ca3^^^MRN||Patient^Load^Generator||19690720|M|Patient^Alias^Generator|AA|9999^^CITY^STATE^ZIP^CAN|COUNTY|(866)845-0900||ENGLISH^ENGLISH|SIN|NONE|Account_0a8a1752-e336-43e1-bf7f-0c8f6f437ca3|123-456-7890|||N|BIRTH PLACE|N||||||N\n"
                 + "PV1||I|^^^^^5642 Hilly Av||||2905^Doctor^Attending^M^IV^^M.D|5755^Doctor^Referring^^Sr|770542^Doctor^Consulting^Jr||||||||59367^Doctor^Admitting||Visit_0a3be81e-144b-4885-9b4e-c5cd33c8f038|||||||||||||||||||||||||20210407191342\n";
-
         Encounter encounter = ResourceUtils.getEncounter(hl7message);
-
         Narrative encText = encounter.getText();
         assertNull(encText.getStatus());
         assertThat(encText.getDiv().getChildNodes()).isEmpty();
-
         List<Extension> extensionList = encounter.getExtension();
         assertNotNull(extensionList);
         assertThat(extensionList).isEmpty();
-
         Reference serviceProvider = encounter.getServiceProvider();
         assertThat(serviceProvider).isNotNull();
         assertThat(serviceProvider.getReference()).isNull();
-
     }
 
     @Disabled("type is not yet implmemented. tracking down issue")
@@ -654,14 +569,10 @@ public class Hl7EncounterFHIRConversionTest {
         String hl7message = "MSH|^~\\\\&|SE050|050|PACS|050|20120912011230||ADT^A01|102|T|2.6|||AL|NE|764|||||||^4086::132:2A57:3C28^IPv6\n"
                 + "PID|0010||PID1234^5^M11^A^MR^HOSP~1234568965^^^USA^SS||DOE^JOHN^A^||19800202|F||W|111 TEST_STREET_NAME^^TEST_CITY^NY^111-1111^USA||(905)111-1111|||S|ZZ|12^^^124|34-13-312||||TEST_BIRTH_PLACE\n"
                 + "PV1|1|ff|yyy|EL|ABC||200^ATTEND_DOC_FAMILY_TEST^ATTEND_DOC_GIVEN_TEST|201^REFER_DOC_FAMILY_TEST^REFER_DOC_GIVEN_TEST|202^CONSULTING_DOC_FAMILY_TEST^CONSULTING_DOC_GIVEN_TEST|MED|||||B6|E|272^ADMITTING_DOC_FAMILY_TEST^ADMITTING_DOC_GIVEN_TEST||48390|||||||||||||||||||||||||201409122200|";
-
         Encounter encounter = ResourceUtils.getEncounter(hl7message);
-
         List<CodeableConcept> types = encounter.getType();
         assertThat(types).hasSize(1);
-
         assertThat(types.get(0).getText()).isEqualTo("E");
-
     }
 
     /**
@@ -676,7 +587,6 @@ public class Hl7EncounterFHIRConversionTest {
                 // Key fields are PV1.7, PV1.8, PV1.9, and PV1.17
                 // These fields each have multiple XCNs to test they work with repeating values
                 + "PV1||I|||||2905^DoctorA^Attending^M^IV^^MD~2905-2^DoctorA2^Attending2^M2|5755^DoctorB^Referring^^Sr~5755-2^DoctorB2^Referring2^^Sr2|770542^DoctorC^Consulting^^Jr~770542-2^DoctorC2^Consulting2^^Sr||||||||59367^DoctorD^Admitting~59367-2^DoctorD2^Admitting2|||||||||||||||||||||||||||\n";
-
         HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
         String json = ftv.convert(hl7message, OPTIONS);
         assertThat(json).isNotBlank();
@@ -763,7 +673,7 @@ public class Hl7EncounterFHIRConversionTest {
 
     /**
      * Test Encounter correctly creates and references Practitioners as Participants.
-     * Sparse data test. Only one participant is  created.
+     * Sparse data test. Only one participant is created.
      */
     @Test
     public void testEncounterParticipantMissing() {
@@ -772,7 +682,6 @@ public class Hl7EncounterFHIRConversionTest {
                 + "PID|1||ABC12345^^^MRN||DOE^JANE|||||||||||||||\n"
                 // Key field is PV1.17; note that PV1.7, PV1.8, PV1.9 are purposely empty.  See companion test testEncounterParticipantList
                 + "PV1||I|||||||||||||||59367^Doctor^Admitting|||||||||||||||||||||||||||\n";
-
         HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
         String json = ftv.convert(hl7message, OPTIONS);
         assertThat(json).isNotBlank();
@@ -807,10 +716,9 @@ public class Hl7EncounterFHIRConversionTest {
         assertThat( participantComponent.getIndividual().getDisplay()).isEqualTo("Admitting Doctor");
 
     }
+
     /**
      * Testing Encounter correctly references Observation
-     * 
-     * @throws IOException
      */
     @Test
     public void testEncounterReferencesObservation() throws IOException {
@@ -818,7 +726,6 @@ public class Hl7EncounterFHIRConversionTest {
                 + "PID|||1234^^^^MR||DOE^JANE^|||F|||||||||||||||||||||\n"
                 + "PV1|1|O|Location||||||||||||||||261938_6_201306171546|||||||||||||||||||||||||20130617134644|||||||||\n"
                 + "OBX|1|SN|24467-3^CD3+CD4+ (T4 helper) cells [#/volume] in Blood^LN||=^440|{Cells}/uL^cells per microliter^UCUM|649-1346 cells/mcL|L|||F\r";
-
         HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
         String json = ftv.convert(hl7message, OPTIONS);
         IBaseResource bundleResource = context.getParser().parseResource(json);
@@ -843,8 +750,6 @@ public class Hl7EncounterFHIRConversionTest {
 
     /**
      * Testing Encounter correctly references Observation AND Diagnosis when both are present.
-     * 
-     * @throws IOException
      */
     @Test
     public void testEncounterReferencesObservationAndDiagnosis() throws IOException {
@@ -853,7 +758,6 @@ public class Hl7EncounterFHIRConversionTest {
                 + "PV1|1|O|Location||||||||||||||||261938_6_201306171546|||||||||||||||||||||||||20130617134644|||||||||\n"
                 + "OBX|1|SN|24467-3^CD3+CD4+ (T4 helper) cells [#/volume] in Blood^LN||=^440|{Cells}/uL^cells per microliter^UCUM|649-1346 cells/mcL|L|||F\r"
                 + "DG1|1|ICD10|^Ovarian Cancer|||||||||||||||||||||\r";
-
         HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
         String json = ftv.convert(hl7message, OPTIONS);
         IBaseResource bundleResource = context.getParser().parseResource(json);
