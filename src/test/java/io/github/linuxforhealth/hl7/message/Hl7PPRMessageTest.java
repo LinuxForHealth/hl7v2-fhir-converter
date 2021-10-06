@@ -26,7 +26,7 @@ import org.slf4j.LoggerFactory;
 
 public class Hl7PPRMessageTest {
   private static FHIRContext context = new FHIRContext();
-  private static final ConverterOptions OPTIONS = new Builder().withValidateResource().build();
+  private static final ConverterOptions OPTIONS = new Builder().build(); //withValidateResource()
   private static final Logger LOGGER = LoggerFactory.getLogger(Hl7PPRMessageTest.class);
 
 
@@ -72,7 +72,7 @@ public class Hl7PPRMessageTest {
   }
 
   @Test
-  public void test_ppr_pc1_service_request_present() throws IOException {
+  public void test_ppr_pc1_service_request_document_reference_present() throws IOException {
     String hl7message =
         "MSH|^~\\&|SendTest1|Sendfac1|Receiveapp1|Receivefac1|202101010000|security|PPR^PC1^PPR_PC1|1|P^I|2.6||||||ASCII||\n"
     		+ "PID|||1234^^^^MR||DOE^JANE^|||F|||||||||||||||||||||\n"
@@ -85,6 +85,7 @@ public class Hl7PPRMessageTest {
             + "OBX|1|TX|||ECHOCARDIOGRAPHIC REPORT||||||F|||202101010000|||\n"
             + "OBX|2|TX|||NORMAL LV CHAMBER SIZE WITH MILD CONCENTRIC LVH||||||F|||202101010000|||\n"
             + "OBX|3|TX|||HYPERDYNAMIC LV SYSTOLIC FUNCTION, VISUAL EF 80%||||||F|||202101010000|||\n";
+            
     
     HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
     String json = ftv.convert(hl7message, OPTIONS);
@@ -115,14 +116,13 @@ public class Hl7PPRMessageTest {
                 .map(BundleEntryComponent::getResource).collect(Collectors.toList());
         assertThat(serviceRequestResource).hasSize(1);
 
-    //TODO: uncomment once documentRef is enabled for PPR
-    //    List<Resource> documentRefResource =
-    //		e.stream().filter(v -> ResourceType.DocumentReference == v.getResource().getResourceType())
-    //            .map(BundleEntryComponent::getResource).collect(Collectors.toList());
-    //    assertThat(documentRefResource).hasSize(1);
+    List<Resource> documentRefResource =
+            e.stream().filter(v -> ResourceType.DocumentReference == v.getResource().getResourceType())
+            .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+    assertThat(documentRefResource).hasSize(1);
 
   }
-  
+ 
   
   @Test
   @Disabled("PPR_PC2 not supported yet")
