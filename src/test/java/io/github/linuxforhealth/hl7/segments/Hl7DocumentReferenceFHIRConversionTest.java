@@ -101,7 +101,7 @@ public class Hl7DocumentReferenceFHIRConversionTest {
                 + "TXA|1||TEXT||||201801180346||<PHYSID1>||||||||||AV|||<PHYSID2>||\n"
                 + "ORC|NW|||PGN001|SC|D|1|||MS|MS|||||\n"
                 + "OBR|1||||||20170825010500|||||||||||||002|||||F||||||||\n"
-                // Next three lines create an actual attachment
+                // Next three lines create an attachment
                 + "OBX|1|TX|||ECHOCARDIOGRAPHIC REPORT||||||F|||202101010000|||\n"
                 + "OBX|2|TX|||NORMAL LV CHAMBER SIZE WITH MILD CONCENTRIC LVH||||||F|||202101010000|||\n"
                 + "OBX|3|TX|||HYPERDYNAMIC LV SYSTOLIC FUNCTION, VISUAL EF 80%||||||F|||202101010000|||\n";

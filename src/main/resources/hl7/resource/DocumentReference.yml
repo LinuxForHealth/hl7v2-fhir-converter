@@ -107,7 +107,6 @@ authenticator:
    vars:
       hasValue: TXA.22 | TXA.10
 
-
 content:
    valueOf: secondary/Content
    generateList: true

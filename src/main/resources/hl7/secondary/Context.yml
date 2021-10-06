@@ -11,28 +11,21 @@ period:
     start: $timestamp
 
 related_1:
-  # condition: $providerCode NOT_NULL
+  condition: $providerCode NOT_NULL
   valueOf: resource/Practitioner
   expressionType: reference
   generateList: true
   specs: $providerCode
 
 related_2:
-  # condition: $serviceRequestRef NOT_NULL
-  valueOf: resource/ServiceRequest
-  expressionType: reference
+  valueOf: datatype/Reference
+  expressionType: resource
   generateList: true
   specs: $serviceRequestRef
 
-# encounter:
-#   condition: $Encounter NOT_NULL
-#   valueOf: resource/Encounter
-#   expressionType: reference
-#   specs: $Encounter
-
 encounter:
   condition: $encounterRef NOT_NULL
-  valueOf: resource/Encounter
-  expressionType: reference
+  valueOf: datatype/Reference
+  expressionType: resource
   specs: $encounterRef
 
