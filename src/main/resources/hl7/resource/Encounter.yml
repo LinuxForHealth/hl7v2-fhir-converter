@@ -159,9 +159,9 @@ participant_1:
    valueOf: secondary/Participant
    generateList: true
    expressionType: resource
+   specs: PV1.7
    vars:
       practionerSpec: PV1.7
-      referenceDisplay: PERSON_DISPLAY_NAME, PV1.7
    constants:
       codeableConceptCode: 'ATND'
       codeableConceptText: 'attender'
@@ -170,10 +170,10 @@ participant_2:
    condition: $practionerSpec NOT_NULL
    valueOf: secondary/Participant
    generateList: true
+   specs: PV1.8
    expressionType: resource
    vars:
       practionerSpec: PV1.8
-      referenceDisplay: PERSON_DISPLAY_NAME, PV1.8
    constants:
       codeableConceptCode: 'REF'
       codeableConceptText: 'referrer'
@@ -182,10 +182,10 @@ participant_3:
    condition: $practionerSpec NOT_NULL
    valueOf: secondary/Participant
    generateList: true
+   specs: PV1.9
    expressionType: resource
    vars:
       practionerSpec: PV1.9
-      referenceDisplay: PERSON_DISPLAY_NAME, PV1.9
    constants:
       codeableConceptCode: 'CON'
       codeableConceptText: 'consultant'
@@ -194,10 +194,10 @@ participant_4:
    condition: $practionerSpec NOT_NULL
    valueOf: secondary/Participant
    generateList: true
+   specs: PV1.17
    expressionType: resource
    vars:
       practionerSpec: PV1.17
-      referenceDisplay: PERSON_DISPLAY_NAME, PV1.17
    constants:
       codeableConceptCode: 'ADM'
       codeableConceptText: 'admitter'
@@ -241,6 +241,6 @@ serviceProvider:
       valueOf: resource/Organization_ServiceProvider
       expressionType: reference
       vars:
-            idValue: PV2.23.8 | PV1.3.4.1 | PV1.39
+            idValue: PV2.23.8 | PV1.3.4.1
             name: PV2.23.1 | PV1.3.4.1
 
