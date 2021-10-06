@@ -26,7 +26,7 @@ import org.slf4j.LoggerFactory;
 
 public class Hl7PPRMessageTest {
   private static FHIRContext context = new FHIRContext();
-  private static final ConverterOptions OPTIONS = new Builder().withValidateResource().build();
+  private static final ConverterOptions OPTIONS = new Builder().withValidateResource().withPrettyPrint().build();
   private static final Logger LOGGER = LoggerFactory.getLogger(Hl7PPRMessageTest.class);
 
 
@@ -115,11 +115,10 @@ public class Hl7PPRMessageTest {
                 .map(BundleEntryComponent::getResource).collect(Collectors.toList());
         assertThat(serviceRequestResource).hasSize(1);
 
-    //TODO: uncomment once documentRef is enabled for PPR
-    //    List<Resource> documentRefResource =
-    //		e.stream().filter(v -> ResourceType.DocumentReference == v.getResource().getResourceType())
-    //            .map(BundleEntryComponent::getResource).collect(Collectors.toList());
-    //    assertThat(documentRefResource).hasSize(1);
+        List<Resource> documentRefResource =
+    		e.stream().filter(v -> ResourceType.DocumentReference == v.getResource().getResourceType())
+                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        assertThat(documentRefResource).hasSize(3);
 
   }
   

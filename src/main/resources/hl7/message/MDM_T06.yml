@@ -39,3 +39,14 @@ resources:
       isReferenced: true
       additionalSegments:
              - MSH
+
+    - resourceName: DocumentReference
+      segment: TXA
+      resourcePath: resource/DocumentReference
+      repeats: true
+      additionalSegments:
+        - MSH
+        - PID
+        - COMMON_ORDER.ORC
+        - COMMON_ORDER.OBR
+        - OBSERVATION.OBX

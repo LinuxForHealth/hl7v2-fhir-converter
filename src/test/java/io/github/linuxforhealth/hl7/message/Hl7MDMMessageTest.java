@@ -31,7 +31,7 @@ public class Hl7MDMMessageTest {
 
 
 
-    @Test@Disabled
+    @Test
   public void test_MDMT02_encounter_present() throws IOException {
 	  String hl7message =
 		        "\n"
@@ -68,7 +68,7 @@ public class Hl7MDMMessageTest {
   }
 
 
-  @Test@Disabled
+  @Test
   public void test_MDMT06_encounter_present() throws IOException {
 	  String hl7message =
 		        "\n"

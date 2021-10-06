@@ -10,6 +10,7 @@ attachment:
   vars:
     mime: $contentType
     date: $creationDate
+    data: $contentData
 
 
 
