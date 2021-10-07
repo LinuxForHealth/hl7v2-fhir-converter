@@ -912,7 +912,7 @@ public class Hl7IdentifierFHIRConversionTest {
         assertThat(value).isEqualTo("PG1234567"); // OBR.4.1
         assertThat(system).isEqualTo("urn:id:MYPG"); // OBR.4.2
         type = identifier.getType();
-        DatatypeUtils.checkCommonCodeableConceptAssertions(type, "PGN", "Placer Group Number", "http://terminology.hl7.org/2.1.0/CodeSystem/v2-0203", "Placer Group Number");
+        DatatypeUtils.checkCommonCodeableConceptAssertions(type, "PGN", "Placer Group Number", "http://terminology.hl7.org/2.1.0/CodeSystem/v2-0203", null);
 
         // Test 3:
         //  - Visit number with PV1-19
