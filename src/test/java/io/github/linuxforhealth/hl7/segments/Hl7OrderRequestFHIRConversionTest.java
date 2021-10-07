@@ -319,9 +319,7 @@ public class Hl7OrderRequestFHIRConversionTest {
         +"ORC|NW|P1005|F1005|P1005|SC|D|1||20170920141233|||1212^docProvider^docOrdering|||20170920141233|\r"
         // OBR.4 is the code
         // OBR.31 used for reason code
-        +"OBR|1|P1005|F1005|71260^CT Chest without contrast^ICD10|||||||||||||||||||||||||||exam reason ID^PREAURICULAR EDEMA text||||\r"
-      
-   ;
+        +"OBR|1|P1005|F1005|71260^CT Chest without contrast^ICD10|||||||||||||||||||||||||||exam reason ID^PREAURICULAR EDEMA text||||\r";
 
     HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
     String json = ftv.convert(hl7message, PatientUtils.OPTIONS);
