@@ -58,7 +58,6 @@ identifier_4:
       systemCX: ORC.4.2 
    constants:
    constants:   
-      text: "Placer Group Number"
       # Base URL doesn't find the code, but the versioned system does
       system: "http://terminology.hl7.org/2.1.0/CodeSystem/v2-0203"
       code: "PGN"

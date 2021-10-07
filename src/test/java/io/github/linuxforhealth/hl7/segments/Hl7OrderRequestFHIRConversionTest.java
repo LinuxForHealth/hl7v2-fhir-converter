@@ -314,8 +314,8 @@ public class Hl7OrderRequestFHIRConversionTest {
         // ORC.4 is used for requisition and for PGN identifier
         // ORC.5 is status
         // ORC.9 is authoredOn
-        // ORC.15 is occurenceDateTime
         // ORC.12 is tested for requester
+        // ORC.15 is occurenceDateTime
         +"ORC|NW|P1005|F1005|P1005|SC|D|1||20170920141233|||1212^docProvider^docOrdering|||20170920141233|\r"
         // OBR.4 is the code
         // OBR.31 used for reason code
@@ -371,10 +371,10 @@ public class Hl7OrderRequestFHIRConversionTest {
         "http://hl7.org/fhir/sid/icd-10-cm", "CT Chest without contrast");    
 
     // General over valdation of presence of fields:
-    assertThat(serviceRequest.hasStatus()).isTrue();  // ORC.4
+    assertThat(serviceRequest.hasStatus()).isTrue();  // ORC.5
     assertThat(serviceRequest.hasIntent()).isTrue();
-    assertThat(serviceRequest.hasSubject()).isTrue();  // ORC.9
-    assertThat(serviceRequest.hasAuthoredOn()).isTrue();  // ORC.15
+    assertThat(serviceRequest.hasSubject()).isTrue(); 
+    assertThat(serviceRequest.hasAuthoredOn()).isTrue();  // ORC.9
   }
 
 

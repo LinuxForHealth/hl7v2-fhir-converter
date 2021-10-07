@@ -40,11 +40,11 @@ resources:
         - MSH
 
     - resourceName: ServiceRequest
-      segment: .COMMON_ORDER.ORC
+      segment: COMMON_ORDER.ORC
       resourcePath: resource/ServiceRequest
       repeats: true
       additionalSegments:
-        - .COMMON_ORDER.OBR
+        - COMMON_ORDER.OBR
         - MSH
         - PV1
         - PID   
