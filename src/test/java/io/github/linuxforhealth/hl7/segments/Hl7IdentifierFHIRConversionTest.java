@@ -868,7 +868,7 @@ public class Hl7IdentifierFHIRConversionTest {
         String serviceRequest = "MSH|^~\\&|SendTest1|Sendfac1|Receiveapp1|Receivefac1|200603081747|security|PPR^PC1^PPR_PC1|1|P^I|2.6||||||ASCII||\n" +
                 "PID|1||000054321^^^MRN|||||||||||||M|CAT|78654||||N\n" +
                 "PRB|AD|200603150625|aortic stenosis|53692||2||200603150625\n" +
-                // ORC.4 used for PGN identifier
+                // ORC.4 is not used as an identifier
                 "ORC||||PG1234567^MYPG||E|^Q6H^D10^^^R\n" +
                 "OBR|1|CD150920001336^OE|CD150920001336^IE|||20150930000000|20150930164100|||||||||25055^MARCUSON^PATRICIA^L|||||||||F|||5755^DUNN^CHAD^B~25055^MARCUSON^PATRICIA^L|||WEAKNESS|DAS, SURJYA P||SHIELDS, SHARON A|||||||||";
 
@@ -876,7 +876,7 @@ public class Hl7IdentifierFHIRConversionTest {
 
         // Expect 3 identifiers
         assertThat(serviceReq.hasIdentifier()).isTrue();
-        assertThat(serviceReq.getIdentifier()).hasSize(4);
+        assertThat(serviceReq.getIdentifier()).hasSize(3);
 
         // Identifier 1: visit number
         Identifier identifier = serviceReq.getIdentifier().get(0);
@@ -905,15 +905,6 @@ public class Hl7IdentifierFHIRConversionTest {
         type = identifier.getType();
         DatatypeUtils.checkCommonCodeableConceptAssertions(type, "PLAC", "Placer Identifier", "http://terminology.hl7.org/CodeSystem/v2-0203", null);
 
-        //Identifier 4: placer group number
-        identifier = serviceReq.getIdentifier().get(3);
-        value = identifier.getValue();
-        system = identifier.getSystem();
-        assertThat(value).isEqualTo("PG1234567"); // OBR.4.1
-        assertThat(system).isEqualTo("urn:id:MYPG"); // OBR.4.2
-        type = identifier.getType();
-        DatatypeUtils.checkCommonCodeableConceptAssertions(type, "PGN", "Placer Group Number", "http://terminology.hl7.org/2.1.0/CodeSystem/v2-0203", null);
-
         // Test 3:
         //  - Visit number with PV1-19
         //  - filler from OBR
@@ -922,14 +913,12 @@ public class Hl7IdentifierFHIRConversionTest {
                 "PID|1||000054321^^^MRN|||||||||||||M|CAT|||||N\n" +
                 "PV1||I|6N^1234^A^GENERAL HOSPITAL2|||||||SUR||||||||S|8846511|A|||||||||||||||||||SF|K||||20170215080000\n" +
                 "PRB|AD|200603150625|aortic stenosis|53692||2||200603150625\n" +
-                // Leave ORC.4 empty so there is no PGN identifier.
                 "ORC||PON001||||E|^Q6H^D10^^^R\n" +
                 "OBR|1||CD150920001336|||20150930000000|20150930164100|||||||||25055^MARCUSON^PATRICIA^L|||||||||F|||5755^DUNN^CHAD^B~25055^MARCUSON^PATRICIA^L|||WEAKNESS|DAS, SURJYA P||SHIELDS, SHARON A|||||||||";
 
         serviceReq = ResourceUtils.getServiceRequest(serviceRequest);
 
         // Expect 3 identifiers
-        // (No PGN, because ORC.4 was empty)
         assertThat(serviceReq.hasIdentifier()).isTrue();
         assertThat(serviceReq.getIdentifier()).hasSize(3);
 

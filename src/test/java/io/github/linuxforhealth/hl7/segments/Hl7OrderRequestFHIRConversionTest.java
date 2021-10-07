@@ -311,7 +311,7 @@ public class Hl7OrderRequestFHIRConversionTest {
         +"EVN|T02|20170920141233|||\r"
         +"PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\r"
         +"PV1|1|I|||||||||||||||||||||||||||||||||||||\r"
-        // ORC.4 is used for requisition and for PGN identifier
+        // ORC.4 is used for requisition
         // ORC.5 is status
         // ORC.9 is authoredOn
         // ORC.12 is tested for requester
@@ -336,9 +336,9 @@ public class Hl7OrderRequestFHIRConversionTest {
     assertThat(serviceRequestList).hasSize(1);
     ServiceRequest serviceRequest = ResourceUtils.getResourceServiceRequest(serviceRequestList.get(0), context);
 
-    // Expect 4 identifiers (VN, PLAC, FILL, PGN)
+    // Expect 3 identifiers (VN, PLAC, FILL)
     assertThat(serviceRequest.hasIdentifier()).isTrue();
-    assertThat(serviceRequest.getIdentifier()).hasSize(4);
+    assertThat(serviceRequest.getIdentifier()).hasSize(3);
 
     // ORC.4.1 value should create a requisition in the serviceRequest
     assertThat(serviceRequest.hasRequisition()).isTrue();
