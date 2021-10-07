@@ -6,20 +6,10 @@
 package io.github.linuxforhealth.hl7.message;
 
 import static org.assertj.core.api.Assertions.assertThat;
-
-import java.io.File;
 import java.io.IOException;
-import java.time.ZoneId;
-import java.util.Base64;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
-import java.util.TimeZone;
 import java.util.stream.Collectors;
-
-import io.github.linuxforhealth.hl7.segments.util.ResourceUtils;
 import org.hl7.fhir.instance.model.api.IBaseResource;
-import org.hl7.fhir.r4.model.Attachment;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
 import org.hl7.fhir.r4.model.Bundle.BundleType;
@@ -28,16 +18,14 @@ import org.hl7.fhir.r4.model.Reference;
 import org.hl7.fhir.r4.model.Resource;
 import org.hl7.fhir.r4.model.ResourceType;
 import org.hl7.fhir.r4.model.ServiceRequest;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import io.github.linuxforhealth.fhir.FHIRContext;
 import io.github.linuxforhealth.hl7.ConverterOptions;
 import io.github.linuxforhealth.hl7.ConverterOptions.Builder;
 import io.github.linuxforhealth.hl7.HL7ToFHIRConverter;
 import io.github.linuxforhealth.hl7.segments.util.ResourceUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class HL7OMLMessageTest {
     private static FHIRContext context = new FHIRContext();
@@ -83,7 +71,7 @@ public class HL7OMLMessageTest {
                 .filter(v -> ResourceType.DiagnosticReport == v.getResource().getResourceType())
                 .map(BundleEntryComponent::getResource).collect(Collectors.toList());
         assertThat(diagnosticresource).hasSize(1);
-        
+
         List<Resource> conditionresource = e.stream()
                 .filter(v -> ResourceType.Condition == v.getResource().getResourceType())
                 .map(BundleEntryComponent::getResource).collect(Collectors.toList());
@@ -95,7 +83,7 @@ public class HL7OMLMessageTest {
         ServiceRequest request = ResourceUtils.getResourceServiceRequest(serviceResource.get(0), context);
         Reference patientRef = request.getSubject();
         assertThat(patientRef.isEmpty()).isFalse();
-        
+
     }
 
     @Test
@@ -129,7 +117,8 @@ public class HL7OMLMessageTest {
 
     @Test
     public void test_oml_multiple() throws IOException {
-        String hl7message = "MSH|^~\\&||Test System|||20210917110100||OML^O21^OML_O21|d1577c69-dfbe-44ad-ba6d-3e05e953b2ea|T|2.5.1|||AL|AL|||||LOI_NG_PRU_PROFILE^^2.16.840.1.113883.9.87^ISO\r"
+      String hl7message =
+          "MSH|^~\\&||Test System|||20210917110100||OML^O21^OML_O21|d1577c69-dfbe-44ad-ba6d-3e05e953b2ea|T|2.6|||AL|AL|||||LOI_NG_PRU_PROFILE^^2.16.840.1.113883.9.87^ISO\r"
     + "PID|1||7659afb9-0dfc-d744-1f40-5b9314807108^^^^MR||Feeney^Sam^^^^^L||20110926000000+0530|M|||953 Schmitt Road^^Milford^MA^^^L|||||S\r"
     + "ORC|NW|8125550e-04db-11ec-a9a8-086d41d421ca^^ID^UUID|||||||20210824000000+0530|||9999997079^Hahn^Reginald^^^^^U^NPI^L^^^NPI\r"
     + "OBR|1|8125550e-04db-11ec-a9a8-086d41d421ca^^ID^UUID||58410-2^CBC panel - Blood by Automated count^LN||||||||||||9999997079^Hahn^Reginald^^^^^U^NPI^L^^^NPI\r"
@@ -142,6 +131,7 @@ public class HL7OMLMessageTest {
         String json = ftv.convert(hl7message);
 
         assertThat(json).isNotBlank();
+        System.out.println(json);
         IBaseResource bundleResource = context.getParser().parseResource(json);
         assertThat(bundleResource).isNotNull();
         Bundle b = (Bundle) bundleResource;
@@ -207,4 +197,4 @@ public class HL7OMLMessageTest {
     }
 
 
-}
+} 
