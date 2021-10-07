@@ -710,7 +710,7 @@ public class Hl7IdentifierFHIRConversionTest {
         DatatypeUtils.checkCommonCodeableConceptAssertions(type, "VN", "Visit number", "http://terminology.hl7.org/CodeSystem/v2-0203", null);
     }
 
-     @Test@Disabled //Test works, but message type is not configured yet
+     @Test
      public void documentReferenceIdentifierTest() {
          // Filler and placer from ORC, extId from MSH-7
          String documentReference =

@@ -29,7 +29,7 @@ import org.slf4j.LoggerFactory;
 
 public class Hl7PPRMessageTest {
   private static FHIRContext context = new FHIRContext();
-  private static final ConverterOptions OPTIONS = new Builder().withValidateResource().build();
+  private static final ConverterOptions OPTIONS = new Builder().withValidateResource().withPrettyPrint().build();
   private static final Logger LOGGER = LoggerFactory.getLogger(Hl7PPRMessageTest.class);
 
 
@@ -133,8 +133,6 @@ public class Hl7PPRMessageTest {
     assertThat(content.getAttachment().hasData()).isTrue();
     String decodedData = new String(Base64.getDecoder().decode(content.getAttachment().getDataElement().getValueAsString()));
     assertThat(decodedData).isEqualTo("ECHOCARDIOGRAPHIC REPORT\nNORMAL LV CHAMBER SIZE WITH MILD CONCENTRIC LVH\nHYPERDYNAMIC LV SYSTOLIC FUNCTION, VISUAL EF 80%\n");
-
-
   }
  
   

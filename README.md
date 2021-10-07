@@ -37,6 +37,7 @@ The converter supports the following message segments:
 * RXO - Pharmacy/Treatment Order
 * RXR - Pharmacy/Treatment Route
 * SPM - Specimen
+* TXA - Transcription Document Header
 
 If you need another message type/event . . .  contributions are welcome! See [CONTRIBUTING.md](CONTRIBUTING.md)!
 
