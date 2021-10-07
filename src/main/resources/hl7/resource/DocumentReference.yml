@@ -115,7 +115,7 @@ content:
       # TODO: in future, if other than plain text, create a mapping
       # contentType: TXA.3 | OBX.2
       creationDate: TXA.7
-      data: OBX.5 *&, GeneralUtils.concatenateWithChar(data, '\n')
+      contentData: OBX.5 *&, GeneralUtils.concatenateWithChar(contentData, '\n')
    constants: 
       contentType: "text/plain"   
 
