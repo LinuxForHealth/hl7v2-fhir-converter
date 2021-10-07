@@ -7,10 +7,12 @@ package io.github.linuxforhealth.hl7.message;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import java.io.IOException;
+import java.util.Base64;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r4.model.Bundle;
+import org.hl7.fhir.r4.model.DocumentReference;
 import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
 import org.hl7.fhir.r4.model.Bundle.BundleType;
 import org.hl7.fhir.r4.model.Resource;
@@ -21,6 +23,7 @@ import io.github.linuxforhealth.fhir.FHIRContext;
 import io.github.linuxforhealth.hl7.ConverterOptions;
 import io.github.linuxforhealth.hl7.ConverterOptions.Builder;
 import io.github.linuxforhealth.hl7.HL7ToFHIRConverter;
+import io.github.linuxforhealth.hl7.segments.util.ResourceUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -72,7 +75,7 @@ public class Hl7PPRMessageTest {
   }
 
   @Test
-  public void test_ppr_pc1_service_request_present() throws IOException {
+  public void testPprPc1ServiceRequestPresentDocumentReferenceDetails() throws IOException {
     String hl7message =
         "MSH|^~\\&|SendTest1|Sendfac1|Receiveapp1|Receivefac1|202101010000|security|PPR^PC1^PPR_PC1|1|P^I|2.6||||||ASCII||\n"
     		+ "PID|||1234^^^^MR||DOE^JANE^|||F|||||||||||||||||||||\n"
@@ -81,11 +84,13 @@ public class Hl7PPRMessageTest {
             + "OBX|1|NM|111^TotalProtein||7.5|gm/dl|5.9-8.4||||F\n"
             + "NTE|1|P|Problem Comments\n"
             + "ORC|NW|1000^OE|9999999^RX|||E|^Q6H^D10^^^R\n"
-            + "OBR|1|TESTID|TESTID|||202101010000|202101010000||||||||||||||||||F||||||WEAKNESS||||||||||||\n"
+            // OBR.7 is used for the timestamp (because no TXA in a PPR_PC1 message)
+            + "OBR|1|TESTID|TESTID|||201801180346|201801180347||||||||||||||||||F||||||WEAKNESS||||||||||||\n"
+            // Next three lines create an attachment
             + "OBX|1|TX|||ECHOCARDIOGRAPHIC REPORT||||||F|||202101010000|||\n"
             + "OBX|2|TX|||NORMAL LV CHAMBER SIZE WITH MILD CONCENTRIC LVH||||||F|||202101010000|||\n"
             + "OBX|3|TX|||HYPERDYNAMIC LV SYSTOLIC FUNCTION, VISUAL EF 80%||||||F|||202101010000|||\n";
-    
+            
     HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
     String json = ftv.convert(hl7message, OPTIONS);
     assertThat(json).isNotBlank();
@@ -99,7 +104,7 @@ public class Hl7PPRMessageTest {
             .map(BundleEntryComponent::getResource).collect(Collectors.toList());
     assertThat(patientResource).hasSize(1);
     
-    //OBX under PRB (the PROBLEM.PROBLEM_OBSERVATION.OBSERVATION) creates an Observation resource
+    // OBX under PRB (the PROBLEM.PROBLEM_OBSERVATION.OBSERVATION) creates an Observation resource
     List<Resource> obsResource =
             e.stream().filter(v -> ResourceType.Observation == v.getResource().getResourceType())
                 .map(BundleEntryComponent::getResource).collect(Collectors.toList());
@@ -115,13 +120,21 @@ public class Hl7PPRMessageTest {
                 .map(BundleEntryComponent::getResource).collect(Collectors.toList());
         assertThat(serviceRequestResource).hasSize(1);
 
-        List<Resource> documentRefResource =
-    		e.stream().filter(v -> ResourceType.DocumentReference == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
-        assertThat(documentRefResource).hasSize(3);
+    List<Resource> documentRefResource =
+            e.stream().filter(v -> ResourceType.DocumentReference == v.getResource().getResourceType())
+            .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+    assertThat(documentRefResource).hasSize(1);
 
+    DocumentReference documentRef = ResourceUtils.getResourceDocumentReference(documentRefResource.get(0), context);
+    DocumentReference.DocumentReferenceContentComponent content = documentRef.getContentFirstRep();
+    assertThat(content.getAttachment().getContentType()).isEqualTo("text/plain"); // Currently always defaults to text/plain
+    // TODO: why can't this OBR.7 date be found?
+    // assertThat(content.getAttachment().getCreationElement().toString()).containsPattern("2021-01-01T01:00:00"); // OBR.7 date
+    assertThat(content.getAttachment().hasData()).isTrue();
+    String decodedData = new String(Base64.getDecoder().decode(content.getAttachment().getDataElement().getValueAsString()));
+    assertThat(decodedData).isEqualTo("ECHOCARDIOGRAPHIC REPORT\nNORMAL LV CHAMBER SIZE WITH MILD CONCENTRIC LVH\nHYPERDYNAMIC LV SYSTOLIC FUNCTION, VISUAL EF 80%\n");
   }
-  
+ 
   
   @Test
   @Disabled("PPR_PC2 not supported yet")

@@ -29,8 +29,7 @@ RELIGIOUS_AFFILIATION_CC(SimpleDataValueResolver.RELIGIOUS_AFFILIATION_FHIR_CC),
 ```
 
 The resolver takes as input a value and returns a `CodeableConcept` object, which can be used in the template yaml.  In the example code, the input value is converted to a string and the HAPI FHIR `V3ReligiousAffiliation.class` is used to lookup the code.  With the code, the V3ReligiousAffiliation is found from the code and is used to create the CodeableConcept.
-```
-java
+```java
     public static final ValueExtractor<Object, CodeableConcept> RELIGIOUS_AFFILIATION_FHIR_CC = (Object value) -> {
         String val = Hl7DataHandlerUtil.getStringValue(value);
         String code = getFHIRCode(val, V3ReligiousAffiliation.class);
@@ -79,8 +78,7 @@ district:
 ```
 `Hl7RelatedGeneralUtils.getAddressDistrict` 
 
-```
-java
+```java
 public static String getAddressDistrict(String patientCountyPid12, String addressCountyParishPid119, Object patient) {
         LOGGER.info("getAddressCountyParish for {}", patient);
 
@@ -133,3 +131,58 @@ telecom_1:
     constants: 
        use: "work"
 ```
+
+### Referencing resources
+
+Resources are referenced (linked) in one of two ways:
+
+#### To reference an resource already created:
+```yaml
+subject:
+   valueOf: datatype/Reference
+   expressionType: resource
+   specs: $Patient
+```
+Note the expressionType is `resource` of template `datatype/Reference`.  `specs` is the resource from the message yaml: `$Patient`.  Not the $ capital letter preceding the variable. The created `$Patient` is passed to the `Reference` template as content.
+
+#### To create a new resource and reference a resource:
+```yml
+ performer:
+   valueOf: resource/Practitioner
+   expressionType: reference
+   specs: OBX.16
+```
+Note the expression is a `reference`.  `Practitioner` is the template which will be used with the `specs` OBX.16 to create a Practitioner _and_ create a reference to it in this position.  
+
+#### Passing references to children
+Consider `PPR_PC1.yml`.  Note the resourceNames: `ServiceRequest` and `Encounter`.
+
+In `DocumentReference.yml`, references to `ServiceRequest` and `Encounter` resources already created are passed as `serviceRequestRef` and `encounterRef`.
+```yaml
+context:
+   valueOf: secondary/Context
+   expressionType: resource
+   vars:
+      timestamp: TXA.4 | OBR.7
+      providerCode: TXA.5
+      serviceRequestRef: $ServiceRequest
+      encounterRef: $Encounter
+```
+
+Then in `Context.yml`, the reference are used as `specs` passed into to `resource` expressions to `datatype/Reference`.  Thus the already created `ServiceRequest` and `Encounter` are used.
+
+```yaml
+related_2:
+  valueOf: datatype/Reference
+  expressionType: resource
+  generateList: true
+  specs: $serviceRequestRef
+
+encounter:
+  condition: $encounterRef NOT_NULL
+  valueOf: datatype/Reference
+  expressionType: resource
+  specs: $encounterRef
+```
+
+

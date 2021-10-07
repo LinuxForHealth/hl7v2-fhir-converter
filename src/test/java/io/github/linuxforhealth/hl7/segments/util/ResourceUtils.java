@@ -244,6 +244,12 @@ public class ResourceUtils {
     return (DiagnosticReport) context.getParser().parseResource(klass, s);
   }
 
+  public static DocumentReference getResourceDocumentReference(Resource resource, FHIRContext context) {
+    String s = context.getParser().encodeResourceToString(resource);
+    Class<? extends IBaseResource> klass = DocumentReference.class;
+    return (DocumentReference) context.getParser().parseResource(klass, s);
+  }
+
   public static MedicationRequest getResourceMedicationRequest(Resource resource, FHIRContext context) {
     String s = context.getParser().encodeResourceToString(resource);
     Class<? extends IBaseResource> klass = MedicationRequest.class;
