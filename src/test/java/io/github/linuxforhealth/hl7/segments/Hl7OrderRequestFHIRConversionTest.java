@@ -158,11 +158,11 @@ public class Hl7OrderRequestFHIRConversionTest {
         //  Key input data set up:
         //  1. Map OBR.7 to ServiceRequest.occurrenceDateTime, because ORC.15 is empty
         //  2. Map OBR.7 to DiagnosticReport.effectiveDateTime 
-        //  2a.  ORC.4 is empty on purpose to test that no zombie requisition is created.
-        //  3. Leave ORC.9 empty so that OBR.6 is used for ServiceRequest.authoredOn
-        //  4. OBR.22 used and DiagnosticReport.issued
-        //  5. Leave ORC.12 empty so OBR.16 is used for Practitioner reference
-        //  6. ORC.16 is set to a reason code (but it is ignored because it is secondary to OBR.31, which is present in this case and therefore overrides ORC.16)
+        //  3.  ORC.4 is empty on purpose to test that no zombie requisition is created.
+        //  4. Leave ORC.9 empty so that OBR.6 is used for ServiceRequest.authoredOn
+        //  5. OBR.22 used and DiagnosticReport.issued
+        //  6. Leave ORC.12 empty so OBR.16 is used for Practitioner reference
+        //  7. ORC.16 is set to a reason code (but it is ignored because it is secondary to OBR.31, which is present in this case and therefore overrides ORC.16)
         + "ORC|RE|248648498^|248648498^|||||||||||||042^Human immunodeficiency virus [HIV] disease [42]^I9CDX^^^^29|||||||||||||||\n"
         //  10. OBR.32 will be turned into a Practioner and referenced and the DiagnositicReport.resultsInterpreter
         //  11. OBR.4 maps to both ServiceRequest.code and DiagnosticReport.code
