@@ -129,7 +129,7 @@ public class Hl7EncounterFHIRConversionTest {
         assertThat(encText.getDiv().getChildNodes()).isEmpty();
     }
 
-    // Test for serviceProvider reference in ADT messages with both PV1 and PV2 segments
+    // Test for serviceProvider reference in messages with both PV1 and PV2 segments
     // Part 1: use serviceProvider from PV2.23 subfields
     @ParameterizedTest
     @ValueSource(strings = { "MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||ADT^A01|controlID|P|2.6\r",
@@ -140,6 +140,8 @@ public class Hl7EncounterFHIRConversionTest {
      //"MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||ADT^A28|controlID|P|2.6\r",
      //"MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||ADT^A31|controlID|P|2.6\r"
      // ADT_A34 and ADT_A40 do not create encounters so they do not need to be tested here
+     "MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||RDE^O11|controlID|P|2.6\r",
+     "MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||RDE^O25|controlID|P|2.6\r",
     })
     public void test_encounter_with_serviceProvider_from_PV2(String msh) {
         String hl7message = msh
@@ -178,7 +180,7 @@ public class Hl7EncounterFHIRConversionTest {
         assertThat(orgResource.getName()).isEqualTo("South Shore Hosptial Weymouth");
     }
 
-    // Test for serviceProvider reference in ADT messages with both PV1 and PV2 segments
+    // Test for serviceProvider reference in messages with both PV1 and PV2 segments
     // Part 2: Field PV2.23 is provided but no PV2.23.8; serviceProvider id should use backup field PV1.3.4.1
     @ParameterizedTest
     @ValueSource(strings = { "MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||ADT^A01|controlID|P|2.6\r",
@@ -187,8 +189,10 @@ public class Hl7EncounterFHIRConversionTest {
      //"MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||ADT^A04|controlID|P|2.6\r",
      "MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||ADT^A08|controlID|P|2.6\r",
      //"MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||ADT^A28|controlID|P|2.6\r",
-     //"MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||ADT^A31|controlID|P|2.6\r"
+     //"MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||ADT^A31|controlID|P|2.6\r",
      // ADT_A34 and ADT_A40 do not create encounters so they do not need to be tested here
+     "MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||RDE^O11|controlID|P|2.6\r",
+     "MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||RDE^O25|controlID|P|2.6\r"
     })
     public void test_encounter_PV1_serviceProvider(String msh) {
         String hl7message = msh
@@ -227,7 +231,7 @@ public class Hl7EncounterFHIRConversionTest {
         assertThat(orgResource.getName()).isEqualTo("South Shore Hosptial Weymouth");
     }
 
-    // Test for serviceProvider reference in ADT messages with PV1 segment and no PV2 segment
+    // Test for serviceProvider reference in messages with PV1 segment and no PV2 segment
     // Use serviceProvider from PV1-3.4.1
     @ParameterizedTest
     @ValueSource(strings = { "MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||ADT^A01|controlID|P|2.6\r",
@@ -238,6 +242,8 @@ public class Hl7EncounterFHIRConversionTest {
      //"MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||ADT^A28|controlID|P|2.6\r",
      //"MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||ADT^A31|controlID|P|2.6\r"
      // ADT_A34 and ADT_A40 do not create encounters so they do not need to be tested here
+     "MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||RDE^O11|controlID|P|2.6\r",
+     "MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||RDE^O25|controlID|P|2.6\r",
     })
     public void test_encounter_with_serviceProvider_from_PV1_3_4(String msh) {
         String hl7message =  msh
@@ -576,10 +582,22 @@ public class Hl7EncounterFHIRConversionTest {
         assertTrue(extFound, "modeOfArrival extension not found");
     }
 
-    @Test
-    @Disabled
-    public void test_encounter_PV2segment_missing() {
-        String hl7message = "MSH|^~\\&|WHI_LOAD_GENERATOR|IBM_TORONTO_LAB||IBM|20210330144208|8078780|ADT^A02|MSGID_4e1c575f-6c6d-47b2-ab9f-829f20c96db2|T|2.3\n"
+    // Test messages with PV1 segment and no PV2 segment, and no serviceProvider provided
+    // Extension list should be empty and serviceProvider should be null
+    @ParameterizedTest
+    @ValueSource(strings = { "MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||ADT^A01|controlID|P|2.6\r",
+     //"MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||ADT^A02|controlID|P|2.6\r",
+     //"MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||ADT^A03|controlID|P|2.6\r",
+     //"MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||ADT^A04|controlID|P|2.6\r",
+     "MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||ADT^A08|controlID|P|2.6\r",
+     //"MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||ADT^A28|controlID|P|2.6\r",
+     //"MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||ADT^A31|controlID|P|2.6\r"
+     // ADT_A34 and ADT_A40 do not create encounters so they do not need to be tested here
+     "MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||RDE^O11|controlID|P|2.6\r",
+     "MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||RDE^O25|controlID|P|2.6\r",
+    })
+    public void test_encounter_PV2segment_missing(String msh) {
+        String hl7message = msh //"MSH|^~\\&|WHI_LOAD_GENERATOR|IBM_TORONTO_LAB||IBM|20210330144208|8078780|ADT^A02|MSGID_4e1c575f-6c6d-47b2-ab9f-829f20c96db2|T|2.3\n"
                 + "EVN||20210330144208||ADT_EVENT|007|20210309140700\n"
                 + "PID|1||0a8a1752-e336-43e1-bf7f-0c8f6f437ca3^^^MRN||Patient^Load^Generator||19690720|M|Patient^Alias^Generator|AA|9999^^CITY^STATE^ZIP^CAN|COUNTY|(866)845-0900||ENGLISH^ENGLISH|SIN|NONE|Account_0a8a1752-e336-43e1-bf7f-0c8f6f437ca3|123-456-7890|||N|BIRTH PLACE|N||||||N\n"
                 + "PV1||I|^^^^^5642 Hilly Av||||2905^Doctor^Attending^M^IV^^M.D|5755^Doctor^Referring^^Sr|770542^Doctor^Consulting^Jr||||||||59367^Doctor^Admitting||Visit_0a3be81e-144b-4885-9b4e-c5cd33c8f038|||||||||||||||||||||||||20210407191342\n";
