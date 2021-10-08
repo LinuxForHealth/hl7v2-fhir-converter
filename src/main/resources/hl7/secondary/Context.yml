@@ -10,10 +10,22 @@ period:
   vars:
     start: $timestamp
 
-related:
+related_1:
+  condition: $providerCode NOT_NULL
   valueOf: resource/Practitioner
   expressionType: reference
+  generateList: true
   specs: $providerCode
 
+related_2:
+  valueOf: datatype/Reference
+  expressionType: resource
+  generateList: true
+  specs: $serviceRequestRef
 
+encounter:
+  condition: $encounterRef NOT_NULL
+  valueOf: datatype/Reference
+  expressionType: resource
+  specs: $encounterRef
 
