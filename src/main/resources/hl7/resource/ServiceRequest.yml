@@ -67,6 +67,7 @@ subject:
    specs: $Patient
 
 requisition:
+   condition: valueIn NOT_NULL
    valueOf: datatype/Identifier_var
    expressionType: resource
    specs: ORC.4

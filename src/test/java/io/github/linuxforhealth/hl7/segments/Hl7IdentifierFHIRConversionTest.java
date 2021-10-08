@@ -951,6 +951,161 @@ public class Hl7IdentifierFHIRConversionTest {
 
     }
 
+
+    // NOTE: ORU_RO1 records do not create the ServiceRequest directly.  They create a DiagnosticReport and it creates the ServiceRequest.
+    // This test makes sure the specification for ORU_RO1.DiagnosticReport is specifying PID and PV1 correctly in AdditionalSegments.
+    @Test
+    public void serviceRequestIdentifierTest2() {
+        // Test 1:
+        //  - Visit number with PV1.19
+        //  - filler and placer from OBR
+        String serviceRequest = "MSH|^~\\&|||||20180924152907|34001|ORU^R01^ORU_R01|213|T|2.6|||||||||||\n"
+        // PID.18 is ignored as visit number identifier because PV1.19 is present
+        + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
+        // PV1.19 is used as the identifier visit number
+        + "PV1|1|E|||||||||||||||||78654||||||||||||||||||||||||||\n"
+        //  1. ORC.2 empty so OBR.2 is used
+        //  2. ORC.3 empty so OBR.3 is used
+        + "ORC|RE|||ML18267-C00001^Beaker||||||||||||||||||||||||||||||||||\n"
+        //  10. OBR.3 used for Filler 
+        //  11. OBR.2 used for Placer
+        + "OBR|1|CD150920001336^OE|CD150920001336^IE|83036E^HEMOGLOBIN A1C^PACSEAP^^^^^^HEMOGLOBIN A1C|||||||||||||||||||||||||||||||||||||||||||\n";
+
+        ServiceRequest serviceReq = ResourceUtils.getServiceRequest(serviceRequest);
+
+        // Expect 3 identifiers
+        assertThat(serviceReq.hasIdentifier()).isTrue();
+        assertThat(serviceReq.getIdentifier()).hasSize(3);
+
+        // Identifier 1: visit number should be set by PV1.19
+        Identifier identifier = serviceReq.getIdentifier().get(0);
+        String value = identifier.getValue();
+        String system = identifier.getSystem();
+        assertThat(value).isEqualTo("78654"); // PV1.19
+        assertThat(system).isNull();
+        CodeableConcept type = identifier.getType();
+        DatatypeUtils.checkCommonCodeableConceptAssertions(type, "VN", "Visit number", "http://terminology.hl7.org/CodeSystem/v2-0203", null);
+
+        // Identifier 2: filler
+        identifier = serviceReq.getIdentifier().get(1);
+        value = identifier.getValue();
+        system = identifier.getSystem();
+        assertThat(value).isEqualTo("CD150920001336"); // OBR.3.1
+        assertThat(system).isEqualTo("urn:id:IE"); // OBR.3.2
+        type = identifier.getType();
+        DatatypeUtils.checkCommonCodeableConceptAssertions(type, "FILL", "Filler Identifier", "http://terminology.hl7.org/CodeSystem/v2-0203", null);
+
+        //Identifier 3: placer
+        identifier = serviceReq.getIdentifier().get(2);
+        value = identifier.getValue();
+        system = identifier.getSystem();
+        assertThat(value).isEqualTo("CD150920001336"); // OBR.2.1
+        assertThat(system).isEqualTo("urn:id:OE"); // OBR.2.2
+        type = identifier.getType();
+        DatatypeUtils.checkCommonCodeableConceptAssertions(type, "PLAC", "Placer Identifier", "http://terminology.hl7.org/CodeSystem/v2-0203", null);
+
+        // Test 2
+        //  - Visit number with PID.18
+        //  - filler from ORC
+        //  - placer from ORC
+        serviceRequest = 
+        "MSH|^~\\&|||||20180924152907|34001|ORU^R01^ORU_R01|213|T|2.6|||||||||||\n"
+        // PID.18 is used as backup identifier visit number because PV1.19 is empty
+        + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||665544||||||||||||\n"
+        // PV1.19 is empty and not used as visit number identifier 
+        + "PV1|1|E|||||||||||||||||||||||||||||||||||||||||||\n"
+        //  1. ORC.2 is used as Placer because it has priority over OBR.2
+        //  1. ORC.3 is used as Filler because it has priority over OBR.3
+        + "ORC|RE|248648498|248648499|ML18267-C00001^Beaker||||||||||||||||||||||||||||||||||||\n"
+        //  10. OBR.2 ignored as Placer
+        //  11. OBR.3 ignored as Filler
+        + "OBR|1|CD150920001336|CD150920001336|83036E^HEMOGLOBIN A1C^PACSEAP^^^^^^HEMOGLOBIN A1C||||||||||||||||||||||||||||||||||||||||||||\n";
+
+        serviceReq = ResourceUtils.getServiceRequest(serviceRequest);
+
+        // Expect 3 identifiers
+        assertThat(serviceReq.hasIdentifier()).isTrue();
+        assertThat(serviceReq.getIdentifier()).hasSize(3);
+
+        // Identifier 1: visit number should be set by PID.18
+        identifier = serviceReq.getIdentifier().get(0);
+        value = identifier.getValue();
+        system = identifier.getSystem();
+        assertThat(value).isEqualTo("665544"); // PID.18
+        assertThat(system).isNull();
+        type = identifier.getType();
+        DatatypeUtils.checkCommonCodeableConceptAssertions(type, "VN", "Visit number", "http://terminology.hl7.org/CodeSystem/v2-0203", null);
+
+        // Identifier 2: filler
+        identifier = serviceReq.getIdentifier().get(1);
+        value = identifier.getValue();
+        system = identifier.getSystem();
+        assertThat(value).isEqualTo("248648499"); // ORC.3
+        assertThat(system).isNull();
+        type = identifier.getType();
+        DatatypeUtils.checkCommonCodeableConceptAssertions(type, "FILL", "Filler Identifier", "http://terminology.hl7.org/CodeSystem/v2-0203", null);
+
+        //Identifier 3: placer
+        identifier = serviceReq.getIdentifier().get(2);
+        value = identifier.getValue();
+        system = identifier.getSystem();
+        assertThat(value).isEqualTo("248648498"); // ORC.2
+        assertThat(system).isNull();
+        type = identifier.getType();
+        DatatypeUtils.checkCommonCodeableConceptAssertions(type, "PLAC", "Placer Identifier", "http://terminology.hl7.org/CodeSystem/v2-0203", null);
+
+        // Test 3:
+        //  - MSH.7 as the visit number
+        //  - filler from ORC
+        //  - placer from ORC
+        serviceRequest =  "MSH|^~\\&|||||20180924152907|34001|ORU^R01^ORU_R01|213|T|2.6|||||||||||\n"
+        // PID.18 is empty so MSH.7 with be used as backup identifier visit number 
+        + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
+        // PV1.19 is empty so MSH.7 with be used as backup identifier visit number 
+        + "PV1|1|E|||||||||||||||||||||||||||||||||||||||||||\n"
+        //  1. ORC.2 is used as Placer because it has priority over OBR.2
+        //  1. ORC.3 is used as Filler because it has priority over OBR.3
+        + "ORC|RE|222298|222299|ML18267-C00001^Beaker||||||||||||||||||||||||||||\n"
+        //  10. OBR.2 ignored as Placer
+        //  11. OBR.3 ignored as Filler
+        + "OBR|1|||83036E^HEMOGLOBIN A1C^PACSEAP^^^^^^HEMOGLOBIN A1C|||||||||||||||||||||||||||||||||||||||||||\n";
+
+        serviceReq = ResourceUtils.getServiceRequest(serviceRequest);
+
+        // Expect 3 identifiers
+        assertThat(serviceReq.hasIdentifier()).isTrue();
+        assertThat(serviceReq.getIdentifier()).hasSize(3);
+
+        // Identifier 1: visit number should be set by MSH.7
+        identifier = serviceReq.getIdentifier().get(0);
+        value = identifier.getValue();
+        system = identifier.getSystem();
+        assertThat(value).isEqualTo("20180924152907"); // MSH.7
+        assertThat(system).isNull();
+        type = identifier.getType();
+        DatatypeUtils.checkCommonCodeableConceptAssertions(type, "VN", "Visit number", "http://terminology.hl7.org/CodeSystem/v2-0203", null);
+
+        // Identifier 2: filler
+        identifier = serviceReq.getIdentifier().get(1);
+        value = identifier.getValue();
+        system = identifier.getSystem();
+        assertThat(value).isEqualTo("222299"); // ORC.3
+        assertThat(system).isNull();
+        type = identifier.getType();
+        DatatypeUtils.checkCommonCodeableConceptAssertions(type, "FILL", "Filler Identifier", "http://terminology.hl7.org/CodeSystem/v2-0203", null);
+
+        //Identifier 3: placer
+        identifier = serviceReq.getIdentifier().get(2);
+        value = identifier.getValue();
+        system = identifier.getSystem();
+        assertThat(value).isEqualTo("222298"); // ORC.2
+        assertThat(system).isNull();
+        type = identifier.getType();
+        DatatypeUtils.checkCommonCodeableConceptAssertions(type, "PLAC", "Placer Identifier", "http://terminology.hl7.org/CodeSystem/v2-0203", null);
+
+    }
+
+
     @Test
     public void medicationRequestIdentifierTest() {
         // Visit number from PID-18, extID from RXO-1.1
