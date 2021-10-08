@@ -55,8 +55,8 @@ public class Hl7PatientFHIRConversionTest {
     // "MSH|^~\\&|hl7Integration|hl7Integration|||||OMP^O09|||2.6|\r",
     // "MSH|^~\\&|hl7Integration|hl7Integration|||||ORM^O01|||2.6|\r",
     // "MSH|^~\\&|hl7Integration|hl7Integration|||||ORU^R01|||2.6|\r",
-    // "MSH|^~\\&|hl7Integration|hl7Integration|||||RDE^O11|||2.6|\r",
-    // "MSH|^~\\&|hl7Integration|hl7Integration|||||RDE^O25|||2.6|\r",
+    "MSH|^~\\&|hl7Integration|hl7Integration|||||RDE^O11|||2.6|\r",
+    "MSH|^~\\&|hl7Integration|hl7Integration|||||RDE^O25|||2.6|\r",
     // "MSH|^~\\&|hl7Integration|hl7Integration|||||VXU^V04|||2.6|\r",
     })
   public void test_patient_additional_demographics(String msh) {

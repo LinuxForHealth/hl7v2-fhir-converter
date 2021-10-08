@@ -280,7 +280,7 @@ Engine supports the following condition types:
 * Conditions with AND,   example: ``condition: $obx2 EQUALS SN && $obx5.3 EQUALS ':'``
 * Conditions with OR, example: ``condition: $obx2 EQUALS TX || $obx2 EQUALS ST``
 
-Conditions can be used to choose between multiple sources of data when mapping to a FHIR type. For example, see how `coding` is set in [CodeableConcept.yml](src/main/resources/hl7/datatype/CodeableConcept.yml). `coding` is set by the either coding_1, coding_2, or coding_3 based on the conditions. The last condition that evaluates to true in the list will create the value.
+Conditions can be used to choose between multiple sources of data when mapping to a FHIR type. For example, see how `coding` is set in [CodeableConcept.yml](src/main/resources/hl7/datatype/CodeableConcept.yml). `coding` is set by the either coding_1, coding_2, or coding_3 based on the conditions. The last condition that evaluates to true in the list will create the value. NOTE: This is only in the case when generateList is true. When it is not present or false then the FIRST condition that evaluates to true will create the value.
 
 #### Concatenation
 * There are a number of instances where we need to take strings from different fields and concatenate them together to form a unique identifier.

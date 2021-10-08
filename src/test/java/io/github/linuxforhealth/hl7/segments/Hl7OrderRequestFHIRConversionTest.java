@@ -8,7 +8,7 @@ package io.github.linuxforhealth.hl7.segments;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import org.junit.jupiter.api.Assertions;
+
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -81,7 +81,7 @@ public class Hl7OrderRequestFHIRConversionTest {
     assertThat(serviceRequest.getRequisition().hasValue()).isTrue();
     assertThat(serviceRequest.getRequisition().getValue()).isEqualToIgnoringCase("ML18267-C00001");
 
-    // // ORC.5 creates the serviceRequest.status()
+    // ORC.5 creates the serviceRequest.status()
     assertThat(serviceRequest.hasStatus()).isTrue();
     assertThat(serviceRequest.getStatusElement().getCode()).isEqualTo("active");   
 
@@ -101,10 +101,12 @@ public class Hl7OrderRequestFHIRConversionTest {
         "http://terminology.hl7.org/CodeSystem/ICD-9CM-diagnosiscodes",
         "Human immunodeficiency virus [HIV] disease [42]");
 
-    // ORC.12 should create an ServiceRequest.requester reference
+    // ORC.12 should create an ServiceRequest.requester reference & display
     assertThat(serviceRequest.hasRequester()).isTrue();
+    assertThat(serviceRequest.getRequester().hasDisplay()).isTrue();   
+    assertThat(serviceRequest.getRequester().getDisplay()).isEqualTo("Nicholas Radon");  
+    assertThat(serviceRequest.getRequester().hasReference()).isTrue();    
     String requesterRef = serviceRequest.getRequester().getReference();
-
     Practitioner pract = ResourceUtils.getSpecificPractitionerFromBundle(bundle, requesterRef);
     // Confirm that the matching practitioner by ID has the correct content (simple validation)
     // Should be ORC.12.1 and NOT OBR.16.1
@@ -180,8 +182,11 @@ public class Hl7OrderRequestFHIRConversionTest {
     DatatypeUtils.checkCommonCodeableConceptAssertions(serviceRequest.getReasonCodeFirstRep(), "HIV", "HIV/Aids",
         "urn:id:L", "HIV/Aids");
 
-    // OBR.16 should create an ServiceRequest.requester reference
+    // OBR.16 should create an ServiceRequest.requester reference & display
     assertThat(serviceRequest.hasRequester()).isTrue();
+    assertThat(serviceRequest.getRequester().hasDisplay()).isTrue();   
+    assertThat(serviceRequest.getRequester().getDisplay()).isEqualTo("FRIEDA SCHMIDT MD");  
+    assertThat(serviceRequest.getRequester().hasReference()).isTrue();  
     String requesterRef = serviceRequest.getRequester().getReference();
     Practitioner pract = ResourceUtils.getSpecificPractitionerFromBundle(bundle, requesterRef);
     // Confirm that the matching practitioner by ID has the correct content (simple validation)
@@ -269,7 +274,7 @@ public class Hl7OrderRequestFHIRConversionTest {
   }
 
   @Test
-  public void testAdditionalOBRFields() {
+  public void testAdditionalOBRFieldsNoORCSegment() {
 
     String hl7message =
 
@@ -278,6 +283,8 @@ public class Hl7OrderRequestFHIRConversionTest {
         + "PV1|1|E|||||||||||||||||||||||||||||||||||||||||||\n"
         //  ORC not needed for this OBR test
         //  1. Map OBR.7 and OBR.8 together to DiagnosticReport.effectivePeriod
+        //  2. Presence of OBR with absence of ORC should still create a ServiceRequest
+        //  ORC.15 is missing, so use OBR.7 as ServiceRequest.occurrenceDateTime
         + "OBR|1|248648498^|248648498^|83036E^HEMOGLOBIN A1C^PACSEAP^^^^^^HEMOGLOBIN A1C|||20170707120707|20180808120808|||||||||||||||||F|||||||||||||||||||||||||\n";
 
     HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
@@ -299,6 +306,100 @@ public class Hl7OrderRequestFHIRConversionTest {
     assertThat(diagnosticReport.hasEffectivePeriod()).isTrue();
     assertThat(diagnosticReport.getEffectivePeriod().getStartElement().toString()).containsPattern("2017-07-07T12:07:07");
     assertThat(diagnosticReport.getEffectivePeriod().getEndElement().toString()).containsPattern("2018-08-08T12:08:08");
+
+    List<Resource> serviceRequestList = e.stream()
+    .filter(v -> ResourceType.ServiceRequest == v.getResource().getResourceType())
+    .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+    // Important that we have exactly one service request (no duplication).  OBR creates it as a reference.        
+    assertThat(serviceRequestList).hasSize(1);
+    ServiceRequest serviceRequest = ResourceUtils.getResourceServiceRequest(serviceRequestList.get(0), context);
+    assertThat(serviceRequest.hasStatus()).isTrue();
+
+    // OBR.7 should create an ServiceRequest.occurrenceDateTime date
+    assertThat(serviceRequest.hasOccurrenceDateTimeType()).isTrue();
+    assertThat(serviceRequest.getOccurrenceDateTimeType().toString()).containsPattern("2017-07-07T12:07:07");
+
+    // ORC.5 is missing, so serviceRequest.status() should be unknown
+    assertThat(serviceRequest.hasStatus()).isTrue();
+    assertThat(serviceRequest.getStatusElement().getCode()).isEqualTo("unknown");   
+
   }
+
+  // This test assures the MDM_T02 is properly enabled. 
+  // It focuses on _differences_ in MDM not tested above, then does general confirmation of other fields
+  @Test
+  public void testMDMT02ServiceRequest() {
+
+    String hl7message =
+        "MSH|^~\\&|Epic|PQA|WHIA|IBM|20170920141233||MDM^T02^MDM_T02|M1005|D|2.6\r"
+        +"EVN|T02|20170920141233|||\r"
+        +"PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\r"
+        +"PV1|1|I|||||||||||||||||||||||||||||||||||||\r"
+        // ORC.4 is used for requisition
+        // ORC.5 is status
+        // ORC.9 is authoredOn
+        // ORC.12 is tested for requester
+        // ORC.15 is occurenceDateTime
+        +"ORC|NW|P1005|F1005|P1005|SC|D|1||20170920141233|||1212^docProvider^docOrdering|||20170920141233|\r"
+        // OBR.4 is the code
+        // OBR.31 used for reason code
+        +"OBR|1|P1005|F1005|71260^CT Chest without contrast^ICD10|||||||||||||||||||||||||||exam reason ID^PREAURICULAR EDEMA text||||\r";
+
+    HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
+    String json = ftv.convert(hl7message, PatientUtils.OPTIONS);
+    assertThat(json).isNotBlank();
+
+    IBaseResource bundleResource = context.getParser().parseResource(json);
+    assertThat(bundleResource).isNotNull();
+    Bundle bundle = (Bundle) bundleResource;
+    List<BundleEntryComponent> e = bundle.getEntry();
+
+    List<Resource> serviceRequestList = e.stream()
+        .filter(v -> ResourceType.ServiceRequest == v.getResource().getResourceType())
+        .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+    assertThat(serviceRequestList).hasSize(1);
+    ServiceRequest serviceRequest = ResourceUtils.getResourceServiceRequest(serviceRequestList.get(0), context);
+
+    // Expect 3 identifiers (VN, PLAC, FILL)
+    assertThat(serviceRequest.hasIdentifier()).isTrue();
+    assertThat(serviceRequest.getIdentifier()).hasSize(3);
+
+    // ORC.4.1 value should create a requisition in the serviceRequest
+    assertThat(serviceRequest.hasRequisition()).isTrue();
+    assertThat(serviceRequest.getRequisition().hasValue()).isTrue();
+    assertThat(serviceRequest.getRequisition().getValue()).isEqualToIgnoringCase("P1005");
+    assertThat(serviceRequest.getRequisition().hasSystem()).isFalse();
+    assertThat(serviceRequest.getRequisition().hasType()).isTrue();
+    DatatypeUtils.checkCommonCodeableConceptAssertions(serviceRequest.getRequisition().getType(), "PGN", "Placer Group Number", "http://terminology.hl7.org/2.1.0/CodeSystem/v2-0203", null);
+
+    // ORC.12 should create an ServiceRequest.requester reference
+    assertThat(serviceRequest.hasRequester()).isTrue();
+    assertThat(serviceRequest.getRequester().hasDisplay()).isTrue();   
+    assertThat(serviceRequest.getRequester().getDisplay()).isEqualTo("docOrdering docProvider");  
+    assertThat(serviceRequest.getRequester().hasReference()).isTrue();    
+    String requesterRef = serviceRequest.getRequester().getReference();
+
+    Practitioner pract = ResourceUtils.getSpecificPractitionerFromBundle(bundle, requesterRef);
+    // Confirm that the matching practitioner by ID has the correct content (simple validation)
+    // Should be ORC.12.1
+    assertThat(pract.getIdentifierFirstRep().getValue()).isEqualTo("1212");
+
+    // OBR.31 is the reason code
+    assertThat(serviceRequest.hasReasonCode()).isTrue();
+    assertThat(serviceRequest.getReasonCode()).hasSize(1);
+    DatatypeUtils.checkCommonCodeableConceptAssertions(serviceRequest.getReasonCodeFirstRep(), "exam reason ID", "PREAURICULAR EDEMA text", null, "PREAURICULAR EDEMA text");
+
+    // OBR.4 is the  code
+    assertThat(serviceRequest.hasCode()).isTrue();
+    DatatypeUtils.checkCommonCodeableConceptAssertions(serviceRequest.getCode(), "71260", "CT Chest without contrast",
+        "http://hl7.org/fhir/sid/icd-10-cm", "CT Chest without contrast");    
+
+    // General over valdation of presence of fields:
+    assertThat(serviceRequest.hasStatus()).isTrue();  // ORC.5
+    assertThat(serviceRequest.hasIntent()).isTrue();
+    assertThat(serviceRequest.hasSubject()).isTrue(); 
+    assertThat(serviceRequest.hasAuthoredOn()).isTrue();  // ORC.9
+  }
+
 
 }

@@ -73,6 +73,11 @@ requisition:
    vars:
       valueIn: ORC.4.1
       systemCX:  ORC.4.2
+   constants:   
+      # Base URL doesn't find the code, but the versioned system does
+      system: "http://terminology.hl7.org/2.1.0/CodeSystem/v2-0203"
+      code: "PGN"
+      display: "Placer Group Number"
 
 authoredOn:
    type: DATE_TIME
@@ -91,6 +96,7 @@ requester:
    specs: ORC.12 | OBR.16
    vars:
       request: ORC.12 | OBR.16
+      referenceDisplay: PERSON_DISPLAY_NAME, ORC.12 | OBR.16
 
 reasonCode:
    condition: $reasonCWE NOT_NULL 

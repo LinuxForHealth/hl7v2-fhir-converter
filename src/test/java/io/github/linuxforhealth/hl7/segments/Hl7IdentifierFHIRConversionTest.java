@@ -868,7 +868,8 @@ public class Hl7IdentifierFHIRConversionTest {
         String serviceRequest = "MSH|^~\\&|SendTest1|Sendfac1|Receiveapp1|Receivefac1|200603081747|security|PPR^PC1^PPR_PC1|1|P^I|2.6||||||ASCII||\n" +
                 "PID|1||000054321^^^MRN|||||||||||||M|CAT|78654||||N\n" +
                 "PRB|AD|200603150625|aortic stenosis|53692||2||200603150625\n" +
-                "ORC||||||E|^Q6H^D10^^^R\n" +
+                // ORC.4 is not used as an identifier
+                "ORC||||PG1234567^MYPG||E|^Q6H^D10^^^R\n" +
                 "OBR|1|CD150920001336^OE|CD150920001336^IE|||20150930000000|20150930164100|||||||||25055^MARCUSON^PATRICIA^L|||||||||F|||5755^DUNN^CHAD^B~25055^MARCUSON^PATRICIA^L|||WEAKNESS|DAS, SURJYA P||SHIELDS, SHARON A|||||||||";
 
         ServiceRequest serviceReq = ResourceUtils.getServiceRequest(serviceRequest);
