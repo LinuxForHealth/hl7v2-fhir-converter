@@ -14,8 +14,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r4.model.Bundle;
+import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
 import org.hl7.fhir.r4.model.DiagnosticReport;
+import org.hl7.fhir.r4.model.Identifier;
 import org.hl7.fhir.r4.model.Practitioner;
 import org.hl7.fhir.r4.model.Resource;
 import org.hl7.fhir.r4.model.ResourceType;
@@ -41,8 +43,10 @@ public class Hl7OrderRequestFHIRConversionTest {
     String hl7message =
 
         "MSH|^~\\&|||||20180924152907|34001|ORU^R01^ORU_R01|213|T|2.6|||||||||||\n"
+            // PID.18 is ignored as visit number identifier because PV1.19 is present
             + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
-            + "PV1|1|E|||||||||||||||||||||||||||||||||||||||||||\n"
+            // PV1.19 is used as the identifier visit number
+            + "PV1|1|E|||||||||||||||||47474747||||||||||||||||||||||||||\n"
             //  NOTE: ORC is optional; OBR is required.
             //  Key input data set up:
             //  1. Checking fields ORC.4 to ServiceRequest.requisition
@@ -73,6 +77,20 @@ public class Hl7OrderRequestFHIRConversionTest {
     // Important that we have exactly one service request (no duplication).  OBR creates it as a reference.        
     assertThat(serviceRequestList).hasSize(1);
     ServiceRequest serviceRequest = ResourceUtils.getResourceServiceRequest(serviceRequestList.get(0), context);
+
+    assertThat(serviceRequest.hasIdentifier()).isTrue();
+    assertThat(serviceRequest.getIdentifier()).hasSize(3);
+    // Identifier 1: visit number should be set by PV1.19
+    // ORU_RO1 records do not create the ServiceRequest directly.  They create a DiagnosticReport and it creates the ServiceRequest.
+    // This makes sure the specification for ORU_RO1.DiagnosticReport is specifying PV1 correctly in AdditionalSegments.
+    // Extensive testing of identifiers is done in Hl7IdentifierFHIRConversionTest.java
+    Identifier identifier = serviceRequest.getIdentifier().get(0);
+    String value = identifier.getValue();
+    String system = identifier.getSystem();
+    assertThat(value).isEqualTo("47474747"); // PV1.19
+    assertThat(system).isNull();
+    CodeableConcept type = identifier.getType();
+    DatatypeUtils.checkCommonCodeableConceptAssertions(type, "VN", "Visit number", "http://terminology.hl7.org/CodeSystem/v2-0203", null);
 
     // ORC.4 should create a requisition in the serviceRequest.
     assertThat(serviceRequest.hasRequisition()).isTrue();
@@ -132,12 +150,15 @@ public class Hl7OrderRequestFHIRConversionTest {
   public void testBroadORCPlusOBRFields() {
 
     String hl7message = "MSH|^~\\&|||||20180924152907|34001|ORU^R01^ORU_R01|213|T|2.6|||||||||||\n"
-        + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
+        // PID.18 is used as backup identifier visit number because PV1.19 is empty
+        + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||665544||||||||||||\n"
+        // PV1.19 is empty and not used as visit number identifier 
         + "PV1|1|E|||||||||||||||||||||||||||||||||||||||||||\n"
         //  NOTE: ORC is optional; OBR is required.
         //  Key input data set up:
         //  1. Map OBR.7 to ServiceRequest.occurrenceDateTime, because ORC.15 is empty
-        //  2.  Map OBR.7 to DiagnosticReport.effectiveDateTime 
+        //  2. Map OBR.7 to DiagnosticReport.effectiveDateTime 
+        //  2a.  ORC.4 is empty on purpose to test that no zombie requisition is created.
         //  3. Leave ORC.9 empty so that OBR.6 is used for ServiceRequest.authoredOn
         //  4. OBR.22 used and DiagnosticReport.issued
         //  5. Leave ORC.12 empty so OBR.16 is used for Practitioner reference
@@ -167,7 +188,23 @@ public class Hl7OrderRequestFHIRConversionTest {
     ServiceRequest serviceRequest = ResourceUtils.getResourceServiceRequest(serviceRequestList.get(0), context);
     assertThat(serviceRequest.hasStatus()).isTrue();
 
-    // ORC.4 checked in testBroadORCFields
+    assertThat(serviceRequest.hasIdentifier()).isTrue();
+    assertThat(serviceRequest.getIdentifier()).hasSize(3);
+    // Identifier 1: visit number should be set by in this test by secondary PID.18
+    // ORU_RO1 records do not create the ServiceRequest directly.  They create a DiagnosticReport and it creates the ServiceRequest.
+    // This makes sure the specification for ORU_RO1.DiagnosticReport is specifying PID correctly in AdditionalSegments.
+    // Extensive testing of identifiers is done in Hl7IdentifierFHIRConversionTest.java
+    Identifier identifier = serviceRequest.getIdentifier().get(0);
+    String value = identifier.getValue();
+    String system = identifier.getSystem();
+    assertThat(value).isEqualTo("665544"); // PID.18
+    assertThat(system).isNull();
+    CodeableConcept type = identifier.getType();
+    DatatypeUtils.checkCommonCodeableConceptAssertions(type, "VN", "Visit number", "http://terminology.hl7.org/CodeSystem/v2-0203", null);
+
+    // ORC.4 is missing, so no requisition in the serviceRequest.
+    assertThat(serviceRequest.hasRequisition()).isFalse();
+
     // OBR.6 should create authoredOn because ORC.9 is not filled in
     assertThat(serviceRequest.hasAuthoredOn()).isTrue();
     assertThat(serviceRequest.getAuthoredOnElement().toString()).containsPattern("2012-06-06T12:06:06");
@@ -240,7 +277,9 @@ public class Hl7OrderRequestFHIRConversionTest {
   public void testBroadORCPlusOBRFields2() {
 
     String hl7message = "MSH|^~\\&|||||20180924152907|34001|ORU^R01^ORU_R01|213|T|2.6|||||||||||\n"
+            // PID.18 is empty, MSH.7 will be used as identifier visit number 
             + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
+            // PV1.19  is empty, MSH.7 will be used as identifier visit number 
             + "PV1|1|E|||||||||||||||||||||||||||||||||||||||||||\n"
             //  ORC.15 is empty, OBR.7 is empty, so use OBR-27[0].4 as ServiceRequest.occurrenceDateTime
             //  ORC.5 with purposely bad code to see that 'unknown' is result
@@ -263,6 +302,18 @@ public class Hl7OrderRequestFHIRConversionTest {
     assertThat(serviceRequestList).hasSize(1);
     ServiceRequest serviceRequest = ResourceUtils.getResourceServiceRequest(serviceRequestList.get(0), context);
     assertThat(serviceRequest.hasStatus()).isTrue();
+
+    assertThat(serviceRequest.hasIdentifier()).isTrue();
+    assertThat(serviceRequest.getIdentifier()).hasSize(3);
+    // Identifier 1: visit number should be set by in this test by tertiary MSH.7
+    // See notes about identifier testing in previous tests
+    Identifier identifier = serviceRequest.getIdentifier().get(0);
+    String value = identifier.getValue();
+    String system = identifier.getSystem();
+    assertThat(value).isEqualTo("20180924152907"); // MSH.7 as a string, not as a date
+    assertThat(system).isNull();
+    CodeableConcept type = identifier.getType();
+    DatatypeUtils.checkCommonCodeableConceptAssertions(type, "VN", "Visit number", "http://terminology.hl7.org/CodeSystem/v2-0203", null);
 
     // OBR.27[0].4 should create an ServiceRequest.occurrenceDateTime date
     assertThat(serviceRequest.hasOccurrenceDateTimeType()).isTrue();

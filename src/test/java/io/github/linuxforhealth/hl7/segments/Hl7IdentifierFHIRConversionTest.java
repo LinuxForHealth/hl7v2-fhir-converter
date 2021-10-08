@@ -949,6 +949,8 @@ public class Hl7IdentifierFHIRConversionTest {
         type = identifier.getType();
         DatatypeUtils.checkCommonCodeableConceptAssertions(type, "PLAC", "Placer Identifier", "http://terminology.hl7.org/CodeSystem/v2-0203", null);
 
+        // NOTE: ORU_RO1 records do not create the ServiceRequest directly.  They create a DiagnosticReport and it creates the ServiceRequest.
+        // ORU_R01 fall back identifiers for visit number are tested extensively in Hl7ORUMessageTest.java 
     }
 
     @Test
