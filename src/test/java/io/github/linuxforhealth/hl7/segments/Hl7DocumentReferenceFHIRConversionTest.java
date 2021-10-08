@@ -62,7 +62,7 @@ public class Hl7DocumentReferenceFHIRConversionTest {
     public void doc_ref_authenticator_and_author_test() {
         String documentReferenceMessage = "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|MDM^T02^MDM_T02|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6|56789^NID^UID|MCM||||\n"
                 + "PID|1||000054321^^^MRN|||||||||||||M|CAT|||||N\n"
-                + "TXA|1||TEXT||||201801180346||<PHYSID1>||||||||||AV|||<PHYSID2>||\n"
+                + "TXA|1||TEXT||||201801180346||<PHYSID1>^DOE^JANE^J^^MD||||||||||AV|||<PHYSID2>^DOE^JOHN^K^^MD||\n"
                 + "ORC|NW|||PGN001|SC|D|1|||MS|MS|||||\n"
                 + "OBR|1||||||20170825010500|||||||||||||002|||||F||||||||\n";
         HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
@@ -90,6 +90,8 @@ public class Hl7DocumentReferenceFHIRConversionTest {
         assertThat(documentReference.hasAuthor()).isTrue();
         assertThat(documentReference.hasAuthenticator()).isTrue();
         assertThat(documentReference.getAuthor()).hasSize(1);
+        assertThat(documentReference.getAuthorFirstRep().getDisplay()).isEqualTo("MD JANE J DOE");
+        assertThat(documentReference.getAuthenticator().getDisplay()).isEqualTo("MD JOHN K DOE");
         assertThat(practAuthor.getIdentifierFirstRep().getValue()).isEqualTo("<PHYSID1>"); // Value passed to Author is used as Identifier value in practitioner
         assertThat(practAuthenticator.getIdentifierFirstRep().getValue()).isEqualTo("<PHYSID2>"); // Value passed to Authenticator is used as Identifier value in practitioner
     }
@@ -348,7 +350,7 @@ public class Hl7DocumentReferenceFHIRConversionTest {
 
     @Test
     public void doc_ref_master_identifier_test() {
-        // Test masterIdentifier uses the value(12.1) and uses "urn:id:extID" for system ID when 12.2 is empty
+        // Test masterIdentifier uses the value(12.1) but does not record a system since the system is not available
         String documentReference = "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|MDM^T02^MDM_T02|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6|56789^NID^UID|MCM||||\n"
                 + "PID|1||000054321^^^MRN|||||||||||||M|CAT|||||N\n"
                 + "TXA|1||TEXT||||201801180346|||||<MESSAGEID>|||||PA|R|AV|||||\n"
@@ -358,9 +360,9 @@ public class Hl7DocumentReferenceFHIRConversionTest {
         assertThat(report.hasMasterIdentifier()).isTrue();
         Identifier masterID = report.getMasterIdentifier();
         assertThat(masterID.getValue()).isEqualTo("<MESSAGEID>");
-        assertThat(masterID.getSystem()).isEqualTo("urn:id:extID");
+        assertThat(masterID.getSystem()).isNull();
 
-        // Test masterIdentifier uses the backup value(12.1) and pulls systemID from 12.2
+        // Test masterIdentifier uses the value(12.1) and pulls systemID from 12.2
         documentReference = "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|MDM^T02^MDM_T02|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6|56789^NID^UID|MCM||||\n"
                 + "PID|1||000054321^^^MRN|||||||||||||M|CAT|||||N\n"
                 + "TXA|1||TEXT||||201801180346|||||<MESSAGEID>^SYSTEM|||||PA|R|AV|||||\n"
@@ -371,6 +373,18 @@ public class Hl7DocumentReferenceFHIRConversionTest {
         masterID = report.getMasterIdentifier();
         assertThat(masterID.getValue()).isEqualTo("<MESSAGEID>");
         assertThat(masterID.getSystem()).isEqualTo("urn:id:SYSTEM");
+
+        // Test masterIdentifier uses the backup value(12.3) and does not have a system
+        documentReference = "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|MDM^T02^MDM_T02|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6|56789^NID^UID|MCM||||\n"
+                + "PID|1||000054321^^^MRN|||||||||||||M|CAT|||||N\n"
+                + "TXA|1||TEXT||||201801180346|||||^SYSTEM^<BACKUPID>|||||PA|R|AV|||||\n"
+                + "ORC|NW|||PGN001|SC|D|1|||MS|MS|||||\n"
+                + "OBR|1||||||20170825010500|||||||||||||002|||||F||||||||\n";
+        report = ResourceUtils.getDocumentReference(documentReference);
+        assertThat(report.hasMasterIdentifier()).isTrue();
+        masterID = report.getMasterIdentifier();
+        assertThat(masterID.getValue()).isEqualTo("<BACKUPID>");
+        assertThat(masterID.getSystem()).isNull();
     }
 
     @Test

@@ -16,6 +16,8 @@ related_1:
   expressionType: reference
   generateList: true
   specs: $providerCode
+  vars:
+    referenceDisplay: PERSON_DISPLAY_NAME, XCN
 
 related_2:
   valueOf: datatype/Reference

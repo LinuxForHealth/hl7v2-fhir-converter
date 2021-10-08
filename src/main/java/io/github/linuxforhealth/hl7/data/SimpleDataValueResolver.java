@@ -19,6 +19,7 @@ import java.time.temporal.Temporal;
 import java.time.temporal.UnsupportedTemporalTypeException;
 
 import ca.uhn.hl7v2.model.v26.datatype.CWE;
+import ca.uhn.hl7v2.model.v26.datatype.PPN;
 import ca.uhn.hl7v2.model.v26.datatype.XCN;
 import ca.uhn.hl7v2.model.v26.segment.PV1;
 import ca.uhn.hl7v2.model.v26.datatype.DTM;
@@ -152,6 +153,35 @@ public class SimpleDataValueResolver {
             String valmiddle = Hl7DataHandlerUtil.getStringValue(xcn.getSecondAndFurtherGivenNamesOrInitialsThereof());
             String valfamily = Hl7DataHandlerUtil.getStringValue(xcn.getFamilyName());
             String valsuffix = Hl7DataHandlerUtil.getStringValue(xcn.getSuffixEgJRorIII());
+
+            if (valprefix != null) {
+                sb.append(valprefix).append(" ");
+            }
+            if (valfirst != null) {
+                sb.append(valfirst).append(" ");
+            }
+            if (valmiddle != null) {
+                sb.append(valmiddle).append(" ");
+            }
+            if (valfamily != null) {
+                sb.append(valfamily).append(" ");
+            }
+            if (valsuffix != null) {
+                sb.append(valsuffix).append(" ");
+            }
+            String name = sb.toString();
+            if (StringUtils.isNotBlank(name)) {
+                return name.trim();
+            }
+        }
+        if (value instanceof PPN) {
+            PPN ppn = (PPN) value;
+            StringBuilder sb = new StringBuilder();
+            String valprefix = Hl7DataHandlerUtil.getStringValue(ppn.getPrefixEgDR());
+            String valfirst = Hl7DataHandlerUtil.getStringValue(ppn.getGivenName());
+            String valmiddle = Hl7DataHandlerUtil.getStringValue(ppn.getSecondAndFurtherGivenNamesOrInitialsThereof());
+            String valfamily = Hl7DataHandlerUtil.getStringValue(ppn.getFamilyName());
+            String valsuffix = Hl7DataHandlerUtil.getStringValue(ppn.getSuffixEgJRorIII());
 
             if (valprefix != null) {
                 sb.append(valprefix).append(" ");
