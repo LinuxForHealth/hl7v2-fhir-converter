@@ -350,7 +350,7 @@ public class Hl7DocumentReferenceFHIRConversionTest {
 
     @Test
     public void doc_ref_master_identifier_test() {
-        // Test masterIdentifier uses the value(12.1) but does not record a system since the system is not available
+        // Test masterIdentifier uses the value(12.1) but does not require a system if 12.2 is empty
         String documentReference = "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|MDM^T02^MDM_T02|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6|56789^NID^UID|MCM||||\n"
                 + "PID|1||000054321^^^MRN|||||||||||||M|CAT|||||N\n"
                 + "TXA|1||TEXT||||201801180346|||||<MESSAGEID>|||||PA|R|AV|||||\n"
