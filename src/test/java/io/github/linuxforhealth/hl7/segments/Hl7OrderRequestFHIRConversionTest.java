@@ -169,7 +169,7 @@ public class Hl7OrderRequestFHIRConversionTest {
         //  12. OBR.16 creates a ServiceRequest.requester reference
         //  13. OBR.22 creates a DiagnosticReport.status 
         //  14. OBR.6 creates ServiceRequest.authoredOn
-        + "OBR|1|248648498^|248648498^|83036E^HEMOGLOBIN A1C^PACSEAP^^^^^^HEMOGLOBIN A1C||20120606120606|20170707150707||||L|||||54321678^SCHMIDT^FRIEDA^^MD^^^^^^^^^NPISER||||||20180924152900|||F||||||HIV^HIV/Aids^L^^^^V1|323232^Mahoney^Paul^J||||||||||||||||||\n";
+        + "OBR|1|248648498^|248648498^|83036E^HEMOGLOBIN A1C^PACSEAP^^^^^^HEMOGLOBIN A1C||20120606120606|20170707150707||||L|||||54321678^SCHMIDT^FRIEDA^^MD^^^^^^^^^NPISER||||||20180924152900|||F||||||HIV^HIV/Aids^L^^^^V1|323232&Mahoney&Paul&J||||||||||||||||||\n";
 
     HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
     String json = ftv.convert(hl7message, PatientUtils.OPTIONS);
@@ -267,6 +267,8 @@ public class Hl7OrderRequestFHIRConversionTest {
     // Confirm that the matching practitioner by ID has the correct content (simple validation)
     // Should be the value OBR.32
     assertThat(pract.getIdentifierFirstRep().getValue()).isEqualTo("323232");
+    assertThat(pract.getName()).hasSize(1);
+    assertThat(pract.getName().get(0).getTextElement()).hasToString("Paul J Mahoney");
 
     // Check for OBR.25 mapped to DiagnosticReport.status
     assertThat(diagnosticReport.hasStatus()).isTrue();
