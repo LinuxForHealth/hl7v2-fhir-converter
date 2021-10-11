@@ -51,6 +51,9 @@ public class DateUtil {
     if (returnValue == null) {
       returnValue = getZonedDate(input);
     }
+    if (returnValue == null){
+      returnValue = getDateTimeWithoutZone(input);
+    }
     if (returnValue == null) {
       returnValue = getLocalDateTimeWithDefaultZone(input);
     }
@@ -78,6 +81,29 @@ public class DateUtil {
       LOGGER.debug("Date parsing exception for value {}", input, e);
       return null;
     }
+  }
+
+  private static String getDateTimeWithoutZone(String input) {
+    DateTimeFormatter format = null;
+    for (Entry<Pattern, DateTimeFormatter> pattern : DateFormats.getDateTimePatternsInstance()
+            .entrySet()) {
+      if (pattern.getKey().matcher(input).matches()) {
+        format = pattern.getValue();
+        break;
+      }
+    }
+    if (format != null) {
+      try {
+        LocalDateTime ldt = LocalDateTime.parse(input, DateFormats.getFormatterInstance());
+        return ldt.format(format);
+      } catch (DateTimeParseException e) {
+        LOGGER.warn("Input value cannot be parsed to LocalDateTime {} reason: {}", input,
+                e.getMessage());
+        LOGGER.debug("Input value cannot be parsed to LocalDateTime {} ", input, e);
+        return null;
+      }
+    }
+    return null;
   }
 
   private static String getLocalDate(String input) {
