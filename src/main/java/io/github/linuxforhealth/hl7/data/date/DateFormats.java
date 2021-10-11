@@ -51,7 +51,7 @@ public class DateFormats {
 
   private static DateTimeFormatter getFormatter() {
     String patterns =
-        "[yyyyMMddHHmmss.SZ][yyyyMMddHHmmss.SSZ][yyyyMMddHHmmss.SSSZ][yyyyMMddHHmmss.SSSSZ][yyyyMMddHHmmssZ][yyyyMMddHHmmZ][yyyyMMddHHZ][yyyyMMddZ][yyyyMMZ][yyyyZ][yyyyMMddHHmmss][yyyyMMddHHmm][yyyyMMddHH][yyyyMMdd][yyyyMM][yyyy]";
+        "[yyyyMMddHHmmss.SSS][yyyyMMddHHmmss.SZ][yyyyMMddHHmmss.SSZ][yyyyMMddHHmmss.SSSZ][yyyyMMddHHmmss.SSSSZ][yyyyMMddHHmmssZ][yyyyMMddHHmmZ][yyyyMMddHHZ][yyyyMMddZ][yyyyMMZ][yyyyZ][yyyyMMddHHmmss][yyyyMMddHHmm][yyyyMMddHH][yyyyMMdd][yyyyMM][yyyy]";
     return new DateTimeFormatterBuilder()
 
         .appendPattern(patterns).optionalStart()
