@@ -87,19 +87,25 @@ subject:
 
 date:
    type: INSTANT
-   valueOf: TXA.6
+   valueOf: TXA.6 
    expressionType: HL7Spec
 
 author:
+   condition: $hasValue NOT_NULL
    generateList: true
    expressionType: reference
    valueOf: resource/Practitioner
    specs: TXA.9
+   vars:
+      hasValue: TXA.9
 
 authenticator:
+   condition: $hasValue NOT_NULL
    expressionType: reference
    valueOf: resource/Practitioner
    specs: TXA.22 | TXA.10
+   vars:
+      hasValue: TXA.22 | TXA.10
 
 content:
    valueOf: secondary/Content
@@ -109,6 +115,7 @@ content:
       # TODO: in future, if other than plain text, create a mapping
       # contentType: TXA.3 | OBX.2
       creationDate: TXA.7
+      contentData: OBX.5 *&, GeneralUtils.concatenateWithChar(contentData, '\n')
    constants: 
       contentType: "text/plain"   
 
@@ -129,5 +136,7 @@ context:
    valueOf: secondary/Context
    expressionType: resource
    vars:
-      timestamp: TXA.4
+      timestamp: TXA.4 | OBR.7
       providerCode: TXA.5
+      serviceRequestRef: $ServiceRequest
+      encounterRef: $Encounter

@@ -59,6 +59,7 @@ resources:
     group: PROBLEM
     resourcePath: resource/ServiceRequest
     repeats: true
+    isReferenced: true
     additionalSegments:
       - .ORDER.ORDER_DETAIL.OBR
       - .ORDER.ORDER_DETAIL.ORDER_OBSERVATION.OBX
@@ -77,3 +78,13 @@ resources:
       - .ORDER.ORC
       - PATIENT_VISIT.PV1
 
+  - resourceName: DocumentReference
+    segment: .ORDER.ORC
+    group: PROBLEM
+    resourcePath: resource/DocumentReference
+    additionalSegments:
+      - .ORDER.ORDER_DETAIL.OBR
+      - .ORDER.ORDER_DETAIL.ORDER_OBSERVATION.OBX
+      - PATIENT_VISIT.PV1
+      - MSH
+      - PID

@@ -9,6 +9,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.Base64;
 
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r4.model.Bundle;
@@ -99,12 +100,21 @@ public class Hl7DocumentReferenceFHIRConversionTest {
                 + "PID|1||000054321^^^MRN|||||||||||||M|CAT|||||N\n"
                 + "TXA|1||TEXT||||201801180346||<PHYSID1>||||||||||AV|||<PHYSID2>||\n"
                 + "ORC|NW|||PGN001|SC|D|1|||MS|MS|||||\n"
-                + "OBR|1||||||20170825010500|||||||||||||002|||||F||||||||\n";
+                + "OBR|1||||||20170825010500|||||||||||||002|||||F||||||||\n"
+                // Next three lines create an attachment
+                + "OBX|1|TX|||ECHOCARDIOGRAPHIC REPORT||||||F|||202101010000|||\n"
+                + "OBX|2|TX|||NORMAL LV CHAMBER SIZE WITH MILD CONCENTRIC LVH||||||F|||202101010000|||\n"
+                + "OBX|3|TX|||HYPERDYNAMIC LV SYSTOLIC FUNCTION, VISUAL EF 80%||||||F|||202101010000|||\n";
         DocumentReference report = ResourceUtils.getDocumentReference(documentReferenceMessage);
         DocumentReference.DocumentReferenceContentComponent content = report.getContentFirstRep();
         assertThat(content.getAttachment().getContentType()).isEqualTo("text/plain"); // Future TXA.3, currently always defaults to text/plain
         assertThat(content.getAttachment().getCreationElement().toString()).containsPattern("2018-01-18T03:46:00"); // TXA.7 date
+        assertThat(content.getAttachment().hasData()).isTrue();
+        String decodedData = new String(Base64.getDecoder().decode(content.getAttachment().getDataElement().getValueAsString()));
+        assertThat(decodedData).isEqualTo("ECHOCARDIOGRAPHIC REPORT\nNORMAL LV CHAMBER SIZE WITH MILD CONCENTRIC LVH\nHYPERDYNAMIC LV SYSTOLIC FUNCTION, VISUAL EF 80%\n");
 
+        // TODO: Determine if we need to look at anything other than OBX.2 when it is TX
+        // Leave this test in place as a reminder
         documentReferenceMessage = "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|MDM^T02^MDM_T02|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6|56789^NID^UID|MCM||||\n"
                 + "PID|1||000054321^^^MRN|||||||||||||M|CAT|||||N\n"
                 + "TXA|1||||||201801180346||<PHYSID1>||||||||||AV|||<PHYSID2>||\n"
@@ -116,6 +126,7 @@ public class Hl7DocumentReferenceFHIRConversionTest {
         content = report.getContentFirstRep();
         assertThat(content.getAttachment().getContentType()).isEqualTo("text/plain"); // Future OBX.2 is the backup for content type, but currently always defaults to text/plain
         assertThat(content.getAttachment().getCreationElement().toString()).containsPattern("2018-01-18T03:46:00"); // TXA.7 date
+        assertThat(content.getAttachment().hasData()).isFalse();
     }
 
     @Test
@@ -287,9 +298,9 @@ public class Hl7DocumentReferenceFHIRConversionTest {
         // TXA.19 value is empty so OBR.25 is used
         documentReferenceMessage = "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|MDM^T02^MDM_T02|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6|56789^NID^UID|MCM||||\n"
                 + "PID|1||000054321^^^MRN|||||||||||||M|CAT|||||N\n"
-                + "TXA|1||TEXT||||201801180346||<PHYSID1>||||||||PA|||||<PHYSID2>\n"
                 + "ORC|NW|||PGN001|SC|D|1|||MS|MS\n"
-                + "OBR|1||||||20170825010500|||||||||||||002|||||X\n";
+                + "OBR|1||||||20170825010500|||||||||||||002|||||X\n"
+                + "TXA|1||TEXT||||201801180346||<PHYSID1>||||||||PA|||||<PHYSID2>\n";
         report = ResourceUtils.getDocumentReference(documentReferenceMessage);
         status = report.getStatus();
         assertThat(status.toCode()).isEqualTo("entered-in-error"); // OBR.25
@@ -299,9 +310,9 @@ public class Hl7DocumentReferenceFHIRConversionTest {
         // TXA.19 and OBR.25 values are empty so should fallback to "current"
         documentReferenceMessage = "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|MDM^T02^MDM_T02|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6|56789^NID^UID|MCM||||\n"
                 + "PID|1||000054321^^^MRN|||||||||||||M|CAT|||||N\n"
-                + "TXA|1||TEXT||||201801180346||<PHYSID1>||||||||PA\n"
                 + "ORC|NW|||PGN001|SC|D|1|||MS|MS|||||\n"
-                + "OBR|1||||||20170825010500|||||||||||||002\n";
+                + "OBR|1||||||20170825010500|||||||||||||002\n"
+                + "TXA|1||TEXT||||201801180346||<PHYSID1>||||||||PA\n";
         report = ResourceUtils.getDocumentReference(documentReferenceMessage);
         status = report.getStatus();
         assertThat(status.toCode()).isEqualTo("current"); // default value

@@ -321,7 +321,7 @@ value:
     specs: PID.3
 ```
 
-* ReferenceExpression : This type of expression is used to generate a FHIR reference field/datatype for the current resource.
+* ReferenceExpression : This type of expression is used to generate a FHIR reference field/datatype for the current resource. This will create a new resource. To reference an existing resource, see [Techniques: Referencing resources](TECHNIQUES.md#Referencing-resources)
   Example:
 
 ```yml
