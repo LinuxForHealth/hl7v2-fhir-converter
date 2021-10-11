@@ -19,6 +19,7 @@ import java.time.temporal.Temporal;
 import java.time.temporal.UnsupportedTemporalTypeException;
 
 import ca.uhn.hl7v2.model.v26.datatype.CWE;
+import ca.uhn.hl7v2.model.v26.datatype.PPN;
 import ca.uhn.hl7v2.model.v26.datatype.XCN;
 import ca.uhn.hl7v2.model.v26.segment.PV1;
 import ca.uhn.hl7v2.model.v26.datatype.DTM;
@@ -142,38 +143,53 @@ public class SimpleDataValueResolver {
         }
     };
 
-    // Creates a display name; currently only handles XCN as input
+    // Creates a display name; currently only handles XCN and PPN as input
     public static final ValueExtractor<Object, String> PERSON_DISPLAY_NAME = (Object value) -> {
+        StringBuilder sb = new StringBuilder();
+        String valprefix = null;
+        String valfirst = null;
+        String valmiddle = null;
+        String valfamily = null;
+        String valsuffix = null;
+
         if (value instanceof XCN) {
             XCN xcn = (XCN) value;
-            StringBuilder sb = new StringBuilder();
-            String valprefix = Hl7DataHandlerUtil.getStringValue(xcn.getPrefixEgDR());
-            String valfirst = Hl7DataHandlerUtil.getStringValue(xcn.getGivenName());
-            String valmiddle = Hl7DataHandlerUtil.getStringValue(xcn.getSecondAndFurtherGivenNamesOrInitialsThereof());
-            String valfamily = Hl7DataHandlerUtil.getStringValue(xcn.getFamilyName());
-            String valsuffix = Hl7DataHandlerUtil.getStringValue(xcn.getSuffixEgJRorIII());
+            valprefix = Hl7DataHandlerUtil.getStringValue(xcn.getPrefixEgDR());
+            valfirst = Hl7DataHandlerUtil.getStringValue(xcn.getGivenName());
+            valmiddle = Hl7DataHandlerUtil.getStringValue(xcn.getSecondAndFurtherGivenNamesOrInitialsThereof());
+            valfamily = Hl7DataHandlerUtil.getStringValue(xcn.getFamilyName());
+            valsuffix = Hl7DataHandlerUtil.getStringValue(xcn.getSuffixEgJRorIII());
 
-            if (valprefix != null) {
-                sb.append(valprefix).append(" ");
-            }
-            if (valfirst != null) {
-                sb.append(valfirst).append(" ");
-            }
-            if (valmiddle != null) {
-                sb.append(valmiddle).append(" ");
-            }
-            if (valfamily != null) {
-                sb.append(valfamily).append(" ");
-            }
-            if (valsuffix != null) {
-                sb.append(valsuffix).append(" ");
-            }
-            String name = sb.toString();
-            if (StringUtils.isNotBlank(name)) {
-                return name.trim();
-            }
         }
-        return null;
+        else if (value instanceof PPN) {
+            PPN ppn = (PPN) value;
+            valprefix = Hl7DataHandlerUtil.getStringValue(ppn.getPrefixEgDR());
+            valfirst = Hl7DataHandlerUtil.getStringValue(ppn.getGivenName());
+            valmiddle = Hl7DataHandlerUtil.getStringValue(ppn.getSecondAndFurtherGivenNamesOrInitialsThereof());
+            valfamily = Hl7DataHandlerUtil.getStringValue(ppn.getFamilyName());
+            valsuffix = Hl7DataHandlerUtil.getStringValue(ppn.getSuffixEgJRorIII());
+        }
+
+        if (valprefix != null) {
+            sb.append(valprefix).append(" ");
+        }
+        if (valfirst != null) {
+            sb.append(valfirst).append(" ");
+        }
+        if (valmiddle != null) {
+            sb.append(valmiddle).append(" ");
+        }
+        if (valfamily != null) {
+            sb.append(valfamily).append(" ");
+        }
+        if (valsuffix != null) {
+            sb.append(valsuffix).append(" ");
+        }
+        String name = sb.toString();
+        if (StringUtils.isNotBlank(name)) {
+            return name.trim();
+        }
+        else return null;
     };
 
     public static final ValueExtractor<Object, String> ADMINISTRATIVE_GENDER_CODE_FHIR = (Object value) -> {
