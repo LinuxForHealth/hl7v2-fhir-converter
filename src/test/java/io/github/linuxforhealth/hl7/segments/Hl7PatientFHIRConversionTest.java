@@ -481,7 +481,7 @@ public class Hl7PatientFHIRConversionTest {
     // Tests Data lineage for a message with milliseconds in MSH-7
     @Test
     public void verify_data_lineage_milliseconds_timestamp() {
-        String hl7message = "MSH|^~\\&|SendingApplication|Sending^Facility|Receiving-Application|ReceivingFacility|20060915210000.567||ORU^R01|1473973200100600|P|2.3|||NE|NE\n"
+        String hl7message = "MSH|^~\\&|SendingApplication|Sending^Facility|Receiving-Application|ReceivingFacility|20060915210000.567+0800||ORU^R01|1473973200100600|P|2.3|||NE|NE\n"
                 + "PID|1||1234^^^AssigningAuthority^MR||TEST^PATIENT|\n"
                 + "PD1|||Sample Family Practice^^2222|1111^LastName^ClinicianFirstName^^^^Title||||||||||||A|";
         validate_data_lineage(hl7message, "ORU^R01", true);
