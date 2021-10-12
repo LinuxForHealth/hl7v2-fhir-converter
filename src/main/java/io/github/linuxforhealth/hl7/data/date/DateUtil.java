@@ -53,12 +53,11 @@ public class DateUtil {
             returnValue = getZonedDate(input);
         }
         if (returnValue == null) {
-            returnValue = getDateTimeWithDefaultZone(input);
-        }
-        if (returnValue == null) {
             returnValue = getLocalDateTimeWithDefaultZone(input);
         }
-
+        if (returnValue == null) {
+            returnValue = getDateTimeWithDefaultZone(input);
+        }
         return returnValue;
     }
 
