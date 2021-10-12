@@ -31,3 +31,7 @@ encounter:
   expressionType: resource
   specs: $encounterRef
 
+practiceSetting:
+  valueOf: datatype/CodeableConcept
+  expressionType: resource
+  specs: $practiceSettingIn

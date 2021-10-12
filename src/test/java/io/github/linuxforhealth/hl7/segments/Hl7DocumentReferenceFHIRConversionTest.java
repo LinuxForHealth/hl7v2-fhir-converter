@@ -28,6 +28,8 @@ import io.github.linuxforhealth.fhir.FHIRContext;
 import io.github.linuxforhealth.hl7.HL7ToFHIRConverter;
 import io.github.linuxforhealth.hl7.segments.util.PatientUtils;
 import io.github.linuxforhealth.hl7.segments.util.ResourceUtils;
+import io.github.linuxforhealth.hl7.segments.util.DatatypeUtils;
+
 
 public class Hl7DocumentReferenceFHIRConversionTest {
 
@@ -42,9 +44,9 @@ public class Hl7DocumentReferenceFHIRConversionTest {
         //every field covered in the yaml should be listed here
         String documentReference = "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|" + segment + "^MDM_T02|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6|56789^NID^UID|MCM||||\n"
                 + "PID|1||000054321^^^MRN|||||||||||||M|CAT|||||N\n"
-                + "TXA|1|OP|TEXT|20180117144200|5566^PAPLast^PAPFirst^J^^MD|20180117144200|201801180346||<PHYSID>|<PHYSID>|MODL|<MESSAGEID>|4466^TRANSCLast^TRANSCFirst^J||<MESSAGEID>|This segment is for description|PA|R|AV|||||\n"
                 + "ORC|NW|||PGN001|SC|D|1|||MS|MS|||||\n"
-                + "OBR|1||||||20170825010500|||||||||||||002|||||F||||||||\n";
+                + "OBR|1||||||20170825010500|||||||||||||002|||||F||||||||\n"
+                + "TXA|1|OP|TEXT|20180117144200|5566^PAPLast^PAPFirst^J^^MD|20180117144200|201801180346||<PHYSID>|<PHYSID>|MODL|<MESSAGEID>|4466^TRANSCLast^TRANSCFirst^J||<MESSAGEID>|This segment is for description|PA|R|AV|||||\n";
         DocumentReference report = ResourceUtils.getDocumentReference(documentReference);
 
         assertThat(report.hasAuthenticator()).isTrue();
@@ -70,9 +72,9 @@ public class Hl7DocumentReferenceFHIRConversionTest {
     public void doc_ref_authenticator_and_author_test(String segment) {
         String documentReferenceMessage = "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|" + segment + "^MDM_T02|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6|56789^NID^UID|MCM||||\n"
                 + "PID|1||000054321^^^MRN|||||||||||||M|CAT|||||N\n"
-                + "TXA|1||TEXT||||201801180346||<PHYSID1>^DOE^JANE^J^^MD||||||||||AV|||<PHYSID2>^DOE^JOHN^K^^MD||\n"
                 + "ORC|NW|||PGN001|SC|D|1|||MS|MS|||||\n"
-                + "OBR|1||||||20170825010500|||||||||||||002|||||F||||||||\n";
+                + "OBR|1||||||20170825010500|||||||||||||002|||||F||||||||\n"
+                + "TXA|1||TEXT||||201801180346||<PHYSID1>^DOE^JANE^J^^MD||||||||||AV|||<PHYSID2>^DOE^JOHN^K^^MD||\n";
         HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
         String json = ftv.convert(documentReferenceMessage, PatientUtils.OPTIONS);
         assertThat(json).isNotBlank();
@@ -111,13 +113,14 @@ public class Hl7DocumentReferenceFHIRConversionTest {
     public void doc_ref_content_test(String segment) {
         String documentReferenceMessage = "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|" + segment + "^MDM_T02|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6|56789^NID^UID|MCM||||\n"
                 + "PID|1||000054321^^^MRN|||||||||||||M|CAT|||||N\n"
-                + "TXA|1||TEXT||||201801180346||<PHYSID1>||||||||||AV|||<PHYSID2>||\n"
                 + "ORC|NW|||PGN001|SC|D|1|||MS|MS|||||\n"
                 + "OBR|1||||||20170825010500|||||||||||||002|||||F||||||||\n"
+                + "TXA|1||TEXT||||201801180346||<PHYSID1>||||||||||AV|||<PHYSID2>||\n"
                 // Next three lines create an attachment
                 + "OBX|1|TX|||ECHOCARDIOGRAPHIC REPORT||||||F|||202101010000|||\n"
                 + "OBX|2|TX|||NORMAL LV CHAMBER SIZE WITH MILD CONCENTRIC LVH||||||F|||202101010000|||\n"
                 + "OBX|3|TX|||HYPERDYNAMIC LV SYSTOLIC FUNCTION, VISUAL EF 80%||||||F|||202101010000|||\n";
+
         DocumentReference report = ResourceUtils.getDocumentReference(documentReferenceMessage);
         DocumentReference.DocumentReferenceContentComponent content = report.getContentFirstRep();
         assertThat(content.getAttachment().getContentType()).isEqualTo("text/plain"); // Future TXA.3, currently always defaults to text/plain
@@ -130,9 +133,9 @@ public class Hl7DocumentReferenceFHIRConversionTest {
         // Leave this test in place as a reminder
         documentReferenceMessage = "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|" + segment + "^MDM_T02|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6|56789^NID^UID|MCM||||\n"
                 + "PID|1||000054321^^^MRN|||||||||||||M|CAT|||||N\n"
-                + "TXA|1||||||201801180346||<PHYSID1>||||||||||AV|||<PHYSID2>||\n"
                 + "ORC|NW|||PGN001|SC|D|1|||MS|MS|||||\n"
                 + "OBR|1||||||20170825010500|||||||||||||002|||||F||||||||\n"
+                + "TXA|1||||||201801180346||<PHYSID1>||||||||||AV|||<PHYSID2>||\n"
                 // TODO: find better code for this test which is to see that OBX.2 is the fallback.
                 + "OBX|1|SN|||||||||F";
         report = ResourceUtils.getDocumentReference(documentReferenceMessage);
@@ -149,9 +152,10 @@ public class Hl7DocumentReferenceFHIRConversionTest {
     public void doc_ref_context_test(String segment) {
         String documentReferenceMessage = "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|" + segment + "^MDM_T02|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6|56789^NID^UID|MCM||||\n"
                 + "PID|1||000054321^^^MRN|||||||||||||M|CAT|||||N\n"
-                + "TXA|1||TEXT|20180117144200|5566^PAPLast^PAPFirst^J^^MD||201801180346||<PHYSID1>||||||||||AV|||<PHYSID2>||\n"
                 + "ORC|NW|||PGN001|SC|D|1|||MS|MS|||||\n"
-                + "OBR|1||||||20170825010500|||||||||||||002|||||F||||||||\n";
+                // OBR.24 converts to DocumentReference.practiceSetting
+                + "OBR|1||||||20170825010500|||||||||||||002||||CUS|F||||||||\n"
+                + "TXA|1||TEXT|20180117144200|5566^PAPLast^PAPFirst^J^^MD||201801180346||<PHYSID1>||||||||||AV|||<PHYSID2>||\n";
         HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
         String json = ftv.convert(documentReferenceMessage, PatientUtils.OPTIONS);
         assertThat(json).isNotBlank();
@@ -175,10 +179,14 @@ public class Hl7DocumentReferenceFHIRConversionTest {
         DocumentReference.DocumentReferenceContextComponent context = documentReference.getContext();
         assertThat(context.getPeriod().getStartElement().toString()).containsPattern("2018-01-17T14:42:00");
         assertThat(context.hasRelated()).isTrue();
+        assertThat(context.hasPracticeSetting()).isTrue();  // OBR.24
+        DatatypeUtils.checkCommonCodeableConceptAssertions(context.getPracticeSetting(), "CUS", "Cardiac Ultrasound", "http://terminology.hl7.org/CodeSystem/v2-0074", "CUS");
+
         assertThat(practBundle.getIdentifierFirstRep().getValue()).isEqualTo("5566");
         // Value passed to Context(TXA.5) is used as Identifier value in practitioner
         assertThat(practBundle.hasName()).isTrue();
         assertThat(practBundle.getNameFirstRep().getTextElement().getValue()).isEqualTo("MD PAPFirst J PAPLast");
+
     }
 
     @ParameterizedTest
@@ -188,9 +196,9 @@ public class Hl7DocumentReferenceFHIRConversionTest {
     public void doc_ref_date_test(String segment) {
         String documentReferenceMessage = "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|" + segment + "^MDM_T02|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6|56789^NID^UID|MCM||||\n"
                 + "PID|1||000054321^^^MRN|||||||||||||M|CAT|||||N\n"
-                + "TXA|1||TEXT|||20180117144200|201801180346||<PHYSID1>||||||||||AV|||<PHYSID2>||\n"
                 + "ORC|NW|||PGN001|SC|D|1|||MS|MS|||||\n"
-                + "OBR|1||||||20170825010500|||||||||||||002|||||F||||||||\n";
+                + "OBR|1||||||20170825010500|||||||||||||002|||||F||||||||\n"
+                + "TXA|1||TEXT|||20180117144200|201801180346||<PHYSID1>||||||||||AV|||<PHYSID2>||\n";
         DocumentReference report = ResourceUtils.getDocumentReference(documentReferenceMessage);
 
         InstantType date = report.getDateElement();
@@ -204,9 +212,9 @@ public class Hl7DocumentReferenceFHIRConversionTest {
     public void doc_ref_description_test(String segment) {
         String documentReferenceMessage = "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|" + segment + "^MDM_T02|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6|56789^NID^UID|MCM||||\n"
                 + "PID|1||000054321^^^MRN|||||||||||||M|CAT|||||N\n"
-                + "TXA|1||TEXT||||201801180346||<PHYSID1>|||||||This segment is for description|||AV|||<PHYSID2>||\n"
                 + "ORC|NW|||PGN001|SC|D|1|||MS|MS|||||\n"
-                + "OBR|1||||||20170825010500|||||||||||||002|||||F||||||||\n";
+                + "OBR|1||||||20170825010500|||||||||||||002|||||F||||||||\n"
+                + "TXA|1||TEXT||||201801180346||<PHYSID1>|||||||This segment is for description|||AV|||<PHYSID2>||\n";
         DocumentReference report = ResourceUtils.getDocumentReference(documentReferenceMessage);
 
         String description = report.getDescription();
@@ -220,9 +228,9 @@ public class Hl7DocumentReferenceFHIRConversionTest {
     public void doc_ref_doc_status_test(String segment) {
         String documentReferenceMessage = "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|" + segment + "^MDM_T02|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6|56789^NID^UID|MCM||||\n"
                 + "PID|1||000054321^^^MRN|||||||||||||M|CAT|||||N\n"
-                + "TXA|1||TEXT|||20180117144200|201801180346||<PHYSID1>||||||||PA||AV|||<PHYSID2>||\n"
                 + "ORC|NW|||PGN001|SC|D|1|||MS|MS|||||\n"
-                + "OBR|1||||||20170825010500|||||||||||||002|||||F||||||||\n";
+                + "OBR|1||||||20170825010500|||||||||||||002|||||F||||||||\n"
+                + "TXA|1||TEXT|||20180117144200|201801180346||<PHYSID1>||||||||PA||AV|||<PHYSID2>||\n";
         DocumentReference report = ResourceUtils.getDocumentReference(documentReferenceMessage);
         DocumentReference.ReferredDocumentStatus docStatus = report.getDocStatus();
         assertThat(docStatus.toCode()).isEqualTo("preliminary"); // TXA.17
@@ -233,9 +241,9 @@ public class Hl7DocumentReferenceFHIRConversionTest {
         // Check OBX.11 as fallback
         documentReferenceMessage = "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|" + segment + "^MDM_T02|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6|56789^NID^UID|MCM||||\n"
                 + "PID|1||000054321^^^MRN|||||||||||||M|CAT|||||N\n"
-                + "TXA|1||TEXT|||20180117144200|201801180346||<PHYSID1>||||||||||AV|||<PHYSID2>||\n"
                 + "ORC|NW|||PGN001|SC|D|1|||MS|MS|||||\n"
                 + "OBR|1|||555|||20170825010500|||||||||||||002|||||F||||||||\n"
+                + "TXA|1||TEXT|||20180117144200|201801180346||<PHYSID1>||||||||||AV|||<PHYSID2>||\n"
                 + "OBX|1|SN|||||||||F";
         report = ResourceUtils.getDocumentReference(documentReferenceMessage);
         docStatus = report.getDocStatus();
@@ -247,9 +255,9 @@ public class Hl7DocumentReferenceFHIRConversionTest {
         // Check a value that is not mapped results is no docStatus
         documentReferenceMessage = "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|" + segment + "^MDM_T02|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6|56789^NID^UID|MCM||||\n"
                 + "PID|1||000054321^^^MRN|||||||||||||M|CAT|||||N\n"
-                + "TXA|1||TEXT|||20180117144200|201801180346||<PHYSID1>||||||||||AV|||<PHYSID2>\n"
                 + "ORC|NW|||PGN001|SC|D|1|||MS|MS\n"
                 + "OBR|1|||555|||20170825010500|||||||||||||002|||||F\n"
+                + "TXA|1||TEXT|||20180117144200|201801180346||<PHYSID1>||||||||||AV|||<PHYSID2>\n"
                 + "OBX|1|SN|||||||||X";
         report = ResourceUtils.getDocumentReference(documentReferenceMessage);
         assertThat(report.getDocStatus()).isNull(); // OBX-11 'X' is not mapped
@@ -264,9 +272,9 @@ public class Hl7DocumentReferenceFHIRConversionTest {
     public void doc_ref_relates_to_test(String segment) {
         String documentReferenceMessage = "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|" + segment + "^MDM_T02|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6|56789^NID^UID|MCM||||\n"
                 + "PID|1||000054321^^^MRN|||||||||||||M|CAT|||||N\n"
-                + "TXA|1||TEXT|||20180117144200|201801180346||<PHYSID1>||||4466^TRANSCLast^TRANSCFirst^J||||||AV|||<PHYSID2>||\n"
                 + "ORC|NW|||PGN001|SC|D|1|||MS|MS|||||\n"
-                + "OBR|1||||||20170825010500|||||||||||||002|||||F||||||||\n";
+                + "OBR|1||||||20170825010500|||||||||||||002|||||F||||||||\n"
+                + "TXA|1||TEXT|||20180117144200|201801180346||<PHYSID1>||||4466^TRANSCLast^TRANSCFirst^J||||||AV|||<PHYSID2>||\n";
         HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
         String json = ftv.convert(documentReferenceMessage, PatientUtils.OPTIONS);
         assertThat(json).isNotBlank();
@@ -299,9 +307,9 @@ public class Hl7DocumentReferenceFHIRConversionTest {
     public void doc_ref_security_label_test(String segment) {
         String documentReferenceMessage = "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|" + segment + "^MDM_T02|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6|56789^NID^UID|MCM||||\n"
                 + "PID|1||000054321^^^MRN|||||||||||||M|CAT|||||N\n"
-                + "TXA|1||TEXT||||201801180346||<PHYSID1>||||||||PA|R|AV|||<PHYSID2>||\n"
                 + "ORC|NW|||PGN001|SC|D|1|||MS|MS|||||\n"
-                + "OBR|1||||||20170825010500|||||||||||||002|||||F||||||||\n";
+                + "OBR|1||||||20170825010500|||||||||||||002|||||F||||||||\n"
+                + "TXA|1||TEXT||||201801180346||<PHYSID1>||||||||PA|R|AV|||<PHYSID2>||\n";
         DocumentReference report = ResourceUtils.getDocumentReference(documentReferenceMessage);
 
         CodeableConcept securityLabel = report.getSecurityLabelFirstRep();
@@ -320,9 +328,9 @@ public class Hl7DocumentReferenceFHIRConversionTest {
         // TXA.19 value maps to status; OBR.25 is ignored
         String documentReferenceMessage = "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|" + segment + "^MDM_T02|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6|56789^NID^UID|MCM||||\n"
                 + "PID|1||000054321^^^MRN|||||||||||||M|CAT|||||N\n"
-                + "TXA|1||TEXT||||201801180346||<PHYSID1>||||||||PA||OB|||<PHYSID2>||\n"
                 + "ORC|NW|||PGN001|SC|D|1|||MS|MS|||||\n"
-                + "OBR|1||||||20170825010500|||||||||||||002|||||F||||||||\n";
+                + "OBR|1||||||20170825010500|||||||||||||002|||||F||||||||\n"
+                + "TXA|1||TEXT||||201801180346||<PHYSID1>||||||||PA||OB|||<PHYSID2>||\n";
         DocumentReference report = ResourceUtils.getDocumentReference(documentReferenceMessage);
         org.hl7.fhir.r4.model.Enumerations.DocumentReferenceStatus status = report.getStatus();
         assertThat(status.toCode()).isEqualTo("superseded"); // TXA.19
@@ -360,8 +368,8 @@ public class Hl7DocumentReferenceFHIRConversionTest {
     public void doc_ref_subject_test(String segment) {
         String documentReferenceMessage = "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|" + segment + "^MDM_T02|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6|56789^NID^UID|MCM||||\n"
                 + "PID|1||000054321^^^MRN|||||||||||||M|CAT|||||N\n"
-                + "TXA|1||TEXT||||201801180346||<PHYSID1>||||||||||AV|||<PHYSID2>||\n"
-                + "ORC|NW|||PGN001|SC|D|1|||MS|MS|||||\n" + "OBR|1||||||20170825010500|||||||||||||002|||||F||||||||\n";
+                + "ORC|NW|||PGN001|SC|D|1|||MS|MS|||||\n" + "OBR|1||||||20170825010500|||||||||||||002|||||F||||||||\n"
+                + "TXA|1||TEXT||||201801180346||<PHYSID1>||||||||||AV|||<PHYSID2>||\n";
         HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
         String json = ftv.convert(documentReferenceMessage, PatientUtils.OPTIONS);
         assertThat(json).isNotBlank();
@@ -391,9 +399,9 @@ public class Hl7DocumentReferenceFHIRConversionTest {
         // Test masterIdentifier uses the value(12.1) but does not require a system if 12.2 is empty
         String documentReference = "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|" + segment + "^MDM_T02|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6|56789^NID^UID|MCM||||\n"
                 + "PID|1||000054321^^^MRN|||||||||||||M|CAT|||||N\n"
-                + "TXA|1||TEXT||||201801180346|||||<MESSAGEID>|||||PA|R|AV|||||\n"
                 + "ORC|NW|||PGN001|SC|D|1|||MS|MS|||||\n"
-                + "OBR|1||||||20170825010500|||||||||||||002|||||F||||||||\n";
+                + "OBR|1||||||20170825010500|||||||||||||002|||||F||||||||\n"
+                + "TXA|1||TEXT||||201801180346|||||<MESSAGEID>|||||PA|R|AV|||||\n";
         DocumentReference report = ResourceUtils.getDocumentReference(documentReference);
         assertThat(report.hasMasterIdentifier()).isTrue();
         Identifier masterID = report.getMasterIdentifier();
@@ -403,9 +411,9 @@ public class Hl7DocumentReferenceFHIRConversionTest {
         // Test masterIdentifier uses the value(12.1) and pulls systemID from 12.2
         documentReference = "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|" + segment + "^MDM_T02|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6|56789^NID^UID|MCM||||\n"
                 + "PID|1||000054321^^^MRN|||||||||||||M|CAT|||||N\n"
-                + "TXA|1||TEXT||||201801180346|||||<MESSAGEID>^SYSTEM|||||PA|R|AV|||||\n"
                 + "ORC|NW|||PGN001|SC|D|1|||MS|MS|||||\n"
-                + "OBR|1||||||20170825010500|||||||||||||002|||||F||||||||\n";
+                + "OBR|1||||||20170825010500|||||||||||||002|||||F||||||||\n"
+                + "TXA|1||TEXT||||201801180346|||||<MESSAGEID>^SYSTEM|||||PA|R|AV|||||\n";
         report = ResourceUtils.getDocumentReference(documentReference);
         assertThat(report.hasMasterIdentifier()).isTrue();
         masterID = report.getMasterIdentifier();
@@ -415,9 +423,9 @@ public class Hl7DocumentReferenceFHIRConversionTest {
         // Test masterIdentifier uses the backup value(12.3) and does not have a system
         documentReference = "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|" + segment + "^MDM_T02|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6|56789^NID^UID|MCM||||\n"
                 + "PID|1||000054321^^^MRN|||||||||||||M|CAT|||||N\n"
-                + "TXA|1||TEXT||||201801180346|||||^SYSTEM^<BACKUPID>|||||PA|R|AV|||||\n"
                 + "ORC|NW|||PGN001|SC|D|1|||MS|MS|||||\n"
-                + "OBR|1||||||20170825010500|||||||||||||002|||||F||||||||\n";
+                + "OBR|1||||||20170825010500|||||||||||||002|||||F||||||||\n"
+                + "TXA|1||TEXT||||201801180346|||||^SYSTEM^<BACKUPID>|||||PA|R|AV|||||\n";
         report = ResourceUtils.getDocumentReference(documentReference);
         assertThat(report.hasMasterIdentifier()).isTrue();
         masterID = report.getMasterIdentifier();
@@ -432,9 +440,9 @@ public class Hl7DocumentReferenceFHIRConversionTest {
     public void doc_ref_type_test(String segment) {
         String documentReferenceMessage = "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|" + segment + "^MDM_T02|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6|56789^NID^UID|MCM||||\n"
                 + "PID|1||000054321^^^MRN|||||||||||||M|CAT|||||N\n"
-                + "TXA|1|OP|TEXT||||201801180346||<PHYSID1>||||||||PA||AV|||<PHYSID2>||\n"
                 + "ORC|NW|||PGN001|SC|D|1|||MS|MS|||||\n"
-                + "OBR|1||||||20170825010500|||||||||||||002|||||F||||||||\n";
+                + "OBR|1||||||20170825010500|||||||||||||002|||||F||||||||\n"
+                + "TXA|1|OP|TEXT||||201801180346||<PHYSID1>||||||||PA||AV|||<PHYSID2>||\n";
         DocumentReference report = ResourceUtils.getDocumentReference(documentReferenceMessage);
 
         CodeableConcept type = report.getType();
