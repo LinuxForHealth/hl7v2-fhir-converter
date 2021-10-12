@@ -85,4 +85,10 @@ public class DateUtilTest {
         assertThat(ld).isEqualTo("2007-11-04T01:32:06.345+09:00");
     }
 
+    @Test
+    public void simple_datetime_month_day_milliseconds_no_zone() {
+        String ld = DateUtil.formatToDateTimeWithZone("20071104013206.345");
+        assertThat(ld).isEqualTo("2007-11-04T01:32:06.345+08:00");
+    }
+
 }
