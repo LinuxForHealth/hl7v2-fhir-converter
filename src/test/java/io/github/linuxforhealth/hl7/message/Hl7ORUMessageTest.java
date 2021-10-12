@@ -34,7 +34,7 @@ import io.github.linuxforhealth.fhir.FHIRContext;
 import io.github.linuxforhealth.hl7.ConverterOptions;
 import io.github.linuxforhealth.hl7.ConverterOptions.Builder;
 import io.github.linuxforhealth.hl7.HL7ToFHIRConverter;
-import io.github.linuxforhealth.hl7.segments.util.ResourceUtils;
+import io.github.linuxforhealth.hl7.segments.util.DatatypeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,7 +52,8 @@ public class Hl7ORUMessageTest {
     public void test_oru() throws IOException {
         String hl7message = "MSH|^~\\\\&|SendTest1|Sendfac1|Receiveapp1|Receivefac1|200603081747|security|ORU^R01|MSGID000005|T|2.6\r"
                 + "PID||45483|45483||SMITH^SUZIE^||20160813|M|||123 MAIN STREET^^SCHENECTADY^NY^12345||(123)456-7890|||||^^^T||||||||||||\r"
-                + "OBR|1||986^IA PHIMS Stage^2.16.840.1.114222.4.3.3.5.1.2^ISO|1051-2^New Born Screening^LN|||20151009173644|||||||||||||002|||||F|||2740^Tsadok^Janetary~2913^Merrit^Darren^F~3065^Mahoney^Paul^J~4723^Loh^Robert^L~9052^Winter^Oscar^||||3065^Mahoney^Paul^J|\r"
+                // OBR.24 creates a DiagnosticReport.category
+                + "OBR|1||986^IA PHIMS Stage^2.16.840.1.114222.4.3.3.5.1.2^ISO|1051-2^New Born Screening^LN|||20151009173644|||||||||||||002||||CUS|F|||2740^Tsadok^Janetary~2913^Merrit^Darren^F~3065^Mahoney^Paul^J~4723^Loh^Robert^L~9052^Winter^Oscar^||||3065^Mahoney^Paul^J|\r"
                 + "OBX|1|TX|TS-F-01-002^Endocrine Disorders^L||obs report||||||F\r"
                 + "OBX|2|TX|GA-F-01-024^Galactosemia^L||ECHOCARDIOGRAPHIC REPORT||||||F\r";
 
@@ -95,6 +96,11 @@ public class Hl7ORUMessageTest {
         assertThat(diag.getStatus().toCode()).isEqualTo("final");
         List<Reference> performerRef = diag.getResultsInterpreter();
         assertThat(performerRef.get(0).isEmpty()).isFalse();
+
+        // Check category
+        assertThat(diag.hasCategory()).isTrue(); //OBR.24
+        assertThat(diag.getCategory()).hasSize(1);
+        DatatypeUtils.checkCommonCodeableConceptAssertions(diag.getCategoryFirstRep(), "CUS", "Cardiac Ultrasound", "http://terminology.hl7.org/CodeSystem/v2-0074", "CUS");
     }
 
     @Test
