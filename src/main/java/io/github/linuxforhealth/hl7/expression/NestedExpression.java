@@ -67,7 +67,7 @@ public class NestedExpression extends AbstractExpression {
   @Override
   protected EvaluationResult evaluateExpression(InputDataExtractor dataSource,
       Map<String, EvaluationResult> contextValues, EvaluationResult baseValue) {
-    LOGGER.info("Evaluating child expressions {}", this.getExpressionAttr().getName());
+    LOGGER.debug("Evaluating child expressions {}", this.getExpressionAttr().getName());
     ResourceEvaluationResult result = ExpressionUtility.evaluate(dataSource, contextValues, baseValue,
         this.childexpressions);
     if (result.getResolveValues() == null || result.getResolveValues().isEmpty()) {

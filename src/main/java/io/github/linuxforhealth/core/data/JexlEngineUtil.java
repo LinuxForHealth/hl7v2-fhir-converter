@@ -36,7 +36,7 @@ public final class JexlEngineUtil {
 
   public JexlEngineUtil() {
     jexl = new JexlBuilder().silent(false).debug(true).strict(true).create();
-    LOGGER.info("silent:{} , strict :{} ", jexl.isSilent(), jexl.isStrict());
+    LOGGER.debug("silent:{} , strict :{} ", jexl.isSilent(), jexl.isStrict());
     functions.put(StringUtils.class.getSimpleName(), StringUtils.class);
     functions.put(NumberUtils.class.getSimpleName(), NumberUtils.class);
     functions.put(String.class.getSimpleName(), String.class);

@@ -123,7 +123,8 @@ public class HL7MessageEngine implements MessageEngine {
             getContextValuesFromResource(hl7ResourceTemplate, resourceResults);
         localContextValues.putAll(newContextValues);
       } catch (IllegalArgumentException | IllegalStateException e) {
-        LOGGER.error("Exception during  resource {} generation", rs.getName(), e);
+        LOGGER.error("Exception during resource {} generation", rs.getName(), e);
+        LOGGER.debug("Exception during resource {} generation", rs.getName());
 
       } finally {
         MDC.remove(RESOURCE);
@@ -151,14 +152,15 @@ public class HL7MessageEngine implements MessageEngine {
 
       addResourceToBundle(bundle, Lists.newArrayList(updatedResourceResult));
     } catch (IllegalArgumentException | IllegalStateException e) {
-      LOGGER.error("Exception during  resource {} generation", "PendingExpressions", e);
+      LOGGER.error("Exception during resource {} generation", "PendingExpressions");
+      LOGGER.debug("Exception during resource {} generation", "PendingExpressions", e);
 
     } finally {
       MDC.remove(RESOURCE);
     }
     }
 
-    LOGGER.info(
+    LOGGER.debug(
         "Successfully converted Message: {} , Message Control Id: {} to FHIR bundle resource with id {}",
         dataInput.getName(), dataInput.getId(), bundle.getId());
     return bundle;
@@ -299,7 +301,8 @@ public class HL7MessageEngine implements MessageEngine {
           }
         } catch (RequiredConstraintFailureException | IllegalArgumentException
             | IllegalStateException e) {
-          LOGGER.warn("Exception encountered", e);
+          LOGGER.warn("generateMultipleResources - Exception encountered");
+          LOGGER.debug("generateMultipleResources - Exception encountered", e);
         }
       }
     }
@@ -317,9 +320,9 @@ public class HL7MessageEngine implements MessageEngine {
 
     try {
       if (obj != null) {
-        LOGGER.info("Converting resourceName {} to FHIR {}", resourceClass, obj.getResource());
+        LOGGER.debug("Converting resourceName {} to FHIR {}", resourceClass, obj.getResource());
         String json = OBJ_MAPPER.writeValueAsString(obj.getResource());
-        LOGGER.info("Adding resourceName {} to FHIR {}", resourceClass, json);
+        LOGGER.debug("Adding resourceName {} to FHIR {}", resourceClass, json);
         if (json != null) {
           org.hl7.fhir.r4.model.Resource parsed = context.getParser()
               .parseResource(FHIRResourceMapper.getResourceClass(resourceClass), json);
@@ -328,7 +331,8 @@ public class HL7MessageEngine implements MessageEngine {
         }
       }
     } catch (JsonProcessingException e) {
-      LOGGER.error("Processing exception when Serialization", e);
+      LOGGER.error("Processing exception when Serialization");
+      LOGGER.debug("Processing exception when Serialization", e);
     }
   }
 

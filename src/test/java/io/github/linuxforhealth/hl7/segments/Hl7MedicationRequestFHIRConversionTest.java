@@ -36,8 +36,6 @@ import io.github.linuxforhealth.hl7.HL7ToFHIRConverter;
 import io.github.linuxforhealth.hl7.segments.util.PatientUtils;
 import io.github.linuxforhealth.hl7.segments.util.ResourceUtils;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class Hl7MedicationRequestFHIRConversionTest {
 
