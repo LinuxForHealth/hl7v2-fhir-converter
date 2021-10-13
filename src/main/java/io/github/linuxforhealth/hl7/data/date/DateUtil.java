@@ -117,7 +117,7 @@ public class DateUtil {
         ZonedDateTime zdt = ZonedDateTime.parse(input, DateFormats.getFormatterInstance());
         return zdt.format(format);
       } catch (DateTimeParseException e) {
-        LOGGER.warn("Input value cannot be parsed to ZonedDateTime reason: {}", input);
+        LOGGER.warn("Input value cannot be parsed to ZonedDateTime.");
         LOGGER.debug("Input value cannot be parsed to ZonedDateTime {} ", input, e);
         return null;
       }
@@ -162,7 +162,8 @@ public class DateUtil {
       }
     }
     if (temporal == null && !warnings.isEmpty()) {
-      LOGGER.warn("Attempt to parse input value {} to temporal failed ", dateString);
+      LOGGER.warn("Attempt to parse input value to temporal failed.");
+      LOGGER.debug("Attempt to parse input value {} to temporal failed ", dateString);
       for (Entry<String, DateTimeParseException> entry : warnings.entrySet()) {
         LOGGER.debug("{} reason {}", entry.getKey(), entry.getValue().toString());
       }
