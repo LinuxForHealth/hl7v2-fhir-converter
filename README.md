@@ -6,6 +6,9 @@ Message parsing and modeling is supported using the "HAPI" libraries for [HL7](h
 
 The converter supports the following message types/events:
 * ADT_A01 - Patient Administration: Admit/Visit Notification
+* ADT_A08 - Patient Administration: Update Patient Information
+* ADT_A34 - Patient Administration: Merge Patient Information - Patient ID Only
+* ADT_A40 - Patient Administration: Merge Patient - Patient Identifier List
 * OMP_O09 - Pharmacy/Treatment Order
 * ORU_R01 - Observation Reporting: Observation and Result Transmission (Laboratory)
 * PPR_PC1 - Patient Problem: Add Problem
@@ -15,7 +18,9 @@ The converter supports the following message types/events:
 
 The converter supports the following message segments:
 * AL1 - Patient Allergy Information
+* DG1 - Diagnosis
 * EVN - Event Type
+* MRG - Merge Patient Information
 * MSH - Message Header
 * NTE - Notes and Comments
 * OBR - Observation Request
@@ -32,8 +37,14 @@ The converter supports the following message segments:
 * RXO - Pharmacy/Treatment Order
 * RXR - Pharmacy/Treatment Route
 * SPM - Specimen
+* TXA - Transcription Document Header
 
-If you need another message type/event . . .  contributions are welcome! We welcome [Pull Requests](https://github.com/LinuxForHealth/hl7v2-fhir-converter/pulls)!
+If you need another message type/event . . .  contributions are welcome! See [CONTRIBUTING.md](CONTRIBUTING.md)!
+
+## Additional Documentation
+* [Templating Configuration](./TEMPLATING.md)
+* [Development Guide](./DEVELOPMENT.md)
+* [HL7 to FHIR Conversion Design](./HL7FHIR.md)
 
 ## Development Quickstart
 
@@ -103,7 +114,3 @@ The config.properties file location is searched in the following order:
    ``` -Dhl7converter.config.home=/opt/converter/config_home_folder/```
 
 * Lastly, the local classpath resource folder will be searched for config.properties
-
-## Additional Documentation
-* [Templating Configuration](./TEMPLATING.md)
-* [Development Guide](./DEVELOPMENT.md)

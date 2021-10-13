@@ -8,7 +8,9 @@ attachment:
   valueOf: datatype/Attachment
   expressionType: resource
   vars:
-    title: $value
+    mime: $contentType
+    date: $creationDate
+    data: $contentData
 
 
 

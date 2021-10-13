@@ -13,24 +13,41 @@ identifier:
    generateList: true  
    expressionType: resource
    vars:
-      id: CWE.1
+      id: CWE.1 | XON.10 | XON.3
       system: CWE.3
-name_v2:
+name_v1:
    type: STRING
    condition: $idValue NULL
-   valueOf: CWE.2
+   valueOf: CWE.2 | XON.1
    required: true
    expressionType: HL7Spec
    vars:
-      idValue: CWE.1
-name_v1:
+      idValue: CWE.1 | XON.10 | XON.3
+name_v2:
    type: STRING
    condition: $idValue NOT_NULL
-   valueOf: CWE.2
+   valueOf: CWE.2 | XON.1
    expressionType: HL7Spec
    vars:
-      idValue: CWE.1
+      idValue: CWE.1 | XON.10 | XON.3
 alias:
    type: STRING
    valueOf: CWE.5
    expressionType: HL7Spec
+
+address:
+   valueOf: datatype/Address
+   generateList: true
+   expressionType: resource
+   specs: $orgAddressXAD  
+
+contact: 
+   valueOf: secondary/Contact
+   generateList: true
+   expressionType: resource
+   specs: $orgContactXCN
+   constants:
+      code: 'ADMIN'
+      system_code: 'contactentity-type'
+      display: 'Administrative'
+      text: 'Organization Medical Director'

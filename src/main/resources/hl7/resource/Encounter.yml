@@ -1,5 +1,5 @@
 #
-# (C) Copyright IBM Corp. 2020
+# (C) Copyright IBM Corp. 2020, 2021
 #
 # SPDX-License-Identifier: Apache-2.0
 #
@@ -46,11 +46,9 @@ status:
       vars3: String, PV2.16
 
 class:
-    valueOf: datatype/Coding
-    required: true
-    expressionType: resource
-    vars:
-       code: PV1.2
+    type: ACT_ENCOUNTER
+    specs: PV1.2
+    expressionType: HL7Spec
 
 type:
    valueOf: datatype/CodeableConcept
@@ -84,20 +82,38 @@ length:
     valueOf: datatype/Duration
     expressionType: resource
     vars: 
-      time1: DATE_TIME, PV1.44
-      time2: DATE_TIME, PV1.45
+      pv2time: STRING, PV2.11
+      pv1length: PV1_DURATION_LENGTH, PV1
 
-reasonCode:
+reasonCode_1:
     valueOf: datatype/CodeableConcept
     generateList: true
     expressionType: resource
-    specs: EVN.4 | PV2.3
+    specs: EVN.4
 
-reasonReference:
-    valueOf: datatype/Reference
-    generateList: true
-    expressionType: resource
-    specs: $Condition | $Observation
+reasonCode_2:
+  valueOf: datatype/CodeableConcept
+  generateList: true
+  expressionType: resource
+  specs: PV2.3
+  vars:
+    code: PV2.3
+
+reasonReference_1:
+   valueOf: datatype/Reference
+   condition: $Condition NOT_NULL 
+   evaluateLater: true
+   generateList: true
+   expressionType: resource
+   specs: $Condition
+
+reasonReference_2:
+   valueOf: datatype/Reference
+   condition: $Observation NOT_NULL
+   evaluateLater: true
+   generateList: true
+   expressionType: resource
+   specs: $Observation    
 
 hospitalization:
     valueOf: secondary/Hospitalization
@@ -108,13 +124,123 @@ subject:
     expressionType: resource
     specs: $Patient
 
-# Uncomment until we figure out to reference condition from encounter
-# diagnosis.condition is required
-#
-# diagnosis:
-#     valueOf: datatype/Diagnosis
-#     generateList: true
-#     expressionType: resource
-#     specs: DG1
-#     vars:
-#       Condition: $Condition
+diagnosis:
+   expressionType: nested
+   evaluateLater: true
+   generateList: true
+   specs: DG1
+   expressionsMap:
+     condition:
+        valueOf: datatype/Reference
+        expressionType: resource
+        specs: $Condition
+     use:
+        valueOf: datatype/CodeableConcept
+        expressionType: resource
+        specs: DG1.6
+        vars:
+          coding: DIAGNOSIS_USE, DG1.6
+     rank:
+        type: STRING
+        valueOf: DG1.15
+        expressionType: HL7Spec
+
+text:
+   condition: $text NOT_NULL
+   valueOf: datatype/Narrative
+   expressionType: resource
+   vars:
+      text: PV2.12
+   constants:
+      status: "additional"
+
+participant_1:
+   condition: $practionerSpec NOT_NULL
+   valueOf: secondary/Participant
+   generateList: true
+   expressionType: resource
+   specs: PV1.7
+   vars:
+      practionerSpec: PV1.7
+   constants:
+      codeableConceptCode: 'ATND'
+      codeableConceptText: 'attender'
+
+participant_2:
+   condition: $practionerSpec NOT_NULL
+   valueOf: secondary/Participant
+   generateList: true
+   specs: PV1.8
+   expressionType: resource
+   vars:
+      practionerSpec: PV1.8
+   constants:
+      codeableConceptCode: 'REF'
+      codeableConceptText: 'referrer'
+
+participant_3:
+   condition: $practionerSpec NOT_NULL
+   valueOf: secondary/Participant
+   generateList: true
+   specs: PV1.9
+   expressionType: resource
+   vars:
+      practionerSpec: PV1.9
+   constants:
+      codeableConceptCode: 'CON'
+      codeableConceptText: 'consultant'
+
+participant_4:
+   condition: $practionerSpec NOT_NULL
+   valueOf: secondary/Participant
+   generateList: true
+   specs: PV1.17
+   expressionType: resource
+   vars:
+      practionerSpec: PV1.17
+   constants:
+      codeableConceptCode: 'ADM'
+      codeableConceptText: 'admitter'
+
+extension_1:
+   generateList: true
+   expressionType: nested
+   vars:
+      code: String, PV2.38.1
+      displayLookup: ENCOUNTER_MODE_ARRIVAL_DISPLAY, PV2.38.1
+   expressions:
+      - condition: $code NOT_NULL && $displayLookup NOT_NULL
+        expressionType: nested
+        vars:
+            system: SYSTEM_URL, $system_code
+            display: $displayLookup
+        constants:
+            system_code: 'mode-of-arrival-system'
+        expressionsMap:
+            url:
+               type: SYSTEM_URL
+               value: 'encounter-modeOfArrival-extension'
+            valueCoding:
+               valueOf: datatype/Coding
+               expressionType: resource
+
+      - condition: $code NOT_NULL && $displayLookup NULL && $coding NOT_NULL
+        expressionType: nested
+        vars:
+           coding: CODING_SYSTEM_V2, PV2.38
+        expressionsMap:
+            url:
+               type: SYSTEM_URL
+               value: 'encounter-modeOfArrival-extension'
+            valueCoding:
+               valueOf: $coding
+               specs: CWE
+
+serviceProvider:
+      condition: $idValue NOT_NULL
+      valueOf: resource/Organization_ServiceProvider
+      expressionType: reference
+      vars:
+            idValue: PV2.23.8 | PV1.3.4.1
+            name: PV2.23.1 | PV1.3.4.1
+

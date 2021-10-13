@@ -1,5 +1,5 @@
 #
-# (C) Copyright IBM Corp. 2020
+# (C) Copyright IBM Corp. 2020, 2021
 #
 # SPDX-License-Identifier: Apache-2.0
 #
@@ -22,6 +22,15 @@ identifier_1: #joins filler | placer | MSH.7 with whatever gets returned from BU
   constants:
       sys: "urn:id:extID"
       joinChar: '-'
+
+identifier_2:
+   condition: $valueIn NOT_NULL
+   valueOf: datatype/Identifier_var
+   generateList: true
+   expressionType: resource
+   vars:
+      valueIn: OBX.21.1 
+      systemCX: OBX.21.2  
 
 status:
    type: OBSERVATION_STATUS
@@ -55,7 +64,7 @@ effectiveDateTime:
 
 issued:
      type: DATE_TIME
-     valueOf: OBR.22 | MSH.7| OBX.19
+     valueOf: OBR.22 | OBX.19
      expressionType: HL7Spec
 
 
@@ -67,15 +76,42 @@ valueString:
     vars: 
       obx2: STRING, OBX.2
       
-valueQuantity:
+valueQuantity_1:
     valueOf: datatype/Quantity
     expressionType: resource
     condition: $obx2 EQUALS NM
     vars: 
       value: OBX.5
-      unit: OBX.6
+      unit: OBX.6.1
+      code: OBX.6.1
       obx2: STRING, OBX.2
+      resolvedSystem: SYSTEM_URL, OBX.6.3
 
+valueQuantity_2:
+    valueOf: datatype/Quantity
+    expressionType: resource
+    condition: $obx2 EQUALS SN && $separator NULL 
+    vars: 
+      value: OBX.5.2
+      unit: OBX.6.1 
+      code: OBX.6.1 
+      comparator: OBX.5.1
+      obx2: STRING, OBX.2
+      separator: STRING, OBX.5.3
+      resolvedSystem: SYSTEM_URL, OBX.6.3
+
+valueQuantity_3:
+    valueOf: datatype/Quantity
+    expressionType: resource
+    condition: $obx2 EQUALS SN && $separator NOT_NULL && $separator NOT_EQUALS ':' && $separator NOT_EQUALS '/' 
+    vars: 
+      value: OBX.5.2
+      unit: OBX.6.1 
+      code: OBX.6.1
+      comparator: OBX.5.1
+      obx2: STRING, OBX.2
+      separator: STRING, OBX.5.3
+      resolvedSystem: SYSTEM_URL, OBX.6.3
 
 valueCodeableConcept:
      condition:  $obx2 EQUALS  CF || $obx2 EQUALS CNE || $obx2 EQUALS CWE || $obx2 EQUALS CE
@@ -110,8 +146,8 @@ valueTime:
    vars:
      obx2: STRING, OBX.2
 
-valueRatio:
-   condition: $obx2 EQUALS SN && $obx5.3 EQUALS ':'
+valueRatio_1:
+   condition: $obx2 EQUALS SN && $separator NOT_NULL && $separator EQUALS ':'
    valueOf: datatype/Ratio
    expressionType: resource
    specs: OBX.5
@@ -119,8 +155,18 @@ valueRatio:
      numerator: SN.2
      denominator: SN.4
      obx2: STRING, OBX.2
-     obx5.3: STRING, OBX.5.3
-       
+     separator: STRING, SN.3
+
+valueRatio_2:
+   condition: $obx2 EQUALS SN && $separator NOT_NULL && $separator EQUALS '/'
+   valueOf: datatype/Ratio
+   expressionType: resource
+   specs: OBX.5
+   vars:
+     numerator: SN.2
+     denominator: SN.4
+     obx2: STRING, OBX.2
+     separator: STRING, SN.3
 
 interpretation: 
    valueOf: datatype/CodeableConcept
@@ -139,6 +185,7 @@ note_1:
 note_2:
    valueOf: datatype/Annotation
    generateList: true
+   condition: NTE NOT_NULL
    expressionType: resource
    specs: NTE
 
@@ -154,21 +201,56 @@ method:
 
 referenceRange: 
    valueOf: secondary/ReferenceRange
+   condition: $textValue NOT_NULL
    generateList: true
    expressionType: resource
    specs: OBX.7
    vars:
-     low:  OBX.7, GeneralUtils.split(low, "-", 0)
-     high: OBX.7, GeneralUtils.split(high, "-", 1)
-     appliesto: OBX.10
-     text: OBX.7
-     type: OBX.10
+     low:  OBX.7, GeneralUtils.extractLow(low)
+     high: OBX.7, GeneralUtils.extractHigh(high)
+     appliestoValue: OBX.10
+     textValue: OBX.7
+     typeValue: OBX.10
      unit: OBX.6
 
-performer: 
+performer_1:
+   condition: $performerValue NOT_NULL
    valueOf: resource/Practitioner
    generateList: true
    expressionType: reference
    specs: OBX.16
+   vars:
+     performerValue: OBX.16
 
+performer_2:
+   condition: $performerValue2 NOT_NULL
+   valueOf: resource/Organization
+   generateList: true
+   expressionType: reference
+   specs: OBX.23
+   vars:
+     performerValue2: OBX.23
+     orgAddressXAD: OBX.24
+     orgContactXCN: OBX.25
 
+device:
+   condition: $deviceValue NOT_NULL
+   valueOf: resource/Device
+   generateList: true
+   expressionType: reference
+   specs: OBX.18
+   vars:
+     deviceValue: OBX.18
+
+category:
+   condition: $specimen NOT_NULL
+   valueOf: datatype/CodeableConcept_var
+   generateList: true
+   expressionType: resource
+   vars: 
+      system: SYSTEM_URL, $system_code
+      specimen: SPM.4
+   constants:
+      code: 'laboratory'
+      system_code: 'observation-category'
+      display: 'Laboratory'

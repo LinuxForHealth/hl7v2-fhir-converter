@@ -95,13 +95,13 @@ public class ResourceReader {
     return resource;
   }
 
-  public Map<String, HL7MessageModel> getMessageTemplates() throws IOException {
+  public Map<String, HL7MessageModel> getMessageTemplates() {
     Map<String, HL7MessageModel> messagetemplates = new HashMap<>();
     List<String> supportedMessageTemplates =
         ConverterConfiguration.getInstance().getSupportedMessageTemplates();
     for (String template : supportedMessageTemplates) {
-      HL7MessageModel rm = getMessageModel(template.toString());
-      messagetemplates.put(com.google.common.io.Files.getNameWithoutExtension(template.toString()),
+      HL7MessageModel rm = getMessageModel(template);
+      messagetemplates.put(com.google.common.io.Files.getNameWithoutExtension(template),
           rm);
     }
     return messagetemplates;

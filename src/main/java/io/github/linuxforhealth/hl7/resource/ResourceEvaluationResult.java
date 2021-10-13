@@ -10,18 +10,27 @@ public class ResourceEvaluationResult {
 
 
   private List<ResourceValue> additionalResolveValues;
-
-
   private Map<String, Object> resolveValues;
+  private PendingExpressionState pendingExpressions;
 
 
+  public ResourceEvaluationResult(Map<String, Object> resolveValues) {
+    this(resolveValues, new ArrayList<>(), null);
+  }
 
   public ResourceEvaluationResult(Map<String, Object> resolveValues,
       List<ResourceValue> additionalResolveValues) {
+    this(resolveValues, additionalResolveValues,
+        PendingExpressionState.emptyPendingExpressionState());
+  }
+
+  public ResourceEvaluationResult(Map<String, Object> resolveValues,
+      List<ResourceValue> additionalResolveValues, PendingExpressionState pendingExpressions) {
     this.additionalResolveValues = new ArrayList<>();
     this.additionalResolveValues.addAll(additionalResolveValues);
     this.resolveValues = new HashMap<>();
     this.resolveValues.putAll(resolveValues);
+    this.pendingExpressions = pendingExpressions;
   }
 
 
@@ -33,6 +42,10 @@ public class ResourceEvaluationResult {
 
   public Map<String, Object> getResolveValues() {
     return resolveValues;
+  }
+
+  public PendingExpressionState getPendingExpressions() {
+    return pendingExpressions;
   }
 
 }

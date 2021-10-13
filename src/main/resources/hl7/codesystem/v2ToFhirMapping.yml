@@ -22,6 +22,17 @@ ObservationStatus:
    I: registered
    P: preliminary
    W: entered-in-error
+
+ServiceRequestStatus:
+   A: active
+   CA: revoked
+   CM: completed
+   DC: revoked
+   ER: entered-in-error
+   HD: on-hold
+   IP: active
+   SC: active
+      
 AdministrativeGender:
    A: other
    F: female
@@ -29,6 +40,7 @@ AdministrativeGender:
    N: unknown
    O: other
    U: unknown
+
 DiagnosticReportStatus:
    A: partial
    C: corrected
@@ -36,7 +48,7 @@ DiagnosticReportStatus:
    I: unknown
    O: unknown
    P: preliminary
-   R: registered
+   R: partial
    S: unknown
    X: cancelled
    Y: unknown
@@ -77,6 +89,22 @@ NameUse:
   TEMP: temp
   NOUSE: old
   BAD: old
+   
+EncounterModeOfArrivalDisplay:
+  A: Ambulance
+  C: Car
+  F: On foot
+  H: Helicopter
+  O: Other
+  P: Public Transport
+  U: Unknown
+
+#Using Actcode for encounter.class
+V3ActCode:
+  E: EMER
+  I: IMP
+  P: PRENC
+  O: AMB
 
 V3MaritalStatus:
   A: A
@@ -90,6 +118,43 @@ V3MaritalStatus:
   T: T
   U: U
   W: W
+
+DocumentReferenceStatus: #DocumenReference Status
+  #TXA.19
+  AV: current
+  CA: entered-in-error
+  OB: superseded
+  UN: current
+  #OBR.25
+  A: current
+  C: current
+  F: current
+  I: current
+  O: current
+  P: current
+  R: current
+  S: current
+  X: entered-in-error
+
+CompositionStatus: #DocumenReference docStatus
+  #TXA.17
+  AU: final
+  DI: preliminary
+  DO: preliminary
+  IN: preliminary
+  IP: preliminary
+  PA: preliminary
+  LA: final
+  #OBX.11
+  C: final
+  F: final
+  I: preliminary
+  P: preliminary
+  R: preliminary
+  S: preliminary
+  U: final
+  W: entered-in-error
+  # We are not mapping D,N,O,X - those values will result in this field not being set
 
 V3Race:
   # American Indian or Alaska Native	
@@ -279,3 +344,33 @@ V3ReligiousAffiliation:
 
 DiagnosisRole:
    A: AD
+
+MedicationRequestStatus:
+   AF: active
+   CA: cancelled
+   CR: cancelled
+   DC: stopped
+   DE: entered-in-error
+   DF: cancelled
+   DR: stopped
+   FU: active
+   HD: on-hold
+   HR: on-hold
+   NW: active
+   OC: cancelled
+   OD: stopped
+   OE: active
+   OF: active
+   OH: on-hold
+   OK: active
+   OP: active
+   OR: active
+   PY: active
+   RF: active
+   RL: active
+   RO: active
+   RP: active
+   RQ: active
+   RR: active
+   RU: active
+

@@ -1,0 +1,69 @@
+#
+# (C) Copyright IBM Corp. 2021
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+resourceType: Patient
+# Represents data that needs to be extracted for a Patient Resource in FHIR
+# reference: https://www.hl7.org/fhir/patient.html
+
+# This patient resource is used to create patient resources generated from MRG segments.
+id:
+   type: STRING
+   valueOf: UUID.randomUUID()
+   expressionType: JEXL
+
+identifier:
+   condition: $mrgIdentifier NOT_NULL
+   valueOf: datatype/Identifier_SystemID
+   generateList: true
+   expressionType: resource
+   specs: MRG.1
+   constants:
+      use: old
+      mrgIdentifier: MRG.1
+      
+name:
+   valueOf: datatype/HumanName
+   generateList: true
+   expressionType: resource
+   specs: MRG.7
+
+active:
+   type: BOOLEAN  
+   valueOf: false
+
+# A40 uses a group for Patient
+link_1:
+   generateList: true
+   expressionType: nested
+   condition: $triggerEvent EQUALS A34
+   vars: 
+      triggerEvent: STRING, MSH.9.2
+   expressionsMap:
+      type:
+        type: STRING
+        valueOf: 'replaced-by'
+      other:
+        required: true
+        valueOf: datatype/Reference
+        expressionType: resource
+        specs: $Patient
+# A34 does not use a group for patient.
+link_2:
+   generateList: true
+   expressionType: nested
+   condition: $triggerEvent EQUALS A40
+   vars: 
+      triggerEvent: STRING, MSH.9.2
+   expressionsMap:
+      type:
+        type: STRING
+        valueOf: 'replaced-by'
+      other:
+        required: true
+        valueOf: datatype/Reference
+        expressionType: resource
+        specs: $Patient
+        useGroup: true
+

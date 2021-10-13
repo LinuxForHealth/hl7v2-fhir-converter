@@ -9,7 +9,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.UUID;
+
 import org.hl7.fhir.r4.model.Observation.ObservationStatus;
+import org.hl7.fhir.r4.model.ServiceRequest.ServiceRequestStatus;
 import org.hl7.fhir.r4.model.Specimen.SpecimenStatus;
 import org.hl7.fhir.r4.model.codesystems.V3MaritalStatus;
 import org.hl7.fhir.r4.model.codesystems.V3Race;
@@ -17,7 +19,12 @@ import org.hl7.fhir.r4.model.codesystems.V3ReligiousAffiliation;
 import org.junit.jupiter.api.Test;
 import ca.uhn.hl7v2.model.DataTypeException;
 import ca.uhn.hl7v2.model.v26.datatype.CWE;
+import ca.uhn.hl7v2.model.v26.datatype.XCN;
+import ca.uhn.hl7v2.model.v26.segment.PV1;
 import ca.uhn.hl7v2.model.v26.datatype.TX;
+import ca.uhn.hl7v2.model.v26.group.ORU_R01_PATIENT;
+import ca.uhn.hl7v2.model.v26.group.ORU_R01_PATIENT_RESULT;
+import ca.uhn.hl7v2.model.v26.group.ORU_R01_VISIT;
 import ca.uhn.hl7v2.model.v26.message.ORU_R01;
 import io.github.linuxforhealth.core.terminology.SimpleCode;
 import io.github.linuxforhealth.hl7.data.date.DateUtil;
@@ -146,6 +153,20 @@ public class SimpleDataValueResolverTest {
     assertThat(code.getDisplay()).containsPattern("Invalid.*ZZZ.*"+theSystem);    
   }
 
+  @Test
+  public void get_service_request_status_value_valid() {
+    String gen = "SC";
+    assertThat(SimpleDataValueResolver.SERVICE_REQUEST_STATUS.apply(gen))
+		.isEqualTo(ServiceRequestStatus.ACTIVE.toCode());
+  }
+
+  
+  @Test
+  public void get_service_request_status_value_invalid() {
+    String gen = "z";
+    assertThat(SimpleDataValueResolver.SERVICE_REQUEST_STATUS.apply(gen)).isNull();
+  }
+
 
 
   @Test
@@ -255,6 +276,66 @@ public class SimpleDataValueResolverTest {
     assertThat(SimpleDataValueResolver.SYSTEM_ID.apply("A B C")).isEqualTo("urn:id:A_B_C");
     assertThat(SimpleDataValueResolver.SYSTEM_ID.apply("")).isNull();
     assertThat(SimpleDataValueResolver.SYSTEM_ID.apply(null)).isNull();
+  }
+
+  @Test
+  public void getDisplayNameValid() throws DataTypeException {
+    XCN xcn = new XCN(null);
+    xcn.getPrefixEgDR().setValue("Dr");
+    xcn.getGivenName().setValue("Joe");
+    xcn.getSecondAndFurtherGivenNamesOrInitialsThereof().setValue("Q");
+    xcn.getFamilyName().getSurname().setValue("Johnson");
+    xcn.getSuffixEgJRorIII().setValue("III");
+ 
+    assertThat(SimpleDataValueResolver.PERSON_DISPLAY_NAME.apply(xcn)).isEqualTo("Dr Joe Q Johnson III");
+  }
+
+  @Test
+  public void getDisplayNameNotValid() throws DataTypeException {
+    CWE cwe = new CWE(null);
+    cwe.getCwe3_NameOfCodingSystem().setValue("HL70005");
+    cwe.getCwe1_Identifier().setValue("2028-9");
+    cwe.getCwe2_Text().setValue("Asian");
+  
+    // CWE is not a valid input and should return null
+    assertThat(SimpleDataValueResolver.PERSON_DISPLAY_NAME.apply(cwe)).isNull();
+    // String is not a valid input and should return null
+    assertThat(SimpleDataValueResolver.PERSON_DISPLAY_NAME.apply("Bogus String")).isNull();
+  }  
+
+  @Test
+  public void getPV1DurationLength() throws DataTypeException  {
+    // Get a PV1
+    ORU_R01 message = new ORU_R01();
+    ORU_R01_PATIENT_RESULT patientResult = message.getPATIENT_RESULT();
+    ORU_R01_PATIENT patient = patientResult.getPATIENT();
+    ORU_R01_VISIT visit = patient.getVISIT();
+    PV1 pv1 =  visit.getPV1();
+
+    // Admit and Discharge are not yet set; they are still empty
+    assertThat(SimpleDataValueResolver.PV1_DURATION_LENGTH.apply(pv1)).isNull();
+
+    // Admit set, but Discharge not yet set
+    pv1.getAdmitDateTime().setValue("20161013154626"); 
+    assertThat(SimpleDataValueResolver.PV1_DURATION_LENGTH.apply(pv1)).isNull();
+
+    // Admit and Discharge set to valid values
+    pv1.getAdmitDateTime().setValue("20161013154626"); 
+    pv1.getDischargeDateTime().setValue("20161013164626"); 
+    assertThat(SimpleDataValueResolver.PV1_DURATION_LENGTH.apply(pv1)).isEqualTo("60");
+
+    // Admit and Discharge set to valid values less that one minute apart
+    pv1.getAdmitDateTime().setValue("20161013154626"); 
+    pv1.getDischargeDateTime().setValue("20161013154628"); 
+    assertThat(SimpleDataValueResolver.PV1_DURATION_LENGTH.apply(pv1)).isEqualTo("0");
+
+    // Admit and Discharge set to insufficient detail values (have no minutes) return null
+    pv1.getAdmitDateTime().setValue("20161013"); 
+    pv1.getDischargeDateTime().setValue("20161013"); 
+    assertThat(SimpleDataValueResolver.PV1_DURATION_LENGTH.apply(pv1)).isNull();
+
+    // Other input types, such as a string, are not valid and null is returned
+    assertThat(SimpleDataValueResolver.PV1_DURATION_LENGTH.apply("A string")).isNull();
   }
 
 }

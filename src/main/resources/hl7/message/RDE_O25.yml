@@ -30,22 +30,34 @@ resources:
     additionalSegments:
       - .PATIENT_VISIT.PV2
       - MSH
+      - ORDER.OBSERVATION.OBX
 
-  - resourceName: Medication
+  - resourceName: MedicationRequest
     segment: .RXE
-    resourcePath: resource/Medication
+    resourcePath: resource/MedicationRequest
     isReferenced: true
     group: ORDER
     repeats: true
     additionalSegments:
-      - .ORC
-      - .ORDER_DETAIL.RXO
-      - .RXC
       - MSH
+      - .ORC
+      - PATIENT.PATIENT_VISIT.PV1
+      - PATIENT.PID
+      # RXO not included on purpose, only want to use RXE for RDE messages
 
   - resourceName: AllergyIntolerance
-    segment: AL1
+    segment: PATIENT.AL1
     resourcePath: resource/AllergyIntolerance
     repeats: true
     additionalSegments:
+      - MSH
+
+  - resourceName: Observation
+    segment: .OBSERVATION.OBX
+    group: ORDER
+    resourcePath: resource/Observation
+    repeats: true
+    isReferenced: true
+    additionalSegments:
+      - .ORC
       - MSH

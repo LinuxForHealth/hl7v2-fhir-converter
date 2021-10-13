@@ -8,6 +8,7 @@ package io.github.linuxforhealth.hl7.parsing;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
+import ca.uhn.hl7v2.model.v26.segment.MSH;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,7 +46,6 @@ public class HL7DataExtractor {
 
   public HL7DataExtractor(Message message) {
     this.message = message;
-
   }
 
 
@@ -263,14 +263,8 @@ public class HL7DataExtractor {
           e.getMessage());
 
       return new Hl7ParsingTypeResult(new ArrayList<>());
-
-
     }
-
-
   }
-
-
 
   public ParsingResult<Type> getComponent(Type inputType, int component) {
     try {
@@ -325,11 +319,8 @@ public class HL7DataExtractor {
           inputType, component, subComponent, e.getMessage());
 
       return new Hl7ParsingTypeResult(new ArrayList<>());
-
     }
   }
-
-
 
   private Terser getTerser() {
     Message unmodifiableMessage = Unmodifiable.unmodifiableMessage(message);
@@ -337,15 +328,19 @@ public class HL7DataExtractor {
   }
 
   public static String getMessageType(Message message) {
-    return message.getName();
+    try {
+      MSH msh = (MSH) message.get("MSH");
+      String theActualMessageType = msh.getMessageType().getMsg1_MessageCode().getValue() + "_" + msh.getMessageType().getMsg2_TriggerEvent().getValue();
+      return theActualMessageType;
+    } catch (HL7Exception e){
+      LOGGER.warn("Cannot extract actual message type, reason {}", e.getMessage());
+    }
+    return null;
   }
-
 
   public String getMessageType() {
-    return message.getName();
+  return getMessageType(message);
   }
-
-
 
   /**
    * 
@@ -367,8 +362,6 @@ public class HL7DataExtractor {
           e.getMessage());
 
       return new Hl7ParsingStringResult(null);
-
-
     }
   }
 
@@ -390,8 +383,6 @@ public class HL7DataExtractor {
       Preconditions.checkArgument(struct != null, "struct cannot be null ");
       Preconditions.checkArgument(StringUtils.isNotBlank(segment), SEGMENT_CANNOT_BE_NULL_OR_EMPTY);
 
-
-
       if (struct instanceof Group) {
         Group gp = (Group) struct;
 
@@ -410,8 +401,6 @@ public class HL7DataExtractor {
           e.getMessage());
 
       return new Hl7ParsingStructureResult(new ArrayList<>());
-
     }
   }
-
 }

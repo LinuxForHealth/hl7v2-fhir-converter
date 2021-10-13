@@ -20,6 +20,7 @@ resources:
       repeats: false
       isReferenced: true
       additionalSegments:
+             - MSH
       
     - resourceName: Encounter
       segment: PV1
@@ -28,10 +29,25 @@ resources:
       isReferenced: true
       additionalSegments:
              - EVN
+             - MSH
+             - OBSERVATION.OBX
 
     - resourceName: Observation
-      segment: OBX
+      segment: .OBX
+      group: OBSERVATION
       resourcePath: resource/Observation
       repeats: true
       isReferenced: true
       additionalSegments:
+             - MSH
+
+    - resourceName: DocumentReference
+      segment: TXA
+      resourcePath: resource/DocumentReference
+      repeats: true
+      additionalSegments:
+        - MSH
+        - PID
+        - COMMON_ORDER.ORC
+        - OBR
+        - OBSERVATION.OBX

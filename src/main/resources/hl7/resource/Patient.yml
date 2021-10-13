@@ -44,6 +44,17 @@ identifier_3:
       code: DL
       display: Driver's license number
 # There is no text for PID.20
+identifier_4:
+   condition: $mrgIdentifier NOT_NULL
+   valueOf: datatype/Identifier_SystemID
+   generateList: true
+   expressionType: resource
+   specs: MRG.1
+   constants:
+      use: old
+      mrgIdentifier: MRG.1
+# Add the old MR # from the MRG segment
+
 name:
    valueOf: datatype/HumanName
    generateList: true
@@ -61,7 +72,7 @@ address:
    specs: PID.11
 telecom_1:
    condition: $pid14 NOT_NULL
-   valueOf: datatype/Telecom
+   valueOf: datatype/ContactPoint
    generateList: true
    expressionType: resource
    specs: PID.14
@@ -72,7 +83,7 @@ telecom_1:
 # The yaml is processed in reverse order, therefore
 telecom_2:
    condition: $pid13 NOT_NULL
-   valueOf: datatype/Telecom
+   valueOf: datatype/ContactPoint
    generateList: true
    expressionType: resource
    specs: PID.13
@@ -138,11 +149,15 @@ maritalStatus:
    condition: $coding NOT_NULL
    vars:
       coding: MARITAL_STATUS, PID.16
+      text: String, PID.16.2
 generalPractitioner:
+   condition: $practitionerVal NOT_NULL
    valueOf: resource/Practitioner
    generateList: true
    expressionType: reference
    specs: PD1.4
+   vars:
+      practitionerVal: PD1.4
 extension:
    generateList: true
    expressionType: nested
@@ -167,6 +182,8 @@ extension:
             condition: $coding NOT_NULL
             vars:
                coding: RELIGIOUS_AFFILIATION_CC, PID.17
+               text: String, PID.17.2
+
    -  expressionType: nested
       specs: PID.10
       generateList: true
@@ -185,3 +202,25 @@ communication:
    expressionType: resource
    vars:
       language: PID.15
+
+active:
+   type: BOOLEAN  
+   valueOf: true
+
+
+link:
+   generateList: true
+   evaluateLater: true
+   expressionType: nested
+   condition: $mrgSegment NOT_NULL
+   vars: 
+      mrgSegment: MRG
+   expressionsMap:
+      type:
+        type: STRING
+        valueOf: 'replaces'
+      other:
+        required: true
+        valueOf: resource/PatientMRG
+        expressionType: reference
+

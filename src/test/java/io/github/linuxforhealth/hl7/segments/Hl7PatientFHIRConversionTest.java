@@ -6,6 +6,8 @@
 package io.github.linuxforhealth.hl7.segments;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.Assertions;
@@ -39,9 +41,26 @@ public class Hl7PatientFHIRConversionTest {
   private static FHIRContext context = new FHIRContext(true, false);
   private static final Logger LOGGER = LoggerFactory.getLogger(Hl7PatientFHIRConversionTest.class);
 
-  @Test
-  public void test_patient_additional_demographics() {
-    String hl7message = "MSH|^~\\&|hl7Integration|hl7Integration|||||ADT^A01|||2.6|\n"
+  // Tests the PD1 segment with all supported message types.
+  @ParameterizedTest
+  @ValueSource(strings = { "MSH|^~\\&|hl7Integration|hl7Integration|||||ADT^A01|||2.6|\r",
+    // "MSH|^~\\&|hl7Integration|hl7Integration|||||ADT^A02|||2.6|\r",
+    // "MSH|^~\\&|hl7Integration|hl7Integration|||||ADT^A03|||2.6|\r",
+    // "MSH|^~\\&|hl7Integration|hl7Integration|||||ADT^A04|||2.6|\r",
+    "MSH|^~\\&|hl7Integration|hl7Integration|||||ADT^A08|||2.6|\r",
+    // "MSH|^~\\&|hl7Integration|hl7Integration|||||ADT^A28|||2.6|\r",
+    // "MSH|^~\\&|hl7Integration|hl7Integration|||||ADT^A31|||2.6|\r",
+    "MSH|^~\\&|hl7Integration|hl7Integration|||||ADT^A34|||2.6|\r",
+    "MSH|^~\\&|hl7Integration|hl7Integration|||||ADT^A40|||2.6|\r",
+    // "MSH|^~\\&|hl7Integration|hl7Integration|||||OMP^O09|||2.6|\r",
+    // "MSH|^~\\&|hl7Integration|hl7Integration|||||ORM^O01|||2.6|\r",
+    // "MSH|^~\\&|hl7Integration|hl7Integration|||||ORU^R01|||2.6|\r",
+    // "MSH|^~\\&|hl7Integration|hl7Integration|||||RDE^O11|||2.6|\r",
+    // "MSH|^~\\&|hl7Integration|hl7Integration|||||RDE^O25|||2.6|\r",
+    // "MSH|^~\\&|hl7Integration|hl7Integration|||||VXU^V04|||2.6|\r",
+    })
+  public void test_patient_additional_demographics(String msh) {
+    String hl7message = msh
     		+ "PID|1||1234^^^AssigningAuthority^MR||TEST^PATIENT|\n"
     		+ "PD1|||Sample Family Practice^^2222|1111^LastName^ClinicianFirstName^^^^Title||||||||||||A|";
 
@@ -288,22 +307,22 @@ public class Hl7PatientFHIRConversionTest {
             "MSH|^~\\&|MyEMR|DE-000001| |CAIRLO|20160701123030-0700||VXU^V04^VXU_V04|CA0001|P|2.6|||ER|AL|||||Z22^CDCPHINVS|DE-000001\r" +
                     "PID|1||12345678^^^MRN||TestPatient^Jane|||||||||||M^^^^^^47||||||\r";
 
-    String singlePatientWithVersion =
+    String singlePatientWithVersionAndOriginalText =
             "MSH|^~\\&|MyEMR|DE-000001| |CAIRLO|20160701123030-0700||VXU^V04^VXU_V04|CA0001|P|2.6|||ER|AL|||||Z22^CDCPHINVS|DE-000001\r" +
-                    "PID|1||12345678^^^MRN||TestPatient^Jane|||||||||||S^^^^^^1.1||||||\r";
+                    "PID|1||12345678^^^MRN||TestPatient^Jane|||||||||||S^unmarried^^^^^1.1||||||\r";
 
     Patient patientObjMarried = PatientUtils.createPatientFromHl7Segment(marriedPatientWithVersion);
     assertThat(patientObjMarried.hasMaritalStatus()).isTrue();
-    assertThat(patientObjMarried.getMaritalStatus().getText()).isEqualTo("Married");
+    assertThat(patientObjMarried.getMaritalStatus().hasText()).isFalse();
     assertThat(patientObjMarried.getMaritalStatus().getCoding()).hasSize(1);
     Coding coding = patientObjMarried.getMaritalStatus().getCodingFirstRep();
     assertThat(coding.getDisplay()).isEqualTo(V3MaritalStatus.M.getDisplay());
     assertThat(coding.getSystem()).isEqualTo(V3MaritalStatus.M.getSystem());
     assertThat(coding.getVersion()).isEqualTo("47");
 
-    Patient patientObjMarriedAltText = PatientUtils.createPatientFromHl7Segment(singlePatientWithVersion);
+    Patient patientObjMarriedAltText = PatientUtils.createPatientFromHl7Segment(singlePatientWithVersionAndOriginalText);
     assertThat(patientObjMarriedAltText.hasMaritalStatus()).isTrue();
-    assertThat(patientObjMarriedAltText.getMaritalStatus().getText()).isEqualTo("Never Married");
+    assertThat(patientObjMarriedAltText.getMaritalStatus().getText()).isEqualTo("unmarried");
     assertThat(patientObjMarriedAltText.getMaritalStatus().getCoding()).hasSize(1);
     coding = patientObjMarriedAltText.getMaritalStatus().getCodingFirstRep();
     assertThat(coding.getDisplay()).isEqualTo(V3MaritalStatus.S.getDisplay());
@@ -348,8 +367,8 @@ public class Hl7PatientFHIRConversionTest {
     assertThat(ccNoCode.getLanguage().getText()).isEqualTo("English");
     Coding codeNo = ccNoCode.getLanguage().getCodingFirstRep();
     assertThat(codeNo.getCode()).isEqualTo("ENG");
-    assertThat(codeNo.getSystem()).isNull();
-    assertThat(codeNo.hasDisplay()).isFalse();
+    assertThat(code.getDisplay()).isEqualTo("English");
+    assertThat(codeNo.hasDisplay()).isTrue();
 
     Patient patientObjCodeOnly = PatientUtils.createPatientFromHl7Segment(patientEnglishCodeOnly);
     assertThat(patientObjCodeOnly.hasCommunication()).isTrue();
@@ -361,7 +380,7 @@ public class Hl7PatientFHIRConversionTest {
     Coding coding = ccCodeOnly.getLanguage().getCodingFirstRep();
     assertThat(coding.getCode()).isEqualTo("ENG");
     assertThat(coding.getSystem()).isNull();
-    assertThat(codeNo.hasDisplay()).isFalse();
+    assertThat(coding.getDisplay()).isNull();
 
   }
 
@@ -443,6 +462,7 @@ public class Hl7PatientFHIRConversionTest {
     HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
     String json = ftv.convert(hl7message , PatientUtils.OPTIONS);
     assertThat(json).isNotBlank();
+    LOGGER.info(json);
 
     IBaseResource bundleResource = context.getParser().parseResource(json);
     assertThat(bundleResource).isNotNull();
@@ -486,7 +506,7 @@ public class Hl7PatientFHIRConversionTest {
         + "EVN|A01|20130617154644\r"
         + "PID|1|465 306 5961|000010016^^^MR~000010017^^^MR~000010018^^^MR|407623|Wood^Patrick^^Sr^MR||19700101|female|||High Street^^Oxford^^Ox1 4DP~George St^^Oxford^^Ox1 5AP|||||||\r"
         + "NK1|1|Wood^John^^^MR|Father||999-9999\r" + "NK1|2|Jones^Georgie^^^MSS|MOTHER||999-9999\r"
-        + "PV1|1||Location||||||||||||||||261938_6_201306171546|||||||||||||||||||||||||20130617134644|||||||||\r"
+        + "PV1|1|E|Location||||||||||||||||261938_6_201306171546|||||||||||||||||||||||||20130617134644|||||||||\r"
         + "OBX|1|TX|1234||First line: ECHOCARDIOGRAPHIC REPORT||||||F|||||2740^Tsadok^Janetary~2913^Merrit^Darren^F~3065^Mahoney^Paul^J~4723^Loh^Robert^L~9052^Winter^Oscar^|\r";
 
     validate_data_lineage(hl7message, "ADT^A01");

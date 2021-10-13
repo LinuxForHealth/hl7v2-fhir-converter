@@ -46,8 +46,7 @@ public class ConfigDirectoryLocationStrategy implements FileLocationStrategy {
    */
   @Override
   public URL locate(final FileSystem fileSystem, final FileLocator locator) {
-    if (StringUtils.isNotEmpty(locator.getFileName())) {
-      if (confDirectory != null) {
+    if (StringUtils.isNotEmpty(locator.getFileName()) && confDirectory != null) {
         LOGGER.info("Looking for config file in location {} based on config.home system property.",
             confDirectory);
       final File file = new File(confDirectory, locator.getFileName());
@@ -59,7 +58,6 @@ public class ConfigDirectoryLocationStrategy implements FileLocationStrategy {
           return null;
         }
       }
-    }
     }
     return null;
   }

@@ -37,10 +37,13 @@ import io.github.linuxforhealth.core.ObjectMapperUtil;
 import io.github.linuxforhealth.core.exception.RequiredConstraintFailureException;
 import io.github.linuxforhealth.core.expression.EvaluationResultFactory;
 import io.github.linuxforhealth.core.resource.ResourceResult;
+import io.github.linuxforhealth.core.resource.SimpleResourceValue;
 import io.github.linuxforhealth.fhir.FHIRContext;
 import io.github.linuxforhealth.fhir.FHIRResourceMapper;
 import io.github.linuxforhealth.hl7.message.util.SegmentExtractorUtil;
 import io.github.linuxforhealth.hl7.message.util.SegmentGroup;
+import io.github.linuxforhealth.hl7.resource.ResourceEvaluationResult;
+import io.github.linuxforhealth.hl7.util.ExpressionUtility;
 
 /**
  * Implements Message engine for HL7 message data
@@ -50,8 +53,7 @@ import io.github.linuxforhealth.hl7.message.util.SegmentGroup;
  */
 public class HL7MessageEngine implements MessageEngine {
 
-
-
+  private static final String RESOURCE = "Resource";
   private static final Logger LOGGER = LoggerFactory.getLogger(HL7MessageEngine.class);
   private static final ObjectMapper OBJ_MAPPER = ObjectMapperUtil.getJSONInstance();
   private FHIRContext context;
@@ -75,7 +77,6 @@ public class HL7MessageEngine implements MessageEngine {
     this.bundleType = bundleType;
   }
 
-
   /**
    * Converts a HL7 message to a FHIR bundle with the list of resources specified
    * 
@@ -93,16 +94,28 @@ public class HL7MessageEngine implements MessageEngine {
     HL7MessageData hl7DataInput = (HL7MessageData) dataInput;
     Bundle bundle = initBundle();
     Map<String, EvaluationResult> localContextValues = new HashMap<>(contextValues);
+    List<ResourceResult> resourceResultsWithEvalLater = new ArrayList<>();
     for (FHIRResourceTemplate genericTemplate : resources) {
       HL7FHIRResourceTemplate hl7ResourceTemplate = (HL7FHIRResourceTemplate) genericTemplate;
       ResourceModel rs = genericTemplate.getResource();
       List<ResourceResult> resourceResults = new ArrayList<>();
       try {
-        MDC.put("Resource", rs.getName());
+        MDC.put(RESOURCE, rs.getName());
         List<ResourceResult> results =
-            generateResources(hl7DataInput, hl7ResourceTemplate, localContextValues, bundle);
+            generateResources(hl7DataInput, hl7ResourceTemplate, localContextValues);
         if (results != null) {
           resourceResults.addAll(results);
+          results.stream()
+              .filter(
+                  r -> (r.getPendingExpressions() != null && !r.getPendingExpressions().isEmpty()))
+              .forEach(re -> resourceResultsWithEvalLater.add(re));
+          List<ResourceResult> resultsToAddToBundle = results.stream()
+              .filter(
+                  r -> (r.getPendingExpressions() == null || r.getPendingExpressions().isEmpty()))
+              .collect(Collectors.toList());
+
+          addResourceToBundle(bundle, resultsToAddToBundle);
+
         }
 
         resourceResults.removeIf(isEmpty());
@@ -113,12 +126,38 @@ public class HL7MessageEngine implements MessageEngine {
         LOGGER.error("Exception during  resource {} generation", rs.getName(), e);
 
       } finally {
-        MDC.remove("Resource");
+        MDC.remove(RESOURCE);
       }
-
-
-
     }
+    for (ResourceResult r : resourceResultsWithEvalLater) {
+      MDC.put(RESOURCE, "PendingExpressions");
+      try {
+        Map<String, EvaluationResult> primaryContextValues = new HashMap<>(localContextValues);
+        r.getPendingExpressions().getContextValues().entrySet()
+            .forEach(e -> primaryContextValues.putIfAbsent(e.getKey(), e.getValue()));
+      ResourceEvaluationResult res =
+          ExpressionUtility.evaluate(hl7DataInput, primaryContextValues,
+              r.getPendingExpressions().getExpressions());
+
+      Map<String, Object> resolvedValues = new HashMap<>();
+      resolvedValues.putAll(r.getValue().getResource());
+      resolvedValues.putAll(res.getResolveValues());
+      List<ResourceValue> additionalResources = new ArrayList<>();
+      additionalResources.addAll(r.getAdditionalResources());
+      additionalResources.addAll(res.getAdditionalResolveValues());
+      ResourceResult updatedResourceResult = new ResourceResult(
+          new SimpleResourceValue(resolvedValues, r.getValue().getFHIRResourceType()),
+          additionalResources, r.getGroupId());
+
+      addResourceToBundle(bundle, Lists.newArrayList(updatedResourceResult));
+    } catch (IllegalArgumentException | IllegalStateException e) {
+      LOGGER.error("Exception during  resource {} generation", "PendingExpressions", e);
+
+    } finally {
+      MDC.remove(RESOURCE);
+    }
+    }
+
     LOGGER.info(
         "Successfully converted Message: {} , Message Control Id: {} to FHIR bundle resource with id {}",
         dataInput.getName(), dataInput.getId(), bundle.getId());
@@ -126,8 +165,7 @@ public class HL7MessageEngine implements MessageEngine {
   }
 
   private List<ResourceResult> generateResources(HL7MessageData hl7DataInput,
-      HL7FHIRResourceTemplate template, Map<String, EvaluationResult> contextValues,
-      Bundle bundle) {
+      HL7FHIRResourceTemplate template, Map<String, EvaluationResult> contextValues) {
 
     ResourceModel resourceModel = template.getResource();
     List<String> segmentGroup = template.getAttributes().getSegment().getGroup();
@@ -139,17 +177,17 @@ public class HL7MessageEngine implements MessageEngine {
 
       resourceResults = generateMultipleResources(hl7DataInput, resourceModel, contextValues,
           multipleSegments, template.isGenerateMultiple());
-
     }
+    return resourceResults;
+  }
 
+  private void addResourceToBundle(Bundle bundle, List<ResourceResult> resourceResults) {
     if (resourceResults != null && !resourceResults.isEmpty()) {
       for (ResourceResult resReult : resourceResults) {
         addToBundle(bundle, Lists.newArrayList(resReult.getValue()));
         addToBundle(bundle, resReult.getAdditionalResources());
       }
     }
-
-    return resourceResults;
   }
 
   private static Predicate<ResourceResult> isEmpty() {
@@ -202,8 +240,6 @@ public class HL7MessageEngine implements MessageEngine {
     return bundle;
   }
 
-
-
   private static Map<String, EvaluationResult> getContextMap(SegmentGroup segmentGroup) {
     // populate local context with additional segment details
     Map<String, EvaluationResult> localContextValues = new HashMap<>();
@@ -215,8 +251,6 @@ public class HL7MessageEngine implements MessageEngine {
     }
     return localContextValues;
   }
-
-
 
   private static List<SegmentGroup> getMultipleSegments(final HL7MessageData hl7DataInput,
       final HL7FHIRResourceTemplate template, List<String> segmentGroup, String segment) {
@@ -262,16 +296,12 @@ public class HL7MessageEngine implements MessageEngine {
               // If only single resource needs to be generated then return.
               return resourceResults;
             }
-
           }
-
-
         } catch (RequiredConstraintFailureException | IllegalArgumentException
             | IllegalStateException e) {
           LOGGER.warn("Exception encountered", e);
         }
       }
-
     }
     return resourceResults;
   }
@@ -279,14 +309,9 @@ public class HL7MessageEngine implements MessageEngine {
 
   private void addToBundle(Bundle bundle, List<ResourceValue> objects) {
     if (objects != null && !objects.isEmpty()) {
-      objects.forEach(obj -> {
-        addEntry(obj.getFHIRResourceType(), obj, bundle);
-      });
-
+      objects.forEach(obj -> addEntry(obj.getFHIRResourceType(), obj, bundle));
     }
   }
-
-
 
   private void addEntry(String resourceClass, ResourceValue obj, Bundle bundle) {
 
@@ -305,14 +330,10 @@ public class HL7MessageEngine implements MessageEngine {
     } catch (JsonProcessingException e) {
       LOGGER.error("Processing exception when Serialization", e);
     }
-
-
   }
 
   @Override
   public FHIRContext getFHIRContext() {
     return context;
   }
-
-
 }

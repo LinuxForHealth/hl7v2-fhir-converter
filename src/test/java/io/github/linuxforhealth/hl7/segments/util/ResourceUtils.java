@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+import java.util.ArrayList;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -27,11 +28,11 @@ public class ResourceUtils {
   private static final ConverterOptions OPTIONS =
     new Builder().withValidateResource().withPrettyPrint().build();
 
-  private static List<BundleEntryComponent> createHl7Segment(String inputSegment){
+  public static List<BundleEntryComponent> createHl7Segment(String inputSegment){
     HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
     String json = ftv.convert(inputSegment, OPTIONS);
-    System.out.println(json);
     assertThat(json).isNotBlank();
+    LOGGER.info("FHIR json result:\n" + json);
     FHIRContext context = new FHIRContext();
     IBaseResource bundleResource = context.getParser().parseResource(json);
     assertThat(bundleResource).isNotNull();
@@ -208,5 +209,80 @@ public class ResourceUtils {
     Class<? extends IBaseResource> klass = MedicationAdministration.class;
 
     return (MedicationAdministration) context.getParser().parseResource(klass, s);
+  }
+
+  // Given a bundle and practioner reference, returns the matching referenced Practitioner from the bundle
+  // Asserts that there is at least one practitioner in the bundle and exactly one match for the reference
+  public static Practitioner getSpecificPractitionerFromBundle(Bundle bundle, String practitionerRef) {
+    List<BundleEntryComponent> entries = bundle.getEntry();
+    // Find the practitioner resources from the FHIR bundle.
+    List<Resource> practitioners = entries.stream()
+        .filter(v -> ResourceType.Practitioner == v.getResource().getResourceType())
+        .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+    assertThat(practitioners.size()).isPositive(); // Confirm there is at least one practitioner
+    // Find all practitioners with matching Id's in the list of practitioners.
+    List<Resource> matchingPractitioners = new ArrayList<Resource>();
+    for (int i = 0; i < practitioners.size(); i++) {
+      if (practitioners.get(i).getId().equalsIgnoreCase(practitionerRef)) {
+        matchingPractitioners.add(practitioners.get(i));
+      }
+    }
+    assertThat(matchingPractitioners).hasSize(1); // Count must be exactly 1.  
+    Practitioner pract = (Practitioner) matchingPractitioners.get(0);
+    return pract;
+  }
+ 
+  public static ServiceRequest getResourceServiceRequest(Resource resource, FHIRContext context ) {
+    String s = context.getParser().encodeResourceToString(resource);
+    Class<? extends IBaseResource> klass = ServiceRequest.class;
+    return (ServiceRequest) context.getParser().parseResource(klass, s);
+  }
+
+  public static DiagnosticReport getResourceDiagnosticReport(Resource resource, FHIRContext context) {
+    String s = context.getParser().encodeResourceToString(resource);
+    Class<? extends IBaseResource> klass = DiagnosticReport.class;
+    return (DiagnosticReport) context.getParser().parseResource(klass, s);
+  }
+
+  public static DocumentReference getResourceDocumentReference(Resource resource, FHIRContext context) {
+    String s = context.getParser().encodeResourceToString(resource);
+    Class<? extends IBaseResource> klass = DocumentReference.class;
+    return (DocumentReference) context.getParser().parseResource(klass, s);
+  }
+
+  public static MedicationRequest getResourceMedicationRequest(Resource resource, FHIRContext context) {
+    String s = context.getParser().encodeResourceToString(resource);
+    Class<? extends IBaseResource> klass = MedicationRequest.class;
+    return (MedicationRequest) context.getParser().parseResource(klass, s);
+  }
+
+  public static Patient getResourcePatient(Resource resource, FHIRContext context) {
+    String s = context.getParser().encodeResourceToString(resource);
+    Class<? extends IBaseResource> klass = Patient.class;
+    return (Patient) context.getParser().parseResource(klass, s);
+  }
+
+  public static Immunization getResourceImmunization(Resource resource, FHIRContext context) {
+    String s = context.getParser().encodeResourceToString(resource);
+    Class<? extends IBaseResource> klass = Immunization.class;
+    return (Immunization) context.getParser().parseResource(klass, s);
+  }
+
+  public static Encounter getResourceEncounter(Resource resource, FHIRContext context) {
+      String s = context.getParser().encodeResourceToString(resource);
+      Class<? extends IBaseResource> klass = Encounter.class;
+      return (Encounter) context.getParser().parseResource(klass, s);
+  }
+
+  public static Practitioner getResourcePractitioner(Resource resource, FHIRContext context) {
+      String s = context.getParser().encodeResourceToString(resource);
+      Class<? extends IBaseResource> klass = Practitioner.class;
+      return (Practitioner) context.getParser().parseResource(klass, s);
+  }
+
+  public static Organization getResourceOrganization(Resource resource, FHIRContext context) {
+      String s = context.getParser().encodeResourceToString(resource);
+      Class<? extends IBaseResource> klass = Organization.class;
+      return (Organization) context.getParser().parseResource(klass, s);
   }
 }

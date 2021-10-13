@@ -39,6 +39,7 @@ public class ConditionUtil {
 
   private static Condition createSimpleCondition(String conditionString) {
     StringTokenizer stk = new StringTokenizer(conditionString);
+    stk.setQuoteChar('\'');
     if (stk.getTokenList().size() == 2) {
       String var1 = stk.nextToken();
       String var2 = stk.nextToken();

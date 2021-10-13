@@ -31,6 +31,8 @@ resources:
       additionalSegments:
              - .PV2
              - MSH
+             - PID
+             - ORDER.OBSERVATION.OBX
 
     - resourceName: Immunization
       segment: .RXA

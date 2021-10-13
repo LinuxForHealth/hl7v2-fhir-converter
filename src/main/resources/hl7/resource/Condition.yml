@@ -63,12 +63,12 @@ category_x1:
    generateList: true
    expressionType: resource
    condition:  $source NOT_NULL
-   vars:     
+   vars:
      source: PRB.3
    constants:
      display: 'Problem List Item'
      code: 'problem-list-item'
-     text: 'problem-list-item'
+     text: 'Problem List Item'
      system: 'http://terminology.hl7.org/CodeSystem/condition-category'
      type: problem-list-item
 
@@ -78,22 +78,14 @@ category_x2:
    generateList: true
    expressionType: resource
    condition:  $source NULL
-   vars:     
+   vars:
      source: PRB.3
    constants:
      display: 'Encounter Diagnosis'
      code: 'encounter-diagnosis'
-     text: 'encounter-diagnosis'
-     system: 'http://terminology.hl7.org/CodeSystem/condition-category' 
+     text: 'Encounter Diagnosis'
+     system: 'http://terminology.hl7.org/CodeSystem/condition-category'
      type: encounter-diagnosis
-
-clinicalStatus:
-   valueOf: datatype/CodeableConcept_var
-   expressionType: resource
-   constants:
-      system: 'http://terminology.hl7.org/CodeSystem/condition-clinical'
-      code: 'remission'
-      display: 'Remission'
 
 severity:
   valueOf: datatype/CodeableConcept
@@ -106,7 +98,7 @@ code:
    generateList: true
    expressionType: resource
    specs: PRB.3 | DG1.3
-          
+
 encounter:
   valueOf: datatype/Reference
   expressionType: resource
@@ -117,19 +109,6 @@ subject:
   expressionType: resource
   specs: $Patient
 
-onsetDateTime:
-     type: DATE_TIME
-     valueOf: PRB.16 | DG1.5
-     expressionType: HL7Spec
-
-stage:
-   valueOf: secondary/Stage
-   generateList: true
-   expressionType: resource
-   specs: PRB.14
-   vars:
-     code: PRB.14
-
 evidence:
   valueOf: secondary/evidence
   generateList: true
@@ -138,10 +117,13 @@ evidence:
   useGroup: true
 
 asserter:
+   condition: $asserterVal NOT_NULL
    valueOf: resource/Practitioner
    generateList: true
    expressionType: reference
    specs: DG1.16
+   vars:
+     asserterVal: DG1.16
 
 recordedDate:
    type: DATE_TIME
@@ -160,14 +142,19 @@ verificationStatus:
   specs: PRB.13
   vars:
     code: PRB.13
-  
+
+onsetDateTime:
+  type: DATE_TIME
+  valueOf: PRB.16 | DG1.5
+  expressionType: HL7Spec
+
 onsetString:
-  condition: $onsetDateTime NOT_NULL
+  condition: $onsetDateTime NULL
   type: STRING
   valueOf: PRB.17
   expressionType: HL7Spec
   vars:
-    onsetDateTime: PRB.16
+    onsetDateTime: PRB.16  #DG1.5 not referenced for onsetDateTime as there is currently not a fallback DG1 segment to use for a onset string
 
 extension_1:
    generateList: true
@@ -178,3 +165,21 @@ extension_1:
    constants:
       KEY_NAME_SUFFIX: DateTime
       urlValue: condition-assertedDate
+
+# We don't populate this optional field if the value is invalid.
+verificationStatus:
+  condition: $coding NOT_NULL
+  valueOf: datatype/CodeableConcept
+  expressionType: resource
+  vars:
+    coding: CONDITION_VERIFICATION_STATUS_FHIR, PRB.13
+    text: String, PRB.13.2
+
+# We don't populate this optional field if the value is invalid.
+clinicalStatus:
+  condition: $coding NOT_NULL
+  valueOf: datatype/CodeableConcept
+  expressionType: resource
+  vars:
+    coding: CONDITION_CLINICAL_STATUS_FHIR, PRB.14
+    text: String, PRB.14.2

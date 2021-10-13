@@ -52,7 +52,7 @@ public class HL7ToFHIRConverter {
       messagetemplates.putAll(ResourceReader.getInstance().getMessageTemplates());
       TerminologyLookup.init();
       UrlLookup.init();
-    } catch (IOException | IllegalArgumentException e) {
+    } catch (IllegalArgumentException e) {
       throw new IllegalStateException("Failure to initialize the templates for the converter.", e);
     }
   }

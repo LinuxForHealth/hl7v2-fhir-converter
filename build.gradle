@@ -1,9 +1,9 @@
 /*
- * (C) Copyright IBM Corp. 2020
+ * (C) Copyright IBM Corp. 2020, 2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
- 
+
 plugins {
     // Apply the java-library plugin to add support for Java Library
     id 'java-library'
@@ -74,6 +74,8 @@ repositories {
 
 test {
     useJUnitPlatform()
+    // Use parallel processing as possible
+    maxParallelForks = (int) (Runtime.runtime.availableProcessors() / 2 + 1)
     finalizedBy jacocoTestReport // report is always generated after tests run
 }
 
@@ -119,8 +121,6 @@ artifacts {
     archives sourcesJar
     archives javadocJar
 }
-
-
 
 
 publishing {
@@ -170,7 +170,7 @@ if (isReleaseVersion ) {
     def signingKey = System.getenv("signingKey")
     def signingPassword = System.getenv("signingPassword")
     useInMemoryPgpKeys(signingKeyId, signingKey, signingPassword)
-    }   
+    }
     sign publishing.publications.mavenPublication
 }
 

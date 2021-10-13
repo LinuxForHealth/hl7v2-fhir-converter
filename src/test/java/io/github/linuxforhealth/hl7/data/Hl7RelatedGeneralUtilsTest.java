@@ -116,6 +116,63 @@ public class Hl7RelatedGeneralUtilsTest {
   }
 
 
+
+  // ExtractHigh and ExtractLow assumes if there are two or more values, the first is low, the second is high,
+  // but if there is only one value, it is the high
+  @Test
+  public void testExtractHigh() {
+
+    String aString = "27.0-55.2";
+    String resultValue = Hl7RelatedGeneralUtils.extractHigh(aString);
+    assertThat(resultValue).isEqualTo("55.2");
+
+    aString = "47.47";
+    resultValue = Hl7RelatedGeneralUtils.extractHigh(aString);
+    assertThat(resultValue).isEqualTo("47.47");
+
+    aString = "<0.50 IU/mL";
+    resultValue = Hl7RelatedGeneralUtils.extractHigh(aString);
+    assertThat(resultValue).isEqualTo("0.50");
+
+    aString = "something111another222more333done";
+    resultValue = Hl7RelatedGeneralUtils.extractHigh(aString);
+    assertThat(resultValue).isEqualTo("222");
+
+    aString = "Normal";
+    resultValue = Hl7RelatedGeneralUtils.extractHigh(aString);
+    assertThat(resultValue).isNull();
+
+  }
+
+  // ExtractHigh and ExtractLow assumes if there are two or more numbers (with or without decimal points), 
+  // the first is low, the second is high, but if there is only one value, it is the high
+  // See extensive notes near the methods. 
+  @Test
+  public void testExtractLow() {
+
+    String aString = "27.0-55.2";
+    String resultValue = Hl7RelatedGeneralUtils.extractLow(aString);
+    assertThat(resultValue).isEqualTo("27.0");
+
+    aString = "47.47";
+    resultValue = Hl7RelatedGeneralUtils.extractLow(aString);
+    assertThat(resultValue).isNull();
+
+    aString = "<0.50 IU/mL";
+    resultValue = Hl7RelatedGeneralUtils.extractLow(aString);
+    assertThat(resultValue).isNull();
+
+    aString = "something111another222more333done";
+    resultValue = Hl7RelatedGeneralUtils.extractLow(aString);
+    assertThat(resultValue).isEqualTo("111");
+
+    aString = "Normal";
+    resultValue = Hl7RelatedGeneralUtils.extractLow(aString);
+    assertThat(resultValue).isNull();
+
+  }
+
+
   @Test
   public void test_makeStringArray() {
     // Test for 2
@@ -252,6 +309,23 @@ public class Hl7RelatedGeneralUtilsTest {
     assertThat(Hl7RelatedGeneralUtils.getFormattedTelecomNumberValue("111","","","4444444","555","112")).contains("ext. 555");
     assertThat(Hl7RelatedGeneralUtils.getFormattedTelecomNumberValue("111","","","4444444","555","112")).isEqualTo("444 4444 ext. 555");
     assertThat(Hl7RelatedGeneralUtils.getFormattedTelecomNumberValue("111","","","4444444","","112")).isEqualTo("444 4444");  // Same rule without extension
+  }
+
+  @Test
+  public void testGetFormatAsId() {
+   
+    // Inputs are any string
+    assertThat(Hl7RelatedGeneralUtils.formatAsId("Mayo Clinic")).isEqualTo("mayo.clinic");
+    assertThat(Hl7RelatedGeneralUtils.formatAsId("OMC")).isEqualTo("omc");
+    assertThat(Hl7RelatedGeneralUtils.formatAsId("   4 5 6  ")).isEqualTo("4.5.6");
+
+    // Edge cases (if these occur we might have name space collisions)
+    // The input is trimmed so totally blank input becomes empty
+    assertThat(Hl7RelatedGeneralUtils.formatAsId(" ")).isEmpty();
+    assertThat(Hl7RelatedGeneralUtils.formatAsId("")).isEmpty();
+    // Null in becomes null out
+    assertThat(Hl7RelatedGeneralUtils.formatAsId(null)).isNull();
+
   }
 
 }
