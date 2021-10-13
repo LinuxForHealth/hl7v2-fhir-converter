@@ -81,14 +81,32 @@ public class DateUtilTest {
 
     @Test
     public void simple_datetime_month_day_milliseconds_zone() {
-        String ld = DateUtil.formatToDateTimeWithZone("20071104013206.345+0900");
+        String ld = DateUtil.formatToDateTimeWithZone("20071104013206.3+0900");
+        assertThat(ld).isEqualTo("2007-11-04T01:32:06.3+09:00");
+
+        ld = DateUtil.formatToDateTimeWithZone("20071104013206.34+0900");
+        assertThat(ld).isEqualTo("2007-11-04T01:32:06.34+09:00");
+
+        ld = DateUtil.formatToDateTimeWithZone("20071104013206.345+0900");
         assertThat(ld).isEqualTo("2007-11-04T01:32:06.345+09:00");
+
+        ld = DateUtil.formatToDateTimeWithZone("20071104013206.3456+0900");
+        assertThat(ld).isEqualTo("2007-11-04T01:32:06.3456+09:00");
     }
 
     @Test
     public void simple_datetime_month_day_milliseconds_no_zone() {
-        String ld = DateUtil.formatToDateTimeWithZone("20071104013206.345");
+        String ld = DateUtil.formatToDateTimeWithZone("20071104013206.3");
+        assertThat(ld).isEqualTo("2007-11-04T01:32:06.3+08:00");
+
+        ld = DateUtil.formatToDateTimeWithZone("20071104013206.34");
+        assertThat(ld).isEqualTo("2007-11-04T01:32:06.34+08:00");
+
+        ld = DateUtil.formatToDateTimeWithZone("20071104013206.345");
         assertThat(ld).isEqualTo("2007-11-04T01:32:06.345+08:00");
+
+        ld = DateUtil.formatToDateTimeWithZone("20071104013206.3456");
+        assertThat(ld).isEqualTo("2007-11-04T01:32:06.3456+08:00");
     }
 
 }
