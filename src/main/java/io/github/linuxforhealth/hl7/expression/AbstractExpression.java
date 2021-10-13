@@ -127,7 +127,7 @@ public abstract class AbstractExpression implements Expression {
         return result;
       }
     } catch (DataExtractionException | IllegalArgumentException e) {
-      LOGGER.warn("Failure encountered during evaluation of expression, exception {}", 
+      LOGGER.warn("Failure encountered during evaluation of expression {}", 
           this.attr.getName());
       return null;
     } finally {
