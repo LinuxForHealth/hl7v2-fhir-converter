@@ -11,7 +11,9 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.DateTimeParseException;
+import java.time.temporal.ChronoField;
 import java.time.temporal.Temporal;
 import java.util.HashMap;
 import java.util.Map;
@@ -93,8 +95,30 @@ public class DateUtil {
         }
         if (format != null) {
             try {
-                LocalDateTime ldt = LocalDateTime.parse(input, DateFormats.getFormatterInstance());
-                return ldt.format(format);
+                DateTimeFormatter dtf = DateFormats.getFormatterInstance();
+                // If I replace the above with this new formatter, it works.
+                // Of course this is not a solution since it is just one pattern.
+                // Not sure why the above formatter does not work.
+                DateTimeFormatterBuilder builder = new DateTimeFormatterBuilder()
+                        .appendPattern("[yyyyMMddHHmmss.SSS]")
+                        .optionalStart()
+                        .parseDefaulting(ChronoField.MONTH_OF_YEAR, 1)
+                        .parseDefaulting(ChronoField.DAY_OF_MONTH, 1)
+                        .optionalEnd();
+                DateTimeFormatter dtf2 = builder.toFormatter();
+
+                LocalDateTime ldt = LocalDateTime.parse(input, dtf);
+                //LocalDateTime ldt = LocalDateTime.parse(input, DateFormats.ISO_LOCAL_DATE_TIME_MS);
+                //LocalDateTime ldt = LocalDateTime.parse(input, format);
+                ZoneId zone = ConverterConfiguration.getInstance().getZoneId();
+                if (zone != null) {
+                    ZonedDateTime zdt = ldt.atZone(zone);
+                    return zdt.toString();
+                } else {
+                    LOGGER.warn("No default zone set, cannot convert LocalDateTime to ZonedDateTime, input {} ",
+                            input);
+                    return null;
+                }
             } catch (DateTimeParseException e) {
                 LOGGER.warn("Input value cannot be parsed to LocalDateTime {} reason: {}", input,
                         e.getMessage());
