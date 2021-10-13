@@ -101,7 +101,7 @@ public abstract class AbstractExpression implements Expression {
 
 
       Map<String, EvaluationResult> localContextValues =
-          new HashMap<>(ImmutableMap.copyOf(contextValues));
+          new HashMap<>(contextValues);
 
       if (!baseValue.isEmpty()) {
         localContextValues.put(baseValue.getIdentifier(), baseValue);
@@ -144,7 +144,7 @@ public abstract class AbstractExpression implements Expression {
 
 
   private EvaluationResult evaluateValueOfExpression(InputDataExtractor dataSource,
-      Map<String, EvaluationResult> contextValues, EvaluationResult baseinputValue) {
+      Map<String, EvaluationResult> localContextValues, EvaluationResult baseinputValue) {
     /**
      * Steps:
      * <ul>
@@ -159,7 +159,6 @@ public abstract class AbstractExpression implements Expression {
      * 
      */
 
-    Map<String, EvaluationResult> localContextValues = new HashMap<>(contextValues);
     // Add constants to the context map
     this.attr.getConstants().entrySet().forEach(e -> localContextValues.put(e.getKey(),
         EvaluationResultFactory.getEvaluationResult(e.getValue())));
