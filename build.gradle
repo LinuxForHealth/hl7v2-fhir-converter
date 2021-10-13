@@ -110,16 +110,8 @@ task sourcesJar(type: Jar, dependsOn: classes) {
     from sourceSets.main.allSource
 }
 
-javadoc.failOnError = false
-task javadocJar(type: Jar, dependsOn: javadoc) {
-    classifier = 'javadoc'
-    from javadoc.destinationDir
-    javadoc.options.addStringOption('Xdoclint:none', '-quiet')
-}
-
 artifacts {
     archives sourcesJar
-    archives javadocJar
 }
 
 
@@ -129,9 +121,6 @@ publishing {
             from components.java
             artifact sourcesJar {
                 classifier "sources"
-            }
-            artifact javadocJar {
-                classifier "javadoc"
             }
             groupId = group
             artifactId 'hl7v2-fhir-converter'

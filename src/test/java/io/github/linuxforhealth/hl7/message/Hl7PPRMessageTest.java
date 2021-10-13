@@ -126,10 +126,11 @@ public class Hl7PPRMessageTest {
     assertThat(documentRefResource).hasSize(1);
 
     DocumentReference documentRef = ResourceUtils.getResourceDocumentReference(documentRefResource.get(0), context);
+    DocumentReference.DocumentReferenceContextComponent drContext = documentRef.getContext();
+    assertThat(drContext.getPeriod().getStartElement().toString()).containsPattern("2018-01-18T03:47:00"); // OBR.7
     DocumentReference.DocumentReferenceContentComponent content = documentRef.getContentFirstRep();
     assertThat(content.getAttachment().getContentType()).isEqualTo("text/plain"); // Currently always defaults to text/plain
-    // TODO: why can't this OBR.7 date be found?
-    // assertThat(content.getAttachment().getCreationElement().toString()).containsPattern("2021-01-01T01:00:00"); // OBR.7 date
+    assertThat(content.getAttachment().getCreation()).isNull(); // No TXA.7 in message
     assertThat(content.getAttachment().hasData()).isTrue();
     String decodedData = new String(Base64.getDecoder().decode(content.getAttachment().getDataElement().getValueAsString()));
     assertThat(decodedData).isEqualTo("ECHOCARDIOGRAPHIC REPORT\nNORMAL LV CHAMBER SIZE WITH MILD CONCENTRIC LVH\nHYPERDYNAMIC LV SYSTOLIC FUNCTION, VISUAL EF 80%\n");

@@ -103,18 +103,18 @@ resultsInterpreter:
    valueOf: resource/Practitioner
    generateList: true
    expressionType: reference
-   specs: OBR.32
+   specs: OBR.32.1
    vars:
-      interpreter: OBR.32
+      interpreter: OBR.32.1
 
 basedOn:
-   condition: $basedOnORC NOT_NULL
+   condition: $basedOnORCOBR NOT_NULL
    valueOf: resource/ServiceRequest
    generateList: true
    expressionType: reference
-   specs: ORC
+   specs: ORC | OBR
    vars:
-      basedOnORC: ORC      
+      basedOnORCOBR: ORC | OBR     
 
 specimen:
    valueOf: datatype/Reference

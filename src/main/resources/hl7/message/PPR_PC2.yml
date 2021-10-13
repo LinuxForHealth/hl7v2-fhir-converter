@@ -76,12 +76,13 @@ resources:
       - PATIENT_VISIT.PV1
         
   - resourceName: DocumentReference
-    segment: .ORDER.ORDER_DETAIL.ORDER_OBSERVATION.OBX
+    segment: .ORDER.ORC
     group: PROBLEM
     resourcePath: resource/DocumentReference
     repeats: true
     additionalSegments:
-      - .ORC
-      - .ORDER.ORDER_DETAIL.ORDER_DETAIL_SEGMENT.OBR
+      - .ORDER.ORDER_DETAIL.OBR
+      - .ORDER.ORDER_DETAIL.ORDER_OBSERVATION.OBX
+      - PATIENT_VISIT.PV1
       - MSH
       - PID
