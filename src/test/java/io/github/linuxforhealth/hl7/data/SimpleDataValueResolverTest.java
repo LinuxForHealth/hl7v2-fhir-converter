@@ -88,8 +88,6 @@ public class SimpleDataValueResolverTest {
 
         // Test DateTime adjusts for milliseconds
         gen = "20110613122406.637";
-        System.out.println(SimpleDataValueResolver.DATE_TIME.apply(gen));
-        System.out.println(DateUtil.formatToDateTimeWithZone(gen));
         assertThat(SimpleDataValueResolver.DATE_TIME.apply(gen)).isNotNull();
         assertThat(SimpleDataValueResolver.DATE_TIME.apply(gen)).isEqualTo(DateUtil.formatToDateTimeWithZone(gen));
     }

@@ -28,16 +28,6 @@ public class DateFormats {
 
     static DateTimeFormatter FHIR_ZONE_DATE_TIME_FORMAT = DateTimeFormatter.ISO_OFFSET_DATE_TIME;
 
-    static DateTimeFormatter ISO_LOCAL_DATE_TIME_MS = new DateTimeFormatterBuilder()
-            .parseCaseInsensitive()
-            .append(DateTimeFormatter.ISO_LOCAL_DATE)
-            .appendLiteral('T')
-            .append(DateTimeFormatter.ISO_LOCAL_TIME)
-            //.appendLiteral('.')
-            .optionalStart()
-            .appendFraction(ChronoField.MILLI_OF_SECOND, 1, 4, true)
-            .toFormatter();
-
     private static final DateFormats dateFormats = new DateFormats();
 
     private DateTimeFormatter formatter;
@@ -55,12 +45,10 @@ public class DateFormats {
     }
 
     private static DateTimeFormatter getFormatter() {
-        String patterns = //"[yyyyMMddHHmmss.SSS]" +
-                //"[yyyyMMddHHmmss.S][yyyyMMddHHmmss.SS][yyyyMMddHHmmss.SSS][yyyyMMddHHmmss.SSSS]" +
-                "[yyyyMMddHHmmss.SZ][yyyyMMddHHmmss.SSZ][yyyyMMddHHmmss.SSSZ][yyyyMMddHHmmss.SSSSZ]" +
-                        "[yyyyMMddHHmmss.S][yyyyMMddHHmmss.SS][yyyyMMddHHmmss.SSS][yyyyMMddHHmmss.SSSS]" +
-                        "[yyyyMMddHHmmssZ][yyyyMMddHHmmZ][yyyyMMddHHZ][yyyyMMddZ][yyyyMMZ][yyyyZ]" +
-                        "[yyyyMMddHHmmss][yyyyMMddHHmm][yyyyMMddHH][yyyyMMdd][yyyyMM][yyyy]";
+        String patterns = "[yyyyMMddHHmmss.SZ][yyyyMMddHHmmss.SSZ][yyyyMMddHHmmss.SSSZ][yyyyMMddHHmmss.SSSSZ][yyyyMMddHHmmssZ]"
+                + "[yyyyMMddHHmmZ][yyyyMMddHHZ][yyyyMMddZ][yyyyMMZ][yyyyZ]"
+                + "[yyyyMMddHHmmss.SSSS][yyyyMMddHHmmss.SSS][yyyyMMddHHmmss.SS][yyyyMMddHHmmss.S]"
+                + "[yyyyMMddHHmmss][yyyyMMddHHmm][yyyyMMddHH][yyyyMMdd][yyyyMM][yyyy]";
         return new DateTimeFormatterBuilder()
                 .appendPattern(patterns).optionalStart()
                 .parseDefaulting(ChronoField.MONTH_OF_YEAR, 1).parseDefaulting(ChronoField.DAY_OF_MONTH, 1)
@@ -82,12 +70,9 @@ public class DateFormats {
 
     private static Map<Pattern, DateTimeFormatter> getDateTimePatterns() {
         Map<Pattern, DateTimeFormatter> patterns = new HashMap<>();
-        patterns.put(PATTERN4, ISO_LOCAL_DATE_TIME_MS);
-        patterns.put(PATTERN5, ISO_LOCAL_DATE_TIME_MS);
-        patterns.put(PATTERN6, ISO_LOCAL_DATE_TIME_MS);
-        //        patterns.put(PATTERN4, DateTimeFormatter.ISO_LOCAL_DATE_TIME);
-        //        patterns.put(PATTERN5, DateTimeFormatter.ISO_LOCAL_DATE_TIME);
-        //        patterns.put(PATTERN6, DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+        patterns.put(PATTERN4, DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+        patterns.put(PATTERN5, DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+        patterns.put(PATTERN6, DateTimeFormatter.ISO_LOCAL_DATE_TIME);
         return patterns;
     }
 
