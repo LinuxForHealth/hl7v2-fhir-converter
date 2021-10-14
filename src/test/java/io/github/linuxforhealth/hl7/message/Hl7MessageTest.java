@@ -630,7 +630,7 @@ public class Hl7MessageTest {
             + "AL1|1|DRUG|00000741^OXYCODONE||HYPOTENSION\r"
             + "AL1|2|DRUG|00001433^TRAMADOL||SEIZURES~VOMITING\r";
     String json = message.convert(hl7message, engine);
-    LOGGER.info(json);
+    LOGGER.debug(json);
     IBaseResource bundleResource = context.getParser().parseResource(json);
     assertThat(bundleResource).isNotNull();
     Bundle b = (Bundle) bundleResource;

@@ -35,7 +35,7 @@ public class PatientUtils  {
   public static Patient createPatientFromHl7Segment(String inputSegment){
     HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
     String json = ftv.convert(inputSegment, OPTIONS);
-    LOGGER.info(json);
+    LOGGER.debug(json);
     assertThat(json).isNotBlank();
     FHIRContext context = new FHIRContext();
     IBaseResource bundleResource = context.getParser().parseResource(json);
