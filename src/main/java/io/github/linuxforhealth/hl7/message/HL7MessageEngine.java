@@ -123,8 +123,8 @@ public class HL7MessageEngine implements MessageEngine {
             getContextValuesFromResource(hl7ResourceTemplate, resourceResults);
         localContextValues.putAll(newContextValues);
       } catch (IllegalArgumentException | IllegalStateException e) {
-        LOGGER.error("Exception during resource {} generation", rs.getName(), e);
-        LOGGER.debug("Exception during resource {} generation", rs.getName());
+        LOGGER.error("Exception during resource {} generation", rs.getName());
+        LOGGER.debug("Exception during resource {} generation", rs.getName(), e);
 
       } finally {
         MDC.remove(RESOURCE);
@@ -160,6 +160,7 @@ public class HL7MessageEngine implements MessageEngine {
     }
     }
 
+    LOGGER.info("Successfully converted message");
     LOGGER.debug(
         "Successfully converted Message: {} , Message Control Id: {} to FHIR bundle resource with id {}",
         dataInput.getName(), dataInput.getId(), bundle.getId());

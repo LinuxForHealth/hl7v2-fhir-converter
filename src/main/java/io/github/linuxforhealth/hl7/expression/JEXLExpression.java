@@ -38,6 +38,7 @@ public class JEXLExpression extends AbstractExpression {
         localContextValues.put(v.getVariableName(), new EmptyEvaluationResult());
       }
     }
+    LOGGER.info("Evaluating expression");
     LOGGER.debug("Evaluating value of {}", this.getExpressionAttr().getValueOf());
     return dataSource.evaluateJexlExpression(this.getExpressionAttr().getValueOf(), contextValues);
   }
