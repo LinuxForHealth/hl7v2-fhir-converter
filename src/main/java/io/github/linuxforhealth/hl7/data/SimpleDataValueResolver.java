@@ -115,14 +115,15 @@ public class SimpleDataValueResolver {
                 if (sdate1 != null && sdate2 != null) {
                     Temporal date1 = DateUtil.getTemporal(DateUtil.formatToDateTimeWithZone(sdate1));
                     Temporal date2 = DateUtil.getTemporal(DateUtil.formatToDateTimeWithZone(sdate2));
-                    LOGGER.info("temporal dates start: {} , end: {} ", date1, date2);
+                    LOGGER.info("computing temporal dates");
+                    LOGGER.debug("temporal dates start: {} , end: {} ", date1, date2);
                     if (date1 != null && date2 != null) {
                         return String.valueOf(ChronoUnit.MINUTES.between(date1, date2));
                     }
                 }
             } catch (UnsupportedTemporalTypeException e) {
-                LOGGER.warn("Cannot evaluate time difference for start: {} , end: {} reason {} ", start, end,
-                        e.getMessage());
+                LOGGER.warn("Cannot evaluate time difference.");
+                LOGGER.debug("Cannot evaluate time difference for start: {} , end: {} reason {} ", start, end, e.getMessage());
                 return null;
             }
         }
@@ -138,7 +139,8 @@ public class SimpleDataValueResolver {
                 return null;
             }
         } catch (IllegalArgumentException | URISyntaxException e) {
-            LOGGER.warn("Value not valid URI, value: {}", value, e);
+            LOGGER.warn("Value not valid URI, value: {}", value);
+            LOGGER.debug("Value not valid URI, value: {}", value, e);
             return null;
         }
     };
@@ -634,12 +636,13 @@ public class SimpleDataValueResolver {
             try {
                 return UUID.fromString(value);
             } catch (IllegalArgumentException e) {
-                LOGGER.warn("Value not valid UUID, value: {}  failure reason {}", value, e.getMessage());
+                LOGGER.warn("Value not valid UUID");
                 LOGGER.debug("Value not valid UUID, value: {}", value, e);
                 return null;
             }
         } else {
-            LOGGER.info("Value for  UUID is null, value: {}", value);
+            LOGGER.info("Value for UUID is null");
+            LOGGER.debug("Value for UUID is null, value: {}", value);
             return null;
         }
     }
@@ -649,8 +652,8 @@ public class SimpleDataValueResolver {
             UUID.fromString(val);
             return true;
         } catch (IllegalArgumentException e) {
-            LOGGER.warn("Not a valid UUID reason {} ", e.getMessage());
-            LOGGER.debug("Not a valid UUID ", e);
+            LOGGER.warn("Could not extract valid UUID - not a valid UUID");
+            LOGGER.debug("Not a valid UUID", e);
             return false;
         }
     }

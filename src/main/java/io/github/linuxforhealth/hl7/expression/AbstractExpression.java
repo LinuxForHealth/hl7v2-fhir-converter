@@ -101,7 +101,7 @@ public abstract class AbstractExpression implements Expression {
     try {
       setLoggingContext();
 
-      LOGGER.info("Started Evaluating  with baseValue {} expression {} ", baseValue, this);
+      LOGGER.debug("Started Evaluating with baseValue {} expression {} ", baseValue, this);
 
 
       Map<String, EvaluationResult> localContextValues =
@@ -113,8 +113,7 @@ public abstract class AbstractExpression implements Expression {
 
       result = evaluateValueOfExpression(dataSource, localContextValues, baseValue);
 
-      LOGGER.info("Completed Evaluating returned value  {} ----  for  expression {} ", result,
-          this);
+      LOGGER.debug("Completed Evaluating returned value  {} ----  for  expression {} ", result, this);
 
       if (this.conditionSatisfiedState && this.isRequired()
           && (result == null || result.isEmpty())) {
@@ -127,7 +126,7 @@ public abstract class AbstractExpression implements Expression {
         return result;
       }
     } catch (DataExtractionException | IllegalArgumentException e) {
-      LOGGER.warn("Failure encountered during evaluation of expression {} , exception {}", this,
+      LOGGER.warn("Failure encountered during evaluation of expression {}", 
           this.attr.getName());
       return null;
     } finally {
@@ -293,7 +292,8 @@ public abstract class AbstractExpression implements Expression {
               new EmptyEvaluationResult());
         }
       } catch (DataExtractionException e) {
-        LOGGER.error("Cannot extract value for variable {} ", var.getVariableName(), e);
+        LOGGER.error("Cannot extract value for variable {} ", var.getVariableName());
+        LOGGER.debug("Cannot extract value for variable {} ", var.getVariableName(), e);
       }
     }
     return localVariables;

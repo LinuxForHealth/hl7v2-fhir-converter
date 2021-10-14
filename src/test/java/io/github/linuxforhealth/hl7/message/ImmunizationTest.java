@@ -16,6 +16,8 @@ import org.hl7.fhir.r4.model.Immunization;
 import org.hl7.fhir.r4.model.Resource;
 import org.hl7.fhir.r4.model.ResourceType;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import com.google.common.collect.Lists;
 import io.github.linuxforhealth.api.ResourceModel;
 import io.github.linuxforhealth.fhir.FHIRContext;
@@ -30,6 +32,7 @@ public class ImmunizationTest {
     private static final ConverterOptions OPTIONS = new Builder().withValidateResource().build();
 
     private static HL7MessageEngine engine = new HL7MessageEngine(context);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ImmunizationTest.class);
 
     @Test
     public void test_vxuv04_patient_encounter_present() throws IOException {
@@ -50,7 +53,7 @@ public class ImmunizationTest {
         HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
         String json = ftv.convert(hl7message, OPTIONS);
         assertThat(json).isNotBlank();
-        System.out.println(json);
+        LOGGER.debug(json);
         IBaseResource bundleResource = context.getParser().parseResource(json);
         assertThat(bundleResource).isNotNull();
         Bundle b = (Bundle) bundleResource;

@@ -96,7 +96,8 @@ public class HL7MessageData implements InputDataExtractor {
         res = extractSpecValues(hl7spec);
       }
     } catch (DataExtractionException e) {
-      LOGGER.warn("cannot extract value for variable {} ", hl7spec, e);
+      LOGGER.warn("cannot extract value for variable {} ", hl7spec);
+      LOGGER.debug("cannot extract value for variable {} ", hl7spec, e);
     }
     if (res != null) {
       return res.getValue();

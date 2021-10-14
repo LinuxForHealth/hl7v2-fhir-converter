@@ -11,6 +11,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import com.google.common.collect.ImmutableMap;
 import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Message;
@@ -24,6 +26,9 @@ import io.github.linuxforhealth.hl7.parsing.HL7DataExtractor;
 import io.github.linuxforhealth.hl7.parsing.HL7HapiParser;
 
 public class ResourceExpressionTest {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(ResourceExpressionTest.class);
+
   String message = "MSH|^~\\&|hl7Integration|hl7Integration|||||ADT^A01|||2.3|\r"
       + "EVN|A01|20130617154644\r"
       + "PID|1|465 306 5961|000010016^5^M11^SY1^MR^|407623|Wood^Patrick^^^MR||19700101|female|||High Street^^Oxford^^Ox1 4DP~George St^^Oxford^^Ox1 5AP|||||||\r"
@@ -321,7 +326,7 @@ public class ResourceExpressionTest {
     assertThat(result.get(0).get("name")).isEqualTo("sanofi");
     assertThat(result.get(0).get("identifier")).isNull();
 
-    System.out.println(result);
+    LOGGER.debug("result="+result);
 
   }
 
@@ -397,7 +402,7 @@ public class ResourceExpressionTest {
         (List<Map<String, Object>>) result.get(0).get("identifier");
     assertThat(identifiers.get(0).get("value")).isEqualTo("PMC");
 
-    System.out.println(result);
+    LOGGER.debug("result="+result);
 
   }
 
