@@ -86,11 +86,17 @@ doseQuantity:
    vars:
       value: RXA.6
       unit: RXA.7
-performer:
+performer_1:
    valueOf: secondary/Performer
+   generateList: true
    expressionType: resource
    vars:
       orderingProvider: ORC.12
+performer_2:
+   valueOf: secondary/Performer
+   generateList: true
+   expressionType: resource
+   vars:
       administeringProvider: RXA.10
 note:
    valueOf: datatype/Annotation
