@@ -1,0 +1,240 @@
+{
+  "exclude": {
+    "files": null,
+    "lines": null
+  },
+  "generated_at": "2021-09-29T13:20:47Z",
+  "plugins_used": [
+    {
+      "name": "ExternalRefDetector"
+    }
+  ],
+  "results": {
+    "build.gradle": [
+      {
+        "hashed_secret": "a79a5fc05060a1428e06af7c6699eed101bdf80a",
+        "is_secret": false,
+        "line_number": 71,
+        "type": "External URL References"
+      },
+      {
+        "hashed_secret": "2ace62c1befa19e3ea37dd52be9f6d508c5163e6",
+        "is_secret": false,
+        "line_number": 157,
+        "type": "External URL References"
+      }
+    ],
+    "src/main/java/io/github/linuxforhealth/core/Constants.java": [
+      {
+        "hashed_secret": "2ace62c1befa19e3ea37dd52be9f6d508c5163e6",
+        "is_secret": false,
+        "line_number": 23,
+        "type": "External URL References"
+      }
+    ],
+    "src/main/java/io/github/linuxforhealth/hl7/data/Hl7RelatedGeneralUtils.java": [
+      {
+        "hashed_secret": "2ace62c1befa19e3ea37dd52be9f6d508c5163e6",
+        "line_number": 316,
+        "type": "External URL References"
+      }
+    ],
+    "src/main/resources/hl7/codesystem/CodingSystemMapping.yml": [
+      {
+        "hashed_secret": "2ace62c1befa19e3ea37dd52be9f6d508c5163e6",
+        "line_number": 4529,
+        "type": "External URL References"
+      }
+    ],
+    "src/main/resources/hl7/codesystem/ExtensionUrlMapping.yml": [
+      {
+        "hashed_secret": "2ace62c1befa19e3ea37dd52be9f6d508c5163e6",
+        "line_number": 43,
+        "type": "External URL References"
+      }
+    ],
+    "src/main/resources/hl7/resource/Condition.yml": [
+      {
+        "hashed_secret": "2ace62c1befa19e3ea37dd52be9f6d508c5163e6",
+        "line_number": 22,
+        "type": "External URL References"
+      }
+    ],
+    "src/main/resources/hl7/resource/DiagnosticReport.yml": [
+      {
+        "hashed_secret": "2ace62c1befa19e3ea37dd52be9f6d508c5163e6",
+        "line_number": 44,
+        "type": "External URL References"
+      }
+    ],
+    "src/main/resources/hl7/resource/DocumentReference.yml": [
+      {
+        "hashed_secret": "2ace62c1befa19e3ea37dd52be9f6d508c5163e6",
+        "line_number": 44,
+        "type": "External URL References"
+      }
+    ],
+    "src/main/resources/hl7/resource/Encounter.yml": [
+      {
+        "hashed_secret": "2ace62c1befa19e3ea37dd52be9f6d508c5163e6",
+        "line_number": 34,
+        "type": "External URL References"
+      }
+    ],
+    "src/main/resources/hl7/resource/MedicationAdministration.yml": [
+      {
+        "hashed_secret": "2ace62c1befa19e3ea37dd52be9f6d508c5163e6",
+        "line_number": 21,
+        "type": "External URL References"
+      }
+    ],
+    "src/main/resources/hl7/resource/MedicationRequest.yml": [
+      {
+        "hashed_secret": "2ace62c1befa19e3ea37dd52be9f6d508c5163e6",
+        "line_number": 21,
+        "type": "External URL References"
+      }
+    ],
+    "src/main/resources/hl7/resource/Patient.yml": [
+      {
+        "hashed_secret": "b858cb282617fb0956d960215c8e84d1ccf909c6",
+        "line_number": 43,
+        "type": "External URL References"
+      }
+    ],
+    "src/main/resources/hl7/resource/Procedure.yml": [
+      {
+        "hashed_secret": "2ace62c1befa19e3ea37dd52be9f6d508c5163e6",
+        "line_number": 30,
+        "type": "External URL References"
+      }
+    ],
+    "src/main/resources/hl7/resource/ServiceRequest.yml": [
+      {
+        "hashed_secret": "2ace62c1befa19e3ea37dd52be9f6d508c5163e6",
+        "line_number": 47,
+        "type": "External URL References"
+      }
+    ],
+    "src/test/java/io/github/linuxforhealth/FHIRConverterTest.java": [
+      {
+        "hashed_secret": "2ace62c1befa19e3ea37dd52be9f6d508c5163e6",
+        "line_number": 405,
+        "type": "External URL References"
+      }
+    ],
+    "src/test/java/io/github/linuxforhealth/core/config/ConverterConfigurationTest.java": [
+      {
+        "hashed_secret": "2ace62c1befa19e3ea37dd52be9f6d508c5163e6",
+        "line_number": 87,
+        "type": "External URL References"
+      }
+    ],
+    "src/test/java/io/github/linuxforhealth/core/terminology/TerminologyLookupTest.java": [
+      {
+        "hashed_secret": "2ace62c1befa19e3ea37dd52be9f6d508c5163e6",
+        "line_number": 19,
+        "type": "External URL References"
+      }
+    ],
+    "src/test/java/io/github/linuxforhealth/hl7/expression/Hl7ExpressionTest.java": [
+      {
+        "hashed_secret": "2ace62c1befa19e3ea37dd52be9f6d508c5163e6",
+        "line_number": 227,
+        "type": "External URL References"
+      }
+    ],
+    "src/test/java/io/github/linuxforhealth/hl7/expression/ResourceExpressionTest.java": [
+      {
+        "hashed_secret": "2ace62c1befa19e3ea37dd52be9f6d508c5163e6",
+        "line_number": 284,
+        "type": "External URL References"
+      }
+    ],
+    "src/test/java/io/github/linuxforhealth/hl7/message/Hl7MessageTest.java": [
+      {
+        "hashed_secret": "2ace62c1befa19e3ea37dd52be9f6d508c5163e6",
+        "line_number": 481,
+        "type": "External URL References"
+      }
+    ],
+    "src/test/java/io/github/linuxforhealth/hl7/message/ImmunizationTest.java": [
+      {
+        "hashed_secret": "2ace62c1befa19e3ea37dd52be9f6d508c5163e6",
+        "line_number": 111,
+        "type": "External URL References"
+      }
+    ],
+    "src/test/java/io/github/linuxforhealth/hl7/segments/CodeableConceptTest.java": [
+      {
+        "hashed_secret": "2ace62c1befa19e3ea37dd52be9f6d508c5163e6",
+        "line_number": 393,
+        "type": "External URL References"
+      }
+    ],
+    "src/test/java/io/github/linuxforhealth/hl7/segments/FHIRExtensionsTest.java": [
+      {
+        "hashed_secret": "2ace62c1befa19e3ea37dd52be9f6d508c5163e6",
+        "line_number": 23,
+        "type": "External URL References"
+      }
+    ],
+    "src/test/java/io/github/linuxforhealth/hl7/segments/HL7ConditionFHIRConversionTest.java": [
+      {
+        "hashed_secret": "2ace62c1befa19e3ea37dd52be9f6d508c5163e6",
+        "line_number": 390,
+        "type": "External URL References"
+      }
+    ],
+    "src/test/java/io/github/linuxforhealth/hl7/segments/HL7MergeFHIRConversionTest.java": [
+      {
+        "hashed_secret": "2ace62c1befa19e3ea37dd52be9f6d508c5163e6",
+        "line_number": 432,
+        "type": "External URL References"
+      }
+    ],
+    "src/test/java/io/github/linuxforhealth/hl7/segments/Hl7EncounterFHIRConversionTest.java": [
+      {
+        "hashed_secret": "2ace62c1befa19e3ea37dd52be9f6d508c5163e6",
+        "line_number": 495,
+        "type": "External URL References"
+      }
+    ],
+    "src/test/java/io/github/linuxforhealth/hl7/segments/Hl7IdentifierFHIRConversionTest.java": [
+      {
+        "hashed_secret": "2ace62c1befa19e3ea37dd52be9f6d508c5163e6",
+        "line_number": 1098,
+        "type": "External URL References"
+      }
+    ],
+    "src/test/java/io/github/linuxforhealth/hl7/segments/Hl7MedicationRequestFHIRConversionTest.java": [
+      {
+        "hashed_secret": "2ace62c1befa19e3ea37dd52be9f6d508c5163e6",
+        "line_number": 386,
+        "type": "External URL References"
+      }
+    ],
+    "src/test/java/io/github/linuxforhealth/hl7/segments/Hl7ObservationFHIRConversionTest.java": [
+      {
+        "hashed_secret": "2ace62c1befa19e3ea37dd52be9f6d508c5163e6",
+        "line_number": 597,
+        "type": "External URL References"
+      }
+    ],
+    "src/test/java/io/github/linuxforhealth/hl7/segments/Hl7OrderRequestFHIRConversionTest.java": [
+      {
+        "hashed_secret": "2ace62c1befa19e3ea37dd52be9f6d508c5163e6",
+        "line_number": 98,
+        "type": "External URL References"
+      }
+    ],
+    "src/test/resources/additional_conceptmap.yml": [
+      {
+        "hashed_secret": "2ace62c1befa19e3ea37dd52be9f6d508c5163e6",
+        "line_number": 3,
+        "type": "External URL References"
+      }
+    ]
+  },
+  "version": "0.12.0-ibm.3"
+}

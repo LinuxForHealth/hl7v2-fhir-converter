@@ -38,26 +38,26 @@ import io.github.linuxforhealth.hl7.segments.util.PatientUtils;
 
 public class Hl7PatientFHIRConversionTest {
 
-    private static FHIRContext context = new FHIRContext(true, false);
-    private static final Logger LOGGER = LoggerFactory.getLogger(Hl7PatientFHIRConversionTest.class);
+  private static FHIRContext context = new FHIRContext(true, false);
+  private static final Logger LOGGER = LoggerFactory.getLogger(Hl7PatientFHIRConversionTest.class);
 
-    // Tests the PD1 segment with all supported message types.
-    @ParameterizedTest
-    @ValueSource(strings = { "MSH|^~\\&|hl7Integration|hl7Integration|||||ADT^A01|||2.6|\r",
-            // "MSH|^~\\&|hl7Integration|hl7Integration|||||ADT^A02|||2.6|\r",
-            // "MSH|^~\\&|hl7Integration|hl7Integration|||||ADT^A03|||2.6|\r",
-            // "MSH|^~\\&|hl7Integration|hl7Integration|||||ADT^A04|||2.6|\r",
-            "MSH|^~\\&|hl7Integration|hl7Integration|||||ADT^A08|||2.6|\r",
-            // "MSH|^~\\&|hl7Integration|hl7Integration|||||ADT^A28|||2.6|\r",
-            // "MSH|^~\\&|hl7Integration|hl7Integration|||||ADT^A31|||2.6|\r",
-            "MSH|^~\\&|hl7Integration|hl7Integration|||||ADT^A34|||2.6|\r",
-            "MSH|^~\\&|hl7Integration|hl7Integration|||||ADT^A40|||2.6|\r",
-            // "MSH|^~\\&|hl7Integration|hl7Integration|||||OMP^O09|||2.6|\r",
-            // "MSH|^~\\&|hl7Integration|hl7Integration|||||ORM^O01|||2.6|\r",
-            // "MSH|^~\\&|hl7Integration|hl7Integration|||||ORU^R01|||2.6|\r",
-            "MSH|^~\\&|hl7Integration|hl7Integration|||||RDE^O11|||2.6|\r",
-            "MSH|^~\\&|hl7Integration|hl7Integration|||||RDE^O25|||2.6|\r",
-            // "MSH|^~\\&|hl7Integration|hl7Integration|||||VXU^V04|||2.6|\r",
+  // Tests the PD1 segment with all supported message types.
+  @ParameterizedTest
+  @ValueSource(strings = { "MSH|^~\\&|hl7Integration|hl7Integration|||||ADT^A01|||2.6|\r",
+    // "MSH|^~\\&|hl7Integration|hl7Integration|||||ADT^A02|||2.6|\r",
+    // "MSH|^~\\&|hl7Integration|hl7Integration|||||ADT^A03|||2.6|\r",
+    // "MSH|^~\\&|hl7Integration|hl7Integration|||||ADT^A04|||2.6|\r",
+    "MSH|^~\\&|hl7Integration|hl7Integration|||||ADT^A08|||2.6|\r",
+    // "MSH|^~\\&|hl7Integration|hl7Integration|||||ADT^A28|||2.6|\r",
+    // "MSH|^~\\&|hl7Integration|hl7Integration|||||ADT^A31|||2.6|\r",
+    "MSH|^~\\&|hl7Integration|hl7Integration|||||ADT^A34|||2.6|\r",
+    "MSH|^~\\&|hl7Integration|hl7Integration|||||ADT^A40|||2.6|\r",
+    // "MSH|^~\\&|hl7Integration|hl7Integration|||||OMP^O09|||2.6|\r",
+    // "MSH|^~\\&|hl7Integration|hl7Integration|||||ORM^O01|||2.6|\r",
+    "MSH|^~\\&|hl7Integration|hl7Integration|||||ORU^R01|||2.6|\r",
+    "MSH|^~\\&|hl7Integration|hl7Integration|||||RDE^O11|||2.6|\r",
+    "MSH|^~\\&|hl7Integration|hl7Integration|||||RDE^O25|||2.6|\r",
+    // "MSH|^~\\&|hl7Integration|hl7Integration|||||VXU^V04|||2.6|\r",
     })
     public void test_patient_additional_demographics(String msh) {
         String hl7message = msh
