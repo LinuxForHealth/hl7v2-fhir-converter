@@ -333,7 +333,7 @@ String hl7message =
     assertThat(obsResource).hasSize(1);
     List<Resource> pracResource = e.stream().filter(v -> ResourceType.Practitioner == v.getResource().getResourceType())
         .map(BundleEntryComponent::getResource).collect(Collectors.toList());
-    assertThat(pracResource).hasSize(5);
+    assertThat(pracResource).hasSize(6);
 
     List<Resource> organizationRes = e.stream()
         .filter(v -> ResourceType.Organization == v.getResource().getResourceType())
