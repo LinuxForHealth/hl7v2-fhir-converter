@@ -143,6 +143,7 @@ public class Hl7EncounterFHIRConversionTest {
      "MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||RDE^O11|controlID|P|2.6\r",
      "MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||RDE^O25|controlID|P|2.6\r",
      "MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||ORU^R01|controlID|P|2.6\r",
+     "MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||VXU^V04|controlID|P|2.6\r",
     })
     public void test_encounter_with_serviceProvider_from_PV2(String msh) {
         String hl7message = msh
@@ -195,6 +196,7 @@ public class Hl7EncounterFHIRConversionTest {
      "MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||RDE^O11|controlID|P|2.6\r",
      "MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||RDE^O25|controlID|P|2.6\r",
      "MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||ORU^R01|controlID|P|2.6\r",     
+     "MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||VXU^V04|controlID|P|2.6\r",
     })
     public void test_encounter_PV1_serviceProvider(String msh) {
         String hl7message = msh
@@ -246,7 +248,8 @@ public class Hl7EncounterFHIRConversionTest {
      // ADT_A34 and ADT_A40 do not create encounters so they do not need to be tested here
      "MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||RDE^O11|controlID|P|2.6\r",
      "MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||RDE^O25|controlID|P|2.6\r",
-     "MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||ORU^R01|controlID|P|2.6\r",     
+     "MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||ORU^R01|controlID|P|2.6\r", 
+     "MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||VXU^V04|controlID|P|2.6\r",    
     })
     public void test_encounter_with_serviceProvider_from_PV1_3_4(String msh) {
         String hl7message =  msh
@@ -599,6 +602,7 @@ public class Hl7EncounterFHIRConversionTest {
      "MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||RDE^O11|controlID|P|2.6\r",
      "MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||RDE^O25|controlID|P|2.6\r",
      "MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||ORU^R01|controlID|P|2.6\r",
+     "MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||VXU^V04|controlID|P|2.6\r",
     })
     public void test_encounter_PV2segment_missing(String msh) {
         String hl7message = msh //"MSH|^~\\&|WHI_LOAD_GENERATOR|IBM_TORONTO_LAB||IBM|20210330144208|8078780|ADT^A02|MSGID_4e1c575f-6c6d-47b2-ab9f-829f20c96db2|T|2.3\n"
