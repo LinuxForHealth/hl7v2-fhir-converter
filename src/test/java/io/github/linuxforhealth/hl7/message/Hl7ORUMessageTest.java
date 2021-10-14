@@ -326,7 +326,7 @@ public class Hl7ORUMessageTest {
         assertThat(obsRef).hasSize(1);
         assertThat(obsRef.get(0).isEmpty()).isFalse();
 
-        // Verify presentedForm from OBX of type TX - In this case no attachments created because the OBX of type TX have ids.
+        // Verify presentedForm from OBX of type TX - In this case no attachments created because the OBX is not of type TX.
         List<Attachment> attachments = diag.getPresentedForm();
         Assertions.assertTrue(attachments.size() == 0, "Unexpected number of attachments");
 
@@ -472,7 +472,7 @@ public class Hl7ORUMessageTest {
         assertThat(obsRef2).hasSize(2); //TODO: We are currently getting 4, this should be 2 for each docRef.  Can we verify that the right ones were grouped to the right diagReport?
         assertThat(obsRef2.get(0).isEmpty()).isFalse();
 
-        // Verify presentedForm from OBX of type TX - In this case no attachments created because the OBX of type TX have ids.
+        // Verify presentedForm from OBX of type TX - In this case no attachments created because the OBX is not type TX.
         List<Attachment> attachments2 = diag2.getPresentedForm();
         Assertions.assertTrue(attachments2.size() == 0, "Unexpected number of attachments");
 
@@ -676,12 +676,6 @@ public class Hl7ORUMessageTest {
         assertThat(diag.getStatus().toCode()).isEqualTo("final");  // Verify status from OBR.25
         assertThat(diag.getCategory().size()).isEqualTo(1); // Verify category from OBR.24
         DatatypeUtils.checkCommonCodeableConceptAssertions(diag.getCategoryFirstRep(), "CT", "CAT Scan", "http://terminology.hl7.org/CodeSystem/v2-0074", "CT");
-
-        // assertThat(diag.getCategory().get(0).getCoding().size()).isEqualTo(1);
-        // assertThat(diag.getCategory().get(0).getCoding().get(0).getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/v2-0074");
-        // assertThat(diag.getCategory().get(0).getCoding().get(0).getCode()).isEqualTo("CT");
-        // assertThat(diag.getCategory().get(0).getCoding().get(0).getDisplay()).isEqualTo("CAT Scan");
-        // assertThat(diag.getCategory().get(0).getText()).isEqualTo("CT");
 
         // Verify code from OBR.4; This tests scenario of the code not being in the default loinc system.
         assertThat(diag.hasCode()).isTrue();
