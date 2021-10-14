@@ -31,7 +31,7 @@ import io.github.linuxforhealth.hl7.parsing.result.Hl7ParsingTypeResult;
 import io.github.linuxforhealth.hl7.parsing.result.ParsingResult;
 
 public class HL7DataExtractor {
-  private static final String CANNOT_EXTRACT_VALUE_FOR_REP_REASON = "Cannot extract value for {} rep {} reason {}";
+  private static final String CANNOT_EXTRACT_VALUE_FOR_REP_REASON = "Cannot extract value for {} rep {}";
 
   private static final String SEGMENT_CANNOT_BE_NULL_OR_EMPTY = "segment cannot be null or empty";
 
@@ -93,7 +93,7 @@ public class HL7DataExtractor {
       return parsingResult;
     } catch (HL7Exception | IllegalArgumentException | ArrayIndexOutOfBoundsException e) {
       String spec = group + " " + groupRep + " " + segment;
-      LOGGER.debug("Cannot extract value for {} rep {} ", spec, rep, e);
+      LOGGER.debug(CANNOT_EXTRACT_VALUE_FOR_REP_REASON, spec, rep, e);
       LOGGER.warn(CANNOT_EXTRACT_VALUE_FOR_REP_REASON, spec, rep);
       return new Hl7ParsingStructureResult(new ArrayList<>());
 
@@ -166,7 +166,7 @@ public class HL7DataExtractor {
 
 
     } catch (IllegalArgumentException | HL7Exception | ArrayIndexOutOfBoundsException e) {
-      LOGGER.debug("Cannot extract value for {} rep{}  ", spec, rep, e);
+      LOGGER.debug(CANNOT_EXTRACT_VALUE_FOR_REP_REASON, spec, rep, e);
       LOGGER.warn(CANNOT_EXTRACT_VALUE_FOR_REP_REASON, spec, rep);
 
       return false;
@@ -190,7 +190,7 @@ public class HL7DataExtractor {
       }
       return parsingResult;
     } catch (HL7Exception | IllegalArgumentException | ArrayIndexOutOfBoundsException e) {
-      LOGGER.debug("Cannot extract value for {} rep {}  ", structure, rep, e);
+      LOGGER.debug(CANNOT_EXTRACT_VALUE_FOR_REP_REASON, structure, rep, e);
       LOGGER.warn(CANNOT_EXTRACT_VALUE_FOR_REP_REASON, structure, rep);
 
       return new Hl7ParsingStructureResult(new ArrayList<>());
@@ -310,8 +310,7 @@ public class HL7DataExtractor {
       }
       return result;
     } catch (IllegalArgumentException | HL7Exception | ArrayIndexOutOfBoundsException e) {
-      LOGGER.debug("Cannot extract value for type {} component {} subComponent {}  ", inputType,
-          component, subComponent, e);
+      LOGGER.debug("Cannot extract value for type {} component {} subComponent {}  ", inputType, component, subComponent, e);
       LOGGER.warn("Cannot extract value for type {} component {},subComponent {} ",
           inputType, component, subComponent);
 

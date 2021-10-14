@@ -159,7 +159,7 @@ public class HL7ToFHIRConverter {
     try{
         if(hl7message != null) {
             String messageStructureInfo = hl7message.printStructure();
-            LOGGER.debug("HL7_MESSAGE_STRUCTURE=\n"+messageStructureInfo);
+            LOGGER.debug("HL7_MESSAGE_STRUCTURE={}",messageStructureInfo);
         }
     } catch (HL7Exception e) {
         throw new IllegalArgumentException("Error printing message structure.", e);

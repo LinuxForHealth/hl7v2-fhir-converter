@@ -106,8 +106,7 @@ public class Hl7RelatedGeneralUtils {
 
     public static String generateName(Object prefix, Object first, Object middle, Object family, Object suffix) {
         LOGGER.info("Generating name");
-        LOGGER.debug("Generating name from  from prefix {}, first {}, middle {}, family {} ,suffix {}", prefix, first, middle,
-                family, suffix);
+        LOGGER.debug("Generating name from  from prefix {}, first {}, middle {}, family {} ,suffix {}", prefix, first, middle, family, suffix);
         StringBuilder sb = new StringBuilder();
         String valprefix = Hl7DataHandlerUtil.getStringValue(prefix);
         String valfirst = Hl7DataHandlerUtil.getStringValue(first);

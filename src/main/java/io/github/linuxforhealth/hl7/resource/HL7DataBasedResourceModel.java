@@ -88,8 +88,7 @@ public class HL7DataBasedResourceModel implements ResourceModel {
 
     } catch (RequiredConstraintFailureException e) {
       LOGGER.warn("Resource Constraint condition not satisfied for {}.", this.name);
-      LOGGER.debug("Resource Constraint condition not satisfied for {}, exception {}", this.name,
-          e.toString());
+      LOGGER.debug("Resource Constraint condition not satisfied for {}, exception {}", this.name, e.toString());
       return null;
 
     } catch (IllegalArgumentException | IllegalStateException | DataExtractionException e) {

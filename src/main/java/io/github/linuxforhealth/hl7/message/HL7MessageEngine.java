@@ -152,8 +152,8 @@ public class HL7MessageEngine implements MessageEngine {
 
       addResourceToBundle(bundle, Lists.newArrayList(updatedResourceResult));
     } catch (IllegalArgumentException | IllegalStateException e) {
-      LOGGER.error("Exception during resource {} generation", "PendingExpressions");
-      LOGGER.debug("Exception during resource {} generation", "PendingExpressions", e);
+      LOGGER.error("Exception during resource PendingExpressions generation");
+      LOGGER.debug("Exception during resource PendingExpressions generation", e);
 
     } finally {
       MDC.remove(RESOURCE);
@@ -161,9 +161,7 @@ public class HL7MessageEngine implements MessageEngine {
     }
 
     LOGGER.info("Successfully converted message");
-    LOGGER.debug(
-        "Successfully converted Message: {} , Message Control Id: {} to FHIR bundle resource with id {}",
-        dataInput.getName(), dataInput.getId(), bundle.getId());
+    LOGGER.debug("Successfully converted Message: {} , Message Control Id: {} to FHIR bundle resource with id {}", dataInput.getName(), dataInput.getId(), bundle.getId());
     return bundle;
   }
 
@@ -332,8 +330,8 @@ public class HL7MessageEngine implements MessageEngine {
         }
       }
     } catch (JsonProcessingException e) {
-      LOGGER.error("Processing exception when Serialization");
-      LOGGER.debug("Processing exception when Serialization", e);
+      LOGGER.error("Processing exception when serialization");
+      LOGGER.debug("Processing exception when serialization", e);
     }
   }
 

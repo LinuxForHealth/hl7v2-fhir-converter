@@ -326,7 +326,7 @@ public class ResourceExpressionTest {
     assertThat(result.get(0).get("name")).isEqualTo("sanofi");
     assertThat(result.get(0).get("identifier")).isNull();
 
-    LOGGER.info("result="+result);
+    LOGGER.debug("result="+result);
 
   }
 
@@ -402,7 +402,7 @@ public class ResourceExpressionTest {
         (List<Map<String, Object>>) result.get(0).get("identifier");
     assertThat(identifiers.get(0).get("value")).isEqualTo("PMC");
 
-    LOGGER.info("result="+result);
+    LOGGER.debug("result="+result);
 
   }
 

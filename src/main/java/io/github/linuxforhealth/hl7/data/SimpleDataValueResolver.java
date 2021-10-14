@@ -115,7 +115,7 @@ public class SimpleDataValueResolver {
                 if (sdate1 != null && sdate2 != null) {
                     Temporal date1 = DateUtil.getTemporal(DateUtil.formatToDateTimeWithZone(sdate1));
                     Temporal date2 = DateUtil.getTemporal(DateUtil.formatToDateTimeWithZone(sdate2));
-                    LOGGER.debug("computing temporal dates");
+                    LOGGER.info("computing temporal dates");
                     LOGGER.debug("temporal dates start: {} , end: {} ", date1, date2);
                     if (date1 != null && date2 != null) {
                         return String.valueOf(ChronoUnit.MINUTES.between(date1, date2));
@@ -123,8 +123,7 @@ public class SimpleDataValueResolver {
                 }
             } catch (UnsupportedTemporalTypeException e) {
                 LOGGER.warn("Cannot evaluate time difference.");
-                LOGGER.debug("Cannot evaluate time difference for start: {} , end: {} reason {} ", start, end,
-                e.getMessage());
+                LOGGER.debug("Cannot evaluate time difference for start: {} , end: {} reason {} ", start, end, e.getMessage());
                 return null;
             }
         }

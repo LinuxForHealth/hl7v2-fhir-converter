@@ -25,7 +25,7 @@ public class Hl7RelatedGeneralUtilsTest {
   public void test_generate_name() {
     String name = Hl7RelatedGeneralUtils.generateName("prefix", "first", "M", "family", "suffix");
     assertThat(name).isEqualTo("prefix first M family suffix");
-    LOGGER.info("name="+name);
+    LOGGER.debug("name="+name);
   }
 
 

@@ -113,8 +113,7 @@ public abstract class AbstractExpression implements Expression {
 
       result = evaluateValueOfExpression(dataSource, localContextValues, baseValue);
 
-      LOGGER.debug("Completed Evaluating returned value  {} ----  for  expression {} ", result,
-          this);
+      LOGGER.debug("Completed Evaluating returned value  {} ----  for  expression {} ", result, this);
 
       if (this.conditionSatisfiedState && this.isRequired()
           && (result == null || result.isEmpty())) {

@@ -70,8 +70,7 @@ public class DateUtil {
                 return returnValue;
             } else {
                 LOGGER.warn("No default zone set, cannot convert LocalDateTime to ZonedDateTime");
-                LOGGER.debug("No default zone set, cannot convert LocalDateTime to ZonedDateTime, input {} ",
-                input);
+                LOGGER.debug("No default zone set, cannot convert LocalDateTime to ZonedDateTime, input {} ", input);
                 return null;
             }
         } catch (DateTimeParseException e) {
