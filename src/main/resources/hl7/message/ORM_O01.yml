@@ -71,7 +71,7 @@ resources:
       - PATIENT.PATIENT_VISIT.PV1
       - PATIENT.PID
 
- - resourceName: DocumentReference
+  - resourceName: DocumentReference
     segment: ORDER.ORC
     resourcePath: resource/DocumentReference
     additionalSegments:

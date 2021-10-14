@@ -114,3 +114,10 @@ The config.properties file location is searched in the following order:
    ``` -Dhl7converter.config.home=/opt/converter/config_home_folder/```
 
 * Lastly, the local classpath resource folder will be searched for config.properties
+
+### PHI (Protected Health Information)
+
+Since this converter is used in production environments using real patient data it can not log or print out anything that may contain PHI data. We will be stripping out all debug log statements as part of the build. This allows developers to use these debug statements to debug issues with santized unit test data.
+
+* Please do not add any print outs (ie system.out.println etc). Use the logger.
+* When adding / editing current or future error, warn, and info log statements please be careful to not add any data structures that might contain PHI. If you aren't sure then make the log statement debug so it's stripped out.
