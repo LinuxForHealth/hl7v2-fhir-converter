@@ -12,19 +12,30 @@ type:
    vars: 
      # Because calculated system id's don't have text if there is a valid system, 
      # see if there is a valid code and system as input to creating text in the CodeableConcept
-     identifierCoding: CODING_SYSTEM_V2_IDENTIFIER, CX.5
+     identifierCoding: CODING_SYSTEM_V2_IDENTIFIER, CX.5 | $type
 
-system: 
+system_1: 
      condition: $systemExists NOT_NULL
      type: SYSTEM_ID
      valueOf: CX.4 | CWE.4 |EI.2
      expressionType: HL7Spec
      vars:
           systemExists: CX.4 | CWE.4 | EI.2
+
+# When a system is passed in, try looking it up.
+# If it doesn't resolve, create a system ID (urn:id:xxxx)
+system_2: 
+     condition: $system NOT_NULL
+     type: STRING
+     valueOf:  $systemLookup | $systemCreated 
+     expressionType: HL7Spec
+     vars: 
+          systemCreated: SYSTEM_ID, $system
+          systemLookup: SYSTEM_URL, $system          
     
 value: 
      type: STRING
-     valueOf: CX.1 | CWE.1 |EI.1
+     valueOf: CX.1 | CWE.1 |EI.1 | $value
      expressionType: HL7Spec
      required: true
 
@@ -32,8 +43,8 @@ period:
     valueOf: datatype/Period
     expressionType: resource
     vars: 
-       start: CX.7 | CWE.7
-       end: CX.8 | CWE.8
+       start: CX.7 | CWE.7 | $start
+       end: CX.8 | CWE.8 | $end
 
 use:
    condition: $mrgUse NOT_NULL
