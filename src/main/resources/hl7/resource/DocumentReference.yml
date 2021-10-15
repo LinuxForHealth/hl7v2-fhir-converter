@@ -127,18 +127,49 @@ authenticator:
       hasValue: TXA.22 | TXA.10
       referenceDisplay: PERSON_DISPLAY_NAME, TXA.22 | TXA.10
 
-content:
+# If OBX is TX type, create an attachment of the data
+content_1:
    valueOf: secondary/Content
    generateList: true
    expressionType: resource
+   condition: $obx2 EQUALS TX
    vars:
-      # TODO: in future, if other than plain text, create a mapping
+      # TODO: in future, if other than plain text, create a mapping for content type
       # contentType: TXA.3 | OBX.2
       creationDate: TXA.7
       contentData: OBX.5 *&, GeneralUtils.concatenateWithChar(contentData, '\n')
+      obx2: STRING, OBX.2
    constants: 
       contentType: "text/plain"   
 
+# If OBX is any other type, (not TX) the content is put in an Observation
+# DocumentReference still requires Content element, so create an empty (minimal) one.
+# Content type is sufficient minimal, include the date if present
+content_2:
+   valueOf: secondary/Content
+   generateList: true
+   expressionType: resource
+   condition: $obx2 NOT_EQUALS TX
+   vars:
+      creationDate: TXA.7
+      obx2: STRING, OBX.2
+   constants: 
+      contentType: "text/plain"      
+
+# Third case is no OBX record at all
+# DocumentReference still requires Content element, so create an empty (minimal) one.
+# Content type is sufficient for minimal, include the date if present
+content_3:
+   valueOf: secondary/Content
+   generateList: true
+   expressionType: resource
+   condition: $obx NULL
+   vars:
+      creationDate: TXA.7
+      obx: OBX 
+   constants: 
+      contentType: "text/plain"
+        
 description:
    type: STRING
    expressionType: HL7Spec

@@ -388,7 +388,7 @@ public class Hl7IdentifierFHIRConversionTest {
               + "PID|||555444222111^^^MPI&GenHosp&L^MR||james^anderson||19600614|M||C|||^^^^^626^5641111|^^^^^626^5647654||||||||N\r"
               + "PV1||I|6N^1234^A^GENHOS||||0100^ANDERSON^CARL|0148^ADDISON^JAMES||SUR|||||||0148^ANDERSON^CARL|S|1400|A|||||||||||||||||||SF|K||||199501102300\r"
               + "PRB|AD|200603150625|aortic stenosis|53692||2||200603150625\r"
-              + "OBX|1|TX|DINnumber^^LSFUSERDATAE||ECHOCARDIOGRAPHIC REPORT||||||F|||20150930164100|||\r"
+              + "OBX|1|ST|DINnumber^^LSFUSERDATAE||ECHOCARDIOGRAPHIC REPORT||||||F|||20150930164100|||\r"
               + "ORC|NW|PON001|FON001|PGN001|SC|D|1||20170825010500|MS|MS||||20170825010500|";
         observation = ResourceUtils.getObservation(msg);
 
@@ -408,7 +408,7 @@ public class Hl7IdentifierFHIRConversionTest {
               + "PID|||555444222111^^^MPI&GenHosp&L^MR||james^anderson||19600614|M||C|99 Oakland #106^^qwerty^OH^44889||||||||||N\r"
               + "PV1||I|6N^1234^A^GENHOS||||0100^ANDERSON^CARL|0148^ADDISON^JAMES||SUR|||||||0148^ANDERSON^CARL|S|1400|A||SF|K||||199501102300\r"
               + "PRB|AD|200603150625|aortic stenosis|53692||2||200603150625\r"
-              + "OBX|1|TX|DINnumber||ECHOCARDIOGRAPHIC REPORT||||||F|||20150930164100|||\r"
+              + "OBX|1|ST|DINnumber||ECHOCARDIOGRAPHIC REPORT||||||F|||20150930164100|||\r"
               + "ORC|NW|PON001|||SC|D|1||20170825010500|MS|MS|||||";
         observation = ResourceUtils.getObservation(msg);
 
@@ -721,8 +721,6 @@ public class Hl7IdentifierFHIRConversionTest {
                          "OBR|1||CD_000000^IE|2244^General Order|||20170825010500||||||Relevant Clinical Information|||||||002|||||F|||550600^Tsadok550600^Janetary~660600^Merrit660600^Darren^F~770600^Das770600^Surjya^P~880600^Winter880600^Oscar^||||770600&Das770600&Surjya&P^^^6N^1234^A|\n" +
                          "TXA|1||B45678||||||\n";
 
-
-
         DocumentReference report = ResourceUtils.getDocumentReference(documentReference);
 
          // Expect 3 identifiers
@@ -856,8 +854,7 @@ public class Hl7IdentifierFHIRConversionTest {
          assertThat(coding.getDisplay()).isEqualTo("Placer Identifier");
      }
 
-
-
+     
     @Test
     public void serviceRequestIdentifierTest1() {
         // Test 1 removed:  OMP_O09 messages do not create a service request

@@ -96,7 +96,7 @@ public class Hl7ORUMessageTest {
         ///////////////////////////////////////////
         DiagnosticReport diag = ResourceUtils.getResourceDiagnosticReport(diagnosticReport.get(0), context);
         assertThat(diag.getStatus().toCode()).isEqualTo("final");  // Verify status from OBR.25
-        assertThat(diag.getCategory().size()).isEqualTo(0); // Verify category from OBR.24
+        assertThat(diag.getCategory().size()).isZero(); // Verify category from OBR.24
         
         // Verify code from OBR.4
         assertThat(diag.hasCode()).isTrue();
@@ -122,7 +122,7 @@ public class Hl7ORUMessageTest {
         assertThat(diag.getBasedOn().get(0).getReference().substring(0, 15)).isEqualTo("ServiceRequest/");
 
         assertThat(diag.getSpecimen()).isEmpty(); // Verify specimen reference
-        assertThat(diag.getResult().isEmpty()); // Verify result reference
+        assertThat(diag.getResult()).isEmpty(); // Verify result reference
 
         // Verify presentedForm from OBX of type TX - In this case no attachments created since there are no OBX with type TX
         List<Attachment> attachments = diag.getPresentedForm();
@@ -131,15 +131,16 @@ public class Hl7ORUMessageTest {
     }
 
     @Test
-    // Test multiple OBX put into Observation resources.  Observation resources are created instead of attachments in the diagReport because there
-    // are ids (OBX.3) on the OBX of type TX.
+    // Test multiple OBX (non TX) put into Observation resources. 
+    // Observation resources are created instead of attachments in the diagReport because they are not type TX.
     public void test_oru_with_multiple_observations() throws IOException {
         String hl7message = "MSH|^~\\\\&|SendTest1|Sendfac1|Receiveapp1|Receivefac1|200603081747|security|ORU^R01|MSGID000005|T|2.6\r"
             + "PID||45483|45483||SMITH^SUZIE^||20160813|M|||123 MAIN STREET^^SCHENECTADY^NY^12345||(123)456-7890|||||^^^T||||||||||||\r"
             // OBR.24 creates a DiagnosticReport.category
             + "OBR|1||986^IA PHIMS Stage^2.16.840.1.114222.4.3.3.5.1.2^ISO|1051-2^New Born Screening^LN|||20151009173644|||||||||||||002||||CUS|F|||2740^Tsadok^Janetary~2913^Merrit^Darren^F~3065^Mahoney^Paul^J~4723^Loh^Robert^L~9052^Winter^Oscar^||||3065^Mahoney^Paul^J|\r"
-            + "OBX|1|TX|TS-F-01-002^Endocrine Disorders^L||obs report||||||F\r"
-            + "OBX|2|TX|GA-F-01-024^Galactosemia^L||ECHOCARDIOGRAPHIC REPORT||||||F\r";
+            + "OBX|1|ST|TS-F-01-002^Endocrine Disorders^L||obs report||||||F\r"
+            + "OBX|2|ST|GA-F-01-024^Galactosemia^L||ECHOCARDIOGRAPHIC REPORT||||||F\r";
+     
 
         HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
         String json = ftv.convert(hl7message, OPTIONS_PRETTYPRINT);
@@ -212,7 +213,7 @@ public class Hl7ORUMessageTest {
         assertThat(diag.getBasedOn().get(0).getReference().substring(0, 15)).isEqualTo("ServiceRequest/");
         assertThat(diag.getSpecimen()).isEmpty(); // Verify specimen reference
 
-        // Verify result reference
+            // Verify result reference
         List<Reference> obsRef = diag.getResult();
         assertThat(obsRef.isEmpty()).isFalse();
         assertThat(obsRef).hasSize(2);
@@ -495,10 +496,10 @@ public class Hl7ORUMessageTest {
         String hl7message = "MSH|^~\\\\&|SendTest1|Sendfac1|Receiveapp1|Receivefac1|200603081747|security|ORU^R01|MSGID000005|T|2.6\r"
                 + "PID||45483|45483||SMITH^SUZIE^||20160813|M|||123 MAIN STREET^^SCHENECTADY^NY^12345||(123)456-7890|||||^^^T||||||||||||\r"
                 + "OBR|1||986^IA PHIMS Stage^2.16.840.1.114222.4.3.3.5.1.2^ISO|1051-2^New Born Screening^LN|||20151009173644|||||||||||||002|||||F|||2740^Tsadok^Janetary~2913^Merrit^Darren^F~3065^Mahoney^Paul^J~4723^Loh^Robert^L~9052^Winter^Oscar^||||3065^Mahoney^Paul^J|\r"
-                + "OBX|1|TX|TS-F-01-002^Endocrine Disorders^L||obs report||||||F\r"
+                + "OBX|1|ST|TS-F-01-002^Endocrine Disorders^L||obs report||||||F\r"
                 + "SPM|1|SpecimenID||BLD|||||||P||||||201410060535|201410060821||Y||||||1\r";
 
-        HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
+                HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
         String json = ftv.convert(hl7message, OPTIONS_PRETTYPRINT);
         assertThat(json).isNotBlank();
         LOGGER.info("FHIR json result:\n" + json);
@@ -538,7 +539,7 @@ public class Hl7ORUMessageTest {
             .map(BundleEntryComponent::getResource).collect(Collectors.toList());
         assertThat(specimenResource).hasSize(1);
 
-        // Expecting only the above resources, no extras!
+        // Expecting only the above resources, no extras! 
         assertThat(e.size()).isEqualTo(6);
 
         ///////////////////////////////////////////
@@ -581,9 +582,10 @@ public class Hl7ORUMessageTest {
         assertThat(obsRef.isEmpty()).isFalse();
         assertThat(obsRef).hasSize(1);
         assertThat(obsRef.get(0).isEmpty()).isFalse();
-        // Verify presentedForm from OBX of type TX - In this case no attachments created because the OBX of type TX have ids.
+        // Verify presentedForm from OBX of type ST - No attachments expected because OBX of type not TX creates an Observation.
         List<Attachment> attachments = diag.getPresentedForm();
         Assertions.assertTrue(attachments.size() == 0, "Unexpected number of attachments");
+
 
         ////////////////////////////////////
         // Verify the references that aren't covered in Observation tests
@@ -601,14 +603,12 @@ public class Hl7ORUMessageTest {
 
     /**
      * 
-     * ORU messages with an OBR and multiple OBX segments that do not have an id represent a report
-     * 
-     * The OBX segments should be grouped together and added to the presentedForm as an attachment for the diagnostic
-     * report
+     * ORU messages with an OBR and multiple OBX segments create records only for non TX type OBX
+     * The OBX type TX are added to the presentedForm as an attachment for the diagnostic
      * @throws IOException
      */
     @Test
-    public void test_oru_multipleOBXWithNoId() throws IOException {
+    public void test_oru_multipleOBXofDifferentTypes() throws IOException {
         HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
         String json = ftv.convert(new File("src/test/resources/ORU-multiline-short.hl7"), OPTIONS_PRETTYPRINT);
         assertThat(json).isNotBlank();
@@ -660,14 +660,14 @@ public class Hl7ORUMessageTest {
             .map(BundleEntryComponent::getResource).collect(Collectors.toList());
         assertThat(servReqResource).hasSize(1);        
 
+        // Verify there are no extra resources created
+        assertThat(e.size()).isEqualTo(10);
+
         //Verify no observations are created
         List<Resource> obsResource = e.stream()
                 .filter(v -> ResourceType.Observation == v.getResource().getResourceType())
                 .map(BundleEntryComponent::getResource).collect(Collectors.toList());
         assertThat(obsResource).hasSize(0);  // TODO: When NTE is implemented, then update this to one.
-
-        // Verify there are no extra resources created
-        assertThat(e.size()).isEqualTo(10);
 
         ///////////////////////////////////////////
         // Now confirm content of the diagnosticReport because we don't have separate tests for DiagnosticReport
@@ -786,11 +786,11 @@ public class Hl7ORUMessageTest {
                 .map(BundleEntryComponent::getResource).collect(Collectors.toList());
         assertThat(messageHeader).hasSize(1);
 
-        // Verify one observations is created
+        // Verify one Observation is created (from the ST, not the TX)
         List<Resource> obsResource = e.stream()
                 .filter(v -> ResourceType.Observation == v.getResource().getResourceType())
                 .map(BundleEntryComponent::getResource).collect(Collectors.toList());
-        assertThat(obsResource).hasSize(1);  // TODO: When NTE is implemented, then update this to 2.
+         assertThat(obsResource).hasSize(1);  // TODO: When NTE is implemented, then update this.
 
         // Verify Diagnostic Report is created as expected
         List<Resource> reportResource = e.stream()
@@ -838,7 +838,6 @@ public class Hl7ORUMessageTest {
         assertThat(diag.getResultsInterpreter()).isEmpty(); // Verify resultsInterpreter from OBR.32
         assertThat(diag.getBasedOn()).hasSize(1); // Verify basedOn is ref to the ServiceRequest created for ORC or OBR
         assertThat(diag.getBasedOn().get(0).getReference().substring(0, 15)).isEqualTo("ServiceRequest/");
-
         
         // Verify specimen reference
         List<Reference> spmRef = diag.getSpecimen();

@@ -285,4 +285,16 @@ public class ResourceUtils {
       Class<? extends IBaseResource> klass = Organization.class;
       return (Organization) context.getParser().parseResource(klass, s);
   }
+
+  public static MessageHeader getResourceMessageHeader(Resource resource, FHIRContext context) {
+    String s = context.getParser().encodeResourceToString(resource);
+    Class<? extends IBaseResource> klass = MessageHeader.class;
+    return (MessageHeader) context.getParser().parseResource(klass, s);
+  }
+  
+  public static Condition getResourceCondition(Resource resource, FHIRContext context) {
+    String s = context.getParser().encodeResourceToString(resource);
+    Class<? extends IBaseResource> klass = Condition.class;
+    return (Condition) context.getParser().parseResource(klass, s);
+  }
 }
