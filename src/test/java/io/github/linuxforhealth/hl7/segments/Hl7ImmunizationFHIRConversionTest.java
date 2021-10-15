@@ -9,6 +9,7 @@ import com.google.common.collect.Lists;
 import io.github.linuxforhealth.api.ResourceModel;
 import io.github.linuxforhealth.fhir.FHIRContext;
 import io.github.linuxforhealth.hl7.ConverterOptions;
+import io.github.linuxforhealth.hl7.HL7ToFHIRConverter;
 import io.github.linuxforhealth.hl7.message.HL7FHIRResourceTemplate;
 import io.github.linuxforhealth.hl7.message.HL7FHIRResourceTemplateAttributes;
 import io.github.linuxforhealth.hl7.message.HL7MessageEngine;
@@ -32,28 +33,10 @@ public class Hl7ImmunizationFHIRConversionTest {
   private static FHIRContext context = new FHIRContext(true, false);
   private static final ConverterOptions OPTIONS = new ConverterOptions.Builder().withValidateResource().build();
 
-  private static HL7MessageEngine engine = new HL7MessageEngine(context);
-
   @Test
   public void testImmunization() throws IOException {
-    ResourceModel rsmPatient = ResourceReader.getInstance().generateResourceModel("resource/Patient");
 
-    HL7FHIRResourceTemplateAttributes attributesPatient = new HL7FHIRResourceTemplateAttributes.Builder()
-            .withResourceName("Patient")
-            .withResourceModel(rsmPatient).withSegment("PID").withIsReferenced(true)
-            .withRepeats(false).build();
 
-    HL7FHIRResourceTemplate patient = new HL7FHIRResourceTemplate(attributesPatient);
-
-    ResourceModel rsm = ResourceReader.getInstance().generateResourceModel("resource/Immunization");
-
-    HL7FHIRResourceTemplateAttributes attributes = new HL7FHIRResourceTemplateAttributes.Builder()
-            .withResourceName("Immunization").withResourceModel(rsm).withGroup("ORDER")
-            .withSegment(".RXA").withAdditionalSegments(Lists.newArrayList(".OBSERVATION.OBX", ".ORC"))
-            .withRepeats(true).build();
-
-    HL7FHIRResourceTemplate immunization = new HL7FHIRResourceTemplate(attributes);
-    HL7MessageModel message = new HL7MessageModel("VXU_V04", Lists.newArrayList(patient, immunization));
     String hl7VUXmessageRep = "MSH|^~\\&|MYEHR2.5|RI88140101|KIDSNET_IFL|RIHEALTH|20130531||VXU^V04^VXU_V04|20130531RI881401010105|P|2.5.1|||NE|AL||||||RI543763\r"
             + "PID|1||12345^^^^MR||TestPatient^Jane^^^^^L||||||\r"
             + "ORC|RE||197027|||||||^Clerk^Myron||MD67895^Pediatric^MARY^^^^MD^^RIA|||||RI2050\r"
@@ -61,8 +44,8 @@ public class Hl7ImmunizationFHIRConversionTest {
             + "RXR|C28161^IM^NCIT^IM^INTRAMUSCULAR^HL70162|RT^right thigh^HL70163\r"
             + "OBX|1|CE|64994-7^vaccine fund pgm elig cat^LN|1|V02^VFC eligible Medicaid/MedicaidManaged Care^HL70064||||||F|||20130531|||VXC40^per imm^CDCPHINVS\r";
 
-    String json = message.convert(hl7VUXmessageRep, engine);
-    System.out.println(json);
+    HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
+    String json = ftv.convert(hl7VUXmessageRep, OPTIONS);
     IBaseResource bundleResource = context.getParser().parseResource(json);
     assertThat(bundleResource).isNotNull();
     Bundle b = (Bundle) bundleResource;
@@ -83,7 +66,8 @@ public class Hl7ImmunizationFHIRConversionTest {
     assertThat(resource.getOccurrence()).hasToString("DateTimeType[2013-05-31]"); // RXA.3
 
     assertThat(resource.getReportOrigin().getCoding().get(0).getSystem()).isEqualTo("urn:id:NIP001");// RXA.9.3
-    assertThat(resource.getReportOrigin().getCoding().get(0).getCode()).isEqualTo("00");// RXA.9.1
+    assertThat(resource.getReportOrigin().getCoding().get(0).getCode()).isEqualTo("00");// RXA.9.
+    assertThat(resource.getReportOrigin().getCoding().get(0).getDisplay()).isEqualTo("new immunization record"); // RXA.9.2
     assertThat(resource.getReportOrigin().getText()).isEqualTo("new immunization record");// RXA.9.2
     assertThat(resource.getManufacturer().isEmpty()).isFalse(); // RXA.17
 
@@ -95,11 +79,26 @@ public class Hl7ImmunizationFHIRConversionTest {
             .isEqualTo("OP"); // ORC.12
     assertThat(resource.getPerformer().get(0).getFunction().getText())
             .isEqualTo("Ordering Provider"); // ORC.12
+    assertThat(resource.getPerformer().get(0).getActor().getReference().   isEmpty()).isFalse(); // ORC.12
+
     assertThat(resource.getPerformer().get(1).getFunction().getCoding().get(0).getCode())
             .isEqualTo("AP"); // RXA.10
     assertThat(resource.getPerformer().get(1).getFunction().getText())
             .isEqualTo("Administering Provider"); // RXA.10
-    assertThat(resource.getPerformer().get(0).getActor().isEmpty()).isFalse(); // ORC.12
+    assertThat(resource.getPerformer().get(1).getActor().isEmpty()).isFalse(); // RXA.10
+
+    String requesterRef1 = resource.getPerformer().get(0).getActor().getReference();
+    Practitioner practBundle1 = ResourceUtils.getSpecificPractitionerFromBundle(b, requesterRef1);
+    String requesterRef2 = resource.getPerformer().get(1).getActor().getReference();
+    Practitioner practBundle2 = ResourceUtils.getSpecificPractitionerFromBundle(b, requesterRef2);
+
+    assertThat(practBundle1.getNameFirstRep().getText()).isEqualTo("MARY Pediatric");
+    assertThat(practBundle1.getNameFirstRep().getFamily()).isEqualTo("Pediatric");
+    assertThat(practBundle1.getNameFirstRep().getGiven().get(0).toString()).isEqualTo("MARY");
+    assertThat(practBundle1.getIdentifierFirstRep().getValue()).isEqualTo("MD67895");
+    assertThat(practBundle2.getNameFirstRep().getText()).isEqualTo("Nurse Sticker");
+    assertThat(practBundle2.getNameFirstRep().getFamily()).isEqualTo("Sticker");
+    assertThat(practBundle2.getNameFirstRep().getGiven().get(0).toString()).isEqualTo("Nurse");
 
     // Test that a ServiceRequest is not created for VXU_V04
     List<Resource> serviceRequestList = e.stream()
@@ -122,5 +121,5 @@ public class Hl7ImmunizationFHIRConversionTest {
     assertThat(immunization1.getPerformer().get(0).getFunction().getCodingFirstRep().getCode()).isEqualTo("AP");// RXA.10
     assertThat(immunization1.getPerformer().get(0).getFunction().getText()).isEqualTo("Administering Provider"); // RXA.10
   }
-  
+  // TODO: 10/15/21 RXA-9 (also mapped to primarySource)/ RXA-6,7 doseQuantity RXA-18 statusReason /RXA-20 (status, statusReason, isSubpotent) 
 }
