@@ -30,7 +30,7 @@ import org.slf4j.LoggerFactory;
 
 public class Hl7VXUMessageTest {
     private static FHIRContext context = new FHIRContext(true, false);
-    private static final Logger LOGGER = LoggerFactory.getLogger(Hl7ORUMessageTest.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Hl7VXUMessageTest.class);
     private static final ConverterOptions OPTIONS_PRETTYPRINT = new Builder()
         .withBundleType(BundleType.COLLECTION)
         .withValidateResource()
@@ -46,7 +46,7 @@ public class Hl7VXUMessageTest {
         HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
         String json = ftv.convert(hl7message, OPTIONS_PRETTYPRINT);
         assertThat(json).isNotBlank();
-        LOGGER.info("FHIR json result:\n" + json);
+        LOGGER.debug("FHIR json result:\n" + json);
         IBaseResource bundleResource = context.getParser().parseResource(json);
         assertThat(bundleResource).isNotNull();
         Bundle b = (Bundle) bundleResource;
@@ -72,7 +72,7 @@ public class Hl7VXUMessageTest {
         HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
         String json = ftv.convert(hl7message, OPTIONS_PRETTYPRINT);
         assertThat(json).isNotBlank();
-        LOGGER.info("FHIR json result:\n" + json);
+        LOGGER.debug("FHIR json result:\n" + json);
         IBaseResource bundleResource = context.getParser().parseResource(json);
         assertThat(bundleResource).isNotNull();
         Bundle b = (Bundle) bundleResource;
@@ -105,7 +105,7 @@ public class Hl7VXUMessageTest {
         HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
         String json = ftv.convert(hl7message, OPTIONS_PRETTYPRINT);
         assertThat(json).isNotBlank();
-        LOGGER.info("FHIR json result:\n" + json);
+        LOGGER.debug("FHIR json result:\n" + json);
         IBaseResource bundleResource = context.getParser().parseResource(json);
         assertThat(bundleResource).isNotNull();
         Bundle b = (Bundle) bundleResource;
@@ -140,7 +140,7 @@ public class Hl7VXUMessageTest {
         HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
         String json = ftv.convert(hl7message, OPTIONS_PRETTYPRINT);
         assertThat(json).isNotBlank();
-        LOGGER.info("FHIR json result:\n" + json);
+        LOGGER.debug("FHIR json result:\n" + json);
         IBaseResource bundleResource = context.getParser().parseResource(json);
         assertThat(bundleResource).isNotNull();
         Bundle b = (Bundle) bundleResource;
@@ -179,7 +179,7 @@ public class Hl7VXUMessageTest {
         HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
         String json = ftv.convert(hl7message, OPTIONS_PRETTYPRINT);
         assertThat(json).isNotBlank();
-        LOGGER.info("FHIR json result:\n" + json);
+        LOGGER.debug("FHIR json result:\n" + json);
         IBaseResource bundleResource = context.getParser().parseResource(json);
         assertThat(bundleResource).isNotNull();
         Bundle b = (Bundle) bundleResource;
@@ -220,7 +220,7 @@ public class Hl7VXUMessageTest {
         HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
         String json = ftv.convert(hl7message, OPTIONS_PRETTYPRINT);
         assertThat(json).isNotBlank();
-        LOGGER.info("FHIR json result:\n" + json);
+        LOGGER.debug("FHIR json result:\n" + json);
         IBaseResource bundleResource = context.getParser().parseResource(json);
         assertThat(bundleResource).isNotNull();
         Bundle b = (Bundle) bundleResource;
@@ -263,7 +263,7 @@ public class Hl7VXUMessageTest {
         HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
         String json = ftv.convert(hl7message, OPTIONS_PRETTYPRINT);
         assertThat(json).isNotBlank();
-        LOGGER.info("FHIR json result:\n" + json);
+        LOGGER.debug("FHIR json result:\n" + json);
         IBaseResource bundleResource = context.getParser().parseResource(json);
         assertThat(bundleResource).isNotNull();
         Bundle b = (Bundle) bundleResource;
@@ -314,7 +314,7 @@ public class Hl7VXUMessageTest {
         HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
         String json = ftv.convert(hl7message, OPTIONS_PRETTYPRINT);
         assertThat(json).isNotBlank();
-        LOGGER.info("FHIR json result:\n" + json);
+        LOGGER.debug("FHIR json result:\n" + json);
         IBaseResource bundleResource = context.getParser().parseResource(json);
         assertThat(bundleResource).isNotNull();
         Bundle b = (Bundle) bundleResource;
