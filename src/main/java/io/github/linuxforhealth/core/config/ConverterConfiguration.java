@@ -98,7 +98,8 @@ public class ConverterConfiguration {
     try {
     zoneId = ZoneId.of(zoneText);
     } catch (DateTimeException e) {
-      LOGGER.warn("Cannot create ZoneId from :" + zoneText, e);
+      LOGGER.warn("Cannot create ZoneId");
+      LOGGER.debug("Cannot create ZoneId from :" + zoneText, e);
       zoneId = null;
     }
   }

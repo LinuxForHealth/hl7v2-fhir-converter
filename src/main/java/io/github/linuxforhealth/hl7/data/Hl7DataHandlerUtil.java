@@ -138,7 +138,8 @@ public class Hl7DataHandlerUtil {
                 try {
                     returnvalue = com.getComponent(0).toString();
                 } catch (DataTypeException e) {
-                    LOGGER.warn("Failure when extracting string value for {}", local, e);
+                    LOGGER.warn("Failure when extracting string value");
+                    LOGGER.debug("Failure when extracting string value for {}", local, e);
                     returnvalue = null;
                 }
             }

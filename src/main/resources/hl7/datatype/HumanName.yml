@@ -34,7 +34,7 @@ prefix:
      expressionType: HL7Spec
 use:
     type: NAME_USE
-    valueOf: XPN.7
+    valueOf: XPN.7 | XCN.10
     expressionType: HL7Spec
 
 suffix: 

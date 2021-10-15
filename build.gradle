@@ -166,3 +166,19 @@ if (isReleaseVersion ) {
 tasks.withType(Sign) {
     onlyIf { isReleaseVersion }
 }
+
+task deleteJavaDebugLogs {
+    description("This function will delete all DEBUG log statements from the project.")
+    doLast {
+        FileTree  javaFiles = fileTree('src/main') {
+            include '**/*.java'
+        }
+        String regex = "LOGGER.debug.*"
+        javaFiles.each { File javaFile ->
+            println "Start replacing regex on $javaFile.name"
+            String content = javaFile.getText()
+            content = content.replaceAll(regex, "")
+            javaFile.setText(content)
+        }
+    }
+}

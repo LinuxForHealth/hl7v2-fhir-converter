@@ -57,7 +57,7 @@ public class Hl7PatientFHIRConversionTest {
     "MSH|^~\\&|hl7Integration|hl7Integration|||||ORU^R01|||2.6|\r",
     "MSH|^~\\&|hl7Integration|hl7Integration|||||RDE^O11|||2.6|\r",
     "MSH|^~\\&|hl7Integration|hl7Integration|||||RDE^O25|||2.6|\r",
-    // "MSH|^~\\&|hl7Integration|hl7Integration|||||VXU^V04|||2.6|\r",
+    "MSH|^~\\&|hl7Integration|hl7Integration|||||VXU^V04|||2.6|\r",
     })
     public void test_patient_additional_demographics(String msh) {
         String hl7message = msh
@@ -446,7 +446,7 @@ public class Hl7PatientFHIRConversionTest {
         HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
         String json = ftv.convert(hl7message, PatientUtils.OPTIONS);
         assertThat(json).isNotBlank();
-        LOGGER.info(json);
+        LOGGER.debug(json);
 
         IBaseResource bundleResource = context.getParser().parseResource(json);
         assertThat(bundleResource).isNotNull();
