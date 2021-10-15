@@ -166,22 +166,6 @@ content_3:
    constants: 
       contentType: "text/plain"
         
-
-
-# content_3:
-#    valueOf: secondary/Content
-#    generateList: true
-#    expressionType: resource
-#    condition: $obx NULL
-#    vars:
-#       creationDate: TXA.7
-#       # contentData: $nothing *&, GeneralUtils.concatenateWithChar(contentData, '\n')
-#       obx: OBX
-#    constants: 
-#       contentType: "text/plain"  
-#       # nothing: ''   
-#       contentData: ''    
-
 description:
    type: STRING
    expressionType: HL7Spec
