@@ -10,7 +10,6 @@ plugins {
     id 'jacoco'
     id 'maven-publish'
     id 'signing'
-
 }
 
 group = 'io.github.linuxforhealth'
@@ -44,10 +43,7 @@ implementation group: 'ca.uhn.hapi.fhir', name: 'hapi-fhir-validation', version:
 // https://mvnrepository.com/artifact/ca.uhn.hapi.fhir/hapi-fhir-validation
 implementation group: 'ca.uhn.hapi.fhir', name: 'hapi-fhir-validation-resources-r4', version: '5.1.0'
 
-
-
 implementation group: 'org.apache.commons', name: 'commons-jexl3', version: '3.1'
-
 
 // https://mvnrepository.com/artifact/org.apache.commons/commons-configuration2
 implementation group: 'org.apache.commons', name: 'commons-configuration2', version: '2.7'
@@ -67,9 +63,7 @@ testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:5.7.2"
 
 // In this section you declare where to find the dependencies of your project
 repositories {
-
-    mavenCentral()
-   
+    mavenCentral()  
 }
 
 test {
@@ -89,14 +83,12 @@ jacocoTestReport {
 }
 
 publishing {
-
   repositories {
     maven {
       name = "OSSRH"
       def releaseRepo = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
       def snapshotRepo = "https://oss.sonatype.org/content/repositories/snapshots/"
       url = isReleaseVersion ? releaseRepo : snapshotRepo
-      
       credentials {
         username = System.getenv("MAVEN_USERNAME")
         password = System.getenv("MAVEN_PASSWORD")
@@ -110,10 +102,17 @@ task sourcesJar(type: Jar, dependsOn: classes) {
     from sourceSets.main.allSource
 }
 
-artifacts {
-    archives sourcesJar
+javadoc.failOnError = false
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+    javadoc.options.addStringOption('Xdoclint:none', '-quiet')
 }
 
+artifacts {
+    archives sourcesJar
+    archives javadocJar
+}
 
 publishing {
     publications {
@@ -122,43 +121,44 @@ publishing {
             artifact sourcesJar {
                 classifier "sources"
             }
+            artifact javadocJar {
+                classifier "javadoc"
+            }
             groupId = group
             artifactId 'hl7v2-fhir-converter'
             version = version
             
             pom {
-                    name = "hl7v2-fhir-converter"
-                    description = "FHIR converter is a Java based library that enables converting Hl7v2 messages to FHIR resources"
-                    url = "https://github.com/LinuxForHealth/hl7v2-fhir-converter"
-                    licenses {
-                      license {
+                name = "hl7v2-fhir-converter"
+                description = "FHIR converter is a Java based library that enables converting Hl7v2 messages to FHIR resources"
+                url = "https://github.com/LinuxForHealth/hl7v2-fhir-converter"
+                licenses {
+                    license {
                         name = "The Apache License, Version 2.0"
                         url = "http://www.apache.org/licenses/LICENSE-2.0.txt"
-                      }
                     }
-                    developers {
-                      developer {
+                }
+                developers {
+                    developer {
                         id = "pbhallam"
-                        
-                      }
                     }
-                    scm {
+                }
+                scm {
                       url = "https://github.com/LinuxForHealth/hl7v2-fhir-converter.git"
-                     
-                    }
-                  }
-           
+                }
+            }
+
         }
     }
 }
 
 
 signing {
-if (isReleaseVersion ) {
-    def signingKeyId = System.getenv("signingKeyId")
-    def signingKey = System.getenv("signingKey")
-    def signingPassword = System.getenv("signingPassword")
-    useInMemoryPgpKeys(signingKeyId, signingKey, signingPassword)
+    if (isReleaseVersion ) {
+        def signingKeyId = System.getenv("signingKeyId")
+        def signingKey = System.getenv("signingKey")
+        def signingPassword = System.getenv("signingPassword")
+        useInMemoryPgpKeys(signingKeyId, signingKey, signingPassword)
     }
     sign publishing.publications.mavenPublication
 }
