@@ -144,6 +144,7 @@ content_1:
 
 # If OBX is any other type, (not TX) the content is put in an Observation
 # DocumentReference still requires Content element, so create an empty (minimal) one.
+# Content type is sufficient minimal, include the date if present
 content_2:
    valueOf: secondary/Content
    generateList: true
@@ -152,9 +153,12 @@ content_2:
    vars:
       creationDate: TXA.7
       obx2: STRING, OBX.2
+   constants: 
+      contentType: "text/plain"      
 
 # Third case is no OBX record at all
 # DocumentReference still requires Content element, so create an empty (minimal) one.
+# Content type is sufficient for minimal, include the date if present
 content_3:
    valueOf: secondary/Content
    generateList: true

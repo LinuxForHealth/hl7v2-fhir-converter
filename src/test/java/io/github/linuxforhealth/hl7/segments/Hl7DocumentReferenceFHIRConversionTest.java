@@ -20,7 +20,9 @@ import org.hl7.fhir.r4.model.InstantType;
 import org.hl7.fhir.r4.model.Practitioner;
 import org.hl7.fhir.r4.model.Resource;
 import org.hl7.fhir.r4.model.ResourceType;
+import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
 import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
@@ -151,8 +153,27 @@ public class Hl7DocumentReferenceFHIRConversionTest {
         content = report.getContentFirstRep();
         // Because the OBX is not TX, the content is put in an Observation
         // FHIR requires a Content element, so only a minimal one is created.
-        assertThat(content.getAttachment().hasContentType()).isFalse(); // Future OBX.2 is the backup for content type, but currently always defaults to text/plain
+        assertThat(content.getAttachment().hasContentType()).isTrue(); // Future OBX.2 is the backup for content type, but currently always defaults to text/plain
+        assertThat(content.getAttachment().getContentType()).isEqualTo("text/plain"); // Currently always defaults to text/plain
         assertThat(content.getAttachment().getCreationElement().toString()).containsPattern("2018-01-18T03:46:00"); // TXA.7 date
+        assertThat(content.getAttachment().hasData()).isFalse();
+
+        // Test that content is created even if TXA.7 is empty
+        documentReferenceMessage = "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|" + segment + "^MDM_T02|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6|56789^NID^UID|MCM||||\n"
+                + "PID|1||000054321^^^MRN|||||||||||||M|CAT|||||N\n"
+                + "PV1|1|I||||||||||||||||||||||||||||||||||||||||||\n"
+                + "ORC|NW|||PGN001|SC|D|1|||MS|MS|||||\n"
+                + "OBR|1||||||20170825010500|||||||||||||002|||||F||||||||\n"
+                // Ensure that empty TXA.7 still works
+                + "TXA|1||||||||<PHYSID1>||||||||||AV|||<PHYSID2>||\n"
+                + "OBX|1|SN|||||||||F";
+        report = ResourceUtils.getDocumentReference(documentReferenceMessage);
+        content = report.getContentFirstRep();
+        // Because the OBX is not TX, the content is put in an Observation
+        // FHIR requires a Content element, so only a minimal one is created.
+        assertThat(content.getAttachment().hasContentType()).isTrue(); // Currently always defaults to text/plain
+        assertThat(content.getAttachment().getContentType()).isEqualTo("text/plain"); // Currently always defaults to text/plain, even if not data for content
+        assertThat(content.getAttachment().hasCreationElement()).isFalse(); // No TXA.7 date
         assertThat(content.getAttachment().hasData()).isFalse();
     }
 

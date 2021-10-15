@@ -88,9 +88,9 @@ public class Hl7PPRMessageTest {
             // OBR.7 is used for the timestamp (because no TXA in a PPR_PC1 message)
             + "OBR|1|TESTID|TESTID|||201801180346|201801180347||||||||||||||||||F||||||WEAKNESS||||||||||||\n"
             // Next three lines create an attachment because OBX type TX
-            + "OBX|1|TX|3||ECHOCARDIOGRAPHIC REPORT||||||F|||202101010000|||\n"
-            + "OBX|2|TX|3||NORMAL LV CHAMBER SIZE WITH MILD CONCENTRIC LVH||||||F|||202101010000|||\n"
-            + "OBX|3|TX|3||HYPERDYNAMIC LV SYSTOLIC FUNCTION, VISUAL EF 80%||||||F|||202101010000|||\n";
+            + "OBX|1|TX|||ECHOCARDIOGRAPHIC REPORT||||||F|||202101010000|||\n"
+            + "OBX|2|TX|||NORMAL LV CHAMBER SIZE WITH MILD CONCENTRIC LVH||||||F|||202101010000|||\n"
+            + "OBX|3|TX|||HYPERDYNAMIC LV SYSTOLIC FUNCTION, VISUAL EF 80%||||||F|||202101010000|||\n";
             
     HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
     String json = ftv.convert(hl7message, OPTIONS);
