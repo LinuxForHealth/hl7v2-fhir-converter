@@ -25,6 +25,6 @@ period:
     valueOf: datatype/Period
     expressionType: resource
     vars: 
-       start: CX.7 | CWE.7 | $start
-       end: CX.8 | CWE.8 | $end
+       start: CX.7 | CWE.7
+       end: CX.8 | CWE.8
 

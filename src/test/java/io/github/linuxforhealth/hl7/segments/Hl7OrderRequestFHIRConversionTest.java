@@ -52,7 +52,7 @@ public class Hl7OrderRequestFHIRConversionTest {
             //  1. Checking fields ORC.4 to ServiceRequest.requisition
             //  1b. ORC.5 to ServiceRequest.status 
             //  2. ORC.9 to ServiceRequest.authoredOn (overrides secondary OBR.6)
-            //  3. ORC.12 to ServiceRequest.requester AND Practitioner object and reference to Practictioner
+            //  3. ORC.12 to ServiceRequest.requester AND Practitioner object and reference to Practictioner, ORC.12.9 tests unknown system logic
             //  4. ORC.15 to ServiceRequest.occurrenceDateTime (overrides secondary OBR.7)
             //  5. ORC.16 is set to a reason code (secondary to OBR.31, which is purposely not present in this case)
             + "ORC|RE|248648498^|248648498^|ML18267-C00001^Beaker|SC||||20120628071200|||5742200012^Radon^Nicholas^^^^^^FAKESYSTEM^L^^^NPI|||20170917151717|042^Human immunodeficiency virus [HIV] disease [42]^I9CDX^^^^29|||||||||||||||\n"
@@ -131,7 +131,7 @@ public class Hl7OrderRequestFHIRConversionTest {
     // Check the practitioner content in detail, validating subfields. Compare to ORC.12
     assertThat(pract.getIdentifier()).hasSize(1);
     assertThat(pract.getIdentifierFirstRep().getValue()).isEqualTo("5742200012");  // ORC.12.1
-    assertThat(pract.getIdentifierFirstRep().getSystem()).isEqualTo("urn:id:FAKESYSTEM"); // ORC.12.9
+    assertThat(pract.getIdentifierFirstRep().getSystem()).isEqualTo("urn:id:FAKESYSTEM"); // ORC.12.9, tests unknown system logic
     DatatypeUtils.checkCommonCodeableConceptAssertions(pract.getIdentifierFirstRep().getType(), "NPI", "National provider identifier", "http://terminology.hl7.org/CodeSystem/v2-0203", null);  // ORC.12.13
     assertThat(pract.getName()).hasSize(1);
     assertThat(pract.getNameFirstRep().getTextElement().toString()).hasToString("Nicholas Radon"); // Combined ORC.12.2 - ORC.12.7
@@ -173,10 +173,10 @@ public class Hl7OrderRequestFHIRConversionTest {
         + "ORC|RE|248648498^|248648498^|||||||||||||042^Human immunodeficiency virus [HIV] disease [42]^I9CDX^^^^29|||||||||||||||\n"
         //  10. OBR.32 will be turned into a Practioner and referenced and the DiagnositicReport.resultsInterpreter
         //  11. OBR.4 maps to both ServiceRequest.code and DiagnosticReport.code
-        //  12. OBR.16 creates a ServiceRequest.requester reference
-        //  13. OBR.22 creates a DiagnosticReport.status 5742200012^Radon^Nicholas^4^5^6^7^8^FAKESYSTEM^L^11^12^NPI
+        //  12. OBR.16 creates a ServiceRequest.requester reference, OBR.16.9 tests known system logic
+        //  13. OBR.22 creates a DiagnosticReport.status
         //  14. OBR.6 creates ServiceRequest.authoredOn
-        + "OBR|1|248648498^|248648498^|83036E^HEMOGLOBIN A1C^PACSEAP^^^^^^HEMOGLOBIN A1C||20120606120606|20170707150707||||L|||||54321678^SCHMIDT^FRIEDA^^MD^^^^FAKESYS2^D^^^NPI||||||20180924152900|||F||||||HIV^HIV/Aids^L^^^^V1|323232&Mahoney&Paul&J||||||||||||||||||\n";
+        + "OBR|1|248648498^|248648498^|83036E^HEMOGLOBIN A1C^PACSEAP^^^^^^HEMOGLOBIN A1C||20120606120606|20170707150707||||L|||||54321678^SCHMIDT^FRIEDA^^MD^^^^NPI^D^^^NPI||||||20180924152900|||F||||||HIV^HIV/Aids^L^^^^V1|323232&Mahoney&Paul&J||||||||||||||||||\n";
 
     HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
     String json = ftv.convert(hl7message, PatientUtils.OPTIONS);
@@ -238,7 +238,7 @@ public class Hl7OrderRequestFHIRConversionTest {
     // Check the practitioner content in detail, validating subfields.
     assertThat(pract.getIdentifier()).hasSize(1);
     assertThat(pract.getIdentifierFirstRep().getValue()).isEqualTo("54321678"); // OBR.16.1
-    assertThat(pract.getIdentifierFirstRep().getSystem()).isEqualTo("urn:id:FAKESYS2"); // OBR.16.9
+    assertThat(pract.getIdentifierFirstRep().getSystem()).isEqualTo("http://hl7.org/fhir/sid/us-npi"); // OBR.16.9, tests known system logic
     DatatypeUtils.checkCommonCodeableConceptAssertions(pract.getIdentifierFirstRep().getType(), "NPI", "National provider identifier", "http://terminology.hl7.org/CodeSystem/v2-0203", null);  // OBR.16.13
     assertThat(pract.getName()).hasSize(1);
     assertThat(pract.getNameFirstRep().getTextElement().toString()).hasToString("FRIEDA SCHMIDT MD"); // Combined OBR.16.2 - OBR.16.7

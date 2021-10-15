@@ -21,8 +21,7 @@ identifier:
     vars:
       system: XCN.9 | CNN.9 | NDL.9 | PPN.9
       value: XCN.1 | CNN.1 | NDL.1 | PPN.1
-      start: XCN.19 
-      end: XCN.20
+
       type: XCN.13
 name: 
     specs: XCN | XCN | CNN | NDL | PPN

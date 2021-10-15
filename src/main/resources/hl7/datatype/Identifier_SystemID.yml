@@ -35,7 +35,7 @@ system_2:
     
 value: 
      type: STRING
-     valueOf: CX.1 | CWE.1 |EI.1 | $value
+     valueOf: CX.1 | CWE.1 | EI.1 | $value
      expressionType: HL7Spec
      required: true
 
@@ -43,8 +43,8 @@ period:
     valueOf: datatype/Period
     expressionType: resource
     vars: 
-       start: CX.7 | CWE.7 | $start
-       end: CX.8 | CWE.8 | $end
+       start: CX.7 | CWE.7 | XCN.19
+       end: CX.8 | CWE.8 | XCN.20
 
 use:
    condition: $mrgUse NOT_NULL
