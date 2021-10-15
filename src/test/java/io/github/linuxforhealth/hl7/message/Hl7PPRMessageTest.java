@@ -61,7 +61,8 @@ public class Hl7PPRMessageTest {
     List<Resource> obsResource =
         e.stream().filter(v -> ResourceType.Observation == v.getResource().getResourceType())
             .map(BundleEntryComponent::getResource).collect(Collectors.toList());
-    assertThat(obsResource).hasSize(2);
+    // No Observations because the OBX records are TX     
+    assertThat(obsResource).hasSize(0);
 
     List<Resource> encounterResource =
         e.stream().filter(v -> ResourceType.Encounter == v.getResource().getResourceType())
@@ -86,10 +87,10 @@ public class Hl7PPRMessageTest {
             + "ORC|NW|1000^OE|9999999^RX|||E|^Q6H^D10^^^R\n"
             // OBR.7 is used for the timestamp (because no TXA in a PPR_PC1 message)
             + "OBR|1|TESTID|TESTID|||201801180346|201801180347||||||||||||||||||F||||||WEAKNESS||||||||||||\n"
-            // Next three lines create an attachment
-            + "OBX|1|TX|||ECHOCARDIOGRAPHIC REPORT||||||F|||202101010000|||\n"
-            + "OBX|2|TX|||NORMAL LV CHAMBER SIZE WITH MILD CONCENTRIC LVH||||||F|||202101010000|||\n"
-            + "OBX|3|TX|||HYPERDYNAMIC LV SYSTOLIC FUNCTION, VISUAL EF 80%||||||F|||202101010000|||\n";
+            // Next three lines create an attachment because OBX type TX
+            + "OBX|1|TX|3||ECHOCARDIOGRAPHIC REPORT||||||F|||202101010000|||\n"
+            + "OBX|2|TX|3||NORMAL LV CHAMBER SIZE WITH MILD CONCENTRIC LVH||||||F|||202101010000|||\n"
+            + "OBX|3|TX|3||HYPERDYNAMIC LV SYSTOLIC FUNCTION, VISUAL EF 80%||||||F|||202101010000|||\n";
             
     HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
     String json = ftv.convert(hl7message, OPTIONS);
@@ -108,7 +109,8 @@ public class Hl7PPRMessageTest {
     List<Resource> obsResource =
             e.stream().filter(v -> ResourceType.Observation == v.getResource().getResourceType())
                 .map(BundleEntryComponent::getResource).collect(Collectors.toList());
-        assertThat(obsResource).hasSize(1);
+    // One Observation from the NM, but not from the TX                    
+    assertThat(obsResource).hasSize(1);
 
     List<Resource> encounterResource =
         e.stream().filter(v -> ResourceType.Encounter == v.getResource().getResourceType())

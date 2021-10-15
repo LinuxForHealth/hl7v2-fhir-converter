@@ -344,7 +344,6 @@ String hl7message =
   }
 
   @Test
-
   /*
    * This tests some of coding systems of interest or potential problems
    */
@@ -429,10 +428,12 @@ String hl7message =
     assertThat(encounterResource).hasSize(1);
     List<Resource> obsResource = e.stream().filter(v -> ResourceType.Observation == v.getResource().getResourceType())
         .map(BundleEntryComponent::getResource).collect(Collectors.toList());
-    assertThat(obsResource).hasSize(1);
+    // No Observation resource because OBX.2 is type TX        
+    assertThat(obsResource).isEmpty();
+    
     List<Resource> pracResource = e.stream().filter(v -> ResourceType.Practitioner == v.getResource().getResourceType())
         .map(BundleEntryComponent::getResource).collect(Collectors.toList());
-    assertThat(pracResource).hasSize(8);
+    assertThat(pracResource).hasSize(4);
 
     List<Resource> allergyResources = e.stream()
         .filter(v -> ResourceType.AllergyIntolerance == v.getResource().getResourceType())

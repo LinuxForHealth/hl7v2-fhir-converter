@@ -38,12 +38,23 @@ status:
    valueOf: OBX.11
    expressionType: HL7Spec
 
+# When OBX's are missing or TX based, we don't want to create an Observation.
+# When TX, because content is already appended to an associated DiagnosticReport or DocumentReference
+# Logic: if OBX exists AND ( (OBX.2 exists AND OBX.2 is NOT TX) OR (OBX.2 is null/empty) ) AND OBX.3 NOT NULL CREATE the Observation.
+# 'code' is set 'required: true' to cause all or nothing creation logic
+# The expression is nested and values are passed to the nested so that BOTH values control the 'all or nothing'
 code:
-   valueOf: datatype/CodeableConcept
-   expressionType: resource
-   specs: OBX.3
+   expressionType: nested
    required: true
-
+   vars:
+     obx3: OBX.3
+     obx2: STRING, OBX.2
+   expressions:
+   -  condition: $obx3 NOT_NULL && $obx2 NOT_EQUALS_STRING TX
+      valueOf: datatype/CodeableConcept
+      expressionType: resource
+      specs: $obx3
+ 
 
 subject:
     valueOf: datatype/Reference
@@ -55,21 +66,18 @@ encounter:
     expressionType: resource
     specs: $Encounter
 
-
 effectiveDateTime:
      type: DATE_TIME
      valueOf: OBX.14 | OBX.19
      expressionType: HL7Spec
-
 
 issued:
      type: DATE_TIME
      valueOf: OBR.22 | OBX.19
      expressionType: HL7Spec
 
-
 valueString:
-    condition: $obx2 EQUALS TX || $obx2 EQUALS ST
+    condition: $obx2 EQUALS ST
     type: STRING_ALL
     valueOf: OBX.5
     expressionType: HL7Spec

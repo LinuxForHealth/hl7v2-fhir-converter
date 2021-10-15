@@ -294,10 +294,11 @@ public class Hl7ObservationFHIRConversionTest {
         assertEquals(3f, r.getDenominator().getValue().floatValue());
     }
 
+ 
     @Test
-    public void testObservationTxResult() throws IOException {
+    public void testObservationSTResult() throws IOException {
         String hl7message = baseMessage
-                + "OBX|1|TX|^Type of protein feed^L||Fourth Line: HYPERDYNAMIC LV SYSTOLIC FUNCTION, VISUAL EF 80%||||||F||||Alex||";
+                + "OBX|1|ST|^Type of protein feed^L||Fourth Line: HYPERDYNAMIC LV SYSTOLIC FUNCTION, VISUAL EF 80%||||||F||||Alex||";
         String json = message.convert(hl7message, engine);
 
         IBaseResource bundleResource = context.getParser().parseResource(json);
@@ -315,10 +316,10 @@ public class Hl7ObservationFHIRConversionTest {
                 .isEqualTo("Fourth Line: HYPERDYNAMIC LV SYSTOLIC FUNCTION, VISUAL EF 80%");
     }
 
-    @Test
-    public void testObservationTxMultiplePartsResult() throws IOException {
+     @Test
+    public void testObservationSTMultiplePartsResult() throws IOException {
         String hl7message = baseMessage
-                + "OBX|1|TX|^Type of protein feed^L||HYPERDYNAMIC LV SYSTOLIC FUNCTION, VISUAL EF 80%~Fifth line, as part of a repeated field||||||F||";
+                + "OBX|1|ST|^Type of protein feed^L||HYPERDYNAMIC LV SYSTOLIC FUNCTION, VISUAL EF 80%~Fifth line, as part of a repeated field||||||F||";
         String json = message.convert(hl7message, engine);
         IBaseResource bundleResource = context.getParser().parseResource(json);
         assertThat(bundleResource).isNotNull();
