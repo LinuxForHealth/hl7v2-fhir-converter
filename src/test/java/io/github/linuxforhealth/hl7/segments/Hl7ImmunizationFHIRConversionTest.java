@@ -5,25 +5,21 @@
  */
 package io.github.linuxforhealth.hl7.segments;
 
-import com.google.common.collect.Lists;
-import io.github.linuxforhealth.api.ResourceModel;
+
 import io.github.linuxforhealth.fhir.FHIRContext;
 import io.github.linuxforhealth.hl7.ConverterOptions;
 import io.github.linuxforhealth.hl7.HL7ToFHIRConverter;
-import io.github.linuxforhealth.hl7.message.HL7FHIRResourceTemplate;
-import io.github.linuxforhealth.hl7.message.HL7FHIRResourceTemplateAttributes;
-import io.github.linuxforhealth.hl7.message.HL7MessageEngine;
-import io.github.linuxforhealth.hl7.message.HL7MessageModel;
-import io.github.linuxforhealth.hl7.resource.ResourceReader;
-import io.github.linuxforhealth.hl7.segments.util.PatientUtils;
+
 import io.github.linuxforhealth.hl7.segments.util.ResourceUtils;
 import org.hl7.fhir.instance.model.api.IBaseResource;
-import org.hl7.fhir.r4.model.*;
+import org.hl7.fhir.r4.model.Immunization;
+import org.hl7.fhir.r4.model.Practitioner;
+import org.hl7.fhir.r4.model.Bundle;
+import org.hl7.fhir.r4.model.Resource;
+import org.hl7.fhir.r4.model.ResourceType;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -74,28 +70,26 @@ public class Hl7ImmunizationFHIRConversionTest {
     assertThat(resource.getLotNumber()).isEqualTo("33k2a"); // RXA.15
     assertThat(resource.getExpirationDate()).isEqualTo("2013-12-10"); // RXA.16
 
+    String requesterRef1 = resource.getPerformer().get(0).getActor().getReference();
+    Practitioner practBundle1 = ResourceUtils.getSpecificPractitionerFromBundle(b, requesterRef1);
     assertThat(resource.getPerformer()).hasSize(2);
     assertThat(resource.getPerformer().get(0).getFunction().getCoding().get(0).getCode())
             .isEqualTo("OP"); // ORC.12
     assertThat(resource.getPerformer().get(0).getFunction().getText())
             .isEqualTo("Ordering Provider"); // ORC.12
     assertThat(resource.getPerformer().get(0).getActor().getReference().   isEmpty()).isFalse(); // ORC.12
+    assertThat(practBundle1.getNameFirstRep().getText()).isEqualTo("MARY Pediatric");
+    assertThat(practBundle1.getNameFirstRep().getFamily()).isEqualTo("Pediatric");
+    assertThat(practBundle1.getNameFirstRep().getGiven().get(0).toString()).isEqualTo("MARY");
+    assertThat(practBundle1.getIdentifierFirstRep().getValue()).isEqualTo("MD67895");
 
+    String requesterRef2 = resource.getPerformer().get(1).getActor().getReference();
+    Practitioner practBundle2 = ResourceUtils.getSpecificPractitionerFromBundle(b, requesterRef2);
     assertThat(resource.getPerformer().get(1).getFunction().getCoding().get(0).getCode())
             .isEqualTo("AP"); // RXA.10
     assertThat(resource.getPerformer().get(1).getFunction().getText())
             .isEqualTo("Administering Provider"); // RXA.10
     assertThat(resource.getPerformer().get(1).getActor().isEmpty()).isFalse(); // RXA.10
-
-    String requesterRef1 = resource.getPerformer().get(0).getActor().getReference();
-    Practitioner practBundle1 = ResourceUtils.getSpecificPractitionerFromBundle(b, requesterRef1);
-    String requesterRef2 = resource.getPerformer().get(1).getActor().getReference();
-    Practitioner practBundle2 = ResourceUtils.getSpecificPractitionerFromBundle(b, requesterRef2);
-
-    assertThat(practBundle1.getNameFirstRep().getText()).isEqualTo("MARY Pediatric");
-    assertThat(practBundle1.getNameFirstRep().getFamily()).isEqualTo("Pediatric");
-    assertThat(practBundle1.getNameFirstRep().getGiven().get(0).toString()).isEqualTo("MARY");
-    assertThat(practBundle1.getIdentifierFirstRep().getValue()).isEqualTo("MD67895");
     assertThat(practBundle2.getNameFirstRep().getText()).isEqualTo("Nurse Sticker");
     assertThat(practBundle2.getNameFirstRep().getFamily()).isEqualTo("Sticker");
     assertThat(practBundle2.getNameFirstRep().getGiven().get(0).toString()).isEqualTo("Nurse");
@@ -121,5 +115,8 @@ public class Hl7ImmunizationFHIRConversionTest {
     assertThat(immunization1.getPerformer().get(0).getFunction().getCodingFirstRep().getCode()).isEqualTo("AP");// RXA.10
     assertThat(immunization1.getPerformer().get(0).getFunction().getText()).isEqualTo("Administering Provider"); // RXA.10
   }
-  // TODO: 10/15/21 RXA-9 (also mapped to primarySource)/ RXA-6,7 doseQuantity RXA-18 statusReason /RXA-20 (status, statusReason, isSubpotent) 
+  // TODO: 10/15/21 RXA-9 (also mapped to primarySource)
+  //  RXA-6,7 doseQuantity
+  //  RXA-18 statusReason
+  //  RXA-20 (status, statusReason, isSubpotent)
 }
