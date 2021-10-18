@@ -347,9 +347,16 @@ public class SegmentExtractorUtil {
     Collections.reverse(reversedGroups);
 
     Structure parent = struct;
+    boolean foundParentGroup = false;
+    int numGroups = reversedGroups.size();
+    int i = 0;
 
-    for (String eachSeg : reversedGroups) {
-      parent = getParentGroup(parent, eachSeg);
+    while(!foundParentGroup && i < numGroups) {
+      parent = getParentGroup(parent, reversedGroups.get(i));
+      if (parent != null) { 
+          foundParentGroup = true; 
+      }
+      i = i+1;
     }
 
     if (parent != null) {

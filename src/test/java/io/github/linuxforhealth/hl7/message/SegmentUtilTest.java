@@ -236,6 +236,46 @@ public class SegmentUtilTest {
   }
 
 
+  @Test
+  public void test_repeating_primary_segment_with_repeating_parent_group()
+      throws HL7Exception {
+    String message = "MSH|^~\\\\&|SendTest1|Sendfac1|Receiveapp1|Receivefac1|200603081747|security|ORU^R01|MSGID000005|T|2.6\r"
+                  + "PID||45483|45483||SMITH^SUZIE^||20160813|M|||123 MAIN STREET^^SCHENECTADY^NY^12345||(123)456-7890|||||^^^T||||||||||||\r"
+                  + "OBR|1||986^IA PHIMS Stage^2.16.840.1.114222.4.3.3.5.1.2^ISO|112^Final Echocardiogram Report|||20151009173644|||||||||||||002|||||F|||2740^Tsadok^Janetary~2913^Merrit^Darren^F~3065^Mahoney^Paul^J~4723^Loh^Robert^L~9052^Winter^Oscar^||||3068^JOHN^Paul^J|\r"
+                  + "OBX|1|ST|TS-F-01-007^Endocrine Disorders 7^L||obs report||||||F\r"
+                  + "OBX|2|ST|TS-F-01-008^Endocrine Disorders 8^L||ECHOCARDIOGRAPHIC REPORT||||||F\r"
+                  + "OBR|1||98^IA PHIMS Stage^2.16.840.1.114222.4.3.3.5.1.2^ISO|113^Echocardiogram Report|||20151009173644|||||||||||||002|||||F|||2740^Tsadok^Janetary~2913^Merrit^Darren^F~3065^Mahoney^Paul^J~4723^Loh^Robert^L~9052^Winter^Oscar^||||3065^Mahoney^Paul^J|\r"
+                  + "OBX|1|CWE|625-4^Bacteria identified in Stool by Culture^LN^^^^2.33^^result1|1|27268008^Salmonella^SCT^^^^20090731^^Salmonella species|||A^A^HL70078^^^^2.5|||P|||20120301|||^^^^^^^^Bacterial Culture||201203140957||||||\r"
+                  + "OBX|2|ST|TS-F-01-002^Endocrine Disorders^L||ECHOCARDIOGRAPHIC REPORT Group 2||||||F\r";
+  
+    Message hl7message = getMessage(message);
+    HL7DataExtractor hl7DTE = new HL7DataExtractor(hl7message);
+    List<String> orderGroupList = Lists.newArrayList("PATIENT_RESULT", "ORDER_OBSERVATION");
+    List<String> observationGroupList = Lists.newArrayList("PATIENT_RESULT", "ORDER_OBSERVATION", "OBSERVATION");
+    List<String> specimenGroupList = Lists.newArrayList("PATIENT_RESULT", "ORDER_OBSERVATION", "SPECIMEN");
+    List<HL7Segment> additionalSegments = Lists.newArrayList(
+        new HL7Segment(orderGroupList, "OBR", true), 
+        new HL7Segment(observationGroupList, "NTE", true),
+        new HL7Segment(specimenGroupList, "SPM", true) ,
+        new HL7Segment(orderGroupList, "MSH", false));
+    List<SegmentGroup> segmentGroups = SegmentExtractorUtil.extractSegmentGroups(observationGroupList,
+        "OBX", additionalSegments, hl7DTE,
+        Lists.newArrayList("PATIENT_RESULT", "ORDER_OBSERVATION"));
+    assertThat(segmentGroups).isNotEmpty();
+    assertThat(segmentGroups).hasSize(4);
+
+    List<String> firstGroupIds = Lists.newArrayList(segmentGroups.get(0).getGroupId(), segmentGroups.get(1).getGroupId());
+    List<String> secondGroupIds = Lists.newArrayList(segmentGroups.get(2).getGroupId(), segmentGroups.get(3).getGroupId());
+    // The first two OBX should have the same group ID
+    assertThat(firstGroupIds).containsOnly(firstGroupIds.get(0));
+    // The second two OBX should have the same group ID
+    assertThat(secondGroupIds).containsOnly(secondGroupIds.get(0));
+    // The parent should be the ORDER_OBSERVATION group
+    assertThat(firstGroupIds.get(0)).contains("ORDER_OBSERVATION");
+    assertThat(secondGroupIds.get(0)).contains("ORDER_OBSERVATION");
+    // The first group of OBX should have a different ID than the second group of OBX.
+    assertThat(firstGroupIds.get(0)).isNotEqualTo(secondGroupIds.get(0));
+  }
 
   // Test for extracting segments outside of group
 

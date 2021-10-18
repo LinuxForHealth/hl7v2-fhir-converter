@@ -347,16 +347,16 @@ public class Hl7ORUMessageTest {
 
     }
 
-    @Test@Disabled
+    @Test
     public void test_oru_with_multiple_reports() throws IOException {
         String hl7message = "MSH|^~\\\\&|SendTest1|Sendfac1|Receiveapp1|Receivefac1|200603081747|security|ORU^R01|MSGID000005|T|2.6\r"
                 + "PID||45483|45483||SMITH^SUZIE^||20160813|M|||123 MAIN STREET^^SCHENECTADY^NY^12345||(123)456-7890|||||^^^T||||||||||||\r"
                 + "OBR|1||986^IA PHIMS Stage^2.16.840.1.114222.4.3.3.5.1.2^ISO|112^Final Echocardiogram Report|||20151009173644|||||||||||||002|||||F|||2740^Tsadok^Janetary~2913^Merrit^Darren^F~3065^Mahoney^Paul^J~4723^Loh^Robert^L~9052^Winter^Oscar^||||3068^JOHN^Paul^J|\r"
-                + "OBX|1|TX|TS-F-01-007^Endocrine Disorders 7^L||obs report||||||F\r"
-                + "OBX|2|TX|TS-F-01-008^Endocrine Disorders 8^L||ECHOCARDIOGRAPHIC REPORT||||||F\r"
+                + "OBX|1|ST|TS-F-01-007^Endocrine Disorders 7^L||obs report||||||F\r"
+                + "OBX|2|ST|TS-F-01-008^Endocrine Disorders 8^L||ECHOCARDIOGRAPHIC REPORT||||||F\r"
                 + "OBR|1||98^IA PHIMS Stage^2.16.840.1.114222.4.3.3.5.1.2^ISO|113^Echocardiogram Report|||20151009173644|||||||||||||002|||||F|||2740^Tsadok^Janetary~2913^Merrit^Darren^F~3065^Mahoney^Paul^J~4723^Loh^Robert^L~9052^Winter^Oscar^||||3065^Mahoney^Paul^J|\r"
                 + "OBX|1|CWE|625-4^Bacteria identified in Stool by Culture^LN^^^^2.33^^result1|1|27268008^Salmonella^SCT^^^^20090731^^Salmonella species|||A^A^HL70078^^^^2.5|||P|||20120301|||^^^^^^^^Bacterial Culture||201203140957||||||\r"
-                + "OBX|2|TX|TS-F-01-002^Endocrine Disorders^L||ECHOCARDIOGRAPHIC REPORT Grroup 2||||||F\r";
+                + "OBX|2|ST|TS-F-01-002^Endocrine Disorders^L||ECHOCARDIOGRAPHIC REPORT Group 2||||||F\r";
 
         HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
         String json = ftv.convert(hl7message, OPTIONS_PRETTYPRINT);
@@ -430,10 +430,10 @@ public class Hl7ORUMessageTest {
         // Verify result reference
         List<Reference> obsRef = diag.getResult();
         assertThat(obsRef.isEmpty()).isFalse();
-        assertThat(obsRef).hasSize(2); //TODO: We are currently getting 4, this should be 2 for each docRef.  Can we verify that the right ones were grouped to the right diagReport?
+        assertThat(obsRef).hasSize(2);
         assertThat(obsRef.get(0).isEmpty()).isFalse();
 
-        // Verify presentedForm from OBX of type TX - In this case no attachments created because the OBX of type TX have ids.
+        // Verify presentedForm from OBX of type TX - In this case no attachments created because the OBX is not of type TX.
         List<Attachment> attachments = diag.getPresentedForm();
         Assertions.assertTrue(attachments.size() == 0, "Unexpected number of attachments");
 
@@ -470,7 +470,7 @@ public class Hl7ORUMessageTest {
         // Verify result reference
         List<Reference> obsRef2 = diag2.getResult();
         assertThat(obsRef2.isEmpty()).isFalse();
-        assertThat(obsRef2).hasSize(2); //TODO: We are currently getting 4, this should be 2 for each docRef.  Can we verify that the right ones were grouped to the right diagReport?
+        assertThat(obsRef2).hasSize(2);
         assertThat(obsRef2.get(0).isEmpty()).isFalse();
 
         // Verify presentedForm from OBX of type TX - In this case no attachments created because the OBX is not type TX.
