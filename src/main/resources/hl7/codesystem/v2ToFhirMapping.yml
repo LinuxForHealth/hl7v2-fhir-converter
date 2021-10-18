@@ -369,8 +369,12 @@ MedicationRequestStatus:
    RF: active
    RL: active
    RO: active
-   RP: active
+   RP: unknown
    RQ: active
    RR: active
    RU: active
-
+   A: active
+   IP: active
+   SC: active
+   CM: completed
+   ER: entered-in-error
