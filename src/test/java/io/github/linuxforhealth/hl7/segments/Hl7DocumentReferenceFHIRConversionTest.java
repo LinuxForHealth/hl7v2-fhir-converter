@@ -20,6 +20,7 @@ import org.hl7.fhir.r4.model.InstantType;
 import org.hl7.fhir.r4.model.Practitioner;
 import org.hl7.fhir.r4.model.Resource;
 import org.hl7.fhir.r4.model.ResourceType;
+import org.hl7.fhir.r4.model.ServiceRequest;
 import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -181,14 +182,17 @@ public class Hl7DocumentReferenceFHIRConversionTest {
     @ValueSource(strings = { 
         "MDM^T02", "MDM^T06"
     }) 
-    public void doc_ref_context_test(String segment) {
+    public void docRefContextAndServiceRequestPresenceTest(String segment) { 
         String documentReferenceMessage = "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|" + segment + "^MDM_T02|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6|56789^NID^UID|MCM||||\n"
                 + "PID|1||000054321^^^MRN|||||||||||||M|CAT|||||N\n"
                 + "PV1|1|I||||||||||||||||||||||||||||||||||||||||||\n"
-                + "ORC|NW|||PGN001|SC|D|1|||MS|MS|||||\n"
+                // ORC required for ServiceRequest test
+                // All three practitioner id's are provided (ORC.2, ORC.3, ORC.456)
+                + "ORC|NW|P1005|F1005|PGN001|SC|D|1|||MS|MS|||||\n"
                 // OBR.24 converts to DocumentReference.practiceSetting
                 + "OBR|1||||||20170825010500|||||||||||||002||||CUS|F||||||||\n"
                 + "TXA|1||TEXT|20180117144200|5566^PAPLast^PAPFirst^J^^MD||201801180346||<PHYSID1>||||||||||AV|||<PHYSID2>||\n"
+                // OBX is type ST so an observation will be created
                 + "OBX|1|ST|100||This is content|||||||X\n";
         HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
         String json = ftv.convert(documentReferenceMessage, PatientUtils.OPTIONS);
@@ -210,17 +214,48 @@ public class Hl7DocumentReferenceFHIRConversionTest {
 
         Practitioner practBundle = ResourceUtils.getSpecificPractitionerFromBundle(bundle, requesterRef);
 
-        DocumentReference.DocumentReferenceContextComponent context = documentReference.getContext();
-        assertThat(context.getPeriod().getStartElement().toString()).containsPattern("2018-01-17T14:42:00");
-        assertThat(context.hasRelated()).isTrue();
-        assertThat(context.hasPracticeSetting()).isTrue();  // OBR.24
-        DatatypeUtils.checkCommonCodeableConceptAssertions(context.getPracticeSetting(), "CUS", "Cardiac Ultrasound", "http://terminology.hl7.org/CodeSystem/v2-0074", "CUS");
+        DocumentReference.DocumentReferenceContextComponent refContext = documentReference.getContext();
+        assertThat(refContext.getPeriod().getStartElement().toString()).containsPattern("2018-01-17T14:42:00");
+        assertThat(refContext.hasRelated()).isTrue();
+        assertThat(refContext.hasPracticeSetting()).isTrue();  // OBR.24
+        DatatypeUtils.checkCommonCodeableConceptAssertions(refContext.getPracticeSetting(), "CUS", "Cardiac Ultrasound", "http://terminology.hl7.org/CodeSystem/v2-0074", "CUS");
 
         assertThat(practBundle.getIdentifierFirstRep().getValue()).isEqualTo("5566");
         // Value passed to Context(TXA.5) is used as Identifier value in practitioner
         assertThat(practBundle.hasName()).isTrue();
         assertThat(practBundle.getNameFirstRep().getTextElement().getValue()).isEqualTo("MD PAPFirst J PAPLast");
 
+        // This part of the test serves as a sanity check for all MDM_T0x's that associated resources are created
+        // Verify we have the other resources we expect and there are no extra resources created
+        // Expected are DocumentReference, ServiceRequest, Observation, 3 Practitioners, Patient, and Encounter
+        assertThat(e.size()).isEqualTo(8);
+
+        List<Resource> patientResource = e.stream()
+                .filter(v -> ResourceType.Patient == v.getResource().getResourceType())
+                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        assertThat(patientResource).hasSize(1);
+
+        List<Resource> encounterResource = e.stream()
+            .filter(v -> ResourceType.Encounter == v.getResource().getResourceType())
+            .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        assertThat(encounterResource).hasSize(1);
+
+        List<Resource> practitionerResource = e.stream()
+            .filter(v -> ResourceType.Practitioner == v.getResource().getResourceType())
+            .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        assertThat(practitionerResource).hasSize(3);
+
+        // Verify one Observation is created (from the ST)
+        List<Resource> obsResource = e.stream()
+                .filter(v -> ResourceType.Observation == v.getResource().getResourceType())
+                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+         assertThat(obsResource).hasSize(1);  // TODO: When NTE is implemented, then update this.
+
+        // Confirm that associated ServiceRequest is created.
+        List<Resource> serviceRequestList = e.stream()
+        .filter(v -> ResourceType.ServiceRequest == v.getResource().getResourceType())
+        .map(BundleEntryComponent::getResource).collect(Collectors.toList()); 
+        assertThat(serviceRequestList).hasSize(1);
     }
 
     @ParameterizedTest
