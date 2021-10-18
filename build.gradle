@@ -69,14 +69,21 @@ repositories {
 
 // Overriding the source directories to the target.
 // This will cause the build/compile to use target instead of src.
-sourceSets.main.java.srcDirs = ['target/main/java'];
-sourceSets.main.resources.srcDirs = ['target/main/resources'];
+if(!localDevEnv.toBoolean()) {
+    println "Overriding sourceset to the target directory"
+    sourceSets.main.java.srcDirs = ['target/main/java'];
+    sourceSets.main.resources.srcDirs = ['target/main/resources'];
+} else {
+    println "localDevEnv is true - Setting sourceset to the src directory"
+    sourceSets.main.java.srcDirs = ['src/main/java'];
+    sourceSets.main.resources.srcDirs = ['src/main/resources'];
+}
 
 test {
-    useJUnitPlatform()
-    // Use parallel processing as possible
-    maxParallelForks = (int) (Runtime.runtime.availableProcessors() / 2 + 1)
-    finalizedBy jacocoTestReport // report is always generated after tests run
+    // useJUnitPlatform()
+    // // Use parallel processing as possible
+    // maxParallelForks = (int) (Runtime.runtime.availableProcessors() / 2 + 1)
+    // finalizedBy jacocoTestReport // report is always generated after tests run
 }
 
 jacocoTestReport {
@@ -175,23 +182,27 @@ tasks.withType(Sign) {
 
 task deleteTarget(type: Delete) {
     description("Deletes the target directory")
-    println 'Deleting target directory'
-    delete "target"
+    if(!localDevEnv.toBoolean()) {
+        println 'Deleting target directory'
+        delete "target"
+    }
 }
 
 task resourcesCopy(type: Copy) {
     description("Copies source to the target.")
-    println 'Copying source to target'
+    if(!localDevEnv.toBoolean()) {
+        println 'Copying source to target'
         copy {
             from 'src'
             into 'target'
         }
+    }
 }
 
 task deleteJavaDebugLogs {
     description("This function will delete all DEBUG log statements from the project.")
-    println 'Stripping DEBUG statements out of target/main'
-
+    if(!localDevEnv.toBoolean()) {
+        println 'Stripping DEBUG statements out of target/main'
         FileTree  javaFiles = fileTree('target/main') {
             include '**/*.java'
         }
@@ -202,7 +213,7 @@ task deleteJavaDebugLogs {
             content = content.replaceAll(regex, "")
             javaFile.setText(content)
         }
-    
+    }
 }
 
 // Strip DEBUG log statements out
