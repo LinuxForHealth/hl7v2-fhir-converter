@@ -256,16 +256,6 @@ public class Hl7DocumentReferenceFHIRConversionTest {
         .filter(v -> ResourceType.ServiceRequest == v.getResource().getResourceType())
         .map(BundleEntryComponent::getResource).collect(Collectors.toList()); 
         assertThat(serviceRequestList).hasSize(1);
-        // Because we had a bug here once, light test the elements.
-        ServiceRequest serviceRequest = ResourceUtils.getResourceServiceRequest(serviceRequestList.get(0), context);
-        assertThat(serviceRequest.hasStatus()).isTrue();
-        assertThat(serviceRequest.hasIdentifier()).isTrue();
-        assertThat(serviceRequest.getIdentifier()).hasSize(3);
-        assertThat(serviceRequest.hasIntent()).isTrue();
-        assertThat(serviceRequest.hasOccurrence()).isTrue();
-        assertThat(serviceRequest.hasRequisition()).isTrue();
-        assertThat(serviceRequest.hasSubject()).isTrue();
-
     }
 
     @ParameterizedTest

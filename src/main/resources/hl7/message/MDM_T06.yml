@@ -31,6 +31,7 @@ resources:
              - EVN
              - MSH
 
+    # This group placement of OBX matches the parser, but not the documented grouping   
     - resourceName: Observation
       segment: .OBX
       resourcePath: resource/Observation

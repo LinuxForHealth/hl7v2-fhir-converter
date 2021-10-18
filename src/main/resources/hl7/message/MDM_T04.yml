@@ -49,7 +49,8 @@ resources:
         - COMMON_ORDER.OBR
         - MSH
         - PV1
-        - PID   
+        - PID
+           
     - resourceName: DocumentReference
       segment: TXA
       resourcePath: resource/DocumentReference
