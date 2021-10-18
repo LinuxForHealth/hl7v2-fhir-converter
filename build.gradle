@@ -80,10 +80,10 @@ if(!localDevEnv.toBoolean()) {
 }
 
 test {
-    // useJUnitPlatform()
-    // // Use parallel processing as possible
-    // maxParallelForks = (int) (Runtime.runtime.availableProcessors() / 2 + 1)
-    // finalizedBy jacocoTestReport // report is always generated after tests run
+    useJUnitPlatform()
+    // Use parallel processing as possible
+    maxParallelForks = (int) (Runtime.runtime.availableProcessors() / 2 + 1)
+    finalizedBy jacocoTestReport // report is always generated after tests run
 }
 
 jacocoTestReport {
