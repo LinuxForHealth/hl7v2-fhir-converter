@@ -31,7 +31,7 @@ resources:
              - EVN
              - MSH
 
-    # This group placement of OBX matches the parser, but not the documented grouping   
+    # This group placement of OBX matches the parser, but not the documented groups in the HL7 Standard v2.6 at vico.org.  
     - resourceName: Observation
       segment: .OBX
       resourcePath: resource/Observation
