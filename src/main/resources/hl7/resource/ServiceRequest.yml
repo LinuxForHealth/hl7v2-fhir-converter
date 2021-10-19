@@ -66,8 +66,8 @@ subject:
    expressionType: resource
    specs: $Patient
 
-# Requisition was removed because PGN does not currently validate with HAPI HL7 validator using system http://terminology.hl7.org/CodeSystem/v2-0203.
-# The only known possible alternative system: http://terminology.hl7.org/2.1.0/CodeSystem/v2-0203 fails to validate with HAPI FHIR parser.
+# Requisition was removed because PGN does not currently validate with HAPI HL7 parser using system http://terminology.hl7.org/CodeSystem/v2-0203.
+# The only known possible alternative system: http://terminology.hl7.org/2.1.0/CodeSystem/v2-0203 fails to validate with HAPI FHIR validator.
 
 authoredOn:
    type: DATE_TIME
