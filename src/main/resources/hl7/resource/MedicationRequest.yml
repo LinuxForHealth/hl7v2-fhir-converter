@@ -77,8 +77,10 @@ subject:
   
 status:
   type: MEDREQ_STATUS
-  valueOf:  ORC.1
+  valueOf: $val
   expressionType: HL7Spec
+  vars:
+    val: ORC.5 | ORC.1
 
 intent:
   type: STRING
