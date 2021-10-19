@@ -66,19 +66,7 @@ subject:
    expressionType: resource
    specs: $Patient
 
-requisition:
-   condition: valueIn NOT_NULL
-   valueOf: datatype/Identifier_var
-   expressionType: resource
-   specs: ORC.4
-   vars:
-      valueIn: ORC.4.1
-      systemCX:  ORC.4.2
-   constants:   
-      # Base URL doesn't find the code, but the versioned system does
-      system: "http://terminology.hl7.org/2.1.0/CodeSystem/v2-0203"
-      code: "PGN"
-      display: "Placer Group Number"
+# Requisition was removed because PGN does not currently validate with http://terminology.hl7.org/2.1.0/CodeSystem/v2-0203
 
 authoredOn:
    type: DATE_TIME
