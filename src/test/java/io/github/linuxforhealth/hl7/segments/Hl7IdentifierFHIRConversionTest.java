@@ -1113,7 +1113,7 @@ public class Hl7IdentifierFHIRConversionTest {
                 + "RXO|RX700001^DOCUSATE SODIUM 100 MG CAPSULE|100||mg|||||G||10||5|\r";
         MedicationRequest medReq = ResourceUtils.getMedicationRequest(medicationRequest);
 
-        // Expect 2 identifiers
+        // Expect 4 identifiers
         assertThat(medReq.hasIdentifier()).isTrue();
         assertThat(medReq.getIdentifier()).hasSize(4);
 
@@ -1187,7 +1187,7 @@ public class Hl7IdentifierFHIRConversionTest {
                 + "RXO|^DOCUSATE SODIUM 100 MG CAPSULE|100||mg|||||G||10||5|\r";
         medReq = ResourceUtils.getMedicationRequest(medicationRequest);
 
-        // Expect 2 identifiers
+        // Expect 3 identifiers
         assertThat(medReq.hasIdentifier()).isTrue();
         assertThat(medReq.getIdentifier()).hasSize(3);
 
