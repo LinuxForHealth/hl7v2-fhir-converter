@@ -241,11 +241,12 @@ public class Hl7MedicationRequestFHIRConversionTest {
     })
     public void test_medicationCodeableConcept_authoredOn_and_intent_in_rde_with_rxO_with_rxe(String msh) {
 
+        //AuthoredOn comes from ORC.9
         String hl7message = msh
                 + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
                 + "ORC|NW|F800006^OE|P800006^RX|||E|10^BID^D4^^^R||20180622230000\n"
                 + "RXO|RX800006^Test15 SODIUM 100 MG CAPSULE^NDC||100||mg|||||G||10||5\n"
-                + "RXE|^Q24H&0600^^20210330144208^^ROU|DUONEB3INH^3 ML PLAS CONT : IPRATROPIUM-ALBUTEROL 0.5-2.5 (3) MG/3ML IN SOLN^ADS^^^^^^ipratropium-albuterol (DUONEB) nebulizer solution 3 mL|3||mL|47||||1|PC||||||||||||||||||||^DUONEB|20180622230000||||||||\n";
+                + "RXE|^Q24H&0600^^20210330144208^^ROU|DUONEB3INH^3 ML PLAS CONT : IPRATROPIUM-ALBUTEROL 0.5-2.5 (3) MG/3ML IN SOLN^ADS^^^^^^ipratropium-albuterol (DUONEB) nebulizer solution 3 mL|3||mL|47||||1|PC||||||||||||||||||||^DUONEB|||||||||\n";
 
         HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
         String json = ftv.convert(hl7message, PatientUtils.OPTIONS);
@@ -267,7 +268,7 @@ public class Hl7MedicationRequestFHIRConversionTest {
         Date authoredOnDate = medicationRequest.getAuthoredOn();      
         Calendar c = Calendar.getInstance();
         c.clear();
-        c.set(2018, 5, 22, 23, 0); // 2018 06 22 23 00 00   -- june is 05
+        c.set(2018, 5, 22, 23, 0); // 2018 06 22 23 00 00   -- june is 05 //ORC.9
         ZoneId zone = ConverterConfiguration.getInstance().getZoneId();
         TimeZone timeZone = TimeZone.getTimeZone(zone);
         c.setTimeZone(timeZone);
@@ -299,9 +300,10 @@ public class Hl7MedicationRequestFHIRConversionTest {
     })
     public void test_medicationCodeableConcept_authoredOn_and_intent_in_rde_with_just_rxe(String msh) {
 
+        //AuthoredOn comes from RXE.32 (the backup value)
         String hl7message = msh
                 + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
-                + "ORC|NW|F800006^OE|P800006^RX|||E|10^BID^D4^^^R||20180622230000\n"
+                + "ORC|NW|F800006^OE|P800006^RX|||E|10^BID^D4^^^R||\n"
                 + "RXE|^Q24H&0600^^20210330144208^^ROU|DUONEB3INH^3 ML PLAS CONT : IPRATROPIUM-ALBUTEROL 0.5-2.5 (3) MG/3ML IN SOLN^ADS^^^^^^ipratropium-albuterol (DUONEB) nebulizer solution 3 mL|3||mL|47||||1|PC||||||||||||||||||||^DUONEB|20180622230000||||||||\n";
 
         HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
