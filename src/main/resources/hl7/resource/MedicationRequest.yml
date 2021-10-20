@@ -113,7 +113,8 @@ medicationCodeableConcept_3:
 
 authoredOn:
   type: DATE_TIME
-  valueOf: RXE.32
+  valueOf: $val
   expressionType: HL7Spec
-
+  vars:
+    val: ORC.9 | RXE.32
 
