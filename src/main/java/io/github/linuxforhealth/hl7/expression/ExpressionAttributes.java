@@ -54,6 +54,7 @@ public class ExpressionAttributes {
   private final List<ExpressionAttributes> expressions;
   private final Map<String, ExpressionAttributes> expressionsMap;
   private final boolean isEvaluateLater;
+  private final boolean isFuzzyGroup;
 
   // if valueof attribute ends with * then list of values will be generated
   private boolean generateMultiple;
@@ -71,6 +72,7 @@ public class ExpressionAttributes {
 
     this.isRequired = exBuilder.isRequired;
     this.isEvaluateLater = exBuilder.isEvaluateLater;
+    this.isFuzzyGroup = exBuilder.isFuzzyGroup;
     this.generateMultiple = exBuilder.generateList;
 
 
@@ -250,6 +252,10 @@ public class ExpressionAttributes {
   }
 
 
+  public boolean isFuzzyGroup() {
+    return isFuzzyGroup;
+  }
+
 
   public static class Builder {
 
@@ -273,6 +279,7 @@ public class ExpressionAttributes {
 
     private Map<String, ExpressionAttributes> expressionsMap;
     private boolean isEvaluateLater;
+    private boolean isFuzzyGroup;
 
 
     public Builder() {}
@@ -308,6 +315,11 @@ public class ExpressionAttributes {
 
     public Builder withEvaluateLater(boolean isEvaluateLater) {
       this.isEvaluateLater = isEvaluateLater;
+      return this;
+    }
+
+    public Builder withFuzzyGroup(boolean isFuzzyGroup) {
+      this.isFuzzyGroup = isFuzzyGroup;
       return this;
     }
 

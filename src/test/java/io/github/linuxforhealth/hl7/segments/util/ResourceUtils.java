@@ -297,4 +297,10 @@ public class ResourceUtils {
     Class<? extends IBaseResource> klass = Condition.class;
     return (Condition) context.getParser().parseResource(klass, s);
   }
+
+  public static List<Resource> getResourceList(List<BundleEntryComponent> e, ResourceType resourceType){
+    return e.stream()
+    .filter(v -> resourceType == v.getResource().getResourceType())
+    .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+  } 
 }

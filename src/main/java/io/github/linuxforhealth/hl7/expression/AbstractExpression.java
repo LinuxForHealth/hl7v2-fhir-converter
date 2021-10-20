@@ -64,6 +64,12 @@ public abstract class AbstractExpression implements Expression {
   }
 
   @Override
+  public boolean isFuzzyGroup() {
+    return this.attr.isFuzzyGroup();
+
+  } 
+
+  @Override
   public EvaluationResult getDefaultValue() {
     return EvaluationResultFactory.getEvaluationResult(this.attr.getDefaultValue());
   }

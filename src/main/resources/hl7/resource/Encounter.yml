@@ -111,9 +111,10 @@ reasonReference_2:
    valueOf: datatype/Reference
    condition: $Observation NOT_NULL
    evaluateLater: true
+   fuzzyGroup: true
    generateList: true
    expressionType: resource
-   specs: $Observation    
+   specs: $Observation   
 
 hospitalization:
     valueOf: secondary/Hospitalization
