@@ -87,10 +87,10 @@ public class Hl7MedicationRequestFHIRConversionTest {
     @Test
     public void test_medicationreq_status() {
 
-        //ORC.1 = NW -> Expected medication status = ACTIVE
+        //ORC.5 = A -> Expected medication status = ACTIVE
         String hl7message = "MSH|^~\\&|APP|FAC|WHIA|IBM|20180622230000||RDE^O11^RDE_O11|MSGID221xx0xcnvMed31|T|2.6\n"
                 + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
-                + "ORC|NW|F800006^OE|P800006^RX|||E|10^BID^D4^^^R||20180622230000\n"
+                + "ORC||F800006^OE|P800006^RX||A|E|10^BID^D4^^^R||20180622230000\n"
                 + "RXO|RX800006^Test15 SODIUM 100 MG CAPSULE|100||mg|||||G||10||5\n"
                 + "RXE|^^^20180622230000^^R|62756-017^Testosterone Cypionate^NDC|100||mg|||||10||5\n";
 
@@ -110,10 +110,79 @@ public class Hl7MedicationRequestFHIRConversionTest {
         MedicationRequest medicationRequest = ResourceUtils.getResourceMedicationRequest(medicationRequestList.get(0), context);
         assertThat(medicationRequest.getStatus()).isEqualTo(MedicationRequestStatus.ACTIVE);
 
-        //ORC.1 = SC -> Expected medication status = UNKNOWN
+        //ORC.5 = CM -> Expected medication status = COMPLETED
         hl7message = "MSH|^~\\&|APP|FAC|WHIA|IBM|20180622230000||RDE^O11^RDE_O11|MSGID221xx0xcnvMed31|T|2.6\n"
                 + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
-                + "ORC|SC|F800006^OE|P800006^RX|||E|10^BID^D4^^^R||20180622230000\n"
+                + "ORC||F800006^OE|P800006^RX||CM|E|10^BID^D4^^^R||20180622230000\n"
+                + "RXO|RX800006^Test15 SODIUM 100 MG CAPSULE|100||mg|||||G||10||5\n"
+                + "RXE|^^^20180622230000^^R|62756-017^Testosterone Cypionate^NDC|100||mg|||||10||5\n";
+        ftv = new HL7ToFHIRConverter();
+        json = ftv.convert(hl7message, PatientUtils.OPTIONS);
+        assertThat(json).isNotBlank();
+
+        bundleResource = context.getParser().parseResource(json);
+        assertThat(bundleResource).isNotNull();
+        b = (Bundle) bundleResource;
+        e = b.getEntry();
+
+        medicationRequestList.clear();
+        medicationRequestList = e.stream()
+                .filter(v -> ResourceType.MedicationRequest == v.getResource().getResourceType())
+                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        assertThat(medicationRequestList).hasSize(1);
+        medicationRequest = ResourceUtils.getResourceMedicationRequest(medicationRequestList.get(0), context);
+        assertThat(medicationRequest.getStatus()).isEqualTo(MedicationRequestStatus.COMPLETED);
+
+        //ORC.5 = ER -> Expected medication status = ENTEREDINERROR
+        hl7message = "MSH|^~\\&|APP|FAC|WHIA|IBM|20180622230000||RDE^O11^RDE_O11|MSGID221xx0xcnvMed31|T|2.6\n"
+                + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
+                + "ORC||F800006^OE|P800006^RX||ER|E|10^BID^D4^^^R||20180622230000\n"
+                + "RXO|RX800006^Test15 SODIUM 100 MG CAPSULE|100||mg|||||G||10||5\n"
+                + "RXE|^^^20180622230000^^R|62756-017^Testosterone Cypionate^NDC|100||mg|||||10||5\n";
+        ftv = new HL7ToFHIRConverter();
+        json = ftv.convert(hl7message, PatientUtils.OPTIONS);
+        assertThat(json).isNotBlank();
+
+        bundleResource = context.getParser().parseResource(json);
+        assertThat(bundleResource).isNotNull();
+        b = (Bundle) bundleResource;
+        e = b.getEntry();
+
+        medicationRequestList.clear();
+        medicationRequestList = e.stream()
+                .filter(v -> ResourceType.MedicationRequest == v.getResource().getResourceType())
+                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        assertThat(medicationRequestList).hasSize(1);
+        medicationRequest = ResourceUtils.getResourceMedicationRequest(medicationRequestList.get(0), context);
+        assertThat(medicationRequest.getStatus()).isEqualTo(MedicationRequestStatus.ENTEREDINERROR);
+
+        //ORC.1 = NW -> Expected medication status = ACTIVE
+        hl7message = "MSH|^~\\&|APP|FAC|WHIA|IBM|20180622230000||RDE^O11^RDE_O11|MSGID221xx0xcnvMed31|T|2.6\n"
+                + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
+                + "ORC|NW|F800006^OE|P800006^RX|||E|10^BID^D4^^^R||20180622230000\n"
+                + "RXO|RX800006^Test15 SODIUM 100 MG CAPSULE|100||mg|||||G||10||5\n"
+                + "RXE|^^^20180622230000^^R|62756-017^Testosterone Cypionate^NDC|100||mg|||||10||5\n";
+
+        ftv = new HL7ToFHIRConverter();
+        json = ftv.convert(hl7message, PatientUtils.OPTIONS);
+        assertThat(json).isNotBlank();
+
+        bundleResource = context.getParser().parseResource(json);
+        assertThat(bundleResource).isNotNull();
+        b = (Bundle) bundleResource;
+        e = b.getEntry();
+
+        medicationRequestList = e.stream()
+                .filter(v -> ResourceType.MedicationRequest == v.getResource().getResourceType())
+                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        assertThat(medicationRequestList).hasSize(1);
+        medicationRequest = ResourceUtils.getResourceMedicationRequest(medicationRequestList.get(0), context);
+        assertThat(medicationRequest.getStatus()).isEqualTo(MedicationRequestStatus.ACTIVE);
+
+        //ORC.1 = RP -> Expected medication status = UNKNOWN
+        hl7message = "MSH|^~\\&|APP|FAC|WHIA|IBM|20180622230000||RDE^O11^RDE_O11|MSGID221xx0xcnvMed31|T|2.6\n"
+                + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
+                + "ORC|RP|F800006^OE|P800006^RX|||E|10^BID^D4^^^R||20180622230000\n"
                 + "RXO|RX800006^Test15 SODIUM 100 MG CAPSULE|100||mg|||||G||10||5\n"
                 + "RXE|^^^20180622230000^^R|62756-017^Testosterone Cypionate^NDC|100||mg|||||10||5\n";
         ftv = new HL7ToFHIRConverter();
