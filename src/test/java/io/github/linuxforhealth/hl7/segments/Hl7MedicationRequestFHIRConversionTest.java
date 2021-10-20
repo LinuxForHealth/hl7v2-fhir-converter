@@ -430,7 +430,7 @@ public class Hl7MedicationRequestFHIRConversionTest {
 
         String hl7message = msh
                 + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
-                + "ORC|NW|F800006^OE|P800006^RX|||E|10^BID^D4^^^R||20180622230000\n"
+                + "ORC|NW|F800006^OE|P800006^RX|||E|10^BID^D4^^^R||\n"
                 + "RXO|RX800006^Test15 SODIUM 100 MG CAPSULE^NDC||100||mg|||||G||10||5\n";
 
         HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
@@ -482,7 +482,7 @@ public class Hl7MedicationRequestFHIRConversionTest {
         String hl7message = msh
                 + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
                 + "PRB|AD|20140610234741|^oxygenase|Problem_000054321_20190606193536||20140610234741\n"
-                + "ORC|NW|F800006^OE|P800006^RX|||E|10^BID^D4^^^R||20180622230000\n"
+                + "ORC|NW|F800006^OE|P800006^RX|||E|10^BID^D4^^^R||\n"
                 + "OBR|1|||555|||20170825010500||||||||||||||||||F\r"
                 + "RXO|RX800006^Test15 SODIUM 100 MG CAPSULE^NDC||100||mg|||||G||10||5\n";
 
@@ -537,7 +537,7 @@ public class Hl7MedicationRequestFHIRConversionTest {
                 + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\r"
                 + "PV1||I|6N^1234^A^GENHOS||||0100^ANDERSON^CARL|0148^ADDISON^JAMES||SUR|||||||0148^ANDERSON^CARL|S|1400|A|||||||||||||||||||SF|K||||199501102300\r"
                 + "PRB|AD|20141015103243|15777000^Prediabetes (disorder)^SNM|654321^^OtherSoftware.ProblemOID|||20120101||\r"
-                + "ORC|NW|F800006^OE|P800006^RX|||E|10^BID^D4^^^R||20180622230000\r"
+                + "ORC|NW|F800006^OE|P800006^RX|||E|10^BID^D4^^^R||\r"
                 + "OBR|1|||555|||20170825010500||||||||||||||||||F\r"
                 + "RXO|65862-063-01^METOPROLOL TARTRATE^NDC||||Tablet||||||||2|2|AP1234567||||325|mg\r";
 
