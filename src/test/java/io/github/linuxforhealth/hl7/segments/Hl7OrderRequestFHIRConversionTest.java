@@ -49,8 +49,7 @@ public class Hl7OrderRequestFHIRConversionTest {
             + "PV1|1|E|||||||||||||||||47474747||||||||||||||||||||||||||\n"
             //  NOTE: ORC is optional; OBR is required.
             //  Key input data set up:
-            //  1. Checking fields ORC.4 to ServiceRequest.requisition
-            //  1b. ORC.5 to ServiceRequest.status 
+            //  1. ORC.5 to ServiceRequest.status 
             //  2. ORC.9 to ServiceRequest.authoredOn (overrides secondary OBR.6)
             //  3. ORC.12 to ServiceRequest.requester AND Practitioner object and reference to Practictioner, ORC.12.9 tests unknown system logic
             //  4. ORC.15 to ServiceRequest.occurrenceDateTime (overrides secondary OBR.7)
@@ -91,13 +90,6 @@ public class Hl7OrderRequestFHIRConversionTest {
     assertThat(system).isNull();
     CodeableConcept type = identifier.getType();
     DatatypeUtils.checkCommonCodeableConceptAssertions(type, "VN", "Visit number", "http://terminology.hl7.org/CodeSystem/v2-0203", null);
-
-    // ORC.4 should create a requisition in the serviceRequest.
-    assertThat(serviceRequest.hasRequisition()).isTrue();
-    assertThat(serviceRequest.getRequisition().hasSystem()).isTrue();
-    assertThat(serviceRequest.getRequisition().getSystem()).isEqualToIgnoringCase("urn:id:Beaker");
-    assertThat(serviceRequest.getRequisition().hasValue()).isTrue();
-    assertThat(serviceRequest.getRequisition().getValue()).isEqualToIgnoringCase("ML18267-C00001");
 
     // ORC.5 creates the serviceRequest.status()
     assertThat(serviceRequest.hasStatus()).isTrue();
@@ -165,7 +157,6 @@ public class Hl7OrderRequestFHIRConversionTest {
         //  Key input data set up:
         //  1. Map OBR.7 to ServiceRequest.occurrenceDateTime, because ORC.15 is empty
         //  2. Map OBR.7 to DiagnosticReport.effectiveDateTime 
-        //  3.  ORC.4 is empty on purpose to test that no zombie requisition is created.
         //  4. Leave ORC.9 empty so that OBR.6 is used for ServiceRequest.authoredOn
         //  5. OBR.22 used and DiagnosticReport.issued
         //  6. Leave ORC.12 empty so OBR.16 is used for Practitioner reference
@@ -209,7 +200,7 @@ public class Hl7OrderRequestFHIRConversionTest {
     CodeableConcept type = identifier.getType();
     DatatypeUtils.checkCommonCodeableConceptAssertions(type, "VN", "Visit number", "http://terminology.hl7.org/CodeSystem/v2-0203", null);
 
-    // ORC.4 is missing, so no requisition in the serviceRequest.
+    // No requisition in the serviceRequest.
     assertThat(serviceRequest.hasRequisition()).isFalse();
 
     // OBR.6 should create authoredOn because ORC.9 is not filled in
@@ -402,7 +393,6 @@ public class Hl7OrderRequestFHIRConversionTest {
         +"EVN|T02|20170920141233|||\r"
         +"PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\r"
         +"PV1|1|I|||||||||||||||||||||||||||||||||||||\r"
-        // ORC.4 is used for requisition
         // ORC.5 is status
         // ORC.9 is authoredOn
         // ORC.12 is tested for requester
@@ -430,14 +420,6 @@ public class Hl7OrderRequestFHIRConversionTest {
     // Expect 3 identifiers (VN, PLAC, FILL)
     assertThat(serviceRequest.hasIdentifier()).isTrue();
     assertThat(serviceRequest.getIdentifier()).hasSize(3);
-
-    // ORC.4.1 value should create a requisition in the serviceRequest
-    assertThat(serviceRequest.hasRequisition()).isTrue();
-    assertThat(serviceRequest.getRequisition().hasValue()).isTrue();
-    assertThat(serviceRequest.getRequisition().getValue()).isEqualToIgnoringCase("P1005");
-    assertThat(serviceRequest.getRequisition().hasSystem()).isFalse();
-    assertThat(serviceRequest.getRequisition().hasType()).isTrue();
-    DatatypeUtils.checkCommonCodeableConceptAssertions(serviceRequest.getRequisition().getType(), "PGN", "Placer Group Number", "http://terminology.hl7.org/2.1.0/CodeSystem/v2-0203", null);
 
     // ORC.12 should create an ServiceRequest.requester reference
     assertThat(serviceRequest.hasRequester()).isTrue();
