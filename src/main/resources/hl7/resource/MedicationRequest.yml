@@ -96,6 +96,7 @@ medicationCodeableConcept_1:
   specs: RXO.1
   vars:
     rxO: RXO.1
+
 medicationCodeableConcept_2:
   condition: $rxE NOT_NULL 
   valueOf: datatype/CodeableConcept
@@ -103,6 +104,7 @@ medicationCodeableConcept_2:
   specs: RXE.2
   vars:
     rxE: RXE.2
+
 medicationCodeableConcept_3:
   condition: $rxC NOT_NULL
   valueOf: datatype/CodeableConcept
@@ -118,3 +120,8 @@ authoredOn:
   vars:
     val: ORC.9 | RXE.32
 
+reasonCode:
+  valueOf: datatype/CodeableConcept
+  generateList: true
+  expressionType: resource
+  specs: RXE.27 | RXO.20 | ORC.16
