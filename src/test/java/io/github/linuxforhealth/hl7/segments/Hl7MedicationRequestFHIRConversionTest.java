@@ -598,6 +598,8 @@ public class Hl7MedicationRequestFHIRConversionTest {
         assertThat(medicationRequestList).hasSize(1);
         MedicationRequest medicationRequest = ResourceUtils.getResourceMedicationRequest(medicationRequestList.get(0), context);
 
+        assertThat(medicationRequest.getReasonCode()).hasSize(1);
+        assertThat(medicationRequest.getReasonCodeFirstRep().getCoding()).hasSize(1);
         assertThat(medicationRequest.getReasonCodeFirstRep().getCodingFirstRep().getCode()).isEqualTo("Wheezing");
         assertThat(medicationRequest.getReasonCodeFirstRep().getCodingFirstRep().getDisplay()).isEqualTo("Wheezing");
         assertThat(medicationRequest.getReasonCodeFirstRep().getCodingFirstRep().getSystem()).isEqualTo("urn:id:PRN");
@@ -627,6 +629,8 @@ public class Hl7MedicationRequestFHIRConversionTest {
         assertThat(medicationRequestList).hasSize(1);
         medicationRequest = ResourceUtils.getResourceMedicationRequest(medicationRequestList.get(0), context);
 
+        assertThat(medicationRequest.getReasonCode()).hasSize(1);
+        assertThat(medicationRequest.getReasonCodeFirstRep().getCoding()).hasSize(1);
         assertThat(medicationRequest.getReasonCodeFirstRep().getCodingFirstRep().getCode()).isEqualTo("134006");
         assertThat(medicationRequest.getReasonCodeFirstRep().getCodingFirstRep().getDisplay()).isNull();
         assertThat(medicationRequest.getReasonCodeFirstRep().getCodingFirstRep().getSystem()).isNull();
@@ -653,6 +657,8 @@ public class Hl7MedicationRequestFHIRConversionTest {
         assertThat(medicationRequestList).hasSize(1);
         medicationRequest = ResourceUtils.getResourceMedicationRequest(medicationRequestList.get(0), context);
 
+        assertThat(medicationRequest.getReasonCode()).hasSize(1);
+        assertThat(medicationRequest.getReasonCodeFirstRep().getCoding()).hasSize(1);
         assertThat(medicationRequest.getReasonCodeFirstRep().getCodingFirstRep().getCode()).isEqualTo("4338008");
         assertThat(medicationRequest.getReasonCodeFirstRep().getCodingFirstRep().getDisplay()).isEqualTo("Wheezing");
         assertThat(medicationRequest.getReasonCodeFirstRep().getCodingFirstRep().getSystem()).isEqualTo("urn:id:PRN");

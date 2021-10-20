@@ -124,4 +124,4 @@ reasonCode:
   valueOf: datatype/CodeableConcept
   generateList: true
   expressionType: resource
-  specs: RXE.27 | RXO.20 | RXA.19 | ORC.16 #not sure what message type uses RXA?
+  specs: RXE.27 | RXO.20 | ORC.16
