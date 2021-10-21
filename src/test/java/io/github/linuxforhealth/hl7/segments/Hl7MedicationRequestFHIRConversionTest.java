@@ -664,7 +664,7 @@ public class Hl7MedicationRequestFHIRConversionTest {
     public void test_MedicationRequest_category_requester_and_dispenseRequest(){
         String hl7message = "MSH|^~\\&||||||S1|RDE^O11||T|2.6|||||||||\n"
                 + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
-                + "ORC|NW|F800006^OE|P800006^RX|||E|10^BID^D4^^^R||20180622230000|||3122^PROVIDER^ORDERING|||20190606193536||||||||||||||I\n"
+                + "ORC|NW|||||E|10^BID^D4^^^R||20180622230000|||3122^PROVIDER^ORDERING|||20190606193536||||||||||||||I\n"
                 + "RXE|^Q24H&0600^^20210330144208^^ROU|DUONEB3INH^3 ML PLAS CONT : IPRATROPIUM-ALBUTEROL 0.5-2.5 (3) MG/3ML IN SOLN^ADS^^^^^^ipratropium-albuterol (DUONEB) nebulizer solution 3 mL|3||mL|47||||1|PC||||||||||||||||Wheezing^Wheezing^PRN||||^DUONEB|20180622230000||||||||\n";
 
         HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
@@ -694,6 +694,7 @@ public class Hl7MedicationRequestFHIRConversionTest {
         assertThat(practName.getText()).isEqualTo("ORDERING PROVIDER"); // ORC.12
 
         //category comes from  ORC.29
+        assertThat(medicationRequest.getCategory()).hasSize(1);
         assertThat(medicationRequest.getCategory().get(0).hasCoding()).isTrue();
         assertThat(medicationRequest.getCategory().get(0).getCodingFirstRep().getCode()).isEqualTo("inpatient");
         assertThat(medicationRequest.getCategory().get(0).getCodingFirstRep().getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/medicationrequest-category");
@@ -705,7 +706,7 @@ public class Hl7MedicationRequestFHIRConversionTest {
 
         hl7message = "MSH|^~\\&||||||S1|RDE^O11||T|2.6|||||||||\n"
                 + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
-                + "ORC|NW|F800006^OE|P800006^RX|||E|10^BID^D4^^^R||20180622230000||||||20190606193536||||||||||||||I\n"
+                + "ORC|NW|||||E|10^BID^D4^^^R||20180622230000||||||20190606193536||||||||||||||I\n"
                 + "RXE|^Q24H&0600^^20210330144208^^ROU|DUONEB3INH^3 ML PLAS CONT : IPRATROPIUM-ALBUTEROL 0.5-2.5 (3) MG/3ML IN SOLN^ADS^^^^^^ipratropium-albuterol (DUONEB) nebulizer solution 3 mL|3||mL|47||||1|PC||2213^ORDERING^PROVIDER||||||||||||||Wheezing^Wheezing^PRN||||^DUONEB|20180622230000||||||||\n";
 
         ftv = new HL7ToFHIRConverter();

@@ -222,7 +222,7 @@ public class SimpleDataValueResolver {
         String code = getFHIRCode(val, MedicationRequestCategory.class);
         if (code != null) {
             MedicationRequestCategory category = MedicationRequestCategory.fromCode(code);
-            return new SimpleCode(code, "http://terminology.hl7.org/CodeSystem/medicationrequest-category", category.getDisplay());
+            return new SimpleCode(code, "http://terminology.hl7.org/CodeSystem/medicationrequest-category", category.getDisplay()); // category.getSystem() returns http://hl7.org/fhir/medication-request-category which is invalid so we hardcode the system with the proper url
         } else
             return null;
     };

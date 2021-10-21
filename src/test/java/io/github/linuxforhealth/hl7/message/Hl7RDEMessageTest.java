@@ -40,7 +40,7 @@ public class Hl7RDEMessageTest {
     public void test_RDE_medRequest_patient_present(String msh) throws IOException {
 	    String hl7message = msh
 		    + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\r"
-		    + "ORC|RE|ACCESSION_62fd10ea-522a-4261-837a-30381a5aa04a|ACCESSION_62fd10ea-522a-4261-837a-30381a5aa04a|3200|||^Every 24 hours&1500^^20210330150000^^ROU||20210407191342|2739^BY^ENTERED|2799^BY^VERIFIED|||(696)901-1300|20210407191342||||||ORDERING FAC NAME|ADDR^^CITY^STATE^ZIP^USA|(515)-290-8888|9999^^CITY^STATE^ZIP^CAN|||||I\r"
+		    + "ORC|RE|||3200|||||20210407191342||2799^BY^VERIFIED||||20210407191342||||||ORDERING FAC NAME||||||||I\r"
 		    + "RXE|^Q24H&0600^^20210407191342^^ROU|DEFAULTMED^cefTRIAXone (ROCEPHIN) 2 g in sodium chloride 0.9 % 50 mL IVPB|2||g||||||||\r"
             + "RXR|IM\r";
 
@@ -76,7 +76,7 @@ public class Hl7RDEMessageTest {
     public void test_RDE_medRequest_patient_present_withoutRXR(String msh) throws IOException {
 	    String hl7message = msh
 		    + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\r"
-		    + "ORC|RE|ACCESSION_62fd10ea-522a-4261-837a-30381a5aa04a|ACCESSION_62fd10ea-522a-4261-837a-30381a5aa04a|3200|||^Every 24 hours&1500^^20210330150000^^ROU||20210407191342|2739^BY^ENTERED|2799^BY^VERIFIED|||(696)901-1300|20210407191342||||||ORDERING FAC NAME|ADDR^^CITY^STATE^ZIP^USA|(515)-290-8888|9999^^CITY^STATE^ZIP^CAN|||||I\r"
+            + "ORC|RE|||3200|||||20210407191342||2799^BY^VERIFIED||||20210407191342||||||ORDERING FAC NAME||||||||I\r"
 		    + "RXE|^Q24H&0600^^20210407191342^^ROU|DEFAULTMED^cefTRIAXone (ROCEPHIN) 2 g in sodium chloride 0.9 % 50 mL IVPB|2||g||||||||\r";
 
         HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
@@ -111,7 +111,7 @@ public class Hl7RDEMessageTest {
 	    String hl7message = msh
 		    + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\r"
 		    + "PV1||I|||||||||||||||||Visit_0a4d960d-c528-45c9-bb10-7e9929968247|||||||||||||||||||||||||20210407191342\r"
-		    + "ORC|RE|ACCESSION_62fd10ea-522a-4261-837a-30381a5aa04a|ACCESSION_62fd10ea-522a-4261-837a-30381a5aa04a|3200|||^Every 24 hours&1500^^20210330150000^^ROU||20210407191342|2739^BY^ENTERED|2799^BY^VERIFIED|||(696)901-1300|20210407191342||||||ORDERING FAC NAME|ADDR^^CITY^STATE^ZIP^USA|(515)-290-8888|9999^^CITY^STATE^ZIP^CAN|||||I\r"
+            + "ORC|RE|||3200|||||20210407191342||2799^BY^VERIFIED||||20210407191342||||||ORDERING FAC NAME||||||||I\r"
 		    + "RXE|^Q24H&0600^^20210407191342^^ROU|DEFAULTMED^cefTRIAXone (ROCEPHIN) 2 g in sodium chloride 0.9 % 50 mL IVPB|2||g||||||||\r"
             + "RXR|IM\r";
 
@@ -154,7 +154,7 @@ public class Hl7RDEMessageTest {
             + "PD1|||||||||||01|N||||A\r"
 		    + "PV1||I|||||||||||||||||Visit_0a4d960d-c528-45c9-bb10-7e9929968247|||||||||||||||||||||||||20210407191342\r"
             + "PV2|||||||||||||||||||||||||AI|||||||||||||C|\r"
-		    + "ORC|RE|ACCESSION_62fd10ea-522a-4261-837a-30381a5aa04a|ACCESSION_62fd10ea-522a-4261-837a-30381a5aa04a|3200|||^Every 24 hours&1500^^20210330150000^^ROU||20210407191342|2739^BY^ENTERED|2799^BY^VERIFIED|||(696)901-1300|20210407191342||||||ORDERING FAC NAME|ADDR^^CITY^STATE^ZIP^USA|(515)-290-8888|9999^^CITY^STATE^ZIP^CAN|||||I\r"
+            + "ORC|RE|||3200|||||20210407191342||2799^BY^VERIFIED||||20210407191342||||||ORDERING FAC NAME||||||||I\r"
 		    + "RXE|^Q24H&0600^^20210407191342^^ROU|DEFAULTMED^cefTRIAXone (ROCEPHIN) 2 g in sodium chloride 0.9 % 50 mL IVPB|2||g||||||||\r"
             + "RXR|IM\r";
 
@@ -196,7 +196,7 @@ public class Hl7RDEMessageTest {
             + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\r"
             + "PV1||I|||||||||||||||||Visit_0a4d960d-c528-45c9-bb10-7e9929968247|||||||||||||||||||||||||20210407191342\r"
             + "AL1|1|DA|1605^acetaminophen^L|MO|Muscle Pain~hair loss\r"
-            + "ORC|RE|ACCESSION_62fd10ea-522a-4261-837a-30381a5aa04a|ACCESSION_62fd10ea-522a-4261-837a-30381a5aa04a|3200|||^Every 24 hours&1500^^20210330150000^^ROU||20210407191342|2739^BY^ENTERED|2799^BY^VERIFIED|||(696)901-1300|20210407191342||||||ORDERING FAC NAME|ADDR^^CITY^STATE^ZIP^USA|(515)-290-8888|9999^^CITY^STATE^ZIP^CAN|||||I\r"
+            + "ORC|RE|||3200|||||20210407191342||2799^BY^VERIFIED||||20210407191342||||||ORDERING FAC NAME||||||||I\r"
             + "RXE|^Q24H&0600^^20210407191342^^ROU|DEFAULTMED^cefTRIAXone (ROCEPHIN) 2 g in sodium chloride 0.9 % 50 mL IVPB|2||g||||||||\r"
             + "RXR|IM\r";
 
@@ -241,7 +241,7 @@ public class Hl7RDEMessageTest {
     public void test_RDE_medRequest_patient_observation_present(String msh) throws IOException {
         String hl7message = msh
             + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\r"
-            + "ORC|RE|ACCESSION_62fd10ea-522a-4261-837a-30381a5aa04a|ACCESSION_62fd10ea-522a-4261-837a-30381a5aa04a|3200|||^Every 24 hours&1500^^20210330150000^^ROU||20210407191342|2739^BY^ENTERED|2799^BY^VERIFIED|||(696)901-1300|20210407191342||||||ORDERING FAC NAME|ADDR^^CITY^STATE^ZIP^USA|(515)-290-8888|9999^^CITY^STATE^ZIP^CAN|||||I\r"
+            + "ORC|RE|||3200|||||20210407191342||2799^BY^VERIFIED||||20210407191342||||||ORDERING FAC NAME||||||||I\r"
             + "RXE|^Q24H&0600^^20210407191342^^ROU|DEFAULTMED^cefTRIAXone (ROCEPHIN) 2 g in sodium chloride 0.9 % 50 mL IVPB|2||g||||||||\r"
             + "OBX|1|NM|Most Current Weight^Most current measured weight (actual)||90|kg";
 
@@ -282,7 +282,7 @@ public class Hl7RDEMessageTest {
         String hl7message = msh
             + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\r"
             + "PV1||I|||||||||||||||||Visit_0a4d960d-c528-45c9-bb10-7e9929968247|||||||||||||||||||||||||20210407191342\r"
-            + "ORC|RE|ACCESSION_62fd10ea-522a-4261-837a-30381a5aa04a|ACCESSION_62fd10ea-522a-4261-837a-30381a5aa04a|3200|||^Every 24 hours&1500^^20210330150000^^ROU||20210407191342|2739^BY^ENTERED|2799^BY^VERIFIED|||(696)901-1300|20210407191342||||||ORDERING FAC NAME|ADDR^^CITY^STATE^ZIP^USA|(515)-290-8888|9999^^CITY^STATE^ZIP^CAN|||||I\r"
+            + "ORC|RE|||3200|||||20210407191342||2799^BY^VERIFIED||||20210407191342||||||ORDERING FAC NAME||||||||I\r"
             + "RXE|^Q24H&0600^^20210407191342^^ROU|DEFAULTMED^cefTRIAXone (ROCEPHIN) 2 g in sodium chloride 0.9 % 50 mL IVPB|2||g||||||||\r"
             + "OBX|1|NM|Most Current Weight^Most current measured weight (actual)||90|kg";
 
@@ -330,7 +330,7 @@ public class Hl7RDEMessageTest {
             + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\r"
             + "PV1||I|||||||||||||||||Visit_0a4d960d-c528-45c9-bb10-7e9929968247|||||||||||||||||||||||||20210407191342\r"
             + "AL1|1|DA|1605^acetaminophen^L|MO|Muscle Pain~hair loss\r"
-            + "ORC|RE|ACCESSION_62fd10ea-522a-4261-837a-30381a5aa04a|ACCESSION_62fd10ea-522a-4261-837a-30381a5aa04a|3200|||^Every 24 hours&1500^^20210330150000^^ROU||20210407191342|2739^BY^ENTERED|2799^BY^VERIFIED|||(696)901-1300|20210407191342||||||ORDERING FAC NAME|ADDR^^CITY^STATE^ZIP^USA|(515)-290-8888|9999^^CITY^STATE^ZIP^CAN|||||I\r"
+            + "ORC|RE|||3200|||||20210407191342||2799^BY^VERIFIED||||20210407191342||||||ORDERING FAC NAME||||||||I\r"
             + "RXE|^Q24H&0600^^20210407191342^^ROU|DEFAULTMED^cefTRIAXone (ROCEPHIN) 2 g in sodium chloride 0.9 % 50 mL IVPB|2||g||||||||\r"
             + "RXR|IM\r"
             + "OBX|1|NM|Most Current Weight^Most current measured weight (actual)||90|kg";
