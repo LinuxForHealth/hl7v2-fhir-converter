@@ -28,6 +28,7 @@ import ca.uhn.hl7v2.model.Varies;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.hl7.fhir.dstu3.model.codesystems.MedicationRequestCategory;
 import org.hl7.fhir.exceptions.FHIRException;
 import org.hl7.fhir.r4.model.AllergyIntolerance.AllergyIntoleranceCategory;
 import org.hl7.fhir.r4.model.AllergyIntolerance.AllergyIntoleranceCriticality;
@@ -214,6 +215,16 @@ public class SimpleDataValueResolver {
             return code;
         }
         return "unknown"; // when the HL7 status codes get mapped in v2toFhirMapping, we will return code. "unknown" is being returned because the hl7 message is not mapped to fhir yet.
+    };
+
+    public static final ValueExtractor<Object, SimpleCode> MEDREQ_CATEGORY_CODE_FHIR = (Object value) -> {
+        String val = Hl7DataHandlerUtil.getStringValue(value);
+        String code = getFHIRCode(val, MedicationRequestCategory.class);
+        if (code != null) {
+            MedicationRequestCategory category = MedicationRequestCategory.fromCode(code);
+            return new SimpleCode(code, "http://terminology.hl7.org/CodeSystem/medicationrequest-category", category.getDisplay());
+        } else
+            return null;
     };
 
     public static final ValueExtractor<Object, String> OBSERVATION_STATUS_CODE_FHIR = (Object value) -> {

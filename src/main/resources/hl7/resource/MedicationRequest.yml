@@ -89,6 +89,12 @@ intent:
   constants:
     default: "order"
 
+category:
+  valueOf: datatype/CodeableConcept
+  expressionType: resource
+  vars:
+    coding: MEDREQ_CATEGORY, ORC.29
+
 medicationCodeableConcept_1:
   condition: $rxO NOT_NULL
   valueOf: datatype/CodeableConcept
@@ -125,3 +131,19 @@ reasonCode:
   generateList: true
   expressionType: resource
   specs: RXE.27 | RXO.20 | ORC.16
+
+requester:
+  condition: $requesterVal NOT_NULL
+  valueOf: resource/Practitioner
+  generateList: true
+  expressionType: reference
+  specs: RXE.13 | ORC.12
+  vars:
+    requesterVal: RXE.13 | ORC.12
+
+dispenseRequest:
+  valueOf: secondary/DispenseRequest
+  expressionType: resource
+  vars:
+    timestamp: ORC.15
+

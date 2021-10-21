@@ -15,15 +15,10 @@ import java.util.TimeZone;
 import java.util.stream.Collectors;
 
 import org.hl7.fhir.instance.model.api.IBaseResource;
-import org.hl7.fhir.r4.model.Bundle;
+import org.hl7.fhir.r4.model.*;
 import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
 
-import org.hl7.fhir.r4.model.CodeableConcept;
-import org.hl7.fhir.r4.model.MedicationRequest;
 import org.hl7.fhir.r4.model.MedicationRequest.MedicationRequestStatus;
-import org.hl7.fhir.r4.model.Patient;
-import org.hl7.fhir.r4.model.Resource;
-import org.hl7.fhir.r4.model.ResourceType;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -575,7 +570,7 @@ public class Hl7MedicationRequestFHIRConversionTest {
     }
 
     @Test
-    public void test_Medication_ReasonCode(){
+    public void test_MedicationRequest_ReasonCode(){
         //reason code from RXE.27
         String hl7message = "MSH|^~\\&||||||S1|RDE^O11||T|2.6|||||||||\n"
                 + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
@@ -664,4 +659,80 @@ public class Hl7MedicationRequestFHIRConversionTest {
         assertThat(medicationRequest.getReasonCodeFirstRep().getCodingFirstRep().getSystem()).isEqualTo("urn:id:PRN");
 
     }
+
+    @Test
+    public void test_MedicationRequest_category_requester_and_dispenseRequest(){
+        String hl7message = "MSH|^~\\&||||||S1|RDE^O11||T|2.6|||||||||\n"
+                + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
+                + "ORC|NW|F800006^OE|P800006^RX|||E|10^BID^D4^^^R||20180622230000|||3122^PROVIDER^ORDERING|||20190606193536||||||||||||||I\n"
+                + "RXE|^Q24H&0600^^20210330144208^^ROU|DUONEB3INH^3 ML PLAS CONT : IPRATROPIUM-ALBUTEROL 0.5-2.5 (3) MG/3ML IN SOLN^ADS^^^^^^ipratropium-albuterol (DUONEB) nebulizer solution 3 mL|3||mL|47||||1|PC||||||||||||||||Wheezing^Wheezing^PRN||||^DUONEB|20180622230000||||||||\n";
+
+        HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
+        String json = ftv.convert(hl7message, PatientUtils.OPTIONS);
+        assertThat(json).isNotBlank();
+        LOGGER.info("FHIR json result:\n" + json);
+
+        IBaseResource bundleResource = context.getParser().parseResource(json);
+        assertThat(bundleResource).isNotNull();
+        Bundle b = (Bundle) bundleResource;
+        List<BundleEntryComponent> e = b.getEntry();
+
+        List<Resource> medicationRequestList = e.stream()
+                .filter(v -> ResourceType.MedicationRequest == v.getResource().getResourceType())
+                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        assertThat(medicationRequestList).hasSize(1);
+        MedicationRequest medicationRequest = ResourceUtils.getResourceMedicationRequest(medicationRequestList.get(0), context);
+
+        // requester comes from ORC.12 which is the back up value for RXE.13
+        String requesterRef = medicationRequest.getRequester().getReference();
+        Practitioner practBundle = ResourceUtils.getSpecificPractitionerFromBundle(b, requesterRef);
+
+        Identifier practitionerIdentifier = practBundle.getIdentifierFirstRep();
+        HumanName practName = practBundle.getNameFirstRep();
+        assertThat(practitionerIdentifier.getValue()).isEqualTo("3122"); // ORC.12
+        assertThat(practitionerIdentifier.getSystem()).isNull(); // ORC.12
+        assertThat(practName.getText()).isEqualTo("ORDERING PROVIDER"); // ORC.12
+
+        //category comes from  ORC.29
+        assertThat(medicationRequest.getCategory().get(0).hasCoding()).isTrue();
+        assertThat(medicationRequest.getCategory().get(0).getCodingFirstRep().getCode()).isEqualTo("inpatient");
+        assertThat(medicationRequest.getCategory().get(0).getCodingFirstRep().getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/medicationrequest-category");
+        assertThat(medicationRequest.getCategory().get(0).getCodingFirstRep().getDisplay()).isEqualTo("Inpatient");
+
+        //DispenseRequest.start comes from ORC.15
+        assertThat(medicationRequest.getDispenseRequest().hasValidityPeriod()).isTrue();
+        assertThat(medicationRequest.getDispenseRequest().getValidityPeriod().getStartElement().toString()).containsPattern("2019-06-06");
+
+        hl7message = "MSH|^~\\&||||||S1|RDE^O11||T|2.6|||||||||\n"
+                + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
+                + "ORC|NW|F800006^OE|P800006^RX|||E|10^BID^D4^^^R||20180622230000||||||20190606193536||||||||||||||I\n"
+                + "RXE|^Q24H&0600^^20210330144208^^ROU|DUONEB3INH^3 ML PLAS CONT : IPRATROPIUM-ALBUTEROL 0.5-2.5 (3) MG/3ML IN SOLN^ADS^^^^^^ipratropium-albuterol (DUONEB) nebulizer solution 3 mL|3||mL|47||||1|PC||2213^ORDERING^PROVIDER||||||||||||||Wheezing^Wheezing^PRN||||^DUONEB|20180622230000||||||||\n";
+
+        ftv = new HL7ToFHIRConverter();
+        json = ftv.convert(hl7message, PatientUtils.OPTIONS);
+        assertThat(json).isNotBlank();
+        LOGGER.info("FHIR json result:\n" + json);
+
+        bundleResource = context.getParser().parseResource(json);
+        assertThat(bundleResource).isNotNull();
+        b = (Bundle) bundleResource;
+        e = b.getEntry();
+
+        medicationRequestList = e.stream()
+                .filter(v -> ResourceType.MedicationRequest == v.getResource().getResourceType())
+                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        assertThat(medicationRequestList).hasSize(1);
+        medicationRequest = ResourceUtils.getResourceMedicationRequest(medicationRequestList.get(0), context);
+
+        // requester comes from RXE.13
+        requesterRef = medicationRequest.getRequester().getReference();
+        practBundle = ResourceUtils.getSpecificPractitionerFromBundle(b, requesterRef);
+
+        practitionerIdentifier = practBundle.getIdentifierFirstRep();
+        practName = practBundle.getNameFirstRep();
+        assertThat(practitionerIdentifier.getValue()).isEqualTo("2213"); // RXE.13
+        assertThat(practitionerIdentifier.getSystem()).isNull(); // RXE.13
+        assertThat(practName.getText()).isEqualTo("PROVIDER ORDERING"); // RXE.13
+    }
+
 }
