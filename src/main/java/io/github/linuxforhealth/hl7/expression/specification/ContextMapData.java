@@ -1,6 +1,7 @@
 package io.github.linuxforhealth.hl7.expression.specification;
 
 import java.util.List;
+import java.util.ArrayList;
 import java.util.Map;
 import io.github.linuxforhealth.api.EvaluationResult;
 import io.github.linuxforhealth.api.InputDataExtractor;
@@ -41,11 +42,22 @@ public class ContextMapData implements InputDataExtractor {
       return new EmptyEvaluationResult();
     }
   }
-
+  //BJCBJC
   @Override
   public EvaluationResult extractMultipleValuesForSpec(Specification spec,
       Map<String, EvaluationResult> contextValues) {
     SimpleSpecification simpleSpec = (SimpleSpecification) spec;
+    if (simpleSpec.getVariable().contains("servation")) {
+      List multiple = new ArrayList();
+      for (Map.Entry<String, EvaluationResult> entry : contextValues.entrySet()) {
+        if (entry.getKey().contains("Observation")){
+          multiple.add(entry.getValue());
+        }
+      }
+      if (multiple.size()>0){
+        return new SimpleEvaluationResult<>(multiple);
+      }
+    } 
     EvaluationResult res = contextValues
         .get(getKeyName(contextValues, VariableUtils.getVarName(simpleSpec.getVariable())));
     if (res != null && !res.isEmpty()) {

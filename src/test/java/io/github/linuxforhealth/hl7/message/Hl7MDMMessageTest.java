@@ -119,7 +119,7 @@ public class Hl7MDMMessageTest {
                 + "EVN||20120101100000\n"
                 + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
                 + "PV1||O|^^^ANA\n"
-                + "TXA|1|DS|TEXT|20120101100000|||||111222^PETERSON^ALAN^S^MD^^||||15.1.14b352bd^Merge.Symphony||||AU\n"
+                + "TXA|1|DS|TEXT|20120101100000|||||||||||||AU\n"
                 + "OBX|1|ST|200||This is an append sample text.||||||F|\n"
                 + "OBX|2|ST|200||This is an append sample text 2.||||||F|\n";
 

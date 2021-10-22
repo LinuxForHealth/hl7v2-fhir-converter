@@ -70,6 +70,9 @@ public class SimpleExpression extends AbstractExpression {
     
     Object resolvedValue = null;
     if (VariableUtils.isVar(value)) {
+      if (this.getExpressionAttr().isFuzzyGroup()){
+        LOGGER.debug("Getting Value for varname {}",value);
+      }
       EvaluationResult obj =
           getVariableValueFromVariableContextMap(value, ImmutableMap.copyOf(localContextValues));
       if (obj != null && !obj.isEmpty()) {

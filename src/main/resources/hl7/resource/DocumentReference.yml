@@ -186,6 +186,7 @@ securityLabel:
 context:
    valueOf: secondary/Context
    expressionType: resource
+   fuzzyGroup: true
    vars:
       practiceSettingIn: OBR.24
       timestamp: TXA.4 | OBR.7

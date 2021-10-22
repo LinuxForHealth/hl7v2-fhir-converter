@@ -117,8 +117,12 @@ public abstract class AbstractExpression implements Expression {
         localContextValues.put(baseValue.getIdentifier(), baseValue);
       }
 
+
       result = evaluateValueOfExpression(dataSource, localContextValues, baseValue);
 
+      if (this.isFuzzyGroup()){
+        LOGGER.debug("Completed Evaluating returned value  {} ----  for  expression {} ", result, this);
+      }
       LOGGER.debug("Completed Evaluating returned value  {} ----  for  expression {} ", result, this);
 
       if (this.conditionSatisfiedState && this.isRequired()
@@ -175,14 +179,14 @@ public abstract class AbstractExpression implements Expression {
 
     List<Object> result = new ArrayList<>();
     List<ResourceValue> additionalresourcesresult = new ArrayList<>();
-    List<Object> baseSpecvalues =
+    List<Object> baseSpecvalues =  // BJCBJC this is key.  I should have two spec values.
         getSpecValues(dataSource, localContextValues, baseinputValue, this.getspecs());
     LOGGER.debug("Base values evaluated {} -----  values {} ", this, baseSpecvalues);
 
 
     if (!baseSpecvalues.isEmpty()) {
       for (Object o : baseSpecvalues) {
-        EvaluationResult gen = generateValue(dataSource, localContextValues,
+        EvaluationResult gen = generateValue(dataSource, localContextValues,  // BJCBJC SHould give me a value
             EvaluationResultFactory.getEvaluationResult(o));
 
         if (gen != null && gen.getValue() != null && !gen.isEmpty()) {
@@ -241,7 +245,7 @@ public abstract class AbstractExpression implements Expression {
     EvaluationResult specValues;
     if (specs == null || specs.isEmpty()) {
       specValues = baseinputValue;
-    } else {
+    } else {  //BJCBJC could put breakpoint here
       specValues = SpecificationUtil.extractMultipleValuesForSpec(specs, dataSource,
           ImmutableMap.copyOf(contextValues));
     }
