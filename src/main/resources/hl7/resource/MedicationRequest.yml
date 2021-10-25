@@ -118,7 +118,7 @@ authoredOn:
   valueOf: $val
   expressionType: HL7Spec
   vars:
-    val: ORC.9 | RXE.32
+    val: RXE.32 | ORC.9
 
 reasonCode:
   valueOf: datatype/CodeableConcept
