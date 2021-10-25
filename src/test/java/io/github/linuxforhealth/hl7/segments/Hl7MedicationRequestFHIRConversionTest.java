@@ -315,7 +315,7 @@ public class Hl7MedicationRequestFHIRConversionTest {
         HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
         String json = ftv.convert(hl7message, PatientUtils.OPTIONS);
         assertThat(json).isNotBlank();
-        LOGGER.info("FHIR json result:\n" + json);
+        LOGGER.debug("FHIR json result:\n" + json);
 
         IBaseResource bundleResource = context.getParser().parseResource(json);
         assertThat(bundleResource).isNotNull();
@@ -373,7 +373,7 @@ public class Hl7MedicationRequestFHIRConversionTest {
         HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
         String json = ftv.convert(hl7message, PatientUtils.OPTIONS);
         assertThat(json).isNotBlank();
-        LOGGER.info("FHIR json result:\n" + json);
+        LOGGER.debug("FHIR json result:\n" + json);
 
         IBaseResource bundleResource = context.getParser().parseResource(json);
         assertThat(bundleResource).isNotNull();
@@ -431,7 +431,7 @@ public class Hl7MedicationRequestFHIRConversionTest {
         HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
         String json = ftv.convert(hl7message, PatientUtils.OPTIONS);
         assertThat(json).isNotBlank();
-        LOGGER.info("FHIR json result:\n" + json);
+        LOGGER.debug("FHIR json result:\n" + json);
 
         IBaseResource bundleResource = context.getParser().parseResource(json);
         assertThat(bundleResource).isNotNull();
@@ -484,7 +484,7 @@ public class Hl7MedicationRequestFHIRConversionTest {
         HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
         String json = ftv.convert(hl7message, PatientUtils.OPTIONS);
         assertThat(json).isNotBlank();
-        LOGGER.info("FHIR json result:\n" + json);
+        LOGGER.debug("FHIR json result:\n" + json);
 
         IBaseResource bundleResource = context.getParser().parseResource(json);
         assertThat(bundleResource).isNotNull();
@@ -539,7 +539,7 @@ public class Hl7MedicationRequestFHIRConversionTest {
         HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
         String json = ftv.convert(hl7message, PatientUtils.OPTIONS);
         assertThat(json).isNotBlank();
-        LOGGER.info("FHIR json result:\n" + json);
+        LOGGER.debug("FHIR json result:\n" + json);
 
         IBaseResource bundleResource = context.getParser().parseResource(json);
         assertThat(bundleResource).isNotNull();
@@ -580,7 +580,7 @@ public class Hl7MedicationRequestFHIRConversionTest {
         HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
         String json = ftv.convert(hl7message, PatientUtils.OPTIONS);
         assertThat(json).isNotBlank();
-        LOGGER.info("FHIR json result:\n" + json);
+        LOGGER.debug("FHIR json result:\n" + json);
 
         IBaseResource bundleResource = context.getParser().parseResource(json);
         assertThat(bundleResource).isNotNull();
@@ -611,7 +611,7 @@ public class Hl7MedicationRequestFHIRConversionTest {
         ftv = new HL7ToFHIRConverter();
         json = ftv.convert(hl7message, PatientUtils.OPTIONS);
         assertThat(json).isNotBlank();
-        LOGGER.info("FHIR json result:\n" + json);
+        LOGGER.debug("FHIR json result:\n" + json);
 
         bundleResource = context.getParser().parseResource(json);
         assertThat(bundleResource).isNotNull();
@@ -639,7 +639,7 @@ public class Hl7MedicationRequestFHIRConversionTest {
         ftv = new HL7ToFHIRConverter();
         json = ftv.convert(hl7message, PatientUtils.OPTIONS);
         assertThat(json).isNotBlank();
-        LOGGER.info("FHIR json result:\n" + json);
+        LOGGER.debug("FHIR json result:\n" + json);
 
         bundleResource = context.getParser().parseResource(json);
         assertThat(bundleResource).isNotNull();
@@ -664,14 +664,13 @@ public class Hl7MedicationRequestFHIRConversionTest {
     public void test_MedicationRequest_category_requester_and_dispenseRequest(){
         String hl7message = "MSH|^~\\&||||||S1|RDE^O11||T|2.6|||||||||\n"
                 + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
-                + "ORC|NW|||||E|10^BID^D4^^^R||20180622230000|||3122^PROVIDER^ORDERING|||20190606193536||||||||||||||I\n"
+                + "ORC|NW|||||E|10^BID^D4^^^R||20180622230000|||3122^PROVIDER^ORDERING^^^DR|||20190606193536||||||||||||||I\n"
                 + "RXE|^Q24H&0600^^20210330144208^^ROU|DUONEB3INH^3 ML PLAS CONT : IPRATROPIUM-ALBUTEROL 0.5-2.5 (3) MG/3ML IN SOLN^ADS^^^^^^ipratropium-albuterol (DUONEB) nebulizer solution 3 mL|3||mL|47||||1|PC||||||||||||||||Wheezing^Wheezing^PRN||||^DUONEB|20180622230000||||||||\n";
 
         HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
         String json = ftv.convert(hl7message, PatientUtils.OPTIONS);
         assertThat(json).isNotBlank();
-        LOGGER.info("FHIR json result:\n" + json);
-
+        LOGGER.debug("FHIR json result:\n" + json);
         IBaseResource bundleResource = context.getParser().parseResource(json);
         assertThat(bundleResource).isNotNull();
         Bundle b = (Bundle) bundleResource;
@@ -689,9 +688,13 @@ public class Hl7MedicationRequestFHIRConversionTest {
 
         Identifier practitionerIdentifier = practBundle.getIdentifierFirstRep();
         HumanName practName = practBundle.getNameFirstRep();
-        assertThat(practitionerIdentifier.getValue()).isEqualTo("3122"); // ORC.12
-        assertThat(practitionerIdentifier.getSystem()).isNull(); // ORC.12
-        assertThat(practName.getText()).isEqualTo("ORDERING PROVIDER"); // ORC.12
+        assertThat(practitionerIdentifier.getValue()).isEqualTo("3122"); // ORC.12.1
+        assertThat(practitionerIdentifier.getSystem()).isNull(); // ORC.12.9
+        assertThat(practName.getFamily()).isEqualTo("PROVIDER"); // ORC.12.2
+        assertThat(practName.getGivenAsSingleString()).isEqualTo("ORDERING"); // ORC.12.3
+        assertThat(practName.getPrefixAsSingleString()).isEqualTo("DR"); //ORC.12.6
+        assertThat(practName.getSuffix()).isEmpty(); // RXE.13.5
+        assertThat(practName.getText()).isEqualTo("DR ORDERING PROVIDER"); // ORC.12
 
         //category comes from  ORC.29
         assertThat(medicationRequest.getCategory()).hasSize(1);
@@ -712,8 +715,7 @@ public class Hl7MedicationRequestFHIRConversionTest {
         ftv = new HL7ToFHIRConverter();
         json = ftv.convert(hl7message, PatientUtils.OPTIONS);
         assertThat(json).isNotBlank();
-        LOGGER.info("FHIR json result:\n" + json);
-
+        LOGGER.debug("FHIR json result:\n" + json);
         bundleResource = context.getParser().parseResource(json);
         assertThat(bundleResource).isNotNull();
         b = (Bundle) bundleResource;
@@ -731,8 +733,17 @@ public class Hl7MedicationRequestFHIRConversionTest {
 
         practitionerIdentifier = practBundle.getIdentifierFirstRep();
         practName = practBundle.getNameFirstRep();
-        assertThat(practitionerIdentifier.getValue()).isEqualTo("2213"); // RXE.13
-        assertThat(practitionerIdentifier.getSystem()).isNull(); // RXE.13
+        CodeableConcept type = practitionerIdentifier.getType();
+
+        assertThat(type.getCodingFirstRep().getCode().toString()).isEqualTo("DEA");
+        assertThat(type.getCodingFirstRep().getDisplay()).isEqualTo("Drug Enforcement Administration registration number");
+        assertThat(type.getCodingFirstRep().getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/v2-0203");
+        assertThat(practitionerIdentifier.getValue()).isEqualTo("2213"); // RXE.13.1
+        assertThat(practitionerIdentifier.getSystem()).isNull(); // RXE.13.9
+        assertThat(practName.getFamily()).isEqualTo("ORDERING"); // RXE.13.2
+        assertThat(practName.getGivenAsSingleString()).isEqualTo("PROVIDER"); // RXE.13.3
+        assertThat(practName.getPrefix()).isEmpty(); // RXE.13.6
+        assertThat(practName.getSuffix()).isEmpty(); // RXE.13.5
         assertThat(practName.getText()).isEqualTo("PROVIDER ORDERING"); // RXE.13
     }
 

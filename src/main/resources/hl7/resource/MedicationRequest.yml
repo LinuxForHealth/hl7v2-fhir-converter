@@ -132,14 +132,25 @@ reasonCode:
   expressionType: resource
   specs: RXE.27 | RXO.20 | ORC.16
 
-requester:
-  condition: $requesterVal NOT_NULL
+requester_1:
+  condition: $rxe13 NOT_NULL
   valueOf: resource/Practitioner
-  generateList: true
   expressionType: reference
-  specs: RXE.13 | ORC.12
+  specs: RXE.13
   vars:
-    requesterVal: RXE.13 | ORC.12
+    rxe13: RXE.13
+  constants:
+    system: "http://terminology.hl7.org/CodeSystem/v2-0203"
+    code: "DEA"
+    display: "Drug Enforcement Administration registration number"
+
+requester_2:
+  condition: $orc12 NOT_NULL && $rxe13 NULL
+  valueOf: resource/Practitioner
+  expressionType: reference
+  specs: ORC.12
+  vars:
+    orc12: ORC.12
 
 dispenseRequest:
   valueOf: secondary/DispenseRequest

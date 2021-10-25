@@ -5,14 +5,19 @@
 #
 # Creates an identifier with a System: uri:id  instead of an assigner + reference + referenced object.
 ---
-type: 
+type_1:
    valueOf: datatype/CodeableConcept
    expressionType: resource
-   specs: CX.5 | $type
+   specs: CX.5 | $typeSegment
    vars: 
      # Because calculated system id's don't have text if there is a valid system, 
      # see if there is a valid code and system as input to creating text in the CodeableConcept
-     identifierCoding: CODING_SYSTEM_V2_IDENTIFIER, CX.5 | $type
+     identifierCoding: CODING_SYSTEM_V2_IDENTIFIER, CX.5 | $typeSegment
+
+type_2:
+  valueOf: datatype/CodeableConcept_var
+  generateList: true
+  expressionType: resource
 
 system_1: 
      condition: $systemExists NOT_NULL
@@ -25,13 +30,13 @@ system_1:
 # When a system is passed in, try looking it up.
 # If it doesn't resolve, create a system ID (urn:id:xxxx)
 system_2: 
-     condition: $system NOT_NULL
+     condition: $systemID NOT_NULL
      type: STRING
      valueOf:  $systemLookup | $systemCreated 
      expressionType: HL7Spec
      vars: 
-          systemCreated: SYSTEM_ID, $system
-          systemLookup: SYSTEM_URL, $system          
+          systemCreated: SYSTEM_ID, $systemID
+          systemLookup: SYSTEM_URL, $systemID
     
 value: 
      type: STRING
