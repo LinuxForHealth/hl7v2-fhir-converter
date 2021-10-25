@@ -85,7 +85,7 @@ public class Hl7MedicationRequestFHIRConversionTest {
         //ORC.5 = A -> Expected medication status = ACTIVE
         String hl7message = "MSH|^~\\&|APP|FAC|WHIA|IBM|20180622230000||RDE^O11^RDE_O11|MSGID221xx0xcnvMed31|T|2.6\n"
                 + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
-                + "ORC||F800006^OE|P800006^RX||A|E|10^BID^D4^^^R||20180622230000\n"
+                + "ORC|NW|F800006^OE|P800006^RX||A|E|10^BID^D4^^^R||20180622230000\n"
                 + "RXO|RX800006^Test15 SODIUM 100 MG CAPSULE|100||mg|||||G||10||5\n"
                 + "RXE|^^^20180622230000^^R|62756-017^Testosterone Cypionate^NDC|100||mg|||||10||5\n";
 
@@ -108,7 +108,7 @@ public class Hl7MedicationRequestFHIRConversionTest {
         //ORC.5 = CM -> Expected medication status = COMPLETED
         hl7message = "MSH|^~\\&|APP|FAC|WHIA|IBM|20180622230000||RDE^O11^RDE_O11|MSGID221xx0xcnvMed31|T|2.6\n"
                 + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
-                + "ORC||F800006^OE|P800006^RX||CM|E|10^BID^D4^^^R||20180622230000\n"
+                + "ORC|NW|F800006^OE|P800006^RX||CM|E|10^BID^D4^^^R||20180622230000\n"
                 + "RXO|RX800006^Test15 SODIUM 100 MG CAPSULE|100||mg|||||G||10||5\n"
                 + "RXE|^^^20180622230000^^R|62756-017^Testosterone Cypionate^NDC|100||mg|||||10||5\n";
         ftv = new HL7ToFHIRConverter();
@@ -131,7 +131,7 @@ public class Hl7MedicationRequestFHIRConversionTest {
         //ORC.5 = ER -> Expected medication status = ENTEREDINERROR
         hl7message = "MSH|^~\\&|APP|FAC|WHIA|IBM|20180622230000||RDE^O11^RDE_O11|MSGID221xx0xcnvMed31|T|2.6\n"
                 + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
-                + "ORC||F800006^OE|P800006^RX||ER|E|10^BID^D4^^^R||20180622230000\n"
+                + "ORC|NW|F800006^OE|P800006^RX||ER|E|10^BID^D4^^^R||20180622230000\n"
                 + "RXO|RX800006^Test15 SODIUM 100 MG CAPSULE|100||mg|||||G||10||5\n"
                 + "RXE|^^^20180622230000^^R|62756-017^Testosterone Cypionate^NDC|100||mg|||||10||5\n";
         ftv = new HL7ToFHIRConverter();
