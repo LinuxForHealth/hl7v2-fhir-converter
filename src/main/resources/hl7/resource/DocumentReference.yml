@@ -10,7 +10,7 @@ id:
    expressionType: JEXL
 
 masterIdentifier_1:
-   condition: $valueIn NOT_NULL && $systemCX NOT_NULL
+   condition: $valueIn NOT_NULL
    valueOf: datatype/Identifier_var
    expressionType: resource
    vars:
@@ -22,11 +22,8 @@ masterIdentifier_2:
    valueOf: datatype/Identifier
    expressionType: resource
    vars:
-      value: TXA.12.1
-      system: SYSTEM_URL, $sys
-      txa: TXA.12.2
-   constants:
-      sys: "urn:id:extID"
+      value: TXA.12.3
+      txa: TXA.12.1
 
 identifier_1:
    valueOf: datatype/Identifier
@@ -63,7 +60,28 @@ identifier_3:
       system: "http://terminology.hl7.org/CodeSystem/v2-0203"
       code: "PLAC"
       display: "Placer Identifier"
-   
+
+identifier_4:
+   condition: $valueIn NOT_NULL
+   valueOf: datatype/Identifier_var
+   generateList: true
+   expressionType: resource
+   vars:
+      valueIn: TXA.12.1
+      systemCX: TXA.12.2
+   constants:
+      code: "EntityId"
+
+identifier_5:
+   condition: $valueIn NOT_NULL
+   valueOf: datatype/Identifier_var
+   generateList: true
+   expressionType: resource
+   vars:
+      valueIn: TXA.12.3
+   constants:
+      code: "UniversalId"
+
 status:
    type: DOC_REF_STATUS
    default: "current"
@@ -98,6 +116,7 @@ author:
    specs: TXA.9
    vars:
       hasValue: TXA.9
+      referenceDisplay: PERSON_DISPLAY_NAME, TXA.9
 
 authenticator:
    condition: $hasValue NOT_NULL
@@ -106,19 +125,51 @@ authenticator:
    specs: TXA.22 | TXA.10
    vars:
       hasValue: TXA.22 | TXA.10
+      referenceDisplay: PERSON_DISPLAY_NAME, TXA.22 | TXA.10
 
-content:
+# If OBX is TX type, create an attachment of the data
+content_1:
    valueOf: secondary/Content
    generateList: true
    expressionType: resource
+   condition: $obx2 EQUALS TX
    vars:
-      # TODO: in future, if other than plain text, create a mapping
+      # TODO: in future, if other than plain text, create a mapping for content type
       # contentType: TXA.3 | OBX.2
       creationDate: TXA.7
       contentData: OBX.5 *&, GeneralUtils.concatenateWithChar(contentData, '\n')
+      obx2: STRING, OBX.2
    constants: 
       contentType: "text/plain"   
 
+# If OBX is any other type, (not TX) the content is put in an Observation
+# DocumentReference still requires Content element, so create an empty (minimal) one.
+# Content type is sufficient minimal, include the date if present
+content_2:
+   valueOf: secondary/Content
+   generateList: true
+   expressionType: resource
+   condition: $obx2 NOT_EQUALS TX
+   vars:
+      creationDate: TXA.7
+      obx2: STRING, OBX.2
+   constants: 
+      contentType: "text/plain"      
+
+# Third case is no OBX record at all
+# DocumentReference still requires Content element, so create an empty (minimal) one.
+# Content type is sufficient for minimal, include the date if present
+content_3:
+   valueOf: secondary/Content
+   generateList: true
+   expressionType: resource
+   condition: $obx NULL
+   vars:
+      creationDate: TXA.7
+      obx: OBX 
+   constants: 
+      contentType: "text/plain"
+        
 description:
    type: STRING
    expressionType: HL7Spec
@@ -136,6 +187,7 @@ context:
    valueOf: secondary/Context
    expressionType: resource
    vars:
+      practiceSettingIn: OBR.24
       timestamp: TXA.4 | OBR.7
       providerCode: TXA.5
       serviceRequestRef: $ServiceRequest

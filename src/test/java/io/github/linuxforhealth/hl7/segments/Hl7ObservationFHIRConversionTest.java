@@ -294,10 +294,11 @@ public class Hl7ObservationFHIRConversionTest {
         assertEquals(3f, r.getDenominator().getValue().floatValue());
     }
 
+ 
     @Test
-    public void testObservationTxResult() throws IOException {
+    public void testObservationSTResult() throws IOException {
         String hl7message = baseMessage
-                + "OBX|1|TX|^Type of protein feed^L||Fourth Line: HYPERDYNAMIC LV SYSTOLIC FUNCTION, VISUAL EF 80%||||||F||||Alex||";
+                + "OBX|1|ST|^Type of protein feed^L||Fourth Line: HYPERDYNAMIC LV SYSTOLIC FUNCTION, VISUAL EF 80%||||||F||||Alex||";
         String json = message.convert(hl7message, engine);
 
         IBaseResource bundleResource = context.getParser().parseResource(json);
@@ -315,10 +316,10 @@ public class Hl7ObservationFHIRConversionTest {
                 .isEqualTo("Fourth Line: HYPERDYNAMIC LV SYSTOLIC FUNCTION, VISUAL EF 80%");
     }
 
-    @Test
-    public void testObservationTxMultiplePartsResult() throws IOException {
+     @Test
+    public void testObservationSTMultiplePartsResult() throws IOException {
         String hl7message = baseMessage
-                + "OBX|1|TX|^Type of protein feed^L||HYPERDYNAMIC LV SYSTOLIC FUNCTION, VISUAL EF 80%~Fifth line, as part of a repeated field||||||F||";
+                + "OBX|1|ST|^Type of protein feed^L||HYPERDYNAMIC LV SYSTOLIC FUNCTION, VISUAL EF 80%~Fifth line, as part of a repeated field||||||F||";
         String json = message.convert(hl7message, engine);
         IBaseResource bundleResource = context.getParser().parseResource(json);
         assertThat(bundleResource).isNotNull();
@@ -433,10 +434,8 @@ public class Hl7ObservationFHIRConversionTest {
         "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|PPR^PC1|||2.6||||||||2.6\r",
         //"MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|PPR^PC2|||2.6||||||||2.6\r",
         //"MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|PPR^PC3|||2.6||||||||2.6\r",
-        "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|RDE^O11|||2.6||||||||2.6\r",
-        "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|RDE^O25|||2.6||||||||2.6\r"
     })
-    public void extendedObservationCWEtest(String msh) throws IOException {
+    public void extendedObservationTestMostMessages(String msh) throws IOException {
         String hl7message = msh
                 + "OBX|1|CWE|DQW^Some text 1^SNM3|100|DQW^Other text 2^SNM3|mm^Text 3^SNM3|56-98|IND|25|ST|F|20210322153839|LKJ|20210320153850|N56|1111^ClinicianLastName^ClinicianFirstName^^^^Title|Manual^Text the 4th^SNM3|Device_1234567^mySystem|20210322153925|Observation Site^Text 5^SNM3|INST^Instance Identifier System||Radiology^Radiological Services|467 Albany Hospital^^Albany^NY|Cardiology^ContactLastName^Jane^Q^^Dr.^MD\r";
 
@@ -614,6 +613,128 @@ public class Hl7ObservationFHIRConversionTest {
         DatatypeUtils.checkCommonCodeableConceptAssertions(obs.getCategoryFirstRep(), "laboratory", "Laboratory",
                 "http://terminology.hl7.org/CodeSystem/observation-category", null);
 
+    }
+
+    // Tests resources created for Observations from RDE messages
+    @ParameterizedTest
+    @ValueSource(strings = { 
+        "MSH|^~\\&|WHI_LOAD_GENERATOR|IBM_TORONTO_LAB||IBM|20210407191342|25739|RDE^O11|MSGID_f209e83f-20db-474d-a7ae-82e5c3894273|T|2.6\r",
+        "MSH|^~\\&|WHI_LOAD_GENERATOR|IBM_TORONTO_LAB||IBM|20210407191342|25739|RDE^O25|MSGID_f209e83f-20db-474d-a7ae-82e5c3894273|T|2.6\r"
+    })
+    public void extendedObservationTestForRDEMessages(String msh) throws IOException {
+
+        String hl7message = msh
+        + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
+        + "ORC|RE|||3200|||||20210407191342||2799^BY^VERIFIED||||20210407191342||||||ORDERING FAC NAME||||||||I\r"
+        + "RXE|^Q24H&0600^^20210407191342^^ROU|DEFAULTMED^cefTRIAXone (ROCEPHIN) 2 g in sodium chloride 0.9 % 50 mL IVPB|2||g||||||||\n"
+        + "OBX|1|NM|Most Current Weight^Most current measured weight (actual)||90|kg||IND||||||20210320153850||1111^ClinicianLastName^ClinicianFirstName^^^^Title|Manual^Text the 4th^SNM3|Device_1234567^mySystem|20210322153925|Observation Site^Text 5^SNM3|INST^Instance Identifier System||Radiology^Radiological Services|467 Albany Hospital^^Albany^NY|Cardiology^ContactLastName^Jane^Q^^Dr.^MD\r";
+
+        HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
+        String json = ftv.convert(hl7message, OPTIONS);
+          
+        IBaseResource bundleResource = context.getParser().parseResource(json);
+        assertThat(bundleResource).isNotNull();
+        Bundle b = (Bundle) bundleResource;
+        List<BundleEntryComponent> e = b.getEntry();
+        List<Resource> obsResource = e.stream()
+                .filter(v -> ResourceType.Observation == v.getResource().getResourceType())
+                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        assertThat(obsResource).hasSize(1);
+
+        Observation obs = (Observation) obsResource.get(0);
+
+        // Check the coding  (OBX.3)
+        assertThat(obs.hasCode()).isTrue();
+        DatatypeUtils.checkCommonCodeableConceptAssertions(obs.getCode(), "Most Current Weight", "Most current measured weight (actual)",
+                null, "Most current measured weight (actual)");
+    
+        // Check the value  (OBX.5)
+        assertNotNull(obs.getValueQuantity());
+        Quantity q = obs.getValueQuantity();
+        assertNull(q.getCode()); //code for unit
+        assertEquals("kg", q.getUnit()); //unit units to OBX.6.1
+        assertNull(q.getSystem());  //system for unit
+        assertEquals(90f, q.getValue().floatValue());
+        assertNull(q.getComparator()); // = is not put in comparator
+
+        // Check that there is no reference range, OBX.6 and OBX.7
+        assertThat(obs.hasReferenceRange()).isFalse();
+
+        // Check interpretation (OBX.8)
+        assertThat(obs.hasInterpretation()).isTrue();
+        assertThat(obs.getInterpretation()).hasSize(1);
+        DatatypeUtils.checkCommonCodeableConceptAssertions(obs.getInterpretationFirstRep(), "IND", "Indeterminate",
+                "http://terminology.hl7.org/CodeSystem/v2-0078", null);
+        
+        // Check the effective Date Time  (OBX.14)
+        assertThat(obs.hasEffective()).isTrue();
+        assertThat(obs.hasEffectiveDateTimeType()).isTrue();
+        assertThat(obs.getEffectiveDateTimeType().asStringValue()).isEqualTo("2021-03-20T15:38:50+08:00");
+        
+        // Check performer  (OBX.16 Practictioner + OBX.23/OBX.24/OBX.25 Organization)
+        assertThat(obs.hasPerformer()).isTrue();
+        assertThat(obs.getPerformer()).hasSize(2); // Practioner and Organization
+        // Get Practitioner and see that it is populated with OBX.16 information
+        assertThat(obs.getPerformer().get(0).hasReference()).isTrue();
+        List<Resource> practitionerResource = e.stream()
+                .filter(v -> ResourceType.Practitioner == v.getResource().getResourceType())
+                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        assertThat(practitionerResource).hasSize(1);
+        Practitioner doctor = getResourcePractitioner(practitionerResource.get(0));
+        assertThat(doctor.getName().get(0).getFamily()).isEqualTo("ClinicianLastName");
+        // Get Organization and see that it is populated with OBX.23/OBX.24/OBX.25 information
+        assertThat(obs.getPerformer().get(1).hasReference()).isTrue();
+        List<Resource> organizationResource = e.stream()
+                .filter(v -> ResourceType.Organization == v.getResource().getResourceType())
+                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        assertThat(organizationResource).hasSize(1);
+        Organization org = getResourceOrganization(organizationResource.get(0));
+        assertThat(org.getName()).isEqualTo("Radiology"); // from OBX.23
+        assertThat(org.getAddress().get(0).getLine().get(0).getValueAsString())
+                .isEqualTo("467 Albany Hospital"); // from OBX.24
+        assertThat(org.getAddress().get(0).getCity()).isEqualTo("Albany"); // from OBX.24
+        assertThat(org.getAddress().get(0).getState()).isEqualTo("NY"); // from OBX.24
+        assertThat(org.getContact().get(0).getName().getFamily()).isEqualTo("ContactLastName"); // from OBX.25
+        assertThat(org.getContact().get(0).getName().getGiven().get(0).getValueAsString()).isEqualTo("Jane"); // from OBX.25
+        assertThat(org.getContact().get(0).getName().getSuffix()).hasSize(0); // There should be no suffix, currently not putting degree 'Title' in suffix
+        assertThat(org.getContact().get(0).getName().getText()).isEqualTo("Dr. Jane Q ContactLastName"); // from OBX.25
+        assertThat(org.getContact().get(0).hasPurpose()).isTrue(); // purpose added because of OBX.25
+        DatatypeUtils.checkCommonCodeableConceptAssertions(org.getContact().get(0).getPurpose(), "ADMIN",
+                "Administrative",
+                "http://terminology.hl7.org/CodeSystem/contactentity-type",
+                "Organization Medical Director");
+
+        // Check method  (OBX.17)
+        assertThat(obs.hasMethod()).isTrue();
+        DatatypeUtils.checkCommonCodeableConceptAssertions(obs.getMethod(), "Manual", "Text the 4th",
+                "http://terminology.hl7.org/CodeSystem/SNM3", "Text the 4th");
+
+        // Check device  (OBX.18)
+        assertThat(obs.hasDevice()).isTrue();
+        assertThat(obs.getDevice().hasReference()).isTrue();
+        List<Resource> deviceResource = e.stream()
+                .filter(v -> ResourceType.Device == v.getResource().getResourceType())
+                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        assertThat(deviceResource).hasSize(1);
+        Device device = getResourceDevice(deviceResource.get(0));
+        assertThat(device.getIdentifier().get(0).getValue()).isEqualTo("Device_1234567");
+        assertThat(device.getIdentifier().get(0).getSystem()).isEqualTo("urn:id:mySystem");
+
+        // Check bodySite  (OBX.20)
+        assertThat(obs.hasBodySite()).isTrue();
+        DatatypeUtils.checkCommonCodeableConceptAssertions(obs.getBodySite(), "Observation Site", "Text 5",
+                "http://terminology.hl7.org/CodeSystem/SNM3", "Text 5");
+
+        // Check identifier  (OBX.21)
+        assertThat(obs.hasIdentifier()).isTrue();
+        assertThat(obs.getIdentifier()).hasSize(2);
+        assertThat(obs.getIdentifier().get(1).getValue()).isEqualTo("INST");
+        assertThat(obs.getIdentifier().get(1).getSystem()).isEqualTo("urn:id:Instance_Identifier_System");
+
+        // OBX.23/OBX.24/OBX.25 went into Performer: Organization.  Checked above.
+
+        // Check for ABSENCE of category (because no SPM)  Presence of category tested in extendedObservationUnusualRangesAndOtherTest
+        assertThat(obs.hasCategory()).isFalse();
     }
     
     private static Practitioner getResourcePractitioner(Resource resource) {

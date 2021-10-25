@@ -16,6 +16,8 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.r4.model.Bundle;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import com.google.common.base.Preconditions;
 import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Message;
@@ -36,9 +38,8 @@ import io.github.linuxforhealth.hl7.resource.ResourceReader;
  * @author pbhallam
  */
 public class HL7ToFHIRConverter {
-	
   private static HL7HapiParser hparser = new HL7HapiParser();
-	
+  private static final Logger LOGGER = LoggerFactory.getLogger(HL7ToFHIRConverter.class);
   private Map<String, HL7MessageModel> messagetemplates = new HashMap<>();
 
   /**
@@ -152,10 +153,16 @@ public class HL7ToFHIRConverter {
       throw new IllegalArgumentException("IOException encountered.", ioe);
     }
 
+    try{
+        if(hl7message != null) {
+            String messageStructureInfo = hl7message.printStructure();
+            LOGGER.debug("HL7_MESSAGE_STRUCTURE={}",messageStructureInfo);
+        }
+    } catch (HL7Exception e) {
+        throw new IllegalArgumentException("Error printing message structure.", e);
+    }
     return hl7message;
   }
-
-
 
   private static void close(HL7HapiParser hparser) {
     if (hparser != null) {

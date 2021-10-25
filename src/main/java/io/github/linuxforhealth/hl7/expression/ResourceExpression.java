@@ -62,8 +62,7 @@ public class ResourceExpression extends AbstractExpression {
     if (result != null && result.getValue() != null) {
       ResourceValue resolvedvalues = result.getValue();
 
-      LOGGER.debug("Evaluated expression {}, returning {} ", this.resourceToGenerate,
-          resolvedvalues);
+      LOGGER.debug("Evaluated expression {}, returning {} ", this.resourceToGenerate, resolvedvalues);
       if (resolvedvalues != null) {
         evaluationResult = EvaluationResultFactory.getEvaluationResult(resolvedvalues.getResource(),
             result.getAdditionalResources());

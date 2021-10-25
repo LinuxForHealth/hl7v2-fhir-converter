@@ -9,6 +9,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.hl7.fhir.r4.model.codesystems.EncounterStatus;
 import org.junit.jupiter.api.Test;
 
@@ -16,11 +19,13 @@ import org.junit.jupiter.api.Test;
 
 public class Hl7RelatedGeneralUtilsTest {
 
+  private static final Logger LOGGER = LoggerFactory.getLogger(Hl7RelatedGeneralUtilsTest.class);
+
   @Test
   public void test_generate_name() {
     String name = Hl7RelatedGeneralUtils.generateName("prefix", "first", "M", "family", "suffix");
     assertThat(name).isEqualTo("prefix first M family suffix");
-    System.out.println(name);
+    LOGGER.debug("name="+name);
   }
 
 

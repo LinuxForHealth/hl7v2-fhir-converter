@@ -73,12 +73,11 @@ public class FHIRContext {
             || ResultSeverityEnum.ERROR == next.getSeverity()) {
           validationIssues
               .add(next.getLocationString() + " " + next.getMessage() + " " + next.getSeverity());
-          LOGGER.error("Validation issues: {} {} {}", next.getLocationString(), next.getMessage(),
-              next.getSeverity());
+          LOGGER.debug("Validation issues: {} {}", next.getLocationString(), next.getSeverity());
+          LOGGER.error("Validation issues: {}", next.getSeverity());
         } else {
           LOGGER
-              .warn("Validation issues: {} {} {}", next.getLocationString(), next.getMessage(),
-                  next.getSeverity());
+              .warn("Validation issues: {}", next.getSeverity());
         }
         if (!validationIssues.isEmpty()) {
           throw new IllegalArgumentException(

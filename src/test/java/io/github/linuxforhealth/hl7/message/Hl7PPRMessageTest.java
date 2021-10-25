@@ -61,7 +61,8 @@ public class Hl7PPRMessageTest {
     List<Resource> obsResource =
         e.stream().filter(v -> ResourceType.Observation == v.getResource().getResourceType())
             .map(BundleEntryComponent::getResource).collect(Collectors.toList());
-    assertThat(obsResource).hasSize(2);
+    // No Observations because the OBX records are TX     
+    assertThat(obsResource).hasSize(0);
 
     List<Resource> encounterResource =
         e.stream().filter(v -> ResourceType.Encounter == v.getResource().getResourceType())
@@ -86,7 +87,7 @@ public class Hl7PPRMessageTest {
             + "ORC|NW|1000^OE|9999999^RX|||E|^Q6H^D10^^^R\n"
             // OBR.7 is used for the timestamp (because no TXA in a PPR_PC1 message)
             + "OBR|1|TESTID|TESTID|||201801180346|201801180347||||||||||||||||||F||||||WEAKNESS||||||||||||\n"
-            // Next three lines create an attachment
+            // Next three lines create an attachment because OBX type TX
             + "OBX|1|TX|||ECHOCARDIOGRAPHIC REPORT||||||F|||202101010000|||\n"
             + "OBX|2|TX|||NORMAL LV CHAMBER SIZE WITH MILD CONCENTRIC LVH||||||F|||202101010000|||\n"
             + "OBX|3|TX|||HYPERDYNAMIC LV SYSTOLIC FUNCTION, VISUAL EF 80%||||||F|||202101010000|||\n";
@@ -108,7 +109,8 @@ public class Hl7PPRMessageTest {
     List<Resource> obsResource =
             e.stream().filter(v -> ResourceType.Observation == v.getResource().getResourceType())
                 .map(BundleEntryComponent::getResource).collect(Collectors.toList());
-        assertThat(obsResource).hasSize(1);
+    // One Observation from the NM, but not from the TX                    
+    assertThat(obsResource).hasSize(1);
 
     List<Resource> encounterResource =
         e.stream().filter(v -> ResourceType.Encounter == v.getResource().getResourceType())
@@ -126,10 +128,11 @@ public class Hl7PPRMessageTest {
     assertThat(documentRefResource).hasSize(1);
 
     DocumentReference documentRef = ResourceUtils.getResourceDocumentReference(documentRefResource.get(0), context);
+    DocumentReference.DocumentReferenceContextComponent drContext = documentRef.getContext();
+    assertThat(drContext.getPeriod().getStartElement().toString()).containsPattern("2018-01-18T03:47:00"); // OBR.7
     DocumentReference.DocumentReferenceContentComponent content = documentRef.getContentFirstRep();
     assertThat(content.getAttachment().getContentType()).isEqualTo("text/plain"); // Currently always defaults to text/plain
-    // TODO: why can't this OBR.7 date be found?
-    // assertThat(content.getAttachment().getCreationElement().toString()).containsPattern("2021-01-01T01:00:00"); // OBR.7 date
+    assertThat(content.getAttachment().getCreation()).isNull(); // No TXA.7 in message
     assertThat(content.getAttachment().hasData()).isTrue();
     String decodedData = new String(Base64.getDecoder().decode(content.getAttachment().getDataElement().getValueAsString()));
     assertThat(decodedData).isEqualTo("ECHOCARDIOGRAPHIC REPORT\nNORMAL LV CHAMBER SIZE WITH MILD CONCENTRIC LVH\nHYPERDYNAMIC LV SYSTOLIC FUNCTION, VISUAL EF 80%\n");

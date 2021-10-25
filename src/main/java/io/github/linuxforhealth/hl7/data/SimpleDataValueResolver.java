@@ -19,6 +19,7 @@ import java.time.temporal.Temporal;
 import java.time.temporal.UnsupportedTemporalTypeException;
 
 import ca.uhn.hl7v2.model.v26.datatype.CWE;
+import ca.uhn.hl7v2.model.v26.datatype.PPN;
 import ca.uhn.hl7v2.model.v26.datatype.XCN;
 import ca.uhn.hl7v2.model.v26.segment.PV1;
 import ca.uhn.hl7v2.model.v26.datatype.DTM;
@@ -27,12 +28,14 @@ import ca.uhn.hl7v2.model.Varies;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.hl7.fhir.dstu3.model.codesystems.MedicationRequestCategory;
 import org.hl7.fhir.exceptions.FHIRException;
 import org.hl7.fhir.r4.model.AllergyIntolerance.AllergyIntoleranceCategory;
 import org.hl7.fhir.r4.model.AllergyIntolerance.AllergyIntoleranceCriticality;
 import org.hl7.fhir.r4.model.DiagnosticReport.DiagnosticReportStatus;
 import org.hl7.fhir.r4.model.Enumerations.AdministrativeGender;
 import org.hl7.fhir.r4.model.Immunization.ImmunizationStatus;
+import org.hl7.fhir.r4.model.MedicationRequest;
 import org.hl7.fhir.r4.model.Observation.ObservationStatus;
 import org.hl7.fhir.r4.model.ServiceRequest.ServiceRequestStatus;
 import org.hl7.fhir.r4.model.Specimen.SpecimenStatus;
@@ -114,14 +117,15 @@ public class SimpleDataValueResolver {
                 if (sdate1 != null && sdate2 != null) {
                     Temporal date1 = DateUtil.getTemporal(DateUtil.formatToDateTimeWithZone(sdate1));
                     Temporal date2 = DateUtil.getTemporal(DateUtil.formatToDateTimeWithZone(sdate2));
-                    LOGGER.info("temporal dates start: {} , end: {} ", date1, date2);
+                    LOGGER.info("computing temporal dates");
+                    LOGGER.debug("temporal dates start: {} , end: {} ", date1, date2);
                     if (date1 != null && date2 != null) {
                         return String.valueOf(ChronoUnit.MINUTES.between(date1, date2));
                     }
                 }
             } catch (UnsupportedTemporalTypeException e) {
-                LOGGER.warn("Cannot evaluate time difference for start: {} , end: {} reason {} ", start, end,
-                        e.getMessage());
+                LOGGER.warn("Cannot evaluate time difference.");
+                LOGGER.debug("Cannot evaluate time difference for start: {} , end: {} reason {} ", start, end, e.getMessage());
                 return null;
             }
         }
@@ -137,43 +141,59 @@ public class SimpleDataValueResolver {
                 return null;
             }
         } catch (IllegalArgumentException | URISyntaxException e) {
-            LOGGER.warn("Value not valid URI, value: {}", value, e);
+            LOGGER.warn("Value not valid URI, value: {}", value);
+            LOGGER.debug("Value not valid URI, value: {}", value, e);
             return null;
         }
     };
 
-    // Creates a display name; currently only handles XCN as input
+    // Creates a display name; currently only handles XCN and PPN as input
     public static final ValueExtractor<Object, String> PERSON_DISPLAY_NAME = (Object value) -> {
+        StringBuilder sb = new StringBuilder();
+        String valprefix = null;
+        String valfirst = null;
+        String valmiddle = null;
+        String valfamily = null;
+        String valsuffix = null;
+
         if (value instanceof XCN) {
             XCN xcn = (XCN) value;
-            StringBuilder sb = new StringBuilder();
-            String valprefix = Hl7DataHandlerUtil.getStringValue(xcn.getPrefixEgDR());
-            String valfirst = Hl7DataHandlerUtil.getStringValue(xcn.getGivenName());
-            String valmiddle = Hl7DataHandlerUtil.getStringValue(xcn.getSecondAndFurtherGivenNamesOrInitialsThereof());
-            String valfamily = Hl7DataHandlerUtil.getStringValue(xcn.getFamilyName());
-            String valsuffix = Hl7DataHandlerUtil.getStringValue(xcn.getSuffixEgJRorIII());
+            valprefix = Hl7DataHandlerUtil.getStringValue(xcn.getPrefixEgDR());
+            valfirst = Hl7DataHandlerUtil.getStringValue(xcn.getGivenName());
+            valmiddle = Hl7DataHandlerUtil.getStringValue(xcn.getSecondAndFurtherGivenNamesOrInitialsThereof());
+            valfamily = Hl7DataHandlerUtil.getStringValue(xcn.getFamilyName());
+            valsuffix = Hl7DataHandlerUtil.getStringValue(xcn.getSuffixEgJRorIII());
 
-            if (valprefix != null) {
-                sb.append(valprefix).append(" ");
-            }
-            if (valfirst != null) {
-                sb.append(valfirst).append(" ");
-            }
-            if (valmiddle != null) {
-                sb.append(valmiddle).append(" ");
-            }
-            if (valfamily != null) {
-                sb.append(valfamily).append(" ");
-            }
-            if (valsuffix != null) {
-                sb.append(valsuffix).append(" ");
-            }
-            String name = sb.toString();
-            if (StringUtils.isNotBlank(name)) {
-                return name.trim();
-            }
         }
-        return null;
+        else if (value instanceof PPN) {
+            PPN ppn = (PPN) value;
+            valprefix = Hl7DataHandlerUtil.getStringValue(ppn.getPrefixEgDR());
+            valfirst = Hl7DataHandlerUtil.getStringValue(ppn.getGivenName());
+            valmiddle = Hl7DataHandlerUtil.getStringValue(ppn.getSecondAndFurtherGivenNamesOrInitialsThereof());
+            valfamily = Hl7DataHandlerUtil.getStringValue(ppn.getFamilyName());
+            valsuffix = Hl7DataHandlerUtil.getStringValue(ppn.getSuffixEgJRorIII());
+        }
+
+        if (valprefix != null) {
+            sb.append(valprefix).append(" ");
+        }
+        if (valfirst != null) {
+            sb.append(valfirst).append(" ");
+        }
+        if (valmiddle != null) {
+            sb.append(valmiddle).append(" ");
+        }
+        if (valfamily != null) {
+            sb.append(valfamily).append(" ");
+        }
+        if (valsuffix != null) {
+            sb.append(valsuffix).append(" ");
+        }
+        String name = sb.toString();
+        if (StringUtils.isNotBlank(name)) {
+            return name.trim();
+        }
+        else return null;
     };
 
     public static final ValueExtractor<Object, String> ADMINISTRATIVE_GENDER_CODE_FHIR = (Object value) -> {
@@ -190,11 +210,21 @@ public class SimpleDataValueResolver {
 
     public static final ValueExtractor<Object, String> MEDREQ_STATUS_CODE_FHIR = (Object value) -> {
     	String val = Hl7DataHandlerUtil.getStringValue(value);
-        String code = getFHIRCode(val, "MedicationRequestStatus");
+        String code = getFHIRCode(val, MedicationRequest.MedicationRequestStatus.class);
         if (code != null) {
             return code;
         }
         return "unknown"; // when the HL7 status codes get mapped in v2toFhirMapping, we will return code. "unknown" is being returned because the hl7 message is not mapped to fhir yet.
+    };
+
+    public static final ValueExtractor<Object, SimpleCode> MEDREQ_CATEGORY_CODE_FHIR = (Object value) -> {
+        String val = Hl7DataHandlerUtil.getStringValue(value);
+        String code = getFHIRCode(val, MedicationRequestCategory.class);
+        if (code != null) {
+            MedicationRequestCategory category = MedicationRequestCategory.fromCode(code);
+            return new SimpleCode(code, "http://terminology.hl7.org/CodeSystem/medicationrequest-category", category.getDisplay()); // category.getSystem() returns http://hl7.org/fhir/medication-request-category which is invalid so we hardcode the system with the proper url
+        } else
+            return null;
     };
 
     public static final ValueExtractor<Object, String> OBSERVATION_STATUS_CODE_FHIR = (Object value) -> {
@@ -618,12 +648,13 @@ public class SimpleDataValueResolver {
             try {
                 return UUID.fromString(value);
             } catch (IllegalArgumentException e) {
-                LOGGER.warn("Value not valid UUID, value: {}  failure reason {}", value, e.getMessage());
+                LOGGER.warn("Value not valid UUID");
                 LOGGER.debug("Value not valid UUID, value: {}", value, e);
                 return null;
             }
         } else {
-            LOGGER.info("Value for  UUID is null, value: {}", value);
+            LOGGER.info("Value for UUID is null");
+            LOGGER.debug("Value for UUID is null, value: {}", value);
             return null;
         }
     }
@@ -633,8 +664,8 @@ public class SimpleDataValueResolver {
             UUID.fromString(val);
             return true;
         } catch (IllegalArgumentException e) {
-            LOGGER.warn("Not a valid UUID reason {} ", e.getMessage());
-            LOGGER.debug("Not a valid UUID ", e);
+            LOGGER.warn("Could not extract valid UUID - not a valid UUID");
+            LOGGER.debug("Not a valid UUID", e);
             return false;
         }
     }

@@ -1,5 +1,6 @@
 {
-    "tabWidth": 2,
+    "tabWidth": 4,
+    "useTabs": true,
     "semi": false,
     "singleQuote": true,
     "proseWrap": "preserve"

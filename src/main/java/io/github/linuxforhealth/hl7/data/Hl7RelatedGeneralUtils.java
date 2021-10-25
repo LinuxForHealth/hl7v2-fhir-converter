@@ -91,7 +91,8 @@ public class Hl7RelatedGeneralUtils {
     }
 
     public static String getEncounterStatus(Object var1, Object var2, Object var3) {
-        LOGGER.info("Generating encounter status from var1{}, var2 {}, var3 {}", var1, var2, var3);
+        LOGGER.info("Generating encounter status");
+        LOGGER.debug("Generating encounter status from var1{}, var2 {}, var3 {}", var1, var2, var3);
         EncounterStatus status = EncounterStatus.UNKNOWN;
         if (var1 != null) {
             status = EncounterStatus.FINISHED;
@@ -104,8 +105,8 @@ public class Hl7RelatedGeneralUtils {
     }
 
     public static String generateName(Object prefix, Object first, Object middle, Object family, Object suffix) {
-        LOGGER.info("Generating name from  from prefix {}, first {}, middle {}, family {} ,suffix {}", prefix, first, middle,
-                family, suffix);
+        LOGGER.info("Generating name");
+        LOGGER.debug("Generating name from  from prefix {}, first {}, middle {}, family {} ,suffix {}", prefix, first, middle, family, suffix);
         StringBuilder sb = new StringBuilder();
         String valprefix = Hl7DataHandlerUtil.getStringValue(prefix);
         String valfirst = Hl7DataHandlerUtil.getStringValue(first);
@@ -147,17 +148,18 @@ public class Hl7RelatedGeneralUtils {
      */
 
     public static Long diffDateMin(Object start, Object end) {
-        LOGGER.info("Generating time diff in min  from var1 {}, var2 {}", start, end);
+        LOGGER.info("Generating time diff");
+        LOGGER.debug("Generating time diff in min  from var1 {}, var2 {}", start, end);
         try {
             Temporal date1 = DateUtil.getTemporal(Hl7DataHandlerUtil.getStringValue(start));
             Temporal date2 = DateUtil.getTemporal(Hl7DataHandlerUtil.getStringValue(end));
-            LOGGER.info("temporal dates start: {} , end: {} ", date1, date2);
+            LOGGER.info("computing temporal dates"); 
+            LOGGER.debug("temporal dates start: {} , end: {} ", date1, date2);
             if (date1 != null && date2 != null) {
                 return ChronoUnit.MINUTES.between(date1, date2);
             }
         } catch (UnsupportedTemporalTypeException e) {
-            LOGGER.warn("Cannot evaluate time difference for start: {} , end: {} reason {} ", start, end,
-                    e.getMessage());
+            LOGGER.warn("Cannot evaluate time difference.");
             LOGGER.debug("Cannot evaluate time difference for start: {} , end: {} ", start, end, e);
             return null;
         }
@@ -223,7 +225,8 @@ public class Hl7RelatedGeneralUtils {
     }
 
     public static String getAddressUse(String xad7Type, String xad16Temp, String xad17Bad) {
-        LOGGER.info("Calculating address Use from XAD.7 {}, XAD.16 {}, XAD.17 {}", xad7Type, xad16Temp, xad17Bad);
+        LOGGER.info("Calculating Address Use");
+        LOGGER.debug("Calculating address Use from XAD.7 {}, XAD.16 {}, XAD.17 {}", xad7Type, xad16Temp, xad17Bad);
 
         String addressUse = "";
         if (xad16Temp != null && xad16Temp.equalsIgnoreCase("Y")
@@ -245,7 +248,8 @@ public class Hl7RelatedGeneralUtils {
     }
 
     public static String getAddressType(String xad7Type, String xad18Type) {
-        LOGGER.info("Calculating address Type from XAD.7 {}, XAD.18 {}", xad7Type, xad18Type);
+        LOGGER.info("Calculating Address Type");
+        LOGGER.debug("Calculating address Type from XAD.7 {}, XAD.18 {}", xad7Type, xad18Type);
 
         String addressType = "";
         if (xad18Type != null && xad18Type.equalsIgnoreCase("M")
@@ -269,7 +273,8 @@ public class Hl7RelatedGeneralUtils {
      */
     public static String getAddressDistrict(String patientCountyPid12, String addressCountyParishPid119,
             Object patient) {
-        LOGGER.info("getAddressCountyParish for {}", patient);
+        LOGGER.info("Calculating AddressCountyParish");
+        LOGGER.debug("getAddressCountyParish for {}", patient);
 
         String returnDistrict = addressCountyParishPid119;
         if (returnDistrict == null) {

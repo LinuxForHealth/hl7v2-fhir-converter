@@ -84,8 +84,8 @@ public class HL7ADTMessageTest {
                 Bundle b = (Bundle) bundleResource;
                 List<BundleEntryComponent> e = b.getEntry();
 
-                // Expecting 5 resources: Encounter, Patient, Observation, AllergyIntolerance, and Condition
-                assertThat(e.size()).isEqualTo(5);
+                // Expecting 4 resources: Encounter, Patient, AllergyIntolerance, and Condition
+                assertThat(e.size()).isEqualTo(4);
 
                 List<Resource> patientResource = e.stream()
                                 .filter(v -> ResourceType.Patient == v.getResource().getResourceType())
@@ -100,7 +100,8 @@ public class HL7ADTMessageTest {
                 List<Resource> observationResource = e.stream()
                                 .filter(v -> ResourceType.Observation == v.getResource().getResourceType())
                                 .map(BundleEntryComponent::getResource).collect(Collectors.toList());
-                assertThat(observationResource).hasSize(1);
+                // No Observation resource because OBX.2 is type TX                        
+                assertThat(observationResource).isEmpty();
 
                 List<Resource> allergyIntoleranceResource = e.stream()
                                 .filter(v -> ResourceType.AllergyIntolerance == v.getResource().getResourceType())
@@ -263,8 +264,8 @@ public class HL7ADTMessageTest {
                 Bundle b = (Bundle) bundleResource;
                 List<BundleEntryComponent> e = b.getEntry();
 
-                // Expecting 5 total resources
-                assertThat(e.size()).isEqualTo(5);
+                // Expecting 4 total resources.  Not expecting an Observation
+                assertThat(e.size()).isEqualTo(4);
                 
                 List<Resource> patientResource = e.stream()
                                 .filter(v -> ResourceType.Patient == v.getResource().getResourceType())
@@ -279,7 +280,8 @@ public class HL7ADTMessageTest {
                 List<Resource> observationResource = e.stream()
                                 .filter(v -> ResourceType.Observation == v.getResource().getResourceType())
                                 .map(BundleEntryComponent::getResource).collect(Collectors.toList());
-                assertThat(observationResource).hasSize(1);
+                // No Observation resource because OBX.2 is type TX        
+                assertThat(observationResource).isEmpty();
 
                 List<Resource> allergyIntoleranceResource = e.stream()
                                 .filter(v -> ResourceType.AllergyIntolerance == v.getResource().getResourceType())
@@ -387,7 +389,7 @@ public class HL7ADTMessageTest {
                 List<Resource> encounterResource = e.stream()
                                 .filter(v -> ResourceType.Encounter == v.getResource().getResourceType())
                                 .map(BundleEntryComponent::getResource).collect(Collectors.toList());
-                assertThat(encounterResource).hasSize(0);
+                assertThat(encounterResource).isEmpty();
 
         }
 
@@ -421,7 +423,7 @@ public class HL7ADTMessageTest {
                 List<Resource> encounterResource = e.stream()
                                 .filter(v -> ResourceType.Encounter == v.getResource().getResourceType())
                                 .map(BundleEntryComponent::getResource).collect(Collectors.toList());
-                assertThat(encounterResource).hasSize(0);
+                assertThat(encounterResource).isEmpty();
 
         }
 

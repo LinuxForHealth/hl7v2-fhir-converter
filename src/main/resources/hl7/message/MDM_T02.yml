@@ -31,13 +31,25 @@ resources:
         - EVN
         - MSH
 
+    # This group placement of OBX matches the parser, but not the documented groups in the HL7 Standard v2.6 at vico.org.  
     - resourceName: Observation
-      segment: OBX
+      segment: .OBX
       resourcePath: resource/Observation
+      group: OBSERVATION
       repeats: true
       isReferenced: true
       additionalSegments:
         - MSH
+
+    - resourceName: ServiceRequest
+      segment: COMMON_ORDER.ORC
+      resourcePath: resource/ServiceRequest
+      repeats: true
+      additionalSegments:
+        - COMMON_ORDER.OBR
+        - MSH
+        - PV1
+        - PID   
 
     - resourceName: DocumentReference
       segment: TXA

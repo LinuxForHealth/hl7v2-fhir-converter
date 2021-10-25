@@ -388,7 +388,7 @@ public class Hl7IdentifierFHIRConversionTest {
               + "PID|||555444222111^^^MPI&GenHosp&L^MR||james^anderson||19600614|M||C|||^^^^^626^5641111|^^^^^626^5647654||||||||N\r"
               + "PV1||I|6N^1234^A^GENHOS||||0100^ANDERSON^CARL|0148^ADDISON^JAMES||SUR|||||||0148^ANDERSON^CARL|S|1400|A|||||||||||||||||||SF|K||||199501102300\r"
               + "PRB|AD|200603150625|aortic stenosis|53692||2||200603150625\r"
-              + "OBX|1|TX|DINnumber^^LSFUSERDATAE||ECHOCARDIOGRAPHIC REPORT||||||F|||20150930164100|||\r"
+              + "OBX|1|ST|DINnumber^^LSFUSERDATAE||ECHOCARDIOGRAPHIC REPORT||||||F|||20150930164100|||\r"
               + "ORC|NW|PON001|FON001|PGN001|SC|D|1||20170825010500|MS|MS||||20170825010500|";
         observation = ResourceUtils.getObservation(msg);
 
@@ -408,7 +408,7 @@ public class Hl7IdentifierFHIRConversionTest {
               + "PID|||555444222111^^^MPI&GenHosp&L^MR||james^anderson||19600614|M||C|99 Oakland #106^^qwerty^OH^44889||||||||||N\r"
               + "PV1||I|6N^1234^A^GENHOS||||0100^ANDERSON^CARL|0148^ADDISON^JAMES||SUR|||||||0148^ANDERSON^CARL|S|1400|A||SF|K||||199501102300\r"
               + "PRB|AD|200603150625|aortic stenosis|53692||2||200603150625\r"
-              + "OBX|1|TX|DINnumber||ECHOCARDIOGRAPHIC REPORT||||||F|||20150930164100|||\r"
+              + "OBX|1|ST|DINnumber||ECHOCARDIOGRAPHIC REPORT||||||F|||20150930164100|||\r"
               + "ORC|NW|PON001|||SC|D|1||20170825010500|MS|MS|||||";
         observation = ResourceUtils.getObservation(msg);
 
@@ -721,8 +721,6 @@ public class Hl7IdentifierFHIRConversionTest {
                          "OBR|1||CD_000000^IE|2244^General Order|||20170825010500||||||Relevant Clinical Information|||||||002|||||F|||550600^Tsadok550600^Janetary~660600^Merrit660600^Darren^F~770600^Das770600^Surjya^P~880600^Winter880600^Oscar^||||770600&Das770600&Surjya&P^^^6N^1234^A|\n" +
                          "TXA|1||B45678||||||\n";
 
-
-
         DocumentReference report = ResourceUtils.getDocumentReference(documentReference);
 
          // Expect 3 identifiers
@@ -856,8 +854,7 @@ public class Hl7IdentifierFHIRConversionTest {
          assertThat(coding.getDisplay()).isEqualTo("Placer Identifier");
      }
 
-
-
+     
     @Test
     public void serviceRequestIdentifierTest1() {
         // Test 1 removed:  OMP_O09 messages do not create a service request
@@ -868,7 +865,8 @@ public class Hl7IdentifierFHIRConversionTest {
         String serviceRequest = "MSH|^~\\&|SendTest1|Sendfac1|Receiveapp1|Receivefac1|200603081747|security|PPR^PC1^PPR_PC1|1|P^I|2.6||||||ASCII||\n" +
                 "PID|1||000054321^^^MRN|||||||||||||M|CAT|78654||||N\n" +
                 "PRB|AD|200603150625|aortic stenosis|53692||2||200603150625\n" +
-                "ORC||||||E|^Q6H^D10^^^R\n" +
+                // ORC.4 is not used as an identifier
+                "ORC||||PG1234567^MYPG||E|^Q6H^D10^^^R\n" +
                 "OBR|1|CD150920001336^OE|CD150920001336^IE|||20150930000000|20150930164100|||||||||25055^MARCUSON^PATRICIA^L|||||||||F|||5755^DUNN^CHAD^B~25055^MARCUSON^PATRICIA^L|||WEAKNESS|DAS, SURJYA P||SHIELDS, SHARON A|||||||||";
 
         ServiceRequest serviceReq = ResourceUtils.getServiceRequest(serviceRequest);
@@ -950,6 +948,161 @@ public class Hl7IdentifierFHIRConversionTest {
 
     }
 
+
+    // NOTE: ORU_RO1 records do not create the ServiceRequest directly.  They create a DiagnosticReport and it creates the ServiceRequest.
+    // This test makes sure the specification for ORU_RO1.DiagnosticReport is specifying PID and PV1 correctly in AdditionalSegments.
+    @Test
+    public void serviceRequestIdentifierTest2() {
+        // Test 1:
+        //  - Visit number with PV1.19
+        //  - filler and placer from OBR
+        String serviceRequest = "MSH|^~\\&|||||20180924152907|34001|ORU^R01^ORU_R01|213|T|2.6|||||||||||\n"
+        // PID.18 is ignored as visit number identifier because PV1.19 is present
+        + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
+        // PV1.19 is used as the identifier visit number
+        + "PV1|1|E|||||||||||||||||78654||||||||||||||||||||||||||\n"
+        //  1. ORC.2 empty so OBR.2 is used
+        //  2. ORC.3 empty so OBR.3 is used
+        + "ORC|RE|||ML18267-C00001^Beaker||||||||||||||||||||||||||||||||||\n"
+        //  10. OBR.3 used for Filler 
+        //  11. OBR.2 used for Placer
+        + "OBR|1|CD150920001336^OE|CD150920001336^IE|83036E^HEMOGLOBIN A1C^PACSEAP^^^^^^HEMOGLOBIN A1C|||||||||||||||||||||||||||||||||||||||||||\n";
+
+        ServiceRequest serviceReq = ResourceUtils.getServiceRequest(serviceRequest);
+
+        // Expect 3 identifiers
+        assertThat(serviceReq.hasIdentifier()).isTrue();
+        assertThat(serviceReq.getIdentifier()).hasSize(3);
+
+        // Identifier 1: visit number should be set by PV1.19
+        Identifier identifier = serviceReq.getIdentifier().get(0);
+        String value = identifier.getValue();
+        String system = identifier.getSystem();
+        assertThat(value).isEqualTo("78654"); // PV1.19
+        assertThat(system).isNull();
+        CodeableConcept type = identifier.getType();
+        DatatypeUtils.checkCommonCodeableConceptAssertions(type, "VN", "Visit number", "http://terminology.hl7.org/CodeSystem/v2-0203", null);
+
+        // Identifier 2: filler
+        identifier = serviceReq.getIdentifier().get(1);
+        value = identifier.getValue();
+        system = identifier.getSystem();
+        assertThat(value).isEqualTo("CD150920001336"); // OBR.3.1
+        assertThat(system).isEqualTo("urn:id:IE"); // OBR.3.2
+        type = identifier.getType();
+        DatatypeUtils.checkCommonCodeableConceptAssertions(type, "FILL", "Filler Identifier", "http://terminology.hl7.org/CodeSystem/v2-0203", null);
+
+        //Identifier 3: placer
+        identifier = serviceReq.getIdentifier().get(2);
+        value = identifier.getValue();
+        system = identifier.getSystem();
+        assertThat(value).isEqualTo("CD150920001336"); // OBR.2.1
+        assertThat(system).isEqualTo("urn:id:OE"); // OBR.2.2
+        type = identifier.getType();
+        DatatypeUtils.checkCommonCodeableConceptAssertions(type, "PLAC", "Placer Identifier", "http://terminology.hl7.org/CodeSystem/v2-0203", null);
+
+        // Test 2
+        //  - Visit number with PID.18
+        //  - filler from ORC
+        //  - placer from ORC
+        serviceRequest = 
+        "MSH|^~\\&|||||20180924152907|34001|ORU^R01^ORU_R01|213|T|2.6|||||||||||\n"
+        // PID.18 is used as backup identifier visit number because PV1.19 is empty
+        + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||665544||||||||||||\n"
+        // PV1.19 is empty and not used as visit number identifier 
+        + "PV1|1|E|||||||||||||||||||||||||||||||||||||||||||\n"
+        //  1. ORC.2 is used as Placer because it has priority over OBR.2
+        //  1. ORC.3 is used as Filler because it has priority over OBR.3
+        + "ORC|RE|248648498|248648499|ML18267-C00001^Beaker||||||||||||||||||||||||||||||||||||\n"
+        //  10. OBR.2 ignored as Placer
+        //  11. OBR.3 ignored as Filler
+        + "OBR|1|CD150920001336|CD150920001336|83036E^HEMOGLOBIN A1C^PACSEAP^^^^^^HEMOGLOBIN A1C||||||||||||||||||||||||||||||||||||||||||||\n";
+
+        serviceReq = ResourceUtils.getServiceRequest(serviceRequest);
+
+        // Expect 3 identifiers
+        assertThat(serviceReq.hasIdentifier()).isTrue();
+        assertThat(serviceReq.getIdentifier()).hasSize(3);
+
+        // Identifier 1: visit number should be set by PID.18
+        identifier = serviceReq.getIdentifier().get(0);
+        value = identifier.getValue();
+        system = identifier.getSystem();
+        assertThat(value).isEqualTo("665544"); // PID.18
+        assertThat(system).isNull();
+        type = identifier.getType();
+        DatatypeUtils.checkCommonCodeableConceptAssertions(type, "VN", "Visit number", "http://terminology.hl7.org/CodeSystem/v2-0203", null);
+
+        // Identifier 2: filler
+        identifier = serviceReq.getIdentifier().get(1);
+        value = identifier.getValue();
+        system = identifier.getSystem();
+        assertThat(value).isEqualTo("248648499"); // ORC.3
+        assertThat(system).isNull();
+        type = identifier.getType();
+        DatatypeUtils.checkCommonCodeableConceptAssertions(type, "FILL", "Filler Identifier", "http://terminology.hl7.org/CodeSystem/v2-0203", null);
+
+        //Identifier 3: placer
+        identifier = serviceReq.getIdentifier().get(2);
+        value = identifier.getValue();
+        system = identifier.getSystem();
+        assertThat(value).isEqualTo("248648498"); // ORC.2
+        assertThat(system).isNull();
+        type = identifier.getType();
+        DatatypeUtils.checkCommonCodeableConceptAssertions(type, "PLAC", "Placer Identifier", "http://terminology.hl7.org/CodeSystem/v2-0203", null);
+
+        // Test 3:
+        //  - MSH.7 as the visit number
+        //  - filler from ORC
+        //  - placer from ORC
+        serviceRequest =  "MSH|^~\\&|||||20180924152907|34001|ORU^R01^ORU_R01|213|T|2.6|||||||||||\n"
+        // PID.18 is empty so MSH.7 with be used as backup identifier visit number 
+        + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
+        // PV1.19 is empty so MSH.7 with be used as backup identifier visit number 
+        + "PV1|1|E|||||||||||||||||||||||||||||||||||||||||||\n"
+        //  1. ORC.2 is used as Placer because it has priority over OBR.2
+        //  1. ORC.3 is used as Filler because it has priority over OBR.3
+        + "ORC|RE|222298|222299|ML18267-C00001^Beaker||||||||||||||||||||||||||||\n"
+        //  10. OBR.2 ignored as Placer
+        //  11. OBR.3 ignored as Filler
+        + "OBR|1|||83036E^HEMOGLOBIN A1C^PACSEAP^^^^^^HEMOGLOBIN A1C|||||||||||||||||||||||||||||||||||||||||||\n";
+
+        serviceReq = ResourceUtils.getServiceRequest(serviceRequest);
+
+        // Expect 3 identifiers
+        assertThat(serviceReq.hasIdentifier()).isTrue();
+        assertThat(serviceReq.getIdentifier()).hasSize(3);
+
+        // Identifier 1: visit number should be set by MSH.7
+        identifier = serviceReq.getIdentifier().get(0);
+        value = identifier.getValue();
+        system = identifier.getSystem();
+        assertThat(value).isEqualTo("20180924152907"); // MSH.7
+        assertThat(system).isNull();
+        type = identifier.getType();
+        DatatypeUtils.checkCommonCodeableConceptAssertions(type, "VN", "Visit number", "http://terminology.hl7.org/CodeSystem/v2-0203", null);
+
+        // Identifier 2: filler
+        identifier = serviceReq.getIdentifier().get(1);
+        value = identifier.getValue();
+        system = identifier.getSystem();
+        assertThat(value).isEqualTo("222299"); // ORC.3
+        assertThat(system).isNull();
+        type = identifier.getType();
+        DatatypeUtils.checkCommonCodeableConceptAssertions(type, "FILL", "Filler Identifier", "http://terminology.hl7.org/CodeSystem/v2-0203", null);
+
+        //Identifier 3: placer
+        identifier = serviceReq.getIdentifier().get(2);
+        value = identifier.getValue();
+        system = identifier.getSystem();
+        assertThat(value).isEqualTo("222298"); // ORC.2
+        assertThat(system).isNull();
+        type = identifier.getType();
+        DatatypeUtils.checkCommonCodeableConceptAssertions(type, "PLAC", "Placer Identifier", "http://terminology.hl7.org/CodeSystem/v2-0203", null);
+
+    }
+
+
     @Test
     public void medicationRequestIdentifierTest() {
         // Visit number from PID-18, extID from RXO-1.1
@@ -960,9 +1113,9 @@ public class Hl7IdentifierFHIRConversionTest {
                 + "RXO|RX700001^DOCUSATE SODIUM 100 MG CAPSULE|100||mg|||||G||10||5|\r";
         MedicationRequest medReq = ResourceUtils.getMedicationRequest(medicationRequest);
 
-        // Expect 2 identifiers
+        // Expect 4 identifiers
         assertThat(medReq.hasIdentifier()).isTrue();
-        assertThat(medReq.getIdentifier()).hasSize(2);
+        assertThat(medReq.getIdentifier()).hasSize(4);
 
         // Identifier 1: Visit number
         Identifier identifier = medReq.getIdentifier().get(0);
@@ -980,11 +1133,29 @@ public class Hl7IdentifierFHIRConversionTest {
         assertThat(value).isEqualTo("RX700001"); // RXO-1.1
         assertThat(system).isEqualTo("urn:id:extID");
 
+        // Identifier 3: Filler
+        identifier = medReq.getIdentifier().get(2);
+        value = identifier.getValue();
+        system = identifier.getSystem();
+        assertThat(value).isEqualTo("CD2017071101"); // ORC-3.1
+        assertThat(system).isEqualTo("urn:id:RX"); // ORC-3.2 any whitespace gets replaced with underscores
+        type = identifier.getType();
+        DatatypeUtils.checkCommonCodeableConceptAssertions(type, "FILL", "Filler Identifier", "http://terminology.hl7.org/CodeSystem/v2-0203", null);
+
+        // Identifier 4: Placer
+        identifier = medReq.getIdentifier().get(3);
+        value = identifier.getValue();
+        system = identifier.getSystem();
+        assertThat(value).isEqualTo("PON001"); // ORC-3.1
+        assertThat(system).isEqualTo("urn:id:OE"); // ORC-3.2 any whitespace gets replaced with underscores
+        type = identifier.getType();
+        DatatypeUtils.checkCommonCodeableConceptAssertions(type, "PLAC", "Placer Identifier", "http://terminology.hl7.org/CodeSystem/v2-0203", null);
+
         // Test: Visit number from PV1-19, extID from RXO-1.1 and RXO-1.3
         medicationRequest = "MSH|^~\\&|PROSLOV|MYHOSPITAL|WHIA|IBM|20170215080000||OMP^O09|MSGID005520|T|2.6|||AL|NE|764|ASCII||||||^4086::132:2A57:3C28^IPv6\r"
                 + "PID|1||000054321^^^MRN|||||||||||||||78654\r"
                 + "PV1||I|||||||||||||||||789789\r"
-                + "ORC|NW|PON001^OE|CD2017071101^RX|||E|10^BID^D4^^^R||20170215080000\r"
+                + "ORC|NW|||||E|10^BID^D4^^^R||20170215080000\r"
                 + "RXO|RX700001^DOCUSATE SODIUM 100 MG CAPSULE^ABC|100||mg|||||G||10||5|\r";
         medReq = ResourceUtils.getMedicationRequest(medicationRequest);
 
@@ -1012,13 +1183,13 @@ public class Hl7IdentifierFHIRConversionTest {
         medicationRequest = "MSH|^~\\&|PROSLOV|MYHOSPITAL|WHIA|IBM|20170215080000||OMP^O09|MSGID005520|T|2.6|||AL|NE|764|ASCII||||||^4086::132:2A57:3C28^IPv6\r"
                 + "PID|1||000054321^^^MRN\r"
                 + "PV1||I||||||||SUR||||||||S||A|||||||||||||||||||SF|K||||20170215080000\r"
-                + "ORC|NW|PON001^OE|CD2017071101^RX|||E|10^BID^D4^^^R||20170215080000\r"
+                + "ORC|NW||CD2017071101^RX|||E|10^BID^D4^^^R||20170215080000\r"
                 + "RXO|^DOCUSATE SODIUM 100 MG CAPSULE|100||mg|||||G||10||5|\r";
         medReq = ResourceUtils.getMedicationRequest(medicationRequest);
 
-        // Expect 2 identifiers
+        // Expect 3 identifiers
         assertThat(medReq.hasIdentifier()).isTrue();
-        assertThat(medReq.getIdentifier()).hasSize(2);
+        assertThat(medReq.getIdentifier()).hasSize(3);
 
         // Identifier 1: Visit number
         identifier = medReq.getIdentifier().get(0);
@@ -1036,11 +1207,20 @@ public class Hl7IdentifierFHIRConversionTest {
         assertThat(value).isEqualTo("DOCUSATE SODIUM 100 MG CAPSULE"); // RXO-1.2
         assertThat(system).isEqualTo("urn:id:extID");
 
+        // Identifier 3: Filler
+        identifier = medReq.getIdentifier().get(2);
+        value = identifier.getValue();
+        system = identifier.getSystem();
+        assertThat(value).isEqualTo("CD2017071101"); // ORC.3.1
+        assertThat(system).isEqualTo("urn:id:RX"); // ORC-3.2 any whitespace gets replaced with underscores
+        type = identifier.getType();
+        DatatypeUtils.checkCommonCodeableConceptAssertions(type, "FILL", "Filler Identifier", "http://terminology.hl7.org/CodeSystem/v2-0203", null);
+
         // Test: Visit number from MSH-7, no RXO-1
         medicationRequest = "MSH|^~\\&|PROSLOV|MYHOSPITAL|WHIA|IBM|20170215080000||RDE^O11^RDE_O11|MSGID005520|T|2.6|||AL|NE|764|ASCII||||||^4086::132:2A57:3C28^IPv6\r"
                 + "PID|1||000054321^^^MRN\r"
                 + "PV1||I||||||||SUR||||||||S||A|||||||||||||||||||SF|K||||20170215080000\r"
-                + "ORC|NW|PON001^OE|CD2017071101^RX|||E|10^BID^D4^^^R||20170215080000\r"
+                + "ORC|NW|||||E|10^BID^D4^^^R||20170215080000\r"
                 + "RXO|||||||||G||10||5|\r"
                 + "RXE|^^^20170923230000^^R|999^Ampicillin 250 MG TAB^NDC|100||mg|123^test^ABC||||10||5|";
         medReq = ResourceUtils.getMedicationRequest(medicationRequest);
@@ -1069,7 +1249,7 @@ public class Hl7IdentifierFHIRConversionTest {
         medicationRequest = "MSH|^~\\&|PROSLOV|MYHOSPITAL|WHIA|IBM|20170215080000||RDE^O11^RDE_O11|MSGID005520|T|2.6|||AL|NE|764|ASCII||||||^4086::132:2A57:3C28^IPv6\r"
                 + "PID|1||000054321^^^MRN|||||||||||||||78654\r"
                 + "PV1||I|||||||||||||||||789789\r"
-                + "ORC|NW|PON001^OE|CD2017071101^RX|||E|10^BID^D4^^^R||20170215080000\r"
+                + "ORC|NW|||||E|10^BID^D4^^^R||20170215080000\r"
                 + "RXE|^^^20170923230000^^R|999^Ampicillin 250 MG TAB^NDC|100||mg|123^test^ABC||||10||5|";
         medReq = ResourceUtils.getMedicationRequest(medicationRequest);
 

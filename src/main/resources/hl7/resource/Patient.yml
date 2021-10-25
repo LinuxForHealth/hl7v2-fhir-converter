@@ -204,9 +204,11 @@ communication:
       language: PID.15
 
 active:
+   condition: $mrgSegment NOT_NULL
    type: BOOLEAN  
    valueOf: true
-
+   vars: 
+      mrgSegment: MRG
 
 link:
    generateList: true

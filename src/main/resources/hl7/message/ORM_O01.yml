@@ -70,3 +70,13 @@ resources:
       - .ORC
       - PATIENT.PATIENT_VISIT.PV1
       - PATIENT.PID
+
+  - resourceName: DocumentReference
+    segment: ORDER.ORC
+    resourcePath: resource/DocumentReference
+    additionalSegments:
+      - ORDER.ORDER_DETAIL.OBR
+      - ORDER.ORDER_DETAIL.OBSERVATION.OBX
+      - PATIENT.PATIENT_VISIT.PV1
+      - MSH
+      - PATIENT.PID

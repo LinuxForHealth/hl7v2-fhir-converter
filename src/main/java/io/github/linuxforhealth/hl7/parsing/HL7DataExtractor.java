@@ -31,7 +31,7 @@ import io.github.linuxforhealth.hl7.parsing.result.Hl7ParsingTypeResult;
 import io.github.linuxforhealth.hl7.parsing.result.ParsingResult;
 
 public class HL7DataExtractor {
-  private static final String CANNOT_EXTRACT_VALUE_FOR_REP_REASON = "Cannot extract value for {} rep {} reason {}";
+  private static final String CANNOT_EXTRACT_VALUE_FOR_REP_REASON = "Cannot extract value for {} rep {}";
 
   private static final String SEGMENT_CANNOT_BE_NULL_OR_EMPTY = "segment cannot be null or empty";
 
@@ -93,8 +93,8 @@ public class HL7DataExtractor {
       return parsingResult;
     } catch (HL7Exception | IllegalArgumentException | ArrayIndexOutOfBoundsException e) {
       String spec = group + " " + groupRep + " " + segment;
-      LOGGER.debug("Cannot extract value for {} rep {} ", spec, rep, e);
-      LOGGER.warn(CANNOT_EXTRACT_VALUE_FOR_REP_REASON, spec, rep, e.getMessage());
+      LOGGER.debug(CANNOT_EXTRACT_VALUE_FOR_REP_REASON, spec, rep, e);
+      LOGGER.warn(CANNOT_EXTRACT_VALUE_FOR_REP_REASON, spec, rep);
       return new Hl7ParsingStructureResult(new ArrayList<>());
 
     }
@@ -128,7 +128,7 @@ public class HL7DataExtractor {
     } catch (HL7Exception | IllegalArgumentException | ArrayIndexOutOfBoundsException e) {
       String spec = group + " " + groupRep + " " + segment;
       LOGGER.debug("Cannot extract value for {} ", spec, e);
-      LOGGER.warn("Cannot extract value for {} reason {}", spec, e.getMessage());
+      LOGGER.warn("Cannot extract value for {} ", spec);
 
       return new Hl7ParsingStructureResult(new ArrayList<>());
 
@@ -147,8 +147,8 @@ public class HL7DataExtractor {
 
 
     } catch (IllegalArgumentException | HL7Exception | ArrayIndexOutOfBoundsException e) {
-      LOGGER.debug("Cannot extract value for {}  ", spec, e);
-      LOGGER.warn("Cannot extract value for {} reason {}", spec, e.getMessage());
+      LOGGER.debug("Cannot extract value for {} ", spec, e);
+      LOGGER.warn("Cannot extract value for {} ", spec);
 
       return false;
     }
@@ -166,8 +166,8 @@ public class HL7DataExtractor {
 
 
     } catch (IllegalArgumentException | HL7Exception | ArrayIndexOutOfBoundsException e) {
-      LOGGER.debug("Cannot extract value for {} rep{}  ", spec, rep, e);
-      LOGGER.warn(CANNOT_EXTRACT_VALUE_FOR_REP_REASON, spec, rep, e.getMessage());
+      LOGGER.debug(CANNOT_EXTRACT_VALUE_FOR_REP_REASON, spec, rep, e);
+      LOGGER.warn(CANNOT_EXTRACT_VALUE_FOR_REP_REASON, spec, rep);
 
       return false;
 
@@ -190,8 +190,8 @@ public class HL7DataExtractor {
       }
       return parsingResult;
     } catch (HL7Exception | IllegalArgumentException | ArrayIndexOutOfBoundsException e) {
-      LOGGER.debug("Cannot extract value for {} rep {}  ", structure, rep, e);
-      LOGGER.warn(CANNOT_EXTRACT_VALUE_FOR_REP_REASON, structure, rep, e.getMessage());
+      LOGGER.debug(CANNOT_EXTRACT_VALUE_FOR_REP_REASON, structure, rep, e);
+      LOGGER.warn(CANNOT_EXTRACT_VALUE_FOR_REP_REASON, structure, rep);
 
       return new Hl7ParsingStructureResult(new ArrayList<>());
     }
@@ -214,8 +214,8 @@ public class HL7DataExtractor {
       }
       return parsingResult;
     } catch (HL7Exception | IllegalArgumentException | ArrayIndexOutOfBoundsException e) {
-      LOGGER.debug("Cannot extract value for {}   ", structure, e);
-      LOGGER.warn("Cannot extract value for {}  reason {}", structure, e.getMessage());
+      LOGGER.debug("Cannot extract value for {} ", structure, e);
+      LOGGER.warn("Cannot extract value for {} ", structure);
 
       return new Hl7ParsingStructureResult(new ArrayList<>());
 
@@ -236,8 +236,7 @@ public class HL7DataExtractor {
     } catch (HL7Exception | IllegalArgumentException | ArrayIndexOutOfBoundsException e) {
 
       LOGGER.debug("Cannot extract value for {} rep {}  field {} ", segment, rep, field, e);
-      LOGGER.warn("Cannot extract value for {} rep {} field {} reason {}", segment, rep, field,
-          e.getMessage());
+      LOGGER.warn("Cannot extract value for {} rep {} field {} ", segment, rep, field);
 
       return new Hl7ParsingTypeResult(new ArrayList<>());
 
@@ -258,9 +257,8 @@ public class HL7DataExtractor {
 
     } catch (HL7Exception | IllegalArgumentException | ArrayIndexOutOfBoundsException e) {
 
-      LOGGER.debug("Cannot extract value for segment {} field {}  ", segment, field, e);
-      LOGGER.warn("Cannot extract value for segment {} field {}, reason {}", segment, field,
-          e.getMessage());
+      LOGGER.debug("Cannot extract value for segment {} field {} ", segment, field, e);
+      LOGGER.warn("Cannot extract value for segment {} field {} ", segment, field);
 
       return new Hl7ParsingTypeResult(new ArrayList<>());
     }
@@ -288,9 +286,8 @@ public class HL7DataExtractor {
 
 
     } catch (IllegalArgumentException | HL7Exception | ArrayIndexOutOfBoundsException e) {
-      LOGGER.debug("Cannot extract value for type {} component {}  ", inputType, component, e);
-      LOGGER.warn("Cannot extract value for type {} component {}, reason {}", inputType, component,
-          e.getMessage());
+      LOGGER.debug("Cannot extract value for type {} component {} ", inputType, component, e);
+      LOGGER.warn("Cannot extract value for type {} component {} ", inputType, component);
 
       return new Hl7ParsingTypeResult(new ArrayList<>());
 
@@ -313,10 +310,9 @@ public class HL7DataExtractor {
       }
       return result;
     } catch (IllegalArgumentException | HL7Exception | ArrayIndexOutOfBoundsException e) {
-      LOGGER.debug("Cannot extract value for type {} component {} subComponent {}  ", inputType,
-          component, subComponent, e);
-      LOGGER.warn("Cannot extract value for type {} component {},subComponent {}, reason {}",
-          inputType, component, subComponent, e.getMessage());
+      LOGGER.debug("Cannot extract value for type {} component {} subComponent {}  ", inputType, component, subComponent, e);
+      LOGGER.warn("Cannot extract value for type {} component {},subComponent {} ",
+          inputType, component, subComponent);
 
       return new Hl7ParsingTypeResult(new ArrayList<>());
     }
@@ -333,7 +329,8 @@ public class HL7DataExtractor {
       String theActualMessageType = msh.getMessageType().getMsg1_MessageCode().getValue() + "_" + msh.getMessageType().getMsg2_TriggerEvent().getValue();
       return theActualMessageType;
     } catch (HL7Exception e){
-      LOGGER.warn("Cannot extract actual message type, reason {}", e.getMessage());
+      LOGGER.warn("Cannot extract actual message type.");
+      LOGGER.debug("Cannot extract actual message type, reason {}", e.getMessage());
     }
     return null;
   }
@@ -369,7 +366,7 @@ public class HL7DataExtractor {
     try {
       return getTerser().get("/MSH-10");
     } catch (HL7Exception | IllegalArgumentException e) {
-      LOGGER.warn("Cannot extract message control id, reason {} ", e.getMessage());
+      LOGGER.warn("Cannot extract message control id.");
       LOGGER.debug("Cannot extract message control id", e);
       return null;
     }
@@ -396,9 +393,8 @@ public class HL7DataExtractor {
       }
       return parsingResult;
     } catch (HL7Exception | IllegalArgumentException | ArrayIndexOutOfBoundsException e) {
-      LOGGER.debug("Cannot extract value for Structure {} Segment {}   ", struct, segment, e);
-      LOGGER.warn("Cannot extract value for Structure {} Segment {}, reason {}", struct, segment,
-          e.getMessage());
+      LOGGER.debug("Cannot extract value for Structure {} Segment {} ", struct, segment, e);
+      LOGGER.warn("Cannot extract value for Structure {} Segment {} ", struct, segment);
 
       return new Hl7ParsingStructureResult(new ArrayList<>());
     }
