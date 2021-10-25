@@ -206,7 +206,7 @@ task deleteJavaDebugLogs {
         FileTree  javaFiles = fileTree('target/main') {
             include '**/*.java'
         }
-        String regex = "LOGGER.debug.*"
+        String regex = "(?ms)(LOGGER.debug.*?;)"
         javaFiles.each { File javaFile ->
             println "Start replacing regex on $javaFile.name"
             String content = javaFile.getText()
