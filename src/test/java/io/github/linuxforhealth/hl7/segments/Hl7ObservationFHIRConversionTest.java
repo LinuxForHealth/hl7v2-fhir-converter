@@ -625,8 +625,8 @@ public class Hl7ObservationFHIRConversionTest {
 
         String hl7message = msh
         + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
-        + "ORC|RE|111|111|3200|||^Every 24 hours&1500^^20210330150000^^ROU||20210407191342|2739^BY^ENTERED|2799^BY^VERIFIED|3122^PROVIDER^ORDERING||(696)901-1300|20210407191342||||||ORDERING FAC NAME|ADDR^^CITY^STATE^ZIP^USA|(515)-290-8888|9999^^CITY^STATE^ZIP^CAN|||||I\n"
-        + "RXE|^Q24H&0600^^20210407191342^^ROU|DEFAULTMED^cefTRIAXone (ROCEPHIN) 2 g in sodium chloride 0.9 % 50 mL IVPB|2||g||||||||12345^LNAME^FNAME\n"
+        + "ORC|RE|||3200|||||20210407191342||2799^BY^VERIFIED||||20210407191342||||||ORDERING FAC NAME||||||||I\r"
+        + "RXE|^Q24H&0600^^20210407191342^^ROU|DEFAULTMED^cefTRIAXone (ROCEPHIN) 2 g in sodium chloride 0.9 % 50 mL IVPB|2||g||||||||\n"
         + "OBX|1|NM|Most Current Weight^Most current measured weight (actual)||90|kg||IND||||||20210320153850||1111^ClinicianLastName^ClinicianFirstName^^^^Title|Manual^Text the 4th^SNM3|Device_1234567^mySystem|20210322153925|Observation Site^Text 5^SNM3|INST^Instance Identifier System||Radiology^Radiological Services|467 Albany Hospital^^Albany^NY|Cardiology^ContactLastName^Jane^Q^^Dr.^MD\r";
 
         HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();

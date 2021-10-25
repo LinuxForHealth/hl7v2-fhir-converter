@@ -378,3 +378,7 @@ MedicationRequestStatus:
    SC: active
    CM: completed
    ER: entered-in-error
+
+MedicationRequestCategory:
+  I: inpatient
+  O: outpatient
