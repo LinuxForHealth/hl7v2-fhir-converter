@@ -460,8 +460,34 @@ public class SimpleDataValueResolver {
             // A non-null, non-empty value in display means a good code from lookup.
             if (coding != null && coding.getDisplay()!=null && !coding.getDisplay().isEmpty()) {
                 return coding;
-            }
+            } 
         }    
+        // All other situations return null.  
+        return null;
+    };
+
+    // Special case of a SYSTEM V2.  User-defined tables IS allow unknown codes.
+    // When an unknown code is detected, return a coding with the code but no system, 
+    // so the code is retained. Only a known code returns a system.
+    // Compare function CODING_SYSTEM_V2_IDENTIFIER for slightly different behavior 
+    public static final ValueExtractor<Object, SimpleCode> CODING_SYSTEM_V2_IS_USER_DEFINED_TABLE = (Object value) -> {
+        value = checkForAndUnwrapVariesObject(value);
+        String table = Hl7DataHandlerUtil.getTableNumber(value);
+        String code = Hl7DataHandlerUtil.getStringValue(value);
+        if (table != null && code != null) {
+            // Found table and a code. Try looking it up.
+            SimpleCode coding = TerminologyLookup.lookup(table, code);
+            // A non-null, non-empty value in display means a good code from lookup.
+            if (coding != null && coding.getDisplay()!=null && !coding.getDisplay().isEmpty()) {
+                return coding;
+            } else { 
+                // Otherwise, must be a user-defined code, so return the code without a system
+                return new SimpleCode(code, null, null, null) ;
+            }
+        } else if (table == null && code != null) {
+            // Handle a code with unknown table
+            return new SimpleCode(code, null, null, null);
+        }
         // All other situations return null.  
         return null;
     };
