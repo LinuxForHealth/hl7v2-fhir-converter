@@ -195,6 +195,17 @@ public class SimpleDataValueResolverTest {
     }
 
     @Test
+    // Tests one leg of CODING_SYSTEM_V2_IS_USER_DEFINED_TABLE that is not covered in other tests
+    public void testCodingSystemV2ISUserDefinedTable() {
+        String code = "ZZZ";
+        SimpleCode coding = SimpleDataValueResolver.CODING_SYSTEM_V2_IS_USER_DEFINED_TABLE.apply(code);
+        assertThat(coding).isNotNull();
+        assertThat(coding.getCode()).isEqualTo(code);
+        assertThat(coding.getSystem()).isNull();
+        assertThat(coding.getDisplay()).isNull();
+    }
+
+    @Test
     public void get_race_value_valid() throws DataTypeException {
         CWE cwe = new CWE(null);
         cwe.getCwe3_NameOfCodingSystem().setValue("HL70005");

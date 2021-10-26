@@ -484,7 +484,10 @@ public class SimpleDataValueResolver {
                 // Otherwise, must be a user-defined code, so return the code without a system
                 return new SimpleCode(code, null, null, null) ;
             }
-        }    
+        } else if (table == null && code != null) {
+            // Handle a code with unknown table
+            return new SimpleCode(code, null, null, null);
+        }
         // All other situations return null.  
         return null;
     };

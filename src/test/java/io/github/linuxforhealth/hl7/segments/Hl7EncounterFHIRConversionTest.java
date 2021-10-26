@@ -46,6 +46,7 @@ import io.github.linuxforhealth.hl7.ConverterOptions;
 import io.github.linuxforhealth.hl7.ConverterOptions.Builder;
 import io.github.linuxforhealth.hl7.HL7ToFHIRConverter;
 import io.github.linuxforhealth.hl7.segments.util.ResourceUtils;
+import io.github.linuxforhealth.hl7.segments.util.DatatypeUtils;
 
 public class Hl7EncounterFHIRConversionTest {
 
@@ -337,44 +338,27 @@ public class Hl7EncounterFHIRConversionTest {
 
     @Test
     public void testEncounterReasonCode() {
-        // EVN.4 for reasonCode; has a known code
+        // EVN.4 and PV2.3 for reasonCode; both with known codes
         String hl7message = "MSH|^~\\&|||||20151008111200||ADT^A01^ADT_A01|MSGID000001|T|2.6|||||||||\n"
                 + "EVN|A04|20151008111200||O|||\n"
                 + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
                 + "PV1|1|E||||||||||||||||||||||||||||||||||||||||||||||||||\n"
-                // PV2.3 is empty on purpose
-                + "PV2|||||Diamond ring|||||||||||||||||||||||||||||||\n";
+                // PV2.3 with known coding
+                + "PV2|||01.4^Fatigue^CCC||Diamond ring|||||||||||||||||||||||||||||||\n";
         Encounter encounter = ResourceUtils.getEncounter(hl7message);
 
         assertThat(encounter.hasReasonCode()).isTrue();
         List<CodeableConcept> reasonCodes = encounter.getReasonCode();
-        assertEquals(1, reasonCodes.size());
-        CodeableConcept encounterReason = encounter.getReasonCodeFirstRep();
-        Coding encounterReasonCoding = encounterReason.getCodingFirstRep();
-        assertThat(encounterReasonCoding.getCode()).isEqualTo("O");
-        assertThat(encounterReasonCoding.getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/v2-0062");
-        assertThat(encounterReasonCoding.getDisplay()).isEqualTo("Other");
-        assertThat(encounterReasonCoding.getVersion()).isNull();
+        assertThat(reasonCodes).hasSize(2);
 
-        // PV2.3 for reasonCode, has an unknown code
-        hl7message = "MSH|^~\\&|||||20151008111200||ADT^A01^ADT_A01|MSGID000001|T|2.6|||||||||\n"
-                // ENV.4 is empty on purpose
-                + "EVN|A04|20151008111200|||||\n"
-                + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
-                + "PV1|1|E||||||||||||||||||||||||||||||||||||||||||||||||||\n"
-                // PV2.3 for reasonCode, has an unknown code
-                + "PV2|||vomits|||||||||||||||||||||||||||||||||\n";
-        encounter = ResourceUtils.getEncounter(hl7message);
-
-        assertThat(encounter.hasReasonCode()).isTrue();
-        reasonCodes = encounter.getReasonCode();
-        assertEquals(1, reasonCodes.size());
-        encounterReason = encounter.getReasonCodeFirstRep();
-        encounterReasonCoding = encounterReason.getCodingFirstRep();
-        assertThat(encounterReasonCoding.getCode()).isEqualTo("vomits");
-        assertThat(encounterReasonCoding.getSystem()).isNull();
-        assertThat(encounterReasonCoding.getDisplay()).isNull();
-        assertThat(encounterReasonCoding.getVersion()).isNull();
+        CodeableConcept encounterReasonEVN = reasonCodes.get(0);
+        CodeableConcept encounterReasonPV2 = reasonCodes.get(1);
+        if (encounterReasonPV2.getTextElement().toString() != "Fatigue") {
+                encounterReasonEVN = reasonCodes.get(1);
+                encounterReasonPV2 = reasonCodes.get(0);
+        }
+        DatatypeUtils.checkCommonCodeableConceptAssertions(encounterReasonPV2, "01.4", "Fatigue", "http://terminology.hl7.org/CodeSystem/CCC", "Fatigue");
+        DatatypeUtils.checkCommonCodeableConceptAssertions(encounterReasonEVN, "O", "Other", "http://terminology.hl7.org/CodeSystem/v2-0062", null);
 
         // Using EVN-4 and PV2.3 for reasonCode BOTH with with unknown codes
         hl7message = "MSH|^~\\&|||||20151008111200||ADT^A01^ADT_A01|MSGID000001|T|2.6|||||||||\n"
@@ -386,21 +370,16 @@ public class Hl7EncounterFHIRConversionTest {
 
         assertThat(encounter.hasReasonCode()).isTrue();
         reasonCodes = encounter.getReasonCode();
-        assertEquals(2, reasonCodes.size());
+        assertThat(reasonCodes).hasSize(2);
 
-        CodeableConcept reasonCodeCC = reasonCodes.get(0);
-        Coding coding = reasonCodeCC.getCodingFirstRep();
-        assertThat(coding.getCode()).isEqualTo("vomits");
-        assertThat(coding.getSystem()).isNull();
-        assertThat(coding.getDisplay()).isNull();
-        assertThat(coding.getVersion()).isNull();
-
-        reasonCodeCC = reasonCodes.get(1);
-        coding = reasonCodeCC.getCodingFirstRep();
-        assertThat(coding.getCode()).isEqualTo("REG_UPDATE");
-        assertThat(coding.getSystem()).isNull();
-        assertThat(coding.getDisplay()).isNull();
-        assertThat(coding.getVersion()).isNull();
+        encounterReasonEVN = reasonCodes.get(0);
+        encounterReasonPV2 = reasonCodes.get(1);
+        if (encounterReasonPV2.getCodingFirstRep().getCode() != "vomits") {
+                encounterReasonEVN = reasonCodes.get(1);
+                encounterReasonPV2 = reasonCodes.get(0);
+        }
+        DatatypeUtils.checkCommonCodeableConceptAssertions(encounterReasonPV2, "vomits", null, null, null);
+        DatatypeUtils.checkCommonCodeableConceptAssertions(encounterReasonEVN, "REG_UPDATE", null, null, null);
     }
 
     @Test
