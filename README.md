@@ -121,3 +121,7 @@ Since this converter is used in production environments using real patient data 
 
 * Please do not add any print outs (ie system.out.println etc). Use the logger.
 * When adding / editing current or future error, warn, and info log statements please be careful to not add any data structures that might contain PHI. If you aren't sure then make the log statement debug so it's stripped out.
+
+### localDevEnv
+
+Before the gradle build step where the compile happens the gradle build copies the _src_ directory to the _target_ directoy and sets the gradle build sourcesets to the target directory. Then it strips out all LOGGER.debug statements. This means the compile/build runs off the target directory where the debug statements have been stripped. However if you are running locally you still want the build to run off the _src_ directory or otherwise you must build after each change to get it copied to the _target_ directory. There is a flag in the gradle.properties named _localDevEnv_ which should always be set to false in GIT but a developer can override this flag to true and the local build will keep the sourcesets tied to the _src_ directory.

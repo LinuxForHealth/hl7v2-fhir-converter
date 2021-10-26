@@ -6,6 +6,7 @@
 
 plugins {
     // Apply the java-library plugin to add support for Java Library
+    id 'java'
     id 'java-library'
     id 'jacoco'
     id 'maven-publish'
@@ -64,6 +65,18 @@ testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:5.7.2"
 // In this section you declare where to find the dependencies of your project
 repositories {
     mavenCentral()  
+}
+
+// Overriding the source directories to the target.
+// This will cause the build/compile to use target instead of src.
+if(!localDevEnv.toBoolean()) {
+    println "Overriding sourceset to the target directory"
+    sourceSets.main.java.srcDirs = ['target/main/java'];
+    sourceSets.main.resources.srcDirs = ['target/main/resources'];
+} else {
+    println "localDevEnv is true - Setting sourceset to the src directory"
+    sourceSets.main.java.srcDirs = ['src/main/java'];
+    sourceSets.main.resources.srcDirs = ['src/main/resources'];
 }
 
 test {
@@ -167,13 +180,33 @@ tasks.withType(Sign) {
     onlyIf { isReleaseVersion }
 }
 
+task deleteTarget(type: Delete) {
+    description("Deletes the target directory")
+    if(!localDevEnv.toBoolean()) {
+        println 'Deleting target directory'
+        delete "target"
+    }
+}
+
+task resourcesCopy(type: Copy) {
+    description("Copies source to the target.")
+    if(!localDevEnv.toBoolean()) {
+        println 'Copying source to target'
+        copy {
+            from 'src'
+            into 'target'
+        }
+    }
+}
+
 task deleteJavaDebugLogs {
     description("This function will delete all DEBUG log statements from the project.")
-    doLast {
-        FileTree  javaFiles = fileTree('src/main') {
+    if(!localDevEnv.toBoolean()) {
+        println 'Stripping DEBUG statements out of target/main'
+        FileTree  javaFiles = fileTree('target/main') {
             include '**/*.java'
         }
-        String regex = "LOGGER.debug.*"
+        String regex = "(?ms)(LOGGER.debug.*?;)"
         javaFiles.each { File javaFile ->
             println "Start replacing regex on $javaFile.name"
             String content = javaFile.getText()
@@ -182,3 +215,11 @@ task deleteJavaDebugLogs {
         }
     }
 }
+
+// Strip DEBUG log statements out
+project.tasks.build.dependsOn project.tasks.deleteJavaDebugLogs
+//BUT FIRST copy src to target
+project.tasks.deleteJavaDebugLogs.dependsOn project.tasks.resourcesCopy
+//BUT FIRST delete target directory
+project.tasks.resourcesCopy.dependsOn project.tasks.deleteTarget
+
