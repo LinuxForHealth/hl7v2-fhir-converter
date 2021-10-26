@@ -14,7 +14,7 @@ type_1:
      # see if there is a valid code and system as input to creating text in the CodeableConcept
      identifierCoding: CODING_SYSTEM_V2_IDENTIFIER, CX.5 | $typeSegment
 
-type_2:
+type_2: # used in instance where objects are passed directly to the codeable concept instead ofo coming directly from a field
   valueOf: datatype/CodeableConcept_var
   generateList: true
   expressionType: resource
