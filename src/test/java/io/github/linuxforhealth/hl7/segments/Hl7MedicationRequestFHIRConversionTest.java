@@ -82,7 +82,7 @@ public class Hl7MedicationRequestFHIRConversionTest {
     @Test
     public void test_medicationreq_status() {
 
-        //ORC.5 = A -> Expected medication status = ACTIVE
+        //ORC.5 = A -> Expected medication status = (ACTIVE ORC.1 is present but ORC.5 takes precedence)
         String hl7message = "MSH|^~\\&|APP|FAC|WHIA|IBM|20180622230000||RDE^O11^RDE_O11|MSGID221xx0xcnvMed31|T|2.6\n"
                 + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
                 + "ORC|NW|F800006^OE|P800006^RX||A|E|10^BID^D4^^^R||20180622230000\n"
@@ -105,7 +105,7 @@ public class Hl7MedicationRequestFHIRConversionTest {
         MedicationRequest medicationRequest = ResourceUtils.getResourceMedicationRequest(medicationRequestList.get(0), context);
         assertThat(medicationRequest.getStatus()).isEqualTo(MedicationRequestStatus.ACTIVE);
 
-        //ORC.5 = CM -> Expected medication status = COMPLETED
+        //ORC.5 = CM -> Expected medication status = COMPLETED (ORC.1 is present but ORC.5 takes precedence)
         hl7message = "MSH|^~\\&|APP|FAC|WHIA|IBM|20180622230000||RDE^O11^RDE_O11|MSGID221xx0xcnvMed31|T|2.6\n"
                 + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
                 + "ORC|NW|F800006^OE|P800006^RX||CM|E|10^BID^D4^^^R||20180622230000\n"
@@ -128,7 +128,7 @@ public class Hl7MedicationRequestFHIRConversionTest {
         medicationRequest = ResourceUtils.getResourceMedicationRequest(medicationRequestList.get(0), context);
         assertThat(medicationRequest.getStatus()).isEqualTo(MedicationRequestStatus.COMPLETED);
 
-        //ORC.5 = ER -> Expected medication status = ENTEREDINERROR
+        //ORC.5 = ER -> Expected medication status = ENTEREDINERROR (ORC.1 is present but ORC.5 takes precedence)
         hl7message = "MSH|^~\\&|APP|FAC|WHIA|IBM|20180622230000||RDE^O11^RDE_O11|MSGID221xx0xcnvMed31|T|2.6\n"
                 + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
                 + "ORC|NW|F800006^OE|P800006^RX||ER|E|10^BID^D4^^^R||20180622230000\n"
@@ -151,7 +151,7 @@ public class Hl7MedicationRequestFHIRConversionTest {
         medicationRequest = ResourceUtils.getResourceMedicationRequest(medicationRequestList.get(0), context);
         assertThat(medicationRequest.getStatus()).isEqualTo(MedicationRequestStatus.ENTEREDINERROR);
 
-        //ORC.1 = NW -> Expected medication status = ACTIVE
+        //ORC.1 = NW -> Expected medication status = ACTIVE (Missing ORC.5 so ORC.1 takes precedence)
         hl7message = "MSH|^~\\&|APP|FAC|WHIA|IBM|20180622230000||RDE^O11^RDE_O11|MSGID221xx0xcnvMed31|T|2.6\n"
                 + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
                 + "ORC|NW|F800006^OE|P800006^RX|||E|10^BID^D4^^^R||20180622230000\n"
@@ -174,7 +174,7 @@ public class Hl7MedicationRequestFHIRConversionTest {
         medicationRequest = ResourceUtils.getResourceMedicationRequest(medicationRequestList.get(0), context);
         assertThat(medicationRequest.getStatus()).isEqualTo(MedicationRequestStatus.ACTIVE);
 
-        //ORC.1 = RP -> Expected medication status = UNKNOWN
+        //ORC.1 = RP -> Expected medication status = UNKNOWN (Missing ORC.5 so ORC.1 takes precedence)
         hl7message = "MSH|^~\\&|APP|FAC|WHIA|IBM|20180622230000||RDE^O11^RDE_O11|MSGID221xx0xcnvMed31|T|2.6\n"
                 + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
                 + "ORC|RP|F800006^OE|P800006^RX|||E|10^BID^D4^^^R||20180622230000\n"
@@ -197,7 +197,7 @@ public class Hl7MedicationRequestFHIRConversionTest {
         medicationRequest = ResourceUtils.getResourceMedicationRequest(medicationRequestList.get(0), context);
         assertThat(medicationRequest.getStatus()).isEqualTo(MedicationRequestStatus.UNKNOWN);
 
-        //ORC.1 = DC -> Expected medication status = STOPPED
+        //ORC.1 = DC -> Expected medication status = STOPPED (Missing ORC.5 so ORC.1 takes precedence)
         hl7message = "MSH|^~\\&|APP|FAC|WHIA|IBM|20180622230000||RDE^O11^RDE_O11|MSGID221xx0xcnvMed31|T|2.6\n"
                 + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
                 + "ORC|DC|F800006^OE|P800006^RX|||E|10^BID^D4^^^R||20180622230000\n"
@@ -227,7 +227,7 @@ public class Hl7MedicationRequestFHIRConversionTest {
         // Confirm that a serviceRequest was not created.      
         assertThat(serviceRequestList).isEmpty();
 
-        //ORC.1 = CA -> Expected medication status = CANCELLED
+        //ORC.1 = CA -> Expected medication status = CANCELLED (Missing ORC.5 so ORC.1 takes precedence)
         hl7message = "MSH|^~\\&|APP|FAC|WHIA|IBM|20180622230000||RDE^O11^RDE_O11|MSGID221xx0xcnvMed31|T|2.6\n"
                 + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
                 + "PV1||I|6N^1234^A^GENHOS||||0100^ANDERSON,CARL|0148^ADDISON,JAMES||SUR|||||||0100^ANDERSON,CARL|S|V446911|A|||||||||||||||||||SF|K||||20180622230000\n"
