@@ -693,7 +693,7 @@ public class Hl7MedicationRequestFHIRConversionTest {
         assertThat(practName.getFamily()).isEqualTo("PROVIDER"); // ORC.12.2
         assertThat(practName.getGivenAsSingleString()).isEqualTo("ORDERING"); // ORC.12.3
         assertThat(practName.getPrefixAsSingleString()).isEqualTo("DR"); //ORC.12.6
-        assertThat(practName.getSuffix()).isEmpty(); // RXE.12.5
+        assertThat(practName.getSuffix()).isEmpty(); //ORC.12.5
         assertThat(practName.getText()).isEqualTo("DR ORDERING PROVIDER"); // ORC.12
 
         //category comes from  ORC.29
