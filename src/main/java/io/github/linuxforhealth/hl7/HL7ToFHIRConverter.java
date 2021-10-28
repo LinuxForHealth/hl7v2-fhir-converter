@@ -38,6 +38,7 @@ import io.github.linuxforhealth.hl7.resource.ResourceReader;
  * @author pbhallam
  */
 public class HL7ToFHIRConverter {
+  private static HL7HapiParser hparser = new HL7HapiParser();
   private static final Logger LOGGER = LoggerFactory.getLogger(HL7ToFHIRConverter.class);
   private Map<String, HL7MessageModel> messagetemplates = new HashMap<>();
 
@@ -136,24 +137,20 @@ public class HL7ToFHIRConverter {
     }
   }
 
-
+  
   private static Message getHl7Message(String data) {
-
-    HL7HapiParser hparser = null;
     Message hl7message = null;
     try (InputStream ins = IOUtils.toInputStream(data, StandardCharsets.UTF_8)) {
       Hl7InputStreamMessageStringIterator iterator = new Hl7InputStreamMessageStringIterator(ins);
       // only supports single message conversion.
       if (iterator.hasNext()) {
-        hparser = new HL7HapiParser();
+        
         hl7message = hparser.getParser().parse(iterator.next());
       }
     } catch (HL7Exception e) {
       throw new IllegalArgumentException("Cannot parse the message.", e);
     } catch (IOException ioe) {
       throw new IllegalArgumentException("IOException encountered.", ioe);
-    } finally {
-      close(hparser);
     }
 
     try{
