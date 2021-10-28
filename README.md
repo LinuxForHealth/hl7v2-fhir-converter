@@ -50,7 +50,7 @@ If you need another message type/event . . .  contributions are welcome! See [CO
 
 The FHIR Converter has the following dependencies:
 
-* JDK 8 or later
+* JDK 11 or later (upgraded from Java 8 on 10/28/21)
 * Gradle 
 
 Note: The FHIR Converter includes a Gradle Wrapper, so a local Gradle install is not required.
