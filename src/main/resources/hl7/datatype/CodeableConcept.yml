@@ -20,14 +20,24 @@ coding_1:
 coding_2:
    condition: $code NOT_NULL && $coding NULL
    type: CODING_SYSTEM_V2_IDENTIFIER
-   valueOf: ID |IS |TX
+   valueOf: ID |TX
    generateList: true
    expressionType: HL7Spec
    vars:
-      code: ID |IS |TX
+      code: ID |TX
+
+# IS is different than ID | TX because we want to keep unknown (user-defined) codes      
+coding_3:
+   condition: $code NOT_NULL && $coding NULL
+   type: CODING_SYSTEM_V2_IS_USER_DEFINED_TABLE
+   valueOf: IS
+   generateList: true
+   expressionType: HL7Spec
+   vars:
+      code: IS
 
 # Generalized CWE for alternate codes handles mismatched systems and codes       
-coding_3:
+coding_4:
    valueOf: $coding
    generateList: true
    condition: $coding NOT_NULL
@@ -36,7 +46,7 @@ coding_3:
       coding: CODING_SYSTEM_V2_ALTERNATE, CWE          
       
 # Generalized CWE through CODING_SYSTEM_V2 handles mismatched systems and codes      
-coding_4:
+coding_5:
    valueOf: $coding
    generateList: true
    condition: $coding NOT_NULL
@@ -44,7 +54,7 @@ coding_4:
    vars:
       coding: CODING_SYSTEM_V2, CWE      
 
-coding_5:
+coding_6:
    valueOf: $coding
    condition: $coding NOT_NULL
    generateList: true

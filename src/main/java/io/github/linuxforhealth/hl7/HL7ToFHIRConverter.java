@@ -159,7 +159,21 @@ public class HL7ToFHIRConverter {
     try{
         if(hl7message != null) {
             String messageStructureInfo = hl7message.printStructure();
-            LOGGER.debug("HL7_MESSAGE_STRUCTURE={}",messageStructureInfo);
+            StringBuilder output = new StringBuilder();
+            String[] messageStructureInfoLines = messageStructureInfo.split(System.getProperty("line.separator"));
+            for (String line: messageStructureInfoLines) {
+                if(!line.contains("|")) {
+                    output.append(line);
+                }
+                else {
+                    int firstDash = line.indexOf("-");
+                    output.append(line.substring(0, firstDash+5));
+                }
+                output.append("\n");
+            }
+            if(output.length() > 0) {
+                LOGGER.info("HL7_MESSAGE_STRUCTURE=\n{}",output);
+            }
         }
     } catch (HL7Exception e) {
         throw new IllegalArgumentException("Error printing message structure.", e);

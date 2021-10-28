@@ -188,8 +188,7 @@ context:
    expressionType: resource
    fuzzyGroup: true
    vars:
-      practiceSettingIn: OBR.24
-      timestamp: TXA.4 | OBR.7
+      timestamp: TXA.4 
       providerCode: TXA.5
       serviceRequestRef: $ServiceRequest
       encounterRef: $Encounter
