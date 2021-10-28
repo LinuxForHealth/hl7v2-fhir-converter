@@ -326,7 +326,7 @@ public class HL7MessageEngine implements MessageEngine {
           org.hl7.fhir.r4.model.Resource parsed = context.getParser()
               .parseResource(FHIRResourceMapper.getResourceClass(resourceClass), json);
 
-          bundle.addEntry().setResource(parsed).setFullUrl("urn:uuid:" + parsed.getId());
+          bundle.addEntry().setResource(parsed).setFullUrl(parsed.getId());
         }
       }
     } catch (JsonProcessingException e) {
