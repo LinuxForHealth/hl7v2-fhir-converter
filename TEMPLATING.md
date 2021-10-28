@@ -24,6 +24,7 @@ A HL7 message template maps one or more HL7 segments to a FHIR resource using th
 | resourcePath       | Required         | Relative path to the resource template. Example: resource/Patient                                                                                                                                    |
 | repeats            | Default: false   | Indicates if a repeating HL7 segment will generate multiple FHIR resources.                                                                                                                          |
 | isReferenced       | Default: false   | Indicates if the FHIR Resource is referenced by other FHIR resources.                                                                                                                                |
+| group | Default: empty   | Base group from which the segment and additionalSegments are specified. 
 | additionalSegments | Default: empty   | List of additional HL7 segment names required to complete the FHIR resource mapping.                                                                                                                 |
 
 FHIR resources are generated in the order listed. FHIR resources with references should follow the resources they reference.
@@ -122,7 +123,6 @@ id:
   valueOf: 'UUID.randomUUID()'
   expressionType: JEXL
 
-
 category_x1:
    valueOf: datatype/CodeableConcept_var
    generateList: true
@@ -147,7 +147,6 @@ category_x2:
    constants:
       type: encounter-diagnosis
 
-
 severity:
    valueOf: datatype/CodeableConcept
    generateList: true
@@ -163,7 +162,6 @@ code:
    specs: PRB.3
    vars:
      code: PRB.3
-
 
 encounter:
     valueOf: datatype/Reference
@@ -194,8 +192,6 @@ evidence:
    specs: $Observation
    useGroup: true
 
-
-
 ```
 
 ### Expressions Types
@@ -219,10 +215,14 @@ The extraction logic for each field can be defined by using expressions. This co
 * expressionType: Based on the expression type a valueOf attribute will get evaluated.
 * generateList: DEFAULT [false]
   Generates an output list output for all values of the specification. If this value is false, then first valid value of spec would be used for evaluation.
-* Constants: DEFAULT - EMPTY<br>
+* constants: DEFAULT - EMPTY<br>
   List of Constants (string values) which can be used during the extraction process.
-* evaluateLater:  DEFAULT: false, If evaluate latter is true then the resource that has this expression will be evaluated except for this expression and will re-evaluate this expression after all the other resources are evaluated. NOTE: this feature currently should only be used for expressions in main resource templates (example Patient, encounter, observation etc) and not in datatype templates (example: coding, Address etc). 
-
+* evaluateLater:  DEFAULT: false, If evaluate latter is true then the resource that has this expression will be evaluated _except_ for this expression and will re-evaluate this expression _after_ all the other resources are evaluated. NOTE: this feature currently should only be used for expressions in main resource templates (example Patient, Encounter, Observation etc) and not in datatype templates (example: Coding, Address etc).
+* expressions: DEFAULT - EMPTY<br>
+  Elements to create as a subset of the element, when `expressionType: nested`.  Usually a list or a map.
+* expressionsMap: DEFAULT - EMPTY<br>
+  Elements to create as key-value pair subsets in an element. Used only as a peer of `expressionType: nested` to indicate the nested expression is a map.
+  
 
 ```yml
       type: String
@@ -371,6 +371,51 @@ text:
 
 ```
 
+* Nested: create the element and sub-elements in `expressions`, as a map or list. Sub-elements of the list or map may have their own conditions of inclusion. Extensions use nested expressions extensively.
+  Example 1 (first two sections of example below): Expressions combine to a list.  Each `-` in the list of the parent extension become an object in the resulting JSON output.
+
+  Example 2 (third section of example below): Expressions combine to a map of key-value pairs.  The third sub-element is itself a nested expression.  It has multiple map keys which each evaluate to a key value pair in the resulting JSON output.
+
+```yml
+extension:
+   generateList: true
+   expressionType: nested
+   expressions:
+   -  condition: $value NOT_NULL
+      valueOf: eExtension
+      expressionType: resource
+      vars:
+         value: String, PID.6.1
+      constants:
+         KEY_NAME_SUFFIX: String
+         urlValue: mothersMaidenName
+
+   -  expressionType: nested
+      expressionsMap:
+         url:
+            type: SYSTEM_URL
+            value: 'religion'
+         valueCodeableConcept:
+            valueOf: datatype/CodeableConcept
+            expressionType: resource
+            condition: $coding NOT_NULL
+            vars:
+               coding: RELIGIOUS_AFFILIATION_CC, PID.17
+               text: String, PID.17.2
+
+   -  expressionType: nested
+      specs: PID.10
+      generateList: true
+      expressionsMap:
+         url:
+            type: SYSTEM_URL
+            value: 'race'
+         valueCodeableConcept:
+            valueOf: datatype/CodeableConcept
+            expressionType: resource
+            specs: CWE
+
+```
 ## Sample output:
 
 ```json
