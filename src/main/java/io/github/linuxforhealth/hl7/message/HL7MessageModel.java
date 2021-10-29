@@ -77,7 +77,7 @@ public class HL7MessageModel implements MessageTemplate<Message> {
 
     //Catch any exceptions and don't display them because they *could* show PHI.
     try {
-	    Bundle bundle = engine.transform(dataSource, this.getResources(), new HashMap<>());
+        Bundle bundle = engine.transform(dataSource, this.getResources(), new HashMap<>());
         result = engine.getFHIRContext().encodeResourceToString(bundle);
     }
     catch(Exception e) {
