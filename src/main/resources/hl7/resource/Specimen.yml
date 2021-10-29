@@ -1,5 +1,5 @@
 #
-# (C) Copyright Mubashir Kazia. 2021
+# (C) Copyright IBM Corp. 2021
 #
 # SPDX-License-Identifier: Apache-2.0
 #
@@ -43,7 +43,7 @@ condition:
    expressionType: resource
    specs: SPM.24
 
-note_1:
+note:
    valueOf: datatype/Annotation
    expressionType: resource
    condition: $obx3 EQUALS 48767-8
@@ -52,8 +52,3 @@ note_1:
       obx3: STRING, OBX.3.1
       text: STRING, OBX.5
 
-note_2:
-   valueOf: datatype/Annotation
-   generateList: true
-   expressionType: resource
-   specs: NTE

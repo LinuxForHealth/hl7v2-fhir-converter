@@ -49,7 +49,7 @@ public class MedicationFHIRConverterTest {
         + "OBX|3|TS|29768-9^DATE VACCINE INFORMATION STATEMENT PUBLISHED^LN|1|20010711||||||F|||20120720101321\r"
         + "OBX|4|TS|29769-7^DATE VACCINE INFORMATION STATEMENT PRESENTED^LN|1|19901207||||||F|||20140701041038\r";
 
-        List<BundleEntryComponent> e =ResourceUtils.createHl7Segment(hl7message);
+        List<BundleEntryComponent> e =ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
 
         // Find the practitioner from the FHIR bundle.
         List<Resource> practitionerResource = e.stream()
