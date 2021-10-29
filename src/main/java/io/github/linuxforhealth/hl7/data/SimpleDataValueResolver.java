@@ -556,6 +556,10 @@ public class SimpleDataValueResolver {
         }
     }
 
+    public static final ValueExtractor<Object, String> NO_DISPLAY = (Object value) -> {
+        if (value == "no display") { return null; };
+        return null;
+    };
     public static final ValueExtractor<Object, String> BUILD_IDENTIFIER_FROM_CWE = (Object value) -> {
         CWE newValue = ((CWE) value);
         String identifier = newValue.getCwe1_Identifier().toString();
