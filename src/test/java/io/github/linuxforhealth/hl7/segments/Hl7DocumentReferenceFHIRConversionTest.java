@@ -546,4 +546,35 @@ public class Hl7DocumentReferenceFHIRConversionTest {
         assertThat(type.getCodingFirstRep().getDisplay()).isEqualTo("Operative report");
         assertThat(type.getCodingFirstRep().getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/v2-0270");
     }
+
+    @ParameterizedTest
+    // Spot check for PPR messages
+    @ValueSource(strings = { 
+        "PPR^PC1", /* "PPR^PC2", "PPR^PC3" */ 
+    })
+    public void doc_ref_ppr_test(String messageType) {
+        String documentReferenceMessage =
+        "MSH|^~\\&|SendTest1|Sendfac1|Receiveapp1|Receivefac1|202101010000|security|"+ messageType + "|1|P^I|2.6||||||ASCII||\r"
+            + "PID|||1234^^^^MR||DOE^JANE^|||F|||||||||||||||||||||\r"
+            + "PV1||I|6N^1234^A^GENHOS|||||||SUR|||||||0148^ANDERSON^CARL|S|1400|A|||||||||||||||||||SF|K||||199501102300\r"
+            + "PRB|AD||202101010000|aortic stenosis|53692||2|||202101010000\r"
+            + "OBX|1|NM|111^TotalProtein||7.5|gm/dl|5.9-8.4||||F\r"
+            + "NTE|1|P|Problem Comments\r"
+            + "ORC|NW|1000^OE|9999999^RX|||E|^Q6H^D10^^^R\r"
+            + "OBR|1|TESTID|TESTID|||201801180346|201801180347||||||||||||||||||F||||||WEAKNESS||||||||||||\r"
+            // Next three lines create an attachment because OBX type TX
+            + "OBX|1|TX|||ECHOCARDIOGRAPHIC REPORT||||||F|||202101010000|||\r"
+            + "OBX|2|TX|||NORMAL LV CHAMBER SIZE WITH MILD CONCENTRIC LVH||||||F|||202101010000|||\r"
+            + "OBX|3|TX|||HYPERDYNAMIC LV SYSTOLIC FUNCTION, VISUAL EF 80%||||||F|||202101010000|||\n";
+
+        DocumentReference documentRef = ResourceUtils.getDocumentReference(documentReferenceMessage);
+        DocumentReference.DocumentReferenceContextComponent drContext = documentRef.getContext();
+        assertThat(drContext.hasPeriod()).isFalse(); // Should contain a reference to the service request
+        DocumentReference.DocumentReferenceContentComponent content = documentRef.getContentFirstRep();
+        assertThat(content.getAttachment().getContentType()).isEqualTo("text/plain"); // Currently always defaults to text/plain
+        assertThat(content.getAttachment().getCreation()).isNull(); // No TXA.7 in message
+        assertThat(content.getAttachment().hasData()).isTrue();
+        String decodedData = new String(Base64.getDecoder().decode(content.getAttachment().getDataElement().getValueAsString()));
+        assertThat(decodedData).isEqualTo("ECHOCARDIOGRAPHIC REPORT\nNORMAL LV CHAMBER SIZE WITH MILD CONCENTRIC LVH\nHYPERDYNAMIC LV SYSTOLIC FUNCTION, VISUAL EF 80%\n");
+    }
 }
