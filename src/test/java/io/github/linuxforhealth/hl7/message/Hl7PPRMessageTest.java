@@ -614,77 +614,7 @@ public class Hl7PPRMessageTest {
             .map(BundleEntryComponent::getResource).collect(Collectors.toList());
         assertThat(docRefResource).hasSize(1);
 
-
-        // For messages that create DocRefs (not DiagReports):
-        // DocRef when there is a TXA, and when there is ORC with OBX of type TX.
-        // ORC with no OBX-type-TX creates an Observation with no DocRef.
-
         // Confirm that no extra resources are created
-        //TODO: Why is there a docRef being created, and why only one instead of one for each SR??
         assertThat(e.size()).isEqualTo(9); //TODO: Should be 11 when card 849 is completed
     }
-
-    @Test
-    public void testPprPc1ServiceRequestPresentDocumentReferenceDetails() throws IOException {
-        String hl7message =
-        "MSH|^~\\&|SendTest1|Sendfac1|Receiveapp1|Receivefac1|202101010000|security|PPR^PC1^PPR_PC1|1|P^I|2.6||||||ASCII||\n"
-            + "PID|||1234^^^^MR||DOE^JANE^|||F|||||||||||||||||||||\n"
-            + "PV1||I|6N^1234^A^GENHOS|||||||SUR|||||||0148^ANDERSON^CARL|S|1400|A|||||||||||||||||||SF|K||||199501102300\n"
-            + "PRB|AD||202101010000|aortic stenosis|53692||2|||202101010000\n"
-            + "OBX|1|NM|111^TotalProtein||7.5|gm/dl|5.9-8.4||||F\n"
-            + "NTE|1|P|Problem Comments\n"
-            + "ORC|NW|1000^OE|9999999^RX|||E|^Q6H^D10^^^R\n"
-            + "OBR|1|TESTID|TESTID|||201801180346|201801180347||||||||||||||||||F||||||WEAKNESS||||||||||||\n"
-            // Next three lines create an attachment because OBX type TX
-            + "OBX|1|TX|||ECHOCARDIOGRAPHIC REPORT||||||F|||202101010000|||\n"
-            + "OBX|2|TX|||NORMAL LV CHAMBER SIZE WITH MILD CONCENTRIC LVH||||||F|||202101010000|||\n"
-            + "OBX|3|TX|||HYPERDYNAMIC LV SYSTOLIC FUNCTION, VISUAL EF 80%||||||F|||202101010000|||\n";
-
-        HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
-        String json = ftv.convert(hl7message, OPTIONS);
-        assertThat(json).isNotBlank();
-        IBaseResource bundleResource = context.getParser().parseResource(json);
-        assertThat(bundleResource).isNotNull();
-        Bundle b = (Bundle) bundleResource;
-        assertThat(b.getType()).isEqualTo(BundleType.COLLECTION);
-        List<BundleEntryComponent> e = b.getEntry();
-        List<Resource> patientResource =
-        e.stream().filter(v -> ResourceType.Patient == v.getResource().getResourceType())
-            .map(BundleEntryComponent::getResource).collect(Collectors.toList());
-        assertThat(patientResource).hasSize(1);
-
-        // OBX under PRB (the PROBLEM.PROBLEM_OBSERVATION.OBSERVATION) creates an Observation resource
-        List<Resource> obsResource =
-        e.stream().filter(v -> ResourceType.Observation == v.getResource().getResourceType())
-            .map(BundleEntryComponent::getResource).collect(Collectors.toList());
-        // One Observation from the NM, but not from the TX                    
-        assertThat(obsResource).hasSize(1);
-
-        List<Resource> encounterResource =
-        e.stream().filter(v -> ResourceType.Encounter == v.getResource().getResourceType())
-            .map(BundleEntryComponent::getResource).collect(Collectors.toList());
-        assertThat(encounterResource).hasSize(1);
-
-        List<Resource> serviceRequestResource =
-        e.stream().filter(v -> ResourceType.ServiceRequest == v.getResource().getResourceType())
-            .map(BundleEntryComponent::getResource).collect(Collectors.toList());
-        assertThat(serviceRequestResource).hasSize(1);
-
-        List<Resource> documentRefResource =
-        e.stream().filter(v -> ResourceType.DocumentReference == v.getResource().getResourceType())
-            .map(BundleEntryComponent::getResource).collect(Collectors.toList());
-        assertThat(documentRefResource).hasSize(1);
-
-        DocumentReference documentRef = ResourceUtils.getResourceDocumentReference(documentRefResource.get(0), context);
-        DocumentReference.DocumentReferenceContextComponent drContext = documentRef.getContext();
-        assertThat(drContext.getRelated()).hasSize(1); // Should contain a reference to the service request
-        assertThat(drContext.getPeriod().getStartElement().toString()).containsPattern("2018-01-18T03:47:00"); // OBR.7
-        DocumentReference.DocumentReferenceContentComponent content = documentRef.getContentFirstRep();
-        assertThat(content.getAttachment().getContentType()).isEqualTo("text/plain"); // Currently always defaults to text/plain
-        assertThat(content.getAttachment().getCreation()).isNull(); // No TXA.7 in message
-        assertThat(content.getAttachment().hasData()).isTrue();
-        String decodedData = new String(Base64.getDecoder().decode(content.getAttachment().getDataElement().getValueAsString()));
-        assertThat(decodedData).isEqualTo("ECHOCARDIOGRAPHIC REPORT\nNORMAL LV CHAMBER SIZE WITH MILD CONCENTRIC LVH\nHYPERDYNAMIC LV SYSTOLIC FUNCTION, VISUAL EF 80%\n");
-    }
-
 }
