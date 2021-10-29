@@ -32,7 +32,7 @@ public final class JexlEngineUtil {
   private JexlEngine jexl;
   private Map<String, Object> functions = new HashMap<>();
 
-
+  private Map<String, JexlExpression> exprCache = new HashMap<String, JexlExpression>();
 
   public JexlEngineUtil() {
     jexl = new JexlBuilder().silent(false).debug(true).strict(true).create();
@@ -56,7 +56,7 @@ public final class JexlEngineUtil {
     functions.put(name, function);
 
   }
-
+  
   public Object evaluate(String jexlExp, Map<String, Object> context) {
     Preconditions.checkArgument(StringUtils.isNotBlank(jexlExp), "jexlExp cannot be blank");
     Preconditions.checkArgument(context != null, "context cannot be null");
@@ -68,7 +68,12 @@ public final class JexlEngineUtil {
     Map<String, Object> localContext = new HashMap<>(functions);
     localContext.putAll(context);
 
-    JexlExpression exp = jexl.createExpression(trimedJexlExp);
+    JexlExpression exp = exprCache.get(trimedJexlExp);
+    if(exp == null) {
+    	exp = jexl.createExpression(trimedJexlExp);
+    	exprCache.put(trimedJexlExp, exp);
+    }
+    
     JexlContext jc = new MapContext();
     localContext.entrySet().forEach(e -> jc.set(e.getKey(), e.getValue()));
     // Now evaluate the expression, getting the result

@@ -189,8 +189,8 @@ public class Hl7DocumentReferenceFHIRConversionTest {
                 // ORC required for ServiceRequest test
                 // All three practitioner id's are provided (ORC.2, ORC.3, ORC.456)
                 + "ORC|NW|P1005|F1005|PGN001|SC|D|1|||MS|MS|||||\n"
-                // OBR.24 converts to DocumentReference.practiceSetting
                 + "OBR|1||||||20170825010500|||||||||||||002||||CUS|F||||||||\n"
+                // TXA.4 used for context start
                 + "TXA|1||TEXT|20180117144200|5566^PAPLast^PAPFirst^J^^MD||201801180346||<PHYSID1>||||||||||AV|||<PHYSID2>||\n"
                 // OBX is type ST so an observation will be created
                 + "OBX|1|ST|100||This is content|||||||X\n";
@@ -215,10 +215,9 @@ public class Hl7DocumentReferenceFHIRConversionTest {
         Practitioner practBundle = ResourceUtils.getSpecificPractitionerFromBundle(bundle, requesterRef);
 
         DocumentReference.DocumentReferenceContextComponent refContext = documentReference.getContext();
-        assertThat(refContext.getPeriod().getStartElement().toString()).containsPattern("2018-01-17T14:42:00");
+        assertThat(refContext.getPeriod().getStartElement().toString()).containsPattern("2018-01-17T14:42:00");  // TXA.4
         assertThat(refContext.hasRelated()).isTrue();
-        assertThat(refContext.hasPracticeSetting()).isTrue();  // OBR.24
-        DatatypeUtils.checkCommonCodeableConceptAssertions(refContext.getPracticeSetting(), "CUS", "Cardiac Ultrasound", "http://terminology.hl7.org/CodeSystem/v2-0074", "CUS");
+        assertThat(refContext.hasPracticeSetting()).isFalse(); 
 
         assertThat(practBundle.getIdentifierFirstRep().getValue()).isEqualTo("5566");
         // Value passed to Context(TXA.5) is used as Identifier value in practitioner

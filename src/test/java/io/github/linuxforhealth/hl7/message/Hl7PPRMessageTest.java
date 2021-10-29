@@ -634,7 +634,6 @@ public class Hl7PPRMessageTest {
             + "OBX|1|NM|111^TotalProtein||7.5|gm/dl|5.9-8.4||||F\n"
             + "NTE|1|P|Problem Comments\n"
             + "ORC|NW|1000^OE|9999999^RX|||E|^Q6H^D10^^^R\n"
-            // OBR.7 is used for the timestamp (because no TXA in a PPR_PC1 message)
             + "OBR|1|TESTID|TESTID|||201801180346|201801180347||||||||||||||||||F||||||WEAKNESS||||||||||||\n"
             // Next three lines create an attachment because OBX type TX
             + "OBX|1|TX|||ECHOCARDIOGRAPHIC REPORT||||||F|||202101010000|||\n"

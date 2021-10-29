@@ -46,6 +46,7 @@ import io.github.linuxforhealth.hl7.ConverterOptions;
 import io.github.linuxforhealth.hl7.ConverterOptions.Builder;
 import io.github.linuxforhealth.hl7.HL7ToFHIRConverter;
 import io.github.linuxforhealth.hl7.segments.util.ResourceUtils;
+import io.github.linuxforhealth.hl7.segments.util.DatatypeUtils;
 
 public class Hl7EncounterFHIRConversionTest {
 
@@ -69,14 +70,10 @@ public class Hl7EncounterFHIRConversionTest {
         assertThat(bundleResource).isNotNull();
         Bundle b = (Bundle) bundleResource;
         List<BundleEntryComponent> e = b.getEntry();
-        List<Resource> patientResource = e.stream()
-                .filter(v -> ResourceType.Patient == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> patientResource = ResourceUtils.getResourceList(e, ResourceType.Patient);
         assertThat(patientResource).hasSize(1);
 
-        List<Resource> encounterResource = e.stream()
-                .filter(v -> ResourceType.Encounter == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> encounterResource = ResourceUtils.getResourceList(e, ResourceType.Encounter);
         assertThat(encounterResource).hasSize(1);
 
         Encounter encounter = ResourceUtils.getResourceEncounter(encounterResource.get(0), context);
@@ -112,14 +109,10 @@ public class Hl7EncounterFHIRConversionTest {
         assertThat(bundleResource).isNotNull();
         Bundle b = (Bundle) bundleResource;
         List<BundleEntryComponent> e = b.getEntry();
-        List<Resource> patientResource = e.stream()
-                .filter(v -> ResourceType.Patient == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> patientResource = ResourceUtils.getResourceList(e, ResourceType.Patient);
         assertThat(patientResource).hasSize(1);
 
-        List<Resource> encounterResource = e.stream()
-                .filter(v -> ResourceType.Encounter == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> encounterResource = ResourceUtils.getResourceList(e, ResourceType.Encounter);
         assertThat(encounterResource).hasSize(1);
 
         Encounter encounter = ResourceUtils.getResourceEncounter(encounterResource.get(0), context);
@@ -161,9 +154,8 @@ public class Hl7EncounterFHIRConversionTest {
         assertThat(bundleResource).isNotNull();
         Bundle b = (Bundle) bundleResource;
         List<BundleEntryComponent> e = b.getEntry();
-        List<Resource> encounterResource = e.stream()
-                .filter(v -> ResourceType.Encounter == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+
+        List<Resource> encounterResource = ResourceUtils.getResourceList(e, ResourceType.Encounter);
         assertThat(encounterResource).hasSize(1);
 
         Encounter encounter = ResourceUtils.getResourceEncounter(encounterResource.get(0), context);
@@ -172,9 +164,7 @@ public class Hl7EncounterFHIRConversionTest {
         String providerString = serviceProvider.getReference();
         assertThat(providerString).isEqualTo("Organization/ssh.weymouth");
 
-        List<Resource> organizations = e.stream()
-                .filter(v -> ResourceType.Organization == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> organizations = ResourceUtils.getResourceList(e, ResourceType.Organization);
         assertThat(organizations).hasSize(1);
 
         Organization orgResource = ResourceUtils.getResourceOrganization(organizations.get(0), context);
@@ -214,9 +204,7 @@ public class Hl7EncounterFHIRConversionTest {
         assertThat(bundleResource).isNotNull();
         Bundle b = (Bundle) bundleResource;
         List<BundleEntryComponent> e = b.getEntry();
-        List<Resource> encounterResource = e.stream()
-                .filter(v -> ResourceType.Encounter == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> encounterResource = ResourceUtils.getResourceList(e, ResourceType.Encounter);
         assertThat(encounterResource).hasSize(1);
 
         Encounter encounter = ResourceUtils.getResourceEncounter(encounterResource.get(0), context);
@@ -225,9 +213,7 @@ public class Hl7EncounterFHIRConversionTest {
         String providerString = serviceProvider.getReference();
         assertThat(providerString).isEqualTo("Organization/toronto");
 
-        List<Resource> organizations = e.stream()
-                .filter(v -> ResourceType.Organization == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> organizations = ResourceUtils.getResourceList(e, ResourceType.Organization);
         assertThat(organizations).hasSize(1);
 
         Organization orgResource = ResourceUtils.getResourceOrganization(organizations.get(0), context);
@@ -267,9 +253,7 @@ public class Hl7EncounterFHIRConversionTest {
         assertThat(bundleResource).isNotNull();
         Bundle b = (Bundle) bundleResource;
         List<BundleEntryComponent> e = b.getEntry();
-        List<Resource> encounterResource = e.stream()
-                .filter(v -> ResourceType.Encounter == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> encounterResource = ResourceUtils.getResourceList(e, ResourceType.Encounter);
         assertThat(encounterResource).hasSize(1);
 
         Encounter encounter = ResourceUtils.getResourceEncounter(encounterResource.get(0), context);
@@ -278,9 +262,7 @@ public class Hl7EncounterFHIRConversionTest {
         String providerString = serviceProvider.getReference();
         assertThat(providerString).isEqualTo("Organization/toronto.east"); // Also verify underscore replacement for Utility.formatAsId
 
-        List<Resource> organizations = e.stream()
-                .filter(v -> ResourceType.Organization == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> organizations = ResourceUtils.getResourceList(e, ResourceType.Organization);
         assertThat(organizations).hasSize(1);
 
         Organization orgResource = ResourceUtils.getResourceOrganization(organizations.get(0),context);
@@ -306,9 +288,7 @@ public class Hl7EncounterFHIRConversionTest {
         assertThat(bundleResource).isNotNull();
         Bundle b = (Bundle) bundleResource;
         List<BundleEntryComponent> e = b.getEntry();
-        List<Resource> encounterResource = e.stream()
-                .filter(v -> ResourceType.Encounter == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> encounterResource = ResourceUtils.getResourceList(e, ResourceType.Encounter);
         assertThat(encounterResource).hasSize(1);
 
         Encounter encounter = ResourceUtils.getResourceEncounter(encounterResource.get(0), context);
@@ -317,9 +297,7 @@ public class Hl7EncounterFHIRConversionTest {
         String providerString = serviceProvider.getReference();
         assertThat(providerString).isEqualTo("Organization/ssh.weymouth.west.build-7.f");
 
-        List<Resource> organizations = e.stream()
-                .filter(v -> ResourceType.Organization == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> organizations = ResourceUtils.getResourceList(e, ResourceType.Organization);
         assertThat(organizations).hasSize(1);
 
         Organization orgResource = ResourceUtils.getResourceOrganization(organizations.get(0), context);
@@ -359,68 +337,49 @@ public class Hl7EncounterFHIRConversionTest {
     }
 
     @Test
-    public void test_encounter_reason_code() {
-        // EVN.4 for reasonCode
-        String hl7message = "MSH|^~\\&|PROSOLV|SENTARA|WHIA|IBM|20151008111200|S1|ADT^A01^ADT_A01|MSGID000001|T|2.6|10092|PRPA008|AL|AL|100|8859/1|ENGLISH|ARM|ARM5007\n"
-                + "EVN|A04|20151008111200|20171013152901|O|OID1006|20171013153621|EVN1009\n"
+    public void testEncounterReasonCode() {
+        // EVN.4 and PV2.3 for reasonCode; both with known codes
+        String hl7message = "MSH|^~\\&|||||20151008111200||ADT^A01^ADT_A01|MSGID000001|T|2.6|||||||||\n"
+                + "EVN|A04|20151008111200||O|||\n"
                 + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
-                + "PV1|1|E|SAN JOSE|A|10089|MILPITAS|2740^Torres^Callie|2913^Grey^Meredith^F|3065^Sloan^Mark^J|CAR|FOSTER CITY|AD|R|1|A4|VI|9052^Shepeard^Derek^|AH|10019181|FIC1002|IC|CC|CR|CO|20161012034052|60000|6|AC|GHBR|20160926054052|AC5678|45000|15000|D|20161016154413|DCD|SAN FRANCISCO|VEG|RE|O|AV|FREMONT|CALIFORNIA|20161013154626|20161014154634|10000|14000|2000|4000|POL8009|V|PHY6007\n"
-                + "PV2|SAN BRUNO|AC4567||less equipped|purse|SAN MATEO|HO|20171014154626|20171018154634|4|3|DIAHHOREA|RSA456|20161013154626|Y|D|20191026001640|O|Y|1|F|Y|KAISER|AI|2|20161013154626|ED|20171018001900|20161013154626|10000|RR|Y|20171108002129|Y|Y|N|N|C^Car^HL70430\n";
+                + "PV1|1|E||||||||||||||||||||||||||||||||||||||||||||||||||\n"
+                // PV2.3 with known coding
+                + "PV2|||01.4^Fatigue^CCC||Diamond ring|||||||||||||||||||||||||||||||\n";
         Encounter encounter = ResourceUtils.getEncounter(hl7message);
 
         assertThat(encounter.hasReasonCode()).isTrue();
         List<CodeableConcept> reasonCodes = encounter.getReasonCode();
-        assertEquals(1, reasonCodes.size());
-        CodeableConcept encounterReason = encounter.getReasonCodeFirstRep();
-        Coding encounterReasonCoding = encounterReason.getCodingFirstRep();
-        assertThat(encounterReasonCoding.getCode()).isEqualTo("O");
-        assertThat(encounterReasonCoding.getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/v2-0062");
-        assertThat(encounterReasonCoding.getDisplay()).isEqualTo("Other");
-        assertThat(encounterReasonCoding.getVersion()).isNull();
+        assertThat(reasonCodes).hasSize(2);
 
-        // PV2.3 for reasonCode
-        hl7message = "MSH|^~\\&|PROSOLV|SENTARA|WHIA|IBM|20151008111200|S1|ADT^A01^ADT_A01|MSGID000001|T|2.6|10092|PRPA008|AL|AL|100|8859/1|ENGLISH|ARM|ARM5007\n"
-                + "EVN|A04|20151008111200|20171013152901||OID1006|20171013153621|EVN1009\n"
+        CodeableConcept encounterReasonEVN = reasonCodes.get(0);
+        CodeableConcept encounterReasonPV2 = reasonCodes.get(1);
+        if (encounterReasonPV2.getTextElement().toString() != "Fatigue") {
+                encounterReasonEVN = reasonCodes.get(1);
+                encounterReasonPV2 = reasonCodes.get(0);
+        }
+        DatatypeUtils.checkCommonCodeableConceptAssertions(encounterReasonPV2, "01.4", "Fatigue", "http://terminology.hl7.org/CodeSystem/CCC", "Fatigue");
+        DatatypeUtils.checkCommonCodeableConceptAssertions(encounterReasonEVN, "O", "Other", "http://terminology.hl7.org/CodeSystem/v2-0062", null);
+
+        // Using EVN-4 and PV2.3 for reasonCode BOTH with with unknown codes
+        hl7message = "MSH|^~\\&|||||20151008111200||ADT^A01^ADT_A01|MSGID000001|T|2.6|||||||||\n"
+                + "EVN|A04|20151008111200||REG_UPDATE|||\n"
                 + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
-                + "PV1|1|L|SAN JOSE|A|10089|MILPITAS|2740^Torres^Callie|2913^Grey^Meredith^F|3065^Sloan^Mark^J|CAR|FOSTER CITY|AD|R|1|A4|VI|9052^Shepeard^Derek^|AH|10019181|FIC1002|IC|CC|CR|CO|20161012034052|60000|6|AC|GHBR|20160926054052|AC5678|45000|15000|D|20161016154413|DCD|SAN FRANCISCO|VEG|RE|O|AV|FREMONT|CALIFORNIA|20161013154626|20161014154634|10000|14000|2000|4000|POL8009|V|PHY6007\n"
-                + "PV2|SAN BRUNO|AC4567|vomits|less equipped|purse|SAN MATEO|HO|20171014154626|20171018154634|4|3|DIAHHOREA|RSA456|20161013154626|Y|D|20191026001640|O|Y|1|F|Y|KAISER|AI|2|20161013154626|ED|20171018001900|20161013154626|10000|RR|Y|20171108002129|Y|Y|N|N|C^Car^HL70430\n";
+                + "PV1|1|E||||||||||||||||||||||||||||||||||||||||||||||||||\n"
+                + "PV2|||vomits|||||||||||||||||||||||||||||||||\n";
         encounter = ResourceUtils.getEncounter(hl7message);
 
         assertThat(encounter.hasReasonCode()).isTrue();
         reasonCodes = encounter.getReasonCode();
-        assertEquals(1, reasonCodes.size());
-        encounterReason = encounter.getReasonCodeFirstRep();
-        encounterReasonCoding = encounterReason.getCodingFirstRep();
-        assertThat(encounterReasonCoding.getCode()).isEqualTo("vomits");
-        assertThat(encounterReasonCoding.getSystem()).isNull();
-        assertThat(encounterReasonCoding.getDisplay()).isNull();
-        assertThat(encounterReasonCoding.getVersion()).isNull();
+        assertThat(reasonCodes).hasSize(2);
 
-        // Using both EVN-4 and PV2.3 for reasonCode
-        hl7message = "MSH|^~\\&|PROSOLV|SENTARA|WHIA|IBM|20151008111200|S1|ADT^A01^ADT_A01|MSGID000001|T|2.6|10092|PRPA008|AL|AL|100|8859/1|ENGLISH|ARM|ARM5007\n"
-                + "EVN|A04|20151008111200|20171013152901|O|OID1006|20171013153621|EVN1009\n"
-                + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
-                + "PV1|1|L|SAN JOSE|A|10089|MILPITAS|2740^Torres^Callie|2913^Grey^Meredith^F|3065^Sloan^Mark^J|CAR|FOSTER CITY|AD|R|1|A4|VI|9052^Shepeard^Derek^|AH|10019181|FIC1002|IC|CC|CR|CO|20161012034052|60000|6|AC|GHBR|20160926054052|AC5678|45000|15000|D|20161016154413|DCD|SAN FRANCISCO|VEG|RE|O|AV|FREMONT|CALIFORNIA|20161013154626|20161014154634|10000|14000|2000|4000|POL8009|V|PHY6007\n"
-                + "PV2|SAN BRUNO|AC4567|vomits|less equipped|purse|SAN MATEO|HO|20171014154626|20171018154634|4|3|DIAHHOREA|RSA456|20161013154626|Y|D|20191026001640|O|Y|1|F|Y|KAISER|AI|2|20161013154626|ED|20171018001900|20161013154626|10000|RR|Y|20171108002129|Y|Y|N|N|C^Car^HL70430\n";
-        encounter = ResourceUtils.getEncounter(hl7message);
-
-        assertThat(encounter.hasReasonCode()).isTrue();
-        reasonCodes = encounter.getReasonCode();
-        assertEquals(2, reasonCodes.size());
-
-        CodeableConcept reasonCodeCC = reasonCodes.get(0);
-        Coding coding = reasonCodeCC.getCodingFirstRep();
-        assertThat(coding.getCode()).isEqualTo("vomits");
-        assertThat(coding.getSystem()).isNull();
-        assertThat(coding.getDisplay()).isNull();
-        assertThat(coding.getVersion()).isNull();
-
-        reasonCodeCC = reasonCodes.get(1);
-        coding = reasonCodeCC.getCodingFirstRep();
-        assertThat(coding.getCode()).isEqualTo("O");
-        assertThat(coding.getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/v2-0062");
-        assertThat(coding.getDisplay()).isEqualTo("Other");
-        assertThat(coding.getVersion()).isNull();
+        encounterReasonEVN = reasonCodes.get(0);
+        encounterReasonPV2 = reasonCodes.get(1);
+        if (encounterReasonPV2.getCodingFirstRep().getCode() != "vomits") {
+                encounterReasonEVN = reasonCodes.get(1);
+                encounterReasonPV2 = reasonCodes.get(0);
+        }
+        DatatypeUtils.checkCommonCodeableConceptAssertions(encounterReasonPV2, "vomits", null, null, null);
+        DatatypeUtils.checkCommonCodeableConceptAssertions(encounterReasonEVN, "REG_UPDATE", null, null, null);
     }
 
     @Test
@@ -636,14 +595,10 @@ public class Hl7EncounterFHIRConversionTest {
         assertThat(bundleResource).isNotNull();
         Bundle b = (Bundle) bundleResource;
         List<BundleEntryComponent> e = b.getEntry();
-        List<Resource> patientResource = e.stream()
-                .filter(v -> ResourceType.Patient == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> patientResource = ResourceUtils.getResourceList(e, ResourceType.Patient);
         assertThat(patientResource).hasSize(1);
 
-        List<Resource> encounterResource = e.stream()
-                .filter(v -> ResourceType.Encounter == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> encounterResource = ResourceUtils.getResourceList(e, ResourceType.Encounter);
         assertThat(encounterResource).hasSize(1);
 
         Encounter encounter = ResourceUtils.getResourceEncounter(encounterResource.get(0), context);
@@ -651,9 +606,7 @@ public class Hl7EncounterFHIRConversionTest {
         List<EncounterParticipantComponent> encParticipantList = encounter.getParticipant();
         assertThat(encParticipantList).hasSize(8);
 
-        List<Resource> practioners = e.stream()
-                .filter(v -> ResourceType.Practitioner == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> practioners = ResourceUtils.getResourceList(e, ResourceType.Practitioner);
         assertThat(practioners).hasSize(8);
 
         HashMap<String, List<String>> practionerMap = new HashMap<String, List<String>>();
@@ -731,14 +684,10 @@ public class Hl7EncounterFHIRConversionTest {
         assertThat(bundleResource).isNotNull();
         Bundle b = (Bundle) bundleResource;
         List<BundleEntryComponent> e = b.getEntry();
-        List<Resource> patientResource = e.stream()
-                .filter(v -> ResourceType.Patient == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> patientResource = ResourceUtils.getResourceList(e, ResourceType.Patient);
         assertThat(patientResource).hasSize(1);
 
-        List<Resource> encounterResource = e.stream()
-                .filter(v -> ResourceType.Encounter == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> encounterResource = ResourceUtils.getResourceList(e, ResourceType.Encounter);
         assertThat(encounterResource).hasSize(1);
 
         Encounter encounter = ResourceUtils.getResourceEncounter(encounterResource.get(0), context);
@@ -746,9 +695,7 @@ public class Hl7EncounterFHIRConversionTest {
         assertThat(encParticipantList).hasSize(1);
         EncounterParticipantComponent participantComponent = encParticipantList.get(0);
 
-        List<Resource> practioners = e.stream()
-                .filter(v -> ResourceType.Practitioner == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> practioners = ResourceUtils.getResourceList(e, ResourceType.Practitioner);
         assertThat(practioners).hasSize(1);
         Practitioner practitioner = ResourceUtils.getResourcePractitioner(practioners.get(0), context);
 
@@ -779,9 +726,7 @@ public class Hl7EncounterFHIRConversionTest {
                 .map(BundleEntryComponent::getResource).collect(Collectors.toList());
         assertThat(obsResource).hasSize(1);
 
-        List<Resource> encounterResource = e.stream()
-                .filter(v -> ResourceType.Encounter == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> encounterResource = ResourceUtils.getResourceList(e, ResourceType.Encounter);
         assertThat(encounterResource).hasSize(1);
 
         Encounter enc = (Encounter) encounterResource.get(0);
@@ -806,14 +751,10 @@ public class Hl7EncounterFHIRConversionTest {
         assertThat(bundleResource).isNotNull();
         Bundle b = (Bundle) bundleResource;
         List<BundleEntryComponent> e = b.getEntry();
-        List<Resource> obsResource = e.stream()
-                .filter(v -> ResourceType.Observation == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> obsResource = ResourceUtils.getResourceList(e, ResourceType.Observation);
         assertThat(obsResource).hasSize(1);
 
-        List<Resource> encounterResource = e.stream()
-                .filter(v -> ResourceType.Encounter == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> encounterResource = ResourceUtils.getResourceList(e, ResourceType.Encounter);
         assertThat(encounterResource).hasSize(1);
 
         Encounter enc = (Encounter) encounterResource.get(0);

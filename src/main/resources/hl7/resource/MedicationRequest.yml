@@ -89,6 +89,12 @@ intent:
   constants:
     default: "order"
 
+category:
+  valueOf: datatype/CodeableConcept
+  expressionType: resource
+  vars:
+    coding: MEDREQ_CATEGORY, ORC.29
+
 medicationCodeableConcept_1:
   condition: $rxO NOT_NULL
   valueOf: datatype/CodeableConcept
@@ -96,6 +102,7 @@ medicationCodeableConcept_1:
   specs: RXO.1
   vars:
     rxO: RXO.1
+
 medicationCodeableConcept_2:
   condition: $rxE NOT_NULL 
   valueOf: datatype/CodeableConcept
@@ -103,6 +110,7 @@ medicationCodeableConcept_2:
   specs: RXE.2
   vars:
     rxE: RXE.2
+
 medicationCodeableConcept_3:
   condition: $rxC NOT_NULL
   valueOf: datatype/CodeableConcept
@@ -113,7 +121,40 @@ medicationCodeableConcept_3:
 
 authoredOn:
   type: DATE_TIME
-  valueOf: RXE.32
+  valueOf: $val
   expressionType: HL7Spec
+  vars:
+    val: RXE.32 | ORC.9
 
+reasonCode:
+  valueOf: datatype/CodeableConcept
+  generateList: true
+  expressionType: resource
+  specs: RXE.27 | RXO.20 | ORC.16
+
+requester_1:
+  condition: $rxe13 NOT_NULL
+  valueOf: resource/Practitioner
+  expressionType: reference
+  specs: RXE.13
+  vars:
+    rxe13: RXE.13
+  constants:
+    system: "http://terminology.hl7.org/CodeSystem/v2-0203"
+    code: "DEA"
+    display: "Drug Enforcement Administration registration number"
+
+requester_2:
+  condition: $orc12 NOT_NULL && $rxe13 NULL
+  valueOf: resource/Practitioner
+  expressionType: reference
+  specs: ORC.12
+  vars:
+    orc12: ORC.12
+
+dispenseRequest:
+  valueOf: secondary/DispenseRequest
+  expressionType: resource
+  vars:
+    timestamp: ORC.15
 

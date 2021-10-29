@@ -38,6 +38,7 @@ import io.github.linuxforhealth.hl7.resource.ResourceReader;
  * @author pbhallam
  */
 public class HL7ToFHIRConverter {
+  private static HL7HapiParser hparser = new HL7HapiParser();
   private static final Logger LOGGER = LoggerFactory.getLogger(HL7ToFHIRConverter.class);
   private Map<String, HL7MessageModel> messagetemplates = new HashMap<>();
 
@@ -136,30 +137,40 @@ public class HL7ToFHIRConverter {
     }
   }
 
-
+  
   private static Message getHl7Message(String data) {
-
-    HL7HapiParser hparser = null;
     Message hl7message = null;
     try (InputStream ins = IOUtils.toInputStream(data, StandardCharsets.UTF_8)) {
       Hl7InputStreamMessageStringIterator iterator = new Hl7InputStreamMessageStringIterator(ins);
       // only supports single message conversion.
       if (iterator.hasNext()) {
-        hparser = new HL7HapiParser();
+        
         hl7message = hparser.getParser().parse(iterator.next());
       }
     } catch (HL7Exception e) {
       throw new IllegalArgumentException("Cannot parse the message.", e);
     } catch (IOException ioe) {
       throw new IllegalArgumentException("IOException encountered.", ioe);
-    } finally {
-      close(hparser);
     }
 
     try{
         if(hl7message != null) {
             String messageStructureInfo = hl7message.printStructure();
-            LOGGER.debug("HL7_MESSAGE_STRUCTURE={}",messageStructureInfo);
+            StringBuilder output = new StringBuilder();
+            String[] messageStructureInfoLines = messageStructureInfo.split(System.getProperty("line.separator"));
+            for (String line: messageStructureInfoLines) {
+                if(!line.contains("|")) {
+                    output.append(line);
+                }
+                else {
+                    int firstDash = line.indexOf("-");
+                    output.append(line.substring(0, firstDash+5));
+                }
+                output.append("\n");
+            }
+            if(output.length() > 0) {
+                LOGGER.info("HL7_MESSAGE_STRUCTURE=\n{}",output);
+            }
         }
     } catch (HL7Exception e) {
         throw new IllegalArgumentException("Error printing message structure.", e);
