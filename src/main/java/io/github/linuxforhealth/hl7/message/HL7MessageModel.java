@@ -21,15 +21,11 @@ import io.github.linuxforhealth.api.MessageEngine;
 import io.github.linuxforhealth.api.MessageTemplate;
 import io.github.linuxforhealth.hl7.parsing.HL7DataExtractor;
 import io.github.linuxforhealth.hl7.parsing.HL7HapiParser;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class HL7MessageModel implements MessageTemplate<Message> {
 
   private List<FHIRResourceTemplate> resources;
   private String messageName;
-  private static final Logger LOGGER = LoggerFactory.getLogger(HL7MessageModel.class);
-
 
   @JsonCreator
   public HL7MessageModel(@JsonProperty("messageName") String messageName,
@@ -74,18 +70,10 @@ public class HL7MessageModel implements MessageTemplate<Message> {
     HL7DataExtractor hl7DTE = new HL7DataExtractor(message);
     HL7MessageData dataSource = new HL7MessageData(hl7DTE);
 
-    String result = null;
-    
-    //Catch any exceptions and don't display them because they *could* show PHI.
-    try {
-	    Bundle bundle = engine.transform(dataSource, this.getResources(), new HashMap<>());
-        result = engine.getFHIRContext().encodeResourceToString(bundle);
-    }
-    catch(Exception e) {
-        LOGGER.error("Error transforming HL7 message");
-    }
-
-    return result;
+    Bundle bundle =
+        engine.transform(dataSource, this.getResources(), new HashMap<>());
+    return engine.getFHIRContext()
+        .encodeResourceToString(bundle);
 
   }
 
