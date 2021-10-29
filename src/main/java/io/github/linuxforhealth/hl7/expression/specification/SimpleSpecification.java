@@ -12,6 +12,7 @@ import io.github.linuxforhealth.api.InputDataExtractor;
 import io.github.linuxforhealth.api.Specification;
 import io.github.linuxforhealth.core.Constants;
 import io.github.linuxforhealth.core.expression.EvaluationResultFactory;
+import io.github.linuxforhealth.core.expression.VariableUtils;
 
 
 /**
@@ -27,14 +28,22 @@ public class SimpleSpecification implements Specification {
   private String variableName;
   private boolean isExtractMultiple;
   private boolean useGroup;
+  private boolean isFuzzyMatch;
+
   private InputDataExtractor primaryDataSource = new ContextMapData();
 
   public SimpleSpecification(String variableName, boolean isMultiple, boolean useGroup) {
-    this.variableName = variableName;
-    this.isExtractMultiple = isMultiple;
-    this.useGroup = useGroup;
+		this(variableName, isMultiple, useGroup, false);
 
   }
+
+	public SimpleSpecification(String variableName, boolean isMultiple, boolean useGroup, boolean usePrefix) {
+		this.variableName = variableName;
+		this.isExtractMultiple = isMultiple;
+		this.useGroup = useGroup;
+        this.isFuzzyMatch = VariableUtils.isFuzzyMatch(variableName);
+
+	}
 
 
 
@@ -80,6 +89,12 @@ public class SimpleSpecification implements Specification {
   public void setUseGroup(boolean useGroup) {
     this.useGroup = useGroup;
   }
+
+  public boolean isFuzzyMatch() {
+    return isFuzzyMatch;
+  }
+
+
 
 
 }

@@ -186,9 +186,8 @@ securityLabel:
 context:
    valueOf: secondary/Context
    expressionType: resource
-   fuzzyGroup: true
    vars:
       timestamp: TXA.4 
       providerCode: TXA.5
-      serviceRequestRef: $ServiceRequest
+      serviceRequestRef: $ServiceRequest?
       encounterRef: $Encounter
