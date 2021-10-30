@@ -9,6 +9,8 @@ The converter supports the following message types/events:
 * ADT_A08 - Patient Administration: Update Patient Information
 * ADT_A34 - Patient Administration: Merge Patient Information - Patient ID Only
 * ADT_A40 - Patient Administration: Merge Patient - Patient Identifier List
+* MDM_T02 - Original Document Notifcication and Content
+* MDM_T06 - Document Addendum Notification and Content
 * OMP_O09 - Pharmacy/Treatment Order
 * ORU_R01 - Observation Reporting: Observation and Result Transmission (Laboratory)
 * PPR_PC1 - Patient Problem: Add Problem
