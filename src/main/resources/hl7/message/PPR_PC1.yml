@@ -43,6 +43,7 @@ resources:
       - .ORDER.ORC
       - .ORDER.ORDER_DETAIL.OBR
       - MSH
+      - .PROBLEM_OBSERVATION.NTE
 
   - resourceName: Condition
     segment: .PRB
@@ -53,6 +54,7 @@ resources:
       - MSH
       - PID
       - PATIENT_VISIT.PV1
+      - .NTE
 
   - resourceName: ServiceRequest
     segment: .ORDER.ORC
