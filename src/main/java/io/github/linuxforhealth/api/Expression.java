@@ -96,14 +96,5 @@ public interface Expression {
 
   }
 
-    /**
-   * 
-   * 
-   * @return true if the expression should compare without explicit grouping. {@link boolean}
-   */
-  default boolean isFuzzyGroup() {
-    return false;
-
-  }
 
 }
