@@ -38,7 +38,7 @@ public class HL7MergeFHIRConversionTest {
                 + "MRG|456||||||\r";
 
         // Convert hl7 message
-        List<BundleEntryComponent> e = ResourceUtils.createHl7Segment(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
 
         // Find the patient resources in the FHIR bundle.
         List<Resource> patientResources = e.stream()
@@ -190,7 +190,7 @@ public class HL7MergeFHIRConversionTest {
                 + "MRG|MR2^^^XYZ\r";
 
         // Convert hl7 message
-        List<BundleEntryComponent> e = ResourceUtils.createHl7Segment(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
 
         // Find the patient resources in the FHIR bundle.
         List<Resource> patientResources = e.stream()
@@ -289,7 +289,7 @@ public class HL7MergeFHIRConversionTest {
                 + "MRG|MR4^^^XYZ^MR||\r";
 
         // Convert hl7 message
-        List<BundleEntryComponent> e = ResourceUtils.createHl7Segment(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
 
         // Find the patient resources in the FHIR bundle.
         List<Resource> patientResources = e.stream()

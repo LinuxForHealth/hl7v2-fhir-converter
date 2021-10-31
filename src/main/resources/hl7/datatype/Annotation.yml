@@ -1,5 +1,5 @@
 #
-# (C) Copyright IBM Corp. 2020
+# (C) Copyright IBM Corp. 2020, 2021
 #
 # SPDX-License-Identifier: Apache-2.0
 #
@@ -23,6 +23,6 @@ time:
    expressionType: HL7Spec
 text:
    type: STRING
-   valueOf: NTE.3 |$text
+   valueOf: $text | NTE.3
    required: true
    expressionType: HL7Spec
