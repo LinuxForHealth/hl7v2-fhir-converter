@@ -27,7 +27,7 @@ public class Hl7NoteFHIRConverterTest {
 
     // Tests NTE creation for OBX (Observations) and ORC/OBRs (ServiceRequests)
     @Test
-    public void testNoteCreationMutipleORU() {
+    public void testNoteCreationMutipleOBX() {
         String hl7ORU = "MSH|^~\\&|||||20180924152907||ORU^R01^ORU_R01|213|T|2.3.1|||||||||||\n"
                 + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
                 // TODO: Future work, handle NTE's on PID
@@ -35,20 +35,23 @@ public class Hl7NoteFHIRConverterTest {
                 + "PV1|1|I||||||||||||||||||||||||||||||||||||||||||20180924152707|\n"
                 + "ORC|RE|248648498^|248648498^|ML18267-C00001^Beaker|||||||||||||||||||||||||||\n"
                 + "OBR|1|248648498^|248648498^|83036E^HEMOGLOBIN A1C^PACSEAP^^^^^^HEMOGLOBIN A1C||||||||||||||||||||||||||||||||||||\n"
-                + "NTE|1|O|TEST ORC/OBR NOTE AA line 1|\n" + "NTE|2|O|TEST NOTE AA line 2|\n"
+                + "NTE|1|O|TEST ORC/OBR NOTE AA line 1|\n" 
+                + "NTE|2|O|TEST NOTE AA line 2|\n"
                 + "NTE|3|O|TEST NOTE AA line 3|\n"
                 + "OBX|1|NM|17985^GLYCOHEMOGLOBIN HGB A1C^LRR^^^^^^GLYCOHEMOGLOBIN HGB A1C||5.6|%|<6.0||||F||||||||||||||\n"
-                + "NTE|1|L|TEST OBXa NOTE BB line 1|\n" + "NTE|2|L|TEST NOTE BB line 2|\n"
+                + "NTE|1|L|TEST OBXa NOTE BB line 1|\n" 
+                + "NTE|2|L|TEST NOTE BB line 2|\n"
                 + "NTE|3|L|TEST NOTE BB line 3|\n"
                 + "OBX|2|NM|17853^MEAN BLOOD GLUCOSE^LRR^^^^^^MEAN BLOOD GLUCOSE||114.02|mg/dL|||||F||||||||||||||\n"
-                + "NTE|1|L|TEST OBXb NOTE CC line 1|\n" + "NTE|2|L|TEST NOTE CC line 2|\n"
+                + "NTE|1|L|TEST OBXb NOTE CC line 1|\n" 
+                + "NTE|2|L|TEST NOTE CC line 2|\n"
                 + "NTE|3|L|TEST NOTE CC line 3|\n"
                 + "NTE|4|L|TEST NOTE CC line 4|\n"
                 + "SPM|1|||^^^^^^^^Blood|||||||||||||20180924152700|20180924152755||||||";
 
         List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7ORU);
         List<Resource> diagnosticReports = ResourceUtils.getResourceList(e, ResourceType.DiagnosticReport);
-        assertThat(diagnosticReports).hasSize(1);
+        assertThat(diagnosticReports).hasSize(1); // From the OBR
 
         // One ServiceRequest contains NTE for ORC/OBR
         List<Resource> serviceRequests = ResourceUtils.getResourceList(e, ResourceType.ServiceRequest);
@@ -63,23 +66,23 @@ public class Hl7NoteFHIRConverterTest {
         // Two observations.  One has GLYCOHEMOGLOBIN and notes BB, One has GLUCOSE and notes CC
         List<Resource> observations = ResourceUtils.getResourceList(e, ResourceType.Observation);
         assertThat(observations).hasSize(2);
-        Observation ObsGlucose = ResourceUtils.getResourceObservation(observations.get(0), ResourceUtils.context);
-        Observation ObsHemoglobin = ResourceUtils.getResourceObservation(observations.get(1), ResourceUtils.context);
+        Observation obsGlucose = ResourceUtils.getResourceObservation(observations.get(0), ResourceUtils.context);
+        Observation obsHemoglobin = ResourceUtils.getResourceObservation(observations.get(1), ResourceUtils.context);
         // Figure out which is first and reassign if needed for testing
-        if (ObsGlucose.getCode().getText() != "MEAN BLOOD GLUCOSE") {
-            Observation temp = ObsGlucose;
-            ObsGlucose = ObsHemoglobin;
-            ObsHemoglobin = temp;
+        if (obsGlucose.getCode().getText() != "MEAN BLOOD GLUCOSE") {
+            Observation temp = obsGlucose;
+            obsGlucose = obsHemoglobin;
+            obsHemoglobin = temp;
         }
-        assertThat(ObsGlucose.hasNote()).isTrue();
-        assertThat(ObsGlucose.getNote()).hasSize(1);
+        assertThat(obsGlucose.hasNote()).isTrue();
+        assertThat(obsGlucose.getNote()).hasSize(1);
         // Processing adds "  \n" two spaces and a line feed
         // Note on test strings. Must double back-slashes to create single backslash in string.
-        assertThat(ObsGlucose.getNote().get(0).getText()).isEqualTo(
+        assertThat(obsGlucose.getNote().get(0).getText()).isEqualTo(
                 "TEST OBXb NOTE CC line 1  \\nTEST NOTE CC line 2  \\nTEST NOTE CC line 3  \\nTEST NOTE CC line 4  \\n");
-        assertThat(ObsHemoglobin.hasNote()).isTrue();
-        assertThat(ObsHemoglobin.getNote()).hasSize(1);
-        assertThat(ObsHemoglobin.getNote().get(0).getText())
+        assertThat(obsHemoglobin.hasNote()).isTrue();
+        assertThat(obsHemoglobin.getNote()).hasSize(1);
+        assertThat(obsHemoglobin.getNote().get(0).getText())
                 .isEqualTo("TEST OBXa NOTE BB line 1  \\nTEST NOTE BB line 2  \\nTEST NOTE BB line 3  \\n");
 
     }
@@ -89,29 +92,37 @@ public class Hl7NoteFHIRConverterTest {
     @Test
     public void testNoteCreationMutiplePPR()
             throws IOException {
+        // TODO: Add PC2 and PC3 tests in future            
         String message = "PPR^PC1";
         String hl7message = "MSH|^~\\&|SendTest1|Sendfac1|Receiveapp1|Receivefac1|200603081747|security|" + message
                 + "|1|P^I|2.6||||||ASCII||\n"
                 + "PID|||555444222111^^^MPI&GenHosp&L^MR||james^anderson|||M||||||||||||||\n"
                 + "PV1||I|||||||||||||||||1400|||||||||||||||||||||||||199501102300\n"
                 + "PRB|AD|200603150625|aortic stenosis|53692||2||200603150625\n"
-                + "NTE|1|O|TEST PRBa NOTE AA line 1|\n" + "NTE|2|O|TEST NOTE AA line 2|\n"
+                + "NTE|1|O|TEST PRBa NOTE AA line 1|\n" 
+                + "NTE|2|O|TEST NOTE AA line 2|\n"
                 + "NTE|3|O|TEST NOTE AA line 3|\n"
                 + "OBX|1|NM|17985^GLYCOHEMOGLOBIN HGB A1C^LRR^^^^^^GLYCOHEMOGLOBIN HGB A1C||5.6|%|<6.0||||F||||||||||||||\n"
-                + "NTE|1|L|TEST OBXb NOTE BB line 1|\n" + "NTE|2|L|TEST NOTE BB line 2|\n"
+                + "NTE|1|L|TEST OBXb NOTE BB line 1|\n" 
+                + "NTE|2|L|TEST NOTE BB line 2|\n"
                 + "NTE|3|L|TEST NOTE BB line 3|\n"
                 + "OBX|2|NM|17853^MEAN BLOOD GLUCOSE^LRR^^^^^^MEAN BLOOD GLUCOSE||114.02|mg/dL|||||F||||||||||||||\n"
-                + "NTE|1|L|TEST OBXc NOTE CC line 1|\n" + "NTE|2|L|TEST NOTE CC line 2|\n"
+                + "NTE|1|L|TEST OBXc NOTE CC line 1|\n" 
+                + "NTE|2|L|TEST NOTE CC line 2|\n"
                 + "NTE|3|L|TEST NOTE CC line 3|\n"
                 + "PRB|AD|200603150625|I47.2^Ventricular tachycardia^ICD-10-CM|53692||2||200603150625\n"
-                + "NTE|1|O|TEST PRBd NOTE DD line 1|\n" + "NTE|2|O|TEST NOTE DD line 2|\n"
+                + "NTE|1|O|TEST PRBd NOTE DD line 1|\n" 
+                + "NTE|2|O|TEST NOTE DD line 2|\n"
                 + "NTE|3|O|TEST NOTE DD line 3|\n"
                 + "OBX|1|NM|8595^BP Mean|1|88|MM HG|||||F|||20180520230000|||\n"
-                + "NTE|1|L|TEST OBXe NOTE EE line 1|\n" + "NTE|2|L|TEST NOTE EE line 2|\n"
+                + "NTE|1|L|TEST OBXe NOTE EE line 1|\n" 
+                + "NTE|2|L|TEST NOTE EE line 2|\n"
                 + "NTE|3|L|TEST NOTE EE line 3|\n"
                 + "OBX|2|NM|7302^Resp Rate|1|19||||||F|||20180520230000|||\n"
-                + "NTE|1|L|TEST OBXf NOTE FF line 1|\n" + "NTE|2|L|TEST NOTE FF line 2|\n"
+                + "NTE|1|L|TEST OBXf NOTE FF line 1|\n" 
+                + "NTE|2|L|TEST NOTE FF line 2|\n"
                 + "NTE|3|L|TEST NOTE FF line 3|\n";
+                // TODO:  have one of these have a single NTE segment, to verify that is handled correctly (no newlines added to text).
 
         List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
         List<Resource> patients = ResourceUtils.getResourceList(e, ResourceType.Patient);
@@ -130,7 +141,7 @@ public class Hl7NoteFHIRConverterTest {
             condStenosis = condTachy;
             condTachy = temp;
         }
-        // Test 
+        // Test the conditions have the correct NTE's associated and have correct content.
         assertThat(condStenosis.hasNote()).isTrue();
         assertThat(condStenosis.getNote()).hasSize(1);
         assertThat(condStenosis.getNote().get(0).getText())
@@ -161,19 +172,19 @@ public class Hl7NoteFHIRConverterTest {
         // Dig through the Conditions, find the referenced Observations, find the matching Observation resource
         // and ensure it has the expected Notes and referenced parent.
         // For the list of Conditions
-        for(int cDex=0; cDex < conditions.size(); cDex++) {
+        for(int condIndex=0; condIndex < conditions.size(); condIndex++) {  // condIndex is index for condition
             // Get the list of Observation references
-            Condition cond = ResourceUtils.getResourceCondition(conditions.get(cDex), ResourceUtils.context);
+            Condition cond = ResourceUtils.getResourceCondition(conditions.get(condIndex), ResourceUtils.context);
             List<ConditionEvidenceComponent> evidences = cond.getEvidence();
-            for(int eDex=0; eDex < evidences.size(); eDex++) {
+            for(int evidenceIndex=0; evidenceIndex < evidences.size(); evidenceIndex++) {
                 // Get the evidence Observation reference
-                String obsReferenceId = evidences.get(eDex).getDetailFirstRep().getReference();
+                String obsReferenceId = evidences.get(evidenceIndex).getDetailFirstRep().getReference();
                 // Find the referenced observation
-                for(int oDex=0; oDex < observations.size(); oDex++) {
+                for(int obsIndex=0; obsIndex < observations.size(); obsIndex++) {
                     // If the Id's match
-                    if (obsReferenceId.contains(observations.get(oDex).getId())) {
+                    if (obsReferenceId.contains(observations.get(obsIndex).getId())) {
                         // Check the contents and the parent
-                        Observation obs = ResourceUtils.getResourceObservation(observations.get(oDex),ResourceUtils.context);
+                        Observation obs = ResourceUtils.getResourceObservation(observations.get(obsIndex),ResourceUtils.context);
                         String code = obs.getCode().getCodingFirstRep().getCode().toString();
                         // The Annotation text should match the mapped text for this key
                         assertThat(obs.getNoteFirstRep().getText()).hasToString(matchObsCodeToNotes.get(code));
@@ -185,6 +196,7 @@ public class Hl7NoteFHIRConverterTest {
                 }
             }    
         }
+        // This confirms ALL of the observations were checked.
         assertThat(observationsVerified).isEqualTo(4);
     }
 
