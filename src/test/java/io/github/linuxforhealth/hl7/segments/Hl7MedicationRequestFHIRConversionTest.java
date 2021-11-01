@@ -669,7 +669,7 @@ public class Hl7MedicationRequestFHIRConversionTest {
 
         HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
         String json = ftv.convert(hl7message, PatientUtils.OPTIONS);
-        assertThat(json).isNotBlank();
+        assertThat(json).isNotBlank(); System.out.println(json);
         LOGGER.debug("FHIR json result:\n" + json);
         IBaseResource bundleResource = context.getParser().parseResource(json);
         assertThat(bundleResource).isNotNull();
