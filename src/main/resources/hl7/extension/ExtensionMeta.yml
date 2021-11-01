@@ -54,7 +54,6 @@ extension_5:
             display: $NULL
          constants:
             system_code: 'source-record-type-system'
-            noDisplay: "no display"
 
 extension_6:
    generateList: true
@@ -72,4 +71,3 @@ extension_6:
             display: $NULL
          constants:
             system_code: 'source-event-trigger-system'
-            noDisplay: "no display"
