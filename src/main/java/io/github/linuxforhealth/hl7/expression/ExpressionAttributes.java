@@ -16,7 +16,6 @@ import org.apache.commons.lang3.EnumUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
-import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.text.StringTokenizer;
 import org.apache.commons.text.matcher.StringMatcherFactory;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -25,8 +24,6 @@ import com.google.common.collect.ImmutableMap;
 import io.github.linuxforhealth.api.Condition;
 import io.github.linuxforhealth.api.Specification;
 import io.github.linuxforhealth.api.Variable;
-import io.github.linuxforhealth.core.Constants;
-import io.github.linuxforhealth.core.expression.VariableUtils;
 import io.github.linuxforhealth.core.expression.condition.ConditionUtil;
 import io.github.linuxforhealth.hl7.expression.specification.SpecificationParser;
 import io.github.linuxforhealth.hl7.expression.variable.VariableGenerator;
@@ -55,6 +52,7 @@ public class ExpressionAttributes {
   private final Map<String, ExpressionAttributes> expressionsMap;
   private final boolean isEvaluateLater;
 
+
   // if valueof attribute ends with * then list of values will be generated
   private boolean generateMultiple;
 
@@ -71,12 +69,13 @@ public class ExpressionAttributes {
 
     this.isRequired = exBuilder.isRequired;
     this.isEvaluateLater = exBuilder.isEvaluateLater;
+   
     this.generateMultiple = exBuilder.generateList;
 
 
     this.specs = getSpecList(exBuilder.rawSpecs, exBuilder.useGroup, this.generateMultiple);
     if (StringUtils.isNotBlank(exBuilder.rawCondition)) {
-      this.condition = ConditionUtil.createCondition(exBuilder.rawCondition);
+      this.condition = ConditionUtil.createCondition(exBuilder.rawCondition, exBuilder.useGroup);
     } else {
       this.condition = null;
     }
@@ -200,7 +199,7 @@ public class ExpressionAttributes {
     boolean retainEmpty = false;
     String expression = inputString;
 
-    if (StringUtils.endsWith(expression, "*")) {
+    if (StringUtils.endsWith(expression, "*") && !StringUtils.endsWith(expression, ".*")) {
       expression = StringUtils.removeEnd(expression, "*");
       extractMultiple = true;
     }
@@ -209,7 +208,7 @@ public class ExpressionAttributes {
       retainEmpty = true;
     }
     // Repeat check for asterisk to allow for different order of special chars
-    if (StringUtils.endsWith(expression, "*")) {
+    if (StringUtils.endsWith(expression, "*") && !StringUtils.endsWith(expression, ".*")) {
       expression = StringUtils.removeEnd(expression, "*");
       extractMultiple = true;
     }
@@ -251,6 +250,7 @@ public class ExpressionAttributes {
 
 
 
+
   public static class Builder {
 
 
@@ -273,6 +273,7 @@ public class ExpressionAttributes {
 
     private Map<String, ExpressionAttributes> expressionsMap;
     private boolean isEvaluateLater;
+  
 
 
     public Builder() {}
@@ -310,6 +311,8 @@ public class ExpressionAttributes {
       this.isEvaluateLater = isEvaluateLater;
       return this;
     }
+
+
 
     public Builder withSpecs(String rawSpecs) {
       this.rawSpecs = rawSpecs;

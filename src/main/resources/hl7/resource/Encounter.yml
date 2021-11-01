@@ -109,11 +109,11 @@ reasonReference_1:
 
 reasonReference_2:
    valueOf: datatype/Reference
-   condition: $Observation NOT_NULL
+   condition: $Observation? NOT_NULL
    evaluateLater: true
    generateList: true
    expressionType: resource
-   specs: $Observation    
+   specs: $Observation? 
 
 hospitalization:
     valueOf: secondary/Hospitalization

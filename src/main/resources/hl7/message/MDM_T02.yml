@@ -45,6 +45,7 @@ resources:
       segment: COMMON_ORDER.ORC
       resourcePath: resource/ServiceRequest
       repeats: true
+      isReferenced: true
       additionalSegments:
         - COMMON_ORDER.OBR
         - MSH

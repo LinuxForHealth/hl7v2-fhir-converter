@@ -61,7 +61,7 @@ coding_6:
    
 # Require available text, and the absense of an identifierCoding
 text:
-   condition: $displayText NOT_NULL && identifierCoding NULL
+   condition: $displayText NOT_NULL && $identifierCoding NULL
    type: STRING
    valueOf: $displayText
    vars:

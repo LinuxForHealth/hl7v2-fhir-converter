@@ -189,5 +189,5 @@ context:
    vars:
       timestamp: TXA.4 
       providerCode: TXA.5
-      serviceRequestRef: $ServiceRequest
+      serviceRequestRef: $ServiceRequest?
       encounterRef: $Encounter
