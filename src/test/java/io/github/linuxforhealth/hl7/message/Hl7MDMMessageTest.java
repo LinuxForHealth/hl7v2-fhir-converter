@@ -46,7 +46,7 @@ public class Hl7MDMMessageTest {
 
     @ParameterizedTest
     @ValueSource(strings = { "MDM^T02", "MDM^T06" })
-    public void test_mdm_mininum_with_OBXtypeTX(String message) throws IOException {
+    public void test_mdm_mininum_with_OBXtypeTXtoDocumenReference(String message) throws IOException {
         String hl7message =
             "MSH|^~\\&|HNAM|W|RAD_IMAGING_REPORT|W|20180118111520||" + message + "|<MESSAGEID>|P|2.6\r"
             + "EVN||20150502090000|\r"
@@ -71,17 +71,17 @@ public class Hl7MDMMessageTest {
         List<Resource> encounterResource =
         e.stream().filter(v -> ResourceType.Encounter == v.getResource().getResourceType())
             .map(BundleEntryComponent::getResource).collect(Collectors.toList());
-        assertThat(encounterResource).hasSize(1);
+        assertThat(encounterResource).hasSize(1); // from EVN, PV1
 
         List<Resource> patientResource =
         e.stream().filter(v -> ResourceType.Patient == v.getResource().getResourceType())
             .map(BundleEntryComponent::getResource).collect(Collectors.toList());
-        assertThat(patientResource).hasSize(1);
+        assertThat(patientResource).hasSize(1); // from PID
 
         List<Resource> documentReferenceResource =
         e.stream().filter(v -> ResourceType.DocumentReference == v.getResource().getResourceType())
             .map(BundleEntryComponent::getResource).collect(Collectors.toList());
-        assertThat(documentReferenceResource).hasSize(1);
+        assertThat(documentReferenceResource).hasSize(1); // from TXA, OBX(type TX)
 
         // Confirm that no extra resources are created
         assertThat(e.size()).isEqualTo(3);
@@ -114,22 +114,22 @@ public class Hl7MDMMessageTest {
         List<Resource> encounterResource =
         e.stream().filter(v -> ResourceType.Encounter == v.getResource().getResourceType())
             .map(BundleEntryComponent::getResource).collect(Collectors.toList());
-        assertThat(encounterResource).hasSize(1);
+        assertThat(encounterResource).hasSize(1); // from EVN, PV1
 
         List<Resource> patientResource =
         e.stream().filter(v -> ResourceType.Patient == v.getResource().getResourceType())
             .map(BundleEntryComponent::getResource).collect(Collectors.toList());
-        assertThat(patientResource).hasSize(1);
+        assertThat(patientResource).hasSize(1); // from PID
 
         List<Resource> documentReferenceResource =
         e.stream().filter(v -> ResourceType.DocumentReference == v.getResource().getResourceType())
             .map(BundleEntryComponent::getResource).collect(Collectors.toList());
-        assertThat(documentReferenceResource).hasSize(1);
+        assertThat(documentReferenceResource).hasSize(1); // from TXA
 
         List<Resource> observationResource =
         e.stream().filter(v -> ResourceType.Observation == v.getResource().getResourceType())
             .map(BundleEntryComponent::getResource).collect(Collectors.toList());
-        assertThat(observationResource).hasSize(1);
+        assertThat(observationResource).hasSize(1); // from OBX(not type TX)
 
         // Confirm that no extra resources are created
         assertThat(e.size()).isEqualTo(4);
@@ -137,7 +137,7 @@ public class Hl7MDMMessageTest {
 
     @ParameterizedTest
     @ValueSource(strings = { "MDM^T02", "MDM^T06" })
-    public void test_mdm_mininum_with_multiple_OBXtypeTX(String message) throws IOException {
+    public void test_mdm_mininum_with_multiple_OBXtypeTXtoDocumentReference(String message) throws IOException {
         String hl7message =
             "MSH|^~\\&|HNAM|W|RAD_IMAGING_REPORT|W|20180118111520||" + message + "|<MESSAGEID>|P|2.6\r"
             + "EVN||20150502090000|\r"
@@ -164,17 +164,17 @@ public class Hl7MDMMessageTest {
         List<Resource> encounterResource =
         e.stream().filter(v -> ResourceType.Encounter == v.getResource().getResourceType())
             .map(BundleEntryComponent::getResource).collect(Collectors.toList());
-        assertThat(encounterResource).hasSize(1);
+        assertThat(encounterResource).hasSize(1); // from EVN, PV1
 
         List<Resource> patientResource =
         e.stream().filter(v -> ResourceType.Patient == v.getResource().getResourceType())
             .map(BundleEntryComponent::getResource).collect(Collectors.toList());
-        assertThat(patientResource).hasSize(1);
+        assertThat(patientResource).hasSize(1); // from PID
 
         List<Resource> documentReferenceResource =
         e.stream().filter(v -> ResourceType.DocumentReference == v.getResource().getResourceType())
             .map(BundleEntryComponent::getResource).collect(Collectors.toList());
-        assertThat(documentReferenceResource).hasSize(1);
+        assertThat(documentReferenceResource).hasSize(1); // from TXA, OBX(type TX)
 
         // Confirm that no extra resources are created
         assertThat(e.size()).isEqualTo(3);
@@ -209,22 +209,22 @@ public class Hl7MDMMessageTest {
         List<Resource> encounterResource =
         e.stream().filter(v -> ResourceType.Encounter == v.getResource().getResourceType())
             .map(BundleEntryComponent::getResource).collect(Collectors.toList());
-        assertThat(encounterResource).hasSize(1);
+        assertThat(encounterResource).hasSize(1); // from EVN, PV1
 
         List<Resource> patientResource =
         e.stream().filter(v -> ResourceType.Patient == v.getResource().getResourceType())
             .map(BundleEntryComponent::getResource).collect(Collectors.toList());
-        assertThat(patientResource).hasSize(1);
+        assertThat(patientResource).hasSize(1); // from PID
 
         List<Resource> documentReferenceResource =
         e.stream().filter(v -> ResourceType.DocumentReference == v.getResource().getResourceType())
             .map(BundleEntryComponent::getResource).collect(Collectors.toList());
-        assertThat(documentReferenceResource).hasSize(1);
+        assertThat(documentReferenceResource).hasSize(1); // from TXA
 
         List<Resource> observationResource =
         e.stream().filter(v -> ResourceType.Observation == v.getResource().getResourceType())
             .map(BundleEntryComponent::getResource).collect(Collectors.toList());
-        assertThat(observationResource).hasSize(3);
+        assertThat(observationResource).hasSize(3); // from OBX (not type TX)
 
         // Confirm that no extra resources are created
         assertThat(e.size()).isEqualTo(6);
@@ -259,22 +259,22 @@ public class Hl7MDMMessageTest {
         List<Resource> encounterResource =
         e.stream().filter(v -> ResourceType.Encounter == v.getResource().getResourceType())
             .map(BundleEntryComponent::getResource).collect(Collectors.toList());
-        assertThat(encounterResource).hasSize(1);
+        assertThat(encounterResource).hasSize(1); // from EVN, PV1
 
         List<Resource> patientResource =
         e.stream().filter(v -> ResourceType.Patient == v.getResource().getResourceType())
             .map(BundleEntryComponent::getResource).collect(Collectors.toList());
-        assertThat(patientResource).hasSize(1);
+        assertThat(patientResource).hasSize(1); // from PID
 
         List<Resource> serviceRequestResource =
         e.stream().filter(v -> ResourceType.ServiceRequest == v.getResource().getResourceType())
             .map(BundleEntryComponent::getResource).collect(Collectors.toList());
-        assertThat(serviceRequestResource).hasSize(1);
+        assertThat(serviceRequestResource).hasSize(1); // from ORC, OBR
 
         List<Resource> documentReferenceResource =
         e.stream().filter(v -> ResourceType.DocumentReference == v.getResource().getResourceType())
             .map(BundleEntryComponent::getResource).collect(Collectors.toList());
-        assertThat(documentReferenceResource).hasSize(1);
+        assertThat(documentReferenceResource).hasSize(1); // from TXA, OBX(type TX)
 
         // Confirm that no extra resources are created
         assertThat(e.size()).isEqualTo(4);
@@ -309,27 +309,27 @@ public class Hl7MDMMessageTest {
         List<Resource> encounterResource =
         e.stream().filter(v -> ResourceType.Encounter == v.getResource().getResourceType())
             .map(BundleEntryComponent::getResource).collect(Collectors.toList());
-        assertThat(encounterResource).hasSize(1);
+        assertThat(encounterResource).hasSize(1); // from EVN, PV1
 
         List<Resource> patientResource =
         e.stream().filter(v -> ResourceType.Patient == v.getResource().getResourceType())
             .map(BundleEntryComponent::getResource).collect(Collectors.toList());
-        assertThat(patientResource).hasSize(1);
+        assertThat(patientResource).hasSize(1); // from PID
 
         List<Resource> serviceRequestResource =
         e.stream().filter(v -> ResourceType.ServiceRequest == v.getResource().getResourceType())
             .map(BundleEntryComponent::getResource).collect(Collectors.toList());
-        assertThat(serviceRequestResource).hasSize(1);
+        assertThat(serviceRequestResource).hasSize(1); // from ORC, OBR
 
         List<Resource> documentReferenceResource =
         e.stream().filter(v -> ResourceType.DocumentReference == v.getResource().getResourceType())
             .map(BundleEntryComponent::getResource).collect(Collectors.toList());
-        assertThat(documentReferenceResource).hasSize(1);
+        assertThat(documentReferenceResource).hasSize(1); // from TXA
 
         List<Resource> observationResource =
         e.stream().filter(v -> ResourceType.Observation == v.getResource().getResourceType())
             .map(BundleEntryComponent::getResource).collect(Collectors.toList());
-        assertThat(observationResource).hasSize(1);
+        assertThat(observationResource).hasSize(1); // from OBX(not type TX)
 
         // Confirm that no extra resources are created
         assertThat(e.size()).isEqualTo(5);
@@ -370,22 +370,22 @@ public class Hl7MDMMessageTest {
         List<Resource> encounterResource =
         e.stream().filter(v -> ResourceType.Encounter == v.getResource().getResourceType())
             .map(BundleEntryComponent::getResource).collect(Collectors.toList());
-        assertThat(encounterResource).hasSize(1);
+        assertThat(encounterResource).hasSize(1); // from EVN, PV1
 
         List<Resource> patientResource =
         e.stream().filter(v -> ResourceType.Patient == v.getResource().getResourceType())
             .map(BundleEntryComponent::getResource).collect(Collectors.toList());
-        assertThat(patientResource).hasSize(1);
+        assertThat(patientResource).hasSize(1); // from PID
 
         List<Resource> serviceRequestResource =
         e.stream().filter(v -> ResourceType.ServiceRequest == v.getResource().getResourceType())
             .map(BundleEntryComponent::getResource).collect(Collectors.toList());
-        assertThat(serviceRequestResource).hasSize(3);
+        assertThat(serviceRequestResource).hasSize(3); // from ORC, OBR in ORDER groups
 
         List<Resource> documentReferenceResource =
         e.stream().filter(v -> ResourceType.DocumentReference == v.getResource().getResourceType())
             .map(BundleEntryComponent::getResource).collect(Collectors.toList());
-        assertThat(documentReferenceResource).hasSize(1);
+        assertThat(documentReferenceResource).hasSize(1); // from TXA, OBX(type TX)
 
         // Confirm that no extra resources are created
         assertThat(e.size()).isEqualTo(6);
@@ -426,27 +426,27 @@ public class Hl7MDMMessageTest {
         List<Resource> encounterResource =
         e.stream().filter(v -> ResourceType.Encounter == v.getResource().getResourceType())
             .map(BundleEntryComponent::getResource).collect(Collectors.toList());
-        assertThat(encounterResource).hasSize(1);
+        assertThat(encounterResource).hasSize(1); // from EVN, PV1
 
         List<Resource> patientResource =
         e.stream().filter(v -> ResourceType.Patient == v.getResource().getResourceType())
             .map(BundleEntryComponent::getResource).collect(Collectors.toList());
-        assertThat(patientResource).hasSize(1);
+        assertThat(patientResource).hasSize(1); // from PID
 
         List<Resource> serviceRequestResource =
         e.stream().filter(v -> ResourceType.ServiceRequest == v.getResource().getResourceType())
             .map(BundleEntryComponent::getResource).collect(Collectors.toList());
-        assertThat(serviceRequestResource).hasSize(3);
+        assertThat(serviceRequestResource).hasSize(3); // from ORC, OVR in ORDER groups
 
         List<Resource> documentReferenceResource =
         e.stream().filter(v -> ResourceType.DocumentReference == v.getResource().getResourceType())
             .map(BundleEntryComponent::getResource).collect(Collectors.toList());
-        assertThat(documentReferenceResource).hasSize(1);
+        assertThat(documentReferenceResource).hasSize(1); // from TXA
 
         List<Resource> observationResource =
         e.stream().filter(v -> ResourceType.Observation == v.getResource().getResourceType())
             .map(BundleEntryComponent::getResource).collect(Collectors.toList());
-        assertThat(observationResource).hasSize(3);
+        assertThat(observationResource).hasSize(3); // from OBX (not TX type)
 
         // Confirm that no extra resources are created
         assertThat(e.size()).isEqualTo(9);
