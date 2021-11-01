@@ -33,6 +33,7 @@ resources:
             - PID
             - PROBLEM.PROBLEM_OBSERVATION.OBX
     
+  # This OBX is for the Problem Observation
   - resourceName: Observation
     segment: .PROBLEM_OBSERVATION.OBX
     group: PROBLEM
@@ -68,6 +69,19 @@ resources:
       - PATIENT_VISIT.PV1
       - MSH
       - PID
+
+  # This OBX is for the Order Observation
+  - resourceName: Observation
+    segment: .ORDER.ORDER_DETAIL.ORDER_OBSERVATION.OBX
+    group: PROBLEM
+    resourcePath: resource/Observation
+    repeats: true
+    isReferenced: true
+    additionalSegments:
+      - .ORDER.ORC
+      - .ORDER.ORDER_DETAIL.OBR
+      - MSH
+      - .ORDER.ORDER_DETAIL.ORDER_OBSERVATION.NTE    
 
   - resourceName: MedicationRequest
     segment: .ORDER.ORDER_DETAIL.RXO
