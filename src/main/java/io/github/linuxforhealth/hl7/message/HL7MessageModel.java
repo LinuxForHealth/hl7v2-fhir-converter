@@ -21,11 +21,15 @@ import io.github.linuxforhealth.api.MessageEngine;
 import io.github.linuxforhealth.api.MessageTemplate;
 import io.github.linuxforhealth.hl7.parsing.HL7DataExtractor;
 import io.github.linuxforhealth.hl7.parsing.HL7HapiParser;
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class HL7MessageModel implements MessageTemplate<Message> {
 
   private List<FHIRResourceTemplate> resources;
   private String messageName;
+  private static final Logger LOGGER = LoggerFactory.getLogger(HL7MessageModel.class);
 
   @JsonCreator
   public HL7MessageModel(@JsonProperty("messageName") String messageName,
@@ -70,10 +74,26 @@ public class HL7MessageModel implements MessageTemplate<Message> {
     HL7DataExtractor hl7DTE = new HL7DataExtractor(message);
     HL7MessageData dataSource = new HL7MessageData(hl7DTE);
 
-    Bundle bundle =
-        engine.transform(dataSource, this.getResources(), new HashMap<>());
-    return engine.getFHIRContext()
-        .encodeResourceToString(bundle);
+    String result = null;
+
+    // Catch any exceptions and log them without the message.
+    // NOTE: We have seen PHI in these exception messages.
+    try {
+        Bundle bundle = engine.transform(dataSource, this.getResources(), new HashMap<>());
+        result = engine.getFHIRContext().encodeResourceToString(bundle);
+    }
+    catch(Exception e) {
+        // Print stack class and trace without the error message.
+        StackTraceElement[] stackTrace = e.getStackTrace();
+        StringBuilder classAndStack = new StringBuilder();
+        classAndStack.append(e.getClass()+"\n");
+        for(int i=0; i < stackTrace.length; i++) {
+        	classAndStack.append(stackTrace[i] +"\n");
+        }
+        LOGGER.error("Error transforming HL7 message. {}",classAndStack);
+    }
+
+    return result;
 
   }
 
