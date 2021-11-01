@@ -689,24 +689,24 @@ public class Hl7MedicationRequestFHIRConversionTest {
 
         Identifier practitionerIdentifier = practBundle.getIdentifierFirstRep();
         HumanName practName = practBundle.getNameFirstRep();
-//        assertThat(practitionerIdentifier.getValue()).isEqualTo("3122"); // ORC.12.1
-//        assertThat(practitionerIdentifier.getSystem()).isNull(); // ORC.12.9
-//        assertThat(practName.getFamily()).isEqualTo("PROVIDER"); // ORC.12.2
-//        assertThat(practName.getGivenAsSingleString()).isEqualTo("ORDERING"); // ORC.12.3
-//        assertThat(practName.getPrefixAsSingleString()).isEqualTo("DR"); //ORC.12.6
-//        assertThat(practName.getSuffix()).isEmpty(); //ORC.12.5
-//        assertThat(practName.getText()).isEqualTo("DR ORDERING PROVIDER"); // ORC.12
-//
-//        //category comes from  ORC.29
-//        assertThat(medicationRequest.getCategory()).hasSize(1);
-//        assertThat(medicationRequest.getCategory().get(0).hasCoding()).isTrue();
-//        assertThat(medicationRequest.getCategory().get(0).getCodingFirstRep().getCode()).isEqualTo("inpatient");
-//        assertThat(medicationRequest.getCategory().get(0).getCodingFirstRep().getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/medicationrequest-category");
-//        assertThat(medicationRequest.getCategory().get(0).getCodingFirstRep().getDisplay()).isEqualTo("Inpatient");
-//
-//        //DispenseRequest.start comes from ORC.15
-//        assertThat(medicationRequest.getDispenseRequest().hasValidityPeriod()).isTrue();
-//        assertThat(medicationRequest.getDispenseRequest().getValidityPeriod().getStartElement().toString()).containsPattern("2019-06-06");
+        assertThat(practitionerIdentifier.getValue()).isEqualTo("3122"); // ORC.12.1
+        assertThat(practitionerIdentifier.getSystem()).isNull(); // ORC.12.9
+        assertThat(practName.getFamily()).isEqualTo("PROVIDER"); // ORC.12.2
+        assertThat(practName.getGivenAsSingleString()).isEqualTo("ORDERING"); // ORC.12.3
+        assertThat(practName.getPrefixAsSingleString()).isEqualTo("DR"); //ORC.12.6
+        assertThat(practName.getSuffix()).isEmpty(); //ORC.12.5
+        assertThat(practName.getText()).isEqualTo("DR ORDERING PROVIDER"); // ORC.12
+
+        //category comes from  ORC.29
+        assertThat(medicationRequest.getCategory()).hasSize(1);
+        assertThat(medicationRequest.getCategory().get(0).hasCoding()).isTrue();
+        assertThat(medicationRequest.getCategory().get(0).getCodingFirstRep().getCode()).isEqualTo("inpatient");
+        assertThat(medicationRequest.getCategory().get(0).getCodingFirstRep().getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/medicationrequest-category");
+        assertThat(medicationRequest.getCategory().get(0).getCodingFirstRep().getDisplay()).isEqualTo("Inpatient");
+
+        //DispenseRequest.start comes from ORC.15
+        assertThat(medicationRequest.getDispenseRequest().hasValidityPeriod()).isTrue();
+        assertThat(medicationRequest.getDispenseRequest().getValidityPeriod().getStartElement().toString()).containsPattern("2019-06-06");
 
         hl7message = "MSH|^~\\&||||||S1|RDE^O11||T|2.6|||||||||\n"
                 + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
@@ -716,7 +716,7 @@ public class Hl7MedicationRequestFHIRConversionTest {
         ftv = new HL7ToFHIRConverter();
         json = ftv.convert(hl7message, PatientUtils.OPTIONS);
         assertThat(json).isNotBlank();
-        LOGGER.debug("FHIR json result:\n" + json); System.out.println(json);
+        LOGGER.debug("FHIR json result:\n" + json);
         bundleResource = context.getParser().parseResource(json);
         assertThat(bundleResource).isNotNull();
         b = (Bundle) bundleResource;
