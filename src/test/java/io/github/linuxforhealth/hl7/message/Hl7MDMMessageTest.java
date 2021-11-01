@@ -17,13 +17,12 @@ import org.hl7.fhir.r4.model.Resource;
 import org.hl7.fhir.r4.model.ResourceType;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import io.github.linuxforhealth.fhir.FHIRContext;
 import io.github.linuxforhealth.hl7.ConverterOptions;
 import io.github.linuxforhealth.hl7.ConverterOptions.Builder;
 import io.github.linuxforhealth.hl7.HL7ToFHIRConverter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class Hl7MDMMessageTest {
     private static FHIRContext context = new FHIRContext();

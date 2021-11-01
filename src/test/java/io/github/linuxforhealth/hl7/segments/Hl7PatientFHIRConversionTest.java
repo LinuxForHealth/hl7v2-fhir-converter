@@ -244,21 +244,25 @@ public class Hl7PatientFHIRConversionTest {
     }
 
     @Test
-    public void patient_name_test() {
+    public void patientNameTest() {
         String patientHasMiddleName = "MSH|^~\\&|MyEMR|DE-000001| |CAIRLO|20160701123030-0700||VXU^V04^VXU_V04|CA0001|P|2.6|||ER|AL|||||Z22^CDCPHINVS|DE-000001\r"
-                +
-                "PID|1||PA123456^^^MYEMR^MR||JONES^GEORGE^M^JR^^^B|MILLER^MARTHA^G^^^^M|20140227|M||2106-3^WHITE^CDCREC|1234 W FIRST ST^^BEVERLY HILLS^CA^90210^^H||^PRN^PH^^^555^5555555||ENG^English^HL70296|||||||2186-5^ not Hispanic or Latino^CDCREC||Y|2\r";
+                // PID 5 fields (name) are extracted and tested
+                + "PID|1||PA123456^^^MYEMR^MR||JONES^GEORGE^Q^III^MR^^B||||||||||||||||||||\r";
 
         Patient patientObjUsualName = PatientUtils.createPatientFromHl7Segment(patientHasMiddleName);
 
         java.util.List<org.hl7.fhir.r4.model.HumanName> name = patientObjUsualName.getName();
-        List givenName = name.get(0).getGiven();
-        List<StringType> suffix = name.get(0).getSuffix();
+        List<StringType> givenName = name.get(0).getGiven();
+        List<StringType> suffixes = name.get(0).getSuffix();
+        assertThat(suffixes).hasSize(1);
+        List<StringType> prefixes = name.get(0).getPrefix();
+        assertThat(prefixes).hasSize(1);
         String fullName = name.get(0).getText();
-        assertThat(givenName.get(0).toString()).isEqualTo("GEORGE");
-        assertThat(givenName.get(1).toString()).isEqualTo("M");
-        assertThat(suffix.get(0).toString()).isEqualTo("JR");
-        assertThat(fullName).isEqualTo("GEORGE M JONES JR");
+        assertThat(prefixes.get(0).toString()).hasToString("MR");
+        assertThat(givenName.get(0).toString()).hasToString("GEORGE");
+        assertThat(givenName.get(1).toString()).hasToString("Q");
+        assertThat(suffixes.get(0).toString()).hasToString("III");
+        assertThat(fullName).isEqualTo("MR GEORGE Q JONES III");
 
     }
 

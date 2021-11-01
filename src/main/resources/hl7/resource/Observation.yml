@@ -192,10 +192,11 @@ note_1:
 
 note_2:
    valueOf: datatype/Annotation
-   generateList: true
-   condition: NTE NOT_NULL
+   condition: $text NOT_NULL
    expressionType: resource
-   specs: NTE
+   # Note on separator: Must double back-slashes to create single backslash in string.
+   vars:
+      text: NTE.3 *&, GeneralUtils.concatenateWithChar(text, '  \\n')
 
 bodySite:
    valueOf: datatype/CodeableConcept

@@ -18,6 +18,7 @@ import com.google.common.collect.ImmutableMap;
 import io.github.linuxforhealth.api.EvaluationResult;
 import io.github.linuxforhealth.api.InputDataExtractor;
 import io.github.linuxforhealth.core.Constants;
+import io.github.linuxforhealth.core.expression.ContextValueUtils;
 import io.github.linuxforhealth.core.expression.EvaluationResultFactory;
 import io.github.linuxforhealth.core.expression.VariableUtils;
 import io.github.linuxforhealth.hl7.data.SimpleDataTypeMapper;
@@ -45,6 +46,7 @@ public class SimpleExpression extends AbstractExpression {
       this.fetch = ImmutablePair.of(tokens[0], tokens[1]);
     }
 
+
   }
 
 
@@ -70,8 +72,11 @@ public class SimpleExpression extends AbstractExpression {
     
     Object resolvedValue = null;
     if (VariableUtils.isVar(value)) {
+      boolean fuzzyMatch = VariableUtils.isFuzzyMatch(value);
       EvaluationResult obj =
-          getVariableValueFromVariableContextMap(value, ImmutableMap.copyOf(localContextValues));
+          ContextValueUtils.getVariableValuesFromVariableContextMap(value,
+              ImmutableMap.copyOf(localContextValues),
+              this.getExpressionAttr().isUseGroup(), fuzzyMatch);
       if (obj != null && !obj.isEmpty()) {
         resolvedValue = obj.getValue();
       }
@@ -110,7 +115,9 @@ public class SimpleExpression extends AbstractExpression {
     if (Constants.BASE_VALUE_NAME.equals(fetch.getKey())) {
       resource = basevalue;
     } else {
-      resource = contextValues.get(getKeyName(contextValues));
+      boolean fuzzyMatch = VariableUtils.isFuzzyMatch(fetch.getKey());
+      resource = ContextValueUtils.getVariableValuesFromVariableContextMap(fetch.getKey(),
+          contextValues, this.getExpressionAttr().isUseGroup(), fuzzyMatch);
     }
     return ExpressionUtility.extractComponent(fetch, resource);
 
@@ -128,28 +135,6 @@ public class SimpleExpression extends AbstractExpression {
     }
   }
 
-  private static EvaluationResult getVariableValueFromVariableContextMap(String varName,
-      ImmutableMap<String, EvaluationResult> contextValues) {
-    if (StringUtils.isNotBlank(varName)) {
-      EvaluationResult fetchedValue;
-      fetchedValue = contextValues.get(VariableUtils.getVarName(varName));
-      return fetchedValue;
-    } else {
-      return null;
-    }
-  }
-
-
-  private String getKeyName(Map<String, EvaluationResult> contextValues) {
-
-    if (this.getExpressionAttr().isUseGroup()) {
-      String groupId = getGroupId(contextValues);
-      return VariableUtils.getVarName(fetch.getKey()) + "_" + groupId;
-    } else {
-      return VariableUtils.getVarName(fetch.getKey());
-    }
-
-  }
 
 
 }

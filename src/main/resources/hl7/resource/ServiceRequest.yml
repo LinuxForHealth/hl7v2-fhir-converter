@@ -103,4 +103,12 @@ code:
    expressionType: resource
    specs: OBR.4
    vars:
-      codeCWE: OBR.4       
+      codeCWE: OBR.4 
+
+note:
+   valueOf: datatype/Annotation
+   condition: $text NOT_NULL
+   expressionType: resource
+   # Note on separator: Must double back-slashes to create single backslash in string.
+   vars:
+      text: NTE.3 *&, GeneralUtils.concatenateWithChar(text, '  \\n')            

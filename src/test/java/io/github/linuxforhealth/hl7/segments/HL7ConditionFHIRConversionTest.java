@@ -47,7 +47,7 @@ public class HL7ConditionFHIRConversionTest {
                 + "PV1||I|||||||||||||||||1400|||||||||||||||||||||||||\r"
                 + "DG1|1|ICD10|C56.9^Ovarian Cancer^I10|Test|20210322154449|A|E123|R45|Y|J76|C|15|1458.98||1|123^DOE^JOHN^A^|C|Y|20210322154326|V45|S1234|Parent Diagnosis|Value345|Group567|DiagnosisG45|Y\r";
 
-        List<BundleEntryComponent> e = ResourceUtils.createHl7Segment(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
 
         // --- CONDITION TESTS ---
 
@@ -178,7 +178,7 @@ public class HL7ConditionFHIRConversionTest {
                 + "PID||||||||||||||||||||||||||||||\r"
                 + "DG1|1|ICD10|B45678|Broken Arm|20210322154449|A|E123|R45|Y|J76|C|15|1458.98||1|123^DOE^JOHN^A^|C|Y|20210322154326|one^https://terminology.hl7.org/CodeSystem/two^three^https://terminology.hl7.org/CodeSystem/four|S1234|Parent Diagnosis|Value345|Group567|DiagnosisG45|Y\r";
 
-        List<BundleEntryComponent> e = ResourceUtils.createHl7Segment(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
 
         // Find the condition from the FHIR bundle.
         List<Resource> conditionResource = e.stream()
@@ -230,7 +230,7 @@ public class HL7ConditionFHIRConversionTest {
                 + "DG1|3|D3|R06.02^Shortness of breath^ICD-10^^^|Shortness of breath||A\r"
                 + "DG1|7|D8|J45.909^Unspecified asthma, uncomplicated^ICD-10^^^|Unspecified asthma, uncomplicated||A";
 
-        List<BundleEntryComponent> e = ResourceUtils.createHl7Segment(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
 
         // Find the condition from the FHIR bundle.
         List<Resource> conditionResource = e.stream()
@@ -305,7 +305,7 @@ public class HL7ConditionFHIRConversionTest {
                 + "DG1|6|D7|I05.9^Mitral valve disorder in childbirth^ICD-10^^^|Mitral valve disorder in childbirth||A|||||||||8|\r"
                 + "DG1|7|D8|J45.909^Unspecified asthma, uncomplicated^ICD-10^^^|Unspecified asthma, uncomplicated||A|||||||||8|\r";
 
-        List<BundleEntryComponent> e = ResourceUtils.createHl7Segment(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
 
         // Find the conditions from the FHIR bundle.
         List<Resource> conditionResource = e.stream()
@@ -375,7 +375,7 @@ public class HL7ConditionFHIRConversionTest {
                 + "PV1||I|||||||||||||||||1492|||||||||||||||||||||||||\r"
                 + "DG1|1|ICD-10-CM|M54.5^Low back pain^ICD-10-CM|Low back pain|20210407191342|A\r";
         
-        List<BundleEntryComponent> e = ResourceUtils.createHl7Segment(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
 
         // Find the conditions from the FHIR bundle.
         List<Resource> conditionResource = e.stream()
@@ -406,7 +406,7 @@ public class HL7ConditionFHIRConversionTest {
                 + "PV1||I||||||||||||||||||||||||||||||||||||||||||\r"
                 + "PRB|AD|20170110074000|K80.00^Cholelithiasis^I10|53956|E1|1|20100907175347|20150907175347|20180310074000||||confirmed^Confirmed^http://terminology.hl7.org/CodeSystem/condition-ver-status|remission^Remission^http://terminology.hl7.org/CodeSystem/condition-clinical|20180310074000|20170102074000|textual representation of the time when the problem began|1^primary|ME^Medium|0.4|marginal|good|marginal|marginal|highly sensitive|some prb detail|\r";
 
-        List<BundleEntryComponent> e = ResourceUtils.createHl7Segment(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
         
         // Find the condition from the FHIR bundle.
         List<Resource> conditionResource = e.stream()
@@ -487,7 +487,7 @@ public class HL7ConditionFHIRConversionTest {
                 + "PV1||I||||||||||||||||||||||||||||||||||||||||||\r"
                 + "PRB|AD|20170110074000|K80.00^Cholelithiasis^I10|53956|E1|1|20100907175347|20150907175347|20180310074000||||confirmed^Confirmed^http://terminology.hl7.org/CodeSystem/condition-ver-status|remission^Remission^http://terminology.hl7.org/CodeSystem/condition-clinical|20180310074000|20170102074000|textual representation of the time when the problem began|1^primary|ME^Medium|0.4|marginal|good|marginal|marginal|highly sensitive|some prb detail|\r";
 
-        List<BundleEntryComponent> e = ResourceUtils.createHl7Segment(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
 
         // Find the condition from the FHIR bundle.
         List<Resource> conditionResource = e.stream()
@@ -532,7 +532,7 @@ public class HL7ConditionFHIRConversionTest {
                 + "PV1||I||||||||||||||||||||||||||||||||||||||||||\r"
                 + "PRB|AD|20170110074000|K80.00^Cholelithiasis^I10|53956|E1|1|20100907175347|20150907175347|||||BAD^Confirmed^http://terminology.hl7.org/CodeSystem/condition-ver-status|INVALID^Remission^http://terminology.hl7.org/CodeSystem/condition-clinical|20180310074000|20170102074000|textual representation of the time when the problem began|1^primary|ME^Medium|0.4|marginal|good|marginal|marginal|highly sensitive|some prb detail|\r";
 
-        List<BundleEntryComponent> e = ResourceUtils.createHl7Segment(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
 
         // Find the condition from the FHIR bundle.
         List<Resource> conditionResource = e.stream()
@@ -562,7 +562,7 @@ public class HL7ConditionFHIRConversionTest {
                 + "PID||||||||||||||||||||||||||||||\r" + "PV1||I||||||||||||||||||||||||||||||||||||||||||\r"
                 + "PRB|AD|20170110074000|K80.00^Cholelithiasis^I10|53956|E1|1|20100907175347|20150907175347|||||confirmed|remission|20180310074000|20170102074000|textual representation of the time when the problem began|1^primary|ME^Medium|0.4|marginal|good|marginal|marginal|highly sensitive|some prb detail|\r";
 
-        List<BundleEntryComponent> e = ResourceUtils.createHl7Segment(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
 
         // Find the condition from the FHIR bundle.
         List<Resource> conditionResource = e.stream()
@@ -608,7 +608,7 @@ public class HL7ConditionFHIRConversionTest {
                 + "PV1||I||||||||||||||||||||||||||||||||||||||||||\r"
                 + "PRB|AD|20170110074000|K80.00^Cholelithiasis^I10|53956|E1|1|20100907175347|20150907175347|||||C^Confirmed^Confirmation Status List||textual representation of the time when the problem began|1^primary|ME^Medium|0.4|marginal|good|marginal|marginal|highly sensitive|some prb detail|\r";
 
-        List<BundleEntryComponent> e = ResourceUtils.createHl7Segment(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
 
         // Find the condition from the FHIR bundle.
         List<Resource> conditionResource = e.stream()
@@ -637,7 +637,7 @@ public class HL7ConditionFHIRConversionTest {
                 + "PV1||I||||||||||||||||||||||||||||||||||||||||||\r"
                 + "PRB|AD|20170110074000|K80.00^Cholelithiasis^I10|53956|E1|1|20100907175347|20150907175347|||||confirmed^Confirmed^Confirmation Status List||textual representation of the time when the problem began|1^primary|ME^Medium|0.4|marginal|good|marginal|marginal|highly sensitive|some prb detail|\r";
 
-        List<BundleEntryComponent> e = ResourceUtils.createHl7Segment(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
 
         // Find the condition from the FHIR bundle.
         List<Resource> conditionResource = e.stream()
@@ -672,7 +672,7 @@ public class HL7ConditionFHIRConversionTest {
                 + "PV1||I||||||||||||||||||||||||||||||||||||||||||\r"
                 + "PRB|AD|20170110074000|K80.00^Cholelithiasis^I10|53956|E1|1|20100907175347|20150907175347|||||BAD|INVALID|20180310074000|20170102074000|textual representation of the time when the problem began|1^primary|ME^Medium|0.4|marginal|good|marginal|marginal|highly sensitive|some prb detail|\r";
 
-        List<BundleEntryComponent> e = ResourceUtils.createHl7Segment(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
 
         // Find the condition from the FHIR bundle.
         List<Resource> conditionResource = e.stream()
@@ -700,7 +700,7 @@ public class HL7ConditionFHIRConversionTest {
                 + "PV1||I||||||||||||||||||||||||||||||||||||||||||\r"
                 + "PRB|AD|20170110074000|K80.00^Cholelithiasis^I10|53956|E1|1|20100907175347|20150907175347|20180310074000||||confirmed^Confirmed^BADCLINCALSTATUSSYSTEM|remission^Remission^BADVERIFICATIONSTATUSSYSTEM|20180310074000|20170102074000|textual representation of the time when the problem began|1^primary|ME^Medium|0.4|marginal|good|marginal|marginal|highly sensitive|some prb detail|\r";
 
-        List<BundleEntryComponent> e = ResourceUtils.createHl7Segment(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
 
         // Find the condition from the FHIR bundle.
         List<Resource> conditionResource = e.stream()
@@ -758,7 +758,7 @@ public class HL7ConditionFHIRConversionTest {
                 + "PID||||||||||||||||||||||||||||||\r"
                 + "PRB|AD|20210101000000|G47.31^Primary central sleep apnea^ICD-10-CM|28827016|||20210101000000|20210101000000|||||confirmed^Confirmed^http://terminology.hl7.org/CodeSystem/condition-ver-status||20210101000000|20210101000000\r";
 
-        List<BundleEntryComponent> e = ResourceUtils.createHl7Segment(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
 
         // Find the condition from the FHIR bundle.
         List<Resource> conditionResource = e.stream()
@@ -791,7 +791,7 @@ public class HL7ConditionFHIRConversionTest {
                 + "PRB|AD|20170110074000|N39.0^Urinary Tract Infection^I9|53957|E2|1|20090907175347|20150907175347||||||||||||||||||\r"
                 + "PRB|AD|20170110074000|C56.9^Ovarian Cancer^I10|53958|E3|2|20110907175347|20160907175347||||||||||||||||||\r";
 
-        List<BundleEntryComponent> e = ResourceUtils.createHl7Segment(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
 
         // Find the condition from the FHIR bundle.
         List<Resource> conditionResource = e.stream()
@@ -812,7 +812,7 @@ public class HL7ConditionFHIRConversionTest {
                 + "PID||||||||||||||||||||||||||||||\r"
                 + "PRB|AD|20170110074000|K80.00^Cholelithiasis^I10|53956|E1|1|20100907175347|20150907175347|||||||20180310074000|20180310074000||1^primary|ME^Medium|0.4|marginal|good|marginal|marginal|highly sensitive|some prb detail|\r";
 
-        List<BundleEntryComponent> e = ResourceUtils.createHl7Segment(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
 
         // Find the condition from the FHIR bundle.
         List<Resource> conditionResource = e.stream()
@@ -837,7 +837,7 @@ public class HL7ConditionFHIRConversionTest {
                 + "PID||||||||||||||||||||||||||||||\r"
                 + "PRB|AD|20170110074000|K80.00^Cholelithiasis^I10|53956|E1|1|20100907175347|20150907175347|||||||20180310074000||textual representation of the time when the problem began|1^primary|ME^Medium|0.4|marginal|good|marginal|marginal|highly sensitive|some prb detail|\r";
 
-        List<BundleEntryComponent> e = ResourceUtils.createHl7Segment(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
 
         // Find the condition from the FHIR bundle.
         List<Resource> conditionResource = e.stream()
