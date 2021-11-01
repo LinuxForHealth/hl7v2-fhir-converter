@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.TimeZone;
 import java.util.stream.Collectors;
 
+import io.github.linuxforhealth.core.terminology.UrlLookup;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r4.model.*;
 import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
@@ -735,6 +736,13 @@ public class Hl7MedicationRequestFHIRConversionTest {
         practName = practBundle.getNameFirstRep();
         CodeableConcept type = practitionerIdentifier.getType();
 
+        //Check meta extension.display is null
+        Extension ext = practBundle.getMeta().getExtension().get(0);
+        assertThat(ext).isNotNull();
+        CodeableConcept cc = (CodeableConcept) ext.getValue();
+
+        assertThat(cc.hasCoding()).isTrue();
+        assertThat(cc.getCoding().get(0).getDisplay()).isNull();
         assertThat(type.getCodingFirstRep().getCode().toString()).isEqualTo("DEA");
         assertThat(type.getCodingFirstRep().getDisplay()).isEqualTo("Drug Enforcement Administration registration number");
         assertThat(type.getCodingFirstRep().getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/v2-0203");

@@ -269,7 +269,18 @@ Variables can be used during expression evaluation.  This engine supports defini
 * ExpressionVariable : Value of a variable is extracted by evaluating a java function. Example:  `` low: OBX.7, GeneralUtils.split(low, "-", 0)``
 * DataTypeVariable: Value of a variable is extracted from [Specification](#specification) and this value is converted to a particular data type. Example: `` var1: STRING, OBX.2``
 
-Note: BASE_VALUE is reserved for base value provided to an expression during evaluation. Do not use or name variable as BASE_VALUE.
+Note: $BASE_VALUE is reserved for base value provided to an expression during evaluation. Do not use or name variable as BASE_VALUE.
+
+Note: $NULL is reserved to pass null value to a variable to help prevent cross contamination later down the line.
+
+```      valueCodeableConcept:
+         valueOf: datatype/CodeableConcept_var
+         expressionType: resource
+         vars:
+            system: SYSTEM_URL, $system_code
+            code: String, MSH.9.2
+            display: $NULL
+ ```
 
 #### Condition
 Conditions evaluate to true or false.<br>
