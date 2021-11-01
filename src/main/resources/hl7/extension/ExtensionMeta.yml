@@ -51,8 +51,10 @@ extension_5:
          vars:
             system: SYSTEM_URL, $system_code
             code: String, MSH.9.1
+            display: $NULL
          constants:
             system_code: 'source-record-type-system'
+           
 
 extension_6:
    generateList: true
@@ -67,5 +69,7 @@ extension_6:
          vars:
             system: SYSTEM_URL, $system_code
             code: String, MSH.9.2
+            display: $NULL
          constants:
             system_code: 'source-event-trigger-system'
+            
