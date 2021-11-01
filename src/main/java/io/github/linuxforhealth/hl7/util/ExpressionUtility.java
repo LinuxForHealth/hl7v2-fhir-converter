@@ -11,16 +11,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import io.github.linuxforhealth.api.EvaluationResult;
 import io.github.linuxforhealth.api.Expression;
 import io.github.linuxforhealth.api.InputDataExtractor;
 import io.github.linuxforhealth.api.ResourceValue;
+import io.github.linuxforhealth.core.Constants;
 import io.github.linuxforhealth.core.ObjectMapperUtil;
 import io.github.linuxforhealth.core.exception.DataExtractionException;
 import io.github.linuxforhealth.core.exception.RequiredConstraintFailureException;
@@ -57,6 +56,7 @@ public class ExpressionUtility {
         try {
             Map<String, Expression> expressionsToEvaluateLater = new HashMap<>();
             Map<String, EvaluationResult> localContext = new HashMap<>(context);
+            localContext.put(Constants.NULL_VAR_NAME, new EmptyEvaluationResult());
             // initialize the map and list to collect values
             List<ResourceValue> additionalResolveValues = new ArrayList<>();
             Map<String, Object> resolveValues = new HashMap<>();

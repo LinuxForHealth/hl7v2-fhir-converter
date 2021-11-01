@@ -26,6 +26,7 @@ public class Constants {
     public static final String HL7_BASE_PATH = "hl7/";
     public static final String FHIR_BASE_PATH = "fhir/";
     public static final String MESSAGE_BASE_PATH = "message/";
+    public static final String NULL_VAR_NAME = "NULL";
 
     private Constants() {
     }
