@@ -11,23 +11,22 @@ import java.util.List;
 import java.util.stream.Collectors;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r4.model.Bundle;
-import org.hl7.fhir.r4.model.Encounter;
-import org.hl7.fhir.r4.model.Reference;
 import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
 import org.hl7.fhir.r4.model.Bundle.BundleType;
-import org.hl7.fhir.r4.model.Resource;
 import org.hl7.fhir.r4.model.DocumentReference;
+import org.hl7.fhir.r4.model.Encounter;
+import org.hl7.fhir.r4.model.Reference;
+import org.hl7.fhir.r4.model.Resource;
 import org.hl7.fhir.r4.model.ResourceType;
 import org.hl7.fhir.r4.model.ServiceRequest;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import io.github.linuxforhealth.fhir.FHIRContext;
 import io.github.linuxforhealth.hl7.ConverterOptions;
 import io.github.linuxforhealth.hl7.ConverterOptions.Builder;
-import io.github.linuxforhealth.hl7.segments.util.ResourceUtils;
 import io.github.linuxforhealth.hl7.HL7ToFHIRConverter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import io.github.linuxforhealth.hl7.segments.util.ResourceUtils;
 
 public class Hl7MDMMessageTest {
     private static FHIRContext context = new FHIRContext();
@@ -169,6 +168,7 @@ public class Hl7MDMMessageTest {
         HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
         String json = ftv.convert(hl7message, OPTIONS);
         assertThat(json).isNotBlank();
+        System.out.println(json);
         LOGGER.info("FHIR json result:\n" + json);
         IBaseResource bundleResource = context.getParser().parseResource(json);
         assertThat(bundleResource).isNotNull();
@@ -220,11 +220,11 @@ public class Hl7MDMMessageTest {
         // --------------
         // The following should pass but it fails because the reference to the ServiceRequest is not created.
         // --------------        
-        // assertThat(docRef.getContext().getRelated()).hasSize(2);
-        // String related1 = docRef.getContext().getRelated().get(0).getReference();
-        // String related2 = docRef.getContext().getRelated().get(1).getReference();
-        // assertThat(related1.contains(practitionerId) || related1.contains(servRequestId)).isTrue();
-        // assertThat(related2.contains(practitionerId) || related2.contains(servRequestId)).isTrue();
+        assertThat(docRef.getContext().getRelated()).hasSize(2);
+        String related1 = docRef.getContext().getRelated().get(0).getReference();
+        String related2 = docRef.getContext().getRelated().get(1).getReference();
+        assertThat(related1.contains(practitionerId) || related1.contains(servRequestId)).isTrue();
+        assertThat(related2.contains(practitionerId) || related2.contains(servRequestId)).isTrue();
     }
 
 }
