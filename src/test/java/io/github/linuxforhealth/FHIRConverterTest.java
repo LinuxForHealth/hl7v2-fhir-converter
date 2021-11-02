@@ -120,38 +120,6 @@ public class FHIRConverterTest {
   }
 
   @Test
-  public void test_ORU_r01_without_status() throws IOException {
-    String ORU_r01 = "MSH|^~\\&|NIST Test Lab APP|NIST Lab Facility||NIST EHR Facility|20150926140551||ORU^R01|NIST-LOI_5.0_1.1-NG|T|2.5.1|||AL|AL|||||\r"
-        + "PID|1||PATID5421^^^NISTMPI^MR||Wilson^Patrice^Natasha^^^^L||19820304|F||2106-3^White^HL70005|144 East 12th Street^^Los Angeles^CA^90012^^H||^PRN^PH^^^203^2290210|||||||||N^Not Hispanic or Latino^HL70189\r"
-        + "ORC|NW|ORD448811^NIST EHR|R-511^NIST Lab Filler||||||20120628070100|||5742200012^Radon^Nicholas^^^^^^NPI^L^^^NPI\r"
-        + "OBR|1|ORD448811^NIST EHR|R-511^NIST Lab Filler|1000^Hepatitis A B C Panel^99USL|||20120628070100|||||||||5742200012^Radon^Nicholas^^^^^^NPI^L^^^NPI\r"
-        + "OBX|1|CWE|22314-9^Hepatitis A virus IgM Ab [Presence] in Serum^LN^HAVM^Hepatitis A IgM antibodies (IgM anti-HAV)^L^2.52||260385009^Negative (qualifier value)^SCT^NEG^NEGATIVE^L^201509USEd^^Negative (qualifier value)||Negative|N|||F|||20150925|||||201509261400\r"
-        + "OBX|2|CWE|20575-7^Hepatitis A virus Ab [Presence] in Serum^LN^HAVAB^Hepatitis A antibodies (anti-HAV)^L^2.52||260385009^Negative (qualifier value)^SCT^NEG^NEGATIVE^L^201509USEd^^Negative (qualifier value)||Negative|N|||F|||20150925|||||201509261400\r"
-        + "OBX|3|NM|22316-4^Hepatitis B virus core Ab [Units/volume] in Serum^LN^HBcAbQ^Hepatitis B core antibodies (anti-HBVc) Quant^L^2.52||0.70|[IU]/mL^international unit per milliliter^UCUM^IU/ml^^L^1.9|<0.50 IU/mL|H|||F|||20150925|||||201509261400";
-
-    HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
-    String json = ftv.convert(ORU_r01, OPTIONS);
-
-    FHIRContext context = new FHIRContext();
-    IBaseResource bundleResource = context.getParser().parseResource(json);
-    assertThat(bundleResource).isNotNull();
-    Bundle b = (Bundle) bundleResource;
-    List<BundleEntryComponent> e = b.getEntry();
-    List<Resource> diagnosticReport = e.stream()
-        .filter(v -> ResourceType.DiagnosticReport == v.getResource().getResourceType())
-        .map(BundleEntryComponent::getResource).collect(Collectors.toList());
-    assertThat(diagnosticReport).hasSize(1);
-
-    String s = context.getParser().encodeResourceToString(diagnosticReport.get(0));
-    Class<? extends IBaseResource> klass = DiagnosticReport.class;
-    DiagnosticReport expectStatusUnknown = (DiagnosticReport) context.getParser().parseResource(klass, s);
-    DiagnosticReport.DiagnosticReportStatus status = expectStatusUnknown.getStatus();
-
-    assertThat(expectStatusUnknown.hasStatus()).isTrue();
-    assertThat(status).isEqualTo(DiagnosticReport.DiagnosticReportStatus.UNKNOWN);
-  }
-
-  @Test
   public void test_dosage_output() throws  IOException {
 String hl7message =
                 "MSH|^~\\&|MyEMR|DE-000001| |CAIRLO|20160701123030-0700||VXU^V04^VXU_V04|CA0001|P|2.6|||ER|AL|||||Z22^CDCPHINVS|DE-000001\r" +
@@ -206,6 +174,7 @@ String hl7message =
   }
 
   @Test
+  // Test an example of a message with message structure specified
   public void test_adt_40_message_with_adt_a39_structure_specified() throws Exception {
     Message hl7message = null;
     // Test that an ADT A40 message with MSH-9.3 of 'ADT_A39' is successfully parsed and converted as an ADT A40 message.
@@ -248,6 +217,7 @@ String hl7message =
   }
 
   @Test
+  // Test an example of a message with no message structure specifed
   public void test_adt_40_message() throws Exception {
     Message hl7message = null;
     // Test that an ADT A40 message with no MSH-9.3 is successfully parsed and converted.
@@ -265,6 +235,7 @@ String hl7message =
     }
 
     String messageType = HL7DataExtractor.getMessageType(hl7message);
+    
 
     assertThat(messageType).isEqualTo("ADT_A40");
 
@@ -286,61 +257,6 @@ String hl7message =
         .map(BundleEntryComponent::getResource).collect(Collectors.toList());
     assertThat(patientResource).hasSize(2);
 
-  }
-
-  @Test
-  public void test_VXU_V04_message() {
-    String hl7VUXmessageRep = "MSH|^~\\&|MYEHR2.5|RI88140101|KIDSNET_IFL|RIHEALTH|20130531||VXU^V04^VXU_V04|20130531RI881401010105|P|2.6|||AL|NE|764|ASCII||||||^4086::132:2A57:3C28^IPv6\r"
-        + "EVN|A01|20130617154644||01\r"
-        + "PID|1||432155^^^ANF^MR||Patient^Johnny^New^^^^L|Smith^Sally|20130414|M||2106-3^White^HL70005|123 Any St^^Somewhere^WI^54000^^M\r"
-        + "PV1|1|B|yyy|E|ABC||200^ATTEND_DOC_FAMILY_TEST^ATTEND_DOC_GIVEN_TEST|201^REFER_DOC_FAMILY_TEST^REFER_DOC_GIVEN_TEST|202^CONSULTING_DOC_FAMILY_TEST^CONSULTING_DOC_GIVEN_TEST|MED|||||B6|E|272^ADMITTING_DOC_FAMILY_TEST^ADMITTING_DOC_GIVEN_TEST||48390|||||||||||||||||||||||||201409122200|20150206031726\r"
-
-        + "ORC|RE||197027|||||||^Clerk^Myron||MD67895^Pediatric^MARY^^^^MD^^RIA|||||RI2050\r"
-        + "RXA|0|1|20130531|20130531|48^HIB PRP-T^CVX|0.5|ML^^ISO+||00^new immunization record^NIP001|^Sticker^Nurse|^^^RI2050||||33k2a|20131210|PMC^sanofi^MVX|||CP|A\r"
-        + "RXR|C28161^IM^NCIT^IM^INTRAMUSCULAR^HL70162|RT^right thigh^HL70163\r"
-        + "OBX|1|CE|64994-7^vaccine fund pgm elig cat^LN|1|V02^VFC eligible Medicaid/MedicaidManaged Care^HL70064||||||F|||20130531|||VXC40^per imm^CDCPHINVS\r"
-        + "OBX|2|CE|30956-7^Vaccine Type^LN|2|48^HIB PRP-T^CVX||||||F|||20130531\r"
-        + "OBX|3|TS|29768-9^VIS Publication Date^LN|2|19981216||||||F|||20130531\r"
-        + "OBX|4|TS|59785-6^VIS Presentation Date^LN|2|20130531||||||F|||20130531\r";
-
-    HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
-
-    String json = ftv.convert(hl7VUXmessageRep, OPTIONS);
-
-    FHIRContext context = new FHIRContext();
-    IBaseResource bundleResource = context.getParser().parseResource(json);
-    assertThat(bundleResource).isNotNull();
-    Bundle b = (Bundle) bundleResource;
-    assertThat(b.getType()).isEqualTo(BundleType.COLLECTION);
-    assertThat(b.getId()).isNotNull();
-    assertThat(b.getMeta().getLastUpdated()).isNotNull();
-
-    List<BundleEntryComponent> e = b.getEntry();
-    List<Resource> patientResource = e.stream().filter(v -> ResourceType.Patient == v.getResource().getResourceType())
-        .map(BundleEntryComponent::getResource).collect(Collectors.toList());
-    assertThat(patientResource).hasSize(1);
-    List<Resource> messageHeader = e.stream()
-        .filter(v -> ResourceType.MessageHeader == v.getResource().getResourceType())
-        .map(BundleEntryComponent::getResource).collect(Collectors.toList());
-    assertThat(messageHeader).hasSize(1);
-
-    List<Resource> encounterResource = e.stream()
-        .filter(v -> ResourceType.Encounter == v.getResource().getResourceType()).map(BundleEntryComponent::getResource)
-        .collect(Collectors.toList());
-    assertThat(encounterResource).hasSize(1);
-    List<Resource> obsResource = e.stream().filter(v -> ResourceType.Immunization == v.getResource().getResourceType())
-        .map(BundleEntryComponent::getResource).collect(Collectors.toList());
-    assertThat(obsResource).hasSize(1);
-    List<Resource> pracResource = e.stream().filter(v -> ResourceType.Practitioner == v.getResource().getResourceType())
-        .map(BundleEntryComponent::getResource).collect(Collectors.toList());
-    assertThat(pracResource).hasSize(6);
-
-    List<Resource> organizationRes = e.stream()
-        .filter(v -> ResourceType.Organization == v.getResource().getResourceType())
-        .map(BundleEntryComponent::getResource).collect(Collectors.toList());
-    // Patient organizations use a system urn:id reference for the organization, 
-    // so we only expect the manufacturer to have an organization.    
-    assertThat(organizationRes).hasSize(1);
   }
 
   @Test

@@ -52,7 +52,8 @@ public class Hl7PatientFHIRConversionTest {
     // "MSH|^~\\&|hl7Integration|hl7Integration|||||ADT^A31|||2.6|\r",
     "MSH|^~\\&|hl7Integration|hl7Integration|||||ADT^A34|||2.6|\r",
     "MSH|^~\\&|hl7Integration|hl7Integration|||||ADT^A40|||2.6|\r",
-    // "MSH|^~\\&|hl7Integration|hl7Integration|||||OMP^O09|||2.6|\r",
+    // MDM messages are not tested here because they do not contain PD1 segments
+    "MSH|^~\\&|hl7Integration|hl7Integration|||||OMP^O09|||2.6|\r",
     // "MSH|^~\\&|hl7Integration|hl7Integration|||||ORM^O01|||2.6|\r",
     "MSH|^~\\&|hl7Integration|hl7Integration|||||ORU^R01|||2.6|\r",
     "MSH|^~\\&|hl7Integration|hl7Integration|||||RDE^O11|||2.6|\r",
@@ -61,8 +62,9 @@ public class Hl7PatientFHIRConversionTest {
     })
     public void test_patient_additional_demographics(String msh) {
         String hl7message = msh
-                + "PID|1||1234^^^AssigningAuthority^MR||TEST^PATIENT|\n"
-                + "PD1|||Sample Family Practice^^2222|1111^LastName^ClinicianFirstName^^^^Title||||||||||||A|";
+                + "PID|1||1234^^^AssigningAuthority^MR||TEST^PATIENT|\r"
+                + "PD1|||Sample Family Practice^^2222|1111^LastName^ClinicianFirstName^^^^Title||||||||||||A|\r"
+                ;
 
         HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
         String json = ftv.convert(hl7message, PatientUtils.OPTIONS);
