@@ -163,8 +163,13 @@ public class HL7ADTMessageTest {
                         .map(BundleEntryComponent::getResource).collect(Collectors.toList());
         assertThat(conditionResource).hasSize(1); // from DG1
 
+        List<Resource> documentReferenceResource = e.stream()
+                        .filter(v -> ResourceType.DocumentReference == v.getResource().getResourceType())
+                        .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        assertThat(documentReferenceResource).hasSize(0); // from OBX of type TX; TODO: this should be 1 when card 855 is implemented
+
         // Confirm that there are no extra resources
-        assertThat(e.size()).isEqualTo(5);
+        assertThat(e.size()).isEqualTo(5); //TODO: this should be 6 when card 855 is implemented
 
     }
 

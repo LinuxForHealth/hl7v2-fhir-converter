@@ -118,7 +118,7 @@ public class FHIRConverterTest {
         ftv.convert(hl7message);
     });
   }
-  
+
   @Test
   public void test_dosage_output() throws  IOException {
 String hl7message =
@@ -193,6 +193,49 @@ String hl7message =
     }
 
     String messageType = HL7DataExtractor.getMessageType(hl7message);
+
+    assertThat(messageType).isEqualTo("ADT_A40");
+
+    // Convert and check for a patient resource
+    HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
+    String json = ftv.convert(hl7messageString, ConverterOptions.SIMPLE_OPTIONS);
+
+    FHIRContext context = new FHIRContext();
+    IBaseResource bundleResource = context.getParser().parseResource(json);
+    assertThat(bundleResource).isNotNull();
+
+    Bundle b = (Bundle) bundleResource;
+    assertThat(b.getType()).isEqualTo(BundleType.COLLECTION);
+    assertThat(b.getId()).isNotNull();
+    assertThat(b.getMeta().getLastUpdated()).isNotNull();
+
+    List<BundleEntryComponent> e = b.getEntry();
+    List<Resource> patientResource = e.stream().filter(v -> ResourceType.Patient == v.getResource().getResourceType())
+        .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+    assertThat(patientResource).hasSize(2);
+
+  }
+
+  @Test
+  // Test an example of a message with no message structure specifed
+  public void test_adt_40_message() throws Exception {
+    Message hl7message = null;
+    // Test that an ADT A40 message with no MSH-9.3 is successfully parsed and converted.
+    String hl7messageString =
+            "MSH|^~\\&|REGADT|MCM|RSP1P8|MCM|200301051530|SEC|ADT^A40|00000003|P|2.6\n" +
+            "PID|||MR1^^^XYZ||MAIDENNAME^EVE\n" +
+            "MRG|MR2^^^XYZ\n";
+
+    InputStream ins = IOUtils.toInputStream(hl7messageString, StandardCharsets.UTF_8);
+    Hl7InputStreamMessageStringIterator iterator = new Hl7InputStreamMessageStringIterator(ins);
+
+    if (iterator.hasNext()) {
+      HL7HapiParser hparser = new HL7HapiParser();
+      hl7message = hparser.getParser().parse(iterator.next());
+    }
+
+    String messageType = HL7DataExtractor.getMessageType(hl7message);
+    
 
     assertThat(messageType).isEqualTo("ADT_A40");
 
