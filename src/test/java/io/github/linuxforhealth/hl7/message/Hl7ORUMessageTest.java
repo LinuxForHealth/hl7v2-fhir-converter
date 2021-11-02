@@ -866,4 +866,36 @@ public class Hl7ORUMessageTest {
             assertThat(obs.getSubject().getReference().substring(0, 8)).isEqualTo("Patient/");
         }
     }
+
+    @Test
+    public void test_ORU_r01_without_status() throws IOException {
+      String ORU_r01 = "MSH|^~\\&|NIST Test Lab APP|NIST Lab Facility||NIST EHR Facility|20150926140551||ORU^R01|NIST-LOI_5.0_1.1-NG|T|2.5.1|||AL|AL|||||\r"
+          + "PID|1||PATID5421^^^NISTMPI^MR||Wilson^Patrice^Natasha^^^^L||19820304|F||2106-3^White^HL70005|144 East 12th Street^^Los Angeles^CA^90012^^H||^PRN^PH^^^203^2290210|||||||||N^Not Hispanic or Latino^HL70189\r"
+          + "ORC|NW|ORD448811^NIST EHR|R-511^NIST Lab Filler||||||20120628070100|||5742200012^Radon^Nicholas^^^^^^NPI^L^^^NPI\r"
+          + "OBR|1|ORD448811^NIST EHR|R-511^NIST Lab Filler|1000^Hepatitis A B C Panel^99USL|||20120628070100|||||||||5742200012^Radon^Nicholas^^^^^^NPI^L^^^NPI\r"
+          + "OBX|1|CWE|22314-9^Hepatitis A virus IgM Ab [Presence] in Serum^LN^HAVM^Hepatitis A IgM antibodies (IgM anti-HAV)^L^2.52||260385009^Negative (qualifier value)^SCT^NEG^NEGATIVE^L^201509USEd^^Negative (qualifier value)||Negative|N|||F|||20150925|||||201509261400\r"
+          + "OBX|2|CWE|20575-7^Hepatitis A virus Ab [Presence] in Serum^LN^HAVAB^Hepatitis A antibodies (anti-HAV)^L^2.52||260385009^Negative (qualifier value)^SCT^NEG^NEGATIVE^L^201509USEd^^Negative (qualifier value)||Negative|N|||F|||20150925|||||201509261400\r"
+          + "OBX|3|NM|22316-4^Hepatitis B virus core Ab [Units/volume] in Serum^LN^HBcAbQ^Hepatitis B core antibodies (anti-HBVc) Quant^L^2.52||0.70|[IU]/mL^international unit per milliliter^UCUM^IU/ml^^L^1.9|<0.50 IU/mL|H|||F|||20150925|||||201509261400";
+  
+      HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
+      String json = ftv.convert(ORU_r01, OPTIONS);
+  
+      FHIRContext context = new FHIRContext();
+      IBaseResource bundleResource = context.getParser().parseResource(json);
+      assertThat(bundleResource).isNotNull();
+      Bundle b = (Bundle) bundleResource;
+      List<BundleEntryComponent> e = b.getEntry();
+      List<Resource> diagnosticReport = e.stream()
+          .filter(v -> ResourceType.DiagnosticReport == v.getResource().getResourceType())
+          .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+      assertThat(diagnosticReport).hasSize(1);
+  
+      String s = context.getParser().encodeResourceToString(diagnosticReport.get(0));
+      Class<? extends IBaseResource> klass = DiagnosticReport.class;
+      DiagnosticReport expectStatusUnknown = (DiagnosticReport) context.getParser().parseResource(klass, s);
+      DiagnosticReport.DiagnosticReportStatus status = expectStatusUnknown.getStatus();
+  
+      assertThat(expectStatusUnknown.hasStatus()).isTrue();
+      assertThat(status).isEqualTo(DiagnosticReport.DiagnosticReportStatus.UNKNOWN);
+    }
 }

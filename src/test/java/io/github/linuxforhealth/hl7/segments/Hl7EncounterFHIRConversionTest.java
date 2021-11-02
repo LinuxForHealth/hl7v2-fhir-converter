@@ -34,7 +34,6 @@ import org.hl7.fhir.r4.model.Practitioner;
 import org.hl7.fhir.r4.model.Reference;
 import org.hl7.fhir.r4.model.Resource;
 import org.hl7.fhir.r4.model.ResourceType;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -55,9 +54,8 @@ public class Hl7EncounterFHIRConversionTest {
     private static final ConverterOptions OPTIONS = new Builder().withValidateResource().withPrettyPrint().build();
 
     @Test
-    @Disabled
     public void test_encounter_visitdescription_present() {
-        String hl7message = "MSH|^~\\&|WHI_LOAD_GENERATOR|IBM_TORONTO_LAB||IBM|20210330144208|8078780|ADT^A02|MSGID_4e1c575f-6c6d-47b2-ab9f-829f20c96db2|T|2.3\n"
+        String hl7message = "MSH|^~\\&|WHI_LOAD_GENERATOR|IBM_TORONTO_LAB||IBM|20210330144208|8078780|ADT^A01|MSGID_4e1c575f-6c6d-47b2-ab9f-829f20c96db2|T|2.3\n"
                 + "EVN||20210330144208||ADT_EVENT|007|20210309140700\n"
                 + "PID|1||0a8a1752-e336-43e1-bf7f-0c8f6f437ca3^^^MRN||Patient^Load^Generator||19690720|M|Patient^Alias^Generator|AA|9999^^CITY^STATE^ZIP^CAN|COUNTY|(866)845-0900||ENGLISH^ENGLISH|SIN|NONE|Account_0a8a1752-e336-43e1-bf7f-0c8f6f437ca3|123-456-7890|||N|BIRTH PLACE|N||||||N\n"
                 + "PV1||I|^^^Toronto^^5642 Hilly Av||||2905^Doctor^Attending^M^IV^^M.D|5755^Doctor^Referring^^Sr|770542^Doctor^Consulting^Jr||||||||59367^Doctor^Admitting||Visit_0a3be81e-144b-4885-9b4e-c5cd33c8f038|||||||||||||||||||||||||20210407191342\n"
@@ -94,9 +92,8 @@ public class Hl7EncounterFHIRConversionTest {
     }
 
     @Test
-    @Disabled
     public void test_encounter_visitdescription_missing() {
-        String hl7message = "MSH|^~\\&|WHI_LOAD_GENERATOR|IBM_TORONTO_LAB||IBM|20210330144208|8078780|ADT^A02|MSGID_4e1c575f-6c6d-47b2-ab9f-829f20c96db2|T|2.3\n"
+        String hl7message = "MSH|^~\\&|WHI_LOAD_GENERATOR|IBM_TORONTO_LAB||IBM|20210330144208|8078780|ADT^A01|MSGID_4e1c575f-6c6d-47b2-ab9f-829f20c96db2|T|2.3\n"
                 + "EVN||20210330144208||ADT_EVENT|007|20210309140700\n"
                 + "PID|1||0a8a1752-e336-43e1-bf7f-0c8f6f437ca3^^^MRN||Patient^Load^Generator||19690720|M|Patient^Alias^Generator|AA|9999^^CITY^STATE^ZIP^CAN|COUNTY|(866)845-0900||ENGLISH^ENGLISH|SIN|NONE|Account_0a8a1752-e336-43e1-bf7f-0c8f6f437ca3|123-456-7890|||N|BIRTH PLACE|N||||||N\n"
                 + "PV1||I|^^^Toronto^^5642 Hilly Av||||2905^Doctor^Attending^M^IV^^M.D|5755^Doctor^Referring^^Sr|770542^Doctor^Consulting^Jr||||||||59367^Doctor^Admitting||Visit_0a3be81e-144b-4885-9b4e-c5cd33c8f038|||||||||||||||||||||||||20210407191342\n"
@@ -125,25 +122,23 @@ public class Hl7EncounterFHIRConversionTest {
     // Test for serviceProvider reference in messages with both PV1 and PV2 segments
     // Part 1: use serviceProvider from PV2.23 subfields
     @ParameterizedTest
-    @ValueSource(strings = { "MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||ADT^A01|controlID|P|2.6\r",
-     //"MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||ADT^A02|controlID|P|2.6\r",
-     //"MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||ADT^A03|controlID|P|2.6\r",
-     //"MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||ADT^A04|controlID|P|2.6\r",
-     "MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||ADT^A08|controlID|P|2.6\r",
-     //"MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||ADT^A28|controlID|P|2.6\r",
-     //"MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||ADT^A31|controlID|P|2.6\r"
-     // ADT_A34 and ADT_A40 do not create encounters so they do not need to be tested here
-     "MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||RDE^O11|controlID|P|2.6\r",
-     "MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||RDE^O25|controlID|P|2.6\r",
-     "MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||ORU^R01|controlID|P|2.6\r",
-     "MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||VXU^V04|controlID|P|2.6\r",
+    @ValueSource(strings = { 
+        "ADT^A01", /*"ADT^A02", "ADT^A03", "ADT^A04",*/ "ADT^A08", /*"ADT^A28", "ADT^A31",*/
+        // ADT_A34 and ADT_A40 do not create encounters so they do not need to be tested here
+        // MDM messages are not tested here because they do not have PV2 segments
+        "OMP^O09",
+        "ORU^R01",
+        "RDE^O11","RDE^O25",
+        "VXU^V04"
     })
-    public void test_encounter_with_serviceProvider_from_PV2(String msh) {
-        String hl7message = msh
-                + "EVN||20210330144208||ADT_EVENT|007|20210309140700\n"
-                + "PID|1||0a8a1752-e336-43e1-bf7f-0c8f6f437ca3^^^MRN||Patient^Load^Generator||19690720|M|Patient^Alias^Generator|AA|9999^^CITY^STATE^ZIP^CAN|COUNTY|(866)845-0900||ENGLISH^ENGLISH|SIN|NONE|Account_0a8a1752-e336-43e1-bf7f-0c8f6f437ca3|123-456-7890|||N|BIRTH PLACE|N||||||N\n"
-                + "PV1||I|^^^Toronto^^5642 Hilly Av||||2905^Doctor^Attending^M^IV^^M.D|5755^Doctor^Referring^^Sr|770542^Doctor^Consulting^Jr||||||||59367^Doctor^Admitting||Visit_0a3be81e-144b-4885-9b4e-c5cd33c8f038|||||||||||||||||||||||||20210407191342\n"
-                + "PV2||TEL||||X-5546||20210330144208|20210309||||||||||||n|N|South Shore Hosptial Weymouth^SSHW^^^^^^SSH_WEYMOUTH|||||||||N||||||\n";
+    public void test_encounter_with_serviceProvider_from_PV2(String message) {
+        String hl7message = 
+            "MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||" + message + "|controlID|P|2.6\r"
+            + "EVN||20210330144208||ADT_EVENT|007|20210309140700\r"
+            + "PID|1||0a8a1752-e336-43e1-bf7f-0c8f6f437ca3^^^MRN||Patient^Load^Generator||19690720|M|Patient^Alias^Generator|AA|9999^^CITY^STATE^ZIP^CAN|COUNTY|(866)845-0900||ENGLISH^ENGLISH|SIN|NONE|Account_0a8a1752-e336-43e1-bf7f-0c8f6f437ca3|123-456-7890|||N|BIRTH PLACE|N||||||N\r"
+            + "PV1||I|^^^Toronto^^5642 Hilly Av||||2905^Doctor^Attending^M^IV^^M.D|5755^Doctor^Referring^^Sr|770542^Doctor^Consulting^Jr||||||||59367^Doctor^Admitting||Visit_0a3be81e-144b-4885-9b4e-c5cd33c8f038|||||||||||||||||||||||||20210407191342\r"
+            + "PV2||TEL||||X-5546||20210330144208|20210309||||||||||||n|N|South Shore Hosptial Weymouth^SSHW^^^^^^SSH_WEYMOUTH|||||||||N||||||\r"
+            ;
 
         HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
         String json = ftv.convert(hl7message, OPTIONS);
@@ -175,25 +170,22 @@ public class Hl7EncounterFHIRConversionTest {
     // Test for serviceProvider reference in messages with both PV1 and PV2 segments
     // Part 2: Field PV2.23 is provided but no PV2.23.8; serviceProvider id should use backup field PV1.3.4.1
     @ParameterizedTest
-    @ValueSource(strings = { "MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||ADT^A01|controlID|P|2.6\r",
-     //"MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||ADT^A02|controlID|P|2.6\r",
-     //"MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||ADT^A03|controlID|P|2.6\r",
-     //"MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||ADT^A04|controlID|P|2.6\r",
-     "MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||ADT^A08|controlID|P|2.6\r",
-     //"MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||ADT^A28|controlID|P|2.6\r",
-     //"MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||ADT^A31|controlID|P|2.6\r",
-     // ADT_A34 and ADT_A40 do not create encounters so they do not need to be tested here
-     "MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||RDE^O11|controlID|P|2.6\r",
-     "MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||RDE^O25|controlID|P|2.6\r",
-     "MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||ORU^R01|controlID|P|2.6\r",     
-     "MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||VXU^V04|controlID|P|2.6\r",
+    @ValueSource(strings = { 
+        "ADT^A01", /*"ADT^A02", "ADT^A03", "ADT^A04",*/ "ADT^A08", /*"ADT^A28", "ADT^A31",*/
+        // ADT_A34 and ADT_A40 do not create encounters so they do not need to be tested here
+        // MDM messages are not tested here because they do not have PV2 segments
+        "OMP^O09",
+        "ORU^R01",
+        "RDE^O11","RDE^O25",
+        "VXU^V04"
     })
-    public void test_encounter_PV1_serviceProvider(String msh) {
-        String hl7message = msh
-                + "EVN||20210330144208||ADT_EVENT|007|20210309140700\r"
-                + "PID|1||0a8a1752-e336-43e1-bf7f-0c8f6f437ca3^^^MRN||Patient^Load^Generator||19690720|M|Patient^Alias^Generator|AA|9999^^CITY^STATE^ZIP^CAN|COUNTY|(866)845-0900||ENGLISH^ENGLISH|SIN|NONE|Account_0a8a1752-e336-43e1-bf7f-0c8f6f437ca3|123-456-7890|||N|BIRTH PLACE|N||||||N\r"
-                + "PV1||I|^^^Toronto^^5642 Hilly Av||||2905^Doctor^Attending^M^IV^^M.D|5755^Doctor^Referring^^Sr|770542^Doctor^Consulting^Jr||||||||59367^Doctor^Admitting||Visit_0a3be81e-144b-4885-9b4e-c5cd33c8f038|||||||||||||||||||||||||20210407191342\r"
-                + "PV2||TEL||||X-5546||20210330144208|20210309||||||||||||n|N|South Shore Hosptial Weymouth|||||||||N||||||\r";
+    public void test_encounter_PV1_serviceProvider(String message) {
+        String hl7message =
+            "MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||" + message + "|controlID|P|2.6\r"
+            + "EVN||20210330144208||ADT_EVENT|007|20210309140700\r"
+            + "PID|1||0a8a1752-e336-43e1-bf7f-0c8f6f437ca3^^^MRN||Patient^Load^Generator||19690720|M|Patient^Alias^Generator|AA|9999^^CITY^STATE^ZIP^CAN|COUNTY|(866)845-0900||ENGLISH^ENGLISH|SIN|NONE|Account_0a8a1752-e336-43e1-bf7f-0c8f6f437ca3|123-456-7890|||N|BIRTH PLACE|N||||||N\r"
+            + "PV1||I|^^^Toronto^^5642 Hilly Av||||2905^Doctor^Attending^M^IV^^M.D|5755^Doctor^Referring^^Sr|770542^Doctor^Consulting^Jr||||||||59367^Doctor^Admitting||Visit_0a3be81e-144b-4885-9b4e-c5cd33c8f038|||||||||||||||||||||||||20210407191342\r"
+            + "PV2||TEL||||X-5546||20210330144208|20210309||||||||||||n|N|South Shore Hosptial Weymouth|||||||||N||||||\r";
 
         HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
         String json = ftv.convert(hl7message, OPTIONS);
@@ -224,25 +216,22 @@ public class Hl7EncounterFHIRConversionTest {
     // Test for serviceProvider reference in messages with PV1 segment and no PV2 segment
     // Use serviceProvider from PV1-3.4.1
     @ParameterizedTest
-    @ValueSource(strings = { "MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||ADT^A01|controlID|P|2.6\r",
-     //"MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||ADT^A02|controlID|P|2.6\r",
-     //"MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||ADT^A03|controlID|P|2.6\r",
-     //"MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||ADT^A04|controlID|P|2.6\r",
-     "MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||ADT^A08|controlID|P|2.6\r",
-     //"MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||ADT^A28|controlID|P|2.6\r",
-     //"MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||ADT^A31|controlID|P|2.6\r"
-     // ADT_A34 and ADT_A40 do not create encounters so they do not need to be tested here
-     "MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||RDE^O11|controlID|P|2.6\r",
-     "MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||RDE^O25|controlID|P|2.6\r",
-     "MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||ORU^R01|controlID|P|2.6\r", 
-     "MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||VXU^V04|controlID|P|2.6\r",    
+    @ValueSource(strings = {
+        "ADT^A01", /*"ADT^A02", "ADT^A03", "ADT^A04",*/ "ADT^A08", /*"ADT^A28", "ADT^A31",*/
+        // ADT_A34 and ADT_A40 do not create encounters so they do not need to be tested here
+        // MDM messages are not tested here because they do not have PV2 segments
+        "OMP^O09",
+        "ORU^R01",
+        "RDE^O11","RDE^O25",
+        "VXU^V04"
     })
-    public void test_encounter_with_serviceProvider_from_PV1_3_4(String msh) {
-        String hl7message =  msh
-                +"EVN|A01|20150502090000|\r"
-                +"PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\r"
-                // PV1-3.4 used for serviceProvider reference; used for both id and name
-                +"PV1||I|INT^0001^02^Toronto East|||||||SUR||||||||S|VisitNumber^^^Toronto North|A|||||||||||||||||||Toronto West||||||\r";
+    public void test_encounter_with_serviceProvider_from_PV1_3_4(String message) {
+        String hl7message =
+            "MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||" + message + "|controlID|P|2.6\r"
+            +"EVN|A01|20150502090000|\r"
+            +"PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\r"
+            // PV1-3.4 used for serviceProvider reference; used for both id and name
+            +"PV1||I|INT^0001^02^Toronto East|||||||SUR||||||||S|VisitNumber^^^Toronto North|A|||||||||||||||||||Toronto West||||||\r";
  
         HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
         String json = ftv.convert(hl7message, OPTIONS);
@@ -466,9 +455,8 @@ public class Hl7EncounterFHIRConversionTest {
     }
 
     @Test
-    @Disabled
     public void test_encounter_modeOfarrival_invalid_singlevalue() {
-        String hl7message = "MSH|^~\\&|WHI_LOAD_GENERATOR|IBM_TORONTO_LAB||IBM|20210330144208|8078780|ADT^A02|MSGID_4e1c575f-6c6d-47b2-ab9f-829f20c96db2|T|2.3\n"
+        String hl7message = "MSH|^~\\&|WHI_LOAD_GENERATOR|IBM_TORONTO_LAB||IBM|20210330144208|8078780|ADT^A01|MSGID_4e1c575f-6c6d-47b2-ab9f-829f20c96db2|T|2.3\n"
                 + "EVN||20210330144208||ADT_EVENT|007|20210309140700\n"
                 + "PID|1||0a8a1752-e336-43e1-bf7f-0c8f6f437ca3^^^MRN||Patient^Load^Generator||19690720|M|Patient^Alias^Generator|AA|9999^^CITY^STATE^ZIP^CAN|COUNTY|(866)845-0900||ENGLISH^ENGLISH|SIN|NONE|Account_0a8a1752-e336-43e1-bf7f-0c8f6f437ca3|123-456-7890|||N|BIRTH PLACE|N||||||N\n"
                 + "PV1||I|^^^Toronto^^5642 Hilly Av||||2905^Doctor^Attending^M^IV^^M.D|5755^Doctor^Referring^^Sr|770542^Doctor^Consulting^Jr||||||||59367^Doctor^Admitting||Visit_0a3be81e-144b-4885-9b4e-c5cd33c8f038|||||||||||||||||||||||||20210407191342\n"
@@ -494,9 +482,8 @@ public class Hl7EncounterFHIRConversionTest {
     }
 
     @Test
-    @Disabled
     public void test_encounter_modeOfarrival_invalid_with_codeAndDisplay() {
-        String hl7message = "MSH|^~\\&|WHI_LOAD_GENERATOR|IBM_TORONTO_LAB||IBM|20210330144208|8078780|ADT^A02|MSGID_4e1c575f-6c6d-47b2-ab9f-829f20c96db2|T|2.3\n"
+        String hl7message = "MSH|^~\\&|WHI_LOAD_GENERATOR|IBM_TORONTO_LAB||IBM|20210330144208|8078780|ADT^A01|MSGID_4e1c575f-6c6d-47b2-ab9f-829f20c96db2|T|2.3\n"
                 + "EVN||20210330144208||ADT_EVENT|007|20210309140700\n"
                 + "PID|1||0a8a1752-e336-43e1-bf7f-0c8f6f437ca3^^^MRN||Patient^Load^Generator||19690720|M|Patient^Alias^Generator|AA|9999^^CITY^STATE^ZIP^CAN|COUNTY|(866)845-0900||ENGLISH^ENGLISH|SIN|NONE|Account_0a8a1752-e336-43e1-bf7f-0c8f6f437ca3|123-456-7890|||N|BIRTH PLACE|N||||||N\n"
                 + "PV1||I|^^^Toronto^^5642 Hilly Av||||2905^Doctor^Attending^M^IV^^M.D|5755^Doctor^Referring^^Sr|770542^Doctor^Consulting^Jr||||||||59367^Doctor^Admitting||Visit_0a3be81e-144b-4885-9b4e-c5cd33c8f038|||||||||||||||||||||||||20210407191342\n"
@@ -521,9 +508,8 @@ public class Hl7EncounterFHIRConversionTest {
     }
 
     @Test
-    @Disabled
     public void test_encounter_modeOfarrival_invalid_with_system() {
-        String hl7message = "MSH|^~\\&|WHI_LOAD_GENERATOR|IBM_TORONTO_LAB||IBM|20210330144208|8078780|ADT^A02|MSGID_4e1c575f-6c6d-47b2-ab9f-829f20c96db2|T|2.3\n"
+        String hl7message = "MSH|^~\\&|WHI_LOAD_GENERATOR|IBM_TORONTO_LAB||IBM|20210330144208|8078780|ADT^A01|MSGID_4e1c575f-6c6d-47b2-ab9f-829f20c96db2|T|2.3\n"
                 + "EVN||20210330144208||ADT_EVENT|007|20210309140700\n"
                 + "PID|1||0a8a1752-e336-43e1-bf7f-0c8f6f437ca3^^^MRN||Patient^Load^Generator||19690720|M|Patient^Alias^Generator|AA|9999^^CITY^STATE^ZIP^CAN|COUNTY|(866)845-0900||ENGLISH^ENGLISH|SIN|NONE|Account_0a8a1752-e336-43e1-bf7f-0c8f6f437ca3|123-456-7890|||N|BIRTH PLACE|N||||||N\n"
                 + "PV1||I|^^^Toronto^^5642 Hilly Av||||2905^Doctor^Attending^M^IV^^M.D|5755^Doctor^Referring^^Sr|770542^Doctor^Consulting^Jr||||||||59367^Doctor^Admitting||Visit_0a3be81e-144b-4885-9b4e-c5cd33c8f038|||||||||||||||||||||||||20210407191342\n"
@@ -550,24 +536,21 @@ public class Hl7EncounterFHIRConversionTest {
     // Test messages with PV1 segment and no PV2 segment, and no serviceProvider provided
     // Extension list should be empty and serviceProvider should be null
     @ParameterizedTest
-    @ValueSource(strings = { "MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||ADT^A01|controlID|P|2.6\r",
-     //"MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||ADT^A02|controlID|P|2.6\r",
-     //"MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||ADT^A03|controlID|P|2.6\r",
-     //"MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||ADT^A04|controlID|P|2.6\r",
-     "MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||ADT^A08|controlID|P|2.6\r",
-     //"MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||ADT^A28|controlID|P|2.6\r",
-     //"MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||ADT^A31|controlID|P|2.6\r"
-     // ADT_A34 and ADT_A40 do not create encounters so they do not need to be tested here
-     "MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||RDE^O11|controlID|P|2.6\r",
-     "MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||RDE^O25|controlID|P|2.6\r",
-     "MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||ORU^R01|controlID|P|2.6\r",
-     "MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||VXU^V04|controlID|P|2.6\r",
+    @ValueSource(strings = {
+        "ADT^A01", /*"ADT^A02", "ADT^A03", "ADT^A04",*/ "ADT^A08", /*"ADT^A28", "ADT^A31",*/
+        // ADT_A34 and ADT_A40 do not create encounters so they do not need to be tested here
+        // MDM messages are not tested here because they do not have PV2 segments
+        "OMP^O09",
+        "ORU^R01",
+        "RDE^O11","RDE^O25",
+        "VXU^V04"
     })
-    public void test_encounter_PV2segment_missing(String msh) {
-        String hl7message = msh //"MSH|^~\\&|WHI_LOAD_GENERATOR|IBM_TORONTO_LAB||IBM|20210330144208|8078780|ADT^A02|MSGID_4e1c575f-6c6d-47b2-ab9f-829f20c96db2|T|2.3\n"
-                + "EVN||20210330144208||ADT_EVENT|007|20210309140700\n"
-                + "PID|1||0a8a1752-e336-43e1-bf7f-0c8f6f437ca3^^^MRN||Patient^Load^Generator||19690720|M|Patient^Alias^Generator|AA|9999^^CITY^STATE^ZIP^CAN|COUNTY|(866)845-0900||ENGLISH^ENGLISH|SIN|NONE|Account_0a8a1752-e336-43e1-bf7f-0c8f6f437ca3|123-456-7890|||N|BIRTH PLACE|N||||||N\n"
-                + "PV1||I|^^^^^5642 Hilly Av||||2905^Doctor^Attending^M^IV^^M.D|5755^Doctor^Referring^^Sr|770542^Doctor^Consulting^Jr||||||||59367^Doctor^Admitting||Visit_0a3be81e-144b-4885-9b4e-c5cd33c8f038|||||||||||||||||||||||||20210407191342\n";
+    public void test_encounter_PV2segment_missing(String message) {
+        String hl7message =
+            "MSH|^~\\&|WHI_LOAD_GENERATOR|IBM_TORONTO_LAB||IBM|20210330144208|8078780|" + message + "|MSGID_4e1c575f-6c6d-47b2-ab9f-829f20c96db2|T|2.3\n"
+            + "EVN||20210330144208||ADT_EVENT|007|20210309140700\n"
+            + "PID|1||0a8a1752-e336-43e1-bf7f-0c8f6f437ca3^^^MRN||Patient^Load^Generator||19690720|M|Patient^Alias^Generator|AA|9999^^CITY^STATE^ZIP^CAN|COUNTY|(866)845-0900||ENGLISH^ENGLISH|SIN|NONE|Account_0a8a1752-e336-43e1-bf7f-0c8f6f437ca3|123-456-7890|||N|BIRTH PLACE|N||||||N\n"
+            + "PV1||I|^^^^^5642 Hilly Av||||2905^Doctor^Attending^M^IV^^M.D|5755^Doctor^Referring^^Sr|770542^Doctor^Consulting^Jr||||||||59367^Doctor^Admitting||Visit_0a3be81e-144b-4885-9b4e-c5cd33c8f038|||||||||||||||||||||||||20210407191342\n";
         Encounter encounter = ResourceUtils.getEncounter(hl7message);
         Narrative encText = encounter.getText();
         assertNull(encText.getStatus());

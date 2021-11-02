@@ -434,6 +434,7 @@ public class Hl7ObservationFHIRConversionTest {
         "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|PPR^PC1|||2.6||||||||2.6\r",
         //"MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|PPR^PC2|||2.6||||||||2.6\r",
         //"MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|PPR^PC3|||2.6||||||||2.6\r",
+        "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|VXU^V04|||2.6||||||||2.6\r",
     })
     public void extendedObservationTestMostMessages(String msh) throws IOException {
         String hl7message = msh
