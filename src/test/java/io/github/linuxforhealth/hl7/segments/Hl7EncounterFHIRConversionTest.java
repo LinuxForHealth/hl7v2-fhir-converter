@@ -74,7 +74,7 @@ public class Hl7EncounterFHIRConversionTest {
         List<Resource> encounterResource = ResourceUtils.getResourceList(e, ResourceType.Encounter);
         assertThat(encounterResource).hasSize(1);
 
-        Encounter encounter = ResourceUtils.getResourceEncounter(encounterResource.get(0), context);
+        Encounter encounter = ResourceUtils.getResourceEncounter(encounterResource.get(0), context); //Encounter.Type comes from  PV1.4
         assertThat(encounter.getTypeFirstRep().getCodingFirstRep().getCode()).isEqualTo("A");
         assertThat(encounter.getTypeFirstRep().getCodingFirstRep().getDisplay()).isEqualTo("Accident");
         assertThat(encounter.getTypeFirstRep().getCodingFirstRep().getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/v2-0007");
@@ -117,7 +117,7 @@ public class Hl7EncounterFHIRConversionTest {
         assertThat(encounterResource).hasSize(1);
 
         Encounter encounter = ResourceUtils.getResourceEncounter(encounterResource.get(0), context);
-        assertThat(encounter.getTypeFirstRep()).isNull();
+        assertThat(encounter.hasType()).isFalse(); // This assertion is to confirm that we do not get a type from PV1.18
 
         Narrative encText = encounter.getText();
         assertNull(encText.getStatus());
