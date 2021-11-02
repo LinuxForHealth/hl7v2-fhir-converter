@@ -355,17 +355,6 @@ public class SimpleDataValueResolver {
         return getFHIRCode(val, SpecimenStatus.class);
     };
 
-    public static final ValueExtractor<Object, String> DOC_REF_STATUS_CODE_FHIR = (Object value) -> {
-        String val = Hl7DataHandlerUtil.getStringValue(value);
-        String code = getFHIRCode(val, Enumerations.DocumentReferenceStatus.class);
-
-        if (code != null) {
-            return code;
-        } else {
-            return "current";
-        }
-    };
-
     public static final ValueExtractor<Object, String> DOC_REF_DOC_STATUS_CODE_FHIR = (Object value) -> {
         String val = Hl7DataHandlerUtil.getStringValue(value);
         return getFHIRCode(val, CompositionStatus.class);
@@ -697,11 +686,11 @@ public class SimpleDataValueResolver {
         }
     }
 
-    private static String getFHIRCode(String hl7Value, Class<?> fhirConceptClassName) {
+    public static String getFHIRCode(String hl7Value, Class<?> fhirConceptClassName) {
     	return getFHIRCode(hl7Value,fhirConceptClassName.getSimpleName());
     }
 
-    private static String getFHIRCode(String hl7Value, String fhirMappingConceptName) {
+    public static String getFHIRCode(String hl7Value, String fhirMappingConceptName) {
         if (hl7Value != null) {
             Map<String, String> mapping = Hl7v2Mapping.getMapping(fhirMappingConceptName);
             if (mapping != null && !mapping.isEmpty()) {

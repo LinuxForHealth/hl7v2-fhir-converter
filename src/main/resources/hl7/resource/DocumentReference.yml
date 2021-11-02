@@ -82,11 +82,21 @@ identifier_5:
    constants:
       code: "UniversalId"
 
+# Only create a DocReference when there is a TXA 
+# OR there is no TXA, but there is an ORC with OBX of type TX.
+# Do this by using required:true and getDocumentReferenceStatus which 
+# returns a value only when the conditions are satisfied.
 status:
-   type: DOC_REF_STATUS
-   default: "current"
-   valueOf: TXA.19 | OBR.25
-   expressionType: HL7Spec
+   type: STRING
+   required: true
+   valueOf: 'GeneralUtils.getDocumentReferenceStatus( txa, txa19, orc, obr25, obx2)'
+   expressionType: JEXL   
+   vars:
+      txa: TXA
+      txa19: TXA.19
+      obr25: OBR.25
+      orc: ORC
+      obx2: OBX.2      
 
 docStatus:
    type: DOC_REF_DOC_STATUS

@@ -10,12 +10,14 @@ import java.time.temporal.Temporal;
 import java.time.temporal.UnsupportedTemporalTypeException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringEscapeUtils;
 import org.apache.commons.text.StringTokenizer;
+import org.hl7.fhir.r4.model.Enumerations;
 import org.hl7.fhir.r4.model.codesystems.EncounterStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -102,6 +104,34 @@ public class Hl7RelatedGeneralUtils {
             status = EncounterStatus.CANCELLED;
         }
         return status.toCode();
+    }
+
+
+    // DocumentReference.yml uses a required:true on status to control the creation of the DocumentReference.
+    // It depends on this getDocumentReferenceStatus returning a status value ONLY when a DocumentReference should be created.
+    // Together with the required:true, this creates logic for messages (MDM, PPR, ORM, OMP) that create DocumentReferences 
+    // a) when there is a TXA, create a DocRef
+    // b) when there is no TXA, and there is an ORC with OBX of type TX, create a DocRef
+    // c) otherwise when there is no TXA create no DocRef
+    // Observation creation is controlled by different code
+    public static String getDocumentReferenceStatus(Object txa, Object txa19, Object orc, Object obr25, Object obx2) {
+        LOGGER.info("Generating DocumentReference status");
+        LOGGER.debug("Generating DocumentReference status from txa{}, txa19 {}, orc {}, obr25 {}, obx2 {}, ", txa, txa19, orc, obr25, obx2);
+
+        if (txa != null || (orc!= null && Objects.equals(Hl7DataHandlerUtil.getStringValue(obx2),"TX"))) {
+            String val = Hl7DataHandlerUtil.getStringValue(txa19);
+            if (val == null) {
+                val = Hl7DataHandlerUtil.getStringValue(obr25);
+            }
+            String code = SimpleDataValueResolver.getFHIRCode(val, Enumerations.DocumentReferenceStatus.class);
+
+            if (code != null) {
+                return code;
+            } else {
+                return "current";
+            }
+        } 
+        return null;
     }
 
     public static String generateName(Object prefix, Object first, Object middle, Object family, Object suffix) {
