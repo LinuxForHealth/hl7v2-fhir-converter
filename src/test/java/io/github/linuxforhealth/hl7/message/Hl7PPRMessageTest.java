@@ -178,11 +178,9 @@ public class Hl7PPRMessageTest {
         assertThat(e.size()).isEqualTo(7);  
     }
 
-    // @ParameterizedTest
-    // @ValueSource(strings = { "PPR^PC1", /* "PPR^PC2", "PPR^PC3" */ })
-    @Test
-    public void test_ppr_pc1_with_VISIT_and_PROBLEM_with_ORDER_group_with_OBXnonTX(/*String message*/) throws IOException {
-        String message = "PPR^PC1";
+    @ParameterizedTest
+    @ValueSource(strings = { "PPR^PC1", /* "PPR^PC2", "PPR^PC3" */ })
+    public void test_ppr_pc1_with_VISIT_and_PROBLEM_with_ORDER_group_with_OBXnonTX(String message) throws IOException {
         String hl7message = 
             "MSH|^~\\&|SendTest1|Sendfac1|Receiveapp1|Receivefac1|200603081747|security|" + message + "|1|P^I|2.6||||||ASCII||\r"
             + "PID|||555444222111^^^MPI&GenHosp&L^MR||james^anderson|||M||||||||||||||\r"
