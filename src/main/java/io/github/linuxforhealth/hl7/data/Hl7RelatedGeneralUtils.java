@@ -118,7 +118,7 @@ public class Hl7RelatedGeneralUtils {
         LOGGER.info("Generating DocumentReference status");
         LOGGER.debug("Generating DocumentReference status from txa{}, txa19 {}, orc {}, obr25 {}, obx2 {}, ", txa, txa19, orc, obr25, obx2);
 
-        if (txa != null || (txa == null && orc!= null && Objects.equals(Hl7DataHandlerUtil.getStringValue(obx2),"TX"))) {
+        if (txa != null || (orc!= null && Objects.equals(Hl7DataHandlerUtil.getStringValue(obx2),"TX"))) {
             String val = Hl7DataHandlerUtil.getStringValue(txa19);
             if (val == null) {
                 val = Hl7DataHandlerUtil.getStringValue(obr25);
