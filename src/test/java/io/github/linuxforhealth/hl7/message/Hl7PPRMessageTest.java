@@ -134,9 +134,12 @@ public class Hl7PPRMessageTest {
         List<Resource> serviceRequestResource = ResourceUtils.getResourceList(e, ResourceType.ServiceRequest);
         assertThat(serviceRequestResource).hasSize(1);
 
+        // We expect NO documentReference because there is no TXA and no TX OBX
+        List<Resource> documentReferences = ResourceUtils.getResourceList(e, ResourceType.DocumentReference);
+        assertThat(documentReferences).isEmpty(); 
+
         // Confirm that no extra resources are created
-        // TODO: When card 849 is completed, then there will be no DocumentReference and we should have exactly 4 resources.
-        assertThat(e.size()).isEqualTo(5); 
+        assertThat(e.size()).isEqualTo(4); 
     }
 
     @ParameterizedTest
@@ -167,14 +170,19 @@ public class Hl7PPRMessageTest {
         List<Resource> serviceRequestResource = ResourceUtils.getResourceList(e, ResourceType.ServiceRequest);
         assertThat(serviceRequestResource).hasSize(3);
 
+        // We expect NO documentReference because there is no TXA and no TX OBX
+        List<Resource> documentReferences = ResourceUtils.getResourceList(e, ResourceType.DocumentReference);
+        assertThat(documentReferences).isEmpty(); 
+
         // Confirm that no extra resources are created
-        // TODO: When card 849 is completed, then there will be no DocumentReference and we should have exactly 7 resources.
-        assertThat(e.size()).isEqualTo(8);  
+        assertThat(e.size()).isEqualTo(7);  
     }
 
-    @ParameterizedTest
-    @ValueSource(strings = { "PPR^PC1", /* "PPR^PC2", "PPR^PC3" */ })
-    public void test_ppr_pc1_with_VISIT_and_PROBLEM_with_ORDER_group_with_OBXnonTX(String message) throws IOException {
+    // @ParameterizedTest
+    // @ValueSource(strings = { "PPR^PC1", /* "PPR^PC2", "PPR^PC3" */ })
+    @Test
+    public void test_ppr_pc1_with_VISIT_and_PROBLEM_with_ORDER_group_with_OBXnonTX(/*String message*/) throws IOException {
+        String message = "PPR^PC1";
         String hl7message = 
             "MSH|^~\\&|SendTest1|Sendfac1|Receiveapp1|Receivefac1|200603081747|security|" + message + "|1|P^I|2.6||||||ASCII||\r"
             + "PID|||555444222111^^^MPI&GenHosp&L^MR||james^anderson|||M||||||||||||||\r"
@@ -203,15 +211,15 @@ public class Hl7PPRMessageTest {
         List<Resource> serviceRequestResources = ResourceUtils.getResourceList(e, ResourceType.ServiceRequest);
         assertThat(serviceRequestResources).hasSize(1);
 
-        // TODO: This should work when card 849 is completed
-        // List<Resource> documentReferences = ResourceUtils.getResourceList(e, ResourceType.DocumentReference);
-        // assertThat(documentReferences).isEmpty(); 
+        // We expect NO documentReference because there is no TXA and neither OBX is TX
+        List<Resource> documentReferences = ResourceUtils.getResourceList(e, ResourceType.DocumentReference);
+        assertThat(documentReferences).isEmpty(); 
 
         List<Resource> observationResource = ResourceUtils.getResourceList(e, ResourceType.Observation);
         assertThat(observationResource).hasSize(2); 
         
         // Confirm that no extra resources are created
-        assertThat(e.size()).isEqualTo(7); //TODO: This should be 6 when the DocRef is removed in card 849
+        assertThat(e.size()).isEqualTo(6);
     }
 
     @ParameterizedTest
@@ -356,8 +364,12 @@ public class Hl7PPRMessageTest {
         List<Resource> medReqResource = ResourceUtils.getResourceList(e, ResourceType.MedicationRequest);
         assertThat(medReqResource).hasSize(1);
 
+        // We expect NO documentReference because there is no TXA and no TX OBX
+        List<Resource> documentReferences = ResourceUtils.getResourceList(e, ResourceType.DocumentReference);
+        assertThat(documentReferences).isEmpty(); 
+
         // Confirm that no extra resources are created
-        assertThat(e.size()).isEqualTo(11);  //TODO: This should be 10 when card 849 is completed which will remove the unwanted docref 
+        assertThat(e.size()).isEqualTo(10); 
     }
 
     @ParameterizedTest
