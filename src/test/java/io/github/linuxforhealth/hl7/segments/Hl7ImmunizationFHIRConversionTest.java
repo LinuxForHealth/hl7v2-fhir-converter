@@ -70,7 +70,7 @@ public class Hl7ImmunizationFHIRConversionTest {
     assertThat(resource.getLotNumber()).isEqualTo("33k2a"); // RXA.15
     assertThat(resource.getExpirationDate()).isEqualTo("2013-12-10"); // RXA.16
 
-    //dose Quantity with a system
+    //dose Quantity with an unknown system
     assertThat(resource.hasDoseQuantity()).isTrue();
     assertThat(resource.getDoseQuantity().getValue().toString()).isEqualTo("0.5");
     assertThat(resource.getDoseQuantity().getUnit()).isEqualTo("ML");
@@ -126,6 +126,22 @@ public class Hl7ImmunizationFHIRConversionTest {
     assertThat(immunization1.getDoseQuantity().getValue().toString()).isEqualTo("0.5");
     assertThat(immunization1.getDoseQuantity().getUnit()).isEqualTo("ML");
     assertThat(immunization1.getDoseQuantity().getSystem()).isNull();
+
+    // Test should only return RXA.10, ORC.12  is empty
+    hl7VUXmessageRep = "MSH|^~\\&|MYEHR2.5|RI88140101|KIDSNET_IFL|RIHEALTH|20130531||VXU^V04^VXU_V04|20130531RI881401010105|P|2.5.1|||NE|AL||||||RI543763\r"
+            + "PID|1||12345^^^^MR||TestPatient^Jane^^^^^L||||||\r"
+            + "ORC|RE||197027|||||||^Clerk^Myron|||||||RI2050\r"
+            + "RXA|0|1|20130531|20130531|48^HIB PRP-T^CVX|0.5|ML^^UCUM||00^new immunization record^NIP001|^Sticker^Nurse|^^^RI2050||||33k2a|20131210|PMC^sanofi^MVX|||CP|A\r"
+            + "RXR|C28161^IM^NCIT^IM^INTRAMUSCULAR^HL70162|RT^right thigh^HL70163\r"
+            + "OBX|1|CE|64994-7^vaccine fund pgm elig cat^LN|1|V02^VFC eligible Medicaid/MedicaidManaged Care^HL70064||||||F|||20130531|||VXC40^per imm^CDCPHINVS\r";
+
+    Immunization immunization2 = ResourceUtils.getImmunization(hl7VUXmessageRep);
+
+    //dose Quantity with a known system
+    assertThat(immunization2.hasDoseQuantity()).isTrue();
+    assertThat(immunization2.getDoseQuantity().getValue().toString()).isEqualTo("0.5");
+    assertThat(immunization2.getDoseQuantity().getUnit()).isEqualTo("ML");
+    assertThat(immunization2.getDoseQuantity().getSystem()).isEqualTo("http://unitsofmeasure.org");
   }
   // TODO: 10/15/21 RXA-9 (also mapped to primarySource)
   //  RXA-18 statusReason

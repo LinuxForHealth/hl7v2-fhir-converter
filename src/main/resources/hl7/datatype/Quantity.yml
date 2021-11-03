@@ -24,7 +24,6 @@ system_2:
    valueOf: $resolvedSystem
 system_3:
    condition: $sys NOT_NULL
-   type: STRING
    valueOf: $systemCWE
    vars:
       systemCWE: $urn + $sys

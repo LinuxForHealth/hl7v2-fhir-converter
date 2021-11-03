@@ -86,9 +86,7 @@ doseQuantity:
    vars:
       value: RXA.6
       unit: RXA.7.1
-      sys: RXA.7.3
-   constants:
-         urn: "urn:id:"
+      sys: DOSE_SYSTEM, RXA.7.3
 performer_1:
    valueOf: secondary/Performer
    generateList: true
@@ -109,8 +107,6 @@ note:
    vars:
       obx3: STRING, OBX.3.1
       text: STRING, OBX.5
-
-      
 reasonReference:
    valueOf: datatype/Reference
    expressionType: resource
