@@ -85,7 +85,10 @@ doseQuantity:
    specs: RXA.6| RXA.7
    vars:
       value: RXA.6
-      unit: RXA.7
+      unit: RXA.7.1
+      sys: RXA.7.3
+   constants:
+         urn: "urn:id:"
 performer_1:
    valueOf: secondary/Performer
    generateList: true
