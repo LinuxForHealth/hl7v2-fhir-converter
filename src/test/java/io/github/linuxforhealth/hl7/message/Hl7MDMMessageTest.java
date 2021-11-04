@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2020
+ * (C) Copyright IBM Corp. 2020, 2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -8,27 +8,17 @@ package io.github.linuxforhealth.hl7.message;
 import static org.assertj.core.api.Assertions.assertThat;
 import java.io.IOException;
 import java.util.List;
-import java.util.stream.Collectors;
-import org.hl7.fhir.instance.model.api.IBaseResource;
-import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
-import org.hl7.fhir.r4.model.Bundle.BundleType;
+import org.hl7.fhir.r4.model.Observation;
 import org.hl7.fhir.r4.model.Resource;
 import org.hl7.fhir.r4.model.ResourceType;
+import org.hl7.fhir.r4.model.ServiceRequest;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import io.github.linuxforhealth.fhir.FHIRContext;
-import io.github.linuxforhealth.hl7.ConverterOptions;
-import io.github.linuxforhealth.hl7.ConverterOptions.Builder;
-import io.github.linuxforhealth.hl7.HL7ToFHIRConverter;
+import io.github.linuxforhealth.hl7.segments.util.ResourceUtils;
 
 public class Hl7MDMMessageTest {
-    private static FHIRContext context = new FHIRContext();
-    private static final ConverterOptions OPTIONS_PRETTYPRINT = new Builder().withBundleType(BundleType.COLLECTION)
-        .withValidateResource().withPrettyPrint().build();
-    private static final Logger LOGGER = LoggerFactory.getLogger(Hl7MDMMessageTest.class);
 
     //An example message for reference:
     // "MSH|^~\\&|HNAM|W|RAD_IMAGING_REPORT|W|20180118111520||MDM^T06|<MESSAGEID>|P|2.6\n"
@@ -55,31 +45,16 @@ public class Hl7MDMMessageTest {
             + "OBX|1|TX|05^Operative Report||                        <HOSPITAL NAME>||||||P\r"
             ;
 
-        HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
-        String json = ftv.convert(hl7message, OPTIONS_PRETTYPRINT);
-
-        assertThat(json).isNotBlank();
-        LOGGER.debug("FHIR json result:\n" + json);
-        IBaseResource bundleResource = context.getParser().parseResource(json);
-        assertThat(bundleResource).isNotNull();
-        Bundle b = (Bundle) bundleResource;
-        assertThat(b.getType()).isEqualTo(BundleType.COLLECTION);
-        List<BundleEntryComponent> e = b.getEntry();
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
 
         // Check for the expected resources
-        List<Resource> encounterResource =
-        e.stream().filter(v -> ResourceType.Encounter == v.getResource().getResourceType())
-            .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> encounterResource = ResourceUtils.getResourceList(e, ResourceType.Encounter);
         assertThat(encounterResource).hasSize(1); // from EVN, PV1
 
-        List<Resource> patientResource =
-        e.stream().filter(v -> ResourceType.Patient == v.getResource().getResourceType())
-            .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> patientResource = ResourceUtils.getResourceList(e, ResourceType.Patient);
         assertThat(patientResource).hasSize(1); // from PID
 
-        List<Resource> documentReferenceResource =
-        e.stream().filter(v -> ResourceType.DocumentReference == v.getResource().getResourceType())
-            .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> documentReferenceResource = ResourceUtils.getResourceList(e, ResourceType.DocumentReference);
         assertThat(documentReferenceResource).hasSize(1); // from TXA, OBX(type TX)
 
         // Confirm that no extra resources are created
@@ -98,36 +73,19 @@ public class Hl7MDMMessageTest {
             + "OBX|1|NM|Most Current Weight^Most current measured weight (actual)||90|kg\r"
             ;
 
-        HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
-        String json = ftv.convert(hl7message, OPTIONS_PRETTYPRINT);
-
-        assertThat(json).isNotBlank();
-        LOGGER.debug("FHIR json result:\n" + json);
-        IBaseResource bundleResource = context.getParser().parseResource(json);
-        assertThat(bundleResource).isNotNull();
-        Bundle b = (Bundle) bundleResource;
-        assertThat(b.getType()).isEqualTo(BundleType.COLLECTION);
-        List<BundleEntryComponent> e = b.getEntry();
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
 
         // Check for the expected resources
-        List<Resource> encounterResource =
-        e.stream().filter(v -> ResourceType.Encounter == v.getResource().getResourceType())
-            .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> encounterResource = ResourceUtils.getResourceList(e, ResourceType.Encounter);
         assertThat(encounterResource).hasSize(1); // from EVN, PV1
 
-        List<Resource> patientResource =
-        e.stream().filter(v -> ResourceType.Patient == v.getResource().getResourceType())
-            .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> patientResource = ResourceUtils.getResourceList(e, ResourceType.Patient);
         assertThat(patientResource).hasSize(1); // from PID
 
-        List<Resource> documentReferenceResource =
-        e.stream().filter(v -> ResourceType.DocumentReference == v.getResource().getResourceType())
-            .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> documentReferenceResource = ResourceUtils.getResourceList(e, ResourceType.DocumentReference);
         assertThat(documentReferenceResource).hasSize(1); // from TXA
 
-        List<Resource> observationResource =
-        e.stream().filter(v -> ResourceType.Observation == v.getResource().getResourceType())
-            .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> observationResource = ResourceUtils.getResourceList(e, ResourceType.Observation);
         assertThat(observationResource).hasSize(1); // from OBX(not type TX)
 
         // Confirm that no extra resources are created
@@ -148,31 +106,16 @@ public class Hl7MDMMessageTest {
             + "OBX|3|TX|05^Operative Report||                             <HOSPITAL ADDRESS2>||||||P\r"
             ;
 
-        HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
-        String json = ftv.convert(hl7message, OPTIONS_PRETTYPRINT);
-
-        assertThat(json).isNotBlank();
-        LOGGER.debug("FHIR json result:\n" + json);
-        IBaseResource bundleResource = context.getParser().parseResource(json);
-        assertThat(bundleResource).isNotNull();
-        Bundle b = (Bundle) bundleResource;
-        assertThat(b.getType()).isEqualTo(BundleType.COLLECTION);
-        List<BundleEntryComponent> e = b.getEntry();
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
 
         // Check for the expected resources
-        List<Resource> encounterResource =
-        e.stream().filter(v -> ResourceType.Encounter == v.getResource().getResourceType())
-            .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> encounterResource = ResourceUtils.getResourceList(e, ResourceType.Encounter);
         assertThat(encounterResource).hasSize(1); // from EVN, PV1
 
-        List<Resource> patientResource =
-        e.stream().filter(v -> ResourceType.Patient == v.getResource().getResourceType())
-            .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> patientResource = ResourceUtils.getResourceList(e, ResourceType.Patient);
         assertThat(patientResource).hasSize(1); // from PID
 
-        List<Resource> documentReferenceResource =
-        e.stream().filter(v -> ResourceType.DocumentReference == v.getResource().getResourceType())
-            .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> documentReferenceResource = ResourceUtils.getResourceList(e, ResourceType.DocumentReference);
         assertThat(documentReferenceResource).hasSize(1); // from TXA, OBX(type TX)
 
         // Confirm that no extra resources are created
@@ -193,36 +136,19 @@ public class Hl7MDMMessageTest {
             + "OBX|3|ST|48767-8^Annotation^LN|2|Some text from doctor||||||F|||20130531\r"
             ;
 
-        HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
-        String json = ftv.convert(hl7message, OPTIONS_PRETTYPRINT);
-
-        assertThat(json).isNotBlank();
-        LOGGER.debug("FHIR json result:\n" + json);
-        IBaseResource bundleResource = context.getParser().parseResource(json);
-        assertThat(bundleResource).isNotNull();
-        Bundle b = (Bundle) bundleResource;
-        assertThat(b.getType()).isEqualTo(BundleType.COLLECTION);
-        List<BundleEntryComponent> e = b.getEntry();
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
 
         // Check for the expected resources
-        List<Resource> encounterResource =
-        e.stream().filter(v -> ResourceType.Encounter == v.getResource().getResourceType())
-            .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> encounterResource = ResourceUtils.getResourceList(e, ResourceType.Encounter);
         assertThat(encounterResource).hasSize(1); // from EVN, PV1
 
-        List<Resource> patientResource =
-        e.stream().filter(v -> ResourceType.Patient == v.getResource().getResourceType())
-            .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> patientResource = ResourceUtils.getResourceList(e, ResourceType.Patient);
         assertThat(patientResource).hasSize(1); // from PID
 
-        List<Resource> documentReferenceResource =
-        e.stream().filter(v -> ResourceType.DocumentReference == v.getResource().getResourceType())
-            .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> documentReferenceResource = ResourceUtils.getResourceList(e, ResourceType.DocumentReference);
         assertThat(documentReferenceResource).hasSize(1); // from TXA
 
-        List<Resource> observationResource =
-        e.stream().filter(v -> ResourceType.Observation == v.getResource().getResourceType())
-            .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> observationResource = ResourceUtils.getResourceList(e, ResourceType.Observation);
         assertThat(observationResource).hasSize(3); // from OBX (not type TX)
 
         // Confirm that no extra resources are created
@@ -243,36 +169,19 @@ public class Hl7MDMMessageTest {
             + "OBX|1|TX|05^Operative Report||                        <HOSPITAL NAME>||||||P\r"
             ;
 
-        HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
-        String json = ftv.convert(hl7message, OPTIONS_PRETTYPRINT);
-
-        assertThat(json).isNotBlank();
-        LOGGER.debug("FHIR json result:\n" + json);
-        IBaseResource bundleResource = context.getParser().parseResource(json);
-        assertThat(bundleResource).isNotNull();
-        Bundle b = (Bundle) bundleResource;
-        assertThat(b.getType()).isEqualTo(BundleType.COLLECTION);
-        List<BundleEntryComponent> e = b.getEntry();
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
 
         // Check for the expected resources
-        List<Resource> encounterResource =
-        e.stream().filter(v -> ResourceType.Encounter == v.getResource().getResourceType())
-            .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> encounterResource = ResourceUtils.getResourceList(e, ResourceType.Encounter);
         assertThat(encounterResource).hasSize(1); // from EVN, PV1
 
-        List<Resource> patientResource =
-        e.stream().filter(v -> ResourceType.Patient == v.getResource().getResourceType())
-            .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> patientResource = ResourceUtils.getResourceList(e, ResourceType.Patient);
         assertThat(patientResource).hasSize(1); // from PID
 
-        List<Resource> serviceRequestResource =
-        e.stream().filter(v -> ResourceType.ServiceRequest == v.getResource().getResourceType())
-            .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> serviceRequestResource = ResourceUtils.getResourceList(e, ResourceType.ServiceRequest);
         assertThat(serviceRequestResource).hasSize(1); // from ORC, OBR
 
-        List<Resource> documentReferenceResource =
-        e.stream().filter(v -> ResourceType.DocumentReference == v.getResource().getResourceType())
-            .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> documentReferenceResource = ResourceUtils.getResourceList(e, ResourceType.DocumentReference);
         assertThat(documentReferenceResource).hasSize(1); // from TXA, OBX(type TX)
 
         // Confirm that no extra resources are created
@@ -282,6 +191,7 @@ public class Hl7MDMMessageTest {
     @ParameterizedTest
     @ValueSource(strings = { "MDM^T02", "MDM^T06" })
     public void test_mdm_ORDER_with_OBXnotTX(String message) throws IOException {
+        // Also check NTE working for MDM messages.
         String hl7message =
             "MSH|^~\\&|HNAM|W|RAD_IMAGING_REPORT|W|20180118111520||" + message + "|<MESSAGEID>|P|2.6\r"
             + "EVN||20150502090000|\r"
@@ -289,49 +199,58 @@ public class Hl7MDMMessageTest {
             + "PV1||O||||||||||||||||||||||||||||||||||||||||||199501102300\r"
             + "ORC|NW|622470H432|||||^^^^^R||||||||||||||\r"
             + "OBR|1|622470H432|102397CE432|||20170725143849|20180102|||||||||||||||||RAD|O||^^^^^R||||REASON_ID_1^REASON_TEXT_1||||\r"
+            // ServiceRequest NTE has a practitioner reference in NTE.4
+            + "NTE|1|O|TEST ORC/OBR NOTE AA line 1||Pract1ID^Pract1Last^Pract1First|\n" 
+            + "NTE|2|O|TEST NOTE AA line 2|\n"
             + "TXA|1|HP^History and physical examination|TX||||201801171442||||||||||||AV|||||\r"
             + "OBX|1|NM|Most Current Weight^Most current measured weight (actual)||90|kg\r"
+            // Observation NTE has a practitioner reference in second NTE.4.
+            + "NTE|1|L|TEST OBX NOTE BB line 1|\n" 
+            + "NTE|2|L|TEST NOTE BB line 2||Pract2ID^Pract2Last^Pract2First|\n"
             ;
 
-        HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
-        String json = ftv.convert(hl7message, OPTIONS_PRETTYPRINT);
-
-        assertThat(json).isNotBlank();
-        LOGGER.debug("FHIR json result:\n" + json);
-        IBaseResource bundleResource = context.getParser().parseResource(json);
-        assertThat(bundleResource).isNotNull();
-        Bundle b = (Bundle) bundleResource;
-        assertThat(b.getType()).isEqualTo(BundleType.COLLECTION);
-        List<BundleEntryComponent> e = b.getEntry();
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
 
         // Check for the expected resources
-        List<Resource> encounterResource =
-        e.stream().filter(v -> ResourceType.Encounter == v.getResource().getResourceType())
-            .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> encounterResource = ResourceUtils.getResourceList(e, ResourceType.Encounter);
         assertThat(encounterResource).hasSize(1); // from EVN, PV1
 
-        List<Resource> patientResource =
-        e.stream().filter(v -> ResourceType.Patient == v.getResource().getResourceType())
-            .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> patientResource = ResourceUtils.getResourceList(e, ResourceType.Patient);
         assertThat(patientResource).hasSize(1); // from PID
 
-        List<Resource> serviceRequestResource =
-        e.stream().filter(v -> ResourceType.ServiceRequest == v.getResource().getResourceType())
-            .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> serviceRequestResource = ResourceUtils.getResourceList(e, ResourceType.ServiceRequest);
         assertThat(serviceRequestResource).hasSize(1); // from ORC, OBR
+        // Light check that ServiceRequest contains NTE for ORC/OBR;  Deep check of NTE in Hl7NoteFHIRConverterTest.
+        List<Resource> serviceRequests = ResourceUtils.getResourceList(e, ResourceType.ServiceRequest);
+        assertThat(serviceRequests).hasSize(1);
+        ServiceRequest serviceRequest = ResourceUtils.getResourceServiceRequest(serviceRequests.get(0),
+                ResourceUtils.context);
+        assertThat(serviceRequest.hasNote()).isTrue();
+        assertThat(serviceRequest.getNote()).hasSize(1);
+        assertThat(serviceRequest.getNote().get(0).getText())
+                .isEqualTo("TEST ORC/OBR NOTE AA line 1  \\nTEST NOTE AA line 2  \\n");
+        assertThat(serviceRequest.getNote().get(0).hasAuthorReference()).isTrue();
 
-        List<Resource> documentReferenceResource =
-        e.stream().filter(v -> ResourceType.DocumentReference == v.getResource().getResourceType())
-            .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> documentReferenceResource = ResourceUtils.getResourceList(e, ResourceType.DocumentReference);
         assertThat(documentReferenceResource).hasSize(1); // from TXA
 
-        List<Resource> observationResource =
-        e.stream().filter(v -> ResourceType.Observation == v.getResource().getResourceType())
-            .map(BundleEntryComponent::getResource).collect(Collectors.toList());
-        assertThat(observationResource).hasSize(1); // from OBX(not type TX)
+        List<Resource> observationResources = ResourceUtils.getResourceList(e, ResourceType.Observation);
+        assertThat(observationResources).hasSize(1); // from OBX(not type TX)
+        // Light check that Observation contains OBX for ORC/OBR;  Deep check of NTE in Hl7NoteFHIRConverterTest.
+        Observation observation = ResourceUtils.getResourceObservation(observationResources.get(0), ResourceUtils.context);
+        // Validate the note contents and reference existance.
+        assertThat(observation.hasNote()).isTrue();
+        assertThat(observation.getNote()).hasSize(1);
+        assertThat(observation.getNote().get(0).getText())
+                .isEqualTo("TEST OBX NOTE BB line 1  \\nTEST NOTE BB line 2  \\n");
+        assertThat(observation.getNote().get(0).hasAuthorReference()).isTrue(); 
+
+        // Two Practitioners, one for the serviceRequest, one for the Observation
+        List<Resource> practitioners = ResourceUtils.getResourceList(e, ResourceType.Practitioner);
+        assertThat(practitioners).hasSize(2); // from NTE.4 references
 
         // Confirm that no extra resources are created
-        assertThat(e.size()).isEqualTo(5);
+        assertThat(e.size()).isEqualTo(7);
     }
 
     @ParameterizedTest
@@ -354,36 +273,19 @@ public class Hl7MDMMessageTest {
             + "OBX|3|TX|05^Operative Report||                             <HOSPITAL ADDRESS2>||||||P\r"
             ;
 
-        HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
-        String json = ftv.convert(hl7message, OPTIONS_PRETTYPRINT);
-
-        assertThat(json).isNotBlank();
-        LOGGER.debug("FHIR json result:\n" + json);
-        IBaseResource bundleResource = context.getParser().parseResource(json);
-        assertThat(bundleResource).isNotNull();
-        Bundle b = (Bundle) bundleResource;
-        assertThat(b.getType()).isEqualTo(BundleType.COLLECTION);
-        List<BundleEntryComponent> e = b.getEntry();
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
 
         // Check for the expected resources
-        List<Resource> encounterResource =
-        e.stream().filter(v -> ResourceType.Encounter == v.getResource().getResourceType())
-            .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> encounterResource = ResourceUtils.getResourceList(e, ResourceType.Encounter);
         assertThat(encounterResource).hasSize(1); // from EVN, PV1
 
-        List<Resource> patientResource =
-        e.stream().filter(v -> ResourceType.Patient == v.getResource().getResourceType())
-            .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> patientResource = ResourceUtils.getResourceList(e, ResourceType.Patient);
         assertThat(patientResource).hasSize(1); // from PID
 
-        List<Resource> serviceRequestResource =
-        e.stream().filter(v -> ResourceType.ServiceRequest == v.getResource().getResourceType())
-            .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> serviceRequestResource = ResourceUtils.getResourceList(e, ResourceType.ServiceRequest);
         assertThat(serviceRequestResource).hasSize(3); // from ORC, OBR in ORDER groups
 
-        List<Resource> documentReferenceResource =
-        e.stream().filter(v -> ResourceType.DocumentReference == v.getResource().getResourceType())
-            .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> documentReferenceResource = ResourceUtils.getResourceList(e, ResourceType.DocumentReference);
         assertThat(documentReferenceResource).hasSize(1); // from TXA, OBX(type TX)
 
         // Confirm that no extra resources are created
@@ -410,41 +312,22 @@ public class Hl7MDMMessageTest {
             + "OBX|3|ST|48767-8^Annotation^LN|2|Some text from doctor||||||F|||20130531\r"
             ;
 
-        HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
-        String json = ftv.convert(hl7message, OPTIONS_PRETTYPRINT);
-
-        assertThat(json).isNotBlank();
-        LOGGER.debug("FHIR json result:\n" + json);
-        IBaseResource bundleResource = context.getParser().parseResource(json);
-        assertThat(bundleResource).isNotNull();
-        Bundle b = (Bundle) bundleResource;
-        assertThat(b.getType()).isEqualTo(BundleType.COLLECTION);
-        List<BundleEntryComponent> e = b.getEntry();
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
 
         // Check for the expected resources
-        List<Resource> encounterResource =
-        e.stream().filter(v -> ResourceType.Encounter == v.getResource().getResourceType())
-            .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> encounterResource = ResourceUtils.getResourceList(e, ResourceType.Encounter);
         assertThat(encounterResource).hasSize(1); // from EVN, PV1
 
-        List<Resource> patientResource =
-        e.stream().filter(v -> ResourceType.Patient == v.getResource().getResourceType())
-            .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> patientResource = ResourceUtils.getResourceList(e, ResourceType.Patient);
         assertThat(patientResource).hasSize(1); // from PID
 
-        List<Resource> serviceRequestResource =
-        e.stream().filter(v -> ResourceType.ServiceRequest == v.getResource().getResourceType())
-            .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> serviceRequestResource = ResourceUtils.getResourceList(e, ResourceType.ServiceRequest);
         assertThat(serviceRequestResource).hasSize(3); // from ORC, OVR in ORDER groups
 
-        List<Resource> documentReferenceResource =
-        e.stream().filter(v -> ResourceType.DocumentReference == v.getResource().getResourceType())
-            .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> documentReferenceResource = ResourceUtils.getResourceList(e, ResourceType.DocumentReference);
         assertThat(documentReferenceResource).hasSize(1); // from TXA
 
-        List<Resource> observationResource =
-        e.stream().filter(v -> ResourceType.Observation == v.getResource().getResourceType())
-            .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> observationResource = ResourceUtils.getResourceList(e, ResourceType.Observation);
         assertThat(observationResource).hasSize(3); // from OBX (not TX type)
 
         // Confirm that no extra resources are created

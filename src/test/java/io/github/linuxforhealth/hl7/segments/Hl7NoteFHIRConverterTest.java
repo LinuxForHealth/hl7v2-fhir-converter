@@ -26,6 +26,10 @@ import org.junit.jupiter.api.Test;
 
 import io.github.linuxforhealth.hl7.segments.util.ResourceUtils;
 
+// These tests push deep into NTE's and precise creation.
+// High level note creation for other messages is done:
+// For MDM_T0x in test_mdm_ORDER_with_OBXnotTX
+
 public class Hl7NoteFHIRConverterTest {
 
     // Tests NTE creation for OBX (Observations) and ORC/OBRs (ServiceRequests)

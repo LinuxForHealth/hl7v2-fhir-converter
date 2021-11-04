@@ -65,6 +65,7 @@ resources:
     isReferenced: true
     additionalSegments:
       - .ORDER_DETAIL.OBR
+      - .ORDER_DETAIL.NTE
       - .ORDER_DETAIL.ORDER_OBSERVATION.OBX
       - PATIENT_VISIT.PV1
       - MSH

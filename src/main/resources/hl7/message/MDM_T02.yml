@@ -40,14 +40,17 @@ resources:
       isReferenced: true
       additionalSegments:
         - MSH
+        - .NTE
 
     - resourceName: ServiceRequest
-      segment: COMMON_ORDER.ORC
+      segment: .ORC
+      group: COMMON_ORDER
       resourcePath: resource/ServiceRequest
       repeats: true
       isReferenced: true
       additionalSegments:
-        - COMMON_ORDER.OBR
+        - .OBR
+        - .NTE
         - MSH
         - PV1
         - PID   
