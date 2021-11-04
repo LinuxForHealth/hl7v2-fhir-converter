@@ -3,13 +3,6 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 #
-authorString:
-   condition: $performer NULL
-   type: STRING
-   valueOf: NTE.2
-   expressionType: HL7Spec
-   vars:
-      performer: NTE.5
 authorReference:
    condition: $performer NOT_NULL
    valueOf: resource/Practitioner
@@ -23,6 +16,6 @@ time:
    expressionType: HL7Spec
 text:
    type: STRING
-   valueOf: $text | NTE.3
+   valueOf: $annotationText | NTE.3
    required: true
    expressionType: HL7Spec
