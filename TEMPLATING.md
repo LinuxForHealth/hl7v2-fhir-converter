@@ -271,7 +271,7 @@ Variables can be used during expression evaluation.  This engine supports defini
 
 Note: $BASE_VALUE is reserved for base value provided to an expression during evaluation. Do not use or name variable as BASE_VALUE.
 
-Note: $NULL is reserved to pass null value to a variable to help prevent cross contamination later down the line.
+Note: $NULL is reserved as the value `null` for comparison and variable assignment. Filling a variable with null helps prevent cross-contamination from similar named variables. Using unique names for variables also helps prevent cross-contamination and is good naming hygene.
 
 ```      valueCodeableConcept:
          valueOf: datatype/CodeableConcept_var

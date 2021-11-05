@@ -31,7 +31,7 @@ resources:
         - EVN
         - MSH
 
-    # This group placement of OBX matches the parser, but not the documented groups in the HL7 Standard v2.6 at vico.org.  
+    # This group name that contains the OBX matches the parser
     - resourceName: Observation
       segment: .OBX
       resourcePath: resource/Observation
@@ -40,14 +40,17 @@ resources:
       isReferenced: true
       additionalSegments:
         - MSH
+        - .NTE
 
     - resourceName: ServiceRequest
-      segment: COMMON_ORDER.ORC
+      segment: .ORC
+      group: COMMON_ORDER
       resourcePath: resource/ServiceRequest
       repeats: true
       isReferenced: true
       additionalSegments:
-        - COMMON_ORDER.OBR
+        - .OBR
+        - .NTE
         - MSH
         - PV1
         - PID   

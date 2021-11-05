@@ -3,13 +3,8 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 #
-authorString:
-   condition: $performer NULL
-   type: STRING
-   valueOf: NTE.2
-   expressionType: HL7Spec
-   vars:
-      performer: NTE.5
+# When annotationText is a concatenation of multiple NTE records, the first NTE.5 is used
+# to create the practitioner reference.  Other NTE.5's are ignored.
 authorReference:
    condition: $performer NOT_NULL
    valueOf: resource/Practitioner
@@ -23,6 +18,6 @@ time:
    expressionType: HL7Spec
 text:
    type: STRING
-   valueOf: $text | NTE.3
+   valueOf: $annotationText | NTE.3
    required: true
    expressionType: HL7Spec

@@ -188,15 +188,15 @@ note_1:
    specs: OBX
    vars:
       obx3: STRING, OBX.3.1
-      text: STRING, OBX.5
+      annotationText: STRING, OBX.5
 
 note_2:
    valueOf: datatype/Annotation
-   condition: $text NOT_NULL
+   condition: $annotationText NOT_NULL
    expressionType: resource
    # Note on separator: Must double back-slashes to create single backslash in string.
    vars:
-      text: NTE.3 *&, GeneralUtils.concatenateWithChar(text, '  \\n')
+      annotationText: NTE.3 *&, GeneralUtils.concatenateWithChar(annotationText, '  \\n')
 
 bodySite:
    valueOf: datatype/CodeableConcept
