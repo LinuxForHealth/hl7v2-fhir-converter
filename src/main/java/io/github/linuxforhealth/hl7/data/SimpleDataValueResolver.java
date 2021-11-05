@@ -578,6 +578,20 @@ public class SimpleDataValueResolver {
         return getFHIRCode(val, AllergyIntoleranceCategory.class);
     };
 
+    public static final ValueExtractor<Object, String> DOSE_SYSTEM = (Object value) -> {
+        String val = Hl7DataHandlerUtil.getStringValue(value);
+        String url = UrlLookup.getAssociatedUrl(val);
+        if (url != null){
+            return url;
+        }
+        else {
+            if (val != null && val.length() > 0) {
+                return "urn:id:" + val.replace(" ", "_");
+            }
+        }
+        return null;
+    };
+
     public static final ValueExtractor<Object, String> SYSTEM_URL = (Object value) -> {
         String val = Hl7DataHandlerUtil.getStringValue(value);
       return UrlLookup.getAssociatedUrl(val);
