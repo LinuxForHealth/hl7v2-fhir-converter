@@ -16,7 +16,6 @@ import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
 import org.hl7.fhir.r4.model.Condition.ConditionEvidenceComponent;
 import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Condition;
-import org.hl7.fhir.r4.model.Extension;
 import org.hl7.fhir.r4.model.Observation;
 import org.hl7.fhir.r4.model.Practitioner;
 import org.hl7.fhir.r4.model.Resource;
@@ -43,17 +42,17 @@ public class Hl7NoteFHIRConverterTest {
                 + "PV1|1|I||||||||||||||||||||||||||||||||||||||||||20180924152707|\n"
                 + "ORC|RE|248648498^|248648498^|ML18267-C00001^Beaker|||||||||||||||||||||||||||\n"
                 + "OBR|1|248648498^|248648498^|83036E^HEMOGLOBIN A1C^PACSEAP^^^^^^HEMOGLOBIN A1C||||||||||||||||||||||||||||||||||||\n"
-                // ServiceRequest NTE has a practitioner reference in NTE.4
+                // ServiceRequest NTE has a practitioner reference in NTE.5
                 + "NTE|1|O|TEST ORC/OBR NOTE AA line 1||Pract1ID^Pract1Last^Pract1First|\n" 
                 + "NTE|2|O|TEST NOTE AA line 2|\n"
                 + "NTE|3|O|TEST NOTE AA line 3|\n"
                 + "OBX|1|NM|17985^GLYCOHEMOGLOBIN HGB A1C^LRR^^^^^^GLYCOHEMOGLOBIN HGB A1C||5.6|%|<6.0||||F||||||||||||||\n"
-                // GLYCOHEMOGLOBIN Observation NTE has a practitioner reference in NTE.4.  Note in second NTE.
+                // GLYCOHEMOGLOBIN Observation NTE has a practitioner reference in NTE.5.  Note in second NTE. The first valied NTE.5 is used.
                 + "NTE|1|L|TEST OBXa NOTE BB line 1|\n" 
                 + "NTE|2|L|TEST NOTE BB line 2||Pract2ID^Pract2Last^Pract2First|\n"
                 + "NTE|3|L|TEST NOTE BB line 3|\n"
                 + "OBX|2|NM|17853^MEAN BLOOD GLUCOSE^LRR^^^^^^MEAN BLOOD GLUCOSE||114.02|mg/dL|||||F||||||||||||||\n"
-                // Glucose Observation NTE has no practitioner reference in NTE.4
+                // Glucose Observation NTE has no practitioner reference in NTE.5
                 + "NTE|1|L|TEST OBXb NOTE CC line 1|\n" 
                 + "NTE|2|L|TEST NOTE CC line 2|\n"
                 + "NTE|3|L|TEST NOTE CC line 3|\n"
@@ -166,9 +165,8 @@ public class Hl7NoteFHIRConverterTest {
                 + "NTE|2|L|TEST NOTE EE line 2|\n"
                 + "NTE|3|L|TEST NOTE EE line 3|\n"
                 + "OBX|2|NM|7302^Resp Rate|1|19||||||F|||20180520230000|||\n"
-                + "NTE|1|L|TEST OBXf NOTE FF line 1|\n";
-                // TODO:  have one of these have a single NTE segment, to verify that is handled correctly (no newlines added to text).
-
+                + "NTE|1|L|TEST OBXf NOTE FF line 1|\n";  // Single NTE to ensure it is created correctly
+ 
         List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
         List<Resource> patients = ResourceUtils.getResourceList(e, ResourceType.Patient);
         assertThat(patients).hasSize(1);

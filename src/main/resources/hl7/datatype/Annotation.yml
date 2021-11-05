@@ -3,6 +3,8 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 #
+# When annotationText is a concatenation of multiple NTE records, the first NTE.5 is used
+# to create the practitioner reference.  Other NTE.5's are ignored.
 authorReference:
    condition: $performer NOT_NULL
    valueOf: resource/Practitioner

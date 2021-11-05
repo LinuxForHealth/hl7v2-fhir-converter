@@ -32,7 +32,7 @@ resources:
              - MSH
              - OBSERVATION.OBX
 
-    # This group placement of OBX matches the parser, but not the documented groups in the HL7 Standard v2.6 at vico.org.  
+    # This group name that contains the OBX matches the parser
     - resourceName: Observation
       segment: .OBX
       resourcePath: resource/Observation

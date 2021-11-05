@@ -199,12 +199,12 @@ public class Hl7MDMMessageTest {
             + "PV1||O||||||||||||||||||||||||||||||||||||||||||199501102300\r"
             + "ORC|NW|622470H432|||||^^^^^R||||||||||||||\r"
             + "OBR|1|622470H432|102397CE432|||20170725143849|20180102|||||||||||||||||RAD|O||^^^^^R||||REASON_ID_1^REASON_TEXT_1||||\r"
-            // ServiceRequest NTE has a practitioner reference in NTE.4
+            // ServiceRequest NTE has a practitioner reference in NTE.5
             + "NTE|1|O|TEST ORC/OBR NOTE AA line 1||Pract1ID^Pract1Last^Pract1First|\n" 
             + "NTE|2|O|TEST NOTE AA line 2|\n"
             + "TXA|1|HP^History and physical examination|TX||||201801171442||||||||||||AV|||||\r"
             + "OBX|1|NM|Most Current Weight^Most current measured weight (actual)||90|kg\r"
-            // Observation NTE has a practitioner reference in second NTE.4.
+            // Observation NTE has a practitioner reference in second NTE.5. Annotation uses the first valid NTE.5
             + "NTE|1|L|TEST OBX NOTE BB line 1|\n" 
             + "NTE|2|L|TEST NOTE BB line 2||Pract2ID^Pract2Last^Pract2First|\n"
             ;
@@ -221,9 +221,7 @@ public class Hl7MDMMessageTest {
         List<Resource> serviceRequestResource = ResourceUtils.getResourceList(e, ResourceType.ServiceRequest);
         assertThat(serviceRequestResource).hasSize(1); // from ORC, OBR
         // Light check that ServiceRequest contains NTE for ORC/OBR;  Deep check of NTE in Hl7NoteFHIRConverterTest.
-        List<Resource> serviceRequests = ResourceUtils.getResourceList(e, ResourceType.ServiceRequest);
-        assertThat(serviceRequests).hasSize(1);
-        ServiceRequest serviceRequest = ResourceUtils.getResourceServiceRequest(serviceRequests.get(0),
+        ServiceRequest serviceRequest = ResourceUtils.getResourceServiceRequest(serviceRequestResource.get(0),
                 ResourceUtils.context);
         assertThat(serviceRequest.hasNote()).isTrue();
         assertThat(serviceRequest.getNote()).hasSize(1);
@@ -236,7 +234,7 @@ public class Hl7MDMMessageTest {
 
         List<Resource> observationResources = ResourceUtils.getResourceList(e, ResourceType.Observation);
         assertThat(observationResources).hasSize(1); // from OBX(not type TX)
-        // Light check that Observation contains OBX for ORC/OBR;  Deep check of NTE in Hl7NoteFHIRConverterTest.
+        // Light check that Observation contains NTE for OBX;  Deep check of NTE in Hl7NoteFHIRConverterTest.
         Observation observation = ResourceUtils.getResourceObservation(observationResources.get(0), ResourceUtils.context);
         // Validate the note contents and reference existance.
         assertThat(observation.hasNote()).isTrue();
