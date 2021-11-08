@@ -41,6 +41,12 @@ identifier_2:
    generateList: true
    expressionType: resource
    vars:
+      # valueIn: ORC.3.1
+      # valueIn2: OBR.3.1
+      # valueIn3: TXA.15.1
+      # systemCX: ORC.3.2 
+      # systemCX2: OBR.3.2 
+      # systemCX3: TXA.15.2
       valueIn: ORC.3.1 | OBR.3.1 | TXA.15.1
       systemCX: ORC.3.2 | OBR.3.2 | TXA.15.2
    constants:
@@ -49,17 +55,23 @@ identifier_2:
       display: "Filler Identifier"
 
 identifier_3:
-   condition: $valueIn NOT_NULL
+   condition: $valueIn NOT_NULL || $valueIn2 NOT_NULL || $valueIn3 NOT_NULL
    valueOf: datatype/Identifier_var
    generateList: true
    expressionType: resource
    vars:
-      valueIn: ORC.2.1 | OBR.2.1 | TXA.14.1
-      systemCX: ORC.2.2 | OBR.2.2 | TXA.14.2
+      valueIn: ORC.2.1
+      valueIn2: OBR.2.1
+      valueIn3: TXA.14.1
+      systemCX: ORC.2.2 
+      systemCX2: OBR.2.2 
+      systemCX3: TXA.14.2
+      # valueIn: ORC.2.1 | OBR.2.1 | TXA.14.1
+      # systemCX: ORC.2.2 | OBR.2.2 | TXA.14.2
    constants:
       system: "http://terminology.hl7.org/CodeSystem/v2-0203"
       code: "PLAC"
-      display: "Placer Identifier"
+      display: "Placer Identifier DOCREF"
 
 identifier_4:
    condition: $valueIn NOT_NULL

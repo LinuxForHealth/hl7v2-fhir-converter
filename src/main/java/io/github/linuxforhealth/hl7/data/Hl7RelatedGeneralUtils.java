@@ -133,8 +133,21 @@ public class Hl7RelatedGeneralUtils {
         } 
         return null;
     }
+ 
+    public static String getFirstNonNullValue(Object obj1, Object obj2, Object obj3) {
+        LOGGER.info("Generating getFirstNonNullValue");
+        LOGGER.debug("Generating getFirstNonNullValue from obj1 {}, obj2 {}, obj3 {}", obj1, obj2, obj3);
 
-    public static String generateName(Object prefix, Object first, Object middle, Object family, Object suffix) {
+        if (obj1 != null) {
+            return Hl7DataHandlerUtil.getStringValue(obj1); 
+        } else if (obj2 != null) {
+            return Hl7DataHandlerUtil.getStringValue(obj2);
+        } else if (obj3 != null) {
+            return Hl7DataHandlerUtil.getStringValue(obj3);
+        }   
+        return null;
+    }
+     public static String generateName(Object prefix, Object first, Object middle, Object family, Object suffix) {
         LOGGER.info("Generating name");
         LOGGER.debug("Generating name from  from prefix {}, first {}, middle {}, family {} ,suffix {}", prefix, first, middle, family, suffix);
         StringBuilder sb = new StringBuilder();
