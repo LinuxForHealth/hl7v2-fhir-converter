@@ -33,41 +33,6 @@ public class Hl7MDMMessageTest {
     // + "OBX|2|TX|05^Operative Report||                             <HOSPITAL ADDRESS2>||||||P\n"
     // + "OBX|3|TX|05^Operative Report||                              <HOSPITAL ADDRESS2>||||||P\n";
 
-    // @ParameterizedTest
-    // @ValueSource(strings = { "MDM^T02", "MDM^T06" })
-    @Test
-    public void noMixingOfParamsInDocumenReference(/*String message*/) throws IOException {
-        String message = "MDM^T02";
-        String hl7message =
-            "MSH|^~\\&|HNAM|W|RAD_IMAGING_REPORT|W|20180118111520||MDM^T06|<MESSAGEID>|P|2.6\n"
-            + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
-            + "PV1|1|O|2GY^2417^W||||ATT_ID^ATT_LN^ATT_MI^ATT_FN^^^MD|REF_ID^REF_LN^REF_MI^REF_FN^^^MD|CONSULTING_ID^CONSULTING_LN^CONSULTING_MI^CONSULTING_FN^^^MD||||||||ADM_ID^ADM_LN^ADM_MI^ADM_FN^^^MD|OTW|<HospitalID>|||||||||||||||||||||||||20180115102400|20180118104500\n"
-            + "ORC|NW||||||^^^^^R|||||1992779250^TEST^DOCTOR-AAA|123D432^^^Family Practice Clinic||||||||FAMILY PRACTICE CLINIC\n"
-            + "OBR|1|ID-AAA-OBR21|ID-AAA-OBR31|LAMIKP^AMIKACIN LEVEL, PEAK^83718||20170725143849|20180102||||L|||||123456789^MILLER^BOB|||REASON_TEXT_1|||||RAD|O||^^^^^R||||REASON_ID_1^REASON_TEXT_1|RESP_ID1&RESP_FAMILY_1&RESP_GIVEN1||TECH_1_ID&TECH_1_FAMILY&TECH_1_GIVEN|TRANS_1_ID&TRANS_1_FAMILY&TRANS_1_GIVEN\n"
-            + "ORC|NW|ID-BBB-ORC21|||||^^^^^R|||||1992779250^TEST^DOCTOR-BBB\n"
-            + "OBR|1|ID-BBB-OBR21^ID-BBB-OBR22|ID-BBB-OBR31|83718^HIGH-DENSITY LIPOPROTEIN (HDL)^NAMING2||20150909170243|||||L|||||1992779250^TEST^DOCTOR||||||||CAT|A||^^^20180204^^R||||REASON_ID_2^REASON_TEXT_2|RESP_ID2&RESP_FAMILY_2&RESP_GIVEN2||TECH_2_ID&TECH_2_FAMILY&TECH_2_GIVEN|TRANS_2_ID&TRANS_2_FAMILY&TRANS_2_GIVEN\n"
-            + "TXA|1|05^Operative Report|TX|201801171442|5566^PAPLast^PAPFirst^J^^MD|201801171442|201801180346||<PHYSID>|<PHYSID>|MODL|<MESSAGEID>||4466^TRANSCLast^TRANSCFirst^J^^MD|<MESSAGEID>||P||AV\n"
-            + "OBX|1|TX|05^Operative Report||                        <HOSPITAL NAME>||||||P\n"
-            + "OBX|2|TX|05^Operative Report||                             <HOSPITAL ADDRESS2>||||||P\n"
-            + "OBX|3|TX|05^Operative Report||                              <HOSPITAL ADDRESS2>||||||P\n";
-
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
-
-        // Check for the expected resources
-        List<Resource> encounterResource = ResourceUtils.getResourceList(e, ResourceType.Encounter);
-        assertThat(encounterResource).hasSize(1); // from EVN, PV1
-
-        List<Resource> patientResource = ResourceUtils.getResourceList(e, ResourceType.Patient);
-        assertThat(patientResource).hasSize(1); // from PID
-
-        List<Resource> documentReferenceResource = ResourceUtils.getResourceList(e, ResourceType.DocumentReference);
-        assertThat(documentReferenceResource).hasSize(1); // from TXA, OBX(type TX)
-
-        // Confirm that no extra resources are created
-        assertThat(e.size()).isEqualTo(3);
-    }
-
-
     @ParameterizedTest
     @ValueSource(strings = { "MDM^T02", "MDM^T06" })
     public void test_mdm_mininum_with_OBXtypeTXtoDocumenReference(String message) throws IOException {

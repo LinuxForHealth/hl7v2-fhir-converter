@@ -107,7 +107,6 @@ note:
    vars:
       obx3: STRING, OBX.3.1
       annotationText: STRING, OBX.5
-   
 reasonReference:
    valueOf: datatype/Reference
    expressionType: resource
