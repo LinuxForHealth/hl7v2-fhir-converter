@@ -10,7 +10,6 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
 import org.hl7.fhir.r4.model.DocumentReference;
@@ -74,7 +73,7 @@ public class Hl7MDMMessageTest {
         List<Resource> patientResource = ResourceUtils.getResourceList(e, ResourceType.Patient);
         assertThat(patientResource).hasSize(1); // from PID
 
-        // Two ServiceRequests.  One for Dr AAA the other for Dr BBB
+        // Two ServiceRequests from the two ORC's.  One references Dr AAA the other references Dr BBB
         List<Resource> serviceRequests = ResourceUtils.getResourceList(e, ResourceType.ServiceRequest);
         assertThat(serviceRequests).hasSize(2); // from TXA, OBX(type TX)
         ServiceRequest srDrAAA = ResourceUtils.getResourceServiceRequest(serviceRequests.get(0), ResourceUtils.context);
@@ -144,6 +143,9 @@ public class Hl7MDMMessageTest {
                 assertThat(system).hasToString(matchDocRefIdValuesSystems.get(code).get(1));
             }
         }  
+
+        List<Resource> practitioners = ResourceUtils.getResourceList(e, ResourceType.Practitioner);
+        assertThat(practitioners).hasSize(7); 
 
         // Confirm that no extra resources are created
         assertThat(e.size()).isEqualTo(12);
