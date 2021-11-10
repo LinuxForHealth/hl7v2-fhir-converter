@@ -16,10 +16,10 @@ value:
 
 system_1:
    type: STRING
-   valueOf: $systemId 
+   valueOf: $systemId
 
 system_2:
-   condition: $systemCX NOT_NULL
+   condition: $valueIn NOT_NULL && $systemCX NOT_NULL 
    valueOf: $join
    vars:
       join: $systemCX, GeneralUtils.noWhiteSpace(join)
