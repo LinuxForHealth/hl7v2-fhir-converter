@@ -22,31 +22,71 @@ identifier_1:
       code: "VN"
       display: "Visit number"
 
-identifier_2:
+# The logic for Filler appears it should be:     
+#  valueIn: ORC.3.1 | OBR.3.1
+#  systemCX: ORC.3.2 | OBR.3.2    
+# But if ORC.3.1 has a value and ORC.3.2 is empty but OBR.3.2 has a value,
+# it results in mismatched code and system values.
+# The code below forces the value and the system to be of the same pair.
+# Similar settings for Placer.
+
+identifier_2a:
    condition: $valueIn NOT_NULL
    valueOf: datatype/Identifier_var
    generateList: true
+   useGroup: true
    expressionType: resource
    vars:
-      valueIn: ORC.3.1 | OBR.3.1
-      systemCX: ORC.3.2 | OBR.3.2
+      valueIn: ORC.3.1
+      systemCX: ORC.3.2
    constants:
       system: "http://terminology.hl7.org/CodeSystem/v2-0203"
       code: "FILL"
       display: "Filler Identifier"
 
-identifier_3:
+identifier_2b:
+   condition: $valueInORC NULL && $valueIn NOT_NULL
+   valueOf: datatype/Identifier_var
+   generateList: true
+   useGroup: true
+   expressionType: resource
+   vars:
+      valueIn: OBR.3.1
+      systemCX: OBR.3.2
+      valueInORC: ORC.3.1
+   constants:
+      system: "http://terminology.hl7.org/CodeSystem/v2-0203"
+      code: "FILL"
+      display: "Filler Identifier"      
+
+identifier_3a:
    condition: $valueIn NOT_NULL
    valueOf: datatype/Identifier_var
    generateList: true
+   useGroup: true
    expressionType: resource
    vars:
-      valueIn: ORC.2.1 | OBR.2.1
-      systemCX: ORC.2.2 | OBR.2.2
+      valueIn: ORC.2.1
+      systemCX: ORC.2.2 
    constants:
       system: "http://terminology.hl7.org/CodeSystem/v2-0203"
       code: "PLAC"
       display: "Placer Identifier"
+
+identifier_3b:
+   condition:  $valueInORC NULL && $valueIn NOT_NULL
+   valueOf: datatype/Identifier_var
+   generateList: true
+   useGroup: true
+   expressionType: resource
+   vars:
+      valueIn: OBR.2.1
+      systemCX: OBR.2.2
+      valueInORC: ORC.2.1
+   constants:
+      system: "http://terminology.hl7.org/CodeSystem/v2-0203"
+      code: "PLAC"
+      display: "Placer Identifier"      
 
 status:
    type: SERVICE_REQUEST_STATUS
