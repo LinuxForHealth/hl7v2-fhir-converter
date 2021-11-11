@@ -12,6 +12,7 @@ The converter supports the following message types/events:
 * MDM_T02 - Original Document Notifcication and Content
 * MDM_T06 - Document Addendum Notification and Content
 * OMP_O09 - Pharmacy/Treatment Order
+* ORM_O01 - General Order Message
 * ORU_R01 - Observation Reporting: Observation and Result Transmission (Laboratory)
 * PPR_PC1 - Patient Problem: Add Problem
 * RDE_O11 - Pharmacy/Treatment Encoded Order

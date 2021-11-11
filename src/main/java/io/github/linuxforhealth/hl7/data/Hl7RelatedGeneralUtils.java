@@ -219,16 +219,23 @@ public class Hl7RelatedGeneralUtils {
         else return null;
     }
 
+    // Concatenates strings with a delimeter character(s) 
+    // Used for NTEs and OBX of type TX
     public static String concatenateWithChar(Object input, String delimiterChar) {
-        // Engine converts the delimiter character to a String; need to fix escaped characters
-        // as they become 2 separate characters rather than 1. 
-        // Currently handling '\n' specifically, have not found a more general solution.
-        String delimiter = delimiterChar;
-        if (delimiterChar.equals("\\n")) {
-            delimiter = Character.toString('\n');
-        }
+        // Engine converts the delimiter character(s) to a String.
+        // We need to fix escaped characters because YAML parsing sees every character as literal 
+        // and passes them in as 2 separate characters rather than 1. 
+        // Example '\n' is not reduced to 10 linefeed, but comes in as 92 78, a literal backslash n
+        // We want to replace 92 78 '\n' as 10 linefeed, 
+        // but want input double backslash 92 92 78 '\\n' to remain as literal 
+        // Currently only \n linefeed is handled.
 
-        return Hl7DataHandlerUtil.getStringValue(input, true, delimiter, false);
+        // Use this regex: r"(?<!\\)\\n|\n" but must double up backslashes in java string
+        String delimiter = delimiterChar.replaceAll("(?<!\\\\)\\\\n|\\n", "\n");
+
+        String result = Hl7DataHandlerUtil.getStringValue(input, true, delimiter, false);
+        return result;
+        // return Hl7DataHandlerUtil.getStringValue(input, true, delimiter, false);
     }
 
     public static List<String> makeStringArray(String... strs) {
