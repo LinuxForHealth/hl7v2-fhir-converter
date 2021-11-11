@@ -88,9 +88,8 @@ public class Hl7NoteFHIRConverterTest {
         assertThat(serviceRequest.hasNote()).isTrue();
         assertThat(serviceRequest.getNote()).hasSize(1);
         // Processing adds "  \n" two spaces and a line feed
-        // Note on test strings. Must double back-slashes to create single backslash in string.
         assertThat(serviceRequest.getNote().get(0).getText())
-                .isEqualTo("TEST ORC/OBR NOTE AA line 1  \\nTEST NOTE AA line 2  \\nTEST NOTE AA line 3  \\n");
+                .isEqualTo("TEST ORC/OBR NOTE AA line 1  \nTEST NOTE AA line 2  \nTEST NOTE AA line 3");
         assertThat(serviceRequest.getNote().get(0).hasAuthorReference()).isTrue();
         String practitionerServReqRefId = serviceRequest.getNote().get(0).getAuthorReference().getReference();
 
@@ -109,14 +108,14 @@ public class Hl7NoteFHIRConverterTest {
         assertThat(obsHemoglobin.hasNote()).isTrue();
         assertThat(obsHemoglobin.getNote()).hasSize(1);
         assertThat(obsHemoglobin.getNote().get(0).getText())
-                .isEqualTo("TEST OBXa NOTE BB line 1  \\nTEST NOTE BB line 2  \\nTEST NOTE BB line 3  \\n");
+                .isEqualTo("TEST OBXa NOTE BB line 1  \nTEST NOTE BB line 2  \nTEST NOTE BB line 3");
         assertThat(obsHemoglobin.getNote().get(0).hasAuthorReference()).isTrue();
         String practitionerObsHemoglobinRefId = obsHemoglobin.getNote().get(0).getAuthorReference().getReference();
 
         assertThat(obsGlucose.hasNote()).isTrue();
         assertThat(obsGlucose.getNote()).hasSize(1);
         assertThat(obsGlucose.getNote().get(0).getText()).isEqualTo(
-                "TEST OBXb NOTE CC line 1  \\nTEST NOTE CC line 2  \\n   \\nTEST NOTE CC line 4  \\n"); // Test that blank lines are preserved.
+                "TEST OBXb NOTE CC line 1  \nTEST NOTE CC line 2  \n   \nTEST NOTE CC line 4"); // Test that blank lines are preserved.
         assertThat(obsGlucose.getNote().get(0).hasAuthorReference()).isFalse();
 
         // Two Practitioners, one for the serviceRequest, one for the GLYCOHEMOGLOBIN Observation
@@ -204,7 +203,7 @@ public class Hl7NoteFHIRConverterTest {
         assertThat(medicationRequest.hasNote()).isTrue();
         assertThat(medicationRequest.getNote()).hasSize(1);
         assertThat(medicationRequest.getNote().get(0).getText())
-                .isEqualTo("TEST MedReq NOTE AA line 1  \\nTEST NOTE AA line 2  \\nTEST NOTE AA line 3  \\n");
+                .isEqualTo("TEST MedReq NOTE AA line 1  \nTEST NOTE AA line 2  \nTEST NOTE AA line 3");
         assertThat(medicationRequest.getNote().get(0).hasAuthorReference()).isTrue();
         String practitionerServReqRefId = medicationRequest.getNote().get(0).getAuthorReference().getReference();
 
@@ -223,14 +222,14 @@ public class Hl7NoteFHIRConverterTest {
         assertThat(obsHemoglobin.hasNote()).isTrue();
         assertThat(obsHemoglobin.getNote()).hasSize(1);
         assertThat(obsHemoglobin.getNote().get(0).getText())
-                .isEqualTo("TEST OBXa NOTE BB line 1  \\nTEST NOTE BB line 2  \\nTEST NOTE BB line 3  \\n");
+                .isEqualTo("TEST OBXa NOTE BB line 1  \nTEST NOTE BB line 2  \nTEST NOTE BB line 3");
         assertThat(obsHemoglobin.getNote().get(0).hasAuthorReference()).isTrue();
         String practitionerObsHemoglobinRefId = obsHemoglobin.getNote().get(0).getAuthorReference().getReference();
 
         assertThat(obsGlucose.hasNote()).isTrue();
         assertThat(obsGlucose.getNote()).hasSize(1);
         assertThat(obsGlucose.getNote().get(0).getText()).isEqualTo(
-                "TEST OBXb NOTE CC line 1  \\nTEST NOTE CC line 2  \\n   \\nTEST NOTE CC line 4  \\n"); // Test that blank lines are preserved.
+                "TEST OBXb NOTE CC line 1  \nTEST NOTE CC line 2  \n   \nTEST NOTE CC line 4"); // Test that blank lines are preserved.
         assertThat(obsGlucose.getNote().get(0).hasAuthorReference()).isFalse();
 
         // Two Practitioners, one for the serviceRequest, one for the GLYCOHEMOGLOBIN Observation
@@ -318,21 +317,21 @@ public class Hl7NoteFHIRConverterTest {
         assertThat(condStenosis.hasNote()).isTrue();
         assertThat(condStenosis.getNote()).hasSize(1);
         assertThat(condStenosis.getNote().get(0).getText())
-                .isEqualTo("TEST PRBa NOTE AA line 1  \\nTEST NOTE AA line 2  \\nTEST NOTE AA line 3  \\n");
+                .isEqualTo("TEST PRBa NOTE AA line 1  \nTEST NOTE AA line 2  \nTEST NOTE AA line 3");
         assertThat(condTachy.hasNote()).isTrue();
         assertThat(condTachy.getNote()).hasSize(1);
         assertThat(condTachy.getNote().get(0).getText())
-                .isEqualTo("TEST PRBd NOTE DD line 1  \\nTEST NOTE DD line 2  \\nTEST NOTE DD line 3  \\n");
+                .isEqualTo("TEST PRBd NOTE DD line 1  \nTEST NOTE DD line 2  \nTEST NOTE DD line 3");
 
         // Four observations.  Two associated with the first problem and two with the second
         // This map tells us what Annotation text is associated with an Observation code
         Map<String, String> matchObsCodeToNotes = new HashMap<>();
         matchObsCodeToNotes.put("17985",
-                "TEST OBXb NOTE BB line 1  \\nTEST NOTE BB line 2  \\nTEST NOTE BB line 3  \\n");
+                "TEST OBXb NOTE BB line 1  \nTEST NOTE BB line 2  \nTEST NOTE BB line 3");
         matchObsCodeToNotes.put("17853",
-                "TEST OBXc NOTE CC line 1  \\nTEST NOTE CC line 2  \\nTEST NOTE CC line 3  \\n");
+                "TEST OBXc NOTE CC line 1  \nTEST NOTE CC line 2  \nTEST NOTE CC line 3");
         matchObsCodeToNotes.put("8595",
-                "TEST OBXe NOTE EE line 1  \\nTEST NOTE EE line 2  \\nTEST NOTE EE line 3  \\n");
+                "TEST OBXe NOTE EE line 1  \nTEST NOTE EE line 2  \nTEST NOTE EE line 3");
         matchObsCodeToNotes.put("7302", "TEST OBXf NOTE FF line 1");
 
         // This map tells us what Parent should be associated with an Observation code

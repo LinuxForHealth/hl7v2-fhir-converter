@@ -195,7 +195,7 @@ evidence:
 ```
 
 ### Expressions Types
-The extraction logic for each field can be defined by using expressions. This component supports 4 different type of expressions. All expressions have the following attributes:
+The extraction logic for each field can be defined by using expressions. This component supports several different types of expressions. All expressions have the following attributes:
 * type: DEFAULT - Object <br>
   Represents the class type for the final return value extracted for the field.
 * specs: DEFAULT - NONE<br>
@@ -217,7 +217,8 @@ The extraction logic for each field can be defined by using expressions. This co
   Generates an output list output for all values of the specification. If this value is false, then first valid value of spec would be used for evaluation.
 * constants: DEFAULT - EMPTY<br>
   List of Constants (string values) which can be used during the extraction process.
-* evaluateLater:  DEFAULT: false, If evaluate latter is true then the resource that has this expression will be evaluated _except_ for this expression and will re-evaluate this expression _after_ all the other resources are evaluated. NOTE: this feature currently should only be used for expressions in main resource templates (example Patient, Encounter, Observation etc) and not in datatype templates (example: Coding, Address etc).
+* evaluateLater:  DEFAULT: false, If evaluate latter is true then the resource that has this expression will be evaluated _except_ for this expression and will re-evaluate this expression _after_ all the other resources are evaluated. NOTE: this feature currently should only be used for expressions in main resource templates (example Patient, Encounter, Observation etc) and not in datatype templates (example: Coding, Address etc). 
+* useGroup:  if true, only segments of the same group are used. 
 * expressions: DEFAULT - EMPTY<br>
   Elements to create as a subset of the element, when `expressionType: nested`.  Usually a list or a map.
 * expressionsMap: DEFAULT - EMPTY<br>
@@ -281,6 +282,8 @@ Note: $NULL is reserved as the value `null` for comparison and variable assignme
             code: String, MSH.9.2
             display: $NULL
  ```
+
+Variables are scoped to the resource expression they are created in and all children of the resource.  A variable created in an expression is local to that expression for that instance and its children.  Care should be taken to keep variables sufficiently unique to avoid contamination.
 
 #### Condition
 Conditions evaluate to true or false.<br>

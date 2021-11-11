@@ -35,6 +35,7 @@ import org.slf4j.LoggerFactory;
 import io.github.linuxforhealth.fhir.FHIRContext;
 import io.github.linuxforhealth.hl7.HL7ToFHIRConverter;
 import io.github.linuxforhealth.hl7.segments.util.PatientUtils;
+import io.github.linuxforhealth.hl7.segments.util.ResourceUtils;
 
 public class Hl7PatientFHIRConversionTest {
 
@@ -54,7 +55,7 @@ public class Hl7PatientFHIRConversionTest {
     "MSH|^~\\&|hl7Integration|hl7Integration|||||ADT^A40|||2.6|\r",
     // MDM messages are not tested here because they do not contain PD1 segments
     "MSH|^~\\&|hl7Integration|hl7Integration|||||OMP^O09|||2.6|\r",
-    // "MSH|^~\\&|hl7Integration|hl7Integration|||||ORM^O01|||2.6|\r",
+    "MSH|^~\\&|hl7Integration|hl7Integration|||||ORM^O01|||2.6|\r",
     "MSH|^~\\&|hl7Integration|hl7Integration|||||ORU^R01|||2.6|\r",
     "MSH|^~\\&|hl7Integration|hl7Integration|||||RDE^O11|||2.6|\r",
     "MSH|^~\\&|hl7Integration|hl7Integration|||||RDE^O25|||2.6|\r",
@@ -66,26 +67,15 @@ public class Hl7PatientFHIRConversionTest {
                 + "PD1|||Sample Family Practice^^2222|1111^LastName^ClinicianFirstName^^^^Title||||||||||||A|\r"
                 ;
 
-        HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
-        String json = ftv.convert(hl7message, PatientUtils.OPTIONS);
-        assertThat(json).isNotBlank();
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
 
-        IBaseResource bundleResource = context.getParser().parseResource(json);
-        assertThat(bundleResource).isNotNull();
-        Bundle b = (Bundle) bundleResource;
-        List<BundleEntryComponent> e = b.getEntry();
-
-        List<Resource> patientResource = e.stream()
-                .filter(v -> ResourceType.Patient == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> patientResource = ResourceUtils.getResourceList(e, ResourceType.Patient);
         assertThat(patientResource).hasSize(1);
         Patient patient = getResourcePatient(patientResource.get(0));
         List<Reference> refs = patient.getGeneralPractitioner();
         assertThat(refs.size()).isGreaterThan(0);
 
-        List<Resource> practitionerResource = e.stream()
-                .filter(v -> ResourceType.Practitioner == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> practitionerResource = ResourceUtils.getResourceList(e, ResourceType.Practitioner);
         assertThat(practitionerResource).hasSize(1);
         Practitioner doc = getResourcePractitioner(practitionerResource.get(0));
         String lastName = doc.getName().get(0).getFamily();

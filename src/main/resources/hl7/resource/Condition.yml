@@ -188,6 +188,5 @@ note:
    valueOf: datatype/Annotation
    condition: $annotationText NOT_NULL
    expressionType: resource
-   # Note on separator: Must double back-slashes to create single backslash in string.
    vars:
-      annotationText: NTE.3 *&, GeneralUtils.concatenateWithChar(annotationText, '  \\n')            
+      annotationText: NTE.3 *&, GeneralUtils.concatenateWithChar(annotationText, '  \n')            

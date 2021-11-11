@@ -212,7 +212,12 @@ public class ResourceUtils {
   // Given a bundle and practioner reference, returns the matching referenced Practitioner from the bundle
   // Asserts that there is at least one practitioner in the bundle and exactly one match for the reference
   public static Practitioner getSpecificPractitionerFromBundle(Bundle bundle, String practitionerRef) {
-    List<BundleEntryComponent> entries = bundle.getEntry();
+    return getSpecificPractitionerFromBundleEntriesList(bundle.getEntry(), practitionerRef);
+  }
+
+  // Given a list of entries from a bundle and practioner reference, returns the matching referenced Practitioner from the bundle
+  // Asserts that there is at least one practitioner in the bundle and exactly one match for the reference
+  public static Practitioner getSpecificPractitionerFromBundleEntriesList(List<BundleEntryComponent> entries, String practitionerRef) {
     // Find the practitioner resources from the FHIR bundle.
     List<Resource> practitioners = entries.stream()
         .filter(v -> ResourceType.Practitioner == v.getResource().getResourceType())
@@ -300,6 +305,12 @@ public class ResourceUtils {
     String s = context.getParser().encodeResourceToString(resource);
     Class<? extends IBaseResource> klass = Observation.class;
     return (Observation) context.getParser().parseResource(klass, s);
+  }
+
+  public static Device getResourceDevice(Resource resource, FHIRContext context) {
+    String s = context.getParser().encodeResourceToString(resource);
+    Class<? extends IBaseResource> klass = Device.class;
+    return (Device) context.getParser().parseResource(klass, s);
   }
 
   public static List<Resource> getResourceList(List<BundleEntryComponent> e, ResourceType resourceType){
