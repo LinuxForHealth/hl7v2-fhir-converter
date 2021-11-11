@@ -42,9 +42,11 @@ resources:
     additionalSegments:
       - MSH
       - .ORC
+      - .NTE
       - PATIENT.PATIENT_VISIT.PV1
       - PATIENT.PID
       # RXO not included on purpose, only want to use RXE for RDE messages
+      # RXO content and NTEs associated with RXO are not processed
 
   - resourceName: AllergyIntolerance
     segment: PATIENT.AL1
@@ -62,3 +64,4 @@ resources:
     additionalSegments:
       - .ORC
       - MSH
+      - .OBSERVATION.NTE
