@@ -7,12 +7,13 @@ package io.github.linuxforhealth.hl7.segments;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.Base64;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.Base64;
 
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r4.model.Bundle;
+import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
 import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.DocumentReference;
 import org.hl7.fhir.r4.model.Identifier;
@@ -20,10 +21,7 @@ import org.hl7.fhir.r4.model.InstantType;
 import org.hl7.fhir.r4.model.Practitioner;
 import org.hl7.fhir.r4.model.Resource;
 import org.hl7.fhir.r4.model.ResourceType;
-import org.hl7.fhir.r4.model.ServiceRequest;
-import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
 import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
@@ -31,8 +29,6 @@ import io.github.linuxforhealth.fhir.FHIRContext;
 import io.github.linuxforhealth.hl7.HL7ToFHIRConverter;
 import io.github.linuxforhealth.hl7.segments.util.PatientUtils;
 import io.github.linuxforhealth.hl7.segments.util.ResourceUtils;
-import io.github.linuxforhealth.hl7.segments.util.DatatypeUtils;
-
 
 public class Hl7DocumentReferenceFHIRConversionTest {
 
@@ -40,12 +36,13 @@ public class Hl7DocumentReferenceFHIRConversionTest {
 
     // Note: All tests for MDM_T02 and MDM_T06 are the same. Use parameters.
     @ParameterizedTest
-    @ValueSource(strings = { 
-        "MDM^T02", "MDM^T06"
-    }) 
+    @ValueSource(strings = {
+            "MDM^T02", "MDM^T06"
+    })
     public void doc_ref_has_all_fields_in_yaml(String segment) {
         //every field covered in the yaml should be listed here
-        String documentReference = "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|" + segment + "^MDM_T02|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6|56789^NID^UID|MCM||||\n"
+        String documentReference = "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|" + segment
+                + "^MDM_T02|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6|56789^NID^UID|MCM||||\n"
                 + "PID|1||000054321^^^MRN|||||||||||||M|CAT|||||N\n"
                 + "PV1|1|I||||||||||||||||||||||||||||||||||||||||||\n"
                 + "ORC|NW|||PGN001|SC|D|1|||MS|MS|||||\n"
@@ -71,18 +68,18 @@ public class Hl7DocumentReferenceFHIRConversionTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = { 
-        "MDM^T02", "MDM^T06"
-    }) 
+    @ValueSource(strings = {
+            "MDM^T02", "MDM^T06"
+    })
     public void doc_ref_authenticator_and_author_test(String segment) {
-        String documentReferenceMessage = "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|" + segment + "^MDM_T02|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6|56789^NID^UID|MCM||||\n"
+        String documentReferenceMessage = "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|" + segment
+                + "^MDM_T02|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6|56789^NID^UID|MCM||||\n"
                 + "PID|1||000054321^^^MRN|||||||||||||M|CAT|||||N\n"
                 + "PV1|1|I||||||||||||||||||||||||||||||||||||||||||\n"
                 + "ORC|NW|||PGN001|SC|D|1|||MS|MS|||||\n"
                 + "OBR|1||||||20170825010500|||||||||||||002|||||F||||||||\n"
                 + "TXA|1||TEXT||||201801180346||<PHYSID1>^DOE^JANE^J^^MD||||||||||AV|||<PHYSID2>^DOE^JOHN^K^^MD||\n"
-                + "OBX|1|ST|100||This is content|||||||X\n"
-                ;
+                + "OBX|1|ST|100||This is content|||||||X\n";
 
         HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
         String json = ftv.convert(documentReferenceMessage, PatientUtils.OPTIONS);
@@ -117,11 +114,12 @@ public class Hl7DocumentReferenceFHIRConversionTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = { 
-        "MDM^T02", "MDM^T06"
-    }) 
+    @ValueSource(strings = {
+            "MDM^T02", "MDM^T06"
+    })
     public void doc_ref_content_test(String segment) {
-        String documentReferenceMessage = "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|" + segment + "^MDM_T02|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6|56789^NID^UID|MCM||||\n"
+        String documentReferenceMessage = "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|" + segment
+                + "^MDM_T02|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6|56789^NID^UID|MCM||||\n"
                 + "PID|1||000054321^^^MRN|||||||||||||M|CAT|||||N\n"
                 + "PV1|1|I||||||||||||||||||||||||||||||||||||||||||\n"
                 + "ORC|NW|||PGN001|SC|D|1|||MS|MS|||||\n"
@@ -137,12 +135,15 @@ public class Hl7DocumentReferenceFHIRConversionTest {
         assertThat(content.getAttachment().getContentType()).isEqualTo("text/plain"); // Future TXA.3, currently always defaults to text/plain
         assertThat(content.getAttachment().getCreationElement().toString()).containsPattern("2018-01-18T03:46:00"); // TXA.7 date
         assertThat(content.getAttachment().hasData()).isTrue();
-        String decodedData = new String(Base64.getDecoder().decode(content.getAttachment().getDataElement().getValueAsString()));
-        assertThat(decodedData).isEqualTo("ECHOCARDIOGRAPHIC REPORT\nNORMAL LV CHAMBER SIZE WITH MILD CONCENTRIC LVH\nHYPERDYNAMIC LV SYSTOLIC FUNCTION, VISUAL EF 80%\n");
+        String decodedData = new String(
+                Base64.getDecoder().decode(content.getAttachment().getDataElement().getValueAsString()));
+        assertThat(decodedData).isEqualTo(
+                "ECHOCARDIOGRAPHIC REPORT\nNORMAL LV CHAMBER SIZE WITH MILD CONCENTRIC LVH\nHYPERDYNAMIC LV SYSTOLIC FUNCTION, VISUAL EF 80%");
 
         // TODO: Determine if we need to look at anything other than OBX.2 when it is TX
         // Leave this test in place as a reminder
-        documentReferenceMessage = "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|" + segment + "^MDM_T02|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6|56789^NID^UID|MCM||||\n"
+        documentReferenceMessage = "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|" + segment
+                + "^MDM_T02|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6|56789^NID^UID|MCM||||\n"
                 + "PID|1||000054321^^^MRN|||||||||||||M|CAT|||||N\n"
                 + "PV1|1|I||||||||||||||||||||||||||||||||||||||||||\n"
                 + "ORC|NW|||PGN001|SC|D|1|||MS|MS|||||\n"
@@ -160,7 +161,8 @@ public class Hl7DocumentReferenceFHIRConversionTest {
         assertThat(content.getAttachment().hasData()).isFalse();
 
         // Test that content is created even if TXA.7 is empty
-        documentReferenceMessage = "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|" + segment + "^MDM_T02|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6|56789^NID^UID|MCM||||\n"
+        documentReferenceMessage = "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|" + segment
+                + "^MDM_T02|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6|56789^NID^UID|MCM||||\n"
                 + "PID|1||000054321^^^MRN|||||||||||||M|CAT|||||N\n"
                 + "PV1|1|I||||||||||||||||||||||||||||||||||||||||||\n"
                 + "ORC|NW|||PGN001|SC|D|1|||MS|MS|||||\n"
@@ -179,11 +181,12 @@ public class Hl7DocumentReferenceFHIRConversionTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = { 
-        "MDM^T02", "MDM^T06"
-    }) 
-    public void docRefContextAndServiceRequestPresenceTest(String segment) { 
-        String documentReferenceMessage = "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|" + segment + "^MDM_T02|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6|56789^NID^UID|MCM||||\n"
+    @ValueSource(strings = {
+            "MDM^T02", "MDM^T06"
+    })
+    public void docRefContextAndServiceRequestPresenceTest(String segment) {
+        String documentReferenceMessage = "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|" + segment
+                + "^MDM_T02|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6|56789^NID^UID|MCM||||\n"
                 + "PID|1||000054321^^^MRN|||||||||||||M|CAT|||||N\n"
                 + "PV1|1|I||||||||||||||||||||||||||||||||||||||||||\n"
                 // ORC required for ServiceRequest test
@@ -215,9 +218,9 @@ public class Hl7DocumentReferenceFHIRConversionTest {
         Practitioner practBundle = ResourceUtils.getSpecificPractitionerFromBundle(bundle, requesterRef);
 
         DocumentReference.DocumentReferenceContextComponent refContext = documentReference.getContext();
-        assertThat(refContext.getPeriod().getStartElement().toString()).containsPattern("2018-01-17T14:42:00");  // TXA.4
+        assertThat(refContext.getPeriod().getStartElement().toString()).containsPattern("2018-01-17T14:42:00"); // TXA.4
         assertThat(refContext.hasRelated()).isTrue();
-        assertThat(refContext.hasPracticeSetting()).isFalse(); 
+        assertThat(refContext.hasPracticeSetting()).isFalse();
 
         assertThat(practBundle.getIdentifierFirstRep().getValue()).isEqualTo("5566");
         // Value passed to Context(TXA.5) is used as Identifier value in practitioner
@@ -235,34 +238,35 @@ public class Hl7DocumentReferenceFHIRConversionTest {
         assertThat(patientResource).hasSize(1);
 
         List<Resource> encounterResource = e.stream()
-            .filter(v -> ResourceType.Encounter == v.getResource().getResourceType())
-            .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+                .filter(v -> ResourceType.Encounter == v.getResource().getResourceType())
+                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
         assertThat(encounterResource).hasSize(1);
 
         List<Resource> practitionerResource = e.stream()
-            .filter(v -> ResourceType.Practitioner == v.getResource().getResourceType())
-            .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+                .filter(v -> ResourceType.Practitioner == v.getResource().getResourceType())
+                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
         assertThat(practitionerResource).hasSize(3);
 
         // Verify one Observation is created (from the ST)
         List<Resource> obsResource = e.stream()
                 .filter(v -> ResourceType.Observation == v.getResource().getResourceType())
                 .map(BundleEntryComponent::getResource).collect(Collectors.toList());
-         assertThat(obsResource).hasSize(1);  // TODO: When NTE is implemented, then update this.
+        assertThat(obsResource).hasSize(1); // TODO: When NTE is implemented, then update this.
 
         // Confirm that associated ServiceRequest is created.
         List<Resource> serviceRequestList = e.stream()
-        .filter(v -> ResourceType.ServiceRequest == v.getResource().getResourceType())
-        .map(BundleEntryComponent::getResource).collect(Collectors.toList()); 
+                .filter(v -> ResourceType.ServiceRequest == v.getResource().getResourceType())
+                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
         assertThat(serviceRequestList).hasSize(1);
     }
 
     @ParameterizedTest
-    @ValueSource(strings = { 
-        "MDM^T02", "MDM^T06"
-    }) 
+    @ValueSource(strings = {
+            "MDM^T02", "MDM^T06"
+    })
     public void doc_ref_date_test(String segment) {
-        String documentReferenceMessage = "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|" + segment + "^MDM_T02|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6|56789^NID^UID|MCM||||\n"
+        String documentReferenceMessage = "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|" + segment
+                + "^MDM_T02|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6|56789^NID^UID|MCM||||\n"
                 + "PID|1||000054321^^^MRN|||||||||||||M|CAT|||||N\n"
                 + "PV1|1|I||||||||||||||||||||||||||||||||||||||||||\n"
                 + "ORC|NW|||PGN001|SC|D|1|||MS|MS|||||\n"
@@ -276,11 +280,12 @@ public class Hl7DocumentReferenceFHIRConversionTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = { 
-        "MDM^T02", "MDM^T06"
-    }) 
+    @ValueSource(strings = {
+            "MDM^T02", "MDM^T06"
+    })
     public void doc_ref_description_test(String segment) {
-        String documentReferenceMessage = "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|" + segment + "^MDM_T02|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6|56789^NID^UID|MCM||||\n"
+        String documentReferenceMessage = "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|" + segment
+                + "^MDM_T02|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6|56789^NID^UID|MCM||||\n"
                 + "PID|1||000054321^^^MRN|||||||||||||M|CAT|||||N\n"
                 + "PV1|1|I||||||||||||||||||||||||||||||||||||||||||\n"
                 + "ORC|NW|||PGN001|SC|D|1|||MS|MS|||||\n"
@@ -294,11 +299,12 @@ public class Hl7DocumentReferenceFHIRConversionTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = { 
-        "MDM^T02", "MDM^T06"
-    }) 
+    @ValueSource(strings = {
+            "MDM^T02", "MDM^T06"
+    })
     public void doc_ref_doc_status_test(String segment) {
-        String documentReferenceMessage = "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|" + segment + "^MDM_T02|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6|56789^NID^UID|MCM||||\n"
+        String documentReferenceMessage = "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|" + segment
+                + "^MDM_T02|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6|56789^NID^UID|MCM||||\n"
                 + "PID|1||000054321^^^MRN|||||||||||||M|CAT|||||N\n"
                 + "PV1|1|I||||||||||||||||||||||||||||||||||||||||||\n"
                 + "ORC|NW|||PGN001|SC|D|1|||MS|MS|||||\n"
@@ -313,7 +319,8 @@ public class Hl7DocumentReferenceFHIRConversionTest {
         assertThat(docStatus.getSystem()).isEqualTo("http://hl7.org/fhir/composition-status");
 
         // Check OBX.11 as fallback
-        documentReferenceMessage = "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|" + segment + "^MDM_T02|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6|56789^NID^UID|MCM||||\n"
+        documentReferenceMessage = "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|" + segment
+                + "^MDM_T02|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6|56789^NID^UID|MCM||||\n"
                 + "PID|1||000054321^^^MRN|||||||||||||M|CAT|||||N\n"
                 + "PV1|1|I||||||||||||||||||||||||||||||||||||||||||\n"
                 + "ORC|NW|||PGN001|SC|D|1|||MS|MS|||||\n"
@@ -328,7 +335,8 @@ public class Hl7DocumentReferenceFHIRConversionTest {
         assertThat(docStatus.getSystem()).isEqualTo("http://hl7.org/fhir/composition-status");
 
         // Check a value that is not mapped results is no docStatus
-        documentReferenceMessage = "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|" + segment + "^MDM_T02|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6|56789^NID^UID|MCM||||\n"
+        documentReferenceMessage = "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|" + segment
+                + "^MDM_T02|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6|56789^NID^UID|MCM||||\n"
                 + "PID|1||000054321^^^MRN|||||||||||||M|CAT|||||N\n"
                 + "PV1|1|I||||||||||||||||||||||||||||||||||||||||||\n"
                 + "ORC|NW|||PGN001|SC|D|1|||MS|MS\n"
@@ -340,13 +348,14 @@ public class Hl7DocumentReferenceFHIRConversionTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = { 
-        "MDM^T02", "MDM^T06"
-    }) 
+    @ValueSource(strings = {
+            "MDM^T02", "MDM^T06"
+    })
     @Disabled
     // TODO: TXA-13 is not yet mapped in DocumentReference.yml
     public void doc_ref_relates_to_test(String segment) {
-        String documentReferenceMessage = "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|" + segment + "^MDM_T02|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6|56789^NID^UID|MCM||||\n"
+        String documentReferenceMessage = "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|" + segment
+                + "^MDM_T02|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6|56789^NID^UID|MCM||||\n"
                 + "PID|1||000054321^^^MRN|||||||||||||M|CAT|||||N\n"
                 + "PV1|1|I||||||||||||||||||||||||||||||||||||||||||\n"
                 + "ORC|NW|||PGN001|SC|D|1|||MS|MS|||||\n"
@@ -379,11 +388,12 @@ public class Hl7DocumentReferenceFHIRConversionTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = { 
-        "MDM^T02", "MDM^T06"
-    }) 
+    @ValueSource(strings = {
+            "MDM^T02", "MDM^T06"
+    })
     public void doc_ref_security_label_test(String segment) {
-        String documentReferenceMessage = "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|" + segment + "^MDM_T02|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6|56789^NID^UID|MCM||||\n"
+        String documentReferenceMessage = "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|" + segment
+                + "^MDM_T02|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6|56789^NID^UID|MCM||||\n"
                 + "PID|1||000054321^^^MRN|||||||||||||M|CAT|||||N\n"
                 + "PV1|1|I||||||||||||||||||||||||||||||||||||||||||\n"
                 + "ORC|NW|||PGN001|SC|D|1|||MS|MS|||||\n"
@@ -400,13 +410,14 @@ public class Hl7DocumentReferenceFHIRConversionTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = { 
-        "MDM^T02", "MDM^T06"
-    }) 
+    @ValueSource(strings = {
+            "MDM^T02", "MDM^T06"
+    })
     public void doc_ref_status_test(String segment) {
         // Check TXA.19
         // TXA.19 value maps to status; OBR.25 is ignored
-        String documentReferenceMessage = "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|" + segment + "^MDM_T02|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6|56789^NID^UID|MCM||||\n"
+        String documentReferenceMessage = "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|" + segment
+                + "^MDM_T02|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6|56789^NID^UID|MCM||||\n"
                 + "PID|1||000054321^^^MRN|||||||||||||M|CAT|||||N\n"
                 + "PV1|1|I||||||||||||||||||||||||||||||||||||||||||\n"
                 + "ORC|NW|||PGN001|SC|D|1|||MS|MS|||||\n"
@@ -420,7 +431,8 @@ public class Hl7DocumentReferenceFHIRConversionTest {
 
         // Check OBR.25 as fallback
         // TXA.19 value is empty so OBR.25 is used
-        documentReferenceMessage = "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|" + segment + "^MDM_T02|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6|56789^NID^UID|MCM||||\n"
+        documentReferenceMessage = "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|" + segment
+                + "^MDM_T02|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6|56789^NID^UID|MCM||||\n"
                 + "PID|1||000054321^^^MRN|||||||||||||M|CAT|||||N\n"
                 + "PV1|1|I||||||||||||||||||||||||||||||||||||||||||\n"
                 + "ORC|NW|||PGN001|SC|D|1|||MS|MS\n"
@@ -434,7 +446,8 @@ public class Hl7DocumentReferenceFHIRConversionTest {
 
         // Check default value case
         // TXA.19 and OBR.25 values are empty so should fallback to "current"
-        documentReferenceMessage = "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|" + segment + "^MDM_T02|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6|56789^NID^UID|MCM||||\n"
+        documentReferenceMessage = "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|" + segment
+                + "^MDM_T02|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6|56789^NID^UID|MCM||||\n"
                 + "PID|1||000054321^^^MRN|||||||||||||M|CAT|||||N\n"
                 + "PV1|1|I||||||||||||||||||||||||||||||||||||||||||\n"
                 + "ORC|NW|||PGN001|SC|D|1|||MS|MS|||||\n"
@@ -448,11 +461,12 @@ public class Hl7DocumentReferenceFHIRConversionTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = { 
-        "MDM^T02", "MDM^T06"
-    }) 
+    @ValueSource(strings = {
+            "MDM^T02", "MDM^T06"
+    })
     public void doc_ref_subject_test(String segment) {
-        String documentReferenceMessage = "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|" + segment + "^MDM_T02|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6|56789^NID^UID|MCM||||\n"
+        String documentReferenceMessage = "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|" + segment
+                + "^MDM_T02|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6|56789^NID^UID|MCM||||\n"
                 + "PID|1||000054321^^^MRN|||||||||||||M|CAT|||||N\n"
                 + "PV1|1|I||||||||||||||||||||||||||||||||||||||||||\n"
                 + "ORC|NW|||PGN001|SC|D|1|||MS|MS|||||\n" + "OBR|1||||||20170825010500|||||||||||||002|||||F||||||||\n"
@@ -480,17 +494,18 @@ public class Hl7DocumentReferenceFHIRConversionTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = { 
-        "MDM^T02", "MDM^T06"
-    }) 
+    @ValueSource(strings = {
+            "MDM^T02", "MDM^T06"
+    })
     public void doc_ref_master_identifier_test(String segment) {
         // Test masterIdentifier uses the value(12.1) but does not require a system if 12.2 is empty
-        String documentReference = "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|" + segment + "^MDM_T02|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6|56789^NID^UID|MCM||||\n"
+        String documentReference = "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|" + segment
+                + "^MDM_T02|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6|56789^NID^UID|MCM||||\n"
                 + "PID|1||000054321^^^MRN|||||||||||||M|CAT|||||N\n"
                 + "PV1|1|I||||||||||||||||||||||||||||||||||||||||||\n"
                 + "ORC|NW|||PGN001|SC|D|1|||MS|MS|||||\n"
                 + "OBR|1||||||20170825010500|||||||||||||002|||||F||||||||\n"
-                + "TXA|1||TEXT||||201801180346|||||<MESSAGEID>|||||PA|R|AV|||||\n"                
+                + "TXA|1||TEXT||||201801180346|||||<MESSAGEID>|||||PA|R|AV|||||\n"
                 + "OBX|1|SN|||||||||X";
         DocumentReference report = ResourceUtils.getDocumentReference(documentReference);
         assertThat(report.hasMasterIdentifier()).isTrue();
@@ -499,7 +514,8 @@ public class Hl7DocumentReferenceFHIRConversionTest {
         assertThat(masterID.getSystem()).isNull();
 
         // Test masterIdentifier uses the value(12.1) and pulls systemID from 12.2
-        documentReference = "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|" + segment + "^MDM_T02|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6|56789^NID^UID|MCM||||\n"
+        documentReference = "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|" + segment
+                + "^MDM_T02|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6|56789^NID^UID|MCM||||\n"
                 + "PID|1||000054321^^^MRN|||||||||||||M|CAT|||||N\n"
                 + "PV1|1|I||||||||||||||||||||||||||||||||||||||||||\n"
                 + "ORC|NW|||PGN001|SC|D|1|||MS|MS|||||\n"
@@ -513,7 +529,8 @@ public class Hl7DocumentReferenceFHIRConversionTest {
         assertThat(masterID.getSystem()).isEqualTo("urn:id:SYSTEM");
 
         // Test masterIdentifier uses the backup value(12.3) and does not have a system
-        documentReference = "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|" + segment + "^MDM_T02|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6|56789^NID^UID|MCM||||\n"
+        documentReference = "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|" + segment
+                + "^MDM_T02|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6|56789^NID^UID|MCM||||\n"
                 + "PID|1||000054321^^^MRN|||||||||||||M|CAT|||||N\n"
                 + "PV1|1|I||||||||||||||||||||||||||||||||||||||||||\n"
                 + "ORC|NW|||PGN001|SC|D|1|||MS|MS|||||\n"
@@ -528,11 +545,12 @@ public class Hl7DocumentReferenceFHIRConversionTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = { 
-        "MDM^T02", "MDM^T06"
-    }) 
+    @ValueSource(strings = {
+            "MDM^T02", "MDM^T06"
+    })
     public void doc_ref_type_test(String segment) {
-        String documentReferenceMessage = "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|" + segment + "^MDM_T02|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6|56789^NID^UID|MCM||||\n"
+        String documentReferenceMessage = "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|" + segment
+                + "^MDM_T02|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6|56789^NID^UID|MCM||||\n"
                 + "PID|1||000054321^^^MRN|||||||||||||M|CAT|||||N\n"
                 + "PV1|1|I||||||||||||||||||||||||||||||||||||||||||\n"
                 + "ORC|NW|||PGN001|SC|D|1|||MS|MS|||||\n"
@@ -549,23 +567,23 @@ public class Hl7DocumentReferenceFHIRConversionTest {
 
     @ParameterizedTest
     // Spot check for PPR messages
-    @ValueSource(strings = { 
-        "PPR^PC1", /* "PPR^PC2", "PPR^PC3" */ 
+    @ValueSource(strings = {
+            "PPR^PC1", /* "PPR^PC2", "PPR^PC3" */
     })
     public void doc_ref_ppr_test(String messageType) {
-        String documentReferenceMessage =
-        "MSH|^~\\&|SendTest1|Sendfac1|Receiveapp1|Receivefac1|202101010000|security|"+ messageType + "|1|P^I|2.6||||||ASCII||\r"
-            + "PID|||1234^^^^MR||DOE^JANE^|||F|||||||||||||||||||||\r"
-            + "PV1||I|6N^1234^A^GENHOS|||||||SUR|||||||0148^ANDERSON^CARL|S|1400|A|||||||||||||||||||SF|K||||199501102300\r"
-            + "PRB|AD||202101010000|aortic stenosis|53692||2|||202101010000\r"
-            + "OBX|1|NM|111^TotalProtein||7.5|gm/dl|5.9-8.4||||F\r"
-            + "NTE|1|P|Problem Comments\r"
-            + "ORC|NW|1000^OE|9999999^RX|||E|^Q6H^D10^^^R\r"
-            + "OBR|1|TESTID|TESTID|||201801180346|201801180347||||||||||||||||||F||||||WEAKNESS||||||||||||\r"
-            // Next three lines create an attachment because OBX type TX
-            + "OBX|1|TX|||ECHOCARDIOGRAPHIC REPORT||||||F|||202101010000|||\r"
-            + "OBX|2|TX|||NORMAL LV CHAMBER SIZE WITH MILD CONCENTRIC LVH||||||F|||202101010000|||\r"
-            + "OBX|3|TX|||HYPERDYNAMIC LV SYSTOLIC FUNCTION, VISUAL EF 80%||||||F|||202101010000|||\n";
+        String documentReferenceMessage = "MSH|^~\\&|SendTest1|Sendfac1|Receiveapp1|Receivefac1|202101010000|security|"
+                + messageType + "|1|P^I|2.6||||||ASCII||\r"
+                + "PID|||1234^^^^MR||DOE^JANE^|||F|||||||||||||||||||||\r"
+                + "PV1||I|6N^1234^A^GENHOS|||||||SUR|||||||0148^ANDERSON^CARL|S|1400|A|||||||||||||||||||SF|K||||199501102300\r"
+                + "PRB|AD||202101010000|aortic stenosis|53692||2|||202101010000\r"
+                + "OBX|1|NM|111^TotalProtein||7.5|gm/dl|5.9-8.4||||F\r"
+                + "NTE|1|P|Problem Comments\r"
+                + "ORC|NW|1000^OE|9999999^RX|||E|^Q6H^D10^^^R\r"
+                + "OBR|1|TESTID|TESTID|||201801180346|201801180347||||||||||||||||||F||||||WEAKNESS||||||||||||\r"
+                // Next three lines create an attachment because OBX type TX
+                + "OBX|1|TX|||ECHOCARDIOGRAPHIC REPORT||||||F|||202101010000|||\r"
+                + "OBX|2|TX|||NORMAL LV CHAMBER SIZE WITH MILD CONCENTRIC LVH||||||F|||202101010000|||\r"
+                + "OBX|3|TX|||HYPERDYNAMIC LV SYSTOLIC FUNCTION, VISUAL EF 80%||||||F|||202101010000|||\n";
 
         DocumentReference documentRef = ResourceUtils.getDocumentReference(documentReferenceMessage);
         DocumentReference.DocumentReferenceContextComponent drContext = documentRef.getContext();
@@ -574,7 +592,9 @@ public class Hl7DocumentReferenceFHIRConversionTest {
         assertThat(content.getAttachment().getContentType()).isEqualTo("text/plain"); // Currently always defaults to text/plain
         assertThat(content.getAttachment().getCreation()).isNull(); // No TXA.7 in message
         assertThat(content.getAttachment().hasData()).isTrue();
-        String decodedData = new String(Base64.getDecoder().decode(content.getAttachment().getDataElement().getValueAsString()));
-        assertThat(decodedData).isEqualTo("ECHOCARDIOGRAPHIC REPORT\nNORMAL LV CHAMBER SIZE WITH MILD CONCENTRIC LVH\nHYPERDYNAMIC LV SYSTOLIC FUNCTION, VISUAL EF 80%\n");
+        String decodedData = new String(
+                Base64.getDecoder().decode(content.getAttachment().getDataElement().getValueAsString()));
+        assertThat(decodedData).isEqualTo(
+                "ECHOCARDIOGRAPHIC REPORT\nNORMAL LV CHAMBER SIZE WITH MILD CONCENTRIC LVH\nHYPERDYNAMIC LV SYSTOLIC FUNCTION, VISUAL EF 80%");
     }
 }

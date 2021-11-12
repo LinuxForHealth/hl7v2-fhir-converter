@@ -21,15 +21,15 @@ import org.hl7.fhir.r4.model.Enumerations;
 import org.hl7.fhir.r4.model.codesystems.EncounterStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Segment;
 import ca.uhn.hl7v2.model.Type;
 import io.github.linuxforhealth.hl7.data.date.DateUtil;
 
-
 public class Hl7RelatedGeneralUtils {
     private static final Logger LOGGER = LoggerFactory.getLogger(Hl7RelatedGeneralUtils.class);
-    
+
     private Hl7RelatedGeneralUtils() {
     }
 
@@ -56,7 +56,8 @@ public class Hl7RelatedGeneralUtils {
     // .* any number of characters
     private static final String REGEX_FIRST_TWO_NUMBERS_AMID_OTHER_TEXT = "^\\D*?([\\d.]+)\\D*([\\d.]*).*";
     // Compile this into a pattern for reuse
-    private static final Pattern PATTERN_FIRST_TWO_NUMBERS_AMID_OTHER_TEXT = Pattern.compile(REGEX_FIRST_TWO_NUMBERS_AMID_OTHER_TEXT);
+    private static final Pattern PATTERN_FIRST_TWO_NUMBERS_AMID_OTHER_TEXT = Pattern
+            .compile(REGEX_FIRST_TWO_NUMBERS_AMID_OTHER_TEXT);
 
     // ExtractLow - see comments above
     public static String extractLow(Object input) {
@@ -65,9 +66,9 @@ public class Hl7RelatedGeneralUtils {
             Matcher m = PATTERN_FIRST_TWO_NUMBERS_AMID_OTHER_TEXT.matcher(val);
 
             // Only the low (first) number if there is also a high (second) number
-            if (m.find() && !m.group(2).isEmpty()){
-                    return m.group(1);
-            } 
+            if (m.find() && !m.group(2).isEmpty()) {
+                return m.group(1);
+            }
             return null;
         }
         return null;
@@ -80,11 +81,11 @@ public class Hl7RelatedGeneralUtils {
             Matcher m = PATTERN_FIRST_TWO_NUMBERS_AMID_OTHER_TEXT.matcher(val);
 
             // If one number, it is the high.  If two numbers, the second is high.
-            if(m.find()) {
-                if (!m.group(2).isEmpty()){
+            if (m.find()) {
+                if (!m.group(2).isEmpty()) {
                     return m.group(2);
                 } else {
-                    return m.group(1);   
+                    return m.group(1);
                 }
             }
             return null;
@@ -106,7 +107,6 @@ public class Hl7RelatedGeneralUtils {
         return status.toCode();
     }
 
-
     // DocumentReference.yml uses a required:true on status to control the creation of the DocumentReference.
     // It depends on this getDocumentReferenceStatus returning a status value ONLY when a DocumentReference should be created.
     // Together with the required:true, this creates logic for messages (MDM, PPR, ORM, OMP) that create DocumentReferences 
@@ -116,27 +116,28 @@ public class Hl7RelatedGeneralUtils {
     // Observation creation is controlled by different code
     public static String getDocumentReferenceStatus(Object txa, Object txa19, Object orc, Object obr25, Object obx2) {
         LOGGER.info("Generating DocumentReference status");
-        LOGGER.debug("Generating DocumentReference status from txa{}, txa19 {}, orc {}, obr25 {}, obx2 {}, ", txa, txa19, orc, obr25, obx2);
+        LOGGER.debug("Generating DocumentReference status from txa{}, txa19 {}, orc {}, obr25 {}, obx2 {}, ", txa,
+                txa19, orc, obr25, obx2);
 
-        if (txa != null || (orc!= null && Objects.equals(Hl7DataHandlerUtil.getStringValue(obx2),"TX"))) {
+        if (txa != null || (orc != null && Objects.equals(Hl7DataHandlerUtil.getStringValue(obx2), "TX"))) {
             String val = Hl7DataHandlerUtil.getStringValue(txa19);
             if (val == null) {
                 val = Hl7DataHandlerUtil.getStringValue(obr25);
             }
             String code = SimpleDataValueResolver.getFHIRCode(val, Enumerations.DocumentReferenceStatus.class);
-
             if (code != null) {
                 return code;
             } else {
                 return "current";
             }
-        } 
+        }
         return null;
     }
 
     public static String generateName(Object prefix, Object first, Object middle, Object family, Object suffix) {
         LOGGER.info("Generating name");
-        LOGGER.debug("Generating name from  from prefix {}, first {}, middle {}, family {} ,suffix {}", prefix, first, middle, family, suffix);
+        LOGGER.debug("Generating name from  from prefix {}, first {}, middle {}, family {} ,suffix {}", prefix, first,
+                middle, family, suffix);
         StringBuilder sb = new StringBuilder();
         String valprefix = Hl7DataHandlerUtil.getStringValue(prefix);
         String valfirst = Hl7DataHandlerUtil.getStringValue(first);
@@ -145,7 +146,6 @@ public class Hl7RelatedGeneralUtils {
         String valsuffix = Hl7DataHandlerUtil.getStringValue(suffix);
 
         if (valprefix != null) {
-
             sb.append(valprefix).append(" ");
         }
         if (valfirst != null) {
@@ -166,7 +166,6 @@ public class Hl7RelatedGeneralUtils {
         } else {
             return null;
         }
-
     }
 
     /**
@@ -176,14 +175,13 @@ public class Hl7RelatedGeneralUtils {
      * @param end DateTime
      * @return Minutes in Long
      */
-
     public static Long diffDateMin(Object start, Object end) {
         LOGGER.info("Generating time diff");
         LOGGER.debug("Generating time diff in min  from var1 {}, var2 {}", start, end);
         try {
             Temporal date1 = DateUtil.getTemporal(Hl7DataHandlerUtil.getStringValue(start));
             Temporal date2 = DateUtil.getTemporal(Hl7DataHandlerUtil.getStringValue(end));
-            LOGGER.info("computing temporal dates"); 
+            LOGGER.info("computing temporal dates");
             LOGGER.debug("temporal dates start: {} , end: {} ", date1, date2);
             if (date1 != null && date2 != null) {
                 return ChronoUnit.MINUTES.between(date1, date2);
@@ -203,20 +201,18 @@ public class Hl7RelatedGeneralUtils {
             if (stk.getTokenList().size() > index) {
                 return stk.getTokenList().get(index);
             }
-
         }
         return null;
     }
 
     public static String noWhiteSpace(Object input) {
         String val = Hl7DataHandlerUtil.getStringValue(input);
-        if(val != null) {
+        if (val != null) {
             String newVal = val.replaceAll("\\s", "_");
             String system = "urn:id:" + newVal;
-
             return system;
-        }
-        else return null;
+        } else
+            return null;
     }
 
     // Concatenates strings with a delimeter character(s) 
@@ -232,26 +228,19 @@ public class Hl7RelatedGeneralUtils {
 
         // Use this regex: r"(?<!\\)\\n|\n" but must double up backslashes in java string
         String delimiter = delimiterChar.replaceAll("(?<!\\\\)\\\\n|\\n", "\n");
-
-        String result = Hl7DataHandlerUtil.getStringValue(input, true, delimiter, false);
-        return result;
-        // return Hl7DataHandlerUtil.getStringValue(input, true, delimiter, false);
+        return Hl7DataHandlerUtil.getStringValue(input, true, delimiter, false, false);
     }
 
     public static List<String> makeStringArray(String... strs) {
         List<String> result = new ArrayList<>();
-
         for (String str : strs)
             if (str != null)
                 result.add(str);
-
         return result;
     }
 
-
-    public static String formatAsId(Object input)
-    {
-        if (input != null){
+    public static String formatAsId(Object input) {
+        if (input != null) {
             // This replaces any special character (other than letters, numbers, dashes, or periods) with a period
             // Then lower-cases, and truncates to 64 characters.
             String stringValue = Hl7DataHandlerUtil.getStringValue(input).trim();
@@ -321,25 +310,20 @@ public class Hl7RelatedGeneralUtils {
                 if (addresses.length == 1) {
                     returnDistrict = patientCountyPid12;
                 }
-
             } catch (HL7Exception e) {
                 // Do nothing. Just eat the error.
                 // Let the initial value stand
             }
-
         }
 
         return returnDistrict;
     }
-
-
 
     // Takes all the pieces of ContactPoint/telecom number from XTN, formats to a user friendly
     // ContactPoint/Telecom number based on rules documented in the steps
     public static String getFormattedTelecomNumberValue(String xtn1Old, String xtn5Country, String xtn6Area,
             String xtn7Local, String xtn8Extension, String xtn12Unformatted) {
         String returnValue = "";
-
         // If the local number exists...
         if (xtn7Local != null && xtn7Local.length() > 0) {
             returnValue = formatCountryAndArea(xtn5Country, xtn6Area) + formatLocalNumber(xtn7Local);
@@ -358,13 +342,11 @@ public class Hl7RelatedGeneralUtils {
         return returnValue;
     }
 
-
     public static String getNarrativeDiv(String text) {
-
-    	String divText = "<div xmlns=\"http://www.w3.org/1999/xhtml\"><p>%s</p></div>";
-    	return String.format(divText, StringEscapeUtils.escapeHtml4(text).replace("~", "<br />"));    
+        String divText = "<div xmlns=\"http://www.w3.org/1999/xhtml\"><p>%s</p></div>";
+        return String.format(divText, StringEscapeUtils.escapeHtml4(text).replace("~", "<br />"));
     }
-    
+
     // Private method to split and format the 7 digit local telecom number
     private static String formatLocalNumber(String localNumber) {
         // Split after the 3rd digit, add a space, add the rest of the number
@@ -387,6 +369,5 @@ public class Hl7RelatedGeneralUtils {
         }
         return returnValue;
     }
-    
 
 }

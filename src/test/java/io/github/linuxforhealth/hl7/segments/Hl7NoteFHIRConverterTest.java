@@ -14,9 +14,9 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
-import org.hl7.fhir.r4.model.Condition.ConditionEvidenceComponent;
 import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Condition;
+import org.hl7.fhir.r4.model.Condition.ConditionEvidenceComponent;
 import org.hl7.fhir.r4.model.MedicationRequest;
 import org.hl7.fhir.r4.model.Observation;
 import org.hl7.fhir.r4.model.Practitioner;
@@ -87,9 +87,11 @@ public class Hl7NoteFHIRConverterTest {
                 ResourceUtils.context);
         assertThat(serviceRequest.hasNote()).isTrue();
         assertThat(serviceRequest.getNote()).hasSize(1);
-        // Processing adds "  \n" two spaces and a line feed
-        assertThat(serviceRequest.getNote().get(0).getText())
-                .isEqualTo("TEST ORC/OBR NOTE AA line 1  \nTEST NOTE AA line 2  \nTEST NOTE AA line 3");
+        // Processing adds "  \n" two spaces and a line feed between each line.
+        // NOTE: the note contains an Annotation, which contains a MarkdownType that has the string.
+        // Must use getTextElement().getValueAsString() to see untrimmed contents.
+        assertThat(serviceRequest.getNote().get(0).getTextElement().getValueAsString()).isEqualTo(
+                "TEST ORC/OBR NOTE AA line 1  \nTEST NOTE AA line 2  \nTEST NOTE AA line 3");
         assertThat(serviceRequest.getNote().get(0).hasAuthorReference()).isTrue();
         String practitionerServReqRefId = serviceRequest.getNote().get(0).getAuthorReference().getReference();
 
@@ -107,14 +109,14 @@ public class Hl7NoteFHIRConverterTest {
         // Validate the note contents and references 
         assertThat(obsHemoglobin.hasNote()).isTrue();
         assertThat(obsHemoglobin.getNote()).hasSize(1);
-        assertThat(obsHemoglobin.getNote().get(0).getText())
+        assertThat(obsHemoglobin.getNote().get(0).getTextElement().getValueAsString())
                 .isEqualTo("TEST OBXa NOTE BB line 1  \nTEST NOTE BB line 2  \nTEST NOTE BB line 3");
         assertThat(obsHemoglobin.getNote().get(0).hasAuthorReference()).isTrue();
         String practitionerObsHemoglobinRefId = obsHemoglobin.getNote().get(0).getAuthorReference().getReference();
 
         assertThat(obsGlucose.hasNote()).isTrue();
         assertThat(obsGlucose.getNote()).hasSize(1);
-        assertThat(obsGlucose.getNote().get(0).getText()).isEqualTo(
+        assertThat(obsGlucose.getNote().get(0).getTextElement().getValueAsString()).isEqualTo(
                 "TEST OBXb NOTE CC line 1  \nTEST NOTE CC line 2  \n   \nTEST NOTE CC line 4"); // Test that blank lines are preserved.
         assertThat(obsGlucose.getNote().get(0).hasAuthorReference()).isFalse();
 
@@ -202,7 +204,9 @@ public class Hl7NoteFHIRConverterTest {
                 ResourceUtils.context);
         assertThat(medicationRequest.hasNote()).isTrue();
         assertThat(medicationRequest.getNote()).hasSize(1);
-        assertThat(medicationRequest.getNote().get(0).getText())
+        // NOTE: the note contains an Annotation, which contains a MarkdownType that has the string.
+        // Must use getTextElement().getValueAsString() to see untrimmed contents.
+        assertThat(medicationRequest.getNote().get(0).getTextElement().getValueAsString())
                 .isEqualTo("TEST MedReq NOTE AA line 1  \nTEST NOTE AA line 2  \nTEST NOTE AA line 3");
         assertThat(medicationRequest.getNote().get(0).hasAuthorReference()).isTrue();
         String practitionerServReqRefId = medicationRequest.getNote().get(0).getAuthorReference().getReference();
@@ -221,14 +225,14 @@ public class Hl7NoteFHIRConverterTest {
         // Validate the note contents and references 
         assertThat(obsHemoglobin.hasNote()).isTrue();
         assertThat(obsHemoglobin.getNote()).hasSize(1);
-        assertThat(obsHemoglobin.getNote().get(0).getText())
+        assertThat(obsHemoglobin.getNote().get(0).getTextElement().getValueAsString())
                 .isEqualTo("TEST OBXa NOTE BB line 1  \nTEST NOTE BB line 2  \nTEST NOTE BB line 3");
         assertThat(obsHemoglobin.getNote().get(0).hasAuthorReference()).isTrue();
         String practitionerObsHemoglobinRefId = obsHemoglobin.getNote().get(0).getAuthorReference().getReference();
 
         assertThat(obsGlucose.hasNote()).isTrue();
         assertThat(obsGlucose.getNote()).hasSize(1);
-        assertThat(obsGlucose.getNote().get(0).getText()).isEqualTo(
+        assertThat(obsGlucose.getNote().get(0).getTextElement().getValueAsString()).isEqualTo(
                 "TEST OBXb NOTE CC line 1  \nTEST NOTE CC line 2  \n   \nTEST NOTE CC line 4"); // Test that blank lines are preserved.
         assertThat(obsGlucose.getNote().get(0).hasAuthorReference()).isFalse();
 
@@ -314,13 +318,15 @@ public class Hl7NoteFHIRConverterTest {
             condTachy = temp;
         }
         // Test the conditions have the correct NTE's associated and have correct content.
+        // NOTE: the note contains an Annotation, which contains a MarkdownType that has the string.
+        // Must use getTextElement().getValueAsString() to see untrimmed contents.
         assertThat(condStenosis.hasNote()).isTrue();
         assertThat(condStenosis.getNote()).hasSize(1);
-        assertThat(condStenosis.getNote().get(0).getText())
+        assertThat(condStenosis.getNote().get(0).getTextElement().getValueAsString())
                 .isEqualTo("TEST PRBa NOTE AA line 1  \nTEST NOTE AA line 2  \nTEST NOTE AA line 3");
         assertThat(condTachy.hasNote()).isTrue();
         assertThat(condTachy.getNote()).hasSize(1);
-        assertThat(condTachy.getNote().get(0).getText())
+        assertThat(condTachy.getNote().get(0).getTextElement().getValueAsString())
                 .isEqualTo("TEST PRBd NOTE DD line 1  \nTEST NOTE DD line 2  \nTEST NOTE DD line 3");
 
         // Four observations.  Two associated with the first problem and two with the second
