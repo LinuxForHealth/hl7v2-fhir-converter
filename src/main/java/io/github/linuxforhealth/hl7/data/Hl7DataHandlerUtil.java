@@ -7,9 +7,11 @@ package io.github.linuxforhealth.hl7.data;
 
 import java.util.Collection;
 import java.util.List;
+
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import ca.uhn.hl7v2.model.Composite;
 import ca.uhn.hl7v2.model.DataTypeException;
 import ca.uhn.hl7v2.model.Primitive;
@@ -32,10 +34,19 @@ public class Hl7DataHandlerUtil {
     }
 
     public static String getStringValue(Object obj, boolean allComponents) {
-        return getStringValue(obj, allComponents, ". ", true);
+        return getStringValue(obj, allComponents, ". ", true, true);
     }
 
-    public static String getStringValue(Object obj, boolean allComponents, String separatorString, boolean trim) {
+    /**
+     * @param obj - object to return the string value of
+     * @param allComponents -
+     * @param separatorString - string to insert between items when obj is a list
+     * @param trim - whether to trim (whitespace) from the result
+     * @param separatorAtEnd - whether to add the separatorString after the final element when obj parm is a list
+     * @return
+     */
+    public static String getStringValue(Object obj, boolean allComponents, String separatorString, boolean trim,
+            boolean separatorAtEnd) {
         if (obj == null) {
             return null;
         }
@@ -48,8 +59,17 @@ public class Hl7DataHandlerUtil {
             if (list.size() == 1) {
                 returnValue = toStringValue(list.get(0), allComponents);
             } else if (!list.isEmpty()) {
+                int listSize = list.size();
+                int listCount = 1;
                 StringBuilder sb = new StringBuilder();
-                list.forEach(e -> sb.append(toStringValue(e, allComponents)).append(separatorString));
+                for (Object listItem : list) {
+                    sb.append(toStringValue(listItem, allComponents));
+                    if (separatorAtEnd || listCount < listSize) {
+                        // append separator, except after last item when separatorAtEnd=false
+                        sb.append(separatorString);
+                    }
+                    listCount++;
+                }
                 returnValue = sb.toString();
                 if (trim) {
                     returnValue = StringUtils.strip(returnValue);

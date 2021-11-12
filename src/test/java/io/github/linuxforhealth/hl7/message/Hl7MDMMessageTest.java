@@ -6,6 +6,7 @@
 package io.github.linuxforhealth.hl7.message;
 
 import static org.assertj.core.api.Assertions.assertThat;
+
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -18,9 +19,9 @@ import org.hl7.fhir.r4.model.Observation;
 import org.hl7.fhir.r4.model.Resource;
 import org.hl7.fhir.r4.model.ResourceType;
 import org.hl7.fhir.r4.model.ServiceRequest;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+
 import io.github.linuxforhealth.hl7.segments.util.ResourceUtils;
 
 public class Hl7MDMMessageTest {
@@ -330,7 +331,9 @@ public class Hl7MDMMessageTest {
                 ResourceUtils.context);
         assertThat(serviceRequest.hasNote()).isTrue();
         assertThat(serviceRequest.getNote()).hasSize(1);
-        assertThat(serviceRequest.getNote().get(0).getText())
+        // NOTE: the note contains an Annotation, which contains a MarkdownType that has the string.
+        // Must use getTextElement().getValueAsString() to see untrimmed contents.
+        assertThat(serviceRequest.getNote().get(0).getTextElement().getValueAsString())
                 .isEqualTo("TEST ORC/OBR NOTE AA line 1  \nTEST NOTE AA line 2");
         assertThat(serviceRequest.getNote().get(0).hasAuthorReference()).isTrue();
 
@@ -345,7 +348,9 @@ public class Hl7MDMMessageTest {
         // Validate the note contents and reference existance.
         assertThat(observation.hasNote()).isTrue();
         assertThat(observation.getNote()).hasSize(1);
-        assertThat(observation.getNote().get(0).getText())
+        // NOTE: the note contains an Annotation, which contains a MarkdownType that has the string.
+        // Must use getTextElement().getValueAsString() to see untrimmed contents.
+        assertThat(observation.getNote().get(0).getTextElement().getValueAsString())
                 .isEqualTo("TEST OBX NOTE BB line 1  \nTEST NOTE BB line 2");
         assertThat(observation.getNote().get(0).hasAuthorReference()).isTrue();
 
