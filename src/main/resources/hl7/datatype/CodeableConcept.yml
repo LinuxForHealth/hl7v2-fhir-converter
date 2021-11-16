@@ -52,9 +52,17 @@ coding_5:
    condition: $coding NOT_NULL
    specs: CWE
    vars:
-      coding: CODING_SYSTEM_V2, CWE      
+      coding: CODING_SYSTEM_V2, CWE
 
 coding_6:
+   type: IMMUNIZATION_STATUS_REASON
+   condition: $customCoding NOT_NULL
+   valueOf: $customCoding
+   specs: $customCoding
+   vars:
+      customCoding: CWE
+
+coding_7:
    valueOf: $coding
    condition: $coding NOT_NULL
    generateList: true

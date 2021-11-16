@@ -40,6 +40,7 @@ import org.hl7.fhir.r4.model.Observation.ObservationStatus;
 import org.hl7.fhir.r4.model.ServiceRequest.ServiceRequestStatus;
 import org.hl7.fhir.r4.model.Specimen.SpecimenStatus;
 import org.hl7.fhir.r4.model.codesystems.V3ActCode;
+import org.hl7.fhir.r4.model.codesystems.V3ActReason;
 import org.hl7.fhir.r4.model.codesystems.V3MaritalStatus;
 import org.hl7.fhir.r4.model.codesystems.ConditionCategory;
 import org.hl7.fhir.r4.model.codesystems.MessageReasonEncounter;
@@ -502,6 +503,27 @@ public class SimpleDataValueResolver {
         String text = Hl7DataHandlerUtil.getOriginalDisplayText(value);
         String version = Hl7DataHandlerUtil.getVersion(value);
         return commonCodingSystemV2(table, code, text, version);
+    };
+
+    public static final ValueExtractor<Object, SimpleCode> IMMUNIZATION_STATUS_REASON = (Object value) -> {
+       // System.out.println("test");
+        if (value instanceof CWE) {
+            CWE cwe = (CWE) value;
+            String actReason = cwe.getCwe1_Identifier().toString();
+            String code = getFHIRCode(actReason, V3ActReason.class);
+            String system = cwe.getCwe3_NameOfCodingSystem().toString();
+            String display = cwe.getCwe2_Text().toString();
+
+            if ( actReason.equals("IMMUNE") || actReason.equals("MEDPREC") || actReason.equals("OSTOCK") ||  actReason.equals("PATOBJ")) {
+                V3ActReason ar = V3ActReason.fromCode(code);
+                System.out.println(code);
+                return new SimpleCode(code,ar.getSystem(),ar.getDisplay());
+            }
+
+
+        }
+         return null;
+
     };
 
     // For OBX.5 and other dynamic encoded fields, the real class is wrapped in the Varies class, and must be extracted from data

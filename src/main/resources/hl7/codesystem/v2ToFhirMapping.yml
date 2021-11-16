@@ -106,6 +106,13 @@ V3ActCode:
   P: PRENC
   O: AMB
 
+#Using Act Reason for immunization.statusReason
+V3ActReason:
+  IMMUNE: IMMUNE
+  MEDPREC: MEDPREC
+  OSTOCK: OSTOCK
+  PATOBJ: PATOBJ
+
 V3MaritalStatus:
   A: A
   C: T

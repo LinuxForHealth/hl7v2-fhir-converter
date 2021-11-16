@@ -23,12 +23,20 @@ status:
    valueOf: RXA.20
    required: true
    expressionType: HL7Spec
-statusReason:
+statusReason_1:
+   condition: $customCoding NOT_NULL
    valueOf: datatype/CodeableConcept
    expressionType: resource
    specs: RXA.18
    vars:
-      code: RXA.18
+      customCoding: RXA.18
+statusReason_2:
+   condition: $coding NOT_NULL
+   valueOf: datatype/CodeableConcept
+   expressionType: resource
+   specs: RXA.18
+   vars:
+      coding: RXA.18
 vaccineCode:
    valueOf: datatype/CodeableConcept
    required: true
