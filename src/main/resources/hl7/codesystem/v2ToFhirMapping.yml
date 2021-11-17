@@ -59,6 +59,14 @@ ImmunizationStatus:
   NA: not-done
   PA: not-done
   RE: not-done
+  CM: completed
+  ER: entered-in-error
+  CA: not-done
+  DC: not-done
+  HD: not-done
+  IP: not-done
+  SC: not-done
+  RP: not-done
   
 MessageReasonEncounter:
    A01: admit
