@@ -140,3 +140,7 @@ fundingSource:
       code: STRING, OBX.5.1
       text: STRING, OBX.5.2
       system: STRING, OBX.5.3
+reasonCode:
+   valueOf: datatype/CodeableConcept
+   expressionType: resource
+   specs: RXA.19
