@@ -134,6 +134,8 @@ public class Hl7ImmunizationFHIRConversionTest {
         assertThat(immunization2.getReasonCodeFirstRep().getCodingFirstRep().getCode()).isEqualTo("00");
         assertThat(immunization2.getReasonCodeFirstRep().getCodingFirstRep().getDisplay()).isEqualTo("refusal");
         assertThat(immunization2.getReasonCodeFirstRep().getCodingFirstRep().getSystem()).isNull();
+        assertThat(immunization2.getReasonCodeFirstRep().getText()).isEqualTo("refusal");
+
         //dose Quantity with a known system
         assertThat(immunization2.hasDoseQuantity()).isTrue();
         assertThat(immunization2.getDoseQuantity().getValue().toString()).isEqualTo("0.5");
@@ -143,5 +145,4 @@ public class Hl7ImmunizationFHIRConversionTest {
     // TODO: 10/15/21 RXA-9 (also mapped to primarySource)
     //  RXA-18 statusReason
     //  RXA-20 (status, statusReason, isSubpotent)
-    // any examples of RXA-19? not seeing any in the test examples
 }
