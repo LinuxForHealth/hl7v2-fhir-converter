@@ -20,6 +20,7 @@ identifier:
       sys: "urn:id:extID"
 status:
    type: IMMUNIZATION_STATUS_CODES
+   default: completed
    valueOf: RXA.20 | ORC.5
    required: true
    expressionType: HL7Spec
