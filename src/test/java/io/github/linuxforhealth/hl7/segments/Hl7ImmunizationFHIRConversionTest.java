@@ -26,17 +26,17 @@ public class Hl7ImmunizationFHIRConversionTest {
 
         String hl7VUXmessageRep = "MSH|^~\\&|MYEHR2.5|RI88140101|KIDSNET_IFL|RIHEALTH|20130531||VXU^V04^VXU_V04|20130531RI881401010105|P|2.5.1|||NE|AL||||||RI543763\r"
                 + "PID|1||12345^^^^MR||TestPatient^Jane^^^^^L||||||\r"
-                + "ORC|RE||197027|||||||^Clerk^Myron||MD67895^Pediatric^MARY^^^^MD^^RIA|||||RI2050\r"
+                + "ORC|RE||197027||ER|||||^Clerk^Myron||MD67895^Pediatric^MARY^^^^MD^^RIA|||||RI2050\r" //ORC.5 is here to prove RXA.20 is taking precedence
                 + "RXA|0|1|20130531|20130531|48^HIB PRP-T^CVX|0.5|ML^^ISO+||00^new immunization record^NIP001|^Sticker^Nurse|^^^RI2050||||33k2a|20131210|PMC^sanofi^MVX|||CP|A\r"
                 + "RXR|C28161^IM^NCIT^IM^INTRAMUSCULAR^HL70162|RT^right thigh^HL70163\r"
                 + "OBX|1|CE|64994-7^vaccine fund pgm elig cat^LN|1|V02^VFC eligible Medicaid/MedicaidManaged Care^HL70064||||||F|||20130531|||VXC40^per imm^CDCPHINVS\r";
 
-    List<Bundle.BundleEntryComponent> e = ResourceUtils
-            .createFHIRBundleFromHL7MessageReturnEntryList(hl7VUXmessageRep);
-    List<Resource> immu = ResourceUtils.getResourceList(e, ResourceType.Immunization);
-    assertThat(immu).hasSize(1);
-    Immunization resource = ResourceUtils.getResourceImmunization(immu.get(0),ResourceUtils.context);
-    assertThat(resource).isNotNull();
+        List<Bundle.BundleEntryComponent> e = ResourceUtils
+                .createFHIRBundleFromHL7MessageReturnEntryList(hl7VUXmessageRep);
+        List<Resource> immu = ResourceUtils.getResourceList(e, ResourceType.Immunization);
+        assertThat(immu).hasSize(1);
+        Immunization resource = ResourceUtils.getResourceImmunization(immu.get(0),ResourceUtils.context);
+        assertThat(resource).isNotNull();
 
         assertThat(resource.getStatus().getDisplay()).isEqualTo("completed"); // RXA.20
         assertThat(resource.getIdentifier().get(0).getValue()).isEqualTo("48-CVX"); // RXA.5.1 + 5.3
@@ -107,23 +107,13 @@ public class Hl7ImmunizationFHIRConversionTest {
                 + "RXA|0|1|20130531|20130531|48^HIB PRP-T^CVX|0.5|ML^^^||00^new immunization record^NIP001|^Sticker^Nurse|^^^RI2050||||33k2a|20131210|PMC^sanofi^MVX|||CP|A\r"
                 + "RXR|C28161^IM^NCIT^IM^INTRAMUSCULAR^HL70162|RT^right thigh^HL70163\r"
                 + "OBX|1|CE|64994-7^vaccine fund pgm elig cat^LN|1|V02^VFC eligible Medicaid/MedicaidManaged Care^HL70064||||||F|||20130531|||VXC40^per imm^CDCPHINVS\r";
-    // Test should only return RXA.10, ORC.12  is empty
-    hl7VUXmessageRep = "MSH|^~\\&|MYEHR2.5|RI88140101|KIDSNET_IFL|RIHEALTH|20130531||VXU^V04^VXU_V04|20130531RI881401010105|P|2.5.1|||NE|AL||||||RI543763\r"
-            + "PID|1||12345^^^^MR||TestPatient^Jane^^^^^L||||||\r"
-            + "ORC|RE||197027||CM|||||^Clerk^Myron|||||||RI2050\r"
-            + "RXA|0|1|20130531|20130531|48^HIB PRP-T^CVX|0.5|ML^^^||00^new immunization record^NIP001|^Sticker^Nurse|^^^RI2050||||33k2a|20131210|PMC^sanofi^MVX||||A\r"
-            + "RXR|C28161^IM^NCIT^IM^INTRAMUSCULAR^HL70162|RT^right thigh^HL70163\r"
-            + "OBX|1|CE|64994-7^vaccine fund pgm elig cat^LN|1|V02^VFC eligible Medicaid/MedicaidManaged Care^HL70064||||||F|||20130531|||VXC40^per imm^CDCPHINVS\r";
 
         Immunization immunization1 = ResourceUtils.getImmunization(hl7VUXmessageRep);
 
         assertThat(immunization1.getPerformer()).hasSize(1);
         assertThat(immunization1.getPerformer().get(0).getFunction().getCodingFirstRep().getCode()).isEqualTo("AP");// RXA.10
         assertThat(immunization1.getPerformer().get(0).getFunction().getText()).isEqualTo("Administering Provider"); // RXA.10
-    assertThat(immunization1.getStatus().getDisplay()).isEqualTo("completed"); // ORC.5 backup to rxa.20
-    assertThat(immunization1.getPerformer()).hasSize(1);
-    assertThat(immunization1.getPerformer().get(0).getFunction().getCodingFirstRep().getCode()).isEqualTo("AP");// RXA.10
-    assertThat(immunization1.getPerformer().get(0).getFunction().getText()).isEqualTo("Administering Provider"); // RXA.10
+        assertThat(immunization1.getStatus().getDisplay()).isEqualTo("completed"); // ORC.5 backup to rxa.20
 
         //dose Quantity without a system
         assertThat(immunization1.hasDoseQuantity()).isTrue();
