@@ -27,7 +27,7 @@ public class Hl7ImmunizationFHIRConversionTest {
         String hl7VUXmessageRep = "MSH|^~\\&|MYEHR2.5|RI88140101|KIDSNET_IFL|RIHEALTH|20130531||VXU^V04^VXU_V04|20130531RI881401010105|P|2.5.1|||NE|AL||||||RI543763\r"
                 + "PID|1||12345^^^^MR||TestPatient^Jane^^^^^L||||||\r"
                 + "ORC|RE||197027||ER|||||^Clerk^Myron||MD67895^Pediatric^MARY^^^^MD^^RIA|||||RI2050\r" //ORC.5 is here to prove RXA.20 is taking precedence
-                + "RXA|0|1|20130531|20130531|48^HIB PRP-T^CVX|0.5|ML^^ISO+||00^new immunization record^NIP001|^Sticker^Nurse|^^^RI2050||||33k2a|20131210|PMC^sanofi^MVX|||CP|A\r"
+                + "RXA|0|1|20130531|20130531|48^HIB PRP-T^CVX|0.5|ML^^ISO+||00^new immunization record^NIP001|^Sticker^Nurse|^^^RI2050||||33k2a|20131210|PMC^sanofi^MVX|||CP|A|20120901041038\r"
                 + "RXR|C28161^IM^NCIT^IM^INTRAMUSCULAR^HL70162|RT^right thigh^HL70163\r"
                 + "OBX|1|CE|64994-7^vaccine fund pgm elig cat^LN|1|V02^VFC eligible Medicaid/MedicaidManaged Care^HL70064||||||F|||20130531|||VXC40^per imm^CDCPHINVS\r";
 
@@ -35,7 +35,7 @@ public class Hl7ImmunizationFHIRConversionTest {
                 .createFHIRBundleFromHL7MessageReturnEntryList(hl7VUXmessageRep);
         List<Resource> immu = ResourceUtils.getResourceList(e, ResourceType.Immunization);
         assertThat(immu).hasSize(1);
-        Immunization resource = ResourceUtils.getResourceImmunization(immu.get(0),ResourceUtils.context);
+        Immunization resource = ResourceUtils.getResourceImmunization(immu.get(0), ResourceUtils.context);
         assertThat(resource).isNotNull();
 
         assertThat(resource.getStatus().getDisplay()).isEqualTo("completed"); // RXA.20
@@ -52,6 +52,8 @@ public class Hl7ImmunizationFHIRConversionTest {
         assertThat(resource.getReportOrigin().getCoding().get(0).getDisplay()).isEqualTo("new immunization record"); // RXA.9.2
         assertThat(resource.getReportOrigin().getText()).isEqualTo("new immunization record");// RXA.9.2
         assertThat(resource.getManufacturer().isEmpty()).isFalse(); // RXA.17
+        assertThat(resource.hasRecorded()).isTrue(); //RXA.22
+        assertThat(resource.getRecordedElement().toString().contains("2012-09-01")); //RXA.22
         String manufacturerRef = resource.getManufacturer().getReference();
 
         assertThat(resource.getLotNumber()).isEqualTo("33k2a"); // RXA.15
@@ -125,11 +127,17 @@ public class Hl7ImmunizationFHIRConversionTest {
         hl7VUXmessageRep = "MSH|^~\\&|MYEHR2.5|RI88140101|KIDSNET_IFL|RIHEALTH|20130531||VXU^V04^VXU_V04|20130531RI881401010105|P|2.5.1|||NE|AL||||||RI543763\r"
                 + "PID|1||12345^^^^MR||TestPatient^Jane^^^^^L||||||\r"
                 + "ORC|RE||197027|||||||^Clerk^Myron|||||||RI2050\r"
-                + "RXA|0|1|20130531|20130531|48^HIB PRP-T^CVX|0.5|ML^^UCUM||00^new immunization record^NIP001|^Sticker^Nurse|^^^RI2050||||33k2a|20131210|PMC^sanofi^MVX|||CP|A\r"
+                + "RXA|0|1|20130531|20130531|48^HIB PRP-T^CVX|0.5|ML^^UCUM||00^new immunization record^NIP001|^Sticker^Nurse|^^^RI2050||||33k2a|20131210|PMC^sanofi^MVX||00^refusal|CP|A\r"
                 + "RXR|C28161^IM^NCIT^IM^INTRAMUSCULAR^HL70162|RT^right thigh^HL70163\r"
                 + "OBX|1|CE|64994-7^vaccine fund pgm elig cat^LN|1|V02^VFC eligible Medicaid/MedicaidManaged Care^HL70064||||||F|||20130531|||VXC40^per imm^CDCPHINVS\r";
 
         Immunization immunization2 = ResourceUtils.getImmunization(hl7VUXmessageRep);
+
+        assertThat(immunization2.hasReasonCode());
+        assertThat(immunization2.getReasonCodeFirstRep().getCodingFirstRep().getCode()).isEqualTo("00");
+        assertThat(immunization2.getReasonCodeFirstRep().getCodingFirstRep().getDisplay()).isEqualTo("refusal");
+        assertThat(immunization2.getReasonCodeFirstRep().getCodingFirstRep().getSystem()).isNull();
+        assertThat(immunization2.getReasonCodeFirstRep().getText()).isEqualTo("refusal");
 
         //dose Quantity with a known system
         assertThat(immunization2.hasDoseQuantity()).isTrue();

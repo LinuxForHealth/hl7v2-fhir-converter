@@ -125,7 +125,7 @@ programEligibility:
    generateList: true
    condition: $obx3 EQUALS 64994-7
    specs: OBX
-   vars:    
+   vars:
       obx3: STRING, OBX.3.1
       code: STRING, OBX.5.1
       text: STRING, OBX.5.2
@@ -141,3 +141,11 @@ fundingSource:
       code: STRING, OBX.5.1
       text: STRING, OBX.5.2
       system: STRING, OBX.5.3
+reasonCode:
+   valueOf: datatype/CodeableConcept
+   expressionType: resource
+   specs: RXA.19
+recorded:
+   type: DATE_TIME
+   valueOf: RXA.22
+   expressionType: HL7Spec
