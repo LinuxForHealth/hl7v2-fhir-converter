@@ -20,7 +20,7 @@ identifier:
       sys: "urn:id:extID"
 status:
    type: IMMUNIZATION_STATUS_CODES
-   valueOf: RXA.20
+   valueOf: RXA.20 | ORC.5
    required: true
    expressionType: HL7Spec
 statusReason:
@@ -124,7 +124,7 @@ programEligibility:
    generateList: true
    condition: $obx3 EQUALS 64994-7
    specs: OBX
-   vars:    
+   vars:
       obx3: STRING, OBX.3.1
       code: STRING, OBX.5.1
       text: STRING, OBX.5.2
@@ -144,3 +144,7 @@ reasonCode:
    valueOf: datatype/CodeableConcept
    expressionType: resource
    specs: RXA.19
+recorded:
+   type: DATE_TIME
+   valueOf: RXA.22
+   expressionType: HL7Spec
