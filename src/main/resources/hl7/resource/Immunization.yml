@@ -61,9 +61,12 @@ reportOrigin:
    expressionType: resource
    specs: RXA.9
 manufacturer:
+   condition: rxa17 NOT_NULL
    valueOf: resource/Organization
    expressionType: reference
    specs: RXA.17
+   vars: 
+      rxa17: RXA.17
 lotNumber:
    type: STRING
    valueOf: RXA.15
