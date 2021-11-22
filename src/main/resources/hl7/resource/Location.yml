@@ -1,0 +1,28 @@
+#
+# (C) Copyright IBM Corp. 2021
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+---
+identifier_1:
+    condition: $valueIn NOT_NULL
+    valueOf: datatype/Identifier_var
+    expressionType: resource
+    specs: PL
+    vars:
+        valueIn: PL.10.1
+        systemCX: PL.10.2
+
+status:
+    type: STRING
+    defalult: active
+    valueOf: LA2.5 | PL.5 | $act
+    expressionType: HL7Spec
+    constants:
+        act: "Active"
+
+address:
+    valueOf: datatype/Address
+    generateList: true
+    expressionType: resource
+    specs: XAD

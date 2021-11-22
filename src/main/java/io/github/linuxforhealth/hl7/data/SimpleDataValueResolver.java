@@ -577,7 +577,15 @@ public class SimpleDataValueResolver {
         String val = Hl7DataHandlerUtil.getStringValue(value);
         return getFHIRCode(val, AllergyIntoleranceCategory.class);
     };
+    public static final ValueExtractor<Object, String> DOSE_VALUE = (Object value) -> {
+        String val = Hl7DataHandlerUtil.getStringValue(value);
 
+        if (val.startsWith("999") ){
+            return null;
+        }
+        else return val;
+
+    };
     public static final ValueExtractor<Object, String> DOSE_SYSTEM = (Object value) -> {
         String val = Hl7DataHandlerUtil.getStringValue(value);
         String url = UrlLookup.getAssociatedUrl(val);
