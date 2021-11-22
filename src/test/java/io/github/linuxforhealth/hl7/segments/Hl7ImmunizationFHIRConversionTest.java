@@ -15,7 +15,9 @@ import org.hl7.fhir.r4.model.ResourceType;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -148,4 +150,48 @@ public class Hl7ImmunizationFHIRConversionTest {
     // TODO: 10/15/21 RXA-9 (also mapped to primarySource)
     //  RXA-18 statusReason
     //  RXA-20 (status, statusReason, isSubpotent)
+
+    // The following checks for a situation where non-manufacturer RXA Immunizations interfered with the creation of manufacturer Immununization
+    // The test will ensure the problem doesn't come back.
+    @Test
+    public void testMultipleImmunizationsNoInterference() throws IOException {
+
+        String hl7VUXmessageRep = "MSH|^~\\&|||||20130531||VXU^V04^VXU_V04|20130531RI881401010105|P|2.5.1||||||||||\r"
+                + "PID|1||12345^^^^MR||TestPatient^Jane^^^^^L||||||\r"
+                // First Immunization, also create manufacturer reference to Organization sanofi 
+                + "ORC|RE||197027||ER||||||||||||RI2050\r" //ORC.5 is here to prove RXA.20 is taking precedence
+                + "RXA|0|1|20130531|20130531|48^HIB PRP-T^CVX|0.5|ML^^ISO+||||||||33k2a|20131210|PMC^sanofi^MVX|||CP|A|\r"
+                // Second Immunization.  No manufacturer or Organization created.
+                + "ORC|RE||IZ-783278^NDA||||||||||||||\r"
+                + "RXA|0|1|20170513|20170513|62^HPV quadrivalent^CVX|999|||||^^^MIICSHORTCODE|||||||00^Parental Refusal^NIP002||RE\r"
+                // Third Immunization, also create manufacturer reference to Organization merck 
+                + "ORC|RE||IZ-783279^NDA||||||||||||||\r"
+                + "RXA|0|1|20170513|20170513|136^MCV4-CRM^CVX^90734^MCV4-CRM^CPT|1|mL||||||||MRK1234|20211201|MSD^MERCK^MVX||||CP|A\r";
+        List<Bundle.BundleEntryComponent> e = ResourceUtils
+                .createFHIRBundleFromHL7MessageReturnEntryList(hl7VUXmessageRep);
+        List<Resource> immunizations = ResourceUtils.getResourceList(e, ResourceType.Immunization);
+        assertThat(immunizations).hasSize(3);  // Exactly 3
+
+        // This maps manufacturer to drug name from RXA records above
+        Map<String, String> mapMfgNameToDrugName = new HashMap<>();
+        mapMfgNameToDrugName.put("MERCK","MCV4-CRM");
+        mapMfgNameToDrugName.put("sanofi","HIB PRP-T");
+        // This maps Immunization drug name to manufacturer reference Id (the GUID)
+        Map<String, String> mapDrugNameToMfgRefId = new HashMap<>();
+        for (int immunizationIndex = 0; immunizationIndex < immunizations.size(); immunizationIndex++) { // condIndex is index for condition
+            Immunization immunization = ResourceUtils.getResourceImmunization(immunizations.get(immunizationIndex), ResourceUtils.context);
+            String mfgId = immunization.hasManufacturer() ? immunization.getManufacturer().getReference() : null;
+            String codeText = immunization.getVaccineCode().getText();
+            mapDrugNameToMfgRefId.put(codeText,mfgId);
+        }
+
+        List<Resource> organizations = ResourceUtils.getResourceList(e, ResourceType.Organization);
+        assertThat(organizations).hasSize(2); // Exactly 2
+        // For each organization, we look up the name, get the known drug, get the manufacturer Id and see it is the same.
+        for (int orgIndex = 0; orgIndex < organizations.size(); orgIndex++) { // orgIndex is index for organization
+            Organization org = ResourceUtils.getResourceOrganization(organizations.get(orgIndex), ResourceUtils.context);
+            assertThat( mapDrugNameToMfgRefId.get(mapMfgNameToDrugName.get(org.getName()))).contains(org.getId());
+        }
+
+    }
 }
