@@ -150,7 +150,3 @@ recorded:
    type: DATE_TIME
    valueOf: RXA.22
    expressionType: HL7Spec
-location:
-   valueOf: resource/Location
-   expressionType: reference
-   specs: RXA.11 | RXA.27 | RXA.28
