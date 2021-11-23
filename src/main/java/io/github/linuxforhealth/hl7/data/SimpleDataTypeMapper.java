@@ -39,6 +39,7 @@ public enum SimpleDataTypeMapper {
   SYSTEM_URL(SimpleDataValueResolver.SYSTEM_URL),
   SYSTEM_ID(SimpleDataValueResolver.SYSTEM_ID),
   DOSE_SYSTEM(SimpleDataValueResolver.DOSE_SYSTEM),
+  DOSE_VALUE(SimpleDataValueResolver.DOSE_VALUE),
   PV1_DURATION_LENGTH(SimpleDataValueResolver.PV1_DURATION_LENGTH),
 
   ALLERGY_INTOLERANCE_CATEGORY(SimpleDataValueResolver.ALLERGY_INTOLERANCE_CATEGORY_CODE_FHIR),
