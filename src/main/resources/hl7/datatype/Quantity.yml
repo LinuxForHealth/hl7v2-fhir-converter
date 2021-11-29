@@ -28,6 +28,6 @@ system_3:
    vars:
       systemCWE: $urn + $sys
 code : 
-   condition: $system NOT_NULL || $resolvedSystem NOT_NULL || $sys NOT_NULL
+   condition: $system NOT_NULL || $resolvedSystem NOT_NULL
    type: String
    valueOf: $code

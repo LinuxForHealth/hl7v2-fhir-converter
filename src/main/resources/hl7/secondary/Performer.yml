@@ -13,7 +13,7 @@ function_v1:
     text: 'Ordering Provider'
 
 function_v2:
-   condition: $administeringProvider NOT_NULL || $administeringOrg NOT_NULL
+   condition: $administeringProvider NOT_NULL || $idValue NOT_NULL
    valueOf: datatype/CodeableConcept_var
    expressionType: resource
    constants:
@@ -28,9 +28,10 @@ actor_1:
    generateList: true
    specs: $orderingProvider | $administeringProvider
 
-#actor_2:
-#  conditition: $administeringOrg NOT_NULL
-#  valueOf: resource/Organization
-#  expressionType: reference
-#  generateList: true
-#  specs: $administeringOrg
+actor_2:
+  condition: $idValue NOT_NULL
+  valueOf: resource/Organization_ServiceProvider
+  expressionType: reference
+  vars:
+    idValue: $idValue
+    name: $name

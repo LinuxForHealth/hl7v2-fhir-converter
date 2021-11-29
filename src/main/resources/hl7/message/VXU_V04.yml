@@ -45,3 +45,4 @@ resources:
               - .RXR
               - .OBSERVATION.OBX
               - MSH
+              - PATIENT.PV1

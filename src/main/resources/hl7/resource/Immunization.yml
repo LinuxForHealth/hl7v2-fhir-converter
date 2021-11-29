@@ -90,7 +90,6 @@ doseQuantity:
    vars:
       value: RXA.6
       unit: RXA.7.1
-      code: RXA.7.1
       sys: DOSE_SYSTEM, RXA.7.3
 performer_1:
    valueOf: secondary/Performer
@@ -104,12 +103,13 @@ performer_2:
    expressionType: resource
    vars:
       administeringProvider: RXA.10
-#performer_3:
-#   valueOf: secondary/Performer
-#   generateList: true
-#   expressionType: resource
-#   vars:
-#      administeringOrg: RXA.11
+performer_3:
+   valueOf: secondary/Performer
+   generateList: true
+   expressionType: resource
+   vars:
+      idValue: RXA.27.4.1 | PV1.3.4 | RXA.11.4.1
+      name: RXA.27.4.1 | PV1.3.4 | RXA.11.4.1
 note:
    valueOf: datatype/Annotation
    expressionType: resource

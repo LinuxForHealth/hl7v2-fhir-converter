@@ -50,7 +50,6 @@ public class ResourceUtils {
     public static List<BundleEntryComponent> createFHIRBundleFromHL7MessageReturnEntryList(String inputSegment) {
         HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
         String json = ftv.convert(inputSegment, OPTIONS);
-        System.out.println(json);
         assertThat(json).isNotBlank();
         LOGGER.debug("FHIR json result:\n" + json);
         FHIRContext context = new FHIRContext();
@@ -254,6 +253,25 @@ public class ResourceUtils {
         assertThat(matchingPractitioners).hasSize(1); // Count must be exactly 1.  
         Practitioner pract = (Practitioner) matchingPractitioners.get(0);
         return pract;
+    }
+
+    public static Organization getSpecificOrganizationFromBundleEntriesList(List<BundleEntryComponent> entries,
+                                                                            String organizationRef) {
+        // Find the organization resources from the FHIR bundle.
+        List<Resource> organizations = entries.stream()
+                .filter(v -> ResourceType.Organization == v.getResource().getResourceType())
+                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        assertThat(organizations.size()).isPositive(); // Confirm there is at least one organization
+        // Find all organizations with matching Id's in the list of organizations.
+        List<Resource> matchingOrganizations = new ArrayList<Resource>();
+        for (int i = 0; i < organizations.size(); i++) {
+            if (organizations.get(i).getId().equalsIgnoreCase(organizationRef)) {
+                matchingOrganizations.add(organizations.get(i));
+            }
+        }
+        assertThat(matchingOrganizations).hasSize(1); // Count must be exactly 1.
+        Organization org = (Organization) matchingOrganizations.get(0);
+        return org;
     }
 
     public static ServiceRequest getResourceServiceRequest(Resource resource, FHIRContext context) {
