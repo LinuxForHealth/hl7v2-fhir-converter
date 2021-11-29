@@ -84,12 +84,14 @@ route:
    expressionType: resource
    specs: RXR.1
 doseQuantity:
+   condition: $value NOT_NULL
    valueOf: datatype/Quantity
    expressionType: resource
-   specs: RXA.6| RXA.7
+   specs: RXA.6 | RXA.7
    vars:
-      value: RXA.6
+      value: DOSE_VALUE, RXA.6
       unit: RXA.7.1
+      code: RXA.7.1
       sys: DOSE_SYSTEM, RXA.7.3
 performer_1:
    valueOf: secondary/Performer

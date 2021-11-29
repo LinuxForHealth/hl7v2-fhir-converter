@@ -604,6 +604,17 @@ public class SimpleDataValueResolver {
         return getFHIRCode(val, AllergyIntoleranceCategory.class);
     };
 
+    public static final ValueExtractor<Object, String> DOSE_VALUE = (Object value) -> {
+        String val = Hl7DataHandlerUtil.getStringValue(value);
+
+        if (val.startsWith("999") ){
+            // 999 is used when the vaccination is refused. In this case we should return null.
+            return null;
+        }
+        else return val;
+
+    };
+
     public static final ValueExtractor<Object, String> DOSE_SYSTEM = (Object value) -> {
         String val = Hl7DataHandlerUtil.getStringValue(value);
         String url = UrlLookup.getAssociatedUrl(val);

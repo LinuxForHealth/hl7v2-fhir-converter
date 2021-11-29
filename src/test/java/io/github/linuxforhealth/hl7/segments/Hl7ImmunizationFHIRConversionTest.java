@@ -65,6 +65,7 @@ public class Hl7ImmunizationFHIRConversionTest {
         assertThat(resource.hasDoseQuantity()).isTrue();
         assertThat(resource.getDoseQuantity().getValue().toString()).isEqualTo("0.5");
         assertThat(resource.getDoseQuantity().getUnit()).isEqualTo("ML");
+        assertThat(resource.getDoseQuantity().getCode()).isEqualTo("ML");
         assertThat(resource.getDoseQuantity().getSystem()).isEqualTo("urn:id:ISO+");
 
         String requesterRef1 = resource.getPerformer().get(0).getActor().getReference();
@@ -151,12 +152,14 @@ public class Hl7ImmunizationFHIRConversionTest {
         assertThat(immunization1.getDoseQuantity().getValue().toString()).isEqualTo("0.5");
         assertThat(immunization1.getDoseQuantity().getUnit()).isEqualTo("ML");
         assertThat(immunization1.getDoseQuantity().getSystem()).isNull();
+        assertThat(immunization1.getDoseQuantity().getCode()).isNull();
+
         // Test should only return RXA.10, ORC.12  is empty
         hl7VUXmessageRep = "MSH|^~\\&|MYEHR2.5|RI88140101|KIDSNET_IFL|RIHEALTH|20130531||VXU^V04^VXU_V04|20130531RI881401010105|P|2.5.1|||NE|AL||||||RI543763\r"
                 + "PID|1||12345^^^^MR||TestPatient^Jane^^^^^L||||||\r"
                 + "PV1|1|R|^^^RI2050|||||||||||||||||V01^20120901041038\r"
                 + "ORC|RE||197027|||||||^Clerk^Myron|||||||RI2050\r"
-                + "RXA|0|1|20130531|20130531|48^HIB PRP-T^CVX|0.5|ML^^UCUM||00^new immunization record^NIP001|^Sticker^Nurse|||||33k2a|20131210|PMC^sanofi^MVX||00^refusal|CP|A\r"
+                + "RXA|0|1|20130531|20130531|48^HIB PRP-T^CVX|0.5|ML^^UCUM||00^new immunization record^NIP001|^Sticker^Nurse|^^^RI2050||||33k2a|20131210|PMC^sanofi^MVX||00^refusal|CP|A\r"
                 + "RXR|C28161^IM^NCIT^IM^INTRAMUSCULAR^HL70162|RT^right thigh^HL70163\r"
                 + "OBX|1|CE|64994-7^vaccine fund pgm elig cat^LN|1|V02^VFC eligible Medicaid/MedicaidManaged Care^HL70064||||||F|||20130531|||VXC40^per imm^CDCPHINVS\r";
 
@@ -193,6 +196,17 @@ public class Hl7ImmunizationFHIRConversionTest {
         assertThat(immunization2.getDoseQuantity().getValue().toString()).isEqualTo("0.5");
         assertThat(immunization2.getDoseQuantity().getUnit()).isEqualTo("ML");
         assertThat(immunization2.getDoseQuantity().getSystem()).isEqualTo("http://unitsofmeasure.org");
+
+        hl7VUXmessageRep = "MSH|^~\\&|MYEHR2.5|RI88140101|KIDSNET_IFL|RIHEALTH|20130531||VXU^V04^VXU_V04|20130531RI881401010105|P|2.5.1|||NE|AL||||||RI543763\r"
+                + "PID|1||12345^^^^MR||TestPatient^Jane^^^^^L||||||\r"
+                + "ORC|RE||197027|||||||^Clerk^Myron|||||||RI2050\r"
+                + "RXA|0|1|20130531|20130531|48^HIB PRP-T^CVX|999|ML^^UCUM||00^new immunization record^NIP001|^Sticker^Nurse|^^^RI2050||||33k2a|20131210|PMC^sanofi^MVX||00^refusal|CP|A\r"
+                + "RXR|C28161^IM^NCIT^IM^INTRAMUSCULAR^HL70162|RT^right thigh^HL70163\r"
+                + "OBX|1|CE|64994-7^vaccine fund pgm elig cat^LN|1|V02^VFC eligible Medicaid/MedicaidManaged Care^HL70064||||||F|||20130531|||VXC40^per imm^CDCPHINVS\r";
+
+        Immunization immunization3 = ResourceUtils.getImmunization(hl7VUXmessageRep);
+        //dose Quantity with 999 as the value which should return null;
+        assertThat(immunization3.hasDoseQuantity()).isFalse();
     }
     // TODO: 10/15/21 RXA-9 (also mapped to primarySource)
     //  RXA-18 statusReason
