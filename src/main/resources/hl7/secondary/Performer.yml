@@ -13,17 +13,24 @@ function_v1:
     text: 'Ordering Provider'
 
 function_v2:
-   condition: $administeringProvider NOT_NULL
+   condition: $administeringProvider NOT_NULL || $administeringOrg NOT_NULL
    valueOf: datatype/CodeableConcept_var
    expressionType: resource
    constants:
     system: 'http://terminology.hl7.org/CodeSystem/v2-0443'
     code: AP
     text: Administering Provider
-actor:
+
+actor_1:
    condition: $orderingProvider NOT_NULL || $administeringProvider NOT_NULL
    valueOf: resource/Practitioner
    expressionType: reference
    generateList: true
    specs: $orderingProvider | $administeringProvider
-   required: true
+
+#actor_2:
+#  conditition: $administeringOrg NOT_NULL
+#  valueOf: resource/Organization
+#  expressionType: reference
+#  generateList: true
+#  specs: $administeringOrg
