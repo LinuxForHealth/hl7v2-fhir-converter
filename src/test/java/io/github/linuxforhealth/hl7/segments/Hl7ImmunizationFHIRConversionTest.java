@@ -65,6 +65,7 @@ public class Hl7ImmunizationFHIRConversionTest {
         assertThat(resource.hasDoseQuantity()).isTrue();
         assertThat(resource.getDoseQuantity().getValue().toString()).isEqualTo("0.5");
         assertThat(resource.getDoseQuantity().getUnit()).isEqualTo("ML");
+        assertThat(resource.getDoseQuantity().getCode()).isEqualTo("ML");
         assertThat(resource.getDoseQuantity().getSystem()).isEqualTo("urn:id:ISO+");
 
         String requesterRef1 = resource.getPerformer().get(0).getActor().getReference();
@@ -124,6 +125,7 @@ public class Hl7ImmunizationFHIRConversionTest {
         assertThat(immunization1.getDoseQuantity().getValue().toString()).isEqualTo("0.5");
         assertThat(immunization1.getDoseQuantity().getUnit()).isEqualTo("ML");
         assertThat(immunization1.getDoseQuantity().getSystem()).isNull();
+        assertThat(immunization1.getDoseQuantity().getCode()).isNull();
 
         // Test should only return RXA.10, ORC.12  is empty
         hl7VUXmessageRep = "MSH|^~\\&|MYEHR2.5|RI88140101|KIDSNET_IFL|RIHEALTH|20130531||VXU^V04^VXU_V04|20130531RI881401010105|P|2.5.1|||NE|AL||||||RI543763\r"

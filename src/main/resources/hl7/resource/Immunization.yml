@@ -91,6 +91,7 @@ doseQuantity:
    vars:
       value: DOSE_VALUE, RXA.6
       unit: RXA.7.1
+      code: RXA.7.1
       sys: DOSE_SYSTEM, RXA.7.3
 performer_1:
    valueOf: secondary/Performer
