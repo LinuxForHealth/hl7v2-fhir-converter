@@ -352,13 +352,6 @@ public class SimpleDataValueResolver {
         String val = Hl7DataHandlerUtil.getStringValue(value);
         return getFHIRCode(val, ImmunizationStatus.class);
     };
-//
-//    public static final ValueExtractor<Object, String> IMMUNIZATION_STATUS_REASON = (Object value) -> {
-//        String val = Hl7DataHandlerUtil.getStringValue(value);
-//
-//        Immunization immunization = new Immunization();
-//        return immunization.stat
-//    };
 
     public static final ValueExtractor<Object, String> SPECIMEN_STATUS_CODE_FHIR = (Object value) -> {
         String val = Hl7DataHandlerUtil.getStringValue(value);
@@ -491,21 +484,6 @@ public class SimpleDataValueResolver {
         return null;
     };
 
-//    public static final ValueExtractor<Object, SimpleCode> VACCINE_CODE = (Object value) -> {
-//        value = checkForAndUnwrapVariesObject(value);
-//        String val = Hl7DataHandlerUtil.getStringValue(value);
-//        String codes =  getFHIRCode(val, Immunization`.class);
-//        // ensure we have a CWE
-//        if (value instanceof CWE) {
-//            CWE cwe = (CWE) value;
-//            String table = Hl7DataHandlerUtil.getStringValue(cwe.getCwe6_NameOfAlternateCodingSystem());
-//            String code = Hl7DataHandlerUtil.getStringValue(cwe.getCwe4_AlternateIdentifier());
-//            String text = Hl7DataHandlerUtil.getStringValue(cwe.getCwe5_AlternateText());
-//            String version = Hl7DataHandlerUtil.getStringValue(cwe.getCwe8_AlternateCodingSystemVersionID());
-//            return commonCodingSystemV2(table, code, text, version);
-//        }
-//        return null;
-//    };
 
     public static final ValueExtractor<Object, SimpleCode> CODING_SYSTEM_V2_ALTERNATE = (Object value) -> {
         value = checkForAndUnwrapVariesObject(value);

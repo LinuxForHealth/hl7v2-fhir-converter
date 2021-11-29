@@ -18,12 +18,11 @@ identifier:
 name_v1:
    type: STRING
    condition: $idValue NULL
-   valueOf: $idValue
+   valueOf: CWE.2 | XON.1
    required: true
    expressionType: HL7Spec
-   specs: CWE.2 | XON.1 | LA2.4
    vars:
-      idValue: CWE.1 | XON.10 | XON.3 | LA2.4.1
+      idValue: CWE.1 | XON.10 | XON.3
 name_v2:
    type: STRING
    condition: $idValue NOT_NULL
