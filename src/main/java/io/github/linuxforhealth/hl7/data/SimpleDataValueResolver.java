@@ -32,11 +32,8 @@ import org.hl7.fhir.dstu3.model.codesystems.MedicationRequestCategory;
 import org.hl7.fhir.exceptions.FHIRException;
 import org.hl7.fhir.r4.model.AllergyIntolerance.AllergyIntoleranceCategory;
 import org.hl7.fhir.r4.model.AllergyIntolerance.AllergyIntoleranceCriticality;
-import org.hl7.fhir.r4.model.CodeableConcept;
-import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.DiagnosticReport.DiagnosticReportStatus;
 import org.hl7.fhir.r4.model.Enumerations.AdministrativeGender;
-import org.hl7.fhir.r4.model.Immunization;
 import org.hl7.fhir.r4.model.Immunization.ImmunizationStatus;
 import org.hl7.fhir.r4.model.MedicationRequest;
 import org.hl7.fhir.r4.model.Observation.ObservationStatus;
@@ -52,7 +49,7 @@ import org.hl7.fhir.r4.model.codesystems.DiagnosisRole;
 import org.hl7.fhir.r4.model.codesystems.ConditionClinical;
 import org.hl7.fhir.r4.model.codesystems.ConditionVerStatus;
 import org.hl7.fhir.r4.model.codesystems.CompositionStatus;
-import org.hl7.fhir.r5.model.Enumerations;
+
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
