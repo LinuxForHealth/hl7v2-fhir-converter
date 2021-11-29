@@ -29,7 +29,7 @@ public class Hl7ImmunizationFHIRConversionTest {
         String hl7VUXmessageRep = "MSH|^~\\&|MYEHR2.5|RI88140101|KIDSNET_IFL|RIHEALTH|20130531||VXU^V04^VXU_V04|20130531RI881401010105|P|2.5.1|||NE|AL||||||RI543763\r"
                 + "PID|1||12345^^^^MR||TestPatient^Jane^^^^^L||||||\r"
                 + "ORC|RE||197027||ER|||||^Clerk^Myron||MD67895^Pediatric^MARY^^^^MD^^RIA|||||RI2050\r" //ORC.5 is here to prove RXA.20 is taking precedence
-                + "RXA|0|1|20130531|20130531|48^HIB PRP-T^CVX|0.5|ML^^ISO+||00^new immunization record^NIP001|^Sticker^Nurse|^^^RI2050||||33k2a|20131210|PMC^sanofi^MVX|00^Parental Refusal^NIP002||CP|A|20120901041038|||||^^^RI2056\r"
+                + "RXA|0|1|20130531|20130531|48^HIB PRP-T^CVX|0.5|ML^^ISO+||00^new immunization record^NIP001|^Sticker^Nurse|^^^RI2050||||33k2a|20131210|PMC^sanofi^MVX|||CP|A|20120901041038|||||^^^RI2056\r"
                 + "RXR|C28161^IM^NCIT^IM^INTRAMUSCULAR^HL70162|RT^right thigh^HL70163\r"
                 + "OBX|1|CE|64994-7^vaccine fund pgm elig cat^LN|1|V02^VFC eligible Medicaid/MedicaidManaged Care^HL70064||||||F|||20130531|||VXC40^per imm^CDCPHINVS\r";
 
@@ -94,11 +94,11 @@ public class Hl7ImmunizationFHIRConversionTest {
 
         String requesterRef3 = resource.getPerformer().get(2).getActor().getReference();
         Organization practBundle3 = ResourceUtils.getSpecificOrganizationFromBundleEntriesList(e, requesterRef3);
-        assertThat(resource.getPerformer().get(1).getFunction().getCoding().get(0).getCode())
-                .isEqualTo("AP"); // RXA.27 takes precedence over PV1.3 and RXA.11
-        assertThat(resource.getPerformer().get(1).getFunction().getText())
-                .isEqualTo("Administering Provider"); // RXA.27
-        assertThat(resource.getPerformer().get(1).getActor().isEmpty()).isFalse(); // RXA.27
+        assertThat(resource.getPerformer().get(2).getFunction().getCoding().get(0).getCode())
+                .isEqualTo("AP"); // RXA.27.4 takes precedence over PV1.3.4 and RXA.11.4 (RXA.11.4 is present to prove RXA takes precedence)
+        assertThat(resource.getPerformer().get(2).getFunction().getText())
+                .isEqualTo("Administering Provider"); // RXA.27.4
+        assertThat(resource.getPerformer().get(2).getActor().isEmpty()).isFalse(); // RXA.27.4
         assertThat(practBundle3.getName()).isEqualTo("RI2056");
         assertThat(practBundle3.getIdentifierFirstRep().getSystem()).isEqualTo("urn:id:extID");
         assertThat(practBundle3.getIdentifierFirstRep().getValue()).isEqualTo("RI2056");
@@ -128,36 +128,39 @@ public class Hl7ImmunizationFHIRConversionTest {
                 .createFHIRBundleFromHL7MessageReturnEntryList(hl7VUXmessageRep);
          immu = ResourceUtils.getResourceList(e, ResourceType.Immunization);
         assertThat(immu).hasSize(1);
-        Immunization immunization1 = ResourceUtils.getResourceImmunization(immu.get(0), ResourceUtils.context);
-        assertThat(immunization1).isNotNull();
+        Immunization immunization = ResourceUtils.getResourceImmunization(immu.get(0), ResourceUtils.context);
+        assertThat(immunization).isNotNull();
+        Immunization.ImmunizationPerformerComponent performer1 = immunization.getPerformer().get(0);
+        Immunization.ImmunizationPerformerComponent performer2 = immunization.getPerformer().get(1);
 
-        assertThat(immunization1.getPerformer()).hasSize(2);
-        assertThat(immunization1.getPerformer().get(0).getFunction().getCodingFirstRep().getCode()).isEqualTo("AP");// RXA.10
-        assertThat(immunization1.getPerformer().get(0).getFunction().getText()).isEqualTo("Administering Provider"); // RXA.10
-        assertThat(immunization1.getStatus().getDisplay()).isEqualTo("completed"); // ORC.5 backup to rxa.20
+        assertThat(immunization.getPerformer()).hasSize(2);
+        assertThat(performer1.getFunction().getCodingFirstRep().getCode()).isEqualTo("AP");// RXA.10
+        assertThat(performer1.getFunction().getText()).isEqualTo("Administering Provider"); // RXA.10
+        assertThat(performer2.getFunction().getCoding().get(0).getCode())
+                .isEqualTo("AP"); // RXA.27.4 takes precedence over RXA.11.4
+        assertThat(performer2.getFunction().getText())
+                .isEqualTo("Administering Provider"); // RXA.27.4
+        assertThat(performer2.getActor().isEmpty()).isFalse(); // RXA.27.4
 
-        String requesterRef = immunization1.getPerformer().get(1).getActor().getReference();
+        String requesterRef = immunization.getPerformer().get(1).getActor().getReference();
         Organization practBundle = ResourceUtils.getSpecificOrganizationFromBundleEntriesList(e, requesterRef);
-        assertThat(immunization1.getPerformer().get(1).getFunction().getCoding().get(0).getCode())
-                .isEqualTo("AP"); // RXA.27 takes precedence over RXA.11
-        assertThat(immunization1.getPerformer().get(1).getFunction().getText())
-                .isEqualTo("Administering Provider"); // RXA.27
-        assertThat(immunization1.getPerformer().get(1).getActor().isEmpty()).isFalse(); // RXA.27
         assertThat(practBundle.getName()).isEqualTo("RI2050");
         assertThat(practBundle.getIdentifierFirstRep().getSystem()).isEqualTo("urn:id:extID");
         assertThat(practBundle.getIdentifierFirstRep().getValue()).isEqualTo("RI2050");
 
+        assertThat(immunization.getStatus().getDisplay()).isEqualTo("completed"); // ORC.5 backup to rxa.20
+
         //dose Quantity without a system
-        assertThat(immunization1.hasDoseQuantity()).isTrue();
-        assertThat(immunization1.getDoseQuantity().getValue().toString()).isEqualTo("0.5");
-        assertThat(immunization1.getDoseQuantity().getUnit()).isEqualTo("ML");
-        assertThat(immunization1.getDoseQuantity().getSystem()).isNull();
-        assertThat(immunization1.getDoseQuantity().getCode()).isNull();
+        assertThat(immunization.hasDoseQuantity()).isTrue();
+        assertThat(immunization.getDoseQuantity().getValue().toString()).isEqualTo("0.5");
+        assertThat(immunization.getDoseQuantity().getUnit()).isEqualTo("ML");
+        assertThat(immunization.getDoseQuantity().getSystem()).isNull();
+        assertThat(immunization.getDoseQuantity().getCode()).isNull();
 
         // Test should only return RXA.10, ORC.12  is empty
         hl7VUXmessageRep = "MSH|^~\\&|MYEHR2.5|RI88140101|KIDSNET_IFL|RIHEALTH|20130531||VXU^V04^VXU_V04|20130531RI881401010105|P|2.5.1|||NE|AL||||||RI543763\r"
                 + "PID|1||12345^^^^MR||TestPatient^Jane^^^^^L||||||\r"
-                + "PV1|1|R|^^^RI2050|||||||||||||||||V01^20120901041038\r"
+                + "PV1|1|R|^^^RI2050|||||||||||||||||\r"
                 + "ORC|RE||197027|||||||^Clerk^Myron|||||||RI2050\r"
                 + "RXA|0|1|20130531|20130531|48^HIB PRP-T^CVX|0.5|ML^^UCUM||00^new immunization record^NIP001|^Sticker^Nurse|^^^RI2050||||33k2a|20131210|PMC^sanofi^MVX||00^refusal|CP|A\r"
                 + "RXR|C28161^IM^NCIT^IM^INTRAMUSCULAR^HL70162|RT^right thigh^HL70163\r"
@@ -167,35 +170,35 @@ public class Hl7ImmunizationFHIRConversionTest {
                 .createFHIRBundleFromHL7MessageReturnEntryList(hl7VUXmessageRep);
         immu = ResourceUtils.getResourceList(e, ResourceType.Immunization);
         assertThat(immu).hasSize(1);
-        Immunization immunization2 = ResourceUtils.getResourceImmunization(immu.get(0), ResourceUtils.context);
+        immunization = ResourceUtils.getResourceImmunization(immu.get(0), ResourceUtils.context);
 
-        assertThat(immunization2).isNotNull();
-        assertThat(immunization2.hasReasonCode());
-        assertThat(immunization2.getReasonCodeFirstRep().getCodingFirstRep().getCode()).isEqualTo("00");
-        assertThat(immunization2.getReasonCodeFirstRep().getCodingFirstRep().getDisplay()).isEqualTo("refusal");
-        assertThat(immunization2.getReasonCodeFirstRep().getCodingFirstRep().getSystem()).isNull();
-        assertThat(immunization2.getReasonCodeFirstRep().getText()).isEqualTo("refusal");
+        assertThat(immunization).isNotNull();
+        assertThat(immunization.hasReasonCode());
+        assertThat(immunization.getReasonCodeFirstRep().getCodingFirstRep().getCode()).isEqualTo("00");
+        assertThat(immunization.getReasonCodeFirstRep().getCodingFirstRep().getDisplay()).isEqualTo("refusal");
+        assertThat(immunization.getReasonCodeFirstRep().getCodingFirstRep().getSystem()).isNull();
+        assertThat(immunization.getReasonCodeFirstRep().getText()).isEqualTo("refusal");
 
-        assertThat(immunization2.getPerformer()).hasSize(2);
-        assertThat(immunization2.getPerformer().get(0).getFunction().getCodingFirstRep().getCode()).isEqualTo("AP");// RXA.10
-        assertThat(immunization2.getPerformer().get(0).getFunction().getText()).isEqualTo("Administering Provider"); // RXA.10
+        assertThat(immunization.getPerformer()).hasSize(2);
+        assertThat(immunization.getPerformer().get(0).getFunction().getCodingFirstRep().getCode()).isEqualTo("AP");// RXA.10
+        assertThat(immunization.getPerformer().get(0).getFunction().getText()).isEqualTo("Administering Provider"); // RXA.10
 
-        requesterRef = immunization2.getPerformer().get(1).getActor().getReference();
+        requesterRef = immunization.getPerformer().get(1).getActor().getReference();
         practBundle = ResourceUtils.getSpecificOrganizationFromBundleEntriesList(e, requesterRef);
-        assertThat(immunization2.getPerformer().get(1).getFunction().getCoding().get(0).getCode())
-                .isEqualTo("AP"); // PV1.3 takes precedence over RXA.11
-        assertThat(immunization2.getPerformer().get(1).getFunction().getText())
+        assertThat(immunization.getPerformer().get(1).getFunction().getCoding().get(0).getCode())
+                .isEqualTo("AP"); // PV1.3.4 takes precedence over RXA.11.4
+        assertThat(immunization.getPerformer().get(1).getFunction().getText())
                 .isEqualTo("Administering Provider"); // PV1.3
-        assertThat(immunization2.getPerformer().get(1).getActor().isEmpty()).isFalse(); // PV1.3
+        assertThat(immunization.getPerformer().get(1).getActor().isEmpty()).isFalse(); // PV1.3.4
         assertThat(practBundle.getName()).isEqualTo("RI2050");
         assertThat(practBundle.getIdentifierFirstRep().getSystem()).isEqualTo("urn:id:extID");
         assertThat(practBundle.getIdentifierFirstRep().getValue()).isEqualTo("RI2050");
 
         //dose Quantity with a known system
-        assertThat(immunization2.hasDoseQuantity()).isTrue();
-        assertThat(immunization2.getDoseQuantity().getValue().toString()).isEqualTo("0.5");
-        assertThat(immunization2.getDoseQuantity().getUnit()).isEqualTo("ML");
-        assertThat(immunization2.getDoseQuantity().getSystem()).isEqualTo("http://unitsofmeasure.org");
+        assertThat(immunization.hasDoseQuantity()).isTrue();
+        assertThat(immunization.getDoseQuantity().getValue().toString()).isEqualTo("0.5");
+        assertThat(immunization.getDoseQuantity().getUnit()).isEqualTo("ML");
+        assertThat(immunization.getDoseQuantity().getSystem()).isEqualTo("http://unitsofmeasure.org");
 
         hl7VUXmessageRep = "MSH|^~\\&|MYEHR2.5|RI88140101|KIDSNET_IFL|RIHEALTH|20130531||VXU^V04^VXU_V04|20130531RI881401010105|P|2.5.1|||NE|AL||||||RI543763\r"
                 + "PID|1||12345^^^^MR||TestPatient^Jane^^^^^L||||||\r"
