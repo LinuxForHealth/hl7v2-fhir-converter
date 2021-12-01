@@ -97,6 +97,30 @@ public class HL7ResourceReaderTest {
 
   }
 
+    // This tests that messagetemplates are loaded the new way via configured path + alternate path
+    // AND that they are found when supported.hl7.messages is omitted and defaults to *
+    @Test
+    public void testGetMessageTemplatesViaAdditionalLocationWithDefaultSupportedList() throws IOException {
+      try {
+        // Set up the config file
+        File configFile = new File(folder, "config.properties");
+        Properties prop = new Properties();
+        prop.put("base.path.resource", "src/main/resources");
+        prop.put("default.zoneid", "+08:00");
+        prop.put("additional.resources.location", "src/test/resources/additional_resources");
+        prop.store(new FileOutputStream(configFile), null);
+        System.setProperty(CONF_PROP_HOME, configFile.getParent());
+  
+        // Get the templates ORU_R01 will be found in the base path and ADT_A09 will be found in the additional path
+        Map<String, HL7MessageModel> messagetemplates = ResourceReader.getInstance().getMessageTemplates();
+        assertThat(messagetemplates.containsKey("ORU_R01")).isTrue(); // found in the base path
+        assertThat(messagetemplates.containsKey("ADT_A09")).isTrue(); // found in the additional path
+      } catch (IllegalArgumentException e) {
+        throw new IllegalStateException("Failure to initialize the templates for the converter.", e);
+      }
+  
+    }
+
 
 
 

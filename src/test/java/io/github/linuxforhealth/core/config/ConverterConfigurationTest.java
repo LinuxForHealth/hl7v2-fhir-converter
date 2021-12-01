@@ -74,12 +74,33 @@ public class ConverterConfigurationTest {
         System.setProperty(CONF_PROP_HOME, configFile.getParent());
         ConverterConfiguration.reset();
         ConverterConfiguration theConvConfig = ConverterConfiguration.getInstance();
+        assertThat(theConvConfig.getSupportedMessageTemplates()).hasSize(4);
         assertThat(theConvConfig.getAdditionalResourcesLocation()).isEqualTo("src/test/resources/additional_resources");
     }
 
     private void writeProperties(File configFile) throws FileNotFoundException, IOException {
         Properties prop = new Properties();
         prop.put("supported.hl7.messages", "ADT_A01, ORU_R01, PPR_PC1, VXU_V04");
+        prop.put("default.zoneid", "+08:00");
+        prop.put("additional.conceptmap.file", "src/test/resources/additional_conceptmap.yml");
+        prop.put("additional.resources.location", "src/test/resources/additional_resources");
+        prop.store(new FileOutputStream(configFile), null);
+    }
+
+
+    @Test
+    public void test_that_supportedhl7messages_defaults_to_asterisk() throws IOException {
+    	File configFile = new File(folder, "config.properties");
+        writePropertiesDefaultMessages(configFile);
+        System.setProperty(CONF_PROP_HOME, configFile.getParent());
+        ConverterConfiguration.reset();
+        ConverterConfiguration theConvConfig = ConverterConfiguration.getInstance();
+        assertThat(theConvConfig.getSupportedMessageTemplates()).hasSize(1);
+        assertThat(theConvConfig.getSupportedMessageTemplates().get(0)).contains("*");
+    }
+
+    private void writePropertiesDefaultMessages(File configFile) throws FileNotFoundException, IOException {
+        Properties prop = new Properties();
         prop.put("default.zoneid", "+08:00");
         prop.put("additional.conceptmap.file", "src/test/resources/additional_conceptmap.yml");
         prop.put("additional.resources.location", "src/test/resources/additional_resources");

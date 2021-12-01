@@ -7,6 +7,7 @@ package io.github.linuxforhealth.core.config;
 
 import java.time.DateTimeException;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -69,11 +70,15 @@ public class ConverterConfiguration {
         resourcefromClassPath = true;
       }
 
-      // get list of supported messages
-      List<Object> values = config.getList(SUPPORTED_HL7_MESSAGES);
+      // get list of supported messages, if not found, default to *
+      List<Object> values = config.getList(SUPPORTED_HL7_MESSAGES, null);
+      if (values != null) {
+        supportedMessageTemplates = values.stream().filter(v -> v != null && StringUtils.isNotBlank(v.toString()))
+        .map(v -> v.toString()).collect(Collectors.toList());
+      } else {
+        supportedMessageTemplates = new ArrayList<>(Arrays.asList("*"));
+      }
 
-      supportedMessageTemplates = values.stream().filter(v -> v != null && StringUtils.isNotBlank(v.toString()))
-          .map(v -> v.toString()).collect(Collectors.toList());
 
       // get default zone
       String zoneText = config.getString(DEFAULT_ZONE_ID, null);
