@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2020
+ * (C) Copyright IBM Corp. 2020, 2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -7,6 +7,7 @@ package io.github.linuxforhealth.core.config;
 
 import java.time.DateTimeException;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -32,6 +33,7 @@ public class ConverterConfiguration {
   private static final String DEFAULT_ZONE_ID = "default.zoneid";
   private static final String CONFIG_PROPERTIES = "config.properties";
   private static final String ADDITIONAL_CONCEPT_MAPS_FILE = "additional.conceptmap.file";
+  private static final String ADDITIONAL_RESOURCES_LOCATION = "additional.resources.location";
 
   private static ConverterConfiguration configuration;
 
@@ -40,23 +42,24 @@ public class ConverterConfiguration {
   private List<String> supportedMessageTemplates;
   private ZoneId zoneId;
   private String additionalConceptmapFile;
+  private String additionalResourcesLocation;
+
   private ConverterConfiguration() {
     try {
-      
-      List<FileLocationStrategy> subs =
-          Arrays.asList(new ConfigDirectoryLocationStrategy(),
-              new ClasspathLocationStrategy());
+
+      List<FileLocationStrategy> subs = Arrays.asList(new ConfigDirectoryLocationStrategy(),
+          new ClasspathLocationStrategy());
       FileLocationStrategy strategy = new CombinedLocationStrategy(subs);
 
       Parameters params = new Parameters();
 
-      FileBasedConfigurationBuilder<FileBasedConfiguration> builder =
-          new FileBasedConfigurationBuilder<FileBasedConfiguration>(PropertiesConfiguration.class)
+      FileBasedConfigurationBuilder<FileBasedConfiguration> builder = new FileBasedConfigurationBuilder<FileBasedConfiguration>(
+          PropertiesConfiguration.class)
 
               .configure(
                   params.properties().setFileName(CONFIG_PROPERTIES)
                       .setThrowExceptionOnMissing(true).setLocationStrategy(strategy)
-                  .setListDelimiterHandler(new DefaultListDelimiterHandler(',')));
+                      .setListDelimiterHandler(new DefaultListDelimiterHandler(',')));
       Configuration config = builder.getConfiguration();
 
       String resourceLoc = config.getString(BASE_PATH_RESOURCE, null);
@@ -67,12 +70,14 @@ public class ConverterConfiguration {
         resourcefromClassPath = true;
       }
 
-      // get list of supported messages
-      List<Object> values = config.getList(SUPPORTED_HL7_MESSAGES);
-
-      supportedMessageTemplates =
-          values.stream().filter(v -> v != null && StringUtils.isNotBlank(v.toString()))
-              .map(v -> v.toString()).collect(Collectors.toList());
+      // get list of supported messages, if not found, default to *
+      List<Object> values = config.getList(SUPPORTED_HL7_MESSAGES, null);
+      if (values != null) {
+        supportedMessageTemplates = values.stream().filter(v -> v != null && StringUtils.isNotBlank(v.toString()))
+        .map(v -> v.toString()).collect(Collectors.toList());
+      } else {
+        supportedMessageTemplates = new ArrayList<>(Arrays.asList("*"));
+      }
 
 
       // get default zone
@@ -84,26 +89,23 @@ public class ConverterConfiguration {
       // get additional concept map
       additionalConceptmapFile = config.getString(ADDITIONAL_CONCEPT_MAPS_FILE, null);
 
+      // get additional resources location
+      additionalResourcesLocation = config.getString(ADDITIONAL_RESOURCES_LOCATION, null);
+
     } catch (ConfigurationException e) {
       throw new IllegalStateException("Cannot read configuration for resource location", e);
     }
   }
 
-
-
-
-
-
   private void getZoneId(String zoneText) {
     try {
-    zoneId = ZoneId.of(zoneText);
+      zoneId = ZoneId.of(zoneText);
     } catch (DateTimeException e) {
       LOGGER.warn("Cannot create ZoneId");
       LOGGER.debug("Cannot create ZoneId from :" + zoneText, e);
       zoneId = null;
     }
   }
-
 
   public static ConverterConfiguration getInstance() {
     if (configuration == null) {
@@ -112,41 +114,36 @@ public class ConverterConfiguration {
     return configuration;
   }
 
-
-
   public static void reset() {
     configuration = null;
   }
-
 
   public String getResourceFolder() {
     return resourceFolder;
   }
 
-
   public boolean isResourcefromClassPath() {
     return resourcefromClassPath;
   }
-
 
   public void setResourcefromClassPath(boolean resourcefromClassPath) {
     this.resourcefromClassPath = resourcefromClassPath;
   }
 
-
   public List<String> getSupportedMessageTemplates() {
     return supportedMessageTemplates;
   }
-
 
   public ZoneId getZoneId() {
     return zoneId;
   }
 
-
   public String getAdditionalConceptmapFile() {
     return additionalConceptmapFile;
   }
 
+  public String getAdditionalResourcesLocation() {
+    return additionalResourcesLocation;
+  }
 
 }
