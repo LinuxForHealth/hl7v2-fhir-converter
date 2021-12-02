@@ -15,6 +15,9 @@ AllergyIntoleranceCriticality:
    MI: low
    SV: high
    U: unable-to-assess
+AllergyIntoleranceType:
+   AL: allergy
+   IN: intolerance
 ObservationStatus:
    C: corrected
    D: cancelled

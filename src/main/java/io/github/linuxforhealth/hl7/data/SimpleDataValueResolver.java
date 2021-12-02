@@ -32,6 +32,7 @@ import org.hl7.fhir.dstu3.model.codesystems.MedicationRequestCategory;
 import org.hl7.fhir.exceptions.FHIRException;
 import org.hl7.fhir.r4.model.AllergyIntolerance.AllergyIntoleranceCategory;
 import org.hl7.fhir.r4.model.AllergyIntolerance.AllergyIntoleranceCriticality;
+import org.hl7.fhir.r4.model.AllergyIntolerance.AllergyIntoleranceType;
 import org.hl7.fhir.r4.model.DiagnosticReport.DiagnosticReportStatus;
 import org.hl7.fhir.r4.model.Enumerations.AdministrativeGender;
 import org.hl7.fhir.r4.model.Immunization.ImmunizationStatus;
@@ -576,6 +577,11 @@ public class SimpleDataValueResolver {
     public static final ValueExtractor<Object, String> ALLERGY_INTOLERANCE_CATEGORY_CODE_FHIR = (Object value) -> {
         String val = Hl7DataHandlerUtil.getStringValue(value);
         return getFHIRCode(val, AllergyIntoleranceCategory.class);
+    };
+    
+    public static final ValueExtractor<Object, String> ALLERGY_INTOLERANCE_TYPE_CODE_FHIR = (Object value) -> {
+        String val = Hl7DataHandlerUtil.getStringValue(value);
+        return getFHIRCode(val, AllergyIntoleranceType.class);
     };
 
     public static final ValueExtractor<Object, String> DOSE_SYSTEM = (Object value) -> {

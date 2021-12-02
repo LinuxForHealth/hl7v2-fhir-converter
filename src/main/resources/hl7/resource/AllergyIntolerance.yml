@@ -10,13 +10,23 @@ id:
   valueOf: 'UUID.randomUUID()'
   expressionType: JEXL
 
-identifier:
+identifier_1:
   valueOf: datatype/Identifier
   generateList: true
   expressionType: resource
   vars:
     system: SYSTEM_URL, $sys
     value: BUILD_IDENTIFIER_FROM_CWE, AL1.3
+  constants:
+    sys: "urn:id:extID"
+
+identifier_2:
+  valueOf: datatype/Identifier
+  generateList: true
+  expressionType: resource
+  vars:
+    system: SYSTEM_URL, $sys
+    value: IAM.7
   constants:
     sys: "urn:id:extID"
 
@@ -38,10 +48,15 @@ verificationStatus:
       code: 'confirmed'
       display: 'Confirmed'
 
+type:
+    type: ALLERGY_INTOLERANCE_TYPE
+    valueOf: IAM.9
+    expressionType: HL7Spec
+
 category:
     type: ALLERGY_INTOLERANCE_CATEGORY
     generateList: true
-    valueOf: AL1.2
+    valueOf: AL1.2 | IAM.2
     expressionType: HL7Spec
     
 criticality:
@@ -53,12 +68,34 @@ code:
    valueOf: datatype/CodeableConcept
    generateList: true
    expressionType: resource
-   specs: AL1.3
+   specs: AL1.3 | IAM.3
 
 onsetDateTime:
    type: DATE_TIME
    valueOf: AL1.6
    expressionType: HL7Spec
+
+recordedDate:
+   type: DATE_TIME
+   valueOf: IAM.13
+   expressionType: HL7Spec
+   
+asserter_1:
+   condition: $iam18 NOT_NULL
+   valueOf: resource/Practitioner
+   expressionType: reference
+   specs: IAM.18
+   vars:
+      iam18: IAM.18
+
+asserter_2:
+   condition: $iam18 NULL && $iam14 NOT_NULL
+   valueOf: resource/Patient
+   expressionType: reference 
+   specs: IAM.14
+   vars:
+      iam14: IAM.14
+      iam18: IAM.18
 
 patient:
     valueOf: datatype/Reference
