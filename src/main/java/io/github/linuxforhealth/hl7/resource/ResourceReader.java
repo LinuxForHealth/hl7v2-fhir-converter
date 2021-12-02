@@ -82,14 +82,16 @@ public class ResourceReader {
   public String getResource(String resourcePath) {
     Path resourceFolderFilePath = Paths.get(converterConfig.getResourceFolder(), resourcePath);
     Path alternateResourceFolderFilePath = Paths.get(converterConfig.getAdditionalResourcesLocation(), resourcePath);
-    String resource;
+    String resource = null;
 
     try {
       if (resourceFolderFilePath != null && resourceFolderFilePath.toFile().exists()) {
         resource = loadFileResource(resourceFolderFilePath.toFile());
-      } else if (alternateResourceFolderFilePath != null && alternateResourceFolderFilePath.toFile().exists()) {
+      } 
+      if (resource == null && alternateResourceFolderFilePath != null && alternateResourceFolderFilePath.toFile().exists()) {
         resource = loadFileResource(alternateResourceFolderFilePath.toFile());
-      } else {
+      } 
+      if (resource == null) {
         resource = loadClassPathResource(resourcePath);
       }
     } catch (IOException ioEx) {
@@ -161,7 +163,7 @@ public class ResourceReader {
 
   private HL7MessageModel getMessageModel(String templateName) {
     // Allow for names that already have .yml extension
-    String yamlizedTemplateName = templateName.contains(".yml") ? templateName : templateName + ".yml";
+    String yamlizedTemplateName = templateName.endsWith(".yml") ? templateName : templateName + ".yml";
     String templateFileContent = getResourceInHl7Folder(Constants.MESSAGE_BASE_PATH + yamlizedTemplateName);
     if (StringUtils.isNotBlank(templateFileContent)) {
       try {

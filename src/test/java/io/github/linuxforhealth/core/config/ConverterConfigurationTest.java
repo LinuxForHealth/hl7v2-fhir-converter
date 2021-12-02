@@ -68,18 +68,23 @@ public class ConverterConfigurationTest {
     }
 
     @Test
-    public void test_that_additional_resources_location_is_found() throws IOException {
+    public void testConfigurationValuesAreSetAndRetrieved() throws IOException {
+        // Create our own properties file
     	File configFile = new File(folder, "config.properties");
         writeProperties(configFile);
         System.setProperty(CONF_PROP_HOME, configFile.getParent());
         ConverterConfiguration.reset();
         ConverterConfiguration theConvConfig = ConverterConfiguration.getInstance();
-        assertThat(theConvConfig.getSupportedMessageTemplates()).hasSize(4);
+        assertThat(theConvConfig.getResourceFolder()).isEqualTo("src/main/resources");
+        assertThat(theConvConfig.getSupportedMessageTemplates()).hasSize(4); // Four messages supported.  (Proves we're using our created file, not the default.)
+        assertThat(theConvConfig.getZoneId().getId()).isEqualTo("+08:00");
+        assertThat(theConvConfig.getAdditionalConceptmapFile()).isEqualTo("src/test/resources/additional_conceptmap.yml");
         assertThat(theConvConfig.getAdditionalResourcesLocation()).isEqualTo("src/test/resources/additional_resources");
     }
 
     private void writeProperties(File configFile) throws FileNotFoundException, IOException {
         Properties prop = new Properties();
+        prop.put("base.path.resource", "src/main/resources");
         prop.put("supported.hl7.messages", "ADT_A01, ORU_R01, PPR_PC1, VXU_V04");
         prop.put("default.zoneid", "+08:00");
         prop.put("additional.conceptmap.file", "src/test/resources/additional_conceptmap.yml");
@@ -87,23 +92,23 @@ public class ConverterConfigurationTest {
         prop.store(new FileOutputStream(configFile), null);
     }
 
-
     @Test
-    public void test_that_supportedhl7messages_defaults_to_asterisk() throws IOException {
+    public void testConfigurationDefaultsAreUsed() throws IOException {
     	File configFile = new File(folder, "config.properties");
         writePropertiesDefaultMessages(configFile);
         System.setProperty(CONF_PROP_HOME, configFile.getParent());
         ConverterConfiguration.reset();
         ConverterConfiguration theConvConfig = ConverterConfiguration.getInstance();
-        assertThat(theConvConfig.getSupportedMessageTemplates()).hasSize(1);
-        assertThat(theConvConfig.getSupportedMessageTemplates().get(0)).contains("*");
+        assertThat(theConvConfig.getResourceFolder()).isEmpty(); // No resource folder specified
+        assertThat(theConvConfig.getSupportedMessageTemplates()).hasSize(1); // Because there was an *, there is only only message template configured
+        assertThat(theConvConfig.getSupportedMessageTemplates().get(0)).contains("*"); // * indicates search for templates.
+        assertThat(theConvConfig.getAdditionalConceptmapFile()).isNull();
+        assertThat(theConvConfig.getAdditionalResourcesLocation()).isNull();
     }
 
     private void writePropertiesDefaultMessages(File configFile) throws FileNotFoundException, IOException {
         Properties prop = new Properties();
         prop.put("default.zoneid", "+08:00");
-        prop.put("additional.conceptmap.file", "src/test/resources/additional_conceptmap.yml");
-        prop.put("additional.resources.location", "src/test/resources/additional_resources");
         prop.store(new FileOutputStream(configFile), null);
     }
 

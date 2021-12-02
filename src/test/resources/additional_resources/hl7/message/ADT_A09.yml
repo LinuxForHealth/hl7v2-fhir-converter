@@ -5,7 +5,11 @@
 #
 # FHIR Resources to extract from ADT_A09 message
 #
+
+########################################################################
 # Used for testing only. Not used in production.
+########################################################################
+
 ---
 resources:
     - resourceName: MessageHeader
