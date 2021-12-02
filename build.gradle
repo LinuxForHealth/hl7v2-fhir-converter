@@ -13,7 +13,8 @@ plugins {
     id 'signing'
 }
 
-group = 'io.github.linuxforhealth'
+// group = 'io.github.linuxforhealth'
+group = 'net.fhirfactory.pegacorn'
 version = (findProperty('version') == 'unspecified') ? '1.0.1-SNAPSHOT' : version
 ext.isReleaseVersion = !version.endsWith("SNAPSHOT")
 
