@@ -7,8 +7,10 @@
 AllergyIntoleranceCategory:
    AA: environment
    DA: medication
+   DRUG: medication
    EA: environment
    FA: food
+   FOOD: food
    LA: environment
    PA: environment
 AllergyIntoleranceCriticality:
