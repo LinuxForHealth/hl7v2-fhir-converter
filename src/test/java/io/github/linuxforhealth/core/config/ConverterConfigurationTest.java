@@ -100,7 +100,7 @@ public class ConverterConfigurationTest {
         ConverterConfiguration.reset();
         ConverterConfiguration theConvConfig = ConverterConfiguration.getInstance();
         assertThat(theConvConfig.getResourceFolder()).isEmpty(); // No resource folder specified
-        assertThat(theConvConfig.getSupportedMessageTemplates()).hasSize(1); // Because there was an *, there is only only message template configured
+        assertThat(theConvConfig.getSupportedMessageTemplates()).hasSize(1); // Because there was an *, there is only one message template configured
         assertThat(theConvConfig.getSupportedMessageTemplates().get(0)).contains("*"); // * indicates search for templates.
         assertThat(theConvConfig.getAdditionalConceptmapFile()).isNull();
         assertThat(theConvConfig.getAdditionalResourcesLocation()).isNull();
