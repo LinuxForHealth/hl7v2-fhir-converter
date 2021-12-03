@@ -349,6 +349,14 @@ public class SimpleDataValueResolver {
         String val = Hl7DataHandlerUtil.getStringValue(value);
         return getFHIRCode(val, ImmunizationStatus.class);
     };
+    public static final ValueExtractor<Object, String> CHECK_STATUS = (Object value) -> {
+        String code = IMMUNIZATION_STATUS_CODES.apply(value);
+        if(code.startsWith("not")){
+            System.out.print(code);
+            return code;
+        }
+        else return null;
+    };
 
     public static final ValueExtractor<Object, String> SPECIMEN_STATUS_CODE_FHIR = (Object value) -> {
         String val = Hl7DataHandlerUtil.getStringValue(value);
@@ -501,6 +509,7 @@ public class SimpleDataValueResolver {
         String code = Hl7DataHandlerUtil.getStringValue(value);
         String text = Hl7DataHandlerUtil.getOriginalDisplayText(value);
         String version = Hl7DataHandlerUtil.getVersion(value);
+        System.out.print(commonCodingSystemV2(table, code, text, version));
         return commonCodingSystemV2(table, code, text, version);
     };
 

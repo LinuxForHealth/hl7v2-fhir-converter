@@ -25,11 +25,13 @@ status:
    required: true
    expressionType: HL7Spec
 statusReason:
+   condition: $status NOT_NULL
    valueOf: datatype/CodeableConcept
    expressionType: resource
    specs: RXA.18
    vars:
       code: RXA.18
+      status: CHECK_STATUS, RXA.20 | ORC.5
 vaccineCode:
    valueOf: datatype/CodeableConcept
    required: true
