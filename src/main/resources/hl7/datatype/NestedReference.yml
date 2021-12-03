@@ -1,0 +1,17 @@
+#
+# (C) Copyright IBM Corp. 2020, 2021
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+---
+reference:
+  type: ORG_REFERENCE
+  valueOf: $BASE_VALUE
+  required: true
+
+# Some references have an associated display. (Example Encounter.participant.individual)
+# Optionally provide a value to have display added.
+display:
+  condition: $referenceDisplay NOT_NULL
+  type: STRING
+  valueOf: $referenceDisplay

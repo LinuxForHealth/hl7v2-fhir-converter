@@ -13,7 +13,7 @@ function_v1:
     text: 'Ordering Provider'
 
 function_v2:
-   condition: $administeringProvider NOT_NULL || $idValue NOT_NULL
+   condition: $administeringProvider NOT_NULL || $idValue NOT_NULL || $rxa27 NOT_NULL || $rxa11 NOT_NULL
    valueOf: datatype/CodeableConcept_var
    expressionType: resource
    constants:
@@ -33,5 +33,19 @@ actor_2:
   valueOf: resource/Organization_ServiceProvider
   expressionType: reference
   vars:
-    idValue: $idValue
-    name: $name
+    idValue: $rxa27
+    name: $rxa27
+
+actor_3:
+  condition: $rxa27 NULL && $rxa11 NOT_NULL && $pv1 NULL
+  valueOf: resource/Organization_ServiceProvider
+  expressionType: reference
+  vars:
+    idValue: $rxa11
+    name: $rxa11
+
+actor_4:
+  condition: $enc NOT_NULL
+  valueOf: datatype/Reference
+  expressionType: resource
+  specs: $Encounter

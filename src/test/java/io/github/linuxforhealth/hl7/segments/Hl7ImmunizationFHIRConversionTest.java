@@ -159,8 +159,7 @@ public class Hl7ImmunizationFHIRConversionTest {
 
         // Test should only return RXA.10, ORC.12  is empty
         hl7VUXmessageRep = "MSH|^~\\&|MYEHR2.5|RI88140101|KIDSNET_IFL|RIHEALTH|20130531||VXU^V04^VXU_V04|20130531RI881401010105|P|2.5.1|||NE|AL||||||RI543763\r"
-                + "PID|1||12345^^^^MR||TestPatient^Jane^^^^^L||||||\r"
-                + "PV1|1|R|^^^RI2050|||||||||||||||||\r"
+                + "PID|1||12345^^^^MR||TestPatient^Jane^^^^^L||||||+ "PV1|1|R|^^^RI2022|||||||||||||||||\r"
                 + "ORC|RE||197027|||||||^Clerk^Myron|||||||RI2050\r"
                 + "RXA|0|1|20130531|20130531|48^HIB PRP-T^CVX|0.5|ML^^UCUM||00^new immunization record^NIP001|^Sticker^Nurse|^^^RI2050||||33k2a|20131210|PMC^sanofi^MVX||00^refusal|CP|A\r"
                 + "RXR|C28161^IM^NCIT^IM^INTRAMUSCULAR^HL70162|RT^right thigh^HL70163\r"

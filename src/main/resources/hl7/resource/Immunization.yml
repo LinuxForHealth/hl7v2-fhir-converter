@@ -110,8 +110,9 @@ performer_3:
    generateList: true
    expressionType: resource
    vars:
-      idValue: RXA.27.4.1 | PV1.3.4 | RXA.11.4.1
-      name: RXA.27.4.1 | PV1.3.4 | RXA.11.4.1
+      rxa27: RXA.27.4.1
+      rxa11: RXA.11.4.1
+      pv1: PV1.3.4.1
 note:
    valueOf: datatype/Annotation
    expressionType: resource
