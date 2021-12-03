@@ -43,9 +43,3 @@ actor_3:
   vars:
     idValue: $rxa11
     name: $rxa11
-
-actor_4:
-  condition: $enc NOT_NULL
-  valueOf: datatype/Reference
-  expressionType: resource
-  specs: $Encounter
