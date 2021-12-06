@@ -1,0 +1,94 @@
+# Do not reference directly: use resource/Location
+# A sub-location for under a point of care.  Much like resource/Location but
+# ignoring the bed (PL.3), room (PL.2) and point of care (PL.1) for name and
+# partOf
+---
+resourceType: Location
+id:
+   type: STRING
+   valueOf: UUID.randomUUID()
+   expressionType: JEXL
+
+name_1:
+    condition: $floor NOT_NULL
+    type: STRING
+    valueOf: PL.8
+    expressionType: HL7Spec
+    vars:
+        floor: PL.8
+
+name_2:
+    condition: $floor NULL && $building NOT_NULL
+    type: STRING
+    valueOf: PL.7
+    expressionType: HL7Spec
+    vars:
+        floor: PL.8
+        building: PL.7
+               
+name_3:
+    condition: $floor NULL && $building NULL && $facility NOT_NULL
+    type: STRING
+    valueOf: PL.4
+    expressionType: HL7Spec
+    vars:
+        floor: PL.8
+        building: PL.7
+        facility: PL.4
+        
+partOf_1:
+    condition: $floor NOT_NULL
+    valueOf: resource/Location_Building
+    expressionType: reference
+    specs: PL
+    vars:
+        floor: PL.8
+
+partOf_2:
+    condition: $floor NULL && $building NOT_NULL
+    valueOf: resource/Location_Facility
+    expressionType: reference
+    specs: PL
+    vars:
+        floor: PL.8
+        building: PL.7
+
+physicalType_1:
+    condition: $floor NOT_NULL
+    valueOf: datatype/CodeableConcept_var
+    expressionType: resource
+    constants:
+        system: 'http://hl7.org/fhir/ValueSet/location-physical-type'
+        code: 'lvl'
+        text: 'Level'
+    vars:
+        floor: PL.8
+
+physicalType_2:
+    condition: $floor NULL && $building NOT_NULL
+    valueOf: datatype/CodeableConcept_var
+    expressionType: resource
+    constants:
+        system: 'http://hl7.org/fhir/ValueSet/location-physical-type'
+        code: 'bu'
+        text: 'Building'
+    vars:
+        floor: PL.8
+        building: PL.7
+
+physicalType_3:
+    condition: $floor NULL && $building NULL && $facility NOT_NULL
+    valueOf: datatype/CodeableConcept_var
+    expressionType: resource
+    constants:
+        system: 'http://hl7.org/fhir/ValueSet/location-physical-type'
+        code: 'si'
+        text: 'Site'
+    vars:
+        floor: PL.8
+        building: PL.7
+        facility: PL.4
+
+mode:
+    type: STRING
+    value: 'instance'

@@ -1,0 +1,26 @@
+# Do not reference directly: use resource/Location
+# A sub-location for under a building.  Much like resource/Location only using
+# facility (PL.4) for name (as this is the top level location in PL)
+---
+resourceType: Location
+id:
+   type: STRING
+   valueOf: UUID.randomUUID()
+   expressionType: JEXL
+
+name:
+    type: STRING
+    valueOf: PL.4
+    expressionType: HL7Spec
+
+physicalType:
+    valueOf: datatype/CodeableConcept_var
+    expressionType: resource
+    constants:
+        system: 'http://hl7.org/fhir/ValueSet/location-physical-type'
+        code: 'si'
+        text: 'Site'
+
+mode:
+    type: STRING
+    value: 'instance'

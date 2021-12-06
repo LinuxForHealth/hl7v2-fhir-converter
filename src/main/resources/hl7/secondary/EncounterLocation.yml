@@ -1,0 +1,6 @@
+# A location under an encounter (references an actual Location type)
+---
+location:
+    valueOf: resource/Location
+    expressionType: reference
+    specs: PL

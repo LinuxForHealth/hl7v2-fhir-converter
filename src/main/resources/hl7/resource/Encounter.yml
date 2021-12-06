@@ -202,6 +202,12 @@ participant_4:
       codeableConceptCode: 'ADM'
       codeableConceptText: 'admitter'
 
+location:
+   valueOf: secondary/EncounterLocation
+   generateList: true
+   expressionType: resource
+   specs: PV1.3 | PV1.6 | PV1.11 | PV1.42 | PV1.43
+
 extension_1:
    generateList: true
    expressionType: nested

@@ -1,0 +1,62 @@
+# Do not reference directly: use resource/Location
+# A sub-location for under a floor.  Much like resource/Location but ignoring
+# the bed (PL.3), room (PL.2), point of care (PL.1) and floor (PL.8) for name
+# and partOf
+---
+resourceType: Location
+id:
+   type: STRING
+   valueOf: UUID.randomUUID()
+   expressionType: JEXL
+
+name_1:
+    condition: $building NOT_NULL
+    type: STRING
+    valueOf: PL.7
+    expressionType: HL7Spec
+    vars:
+        building: PL.7
+               
+name_2:
+    condition: $building NULL && $facility NOT_NULL
+    type: STRING
+    valueOf: PL.4
+    expressionType: HL7Spec
+    vars:
+        building: PL.7
+        facility: PL.4
+        
+partOf_1:
+    condition: $building NOT_NULL
+    valueOf: resource/Location_Facility
+    expressionType: reference
+    specs: PL
+    vars:
+        building: PL.7
+
+physicalType_1:
+    condition: $building NOT_NULL
+    valueOf: datatype/CodeableConcept_var
+    expressionType: resource
+    constants:
+        system: 'http://hl7.org/fhir/ValueSet/location-physical-type'
+        code: 'bu'
+        text: 'Building'
+    vars:
+        building: PL.7
+
+physicalType_2:
+    condition: $building NULL && $facility NOT_NULL
+    valueOf: datatype/CodeableConcept_var
+    expressionType: resource
+    constants:
+        system: 'http://hl7.org/fhir/ValueSet/location-physical-type'
+        code: 'si'
+        text: 'Site'
+    vars:
+        building: PL.7
+        facility: PL.4
+
+mode:
+    type: STRING
+    value: 'instance'

@@ -1,0 +1,166 @@
+# Do not reference directly: use resource/Location
+# A sub-location for under a bed.  Much like resource/Location but ignoring the
+# bed (PL.3) for name and partOf
+---
+resourceType: Location
+id:
+   type: STRING
+   valueOf: UUID.randomUUID()
+   expressionType: JEXL
+
+name_1:
+    condition: $room NOT_NULL
+    type: STRING
+    valueOf: PL.2
+    expressionType: HL7Spec
+    vars:
+        room: PL.2
+
+name_2:
+    condition: $room NULL && $pointofcare NOT_NULL
+    type: STRING
+    valueOf: PL.1
+    expressionType: HL7Spec
+    vars:
+        room: PL.2
+        pointofcare: PL.1
+
+name_3:
+    condition: $room NULL && $pointofcare NULL && $floor NOT_NULL
+    type: STRING
+    valueOf: PL.8
+    expressionType: HL7Spec
+    vars:
+        room: PL.2
+        pointofcare: PL.1
+        floor: PL.8
+
+name_4:
+    condition: $room NULL && $pointofcare NULL && $floor NULL && $building NOT_NULL
+    type: STRING
+    valueOf: PL.7
+    expressionType: HL7Spec
+    vars:
+        room: PL.2
+        pointofcare: PL.1
+        floor: PL.8
+        building: PL.7
+               
+name_5:
+    condition: $room NULL && $pointofcare NULL && $floor NULL && $building NULL && $facility NOT_NULL
+    type: STRING
+    valueOf: PL.4
+    expressionType: HL7Spec
+    vars:
+        room: PL.2
+        pointofcare: PL.1
+        floor: PL.8
+        building: PL.7
+        facility: PL.4
+        
+partOf_1:
+    condition: $room NOT_NULL
+    valueOf: resource/Location_PointOfCare
+    expressionType: reference
+    specs: PL
+    vars:
+        room: PL.2
+        
+partOf_2:
+    condition: $room NULL && $pointofcare NOT_NULL
+    valueOf: resource/Location_Floor
+    expressionType: reference
+    specs: PL
+    vars:
+        room: PL.2
+        pointofcare: PL.1
+        
+partOf_3:
+    condition: $room NULL && $pointofcare NULL && $floor NOT_NULL
+    valueOf: resource/Location_Building
+    expressionType: reference
+    specs: PL
+    vars:
+        room: PL.2
+        pointofcare: PL.1
+        floor: PL.8
+
+partOf_4:
+    condition: $room NULL && $pointofcare NULL && $floor NULL && $building NOT_NULL
+    valueOf: resource/Location_Facility
+    expressionType: reference
+    specs: PL
+    vars:
+        room: PL.2
+        pointofcare: PL.1
+        floor: PL.8
+        building: PL.7
+
+physicalType_1:
+    condition: $room NOT_NULL
+    valueOf: datatype/CodeableConcept_var
+    expressionType: resource
+    constants:
+        system: 'http://hl7.org/fhir/ValueSet/location-physical-type'
+        code: 'ro'
+        text: 'Room'
+    vars:
+        room: PL.2
+        
+physicalType_2:
+    condition: $room NULL && $pointofcare NOT_NULL
+    valueOf: datatype/CodeableConcept_var
+    expressionType: resource
+    constants:
+        system: 'http://hl7.org/fhir/ValueSet/location-physical-type'
+        code: 'wa'
+        text: 'Ward'
+    vars:
+        room: PL.2
+        pointofcare: PL.1
+        
+physicalType_3:
+    condition: $room NULL && $pointofcare NULL && $floor NOT_NULL
+    valueOf: datatype/CodeableConcept_var
+    expressionType: resource
+    constants:
+        system: 'http://hl7.org/fhir/ValueSet/location-physical-type'
+        code: 'lvl'
+        text: 'Level'
+    vars:
+        room: PL.2
+        pointofcare: PL.1
+        floor: PL.8
+
+physicalType_4:
+    condition: $room NULL && $pointofcare NULL && $floor NULL && $building NOT_NULL
+    valueOf: datatype/CodeableConcept_var
+    expressionType: resource
+    constants:
+        system: 'http://hl7.org/fhir/ValueSet/location-physical-type'
+        code: 'bu'
+        text: 'Building'
+    vars:
+        room: PL.2
+        pointofcare: PL.1
+        floor: PL.8
+        building: PL.7
+
+physicalType_5:
+    condition: $room NULL && $pointofcare NULL && $floor NULL && $building NULL && $facility NOT_NULL
+    valueOf: datatype/CodeableConcept_var
+    expressionType: resource
+    constants:
+        system: 'http://hl7.org/fhir/ValueSet/location-physical-type'
+        code: 'si'
+        text: 'Site'
+    vars:
+        room: PL.2
+        pointofcare: PL.1
+        floor: PL.8
+        building: PL.7
+        facility: PL.4
+
+mode:
+    type: STRING
+    value: 'instance'

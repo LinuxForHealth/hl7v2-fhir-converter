@@ -12,6 +12,7 @@ Condition: org.hl7.fhir.r4.model.Condition
 Practitioner: org.hl7.fhir.r4.model.Practitioner
 DiagnosticReport: org.hl7.fhir.r4.model.DiagnosticReport
 Immunization: org.hl7.fhir.r4.model.Immunization
+Location: org.hl7.fhir.r4.model.Location
 Organization: org.hl7.fhir.r4.model.Organization
 MessageHeader: org.hl7.fhir.r4.model.MessageHeader
 Medication: org.hl7.fhir.r4.model.Medication

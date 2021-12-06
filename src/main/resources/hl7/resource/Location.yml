@@ -1,0 +1,215 @@
+# A location tree based on HL7 Person Location (PL) for bed or more general based on this order:
+#   Bed (PL.3) > Room (PL.2) > Point of Care (PL.1) > Floor (PL.8) > Building (PL.7) > Facility (PL.4)
+---
+resourceType: Location
+id:
+   type: STRING
+   valueOf: UUID.randomUUID()
+   expressionType: JEXL
+
+name_1:
+    condition: $bed NOT_NULL
+    type: STRING
+    valueOf: PL.3
+    expressionType: HL7Spec
+    vars:
+        bed: PL.3
+
+name_2:
+    condition: $bed NULL && $room NOT_NULL
+    type: STRING
+    valueOf: PL.2
+    expressionType: HL7Spec
+    vars:
+        bed: PL.3
+        room: PL.2
+
+name_3:
+    condition: $bed NULL && $room NULL && $pointofcare NOT_NULL
+    type: STRING
+    valueOf: PL.1
+    expressionType: HL7Spec
+    vars:
+        bed: PL.3
+        room: PL.2
+        pointofcare: PL.1
+
+name_4:
+    condition: $bed NULL && $room NULL && $pointofcare NULL && $floor NOT_NULL
+    type: STRING
+    valueOf: PL.8
+    expressionType: HL7Spec
+    vars:
+        bed: PL.3
+        room: PL.2
+        pointofcare: PL.1
+        floor: PL.8
+
+name_5:
+    condition: $bed NULL && $room NULL && $pointofcare NULL && $floor NULL && $building NOT_NULL
+    type: STRING
+    valueOf: PL.7
+    expressionType: HL7Spec
+    vars:
+        bed: PL.3
+        room: PL.2
+        pointofcare: PL.1
+        floor: PL.8
+        building: PL.7
+               
+name_6:
+    condition: $bed NULL && $room NULL && $pointofcare NULL && $floor NULL && $building NULL && $facility NOT_NULL
+    type: STRING
+    valueOf: PL.4
+    expressionType: HL7Spec
+    vars:
+        bed: PL.3
+        room: PL.2
+        pointofcare: PL.1
+        floor: PL.8
+        building: PL.7
+        facility: PL.4
+        
+partOf_1:
+    condition: $bed NOT_NULL
+    valueOf: resource/Location_Room
+    expressionType: reference
+    specs: PL
+    vars:
+        bed: PL.3
+    
+partOf_2:
+    condition: $bed NULL && $room NOT_NULL
+    valueOf: resource/Location_PointOfCare
+    expressionType: reference
+    specs: PL
+    vars:
+        bed: PL.3
+        room: PL.2
+        
+partOf_3:
+    condition: $bed NULL && $room NULL && $pointofcare NOT_NULL
+    valueOf: resource/Location_Floor
+    expressionType: reference
+    specs: PL
+    vars:
+        bed: PL.3
+        room: PL.2
+        pointofcare: PL.1
+        
+partOf_4:
+    condition: $bed NULL && $room NULL && $pointofcare NULL && $floor NOT_NULL
+    valueOf: resource/Location_Building
+    expressionType: reference
+    specs: PL
+    vars:
+        bed: PL.3
+        room: PL.2
+        pointofcare: PL.1
+        floor: PL.8
+
+partOf_5:
+    condition: $bed NULL && $room NULL && $pointofcare NULL && $floor NULL && $building NOT_NULL
+    valueOf: resource/Location_Facility
+    expressionType: reference
+    specs: PL
+    vars:
+        bed: PL.3
+        room: PL.2
+        pointofcare: PL.1
+        floor: PL.8
+        building: PL.7
+        
+physicalType_1:
+    condition: $bed NOT_NULL
+    valueOf: datatype/CodeableConcept_var
+    expressionType: resource
+    constants:
+        system: 'http://hl7.org/fhir/ValueSet/location-physical-type'
+        code: 'bd'
+        text: 'Bed'
+    vars:
+        bed: PL.3
+
+physicalType_2:
+    condition: $bed NULL && $room NOT_NULL
+    valueOf: datatype/CodeableConcept_var
+    expressionType: resource
+    constants:
+        system: 'http://hl7.org/fhir/ValueSet/location-physical-type'
+        code: 'ro'
+        text: 'Room'
+    vars:
+        bed: PL.3
+        room: PL.2
+        
+physicalType_3:
+    condition: $bed NULL && $room NULL && $pointofcare NOT_NULL
+    valueOf: datatype/CodeableConcept_var
+    expressionType: resource
+    constants:
+        system: 'http://hl7.org/fhir/ValueSet/location-physical-type'
+        code: 'wa'
+        text: 'Ward'
+    vars:
+        bed: PL.3
+        room: PL.2
+        pointofcare: PL.1
+        
+physicalType_4:
+    condition: $bed NULL && $room NULL && $pointofcare NULL && $floor NOT_NULL
+    valueOf: datatype/CodeableConcept_var
+    expressionType: resource
+    constants:
+        system: 'http://hl7.org/fhir/ValueSet/location-physical-type'
+        code: 'lvl'
+        text: 'Level'
+    vars:
+        bed: PL.3
+        room: PL.2
+        pointofcare: PL.1
+        floor: PL.8
+
+physicalType_5:
+    condition: $bed NULL && $room NULL && $pointofcare NULL && $floor NULL && $building NOT_NULL
+    valueOf: datatype/CodeableConcept_var
+    expressionType: resource
+    constants:
+        system: 'http://hl7.org/fhir/ValueSet/location-physical-type'
+        code: 'bu'
+        text: 'Building'
+    vars:
+        bed: PL.3
+        room: PL.2
+        pointofcare: PL.1
+        floor: PL.8
+        building: PL.7
+
+physicalType_6:
+    condition: $bed NULL && $room NULL && $pointofcare NULL && $floor NULL && $building NULL && $facility NOT_NULL
+    valueOf: datatype/CodeableConcept_var
+    expressionType: resource
+    constants:
+        system: 'http://hl7.org/fhir/ValueSet/location-physical-type'
+        code: 'si'
+        text: 'Site'
+    vars:
+        bed: PL.3
+        room: PL.2
+        pointofcare: PL.1
+        floor: PL.8
+        building: PL.7
+        facility: PL.4
+
+mode:
+    type: STRING
+    value: 'instance'
+    
+description:
+    type: STRING
+    valueOf: PL.9
+    expressionType: HL7Spec
+    
+# ToDo map PL.6 (Person Location Type) to type (just for this file; not in sub-locations)
+
+# ToDo check if PL.5 (Location Status) can be mapped to status
