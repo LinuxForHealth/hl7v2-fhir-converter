@@ -31,7 +31,7 @@ public class Hl7ImmunizationFHIRConversionTest {
                 + "ORC|RE||197027||ER|||||^Clerk^Myron||MD67895^Pediatric^MARY^^^^MD^^RIA|||||RI2050\r" //ORC.5 is here to prove RXA.20 is taking precedence
                 + "RXA|0|1|20130531|20130531|48^HIB PRP-T^CVX|0.5|ML^^ISO+||00^new immunization record^NIP001|^Sticker^Nurse|^^^RI2050||||33k2a|20131210|PMC^sanofi^MVX|||CP|A|20120901041038\r"
                 + "RXR|C28161^IM^NCIT^IM^INTRAMUSCULAR^HL70162|RT^right thigh^HL70163\r"
-                + "OBX|1|CE|64994-7^vaccine fund pgm elig cat^LN|1|V02^VFC eligible Medicaid/MedicaidManaged Care^HL70064||||||F|||20130531|||VXC40^per imm^CDCPHINVS\r";
+                + "OBX|1|DT|69764-9^HIB Info Sheet^LN|1|19981216||||||F|||20130531|||VXC40^per imm^CDCPHINVS\r";
 
         List<Bundle.BundleEntryComponent> e = ResourceUtils
                 .createFHIRBundleFromHL7MessageReturnEntryList(hl7VUXmessageRep);

@@ -154,3 +154,16 @@ recorded:
    type: DATE_TIME
    valueOf: RXA.22
    expressionType: HL7Spec
+reaction:
+   valueOf: secondary/Reaction
+   generateList: true
+   expressionType: resource
+   vars:
+      detail: OBX.3
+education:
+   valueOf: 'GeneralUtils.getImmunization(obx)'
+   generateList: true
+   expressionType: JEXL
+   vars:
+      obx5: OBX.5
+      obx3: OBX.3.1

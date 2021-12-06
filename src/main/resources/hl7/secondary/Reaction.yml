@@ -9,3 +9,9 @@ manifestation:
    generateList: true
    expressionType: resource
    specs: AL1.5  
+
+detail:
+   valueOf: resource/Observation
+   expressionType: reference
+   generateList: true
+   specs: $detail
