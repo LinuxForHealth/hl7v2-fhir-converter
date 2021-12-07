@@ -1,0 +1,88 @@
+#
+# (C) Copyright IBM Corp. 2021
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+# FHIR Resources to extract from HIST_RPT message
+#
+
+########################################################################
+# Used for testing only. Not used in production.
+########################################################################
+
+---
+resources:
+    - resourceName: MessageHeader
+      segment: MSH
+      resourcePath: resource/MessageHeader
+      repeats: false
+      isReferenced: false
+      additionalSegments: 
+        - EVN
+   
+    - resourceName: Patient
+      segment: PID
+      resourcePath: resource/Patient
+      repeats: false
+      isReferenced: true
+      additionalSegments:
+        - PD1
+        - MSH
+
+    - resourceName: DiagnosticReport
+      segment: OBR
+      # group: PATIENT_RESULT.ORDER_OBSERVATION
+      resourcePath: resource/DiagnosticReport
+      repeats: true
+      additionalSegments:
+          - OBX
+          - MSH
+          - PID
+          - PV1 
+
+    # - resourceName: DiagnosticReport
+    #   segment: .OBR
+    #   group: PATIENT_RESULT.ORDER_OBSERVATION
+    #   resourcePath: resource/DiagnosticReport
+    #   repeats: true
+    #   additionalSegments:
+    #       - .ORC
+    #       - .NTE
+    #       - .OBSERVATION.OBX
+    #       - MSH
+    #       - PATIENT_RESULT.PATIENT.PID
+    #       - PATIENT_RESULT.PATIENT.VISIT.PV1
+
+    - resourceName: MedicationRequest
+      segment: RXE
+      group: ORDER
+      resourcePath: resource/MedicationRequest
+      repeats: true
+      additionalSegments:
+        - MSH
+        - PID
+        - PV1
+
+    # - resourceName: MedicationRequest
+    #   segment: .RXE
+    #   group: ORDER
+    #   resourcePath: resource/MedicationRequest
+    #   repeats: true
+    #   additionalSegments:
+    #     - MSH
+    #     - .ORC
+    #     - .NTE
+    #     - PATIENT.PATIENT_VISIT.PV1
+    #     - PATIENT.PID
+        # RXO not included on purpose, only want to use RXE for RDE messages
+        # RXO content and NTEs associated with RXO are not processed          
+
+    - resourceName: Condition
+      segment: DG1
+      resourcePath: resource/Condition
+      isReferenced: true
+      repeats: true
+      additionalSegments:
+        - MSH
+        - PID
+        - PV1        

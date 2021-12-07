@@ -1,0 +1,59 @@
+#
+# (C) Copyright IBM Corp. 2021
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+# FHIR Resources to extract from HIST_RPT message
+#
+
+########################################################################
+# Used for testing only. Not used in production.
+########################################################################
+
+---
+resources:
+    - resourceName: MessageHeader
+      segment: MSH
+      resourcePath: resource/MessageHeader
+      repeats: false
+      isReferenced: false
+      additionalSegments: 
+        - EVN
+   
+    - resourceName: Patient
+      segment: PID
+      resourcePath: resource/Patient
+      repeats: false
+      isReferenced: true
+      additionalSegments:
+        - PD1
+        - MSH
+
+    # - resourceName: Condition
+    #   segment: .PRB
+    #   group: PROBLEM
+    #   resourcePath: resource/Condition
+    #   repeats: true
+    #   additionalSegments:
+    #     - MSH
+    #     - PID
+    #     - PATIENT_VISIT.PV1
+    #     - .NTE
+
+    - resourceName: Condition
+      segment: PRB
+      # group: PROBLEM
+      resourcePath: resource/Condition
+      repeats: true
+      additionalSegments:
+        - MSH
+        - PID
+        # - PATIENT_VISIT.PV1
+        # - .NTE
+
+    - resourceName: AllergyIntolerance
+      segment: AL1
+      resourcePath: resource/AllergyIntolerance
+      repeats: true
+      additionalSegments:
+        - MSH 

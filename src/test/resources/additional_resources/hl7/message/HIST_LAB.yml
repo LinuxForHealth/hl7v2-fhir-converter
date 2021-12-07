@@ -1,0 +1,63 @@
+#
+# (C) Copyright IBM Corp. 2021
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+# FHIR Resources to extract from HIST_LAB message
+#
+
+########################################################################
+# Used for testing only. Not used in production.
+########################################################################
+
+---
+resources:
+    - resourceName: MessageHeader
+      segment: MSH
+      resourcePath: resource/MessageHeader
+      repeats: false
+      isReferenced: false
+      additionalSegments: 
+        - EVN
+   
+    - resourceName: Patient
+      segment: PID
+      resourcePath: resource/Patient
+      repeats: false
+      isReferenced: true
+      additionalSegments:
+        - PD1
+        - MSH
+
+    - resourceName: Encounter
+      segment: PV1
+      resourcePath: resource/Encounter
+      repeats: false
+      isReferenced: true
+      additionalSegments:
+        - PV2
+        - EVN
+        - MSH
+        - DG1
+
+    - resourceName: Observation
+      segment: OBX
+      resourcePath: resource/Observation
+      repeats: true
+      isReferenced: true
+      additionalSegments:
+        - MSH
+        - SPM
+
+    - resourceName: DiagnosticReport
+      segment: OBR
+      resourcePath: resource/DiagnosticReport
+      repeats: true
+      additionalSegments:
+          - OBX
+          - MSH
+          - PID
+          - PV1
+          - SPM 
+
+ 
