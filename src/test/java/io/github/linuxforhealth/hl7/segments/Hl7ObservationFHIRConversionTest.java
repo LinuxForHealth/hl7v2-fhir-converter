@@ -18,8 +18,8 @@ import java.util.stream.Collectors;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
-import org.hl7.fhir.r4.model.Device;
 import org.hl7.fhir.r4.model.CodeableConcept;
+import org.hl7.fhir.r4.model.Device;
 import org.hl7.fhir.r4.model.Observation;
 import org.hl7.fhir.r4.model.Observation.ObservationReferenceRangeComponent;
 import org.hl7.fhir.r4.model.Organization;
@@ -37,15 +37,13 @@ import com.google.common.collect.Lists;
 
 import io.github.linuxforhealth.api.ResourceModel;
 import io.github.linuxforhealth.fhir.FHIRContext;
-import io.github.linuxforhealth.hl7.resource.ResourceReader;
 import io.github.linuxforhealth.hl7.ConverterOptions;
 import io.github.linuxforhealth.hl7.ConverterOptions.Builder;
 import io.github.linuxforhealth.hl7.message.HL7FHIRResourceTemplate;
 import io.github.linuxforhealth.hl7.message.HL7FHIRResourceTemplateAttributes;
 import io.github.linuxforhealth.hl7.message.HL7MessageEngine;
 import io.github.linuxforhealth.hl7.message.HL7MessageModel;
-import io.github.linuxforhealth.hl7.HL7ToFHIRConverter;
-
+import io.github.linuxforhealth.hl7.resource.ResourceReader;
 import io.github.linuxforhealth.hl7.segments.util.DatatypeUtils;
 import io.github.linuxforhealth.hl7.segments.util.ResourceUtils;
 
@@ -71,7 +69,7 @@ public class Hl7ObservationFHIRConversionTest {
 
     @Test
     public void testObservationNmResult() throws IOException {
-        String hl7message = baseMessage + "OBX|1|NM|0135–4^TotalProtein||7.3|gm/dl|5.9-8.4|||R|F";
+        String hl7message = baseMessage + "OBX|1|NM|0135-4^TotalProtein||7.3|gm/dl|5.9-8.4|||R|F";
         String json = message.convert(hl7message, engine);
 
         IBaseResource bundleResource = context.getParser().parseResource(json);
