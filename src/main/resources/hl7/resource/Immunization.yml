@@ -19,32 +19,30 @@ identifier:
    constants:
       sys: "urn:id:extID"
 status:
-   valueOf: "GeneralUtils.getImmunizationStatus(rxa,code)"
+   valueOf: "GeneralUtils.getImmunizationStatus(rxa18,rxa20,orc5)"
    expressionType: JEXL
    vars:
-      rxa: RXA.18
-      code: RXA.20 | ORC.5
+      rxa18: RXA.18
+      rxa20: RXA.20
+      orc5: ORC.5
 statusReason_1:
-   condition: $status NOT_EQUALS RE && $code NOT_NULL
+   condition: $code NOT_NULL
    valueOf: datatype/CodeableConcept
    expressionType: resource
    specs: RXA.18
    vars:
       code: RXA.18
-      status: String, RXA.20
 statusReason_2:
-   condition: $status EQUALS RE
+   condition: $rxa18 NULL && statCode NOT_NULL
    valueOf: datatype/CodeableConcept_var
    expressionType: resource
    vars:
-      code: $co
-      display: $dis
-      system: $sys
-      status: String, RXA.20
+      rxa18: RXA.18
+      statCode: RXA.20 | ORC.5
    constants:
-      co: "PATOBJ"
-      dis: "Patient Refusal"
-      sys: "http://terminology.hl7.org/CodeSystem/v3-ActReason"
+      code: "PATOBJ"
+      display: "Patient Refusal"
+      system: "http://terminology.hl7.org/CodeSystem/v3-ActReason"
 vaccineCode:
    valueOf: datatype/CodeableConcept
    required: true
