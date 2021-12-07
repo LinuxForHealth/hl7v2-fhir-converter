@@ -18,6 +18,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringEscapeUtils;
 import org.apache.commons.text.StringTokenizer;
 import org.hl7.fhir.r4.model.Enumerations;
+import org.hl7.fhir.r4.model.Immunization;
 import org.hl7.fhir.r4.model.codesystems.EncounterStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -105,6 +106,18 @@ public class Hl7RelatedGeneralUtils {
             status = EncounterStatus.CANCELLED;
         }
         return status.toCode();
+    }
+    public static String getImmunizationStatus(Object rxa, Object status){
+        if (rxa == null){
+            String val = Hl7DataHandlerUtil.getStringValue(status);
+            String code = SimpleDataValueResolver.getFHIRCode(val, Immunization.ImmunizationStatus.class);
+            if (code != null){
+                return code;
+            }
+            else return "completed";
+        }
+        else return "not-done";
+
     }
 
     // DocumentReference.yml uses a required:true on status to control the creation of the DocumentReference.
