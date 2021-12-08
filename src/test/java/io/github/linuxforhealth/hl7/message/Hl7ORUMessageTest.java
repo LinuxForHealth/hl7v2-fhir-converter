@@ -123,7 +123,7 @@ public class Hl7ORUMessageTest {
 
         // Verify presentedForm from OBX of type TX - In this case no attachments created since there are no OBX with type TX
         List<Attachment> attachments = diag.getPresentedForm();
-        Assertions.assertTrue(attachments.size() == 0, "Unexpected number of attachments");
+        Assertions.assertEquals(0, attachments.size(), "Unexpected number of attachments");
 
     }
 
@@ -219,7 +219,7 @@ public class Hl7ORUMessageTest {
 
         // Verify presentedForm from OBX of type TX - In this case no attachments created because the OBX of type TX have ids.
         List<Attachment> attachments = diag.getPresentedForm();
-        Assertions.assertTrue(attachments.size() == 0, "Unexpected number of attachments");
+        Assertions.assertEquals(0, attachments.size(), "Unexpected number of attachments");
 
         ////////////////////////////////////
         // Verify the references that aren't covered in Observation tests
@@ -292,7 +292,7 @@ public class Hl7ORUMessageTest {
         ///////////////////////////////////////////
         DiagnosticReport diag = ResourceUtils.getResourceDiagnosticReport(diagnosticReport.get(0), context);
         assertThat(diag.getStatus().toCode()).isEqualTo("final"); // Verify status from OBR.25
-        assertThat(diag.getCategory().size()).isEqualTo(0); // Verify category from OBR.24
+        assertThat(diag.getCategory().size()).isZero(); // Verify category from OBR.24
 
         // Verify code from OBR.4
         assertThat(diag.hasCode()).isTrue();
@@ -326,7 +326,7 @@ public class Hl7ORUMessageTest {
 
         // Verify presentedForm from OBX of type TX - In this case no attachments created because the OBX is not of type TX.
         List<Attachment> attachments = diag.getPresentedForm();
-        Assertions.assertTrue(attachments.size() == 0, "Unexpected number of attachments");
+        Assertions.assertEquals(0, attachments.size(), "Unexpected number of attachments");
 
         ////////////////////////////////////
         // Verify the references that aren't covered in Observation tests
@@ -399,7 +399,7 @@ public class Hl7ORUMessageTest {
         ///////////////////////////////////////////
         DiagnosticReport diag = ResourceUtils.getResourceDiagnosticReport(diagnosticReport.get(0), context);
         assertThat(diag.getStatus().toCode()).isEqualTo("final"); // Verify status from OBR.25
-        assertThat(diag.getCategory().size()).isEqualTo(0); // Verify category from OBR.24
+        assertThat(diag.getCategory().size()).isZero(); // Verify category from OBR.24
 
         // Verify code from OBR.4
         assertThat(diag.hasCode()).isTrue();
@@ -432,14 +432,14 @@ public class Hl7ORUMessageTest {
 
         // Verify presentedForm from OBX of type TX - In this case no attachments created because the OBX is not of type TX.
         List<Attachment> attachments = diag.getPresentedForm();
-        Assertions.assertTrue(attachments.size() == 0, "Unexpected number of attachments");
+        Assertions.assertEquals(0, attachments.size(), "Unexpected number of attachments");
 
         ///////////////////////////////////////////
         // Now confirm content of the SECOND diagnosticReport because we don't have separate tests for DiagnosticReport
         ///////////////////////////////////////////
         DiagnosticReport diag2 = ResourceUtils.getResourceDiagnosticReport(diagnosticReport.get(0), context);
         assertThat(diag2.getStatus().toCode()).isEqualTo("final"); // Verify status from OBR.25
-        assertThat(diag2.getCategory().size()).isEqualTo(0); // Verify category from OBR.24
+        assertThat(diag2.getCategory().size()).isZero(); // Verify category from OBR.24
 
         // Verify code from OBR.4
         assertThat(diag2.hasCode()).isTrue();
@@ -472,7 +472,7 @@ public class Hl7ORUMessageTest {
 
         // Verify presentedForm from OBX of type TX - In this case no attachments created because the OBX is not type TX.
         List<Attachment> attachments2 = diag2.getPresentedForm();
-        Assertions.assertTrue(attachments2.size() == 0, "Unexpected number of attachments");
+        Assertions.assertEquals(0, attachments2.size(), "Unexpected number of attachments");
 
         ////////////////////////////////////        
         // Check the references that aren't covered in Observation tests
@@ -544,7 +544,7 @@ public class Hl7ORUMessageTest {
         ///////////////////////////////////////////
         DiagnosticReport diag = ResourceUtils.getResourceDiagnosticReport(diagnosticReport.get(0), context);
         assertThat(diag.getStatus().toCode()).isEqualTo("final"); // Verify status from OBR.25
-        assertThat(diag.getCategory().size()).isEqualTo(0); // Verify category from OBR.24
+        assertThat(diag.getCategory().size()).isZero(); // Verify category from OBR.24
 
         // Verify code from OBR.4
         assertThat(diag.hasCode()).isTrue();
@@ -581,7 +581,7 @@ public class Hl7ORUMessageTest {
         assertThat(obsRef.get(0).isEmpty()).isFalse();
         // Verify presentedForm from OBX of type ST - No attachments expected because OBX of type not TX creates an Observation.
         List<Attachment> attachments = diag.getPresentedForm();
-        Assertions.assertTrue(attachments.size() == 0, "Unexpected number of attachments");
+        Assertions.assertEquals(0, attachments.size(), "Unexpected number of attachments");
 
         ////////////////////////////////////
         // Verify the references that aren't covered in Observation tests
@@ -615,7 +615,7 @@ public class Hl7ORUMessageTest {
         IBaseResource bundleResource = context.getParser().parseResource(json);
         assertThat(bundleResource).isNotNull();
         Bundle b = (Bundle) bundleResource;
-        Assertions.assertTrue(b.getType() == BundleType.COLLECTION, "Bundle type not expected");
+        Assertions.assertSame(BundleType.COLLECTION, b.getType(), "Bundle type not expected");
         List<BundleEntryComponent> e = b.getEntry();
 
         // Verify that the right resources have been created
@@ -697,24 +697,23 @@ public class Hl7ORUMessageTest {
 
         // Verify specimen reference
         List<Reference> spmRef = diag.getSpecimen();
-        assertThat(spmRef.isEmpty());
+        assertThat(spmRef).isEmpty();
 
         // Verify result reference
         List<Reference> obsRef = diag.getResult();
-        assertThat(obsRef.isEmpty()).isTrue();
+        assertThat(obsRef).isEmpty();
 
         //Verify attachment to diagnostic report
         List<Attachment> attachments = diag.getPresentedForm();
-        Assertions.assertTrue(attachments.size() == 1, "Unexpected number of attachments");
+        Assertions.assertEquals(1, attachments.size(), "Unexpected number of attachments");
         Attachment a = attachments.get(0);
         Assertions.assertTrue(a.getContentType().equalsIgnoreCase("text/plain"), "Incorrect content type");
         Assertions.assertTrue(a.getLanguage().equalsIgnoreCase("en"), "Incorrect language");
         //Verify data attachment after decoding
         String decoded = new String(Base64.getDecoder().decode(a.getDataElement().getValueAsString()));
         System.out.println("Decoded: '" + decoded + "'");
-        Assertions.assertTrue(
-                decoded.equals("\n[PII] Emergency Department\nED Encounter Arrival Date: [ADDRESS] [PERSONALNAME]:"),
-                "Incorrect data");
+        Assertions.assertEquals("\n[PII] Emergency Department\nED Encounter Arrival Date: [ADDRESS] [PERSONALNAME]:",
+                decoded, "Incorrect data");
         Assertions.assertTrue(a.getTitle().equalsIgnoreCase("ECHO CARDIOGRAM COMPLETE"), "Incorrect title");
         //Verify creation data is persisted correctly - 2020-08-02T12:44:55+08:00
         Calendar c = Calendar.getInstance();
@@ -722,7 +721,7 @@ public class Hl7ORUMessageTest {
         c.set(2020, 7, 2, 12, 44, 55);
         c.setTimeZone(TimeZone.getTimeZone(ZoneId.of("+08:00")));
         Date d = c.getTime();
-        Assertions.assertTrue(a.getCreation().equals(d), "Incorrect creation date");
+        Assertions.assertEquals(d, a.getCreation(), "Incorrect creation date");
 
         ////////////////////////////////////
         // Verify the references that aren't covered in Observation tests
@@ -756,7 +755,7 @@ public class Hl7ORUMessageTest {
         IBaseResource bundleResource = context.getParser().parseResource(json);
         Bundle b = (Bundle) bundleResource;
         assertThat(bundleResource).isNotNull();
-        Assertions.assertTrue(b.getType() == BundleType.COLLECTION, "Bundle type not expected");
+        Assertions.assertSame(BundleType.COLLECTION, b.getType(), "Bundle type not expected");
         List<BundleEntryComponent> e = b.getEntry();
 
         // Verify that the right resources have been created
@@ -842,16 +841,16 @@ public class Hl7ORUMessageTest {
 
         // Verify specimen reference
         List<Reference> spmRef = diag.getSpecimen();
-        assertThat(spmRef.isEmpty());
+        assertThat(spmRef).isEmpty();
 
         // Verify result reference
         List<Reference> obsRef = diag.getResult();
-        assertThat(obsRef.isEmpty()).isFalse();
+        assertThat(obsRef).isNotEmpty();
         assertThat(obsRef).hasSize(1);
         assertThat(obsRef.get(0).isEmpty()).isFalse();
         // No attachment created since OBX with TX and no id is not first
         List<Attachment> attachments = diag.getPresentedForm();
-        Assertions.assertTrue(attachments.size() == 0, "Unexpected number of attachments");
+        Assertions.assertEquals(0, attachments.size(), "Unexpected number of attachments");
 
         ////////////////////////////////////
         // Verify the references that aren't covered in Observation tests

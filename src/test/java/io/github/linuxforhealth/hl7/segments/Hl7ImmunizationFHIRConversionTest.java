@@ -5,21 +5,22 @@
  */
 package io.github.linuxforhealth.hl7.segments;
 
-import io.github.linuxforhealth.hl7.segments.util.ResourceUtils;
-import org.hl7.fhir.r4.model.Immunization;
-import org.hl7.fhir.r4.model.Organization;
-import org.hl7.fhir.r4.model.Practitioner;
-import org.hl7.fhir.r4.model.Bundle;
-import org.hl7.fhir.r4.model.Resource;
-import org.hl7.fhir.r4.model.ResourceType;
-import org.junit.jupiter.api.Test;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import org.hl7.fhir.r4.model.Bundle;
+import org.hl7.fhir.r4.model.Immunization;
+import org.hl7.fhir.r4.model.Organization;
+import org.hl7.fhir.r4.model.Practitioner;
+import org.hl7.fhir.r4.model.Resource;
+import org.hl7.fhir.r4.model.ResourceType;
+import org.junit.jupiter.api.Test;
+
+import io.github.linuxforhealth.hl7.segments.util.ResourceUtils;
 
 public class Hl7ImmunizationFHIRConversionTest {
 
@@ -62,7 +63,7 @@ public class Hl7ImmunizationFHIRConversionTest {
         assertThat(resource.getReportOrigin().getText()).isEqualTo("new immunization record");// RXA.9.2
         assertThat(resource.getManufacturer().isEmpty()).isFalse(); // RXA.17
         assertThat(resource.hasRecorded()).isTrue(); //RXA.22
-        assertThat(resource.getRecordedElement().toString().contains("2012-09-01")); //RXA.22
+        assertThat(resource.getRecordedElement().toString()).contains("2012-09-01"); //RXA.22
         String manufacturerRef = resource.getManufacturer().getReference();
 
         assertThat(resource.getLotNumber()).isEqualTo("33k2a"); // RXA.15
@@ -151,7 +152,7 @@ public class Hl7ImmunizationFHIRConversionTest {
 
         immunization = ResourceUtils.getImmunization(hl7VUXmessageRep);
 
-        assertThat(immunization.hasReasonCode());
+        assertThat(immunization.hasReasonCode()).isTrue();
         assertThat(immunization.getReasonCodeFirstRep().getCodingFirstRep().getCode()).isEqualTo("00");
         assertThat(immunization.getReasonCodeFirstRep().getCodingFirstRep().getDisplay()).isEqualTo("refusal");
         assertThat(immunization.getReasonCodeFirstRep().getCodingFirstRep().getSystem()).isNull();
@@ -160,10 +161,10 @@ public class Hl7ImmunizationFHIRConversionTest {
         assertThat(immunization.getStatus().getDisplay()).isEqualTo("not-done");
         assertThat(immunization.hasStatusReason()).isTrue();
         assertThat(immunization.getStatusReason().getCodingFirstRep().getCode()).isEqualTo("PATOBJ"); // If RXA.20 is RE but RXA.18 is blank then we use PATOBJ from v3ActReason
-        assertThat(immunization.getStatusReason().getCodingFirstRep().getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/v3-ActReason");
+        assertThat(immunization.getStatusReason().getCodingFirstRep().getSystem())
+                .isEqualTo("http://terminology.hl7.org/CodeSystem/v3-ActReason");
         assertThat(immunization.getStatusReason().getCodingFirstRep().getDisplay()).isEqualTo("Patient Refusal");
         assertThat(resource.getStatusReason().getText()).isEqualTo("Patient refusal");
-
 
         //dose Quantity with a known system
         assertThat(immunization.hasDoseQuantity()).isTrue();
@@ -219,27 +220,29 @@ public class Hl7ImmunizationFHIRConversionTest {
         List<Bundle.BundleEntryComponent> e = ResourceUtils
                 .createFHIRBundleFromHL7MessageReturnEntryList(hl7VUXmessageRep);
         List<Resource> immunizations = ResourceUtils.getResourceList(e, ResourceType.Immunization);
-        assertThat(immunizations).hasSize(3);  // Exactly 3
+        assertThat(immunizations).hasSize(3); // Exactly 3
 
         // This maps manufacturer to drug name from RXA records above
         Map<String, String> mapMfgNameToDrugName = new HashMap<>();
-        mapMfgNameToDrugName.put("MERCK","MCV4-CRM");
-        mapMfgNameToDrugName.put("sanofi","HIB PRP-T");
+        mapMfgNameToDrugName.put("MERCK", "MCV4-CRM");
+        mapMfgNameToDrugName.put("sanofi", "HIB PRP-T");
         // This maps Immunization drug name to manufacturer reference Id (the GUID)
         Map<String, String> mapDrugNameToMfgRefId = new HashMap<>();
         for (int immunizationIndex = 0; immunizationIndex < immunizations.size(); immunizationIndex++) { // condIndex is index for condition
-            Immunization immunization = ResourceUtils.getResourceImmunization(immunizations.get(immunizationIndex), ResourceUtils.context);
+            Immunization immunization = ResourceUtils.getResourceImmunization(immunizations.get(immunizationIndex),
+                    ResourceUtils.context);
             String mfgId = immunization.hasManufacturer() ? immunization.getManufacturer().getReference() : null;
             String codeText = immunization.getVaccineCode().getText();
-            mapDrugNameToMfgRefId.put(codeText,mfgId);
+            mapDrugNameToMfgRefId.put(codeText, mfgId);
         }
 
         List<Resource> organizations = ResourceUtils.getResourceList(e, ResourceType.Organization);
         assertThat(organizations).hasSize(2); // Exactly 2
         // For each organization, we look up the name, get the known drug, get the manufacturer Id and see it is the same.
         for (int orgIndex = 0; orgIndex < organizations.size(); orgIndex++) { // orgIndex is index for organization
-            Organization org = ResourceUtils.getResourceOrganization(organizations.get(orgIndex), ResourceUtils.context);
-            assertThat( mapDrugNameToMfgRefId.get(mapMfgNameToDrugName.get(org.getName()))).contains(org.getId());
+            Organization org = ResourceUtils.getResourceOrganization(organizations.get(orgIndex),
+                    ResourceUtils.context);
+            assertThat(mapDrugNameToMfgRefId.get(mapMfgNameToDrugName.get(org.getName()))).contains(org.getId());
         }
 
     }
