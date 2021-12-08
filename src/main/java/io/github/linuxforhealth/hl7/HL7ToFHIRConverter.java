@@ -40,6 +40,7 @@ import io.github.linuxforhealth.hl7.resource.ResourceReader;
 public class HL7ToFHIRConverter {
   private static HL7HapiParser hparser = new HL7HapiParser();
   private static final Logger LOGGER = LoggerFactory.getLogger(HL7ToFHIRConverter.class);
+  private static final String FALLBACK_BASE = "Fallback_Base"; // fallback configuration file to use when Trigger Event does not match anything (only used if enabled in supported.hl7.messages)
   private Map<String, HL7MessageModel> messagetemplates = new HashMap<>();
 
   /**
@@ -130,7 +131,15 @@ public class HL7ToFHIRConverter {
       if (hl7MessageTemplateModel != null) {
         return hl7MessageTemplateModel.convert(hl7message, engine);
       } else {
-        throw new UnsupportedOperationException("Message type not yet supported " + messageType);
+        // try to get the our fallback template
+        hl7MessageTemplateModel = messagetemplates.get(FALLBACK_BASE);
+        if (hl7MessageTemplateModel != null) {
+          // fallback template is enabled so use it just like a normal message template model
+          return hl7MessageTemplateModel.convert(hl7message, engine);
+        } else {
+          // it is not enabled by being in the supported.hl7.messages
+          throw new UnsupportedOperationException("Message type not yet supported " + messageType);
+        }
       }
     } else {
       throw new IllegalArgumentException("Parsed HL7 message was null.");
