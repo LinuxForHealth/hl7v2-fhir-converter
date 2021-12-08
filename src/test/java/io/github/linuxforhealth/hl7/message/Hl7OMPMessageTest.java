@@ -6,6 +6,7 @@
 package io.github.linuxforhealth.hl7.message;
 
 import static org.assertj.core.api.Assertions.assertThat;
+
 import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -17,17 +18,18 @@ import org.hl7.fhir.r4.model.Bundle.BundleType;
 import org.hl7.fhir.r4.model.Resource;
 import org.hl7.fhir.r4.model.ResourceType;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import io.github.linuxforhealth.fhir.FHIRContext;
 import io.github.linuxforhealth.hl7.ConverterOptions;
 import io.github.linuxforhealth.hl7.ConverterOptions.Builder;
 import io.github.linuxforhealth.hl7.HL7ToFHIRConverter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class Hl7OMPMessageTest {
     private static FHIRContext context = new FHIRContext();
     private static final ConverterOptions OPTIONS_PRETTYPRINT = new Builder().withBundleType(BundleType.COLLECTION)
-        .withValidateResource().withPrettyPrint().build();
+            .withValidateResource().withPrettyPrint().build();
     private static final Logger LOGGER = LoggerFactory.getLogger(Hl7OMPMessageTest.class);
 
     // For reference, here is an example OMP_O09
@@ -40,16 +42,12 @@ public class Hl7OMPMessageTest {
     // + "RXR|PO^Oral\r"
     // + "OBX|1|NM|Most Current Weight^Most current measured weight (actual)||90|kg\r"
 
-
-
     @Test
     public void test_OMPO09_min_PATIENT_and_min_ORDER_groups() throws IOException {
-        String hl7message =
-            "MSH|^~\\&|WHI_LOAD_GENERATOR|IBM_TORONTO_LAB|MEDORDER|IBM|20210407191342|9022934|OMP^O09|MSGID_bae9ce6a-e35d-4ff5-8d50-c5dde19cc1aa|T|2.5.1\r"
-            + "PID|||1234^^^^MR||DOE^JANE^|||F|||||||||||||||||||||\r"
-            + "ORC|OP|1000|9999999||||^3 times daily^^20210401\r"
-            + "RXO|50111032701^hydrALAZINE HCl 25 MG Oral Tablet^NDC^^^^^^hydrALAZINE (APRESOLINE) 25 MG TABS|||||||||||||||||||||||\r";
-  
+        String hl7message = "MSH|^~\\&|WHI_LOAD_GENERATOR|IBM_TORONTO_LAB|MEDORDER|IBM|20210407191342|9022934|OMP^O09|MSGID_bae9ce6a-e35d-4ff5-8d50-c5dde19cc1aa|T|2.5.1\r"
+                + "PID|||1234^^^^MR||DOE^JANE^|||F|||||||||||||||||||||\r"
+                + "ORC|OP|1000|9999999||||^3 times daily^^20210401\r"
+                + "RXO|50111032701^hydrALAZINE HCl 25 MG Oral Tablet^NDC^^^^^^hydrALAZINE (APRESOLINE) 25 MG TABS|||||||||||||||||||||||\r";
 
         HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
         String json = ftv.convert(hl7message, OPTIONS_PRETTYPRINT);
@@ -61,29 +59,28 @@ public class Hl7OMPMessageTest {
         List<BundleEntryComponent> e = b.getEntry();
 
         List<Resource> patientResource = e.stream()
-            .filter(v -> ResourceType.Patient == v.getResource().getResourceType())
-            .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+                .filter(v -> ResourceType.Patient == v.getResource().getResourceType())
+                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
         assertThat(patientResource).hasSize(1);
-  
+
         List<Resource> medicationRequestResource = e.stream()
-            .filter(v -> ResourceType.MedicationRequest == v.getResource().getResourceType())
-            .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+                .filter(v -> ResourceType.MedicationRequest == v.getResource().getResourceType())
+                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
         assertThat(medicationRequestResource).hasSize(1);
 
         // Confirm that there are no extra resources created
         assertThat(e.size()).isEqualTo(2);
 
     }
-  
+
     @Test
     public void test_OMPO09_PATIENT_with_PATIENT_VISIT_and_min_ORDER_groups() throws IOException {
-        String hl7message =
-            "MSH|^~\\&|WHI_LOAD_GENERATOR|IBM_TORONTO_LAB|MEDORDER|IBM|20210407191342|9022934|OMP^O09|MSGID_bae9ce6a-e35d-4ff5-8d50-c5dde19cc1aa|T|2.5.1\r"
-            + "PID|||1234^^^^MR||DOE^JANE^|||F|||||||||||||||||||||\r"
-            + "PV1||I|||||||||||||||||1400|||||||||||||||||||||||||199501102300\r"
-            + "ORC|OP|1000|9999999||||^3 times daily^^20210401\r"
-            + "RXO|50111032701^hydrALAZINE HCl 25 MG Oral Tablet^NDC^^^^^^hydrALAZINE (APRESOLINE) 25 MG TABS|||||||||||||||||||||||\r";
-  
+        String hl7message = "MSH|^~\\&|WHI_LOAD_GENERATOR|IBM_TORONTO_LAB|MEDORDER|IBM|20210407191342|9022934|OMP^O09|MSGID_bae9ce6a-e35d-4ff5-8d50-c5dde19cc1aa|T|2.5.1\r"
+                + "PID|||1234^^^^MR||DOE^JANE^|||F|||||||||||||||||||||\r"
+                + "PV1||I|||||||||||||||||1400|||||||||||||||||||||||||199501102300\r"
+                + "ORC|OP|1000|9999999||||^3 times daily^^20210401\r"
+                + "RXO|50111032701^hydrALAZINE HCl 25 MG Oral Tablet^NDC^^^^^^hydrALAZINE (APRESOLINE) 25 MG TABS|||||||||||||||||||||||\r";
+
         HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
         String json = ftv.convert(hl7message, OPTIONS_PRETTYPRINT);
         assertThat(json).isNotBlank();
@@ -94,39 +91,38 @@ public class Hl7OMPMessageTest {
         List<BundleEntryComponent> e = b.getEntry();
 
         List<Resource> patientResource = e.stream()
-            .filter(v -> ResourceType.Patient == v.getResource().getResourceType())
-            .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+                .filter(v -> ResourceType.Patient == v.getResource().getResourceType())
+                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
         assertThat(patientResource).hasSize(1);
-  
+
         List<Resource> encounterResource = e.stream()
-            .filter(v -> ResourceType.Encounter == v.getResource().getResourceType())
-            .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+                .filter(v -> ResourceType.Encounter == v.getResource().getResourceType())
+                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
         assertThat(encounterResource).hasSize(1);
 
         List<Resource> medicationRequestResource = e.stream()
-            .filter(v -> ResourceType.MedicationRequest == v.getResource().getResourceType())
-            .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+                .filter(v -> ResourceType.MedicationRequest == v.getResource().getResourceType())
+                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
         assertThat(medicationRequestResource).hasSize(1);
 
         // Confirm that there are no extra resources created
         assertThat(e.size()).isEqualTo(3);
 
     }
-  
+
     @Test
     public void test_OMPO09_full_PATIENT_with_PATIENT_VISIT_and_min_ORDER_groups() throws IOException {
-        String hl7message =
-            "MSH|^~\\&|WHI_LOAD_GENERATOR|IBM_TORONTO_LAB|MEDORDER|IBM|20210407191342|9022934|OMP^O09|MSGID_bae9ce6a-e35d-4ff5-8d50-c5dde19cc1aa|T|2.5.1\r"
-            + "PID|||1234^^^^MR||DOE^JANE^|||F|||||||||||||||||||||\r"
-            + "PD1|||||||||||01|N||||A\r"
-            + "PV1||I|||||||||||||||||1400|||||||||||||||||||||||||199501102300\r"
-            + "PV2|||chortles|||||||||||||||||||||||||||||||||\r"
-            + "AL1|1|DRUG|00000741^OXYCODONE||HYPOTENSION\r"
-            + "AL1|2|DA|1605^acetaminophen^L|MO|Muscle Pain~hair loss\r"
-            + "AL1|3|BRANDNAME4|00008604^LEVAQUIN||RASH ITCHING\r"
-            + "ORC|OP|1000|9999999||||^3 times daily^^20210401\r"
-            + "RXO|50111032701^hydrALAZINE HCl 25 MG Oral Tablet^NDC^^^^^^hydrALAZINE (APRESOLINE) 25 MG TABS|||||||||||||||||||||||\r";
-  
+        String hl7message = "MSH|^~\\&|WHI_LOAD_GENERATOR|IBM_TORONTO_LAB|MEDORDER|IBM|20210407191342|9022934|OMP^O09|MSGID_bae9ce6a-e35d-4ff5-8d50-c5dde19cc1aa|T|2.5.1\r"
+                + "PID|||1234^^^^MR||DOE^JANE^|||F|||||||||||||||||||||\r"
+                + "PD1|||||||||||01|N||||A\r"
+                + "PV1||I|||||||||||||||||1400|||||||||||||||||||||||||199501102300\r"
+                + "PV2|||chortles|||||||||||||||||||||||||||||||||\r"
+                + "AL1|1|DRUG|00000741^OXYCODONE||HYPOTENSION\r"
+                + "AL1|2|DA|1605^acetaminophen^L|MO|Muscle Pain~hair loss\r"
+                + "AL1|3|BRANDNAME4|00008604^LEVAQUIN||RASH ITCHING\r"
+                + "ORC|OP|1000|9999999||||^3 times daily^^20210401\r"
+                + "RXO|50111032701^hydrALAZINE HCl 25 MG Oral Tablet^NDC^^^^^^hydrALAZINE (APRESOLINE) 25 MG TABS|||||||||||||||||||||||\r";
+
         HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
         String json = ftv.convert(hl7message, OPTIONS_PRETTYPRINT);
         assertThat(json).isNotBlank();
@@ -137,23 +133,23 @@ public class Hl7OMPMessageTest {
         List<BundleEntryComponent> e = b.getEntry();
 
         List<Resource> patientResource = e.stream()
-            .filter(v -> ResourceType.Patient == v.getResource().getResourceType())
-            .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+                .filter(v -> ResourceType.Patient == v.getResource().getResourceType())
+                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
         assertThat(patientResource).hasSize(1);
-  
+
         List<Resource> encounterResource = e.stream()
-            .filter(v -> ResourceType.Encounter == v.getResource().getResourceType())
-            .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+                .filter(v -> ResourceType.Encounter == v.getResource().getResourceType())
+                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
         assertThat(encounterResource).hasSize(1);
 
         List<Resource> allergyResource = e.stream()
-            .filter(v -> ResourceType.AllergyIntolerance == v.getResource().getResourceType())
-            .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+                .filter(v -> ResourceType.AllergyIntolerance == v.getResource().getResourceType())
+                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
         assertThat(allergyResource).hasSize(3);
 
         List<Resource> medicationRequestResource = e.stream()
-            .filter(v -> ResourceType.MedicationRequest == v.getResource().getResourceType())
-            .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+                .filter(v -> ResourceType.MedicationRequest == v.getResource().getResourceType())
+                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
         assertThat(medicationRequestResource).hasSize(1);
 
         // Confirm that there are no extra resources created
@@ -162,22 +158,19 @@ public class Hl7OMPMessageTest {
 
     @Test
     public void test_OMPO09_ORDER_with_multiple_OBSERVATIONS_with_OBXnonTX() throws IOException {
-        String hl7message =
-            "MSH|^~\\&|WHI_LOAD_GENERATOR|IBM_TORONTO_LAB|MEDORDER|IBM|20210407191342|9022934|OMP^O09|MSGID_bae9ce6a-e35d-4ff5-8d50-c5dde19cc1aa|T|2.5.1\r"
-            + "PID|||1234^^^^MR||DOE^JANE^|||F|||||||||||||||||||||\r"  //Even though PID is optional, I had to provide it in order to get results from the converter
-            //1st order
-            + "ORC|OP|1000|9999999||||^3 times daily^^20210401\r"
-            + "RXO|50111032701^hydrALAZINE HCl 25 MG Oral Tablet^NDC^^^^^^hydrALAZINE (APRESOLINE) 25 MG TABS|||||||||||||||||||||||\r"
-            + "OBX|1|NM|Most Current Weight^Most current measured weight (actual)||90|kg\r"
-            + "OBX|2|ST|0135–4^TotalProtein||6.4|gm/dl|5.9-8.4||||F||||||\r"
-            + "OBX|3|CE|30945-0^Contraindication^LN||21^acute illness^NIP^^^|||||||F| \r"
-            //2nd order
-            + "ORC|OP|1000|9999999||||^3 times daily^^20210401\r"
-            + "RXO|RX800006^Test15 SODIUM 100 MG CAPSULE|100||mg|||||G||10||5\r"
-            + "OBX|1|ST|TS-F-01-002^Endocrine Disorders^L||obs report||||||F\r"
-            ;
+        String hl7message = "MSH|^~\\&|WHI_LOAD_GENERATOR|IBM_TORONTO_LAB|MEDORDER|IBM|20210407191342|9022934|OMP^O09|MSGID_bae9ce6a-e35d-4ff5-8d50-c5dde19cc1aa|T|2.5.1\r"
+                + "PID|||1234^^^^MR||DOE^JANE^|||F|||||||||||||||||||||\r" //Even though PID is optional, I had to provide it in order to get results from the converter
+                //1st order
+                + "ORC|OP|1000|9999999||||^3 times daily^^20210401\r"
+                + "RXO|50111032701^hydrALAZINE HCl 25 MG Oral Tablet^NDC^^^^^^hydrALAZINE (APRESOLINE) 25 MG TABS|||||||||||||||||||||||\r"
+                + "OBX|1|NM|Most Current Weight^Most current measured weight (actual)||90|kg\r"
+                + "OBX|2|ST|0135-4^TotalProtein||6.4|gm/dl|5.9-8.4||||F||||||\r"
+                + "OBX|3|CE|30945-0^Contraindication^LN||21^acute illness^NIP^^^|||||||F| \r"
+                //2nd order
+                + "ORC|OP|1000|9999999||||^3 times daily^^20210401\r"
+                + "RXO|RX800006^Test15 SODIUM 100 MG CAPSULE|100||mg|||||G||10||5\r"
+                + "OBX|1|ST|TS-F-01-002^Endocrine Disorders^L||obs report||||||F\r";
 
-  
         HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
         String json = ftv.convert(hl7message, OPTIONS_PRETTYPRINT);
         assertThat(json).isNotBlank();
@@ -188,18 +181,18 @@ public class Hl7OMPMessageTest {
         List<BundleEntryComponent> e = b.getEntry();
 
         List<Resource> patientResource = e.stream()
-            .filter(v -> ResourceType.Patient == v.getResource().getResourceType())
-            .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+                .filter(v -> ResourceType.Patient == v.getResource().getResourceType())
+                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
         assertThat(patientResource).hasSize(1);
 
         List<Resource> medicationRequestResource = e.stream()
-            .filter(v -> ResourceType.MedicationRequest == v.getResource().getResourceType())
-            .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+                .filter(v -> ResourceType.MedicationRequest == v.getResource().getResourceType())
+                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
         assertThat(medicationRequestResource).hasSize(2);
 
         List<Resource> observationResource = e.stream()
-            .filter(v -> ResourceType.Observation == v.getResource().getResourceType())
-            .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+                .filter(v -> ResourceType.Observation == v.getResource().getResourceType())
+                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
         assertThat(observationResource).hasSize(4);
 
         // Confirm that there are no extra resources created
@@ -209,20 +202,18 @@ public class Hl7OMPMessageTest {
 
     @Test
     public void test_OMPO09_ORDER_with_multiple_OBSERVATIONS_with_OBXtypeTX() throws IOException {
-        String hl7message =
-            "MSH|^~\\&|WHI_LOAD_GENERATOR|IBM_TORONTO_LAB|MEDORDER|IBM|20210407191342|9022934|OMP^O09|MSGID_bae9ce6a-e35d-4ff5-8d50-c5dde19cc1aa|T|2.5.1\r"
-            + "PID|||1234^^^^MR||DOE^JANE^|||F|||||||||||||||||||||\r"  //Even though PID is optional, I had to provide it in order to get results from the converter
-            + "ORC|OP|1000|9999999||||^3 times daily^^20210401\r"
-            + "RXO|50111032701^hydrALAZINE HCl 25 MG Oral Tablet^NDC^^^^^^hydrALAZINE (APRESOLINE) 25 MG TABS|||||||||||||||||||||||\r"
-            + "OBX|1|TX|||Report line 1|||||||X\r"
-            + "OBX|2|TX|||Report line 2|||||||X\r"
-            //2nd order
-            + "ORC|OP|1000|9999999||||^3 times daily^^20210401\r"
-            + "RXO|RX800006^Test15 SODIUM 100 MG CAPSULE|100||mg|||||G||10||5\r"
-            + "OBX|1|TX|1234^some text^SCT||First line: Sodium Report||||||F||\n"
-            + "OBX|2|TX|1234^some text^SCT||Second line: Sodium REPORT||||||F||\n"
-            ;
-  
+        String hl7message = "MSH|^~\\&|WHI_LOAD_GENERATOR|IBM_TORONTO_LAB|MEDORDER|IBM|20210407191342|9022934|OMP^O09|MSGID_bae9ce6a-e35d-4ff5-8d50-c5dde19cc1aa|T|2.5.1\r"
+                + "PID|||1234^^^^MR||DOE^JANE^|||F|||||||||||||||||||||\r" //Even though PID is optional, I had to provide it in order to get results from the converter
+                + "ORC|OP|1000|9999999||||^3 times daily^^20210401\r"
+                + "RXO|50111032701^hydrALAZINE HCl 25 MG Oral Tablet^NDC^^^^^^hydrALAZINE (APRESOLINE) 25 MG TABS|||||||||||||||||||||||\r"
+                + "OBX|1|TX|||Report line 1|||||||X\r"
+                + "OBX|2|TX|||Report line 2|||||||X\r"
+                //2nd order
+                + "ORC|OP|1000|9999999||||^3 times daily^^20210401\r"
+                + "RXO|RX800006^Test15 SODIUM 100 MG CAPSULE|100||mg|||||G||10||5\r"
+                + "OBX|1|TX|1234^some text^SCT||First line: Sodium Report||||||F||\n"
+                + "OBX|2|TX|1234^some text^SCT||Second line: Sodium REPORT||||||F||\n";
+
         HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
         String json = ftv.convert(hl7message, OPTIONS_PRETTYPRINT);
         assertThat(json).isNotBlank();
@@ -233,18 +224,18 @@ public class Hl7OMPMessageTest {
         List<BundleEntryComponent> e = b.getEntry();
 
         List<Resource> patientResource = e.stream()
-            .filter(v -> ResourceType.Patient == v.getResource().getResourceType())
-            .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+                .filter(v -> ResourceType.Patient == v.getResource().getResourceType())
+                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
         assertThat(patientResource).hasSize(1);
 
         List<Resource> medicationRequestResource = e.stream()
-            .filter(v -> ResourceType.MedicationRequest == v.getResource().getResourceType())
-            .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+                .filter(v -> ResourceType.MedicationRequest == v.getResource().getResourceType())
+                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
         assertThat(medicationRequestResource).hasSize(2);
 
         List<Resource> docRefResource = e.stream()
-            .filter(v -> ResourceType.DocumentReference == v.getResource().getResourceType())
-            .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+                .filter(v -> ResourceType.DocumentReference == v.getResource().getResourceType())
+                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
         assertThat(docRefResource).hasSize(0);//TODO: This should be 2 when card 864 is completed
 
         // Confirm that there are no extra resources created
@@ -254,26 +245,23 @@ public class Hl7OMPMessageTest {
 
     @Test
     public void test_OMPO09_with_multiple_ORDERs_with_and_without_OBXtypeTX() throws IOException {
-        String hl7message =
-            "MSH|^~\\&|WHI_LOAD_GENERATOR|IBM_TORONTO_LAB|MEDORDER|IBM|20210407191342|9022934|OMP^O09|MSGID_bae9ce6a-e35d-4ff5-8d50-c5dde19cc1aa|T|2.5.1\r"
-            + "PID|||1234^^^^MR||DOE^JANE^|||F|||||||||||||||||||||\r"  //Even though PID is optional, I had to provide it in order to get results from the converter
-            // first order group
-            + "ORC|OP|1000|9999999||||^3 times daily^^20210401\r"
-            + "RXO|50111032701^hydrALAZINE HCl 25 MG Oral Tablet^NDC^^^^^^hydrALAZINE (APRESOLINE) 25 MG TABS|||||||||||||||||||||||\r"
-            + "OBX|1|TX|||Report line 1|||||||X\r"
-            + "OBX|2|TX|||Report line 2|||||||X\r"
-            // second order group
-            + "ORC|OP|1000|9999999||||^3 times daily^^20210401\r"
-            + "RXO|50111032701^hydrALAZINE HCl 25 MG Oral Tablet^NDC^^^^^^hydrALAZINE (APRESOLINE) 25 MG TABS|||||||||||||||||||||||\r"
-            + "OBX|1|NM|Most Current Weight^Most current measured weight (actual)||90|kg\r"
-            + "OBX|2|ST|0135–4^TotalProtein||6.4|gm/dl|5.9-8.4||||F||||||\r"
-            + "OBX|3|CE|30945-0^Contraindication^LN||21^acute illness^NIP^^^|||||||F| \r"
-            // third order group
-            + "ORC|OP|1000|9999999||||^3 times daily^^20210401\r"
-            + "RXO|50111032701^hydrALAZINE HCl 25 MG Oral Tablet^NDC^^^^^^hydrALAZINE (APRESOLINE) 25 MG TABS|||||||||||||||||||||||\r"
-            ;
+        String hl7message = "MSH|^~\\&|WHI_LOAD_GENERATOR|IBM_TORONTO_LAB|MEDORDER|IBM|20210407191342|9022934|OMP^O09|MSGID_bae9ce6a-e35d-4ff5-8d50-c5dde19cc1aa|T|2.5.1\r"
+                + "PID|||1234^^^^MR||DOE^JANE^|||F|||||||||||||||||||||\r" //Even though PID is optional, I had to provide it in order to get results from the converter
+                // first order group
+                + "ORC|OP|1000|9999999||||^3 times daily^^20210401\r"
+                + "RXO|50111032701^hydrALAZINE HCl 25 MG Oral Tablet^NDC^^^^^^hydrALAZINE (APRESOLINE) 25 MG TABS|||||||||||||||||||||||\r"
+                + "OBX|1|TX|||Report line 1|||||||X\r"
+                + "OBX|2|TX|||Report line 2|||||||X\r"
+                // second order group
+                + "ORC|OP|1000|9999999||||^3 times daily^^20210401\r"
+                + "RXO|50111032701^hydrALAZINE HCl 25 MG Oral Tablet^NDC^^^^^^hydrALAZINE (APRESOLINE) 25 MG TABS|||||||||||||||||||||||\r"
+                + "OBX|1|NM|Most Current Weight^Most current measured weight (actual)||90|kg\r"
+                + "OBX|2|ST|0135-4^TotalProtein||6.4|gm/dl|5.9-8.4||||F||||||\r"
+                + "OBX|3|CE|30945-0^Contraindication^LN||21^acute illness^NIP^^^|||||||F| \r"
+                // third order group
+                + "ORC|OP|1000|9999999||||^3 times daily^^20210401\r"
+                + "RXO|50111032701^hydrALAZINE HCl 25 MG Oral Tablet^NDC^^^^^^hydrALAZINE (APRESOLINE) 25 MG TABS|||||||||||||||||||||||\r";
 
-  
         HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
         String json = ftv.convert(hl7message, OPTIONS_PRETTYPRINT);
         assertThat(json).isNotBlank();
@@ -284,24 +272,24 @@ public class Hl7OMPMessageTest {
         List<BundleEntryComponent> e = b.getEntry();
 
         List<Resource> patientResource = e.stream()
-            .filter(v -> ResourceType.Patient == v.getResource().getResourceType())
-            .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+                .filter(v -> ResourceType.Patient == v.getResource().getResourceType())
+                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
         assertThat(patientResource).hasSize(1);
 
         List<Resource> medicationRequestResource = e.stream()
-            .filter(v -> ResourceType.MedicationRequest == v.getResource().getResourceType())
-            .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+                .filter(v -> ResourceType.MedicationRequest == v.getResource().getResourceType())
+                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
         assertThat(medicationRequestResource).hasSize(3);
 
         List<Resource> observationResource = e.stream()
-            .filter(v -> ResourceType.Observation == v.getResource().getResourceType())
-            .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+                .filter(v -> ResourceType.Observation == v.getResource().getResourceType())
+                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
         assertThat(observationResource).hasSize(3);
 
         List<Resource> docRefResource = e.stream()
-            .filter(v -> ResourceType.DocumentReference == v.getResource().getResourceType())
-            .map(BundleEntryComponent::getResource).collect(Collectors.toList());
-        assertThat(docRefResource).hasSize(0);  //TODO: This should be 1 when card 864 is completed
+                .filter(v -> ResourceType.DocumentReference == v.getResource().getResourceType())
+                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        assertThat(docRefResource).hasSize(0); //TODO: This should be 1 when card 864 is completed
 
         // Confirm that there are no extra resources created
         assertThat(e.size()).isEqualTo(7); //TODO: This should be 8 when card 864 is completed
