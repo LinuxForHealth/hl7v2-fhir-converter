@@ -26,19 +26,19 @@ status:
       rxa20: RXA.20
       orc5: ORC.5
 statusReason_1:
-   condition: $code NOT_NULL
+   condition: $rxa18 NOT_NULL
    valueOf: datatype/CodeableConcept
    expressionType: resource
    specs: RXA.18
    vars:
-      code: RXA.18
+      rxa18: RXA.18
 statusReason_2:
-   condition: $rxa18 NULL && statCode NOT_NULL
    valueOf: datatype/CodeableConcept_var
    expressionType: resource
+   condition: $rxa18 NULL && $statCode EQUALS RE
    vars:
       rxa18: RXA.18
-      statCode: RXA.20 | ORC.5
+      statCode: STRING, RXA.20
    constants:
       code: "PATOBJ"
       display: "Patient Refusal"
@@ -74,7 +74,7 @@ reportOrigin:
    expressionType: resource
    specs: RXA.9
 manufacturer:
-   condition: rxa17 NOT_NULL
+   condition: $rxa17 NOT_NULL
    valueOf: resource/Organization
    expressionType: reference
    specs: RXA.17

@@ -107,28 +107,18 @@ public class Hl7RelatedGeneralUtils {
         }
         return status.toCode();
     }
+
     public static String getImmunizationStatus(Object rxa18, Object rxa20, Object orc5) {
         if (rxa20 != null){
-            String val = Hl7DataHandlerUtil.getStringValue(rxa20);
-            String code = SimpleDataValueResolver.getFHIRCode(val, Immunization.ImmunizationStatus.class);
-            if (code != null){
-                return code;
-            }
+                return  SimpleDataValueResolver.getFHIRCode(rxa20.toString(), Immunization.ImmunizationStatus.class);
         }
         else if(rxa18 != null) {
             return "not-done";
         }
         else if  (orc5 != null){
-            String val = Hl7DataHandlerUtil.getStringValue(orc5);
-            String code = SimpleDataValueResolver.getFHIRCode(val, Immunization.ImmunizationStatus.class);
-            if (code != null){
-                return code;
-            }
+                return SimpleDataValueResolver.getFHIRCode(orc5.toString(), Immunization.ImmunizationStatus.class);
         }
         else return "completed";
-
-        return null;
-
     }
 
     // DocumentReference.yml uses a required:true on status to control the creation of the DocumentReference.
