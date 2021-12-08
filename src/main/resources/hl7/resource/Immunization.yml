@@ -161,9 +161,9 @@ reaction:
    vars:
       detail: OBX.3
 education:
-   valueOf: 'GeneralUtils.getImmunization(obx)'
+   valueOf: secondary/Education
    generateList: true
-   expressionType: JEXL
+   expressionType: resource
    vars:
       obx5: OBX.5
       obx3: OBX.3.1

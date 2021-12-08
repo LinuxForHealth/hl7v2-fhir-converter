@@ -5,12 +5,12 @@
 #
 ---
 documentType:
-   condition: $obx3 EQUALS $code
-   type: String
-   valueOf: $docuType
+   condition: $checkObx NOT_NULL
+   valueOf: $obx5
    expressionType: HL7Spec
-   constants:
-      code: 69764-9
+   vars:
+      checkObx: CHECK_EDU, $obx3
+
 
 
 #reference:
