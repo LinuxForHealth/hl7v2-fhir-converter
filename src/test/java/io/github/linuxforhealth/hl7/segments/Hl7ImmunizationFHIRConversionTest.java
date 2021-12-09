@@ -8,6 +8,7 @@ package io.github.linuxforhealth.hl7.segments;
 import io.github.linuxforhealth.hl7.segments.util.ResourceUtils;
 import org.hl7.fhir.r4.model.Immunization;
 import org.hl7.fhir.r4.model.Organization;
+import org.hl7.fhir.r4.model.Observation;
 import org.hl7.fhir.r4.model.Practitioner;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Resource;
@@ -57,6 +58,7 @@ public class Hl7ImmunizationFHIRConversionTest {
         assertThat(resource.hasRecorded()).isTrue(); //RXA.22
         assertThat(resource.getRecordedElement().toString().contains("2012-09-01")); //RXA.22
         String manufacturerRef = resource.getManufacturer().getReference();
+        String reactionDetail= resource.getReactionFirstRep().getDetail().getReference();
 
         assertThat(resource.getLotNumber()).isEqualTo("33k2a"); // RXA.15
         assertThat(resource.getExpirationDate()).isEqualTo("2013-12-10"); // RXA.16
@@ -100,6 +102,19 @@ public class Hl7ImmunizationFHIRConversionTest {
         assertThat(org.getId()).isEqualTo(manufacturerRef);
         assertThat(org.hasContact()).isFalse();
 
+        // Looking for one Observation that matches the Reaction.Detail reference
+        List<Resource> observations = ResourceUtils.getResourceList(e, ResourceType.Observation);
+        assertThat(observations).hasSize(1);
+        Observation obs = ResourceUtils.getResourceObservation(observations.get(0), ResourceUtils.context);
+        assertThat(obs.getId()).isEqualTo(reactionDetail);
+        assertThat(obs.getCode().getCodingFirstRep().getDisplay()).isEqualTo("HIB Info Sheet");
+        assertThat(obs.getCode().getCodingFirstRep().getCode()).isEqualTo("69764-9");
+        assertThat(obs.getCode().getCodingFirstRep().getSystem()).isEqualTo("http://loinc.org");
+        assertThat(obs.getCode().getText()).isEqualTo("HIB Info Sheet");
+
+        //Education.DocumentType shows under the condition that OBX.3.1 has 69764-9 as the code
+        assertThat(resource.getEducationFirstRep().getDocumentType()).isEqualTo("19981216");
+
         // Test that a ServiceRequest is not created for VXU_V04
         List<Resource> serviceRequestList = ResourceUtils.getResourceList(e, ResourceType.ServiceRequest);
         // Confirm that a serviceRequest was not created.
@@ -111,7 +126,7 @@ public class Hl7ImmunizationFHIRConversionTest {
                 + "ORC|RE||197027|||||||^Clerk^Myron|||||||RI2050\r"
                 + "RXA|0|1|20130531|20130531|48^HIB PRP-T^CVX|0.5|ML^^^||00^new immunization record^NIP001|^Sticker^Nurse|^^^RI2050||||33k2a|20131210|PMC^sanofi^MVX|||CP|A\r"
                 + "RXR|C28161^IM^NCIT^IM^INTRAMUSCULAR^HL70162|RT^right thigh^HL70163\r"
-                + "OBX|1|CE|64994-7^vaccine fund pgm elig cat^LN|1|V02^VFC eligible Medicaid/MedicaidManaged Care^HL70064||||||F|||20130531|||VXC40^per imm^CDCPHINVS\r";
+                + "OBX|1|ST|30956-7^vaccine type^LN|1|107||||||F|||20130531|||VXC40^per imm^CDCPHINVS\r";
 
         Immunization immunization1 = ResourceUtils.getImmunization(hl7VUXmessageRep);
 
@@ -127,13 +142,16 @@ public class Hl7ImmunizationFHIRConversionTest {
         assertThat(immunization1.getDoseQuantity().getSystem()).isNull();
         assertThat(immunization1.getDoseQuantity().getCode()).isNull();
 
+        //Education.Reference shows under the condition that OBX.3.1 has 30956-7 as the code
+        assertThat(immunization1.getEducationFirstRep().getReference()).isEqualTo("urn:id:107");
+
         // Test should only return RXA.10, ORC.12  is empty
         hl7VUXmessageRep = "MSH|^~\\&|MYEHR2.5|RI88140101|KIDSNET_IFL|RIHEALTH|20130531||VXU^V04^VXU_V04|20130531RI881401010105|P|2.5.1|||NE|AL||||||RI543763\r"
                 + "PID|1||12345^^^^MR||TestPatient^Jane^^^^^L||||||\r"
                 + "ORC|RE||197027|||||||^Clerk^Myron|||||||RI2050\r"
                 + "RXA|0|1|20130531|20130531|48^HIB PRP-T^CVX|0.5|ML^^UCUM||00^new immunization record^NIP001|^Sticker^Nurse|^^^RI2050||||33k2a|20131210|PMC^sanofi^MVX||00^refusal|CP|A\r"
                 + "RXR|C28161^IM^NCIT^IM^INTRAMUSCULAR^HL70162|RT^right thigh^HL70163\r"
-                + "OBX|1|CE|64994-7^vaccine fund pgm elig cat^LN|1|V02^VFC eligible Medicaid/MedicaidManaged Care^HL70064||||||F|||20130531|||VXC40^per imm^CDCPHINVS\r";
+                + "OBX|1|DT|29768-9^vaccine fund pgm elig cat^LN|1|20071115011212||||||F|||20130531|||VXC40^per imm^CDCPHINVS\r";
 
         Immunization immunization2 = ResourceUtils.getImmunization(hl7VUXmessageRep);
 
@@ -149,16 +167,22 @@ public class Hl7ImmunizationFHIRConversionTest {
         assertThat(immunization2.getDoseQuantity().getUnit()).isEqualTo("ML");
         assertThat(immunization2.getDoseQuantity().getSystem()).isEqualTo("http://unitsofmeasure.org");
 
+        //Education.PublicationDate shows under the condition that OBX.3.1 has 29768-9 as the code
+       // assertThat(immunization2.getEducationFirstRep().getPublicationDate().contains("2007-11-15");
+
         hl7VUXmessageRep = "MSH|^~\\&|MYEHR2.5|RI88140101|KIDSNET_IFL|RIHEALTH|20130531||VXU^V04^VXU_V04|20130531RI881401010105|P|2.5.1|||NE|AL||||||RI543763\r"
                 + "PID|1||12345^^^^MR||TestPatient^Jane^^^^^L||||||\r"
                 + "ORC|RE||197027|||||||^Clerk^Myron|||||||RI2050\r"
                 + "RXA|0|1|20130531|20130531|48^HIB PRP-T^CVX|999|ML^^UCUM||00^new immunization record^NIP001|^Sticker^Nurse|^^^RI2050||||33k2a|20131210|PMC^sanofi^MVX||00^refusal|CP|A\r"
                 + "RXR|C28161^IM^NCIT^IM^INTRAMUSCULAR^HL70162|RT^right thigh^HL70163\r"
-                + "OBX|1|CE|64994-7^vaccine fund pgm elig cat^LN|1|V02^VFC eligible Medicaid/MedicaidManaged Care^HL70064||||||F|||20130531|||VXC40^per imm^CDCPHINVS\r";
+                + "OBX|1|DTM|29769-7^Date vaccine information statement presented^LN|1|20071115011212||||||F|||20130531|||VXC40^per imm^CDCPHINVS\r";
 
         Immunization immunization3 = ResourceUtils.getImmunization(hl7VUXmessageRep);
         //dose Quantity with 999 as the value which should return null;
         assertThat(immunization3.hasDoseQuantity()).isFalse();
+
+//        //Education.PresentationDate shows under the condition that OBX.3.1 has 29769-7 as the code
+//         assertThat(immunization2.getEducationFirstRep().getPresentationDate().toString().contains("2007-11-15"));
     }
     // TODO: 10/15/21 RXA-9 (also mapped to primarySource)
     //  RXA-20 (status, statusReason, isSubpotent)

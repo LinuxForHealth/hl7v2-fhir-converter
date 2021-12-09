@@ -159,11 +159,11 @@ reaction:
    generateList: true
    expressionType: resource
    vars:
-      detail: OBX.3
+      detail: OBX.5
 education:
+   condition: $obx5 NOT_NULL
    valueOf: secondary/Education
    generateList: true
    expressionType: resource
    vars:
       obx5: OBX.5
-      obx3: OBX.3.1

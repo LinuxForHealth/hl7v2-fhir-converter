@@ -5,16 +5,38 @@
 #
 ---
 documentType:
-   condition: $checkObx NOT_NULL
-   valueOf: $obx5
+   condition: $obx3 EQUALS 69764-9
+   valueOf: $docType
    expressionType: HL7Spec
    vars:
-      checkObx: CHECK_EDU, $obx3
+      docType: STRING, OBX.5
+      obx3: STRING, OBX.3.1
 
 
+reference:
+   condition: $obx3 EQUALS 30956-7
+   valueOf: $reference
+   expressionType: HL7Spec
+   vars:
+      obx5: STRING, OBX.5
+      obx3: STRING, OBX.3.1
+      reference: $id + obx5
+   constants:
+      id: "urn:id:"
 
-#reference:
-#
+
 #publicationDate:
-#
-#presentationDate:
+#   condition: $obx3 EQUALS 29768-9
+#   valueOf: "GeneralUtils.handleDate(pubDate)"
+#   expressionType: resource
+#   vars:
+#      pubDate: DATE_TIME, OBX.5
+#      obx3: STRING, OBX.3.1
+
+presentationDate:
+   condition: $obx3 EQUALS 29769-7
+   valueOf: $presDate
+   expressionType: HL7Spec
+   vars:
+      presDate: DATE_TIME, OBX.5
+      obx3: STRING, OBX.3.1

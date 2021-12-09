@@ -504,18 +504,6 @@ public class SimpleDataValueResolver {
         return commonCodingSystemV2(table, code, text, version);
     };
 
-    public static final ValueExtractor<Object, String> CHECK_EDU = (Object value) -> {
-        System.out.print(value);
-        switch(value.toString()) {
-            case "29769-7": return "PresentationDate";
-            case "29768-9": return "PublicationDate";
-            case "30956-7": return "Reference";
-            case "69764-9": return "DocumentType";
-
-        }
-    return null;
-    };
-
     // For OBX.5 and other dynamic encoded fields, the real class is wrapped in the Varies class, and must be extracted from data
     private static final Object checkForAndUnwrapVariesObject(Object value) {
         if (value instanceof Varies) {

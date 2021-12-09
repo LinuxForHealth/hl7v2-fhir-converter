@@ -5,6 +5,7 @@
  */
 package io.github.linuxforhealth.hl7.data;
 
+import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.Temporal;
 import java.time.temporal.UnsupportedTemporalTypeException;
@@ -14,6 +15,8 @@ import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.ibm.fhir.model.type.Date;
+import com.ibm.fhir.model.type.DateTime;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringEscapeUtils;
 import org.apache.commons.text.StringTokenizer;
@@ -105,6 +108,16 @@ public class Hl7RelatedGeneralUtils {
             status = EncounterStatus.CANCELLED;
         }
         return status.toCode();
+    }
+
+    public static String handleDate(Object var) {
+        if (var != null){
+            System.out.print(SimpleDataValueResolver.DATE_TIME.apply(var));
+            String date = SimpleDataValueResolver.DATE_TIME.apply(var);
+            System.out.print(Date.of(date));
+            return "2017-10-1";
+        }
+        return null;
     }
 
     // DocumentReference.yml uses a required:true on status to control the creation of the DocumentReference.
