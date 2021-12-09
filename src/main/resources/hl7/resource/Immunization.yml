@@ -134,9 +134,9 @@ reasonReference:
    useGroup: true
 isSubpotent:
    value: true
-   condition: $rxa20 EQUALS 'PA'
+   condition: $rxa20 EQUALS PA
    vars:
-      rxa20: RXA.20
+      rxa20: String, RXA.20
 programEligibility:
    valueOf: datatype/CodeableConcept_var
    expressionType: resource

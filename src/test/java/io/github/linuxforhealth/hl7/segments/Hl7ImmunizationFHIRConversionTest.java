@@ -162,7 +162,7 @@ public class Hl7ImmunizationFHIRConversionTest {
         assertThat(immunization.getStatusReason().getCodingFirstRep().getCode()).isEqualTo("PATOBJ"); // If RXA.20 is RE but RXA.18 is blank then we use PATOBJ from v3ActReason
         assertThat(immunization.getStatusReason().getCodingFirstRep().getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/v3-ActReason");
         assertThat(immunization.getStatusReason().getCodingFirstRep().getDisplay()).isEqualTo("Patient Refusal");
-        assertThat(resource.getStatusReason().getText()).isEqualTo("Patient Refusal");
+        assertThat(resource.getStatusReason().getText()).isEqualTo("Patient refusal");
 
 
         //dose Quantity with a known system
@@ -199,7 +199,6 @@ public class Hl7ImmunizationFHIRConversionTest {
         assertThat(immunization.hasStatusReason()).isFalse();
     }
     // TODO: 10/15/21 RXA-9 (also mapped to primarySource)
-    //  RXA-20 (isSubpotent)
 
     // The following checks for a situation where non-manufacturer RXA Immunizations interfered with the creation of manufacturer Immununization
     // The test will ensure the problem doesn't come back.
