@@ -4,6 +4,10 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+//########################################################################
+// Used for testing only. Not used in production.
+//########################################################################
+
 package org.foo.hl7.custom.message;
 
 import ca.uhn.hl7v2.model.v26.segment.*;
@@ -27,9 +31,8 @@ import ca.uhn.hl7v2.model.*;
  *
  * Sample Message:
  * MSH|^~\\&|||||20210709162149||HIST^PAT|20210709162149|P|2.6
- * PID|1|100021^^^FAC|100021^^^FAC||DOE^JANE||196705270000|F|||||5733551967|||U ++
- * PRB|1|20210726|11334^ABNORMALITIES OF
- * HAIR^ICD9||||201208070948||201208070948|||||||201208070948 ++
+ * PID|1|100021^^^FAC|100021^^^FAC||DOE^JANE||196705270000|F|||||5733551967|||U 
+ * PRB|1|20210726|11334^ABNORMALITIES OF HAIR^ICD9||||201208070948||201208070948|||||||201208070948
  * AL1|90|MA|dog|MO|itch|20210629
  */
 
@@ -63,52 +66,37 @@ public class CUSTOM_PAT extends AbstractMessage {
 	}
 
 	/**
-	 * Returns "2.6"
+	 * Returns the version.
 	 */
 	public String getVersion() {
 		return "2.6";
 	}
 
 	/**
-	 * <p>
 	 * Returns MSH (Message Header) - creates it if necessary
-	 * </p>
-	 *
-	 *
 	 */
 	public MSH getMSH() {
 		return getTyped("MSH", MSH.class);
 	}
 
 	/**
-	 * <p>
 	 * Returns PID (Patient Identification) - creates it if necessary
-	 * </p>
-	 *
-	 *
 	 */
 	public PID getPID() {
 		return getTyped("PID", PID.class);
 	}
 
 	/**
-	 * <p>
 	 * Returns the first repetition of PRB (Problem Details) - creates it if
 	 * necessary
-	 * </p>
-	 *
-	 *
 	 */
 	public PRB getPRB() {
 		return getTyped("PRB", PRB.class);
 	}
 
 	/**
-	 * <p>
 	 * Returns a specific repetition of PRB (Problem Details) - creates it if
 	 * necessary
-	 * </p>
-	 *
 	 *
 	 * @param rep The repetition index (0-indexed, i.e. the first repetition is at
 	 *            index 0)
@@ -120,36 +108,25 @@ public class CUSTOM_PAT extends AbstractMessage {
 	}
 
 	/**
-	 * <p>
 	 * Returns the number of existing repetitions of PRB
-	 * </p>
-	 *
 	 */
 	public int getPRBReps() {
 		return getReps("PRB");
 	}
 
 	/**
-	 * <p>
 	 * Returns a non-modifiable List containing all current existing repetitions of
 	 * PRB.
-	 * <p>
-	 * <p>
 	 * Note that unlike {@link #getPRB()}, this method will not create any reps if
 	 * none are already present, so an empty list may be returned.
-	 * </p>
-	 *
 	 */
 	public java.util.List<PRB> getPRBAll() throws HL7Exception {
 		return getAllAsList("PRB", PRB.class);
 	}
 
 	/**
-	 * <p>
 	 * Inserts a specific repetition of PRB (Problem Details)
-	 * </p>
-	 *
-	 *
+	 * *
 	 * @see AbstractGroup#insertRepetition(Structure, int)
 	 */
 	public void insertPRB(PRB structure, int rep) throws HL7Exception {
@@ -157,10 +134,7 @@ public class CUSTOM_PAT extends AbstractMessage {
 	}
 
 	/**
-	 * <p>
 	 * Inserts a specific repetition of PRB (Problem Details)
-	 * </p>
-	 *
 	 *
 	 * @see AbstractGroup#insertRepetition(Structure, int)
 	 */
@@ -169,10 +143,7 @@ public class CUSTOM_PAT extends AbstractMessage {
 	}
 
 	/**
-	 * <p>
 	 * Removes a specific repetition of PRB (Problem Details)
-	 * </p>
-	 *
 	 *
 	 * @see AbstractGroup#removeRepetition(String, int)
 	 */
@@ -181,25 +152,17 @@ public class CUSTOM_PAT extends AbstractMessage {
 	}
 
 	/**
-	 * <p>
 	 * Returns the first repetition of AL1 (Patient Allergy Information) - creates
 	 * it if necessary
-	 * </p>
-	 *
-	 *
 	 */
 	public AL1 getAL1() {
 		return getTyped("AL1", AL1.class);
 	}
 
 	/**
-	 * <p>
 	 * Returns a specific repetition of AL1 (Patient Allergy Information) - creates
 	 * it if necessary
-	 * </p>
-	 *
-	 *
-	 * @param rep The repetition index (0-indexed, i.e. the first repetition is at
+ 	 * @param rep The repetition index (0-indexed, i.e. the first repetition is at
 	 *            index 0)
 	 * @throws HL7Exception if the repetition requested is more than one greater
 	 *                      than the number of existing repetitions.
@@ -209,24 +172,18 @@ public class CUSTOM_PAT extends AbstractMessage {
 	}
 
 	/**
-	 * <p>
 	 * Returns the number of existing repetitions of AL1
-	 * </p>
-	 *
 	 */
 	public int getAL1Reps() {
 		return getReps("AL1");
 	}
 
 	/**
-	 * <p>
 	 * Returns a non-modifiable List containing all current existing repetitions of
 	 * AL1.
-	 * <p>
-	 * <p>
+	 * 
 	 * Note that unlike {@link #getAL1()}, this method will not create any reps if
 	 * none are already present, so an empty list may be returned.
-	 * </p>
 	 *
 	 */
 	public java.util.List<AL1> getAL1All() throws HL7Exception {
@@ -234,10 +191,7 @@ public class CUSTOM_PAT extends AbstractMessage {
 	}
 
 	/**
-	 * <p>
 	 * Inserts a specific repetition of AL1 (Patient Allergy Information)
-	 * </p>
-	 *
 	 *
 	 * @see AbstractGroup#insertRepetition(Structure, int)
 	 */
@@ -246,10 +200,7 @@ public class CUSTOM_PAT extends AbstractMessage {
 	}
 
 	/**
-	 * <p>
 	 * Inserts a specific repetition of AL1 (Patient Allergy Information)
-	 * </p>
-	 *
 	 *
 	 * @see AbstractGroup#insertRepetition(Structure, int)
 	 */
@@ -258,10 +209,7 @@ public class CUSTOM_PAT extends AbstractMessage {
 	}
 
 	/**
-	 * <p>
 	 * Removes a specific repetition of AL1 (Patient Allergy Information)
-	 * </p>
-	 *
 	 *
 	 * @see AbstractGroup#removeRepetition(String, int)
 	 */

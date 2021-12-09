@@ -1,10 +1,10 @@
-package io.github.linuxforhealth.hl7.message;
-
 /*
  * (C) Copyright IBM Corp. 2020, 2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
+
+package io.github.linuxforhealth.hl7.message;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -45,8 +45,7 @@ import io.github.linuxforhealth.hl7.segments.util.ResourceUtils;
 public class Hl7CustomMessageTest {
 
     // # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-    // NOTE VALIDATION IS INTENTIONALLY TURNED OFF BECAUSE WE ARE CREATING RESOURCES THAT ARE NOT STANDARD
-    // private static final ConverterOptions OPTIONS = new Builder().withValidateResource().withPrettyPrint().build()
+    // NOTE VALIDATION IS INTENTIONALLY NOT USED BECAUSE WE ARE CREATING RESOURCES THAT ARE NOT STANDARD
     private static final ConverterOptions OPTIONS = new Builder().withPrettyPrint().build();
     // # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
@@ -83,11 +82,7 @@ public class Hl7CustomMessageTest {
     public void testCustomPatMessage() throws IOException {
 
         // Set up the config file
-    	commonConfigFileSetup();
-
-        ClassLoader loader = Test.class.getClassLoader();
-        System.out.println(loader.getResource("custom_packages/2.6"));
-        System.out.println(loader.getResource("org/foo/hl7/custom/message/CUSTOM_PAT.class"));
+    	  commonConfigFileSetup();
 
         String hl7message = 
             "MSH|^~\\&|||||20211005105125||CUSTOM^PAT|1a3952f1-38fe-4d55-95c6-ce58ebfc7f10|P|2.6\n"

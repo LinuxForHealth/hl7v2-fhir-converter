@@ -17,8 +17,6 @@ resources:
       resourcePath: resource/MessageHeader
       repeats: false
       isReferenced: false
-      additionalSegments: 
-        - EVN
    
     - resourceName: Patient
       segment: PID
@@ -26,7 +24,6 @@ resources:
       repeats: false
       isReferenced: true
       additionalSegments:
-        - PD1
         - MSH
 
     - resourceName: Condition
