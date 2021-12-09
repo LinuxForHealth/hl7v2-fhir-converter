@@ -345,11 +345,6 @@ public class SimpleDataValueResolver {
         else return null;
     };
 
-    public static final ValueExtractor<Object, String> IMMUNIZATION_STATUS_CODES = (Object value) -> {
-        String val = Hl7DataHandlerUtil.getStringValue(value);
-        return getFHIRCode(val, ImmunizationStatus.class);
-    };
-
     public static final ValueExtractor<Object, String> SPECIMEN_STATUS_CODE_FHIR = (Object value) -> {
         String val = Hl7DataHandlerUtil.getStringValue(value);
         return getFHIRCode(val, SpecimenStatus.class);

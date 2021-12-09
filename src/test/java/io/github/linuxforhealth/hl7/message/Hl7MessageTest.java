@@ -6,9 +6,11 @@
 package io.github.linuxforhealth.hl7.message;
 
 import static org.assertj.core.api.Assertions.assertThat;
+
 import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
+
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
@@ -24,7 +26,9 @@ import org.hl7.fhir.r4.model.Specimen;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import com.google.common.collect.Lists;
+
 import io.github.linuxforhealth.api.ResourceModel;
 import io.github.linuxforhealth.fhir.FHIRContext;
 import io.github.linuxforhealth.hl7.resource.ResourceReader;
@@ -157,7 +161,7 @@ public class Hl7MessageTest {
                 + "PID|1|465 306 5961|000010016^^^MR~000010017^^^MR~000010018^^^MR|407623|Wood^Patrick^^Sr^MR||19700101|female|||High Street^^Oxford^^Ox1 4DP~George St^^Oxford^^Ox1 5AP|||||||\r"
                 + "NK1|1|Wood^John^^^MR|Father||999-9999\r" + "NK1|2|Jones^Georgie^^^MSS|MOTHER||999-9999\r"
                 + "PV1|1||Location||||||||||||||||261938_6_201306171546|||||||||||||||||||||||||20130617134644|||||||||\r"
-                + "OBX|1|NM|0135–4^TotalProtein||7.3|gm/dl|5.9-8.4||||F|||||2740^Tsadok^Janetary~2913^Merrit^Darren^F~3065^Mahoney^Paul^J~4723^Loh^Robert^L~9052^Winter^Oscar^|\r";
+                + "OBX|1|NM|0135-4^TotalProtein||7.3|gm/dl|5.9-8.4||||F|||||2740^Tsadok^Janetary~2913^Merrit^Darren^F~3065^Mahoney^Paul^J~4723^Loh^Robert^L~9052^Winter^Oscar^|\r";
         String json = message.convert(hl7message, engine);
 
         IBaseResource bundleResource = context.getParser().parseResource(json);
@@ -191,8 +195,8 @@ public class Hl7MessageTest {
                 + "PID|1|465 306 5961|000010016^^^MR~000010017^^^MR~000010018^^^MR|407623|Wood^Patrick^^Sr^MR||19700101|female|||High Street^^Oxford^^Ox1 4DP~George St^^Oxford^^Ox1 5AP|||||||\r"
                 + "NK1|1|Wood^John^^^MR|Father||999-9999\r" + "NK1|2|Jones^Georgie^^^MSS|MOTHER||999-9999\r"
                 + "PV1|1||Location||||||||||||||||261938_6_201306171546|||||||||||||||||||||||||20130617134644|||||||||\r"
-                + "OBX|1|NM|0135–4^TotalProtein||7.3|gm/dl|5.9-8.4||||F|||||2740^Tsadok^Janetary~2913^Merrit^Darren^F~3065^Mahoney^Paul^J~4723^Loh^Robert^L~9052^Winter^Oscar^|\r"
-                + "OBX|2|NM|0135–4^TotalProtein||6.4|gm/dl|5.9-8.4||||F|||||2740^Tsadok^Janetary~2913^Merrit^Darren^F~3065^Mahoney^Paul^J~4723^Loh^Robert^L~9052^Winter^Oscar^|\r";
+                + "OBX|1|NM|0135-4^TotalProtein||7.3|gm/dl|5.9-8.4||||F|||||2740^Tsadok^Janetary~2913^Merrit^Darren^F~3065^Mahoney^Paul^J~4723^Loh^Robert^L~9052^Winter^Oscar^|\r"
+                + "OBX|2|NM|0135-4^TotalProtein||6.4|gm/dl|5.9-8.4||||F|||||2740^Tsadok^Janetary~2913^Merrit^Darren^F~3065^Mahoney^Paul^J~4723^Loh^Robert^L~9052^Winter^Oscar^|\r";
         String json = message.convert(hl7message, engine);
 
         IBaseResource bundleResource = context.getParser().parseResource(json);
@@ -229,7 +233,7 @@ public class Hl7MessageTest {
                 + "PID|1|465 306 5961|000010016^^^MR~000010017^^^MR~000010018^^^MR|407623|Wood^Patrick^^Sr^MR||19700101|female|||High Street^^Oxford^^Ox1 4DP~George St^^Oxford^^Ox1 5AP|||||||\r"
                 + "NK1|1|Wood^John^^^MR|Father||999-9999\r" + "NK1|2|Jones^Georgie^^^MSS|MOTHER||999-9999\r"
                 + "PV1|1||Location||||||||||||||||261938_6_201306171546|||||||||||||||||||||||||20130617134644|||||||||\r"
-                + "OBX|1|NM|0135–4^TotalProtein||7.3|gm/dl|5.9-8.4||||F";
+                + "OBX|1|NM|0135-4^TotalProtein||7.3|gm/dl|5.9-8.4||||F";
         String json = message.convert(hl7message, engine);
         IBaseResource bundleResource = context.getParser().parseResource(json);
         assertThat(bundleResource).isNotNull();
@@ -299,8 +303,8 @@ public class Hl7MessageTest {
                 + "PRB|AD|200603150625|aortic stenosis|53692||2||200603150625\r"
                 + "NTE|1|P|Problem Comments\r" + "VAR|varid1|200603150610\r"
                 // Two observation records
-                + "OBX|1|ST|0135–4^TotalProtein||6.4|gm/dl|5.9-8.4||||F|||||2740^Tsadok^Janetary~2913^Merrit^Darren^F|\r"
-                + "OBX|2|ST|0135–4^TotalProtein||7.8|gm/dl|5.9-8.4||||F|||||2740^Tsadok^Janetary~2913^Merrit^Darren^F|\r";
+                + "OBX|1|ST|0135-4^TotalProtein||6.4|gm/dl|5.9-8.4||||F|||||2740^Tsadok^Janetary~2913^Merrit^Darren^F|\r"
+                + "OBX|2|ST|0135-4^TotalProtein||7.8|gm/dl|5.9-8.4||||F|||||2740^Tsadok^Janetary~2913^Merrit^Darren^F|\r";
         String json = message.convert(hl7message, engine);
         assertThat(json).isNotBlank();
 
@@ -513,7 +517,7 @@ public class Hl7MessageTest {
                 + "PID|1|465 306 5961|000010016^^^MR~000010017^^^MR~000010018^^^MR|407623|Wood^Patrick^^Sr^MR||19700101|female|||High Street^^Oxford^^Ox1 4DP~George St^^Oxford^^Ox1 5AP|||||||\r"
                 + "NK1|1|Wood^John^^^MR|Father||999-9999\r" + "NK1|2|Jones^Georgie^^^MSS|MOTHER||999-9999\r"
                 + "PV1|1||Location||||||||||||||||261938_6_201306171546|||||||||||||||||||||||||20130617134644|||||||||\r"
-                + "OBX|1|NM|0135–4^TotalProtein||7.3|gm/dl|5.9-8.4||||F\r"
+                + "OBX|1|NM|0135-4^TotalProtein||7.3|gm/dl|5.9-8.4||||F\r"
                 + "SPM|1|SpecimenID||BLOOD^Blood^^87612001^BLOOD^SCT^^||||Cord Art^Blood, Cord Arterial^^^^^^^|||P||||||201110060535|201110060821||Y||||||1";
         String json = message.convert(hl7message, engine);
         IBaseResource bundleResource = context.getParser().parseResource(json);
@@ -560,7 +564,7 @@ public class Hl7MessageTest {
                 + "EVN||201209122222\r"
                 + "PID|0010||PID1234^5^M11^A^MR^HOSP~1234568965^^^USA^SS||DOE^JOHN^A^||19800202|F||W|111 TEST_STREET_NAME^^TEST_CITY^NY^111-1111^USA||(905)111-1111|||S|ZZ|12^^^124|34-13-312||||TEST_BIRTH_PLACE\r"
                 + "PV1|1|ff|yyy|EL|ABC||200^ATTEND_DOC_FAMILY_TEST^ATTEND_DOC_GIVEN_TEST|201^REFER_DOC_FAMILY_TEST^REFER_DOC_GIVEN_TEST|202^CONSULTING_DOC_FAMILY_TEST^CONSULTING_DOC_GIVEN_TEST|MED|||||B6|E|272^ADMITTING_DOC_FAMILY_TEST^ADMITTING_DOC_GIVEN_TEST||48390|||||||||||||||||||||||||201409122200|20150206031726\r"
-                + "OBX|1|NM|0135–4^TotalProtein||7.3|gm/dl|5.9-8.4||||F|||||2740^TRDSE^Janetary~2913^MRTTE^Darren^F~3065^MGHOBT^Paul^J~4723^LOTHDEW^Robert^L|\r"
+                + "OBX|1|NM|0135-4^TotalProtein||7.3|gm/dl|5.9-8.4||||F|||||2740^TRDSE^Janetary~2913^MRTTE^Darren^F~3065^MGHOBT^Paul^J~4723^LOTHDEW^Robert^L|\r"
                 + "AL1|1|DRUG|00000741^OXYCODONE||HYPOTENSION\r"
                 + "AL1|2|DRUG|00001433^TRAMADOL||SEIZURES~VOMITING\r";
         String json = message.convert(hl7message, engine);

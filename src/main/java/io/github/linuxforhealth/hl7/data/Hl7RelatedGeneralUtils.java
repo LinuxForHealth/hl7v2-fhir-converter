@@ -5,7 +5,6 @@
  */
 package io.github.linuxforhealth.hl7.data;
 
-import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.Temporal;
 import java.time.temporal.UnsupportedTemporalTypeException;
@@ -16,11 +15,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.ibm.fhir.model.type.Date;
-import com.ibm.fhir.model.type.DateTime;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringEscapeUtils;
 import org.apache.commons.text.StringTokenizer;
 import org.hl7.fhir.r4.model.Enumerations;
+import org.hl7.fhir.r4.model.Immunization;
 import org.hl7.fhir.r4.model.codesystems.EncounterStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -118,6 +117,19 @@ public class Hl7RelatedGeneralUtils {
             return "2017-10-1";
         }
         return null;
+    }
+
+    public static String getImmunizationStatus(Object rxa18, Object rxa20, Object orc5) {
+        if (rxa20 != null){
+                return  SimpleDataValueResolver.getFHIRCode(rxa20.toString(), Immunization.ImmunizationStatus.class);
+        }
+        else if(rxa18 != null) {
+            return "not-done";
+        }
+        else if  (orc5 != null){
+                return SimpleDataValueResolver.getFHIRCode(orc5.toString(), Immunization.ImmunizationStatus.class);
+        }
+        else return "completed";
     }
 
     // DocumentReference.yml uses a required:true on status to control the creation of the DocumentReference.
