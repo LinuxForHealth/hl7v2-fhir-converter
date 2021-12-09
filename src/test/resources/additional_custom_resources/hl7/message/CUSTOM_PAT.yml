@@ -1,0 +1,42 @@
+#
+# (C) Copyright IBM Corp. 2021
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+# FHIR Resources to extract from CUSTOM_PAT message
+#
+
+########################################################################
+# Used for testing only. Not used in production.
+########################################################################
+
+---
+resources:
+    - resourceName: MessageHeader
+      segment: MSH
+      resourcePath: resource/MessageHeader
+      repeats: false
+      isReferenced: false
+   
+    - resourceName: Patient
+      segment: PID
+      resourcePath: resource/Patient
+      repeats: false
+      isReferenced: true
+      additionalSegments:
+        - MSH
+
+    - resourceName: Condition
+      segment: PRB
+      resourcePath: resource/Condition
+      repeats: true
+      additionalSegments:
+        - MSH
+        - PID
+
+    - resourceName: AllergyIntolerance
+      segment: AL1
+      resourcePath: resource/AllergyIntolerance
+      repeats: true
+      additionalSegments:
+        - MSH 
