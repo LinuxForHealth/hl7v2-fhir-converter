@@ -57,7 +57,7 @@ DiagnosticReportStatus:
 ImmunizationStatus:
   CP: completed
   NA: not-done
-  PA: not-done
+  PA: completed
   RE: not-done
   CM: completed
   ER: entered-in-error

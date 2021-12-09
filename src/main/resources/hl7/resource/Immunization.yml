@@ -19,17 +19,30 @@ identifier:
    constants:
       sys: "urn:id:extID"
 status:
-   type: IMMUNIZATION_STATUS_CODES
-   default: completed
-   valueOf: RXA.20 | ORC.5
-   required: true
-   expressionType: HL7Spec
-statusReason:
+   valueOf: "GeneralUtils.getImmunizationStatus(rxa18,rxa20,orc5)"
+   expressionType: JEXL
+   vars:
+      rxa18: RXA.18
+      rxa20: RXA.20
+      orc5: ORC.5
+statusReason_1:
+   condition: $rxa18 NOT_NULL
    valueOf: datatype/CodeableConcept
    expressionType: resource
    specs: RXA.18
    vars:
-      code: RXA.18
+      rxa18: RXA.18
+statusReason_2:
+   valueOf: datatype/CodeableConcept_var
+   expressionType: resource
+   condition: $rxa18 NULL && $statCode EQUALS RE
+   vars:
+      rxa18: RXA.18
+      statCode: STRING, RXA.20
+   constants:
+      code: "PATOBJ"
+      display: "Patient Refusal"
+      system: "http://terminology.hl7.org/CodeSystem/v3-ActReason"
 vaccineCode:
    valueOf: datatype/CodeableConcept
    required: true
@@ -61,7 +74,7 @@ reportOrigin:
    expressionType: resource
    specs: RXA.9
 manufacturer:
-   condition: rxa17 NOT_NULL
+   condition: $rxa17 NOT_NULL
    valueOf: resource/Organization
    expressionType: reference
    specs: RXA.17
@@ -121,9 +134,9 @@ reasonReference:
    useGroup: true
 isSubpotent:
    value: true
-   condition: $rxa20 EQUALS 'PA'
+   condition: $rxa20 EQUALS PA
    vars:
-      rxa20: RXA.20
+      rxa20: String, RXA.20
 programEligibility:
    valueOf: datatype/CodeableConcept_var
    expressionType: resource
