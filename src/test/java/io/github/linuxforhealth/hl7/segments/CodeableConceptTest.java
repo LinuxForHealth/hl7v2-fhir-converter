@@ -8,21 +8,27 @@ package io.github.linuxforhealth.hl7.segments;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
+
+import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
 import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Coding;
-import org.hl7.fhir.r4.model.Extension;
-import org.hl7.fhir.r4.model.Patient;
-import org.hl7.fhir.r4.model.MedicationRequest;
 import org.hl7.fhir.r4.model.Condition;
+import org.hl7.fhir.r4.model.Extension;
+import org.hl7.fhir.r4.model.MedicationRequest;
+import org.hl7.fhir.r4.model.Patient;
+import org.hl7.fhir.r4.model.Resource;
+import org.hl7.fhir.r4.model.ResourceType;
+import org.hl7.fhir.r4.model.ServiceRequest;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import io.github.linuxforhealth.core.terminology.UrlLookup;
 import io.github.linuxforhealth.hl7.ConverterOptions;
 import io.github.linuxforhealth.hl7.ConverterOptions.Builder;
+import io.github.linuxforhealth.hl7.segments.util.DatatypeUtils;
+import io.github.linuxforhealth.hl7.segments.util.PatientUtils;
 import io.github.linuxforhealth.hl7.segments.util.ResourceUtils;
-import io.github.linuxforhealth.hl7.segments.util.*;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 class CodeableConceptTest {
     private static final String V3_RACE_SYSTEM = "http://terminology.hl7.org/CodeSystem/v3-Race";
@@ -259,7 +265,8 @@ class CodeableConceptTest {
         MedicationRequest medReq = ResourceUtils.getMedicationRequest(medicationRequestWithCodeableConcept);
         assertThat(medReq.hasMedicationCodeableConcept()).isTrue();
         CodeableConcept medCC = medReq.getMedicationCodeableConcept();
-        DatatypeUtils.checkCommonCodeableConceptAssertions(medCC, "73056-017", "Test15 SODIUM 100 MG CAPSULE", "http://hl7.org/fhir/sid/ndc", "Test15 SODIUM 100 MG CAPSULE");
+        DatatypeUtils.checkCommonCodeableConceptAssertions(medCC, "73056-017", "Test15 SODIUM 100 MG CAPSULE",
+                "http://hl7.org/fhir/sid/ndc", "Test15 SODIUM 100 MG CAPSULE");
 
     }
 
@@ -390,7 +397,117 @@ class CodeableConceptTest {
         Condition condition = ResourceUtils.getCondition(hl7MessageiCD10Coding);
         assertThat(condition.hasCode()).isTrue();
         CodeableConcept condCC = condition.getCode();
-        DatatypeUtils.checkCommonCodeableConceptAssertions(condCC, "K80.00", "Cholelithiasis", "http://hl7.org/fhir/sid/icd-10-cm", "Cholelithiasis");
+        DatatypeUtils.checkCommonCodeableConceptAssertions(condCC, "K80.00", "Cholelithiasis",
+                "http://hl7.org/fhir/sid/icd-10-cm", "Cholelithiasis");
+
+    }
+
+    @Test
+    public void testMultipleCWEsWIthSecondaryCodes() {
+        // This test documents behaviors of how multiple CWEs with primary and secondary codings are GROUPED 
+        // in the resulting CodeableConcept. 
+        // The question is, when there is more than one CodeableConcept in the FHIR resources, should it 
+        // be one codeable concept with an array of two code/systems and one text, like this:
+        // "sampleCodeableConcept": [ {
+        //     "coding": [ {
+        //         "system": "http://system.org/AAAA-system",
+        //         "code": "AAAA",
+        //         "display": "Apples Add Additional Age"
+        //      }, {
+        //         "system": "http://system.org/BBBB-system",
+        //         "code": "BBBB",
+        //         "display": "Berries Become Beneficial"
+        //      } ],
+        //     "text": "Eat Fruits for Health"
+        // } ]
+        // OR should it be an array two codings each with one code/system and a text, like this:
+        // "sampleCodeableConcept": [ {
+        //     "coding": [ {
+        //        "system": "http://system.org/AAAA-system",
+        //        "code": "AAAA",
+        //        "display": "Apples Add Additional Age"
+        //     } ],
+        //     "text": "Apples are Healthy"
+        //     }, {
+        //     "coding": [ {
+        //        "system": "http://system.org/BBBB-system",
+        //        "code": "BBBB",
+        //        "display": "Berries Become Beneficial"
+        //     } ],
+        //     "text": "Berries are Healthy"
+        //   } ]
+        // Both of these are valid in FHIR.
+        //
+        // ANSWER: it currently depends on whether the multiple codings come in the HL7 in 
+        // a repeating field, or in the secondary information of a CWE
+        // 
+        // Detailed discussion in https://github.com/LinuxForHealth/hl7v2-fhir-converter/issues/363
+        // 
+        // This test uses a repeating field with two CWE's each with secondary sub-fields
+        // to illustrate the way things currently work.
+
+        String hl7message = "MSH|^~\\&|||||20180924152907|34001|ORU^R01^ORU_R01|213|T|2.6|||||||||||\n"
+                + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
+                //   + "PV1|1|E|||||||||||||||||||||||||||||||||||||||||||\n"
+                //  ORC.16 key for this test.  It sets a reason code: two codes with two codings each.  See other comments.
+                + "ORC|RE|248648498^|248648498^|ML18267-C00001^Beaker|SC||||||||||20170917151717|042^Human immunodeficiency virus [HIV] disease [42]^I9CDX^HIV^HIV/Aids^L~012^Other respiratory tuberculosis^I9CDX^017^Tuberculosis of other organs^I9CDX|||||||||||||||\n"
+                //  NOTE: OBR.31 is omitted purposely so the ORC.16 is used for the reason code
+                //  NOTE: OBR record required so a ServiceRequest is created
+                + "OBR|1|248648498^|248648498^|83036E^HEMOGLOBIN A1C^PACSEAP^^^^^^HEMOGLOBIN A1C|||||||L|||||||||||||||||||||||||||||||||||||||\n";;
+        // Expected output for reasonCode:
+        // "reasonCode": [ {
+        //     "coding": [ {
+        //       "system": "http://terminology.hl7.org/CodeSystem/ICD-9CM-diagnosiscodes",   << FROM FIRST CWE, PRIMARY CODE
+        //       "code": "042",
+        //       "display": "Human immunodeficiency virus [HIV] disease [42]"
+        //     }, {
+        //       "system": "urn:id:L", << FROM FIRST CWE, SECONDARY CODE
+        //       "code": "HIV",
+        //       "display": "HIV/Aids"
+        //     } ],
+        //     "text": "Human immunodeficiency virus [HIV] disease [42]"
+        //   }, {
+        //     "coding": [ {
+        //       "system": "http://terminology.hl7.org/CodeSystem/ICD-9CM-diagnosiscodes",  << FROM SECOND CWE, PRIMARY CODE
+        //       "code": "012",
+        //       "display": "Other respiratory tuberculosis"
+        //     }, {
+        //       "system": "http://terminology.hl7.org/CodeSystem/ICD-9CM-diagnosiscodes",  << FROM SECOND CWE, SECONDARY CODE
+        //       "code": "017",
+        //       "display": "Tuberculosis of other organs"
+        //     } ],
+        //     "text": "Other respiratory tuberculosis"
+        //   } ]
+
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+
+        List<Resource> serviceRequestList = ResourceUtils.getResourceList(e, ResourceType.ServiceRequest);
+        // Important that we have exactly one service request (no duplication).  OBR creates it as a reference.        
+        assertThat(serviceRequestList).hasSize(1);
+        ServiceRequest serviceRequest = ResourceUtils.getResourceServiceRequest(serviceRequestList.get(0),
+                ResourceUtils.context);
+
+        // ORC.16 should create a ServiceRequest.reasonCode CWE
+        assertThat(serviceRequest.hasReasonCode()).isTrue();
+        assertThat(serviceRequest.getReasonCode()).hasSize(2); // There are two reason codes (an array of 2)
+        assertThat(serviceRequest.getReasonCode().get(0).getCoding()).hasSize(2); // The first reason code has an array of 2 codings
+        assertThat(serviceRequest.getReasonCode().get(1).getCoding()).hasSize(2); // The second reason code has an array of 2 codings
+        // Check the codes in the coding sets to see they are as expected
+        assertThat(serviceRequest.getReasonCode().get(0).getCoding().get(0).getCode()).isEqualTo("042");
+        assertThat(serviceRequest.getReasonCode().get(0).getCoding().get(1).getCode()).isEqualTo("HIV");
+        assertThat(serviceRequest.getReasonCode().get(1).getCoding().get(0).getCode()).isEqualTo("012");
+        assertThat(serviceRequest.getReasonCode().get(1).getCoding().get(1).getCode()).isEqualTo("017");
+
+        // There should be one DiagnosticReport
+        List<Resource> diagnosticReportList = ResourceUtils.getResourceList(e, ResourceType.DiagnosticReport);
+        assertThat(diagnosticReportList).hasSize(1);
+
+        // There should be one Patient
+        List<Resource> patients = ResourceUtils.getResourceList(e, ResourceType.Patient);
+        assertThat(patients).hasSize(1);
+
+        // Ensure there are no extra resources created
+        assertThat(e).hasSize(3);
 
     }
 
