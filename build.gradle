@@ -17,6 +17,9 @@ group = 'io.github.linuxforhealth'
 version = (findProperty('version') == 'unspecified') ? '1.0.1-SNAPSHOT' : version
 ext.isReleaseVersion = !version.endsWith("SNAPSHOT")
 
+sourceCompatibility = 11
+targetCompatibility = 11
+
 dependencies {
 // This dependency is exported to consumers, that is to say found on their compile classpath.
 api 'org.apache.commons:commons-math3:3.6.1'
@@ -75,7 +78,7 @@ if(!localDevEnv.toBoolean()) {
     sourceSets.main.resources.srcDirs = ['target/main/resources'];
 } else {
     println "localDevEnv is true - Setting sourceset to the src directory"
-    sourceSets.main.java.srcDirs = ['src/main/java'];
+    sourceSets.main.java.srcDirs = ['src/main/java', 'src/tools'];
     sourceSets.main.resources.srcDirs = ['src/main/resources'];
 }
 
