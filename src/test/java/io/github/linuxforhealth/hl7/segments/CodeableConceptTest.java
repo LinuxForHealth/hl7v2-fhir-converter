@@ -20,20 +20,14 @@ import org.hl7.fhir.r4.model.Resource;
 import org.hl7.fhir.r4.model.ResourceType;
 import org.hl7.fhir.r4.model.ServiceRequest;
 import org.junit.jupiter.api.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import io.github.linuxforhealth.core.terminology.UrlLookup;
-import io.github.linuxforhealth.hl7.ConverterOptions;
-import io.github.linuxforhealth.hl7.ConverterOptions.Builder;
 import io.github.linuxforhealth.hl7.segments.util.DatatypeUtils;
 import io.github.linuxforhealth.hl7.segments.util.PatientUtils;
 import io.github.linuxforhealth.hl7.segments.util.ResourceUtils;
 
 class CodeableConceptTest {
     private static final String V3_RACE_SYSTEM = "http://terminology.hl7.org/CodeSystem/v3-Race";
-    private static final ConverterOptions OPTIONS = new Builder().withPrettyPrint().build();
-    private static final Logger LOGGER = LoggerFactory.getLogger(Hl7PatientFHIRConversionTest.class);
 
     // These test cover all the paths to create codeableConcepts from CWEs.
     // 
@@ -448,7 +442,6 @@ class CodeableConceptTest {
 
         String hl7message = "MSH|^~\\&|||||20180924152907|34001|ORU^R01^ORU_R01|213|T|2.6|||||||||||\n"
                 + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
-                //   + "PV1|1|E|||||||||||||||||||||||||||||||||||||||||||\n"
                 //  ORC.16 key for this test.  It sets a reason code: two codes with two codings each.  See other comments.
                 + "ORC|RE|248648498^|248648498^|ML18267-C00001^Beaker|SC||||||||||20170917151717|042^Human immunodeficiency virus [HIV] disease [42]^I9CDX^HIV^HIV/Aids^L~012^Other respiratory tuberculosis^I9CDX^017^Tuberculosis of other organs^I9CDX|||||||||||||||\n"
                 //  NOTE: OBR.31 is omitted purposely so the ORC.16 is used for the reason code
