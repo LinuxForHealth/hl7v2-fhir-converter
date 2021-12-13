@@ -122,7 +122,7 @@ javadoc.failOnError = false
 task javadocJar(type: Jar, dependsOn: javadoc) {
     classifier = 'javadoc'
     from javadoc.destinationDir
-    javadoc.options.addStringOption('Xdoclint:none', '-quiet')
+    javadoc.options.addStringOption('noindex', '-quiet')
 }
 
 artifacts {

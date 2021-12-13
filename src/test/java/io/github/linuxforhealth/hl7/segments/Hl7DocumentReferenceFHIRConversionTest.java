@@ -351,8 +351,7 @@ public class Hl7DocumentReferenceFHIRConversionTest {
     @ValueSource(strings = {
             "MDM^T02", "MDM^T06"
     })
-    @Disabled
-    // TODO: TXA-13 is not yet mapped in DocumentReference.yml
+    @Disabled("TODO: TXA-13 is not yet mapped in DocumentReference.yml")
     public void doc_ref_relates_to_test(String segment) {
         String documentReferenceMessage = "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|" + segment
                 + "^MDM_T02|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6|56789^NID^UID|MCM||||\n"
@@ -490,7 +489,7 @@ public class Hl7DocumentReferenceFHIRConversionTest {
         DocumentReference documentReference = (DocumentReference) context.getParser().parseResource(klass, s);
 
         assertThat(documentReference.hasSubject()).isTrue();
-        assertThat(documentReference.getSubject().getReference().startsWith("Patient"));
+        assertThat(documentReference.getSubject().getReference()).startsWith("Patient");
     }
 
     @ParameterizedTest

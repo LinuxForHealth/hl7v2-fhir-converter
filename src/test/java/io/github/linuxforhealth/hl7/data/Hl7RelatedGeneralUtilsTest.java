@@ -96,7 +96,7 @@ public class Hl7RelatedGeneralUtilsTest {
 
         long diff = Hl7RelatedGeneralUtils.diffDateMin("2007-11-04T01:32:06.345+09:00",
                 "2007-11-04T01:32:06.345+09:00");
-        assertThat(diff).isEqualTo(0);
+        assertThat(diff).isZero();
     }
 
     @Test
@@ -204,7 +204,7 @@ public class Hl7RelatedGeneralUtilsTest {
         assertThat(stringArray.get(0)).isEqualTo("apple");
         // Test for 0; expect an empty array
         stringArray = Hl7RelatedGeneralUtils.makeStringArray();
-        assertThat(stringArray.size()).isEqualTo(0);
+        assertThat(stringArray.size()).isZero();
     }
 
     @Test
@@ -219,8 +219,8 @@ public class Hl7RelatedGeneralUtilsTest {
         assertThat(Hl7RelatedGeneralUtils.getAddressUse(ANYTHING, "Y", null)).isEqualTo("temp");
         assertThat(Hl7RelatedGeneralUtils.getAddressUse(null, "Y", ANYTHING)).isEqualTo("temp");
         assertThat(Hl7RelatedGeneralUtils.getAddressUse(null, "Y", null)).isEqualTo("temp");
-        assertThat(Hl7RelatedGeneralUtils.getAddressUse("C", ANYTHING, ANYTHING)).isEqualTo("");
-        assertThat(Hl7RelatedGeneralUtils.getAddressUse("C", ANYTHING, null)).isEqualTo("");
+        assertThat(Hl7RelatedGeneralUtils.getAddressUse("C", ANYTHING, ANYTHING)).isEmpty();
+        assertThat(Hl7RelatedGeneralUtils.getAddressUse("C", ANYTHING, null)).isEmpty();
         assertThat(Hl7RelatedGeneralUtils.getAddressUse("BA", ANYTHING, "")).isEqualTo("old");
         assertThat(Hl7RelatedGeneralUtils.getAddressUse("BA", ANYTHING, null)).isEqualTo("old");
         assertThat(Hl7RelatedGeneralUtils.getAddressUse("BA", null, "")).isEqualTo("old");
@@ -229,8 +229,8 @@ public class Hl7RelatedGeneralUtilsTest {
         assertThat(Hl7RelatedGeneralUtils.getAddressUse(null, ANYTHING, "Y")).isEqualTo("old");
         assertThat(Hl7RelatedGeneralUtils.getAddressUse(ANYTHING, null, "Y")).isEqualTo("old");
         assertThat(Hl7RelatedGeneralUtils.getAddressUse(null, null, "Y")).isEqualTo("old");
-        assertThat(Hl7RelatedGeneralUtils.getAddressUse("BA", ANYTHING, ANYTHING)).isEqualTo("");
-        assertThat(Hl7RelatedGeneralUtils.getAddressUse("BA", null, ANYTHING)).isEqualTo("");
+        assertThat(Hl7RelatedGeneralUtils.getAddressUse("BA", ANYTHING, ANYTHING)).isEmpty();
+        assertThat(Hl7RelatedGeneralUtils.getAddressUse("BA", null, ANYTHING)).isEmpty();
         assertThat(Hl7RelatedGeneralUtils.getAddressUse("H", ANYTHING, ANYTHING)).isEqualTo("home");
         assertThat(Hl7RelatedGeneralUtils.getAddressUse("H", null, ANYTHING)).isEqualTo("home");
         assertThat(Hl7RelatedGeneralUtils.getAddressUse("H", ANYTHING, null)).isEqualTo("home");
@@ -247,11 +247,11 @@ public class Hl7RelatedGeneralUtilsTest {
         assertThat(Hl7RelatedGeneralUtils.getAddressUse("BI", null, ANYTHING)).isEqualTo("billing");
         assertThat(Hl7RelatedGeneralUtils.getAddressUse("BI", ANYTHING, null)).isEqualTo("billing");
         assertThat(Hl7RelatedGeneralUtils.getAddressUse("BI", null, null)).isEqualTo("billing");
-        assertThat(Hl7RelatedGeneralUtils.getAddressUse(ANYTHING, ANYTHING, ANYTHING)).isEqualTo("");
-        assertThat(Hl7RelatedGeneralUtils.getAddressUse(null, ANYTHING, ANYTHING)).isEqualTo("");
-        assertThat(Hl7RelatedGeneralUtils.getAddressUse(ANYTHING, null, ANYTHING)).isEqualTo("");
-        assertThat(Hl7RelatedGeneralUtils.getAddressUse(ANYTHING, ANYTHING, null)).isEqualTo("");
-        assertThat(Hl7RelatedGeneralUtils.getAddressUse(null, null, null)).isEqualTo("");
+        assertThat(Hl7RelatedGeneralUtils.getAddressUse(ANYTHING, ANYTHING, ANYTHING)).isEmpty();
+        assertThat(Hl7RelatedGeneralUtils.getAddressUse(null, ANYTHING, ANYTHING)).isEmpty();
+        assertThat(Hl7RelatedGeneralUtils.getAddressUse(ANYTHING, null, ANYTHING)).isEmpty();
+        assertThat(Hl7RelatedGeneralUtils.getAddressUse(ANYTHING, ANYTHING, null)).isEmpty();
+        assertThat(Hl7RelatedGeneralUtils.getAddressUse(null, null, null)).isEmpty();
 
     }
 
@@ -263,16 +263,16 @@ public class Hl7RelatedGeneralUtilsTest {
         assertThat(Hl7RelatedGeneralUtils.getAddressType(null, "M")).isEqualTo("postal");
         assertThat(Hl7RelatedGeneralUtils.getAddressType("M", "")).isEqualTo("postal");
         assertThat(Hl7RelatedGeneralUtils.getAddressType("M", null)).isEqualTo("postal");
-        assertThat(Hl7RelatedGeneralUtils.getAddressType("M", ANYTHING)).isEqualTo("");
+        assertThat(Hl7RelatedGeneralUtils.getAddressType("M", ANYTHING)).isEmpty();
         assertThat(Hl7RelatedGeneralUtils.getAddressType(ANYTHING, "V")).isEqualTo("physical");
         assertThat(Hl7RelatedGeneralUtils.getAddressType(null, "V")).isEqualTo("physical");
         assertThat(Hl7RelatedGeneralUtils.getAddressType("SH", "")).isEqualTo("physical");
         assertThat(Hl7RelatedGeneralUtils.getAddressType("SH", null)).isEqualTo("physical");
-        assertThat(Hl7RelatedGeneralUtils.getAddressType("SH", ANYTHING)).isEqualTo("");
-        assertThat(Hl7RelatedGeneralUtils.getAddressType(ANYTHING, ANYTHING)).isEqualTo("");
-        assertThat(Hl7RelatedGeneralUtils.getAddressType(ANYTHING, null)).isEqualTo("");
-        assertThat(Hl7RelatedGeneralUtils.getAddressType(null, ANYTHING)).isEqualTo("");
-        assertThat(Hl7RelatedGeneralUtils.getAddressType(null, null)).isEqualTo("");
+        assertThat(Hl7RelatedGeneralUtils.getAddressType("SH", ANYTHING)).isEmpty();
+        assertThat(Hl7RelatedGeneralUtils.getAddressType(ANYTHING, ANYTHING)).isEmpty();
+        assertThat(Hl7RelatedGeneralUtils.getAddressType(ANYTHING, null)).isEmpty();
+        assertThat(Hl7RelatedGeneralUtils.getAddressType(null, ANYTHING)).isEmpty();
+        assertThat(Hl7RelatedGeneralUtils.getAddressType(null, null)).isEmpty();
 
     }
 
@@ -283,11 +283,11 @@ public class Hl7RelatedGeneralUtilsTest {
         // Inputs are XAD.7 Type, XAD.18 Type 
         assertThat(Hl7RelatedGeneralUtils.getAddressType(ANYTHING, "M")).isEqualTo("postal");
         assertThat(Hl7RelatedGeneralUtils.getAddressType("M", "")).isEqualTo("postal");
-        assertThat(Hl7RelatedGeneralUtils.getAddressType("M", ANYTHING)).isEqualTo("");
+        assertThat(Hl7RelatedGeneralUtils.getAddressType("M", ANYTHING)).isEmpty();
         assertThat(Hl7RelatedGeneralUtils.getAddressType(ANYTHING, "V")).isEqualTo("physical");
         assertThat(Hl7RelatedGeneralUtils.getAddressType("SH", "")).isEqualTo("physical");
-        assertThat(Hl7RelatedGeneralUtils.getAddressType("SH", ANYTHING)).isEqualTo("");
-        assertThat(Hl7RelatedGeneralUtils.getAddressType(ANYTHING, ANYTHING)).isEqualTo("");
+        assertThat(Hl7RelatedGeneralUtils.getAddressType("SH", ANYTHING)).isEmpty();
+        assertThat(Hl7RelatedGeneralUtils.getAddressType(ANYTHING, ANYTHING)).isEmpty();
     }
     // Note: Utility  Hl7RelatedGeneralUtils.getAddressDistrict is more effectively tested as part of Patient Address testing
 
