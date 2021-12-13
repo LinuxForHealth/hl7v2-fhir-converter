@@ -106,10 +106,10 @@ public class Hl7OrderRequestFHIRConversionTest {
     // ORC.16 should create a ServiceRequest.reasonCode CWE
     assertThat(serviceRequest.hasReasonCode()).isTrue();
     assertThat(serviceRequest.getReasonCode()).hasSize(1);
-    DatatypeUtils.checkCommonCodeableConceptAssertions(serviceRequest.getReasonCodeFirstRep(), "042",
+    DatatypeUtils.checkCommonCodeableConceptVersionedAssertions(serviceRequest.getReasonCodeFirstRep(), "042",
         "Human immunodeficiency virus [HIV] disease [42]",
         "http://terminology.hl7.org/CodeSystem/ICD-9CM-diagnosiscodes",
-        "Human immunodeficiency virus [HIV] disease [42]");
+        "Human immunodeficiency virus [HIV] disease [42]", "29");
 
     // ORC.12 should create an ServiceRequest.requester reference & display
     assertThat(serviceRequest.hasRequester()).isTrue();
@@ -214,8 +214,8 @@ public class Hl7OrderRequestFHIRConversionTest {
     // OBR.31 should create the ServiceRequest.reasonCode CWE
     assertThat(serviceRequest.hasReasonCode()).isTrue();
     assertThat(serviceRequest.getReasonCode()).hasSize(1);
-    DatatypeUtils.checkCommonCodeableConceptAssertions(serviceRequest.getReasonCodeFirstRep(), "HIV", "HIV/Aids",
-        "urn:id:L", "HIV/Aids");
+    DatatypeUtils.checkCommonCodeableConceptVersionedAssertions(serviceRequest.getReasonCodeFirstRep(), "HIV", "HIV/Aids",
+        "urn:id:L", "HIV/Aids", "V1");
 
     // OBR.16 should create an ServiceRequest.requester reference & display
     assertThat(serviceRequest.hasRequester()).isTrue();

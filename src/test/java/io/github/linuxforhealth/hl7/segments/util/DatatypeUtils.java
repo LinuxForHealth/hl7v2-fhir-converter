@@ -13,9 +13,17 @@ import org.hl7.fhir.r4.model.Coding;
 public class DatatypeUtils {
 
     // Common check for values of a codeable concept.  Null in any input indicates it should check False
-    // Assumes 1 coding and only checks the first one.
+    // Assumes 1 coding and only checks the first one. Kept for backwards compatability. 
+    // Now, use checkCommonCodeableConceptVersionedAssertions.
     public static void checkCommonCodeableConceptAssertions(CodeableConcept cc, String code, String display,
             String system, String text) {
+        checkCommonCodeableConceptVersionedAssertions(cc, code, display, system, text, null);        
+    }
+
+    // Common check for values of a codeable concept, including version.  Null in any input indicates it should check False
+    // Assumes 1 coding and only checks the first one.
+    public static void checkCommonCodeableConceptVersionedAssertions(CodeableConcept cc, String code, String display,
+            String system, String text, String version) {
         if (text == null) {
             assertThat(cc.hasText()).isFalse();
         } else {
@@ -23,30 +31,45 @@ public class DatatypeUtils {
             assertThat(cc.getText()).isEqualTo(text);
         }
 
-        if (code == null && display == null && system == null) {
+        if (code == null && display == null && system == null && version == null) {
             assertThat(cc.hasCoding()).isFalse();
         } else {
             assertThat(cc.hasCoding()).isTrue();
             assertThat(cc.getCoding().size()).isEqualTo(1);
             Coding coding = cc.getCoding().get(0);
-            if (code == null) {
-                assertThat(coding.hasCode()).isFalse();
-            } else {
-                assertThat(coding.hasCode()).isTrue();
-                assertThat(coding.getCode()).isEqualTo(code);
-            }
-            if (display == null) {
-                assertThat(coding.hasDisplay()).isFalse();
-            } else {
-                assertThat(coding.hasDisplay()).isTrue();
-                assertThat(coding.getDisplay()).isEqualTo(display);
-            }
-            if (system == null) {
-                assertThat(coding.hasSystem()).isFalse();
-            } else {
-                assertThat(coding.hasSystem()).isTrue();
-                assertThat(coding.getSystem()).isEqualTo(system);
-            }
+            checkCommonCodingAssertions(coding, code, display, system, version);
         }
+    }
+
+    // Checks a single coding element. Null in any input indicates it should check False
+    public static void checkCommonCodingAssertions(Coding coding, String code, String display,
+            String system, String version) {
+        assertThat(coding).isNotNull();
+
+        if (code == null) {
+            assertThat(coding.hasCode()).isFalse();
+        } else {
+            assertThat(coding.hasCode()).isTrue();
+            assertThat(coding.getCode()).isEqualTo(code);
+        }
+        if (display == null) {
+            assertThat(coding.hasDisplay()).isFalse();
+        } else {
+            assertThat(coding.hasDisplay()).isTrue();
+            assertThat(coding.getDisplay()).isEqualTo(display);
+        }
+        if (system == null) {
+            assertThat(coding.hasSystem()).isFalse();
+        } else {
+            assertThat(coding.hasSystem()).isTrue();
+            assertThat(coding.getSystem()).isEqualTo(system);
+        }
+        if (version == null) {
+            assertThat(coding.hasVersion()).isFalse();
+        } else {
+            assertThat(coding.hasVersion()).isTrue();
+            assertThat(coding.getVersion()).isEqualTo(version);
+        }
+        
     }
 }
