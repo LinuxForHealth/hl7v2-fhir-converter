@@ -29,24 +29,40 @@ public class DatatypeUtils {
             assertThat(cc.hasCoding()).isTrue();
             assertThat(cc.getCoding().size()).isEqualTo(1);
             Coding coding = cc.getCoding().get(0);
-            if (code == null) {
-                assertThat(coding.hasCode()).isFalse();
-            } else {
-                assertThat(coding.hasCode()).isTrue();
-                assertThat(coding.getCode()).isEqualTo(code);
-            }
-            if (display == null) {
-                assertThat(coding.hasDisplay()).isFalse();
-            } else {
-                assertThat(coding.hasDisplay()).isTrue();
-                assertThat(coding.getDisplay()).isEqualTo(display);
-            }
-            if (system == null) {
-                assertThat(coding.hasSystem()).isFalse();
-            } else {
-                assertThat(coding.hasSystem()).isTrue();
-                assertThat(coding.getSystem()).isEqualTo(system);
-            }
+            checkCommonCodingAssertions(coding, code, display, system, null);
         }
+    }
+
+    // Checks a single coding element. Null in any input indicates it should check False
+    public static void checkCommonCodingAssertions(Coding coding, String code, String display,
+            String system, String version) {
+        assertThat(coding).isNotNull();
+        // assertThat(c).isGreaterThan(index-1);
+
+        if (code == null) {
+            assertThat(coding.hasCode()).isFalse();
+        } else {
+            assertThat(coding.hasCode()).isTrue();
+            assertThat(coding.getCode()).isEqualTo(code);
+        }
+        if (display == null) {
+            assertThat(coding.hasDisplay()).isFalse();
+        } else {
+            assertThat(coding.hasDisplay()).isTrue();
+            assertThat(coding.getDisplay()).isEqualTo(display);
+        }
+        if (system == null) {
+            assertThat(coding.hasSystem()).isFalse();
+        } else {
+            assertThat(coding.hasSystem()).isTrue();
+            assertThat(coding.getSystem()).isEqualTo(system);
+        }
+        if (version == null) {
+            assertThat(coding.hasVersion()).isFalse();
+        } else {
+            assertThat(coding.hasVersion()).isTrue();
+            assertThat(coding.getVersion()).isEqualTo(version);
+        }
+        
     }
 }
