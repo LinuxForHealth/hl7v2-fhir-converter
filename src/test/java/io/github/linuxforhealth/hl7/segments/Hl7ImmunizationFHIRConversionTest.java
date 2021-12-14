@@ -15,6 +15,7 @@ import java.util.Map;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Immunization;
 import org.hl7.fhir.r4.model.Organization;
+import org.hl7.fhir.r4.model.Observation;
 import org.hl7.fhir.r4.model.Practitioner;
 import org.hl7.fhir.r4.model.Resource;
 import org.hl7.fhir.r4.model.ResourceType;
@@ -33,7 +34,7 @@ public class Hl7ImmunizationFHIRConversionTest {
                 + "ORC|RE||197027||ER|||||^Clerk^Myron||MD67895^Pediatric^MARY^^^^MD^^RIA|||||RI2050\r" //ORC.5 is here to prove RXA.20 is taking precedence
                 + "RXA|0|1|20130531|20130531|48^HIB PRP-T^CVX|0.5|ML^^ISO+||00^new immunization record^NIP001|^Sticker^Nurse|^^^RI2050||||33k2a|20131210|PMC^sanofi^MVX|00^Patient refusal^NIP002||PA|A|20120901041038\r"
                 + "RXR|C28161^IM^NCIT^IM^INTRAMUSCULAR^HL70162|RT^right thigh^HL70163\r"
-                + "OBX|1|CE|64994-7^vaccine fund pgm elig cat^LN|1|V02^VFC eligible Medicaid/MedicaidManaged Care^HL70064||||||F|||20130531|||VXC40^per imm^CDCPHINVS\r";
+                + "OBX|1|CWE|31044-1^Reaction^LN|1|VXC9^Persistent, inconsolable crying lasting > 3 hours within 48 hours of dose^CDCPHINVS||||||F|||20130531|||VXC40^per imm^CDCPHINVS\r";
 
         List<Bundle.BundleEntryComponent> e = ResourceUtils
                 .createFHIRBundleFromHL7MessageReturnEntryList(hl7VUXmessageRep);
@@ -100,6 +101,26 @@ public class Hl7ImmunizationFHIRConversionTest {
         assertThat(practBundle2.getNameFirstRep().getFamily()).isEqualTo("Sticker");
         assertThat(practBundle2.getNameFirstRep().getGiven().get(0).toString()).isEqualTo("Nurse");
 
+        // Immunization.Reaction Date (OBX.5) and Detail (OBX.5 if OBX 3 is 31044-1)
+        String reactionDetail = resource.getReactionFirstRep().getDetail().getReference();
+        assertThat(resource.getReactionFirstRep().getDateElement().toString()).contains("2013-05-31"); //OBX.14
+        assertThat(resource.getReactionFirstRep().getDetail().hasReference()).isTrue(); //OBX.5
+        // Looking for one Observation that matches the Reaction.Detail reference
+        List<Resource> observations = ResourceUtils.getResourceList(e, ResourceType.Observation);
+        assertThat(observations).hasSize(1);
+        Observation obs = ResourceUtils.getResourceObservation(observations.get(0), ResourceUtils.context);
+        assertThat(obs.getId()).isEqualTo(reactionDetail);
+        assertThat(obs.getCode().getCodingFirstRep().getDisplay()).isEqualTo("Reaction");
+        assertThat(obs.getCode().getCodingFirstRep().getCode()).isEqualTo("31044-1");
+        assertThat(obs.getCode().getCodingFirstRep().getSystem()).isEqualTo("http://loinc.org");
+        assertThat(obs.getCode().getText()).isEqualTo("Reaction");
+        assertThat(obs.getCategoryFirstRep().getCodingFirstRep().getDisplay()).isEqualTo("Persistent, inconsolable crying lasting > 3 hours within 48 hours of dose");
+        assertThat(obs.getCategoryFirstRep().getCodingFirstRep().getCode()).isEqualTo("VXC9");
+        assertThat(obs.getCategoryFirstRep().getCodingFirstRep().getSystem()).isEqualTo("urn:id:CDCPHINVS");
+        assertThat(obs.getCategoryFirstRep().getText()).isEqualTo("Persistent, inconsolable crying lasting > 3 hours within 48 hours of dose");
+        assertThat(obs.getIdentifierFirstRep().getValue()).isEqualTo("31044-1-LN");
+        assertThat(obs.getIdentifierFirstRep().getSystem()).isEqualTo("urn:id:extID");
+
         // Looking for one Organization that matches the manufacturer reference
         List<Resource> organizations = ResourceUtils.getResourceList(e, ResourceType.Organization);
         assertThat(organizations).hasSize(1);
@@ -141,6 +162,7 @@ public class Hl7ImmunizationFHIRConversionTest {
         assertThat(immunization.getDoseQuantity().getSystem()).isNull();
         assertThat(immunization.getDoseQuantity().getCode()).isNull();
 
+        assertThat(immunization.getReactionFirstRep().getDetail().hasReference()).isFalse();
         // Test should only return RXA.10, ORC.12  is empty
         // If RXA.20 is RE but RXA.18 is blank then we use PATOBJ from v3ActReason
         hl7VUXmessageRep = "MSH|^~\\&|MYEHR2.5|RI88140101|KIDSNET_IFL|RIHEALTH|20130531||VXU^V04^VXU_V04|20130531RI881401010105|P|2.5.1|||NE|AL||||||RI543763\r"
@@ -172,6 +194,8 @@ public class Hl7ImmunizationFHIRConversionTest {
         assertThat(immunization.getDoseQuantity().getUnit()).isEqualTo("ML");
         assertThat(immunization.getDoseQuantity().getSystem()).isEqualTo("http://unitsofmeasure.org");
 
+        assertThat(immunization.getReactionFirstRep().getDetail().hasReference()).isFalse();
+
         //ORC.5 backs up RXA.20 and RXA.18
         hl7VUXmessageRep = "MSH|^~\\&|MYEHR2.5|RI88140101|KIDSNET_IFL|RIHEALTH|20130531||VXU^V04^VXU_V04|20130531RI881401010105|P|2.5.1|||NE|AL||||||RI543763\r"
                 + "PID|1||12345^^^^MR||TestPatient^Jane^^^^^L||||||\r"
@@ -186,6 +210,8 @@ public class Hl7ImmunizationFHIRConversionTest {
         assertThat(immunization.getStatus().getDisplay()).isEqualTo("completed"); //ORC.5 backs up RXA.20 and RXA.18
         assertThat(immunization.hasStatusReason()).isFalse();
 
+        assertThat(immunization.getReactionFirstRep().getDetail().hasReference()).isFalse();
+
         //Status defaults to completed RXA.20,RXA.18 and ORC.5 are empty
         hl7VUXmessageRep = "MSH|^~\\&|MYEHR2.5|RI88140101|KIDSNET_IFL|RIHEALTH|20130531||VXU^V04^VXU_V04|20130531RI881401010105|P|2.5.1|||NE|AL||||||RI543763\r"
                 + "PID|1||12345^^^^MR||TestPatient^Jane^^^^^L||||||\r"
@@ -198,6 +224,9 @@ public class Hl7ImmunizationFHIRConversionTest {
 
         assertThat(immunization.getStatus().getDisplay()).isEqualTo("completed"); //Status defaults to completed
         assertThat(immunization.hasStatusReason()).isFalse();
+
+        assertThat(immunization.getReactionFirstRep().getDetail().hasReference()).isFalse();
+
     }
     // TODO: 10/15/21 RXA-9 (also mapped to primarySource)
 

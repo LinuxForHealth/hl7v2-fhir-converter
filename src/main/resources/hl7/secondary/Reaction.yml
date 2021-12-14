@@ -9,3 +9,19 @@ manifestation:
    generateList: true
    expressionType: resource
    specs: AL1.5  
+
+detail:
+   condition: $obx3 EQUALS 31044-1
+   valueOf: resource/Simple_Observation
+   expressionType: reference
+   vars:
+      obx3: String, OBX.3.1
+      obxCWE: OBX.3
+      obx5: OBX.5
+      value: BUILD_IDENTIFIER_FROM_CWE, OBX.3
+
+
+date:
+   type: DATE_TIME
+   valueOf: OBX.14
+   expressionType: HL7Spec

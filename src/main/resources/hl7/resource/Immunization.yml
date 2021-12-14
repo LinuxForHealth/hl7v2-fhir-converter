@@ -167,3 +167,10 @@ recorded:
    type: DATE_TIME
    valueOf: RXA.22
    expressionType: HL7Spec
+reaction:
+   condition: $obx5 NOT_NULL
+   valueOf: secondary/Reaction
+   generateList: true
+   expressionType: resource
+   vars:
+      obx5: OBX.5
