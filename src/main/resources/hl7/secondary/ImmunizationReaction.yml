@@ -8,11 +8,10 @@ detail:
    valueOf: resource/Observation
    expressionType: reference
    vars:
-      obxCWE: OBX.3
       obx5: OBX.5
+      id: $detailId
    constants:
-      statusCode: 'final'
-
+      detailId: "true"
 
 date:
    type: DATE_TIME

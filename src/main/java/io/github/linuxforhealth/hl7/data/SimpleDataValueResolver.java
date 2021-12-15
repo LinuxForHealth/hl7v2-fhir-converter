@@ -542,20 +542,39 @@ public class SimpleDataValueResolver {
 
 
     public static final ValueExtractor<Object, String> BUILD_IDENTIFIER_FROM_CWE = (Object value) -> {
-        CWE newValue = ((CWE) value);
-        String identifier = newValue.getCwe1_Identifier().toString();
-        String text = newValue.getCwe2_Text().toString();
-        String codingSystem = newValue.getCwe3_NameOfCodingSystem().toString();
-        if (identifier != null ) {
-            if (codingSystem != null) {
-                String join = identifier + "-" + codingSystem;
-                return join;
-            }
-            else {
-                return identifier;
-            }
-        }
-        else return text;
+       if(value instanceof CWE) {
+           CWE newValue = ((CWE) value);
+           String identifier = newValue.getCwe1_Identifier().toString();
+           String text = newValue.getCwe2_Text().toString();
+           String codingSystem = newValue.getCwe3_NameOfCodingSystem().toString();
+           if (identifier != null) {
+               if (codingSystem != null) {
+                   String join = identifier + "-" + codingSystem;
+                   return join;
+               } else {
+                   return identifier;
+               }
+           } else return text;
+       }
+       else if (value instanceof Varies){
+           Varies variesValue = ((Varies) value);
+           if(variesValue.getData() instanceof CWE) {
+               CWE cweValue = (CWE) variesValue.getData();
+               String identifier = cweValue.getCwe1_Identifier().toString();
+               String text = cweValue.getCwe2_Text().toString();
+               String codingSystem = cweValue.getCwe3_NameOfCodingSystem().toString();
+               if (identifier != null) {
+                   if (codingSystem != null) {
+                       String join = identifier + "-" + codingSystem;
+                       return join;
+                   } else {
+                       return identifier;
+                   }
+               } else return text;
+
+           }
+       }
+       return null;
     };
 
     public static final ValueExtractor<Object, String> ALLERGY_INTOLERANCE_CRITICALITY_CODE_FHIR = (Object value) -> {

@@ -102,10 +102,10 @@ public class Hl7ImmunizationFHIRConversionTest {
         assertThat(practBundle2.getNameFirstRep().getGiven().get(0).toString()).isEqualTo("Nurse");
 
         // Immunization.Reaction Date (OBX.14) and Detail (OBX.5 if OBX 3 is 31044-1)
-        String reactionDetail = resource.getReactionFirstRep().getDetail().getReference();
         assertThat(resource.getReactionFirstRep().getDateElement().toString()).contains("2013-05-31"); //OBX.14
         assertThat(resource.getReactionFirstRep().getDetail().hasReference()).isTrue(); //OBX.5
         // Looking for one Observation that matches the Reaction.Detail reference
+        String reactionDetail = resource.getReactionFirstRep().getDetail().getReference();
         List<Resource> observations = ResourceUtils.getResourceList(e, ResourceType.Observation);
         assertThat(observations).hasSize(1);
         Observation obs = ResourceUtils.getResourceObservation(observations.get(0), ResourceUtils.context);
@@ -114,7 +114,7 @@ public class Hl7ImmunizationFHIRConversionTest {
         assertThat(obs.getCode().getCodingFirstRep().getCode()).isEqualTo("VXC9");
         assertThat(obs.getCode().getCodingFirstRep().getSystem()).isEqualTo("urn:id:CDCPHINVS");
         assertThat(obs.getCode().getText()).isEqualTo("Persistent, inconsolable crying lasting > 3 hours within 48 hours of dose");
-        assertThat(obs.getIdentifierFirstRep().getValue()).isEqualTo("197027-31044-1-LN");
+        assertThat(obs.getIdentifierFirstRep().getValue()).isEqualTo("197027-VXC9-CDCPHINVS");
         assertThat(obs.getIdentifierFirstRep().getSystem()).isEqualTo("urn:id:extID");
 
         // Looking for one Organization that matches the manufacturer reference

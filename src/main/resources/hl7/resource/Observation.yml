@@ -13,6 +13,7 @@ id:
   expressionType: JEXL
 
 identifier_1: #joins filler | placer | MSH.7 with whatever gets returned from BUILD_FROM_CWE. that magic happens in identifier_Observation
+  condition: $id NULL
   valueOf: datatype/Identifier_Observation
   generateList: true
   expressionType: resource
@@ -22,7 +23,6 @@ identifier_1: #joins filler | placer | MSH.7 with whatever gets returned from BU
   constants:
       sys: "urn:id:extID"
       joinChar: '-'
-
 identifier_2:
    condition: $valueIn NOT_NULL
    valueOf: datatype/Identifier_var
@@ -31,11 +31,21 @@ identifier_2:
    vars:
       valueIn: OBX.21.1
       systemCX: OBX.21.2
-
+identifier_3:
+  condition: $id NOT_NULL
+  valueOf: datatype/Identifier_Observation
+  generateList: true
+  expressionType: resource
+  vars:
+    obx3: BUILD_IDENTIFIER_FROM_CWE, OBX.5
+    fillpla: STRING, ORC.3.1 | OBR.3.1 | ORC.2.1 | OBR.2.1 | MSH.7
+  constants:
+    sys: "urn:id:extID"
+    joinChar: '-'
 status:
    type: OBSERVATION_STATUS
    default: unknown
-   valueOf: OBX.11 | $statusCode
+   valueOf: OBX.11
    expressionType: HL7Spec
 
 # When OBX's are missing or TX based, we don't want to create an Observation.
