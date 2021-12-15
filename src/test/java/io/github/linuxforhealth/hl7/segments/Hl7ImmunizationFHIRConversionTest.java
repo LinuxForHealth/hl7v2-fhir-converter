@@ -144,6 +144,7 @@ public class Hl7ImmunizationFHIRConversionTest {
         assertThat(immunization.getProgramEligibilityFirstRep().getCodingFirstRep().getCode()).isEqualTo("V02");
         assertThat(immunization.getProgramEligibilityFirstRep().getCodingFirstRep().getSystem()).isEqualTo("https://phinvads.cdc.gov/vads/ViewCodeSystem.action?id=2.16.840.1.113883.12.64#");
         assertThat(immunization.getProgramEligibilityFirstRep().getText()).isEqualTo("VFC eligible Medicaid/MedicaidManaged Care");
+        assertThat(immunization.getFundingSource().getCodingFirstRep().getDisplay()).isNull();
 
         assertThat(immunization.hasFundingSource()).isFalse();
 
@@ -182,6 +183,8 @@ public class Hl7ImmunizationFHIRConversionTest {
         assertThat(immunization.getFundingSource().getCodingFirstRep().getCode()).isEqualTo("V02");
         assertThat(immunization.getFundingSource().getCodingFirstRep().getSystem()).isEqualTo("https://phinvads.cdc.gov/vads/ViewCodeSystem.action?id=2.16.840.1.113883.12.64#");
         assertThat(immunization.getFundingSource().getText()).isEqualTo("VFC eligible Medicaid/MedicaidManaged Care");
+        assertThat(immunization.getFundingSource().getCodingFirstRep().getDisplay()).isNull();
+
 
         assertThat(immunization.hasProgramEligibility()).isFalse();
 

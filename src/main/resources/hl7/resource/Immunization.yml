@@ -140,7 +140,6 @@ isSubpotent:
 programEligibility:
    valueOf: datatype/CodeableConcept
    expressionType: resource
-   generateList: true
    condition: $obx3 EQUALS 64994-7
    specs: OBX.5
    vars:
@@ -148,7 +147,6 @@ programEligibility:
 fundingSource:
    valueOf: datatype/CodeableConcept
    expressionType: resource
-   generateList: true
    condition: $obx3 EQUALS 30963-3
    specs: OBX.5
    vars:
