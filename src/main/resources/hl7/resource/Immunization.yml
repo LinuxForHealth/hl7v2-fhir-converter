@@ -67,13 +67,19 @@ statusReason_4:
       code: "IMMUNE"
       display: "immunity"
       system: "http://terminology.hl7.org/CodeSystem/v3-ActReason"
-vaccineCode:
+vaccineCode_1:
    valueOf: datatype/CodeableConcept
-   required: true
    expressionType: resource
    specs: RXA.5
    vars:
       code: RXA.5
+vaccineCode_2:
+   condition: $obx31 EQUALS 30956-7
+   valueOf: datatype/CodeableConcept
+   expressionType: resource
+   specs: OBX.5
+   vars:
+      obx31: String, OBX.3.1
 patient:
    valueOf: datatype/Reference
    required: true

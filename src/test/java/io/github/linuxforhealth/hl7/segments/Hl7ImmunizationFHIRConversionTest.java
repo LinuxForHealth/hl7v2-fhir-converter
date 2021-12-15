@@ -203,7 +203,6 @@ public class Hl7ImmunizationFHIRConversionTest {
         assertThat(immunization.getStatusReason().getCodingFirstRep().getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/v3-ActReason");
         assertThat(immunization.getStatusReason().getCodingFirstRep().getDisplay()).isEqualTo("medical precaution");
 
-        //Status defaults to completed RXA.20,RXA.18 and ORC.5 are empty
         //Status reason comes is IMMUNE when OBX.3 is 59784-9
         hl7VUXmessageRep = "MSH|^~\\&|MYEHR2.5|RI88140101|KIDSNET_IFL|RIHEALTH|20130531||VXU^V04^VXU_V04|20130531RI881401010105|P|2.5.1|||NE|AL||||||RI543763\r"
                 + "PID|1||12345^^^^MR||TestPatient^Jane^^^^^L||||||\r"
@@ -219,6 +218,27 @@ public class Hl7ImmunizationFHIRConversionTest {
         assertThat(immunization.getStatusReason().getCodingFirstRep().getCode()).isEqualTo("IMMUNE");
         assertThat(immunization.getStatusReason().getCodingFirstRep().getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/v3-ActReason");
         assertThat(immunization.getStatusReason().getCodingFirstRep().getDisplay()).isEqualTo("immunity");
+
+        hl7VUXmessageRep = "MSH|^~\\&|MYEHR2.5|RI88140101|KIDSNET_IFL|RIHEALTH|20130531||VXU^V04^VXU_V04|20130531RI881401010105|P|2.5.1|||NE|AL||||||RI543763\r"
+                + "PID|1||12345^^^^MR||TestPatient^Jane^^^^^L||||||\r"
+                + "ORC|||197027|||||||^Clerk^Myron|||||||RI2050\r"
+                + "RXA|0|1|20130531|20130531||999|ML^^UCUM||00^new immunization record^NIP001|^Sticker^Nurse|^^^RI2050||||33k2a|20131210|PMC^sanofi^MVX||00^refusal||A\r"
+                + "RXR|C28161^IM^NCIT^IM^INTRAMUSCULAR^HL70162|RT^right thigh^HL70163\r"
+                + "OBX|1|CE|30956-7^vaccine type^LN|1|107^DTAP^CVX||||||F|||20130531|||VXC40^per imm^CDCPHINVS\r";
+
+        immunization = ResourceUtils.getImmunization(hl7VUXmessageRep);
+
+        assertThat(immunization.getStatus().getDisplay()).isEqualTo("completed"); //Status defaults to completed
+        assertThat(immunization.hasStatusReason()).isFalse();
+
+        // When OBX.3 is 30956-7 we get a vaccine code
+        assertThat(immunization.hasVaccineCode()).isTrue();
+        assertThat(immunization.getVaccineCode().getCodingFirstRep().getCode()).isEqualTo("107");
+        assertThat(immunization.getVaccineCode().getCodingFirstRep().getDisplay()).isNull();
+        assertThat(immunization.getVaccineCode().getCodingFirstRep().getSystem()).isEqualTo("http://hl7.org/fhir/sid/cvx");
+        assertThat(immunization.getVaccineCode().getText()).isEqualTo("DTAP");
+
+
     }
     // TODO: 10/15/21 RXA-9 (also mapped to primarySource)
 
