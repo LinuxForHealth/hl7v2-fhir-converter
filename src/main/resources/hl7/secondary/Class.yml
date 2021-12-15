@@ -12,8 +12,9 @@ value:
 
 type: 
    valueOf: datatype/CodeableConcept_var
-   generateList: true
+   # generateList: true
    expressionType: resource
+   required: true
    vars: 
       system: $typeSystem
       code: $typeCode

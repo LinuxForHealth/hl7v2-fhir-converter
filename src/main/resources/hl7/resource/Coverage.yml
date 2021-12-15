@@ -16,7 +16,7 @@ id:
   expressionType: JEXL
 
 # Status is required, but it comes from a non-table 2 char ST 
-# It MUST be one of: active | cancelled | draft | entered-in-error; default to activew
+# It MUST be one of: active | cancelled | draft | entered-in-error
 # For now, until we get a good mapping, assume all records are active
 status:
    type: STRING
@@ -41,7 +41,7 @@ beneficiary:
 
 class:
    valueOf: secondary/Class
-   condition: $className NOT_NULL
+   condition: $classValue NOT_NULL
    generateList: true
    expressionType: resource
    vars: 
