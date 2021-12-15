@@ -1,0 +1,31 @@
+#
+# (C) Copyright IBM Corp. 2021
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+---
+documentType:
+  condition: $obx3 EQUALS 69764-9
+  valueOf: $docType
+  expressionType: HL7Spec
+  vars:
+    docType: STRING, OBX.5
+    obx3: String, OBX.3.1
+
+
+publicationDate:
+   condition: $obx3 EQUALS 29768-9
+   type: STRING
+   valueOf: $pubDate
+   expressionType: HL7Spec
+   vars:
+      pubDate: OBX.5, GeneralUtils.handleDate(pubDate)
+      obx3: String, OBX.3.1
+#
+#presentationDate:
+#  condition: $obx3 EQUALS 29769-7
+#  valueOf: $presDate
+#  expressionType: HL7Spec
+#  vars:
+#    presDate: DATE, OBX.5
+#    obx3: STRING, OBX.3.1

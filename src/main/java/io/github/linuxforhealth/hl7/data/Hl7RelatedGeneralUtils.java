@@ -5,10 +5,13 @@
  */
 package io.github.linuxforhealth.hl7.data;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.Temporal;
 import java.time.temporal.UnsupportedTemporalTypeException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.regex.Matcher;
@@ -90,6 +93,23 @@ public class Hl7RelatedGeneralUtils {
                 }
             }
             return null;
+        }
+        return null;
+    }
+
+    public static Date handleDate(Object var) throws ParseException {
+        if (var != null){
+        try {
+            SimpleDateFormat format = new SimpleDateFormat("yyyy-mm-dd");
+            String dateString = SimpleDataValueResolver.DATE.apply(var);
+            Date date = format.parse(dateString);
+
+            System.out.print(date);
+            return date;
+        }
+        catch (ParseException pe) {
+            System.out.println("Parse Exception : " + pe);
+         }
         }
         return null;
     }
