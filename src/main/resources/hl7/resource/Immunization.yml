@@ -168,9 +168,10 @@ recorded:
    valueOf: RXA.22
    expressionType: HL7Spec
 reaction:
-   condition: $obx5 NOT_NULL
-   valueOf: secondary/Reaction
+   condition: $obx31 EQUALS 31044-1
+   valueOf: secondary/ImmunizationReaction
    generateList: true
    expressionType: resource
    vars:
       obx5: OBX.5
+      obx31: String, OBX.3.1

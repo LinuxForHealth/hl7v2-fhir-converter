@@ -101,7 +101,7 @@ public class Hl7ImmunizationFHIRConversionTest {
         assertThat(practBundle2.getNameFirstRep().getFamily()).isEqualTo("Sticker");
         assertThat(practBundle2.getNameFirstRep().getGiven().get(0).toString()).isEqualTo("Nurse");
 
-        // Immunization.Reaction Date (OBX.5) and Detail (OBX.5 if OBX 3 is 31044-1)
+        // Immunization.Reaction Date (OBX.14) and Detail (OBX.5 if OBX 3 is 31044-1)
         String reactionDetail = resource.getReactionFirstRep().getDetail().getReference();
         assertThat(resource.getReactionFirstRep().getDateElement().toString()).contains("2013-05-31"); //OBX.14
         assertThat(resource.getReactionFirstRep().getDetail().hasReference()).isTrue(); //OBX.5
@@ -110,15 +110,11 @@ public class Hl7ImmunizationFHIRConversionTest {
         assertThat(observations).hasSize(1);
         Observation obs = ResourceUtils.getResourceObservation(observations.get(0), ResourceUtils.context);
         assertThat(obs.getId()).isEqualTo(reactionDetail);
-        assertThat(obs.getCode().getCodingFirstRep().getDisplay()).isEqualTo("Reaction");
-        assertThat(obs.getCode().getCodingFirstRep().getCode()).isEqualTo("31044-1");
-        assertThat(obs.getCode().getCodingFirstRep().getSystem()).isEqualTo("http://loinc.org");
-        assertThat(obs.getCode().getText()).isEqualTo("Reaction");
-        assertThat(obs.getCategoryFirstRep().getCodingFirstRep().getDisplay()).isEqualTo("Persistent, inconsolable crying lasting > 3 hours within 48 hours of dose");
-        assertThat(obs.getCategoryFirstRep().getCodingFirstRep().getCode()).isEqualTo("VXC9");
-        assertThat(obs.getCategoryFirstRep().getCodingFirstRep().getSystem()).isEqualTo("urn:id:CDCPHINVS");
-        assertThat(obs.getCategoryFirstRep().getText()).isEqualTo("Persistent, inconsolable crying lasting > 3 hours within 48 hours of dose");
-        assertThat(obs.getIdentifierFirstRep().getValue()).isEqualTo("31044-1-LN");
+        assertThat(obs.getCode().getCodingFirstRep().getDisplay()).isEqualTo("Persistent, inconsolable crying lasting > 3 hours within 48 hours of dose");
+        assertThat(obs.getCode().getCodingFirstRep().getCode()).isEqualTo("VXC9");
+        assertThat(obs.getCode().getCodingFirstRep().getSystem()).isEqualTo("urn:id:CDCPHINVS");
+        assertThat(obs.getCode().getText()).isEqualTo("Persistent, inconsolable crying lasting > 3 hours within 48 hours of dose");
+        assertThat(obs.getIdentifierFirstRep().getValue()).isEqualTo("197027-31044-1-LN");
         assertThat(obs.getIdentifierFirstRep().getSystem()).isEqualTo("urn:id:extID");
 
         // Looking for one Organization that matches the manufacturer reference
@@ -162,7 +158,7 @@ public class Hl7ImmunizationFHIRConversionTest {
         assertThat(immunization.getDoseQuantity().getSystem()).isNull();
         assertThat(immunization.getDoseQuantity().getCode()).isNull();
 
-        assertThat(immunization.getReactionFirstRep().getDetail().hasReference()).isFalse();
+        assertThat(immunization.hasReaction()).isFalse();
         // Test should only return RXA.10, ORC.12  is empty
         // If RXA.20 is RE but RXA.18 is blank then we use PATOBJ from v3ActReason
         hl7VUXmessageRep = "MSH|^~\\&|MYEHR2.5|RI88140101|KIDSNET_IFL|RIHEALTH|20130531||VXU^V04^VXU_V04|20130531RI881401010105|P|2.5.1|||NE|AL||||||RI543763\r"
@@ -194,8 +190,7 @@ public class Hl7ImmunizationFHIRConversionTest {
         assertThat(immunization.getDoseQuantity().getUnit()).isEqualTo("ML");
         assertThat(immunization.getDoseQuantity().getSystem()).isEqualTo("http://unitsofmeasure.org");
 
-        assertThat(immunization.getReactionFirstRep().getDetail().hasReference()).isFalse();
-
+        assertThat(immunization.hasReaction()).isFalse();
         //ORC.5 backs up RXA.20 and RXA.18
         hl7VUXmessageRep = "MSH|^~\\&|MYEHR2.5|RI88140101|KIDSNET_IFL|RIHEALTH|20130531||VXU^V04^VXU_V04|20130531RI881401010105|P|2.5.1|||NE|AL||||||RI543763\r"
                 + "PID|1||12345^^^^MR||TestPatient^Jane^^^^^L||||||\r"
@@ -210,8 +205,7 @@ public class Hl7ImmunizationFHIRConversionTest {
         assertThat(immunization.getStatus().getDisplay()).isEqualTo("completed"); //ORC.5 backs up RXA.20 and RXA.18
         assertThat(immunization.hasStatusReason()).isFalse();
 
-        assertThat(immunization.getReactionFirstRep().getDetail().hasReference()).isFalse();
-
+        assertThat(immunization.hasReaction()).isFalse();
         //Status defaults to completed RXA.20,RXA.18 and ORC.5 are empty
         hl7VUXmessageRep = "MSH|^~\\&|MYEHR2.5|RI88140101|KIDSNET_IFL|RIHEALTH|20130531||VXU^V04^VXU_V04|20130531RI881401010105|P|2.5.1|||NE|AL||||||RI543763\r"
                 + "PID|1||12345^^^^MR||TestPatient^Jane^^^^^L||||||\r"
@@ -225,7 +219,7 @@ public class Hl7ImmunizationFHIRConversionTest {
         assertThat(immunization.getStatus().getDisplay()).isEqualTo("completed"); //Status defaults to completed
         assertThat(immunization.hasStatusReason()).isFalse();
 
-        assertThat(immunization.getReactionFirstRep().getDetail().hasReference()).isFalse();
+        assertThat(immunization.hasReaction()).isFalse();
 
     }
     // TODO: 10/15/21 RXA-9 (also mapped to primarySource)

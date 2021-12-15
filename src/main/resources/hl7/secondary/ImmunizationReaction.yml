@@ -1,0 +1,21 @@
+#
+# (C) Copyright IBM Corp. 2021
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+---
+detail:
+   valueOf: resource/Observation
+   expressionType: reference
+   vars:
+      obxCWE: OBX.3
+      obx5: OBX.5
+   constants:
+      statusCode: 'final'
+
+
+date:
+   type: DATE_TIME
+   valueOf: OBX.14
+   expressionType: HL7Spec
+

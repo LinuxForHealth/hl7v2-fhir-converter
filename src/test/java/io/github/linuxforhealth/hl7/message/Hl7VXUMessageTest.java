@@ -288,10 +288,10 @@ public class Hl7VXUMessageTest {
         List<Resource> observationResource = e.stream()
             .filter(v -> ResourceType.Observation == v.getResource().getResourceType())
             .map(BundleEntryComponent::getResource).collect(Collectors.toList());
-        assertThat(observationResource).hasSize(0);  // TODO: Change this to 2 when card 688 is implemented, expect 2 Observations for the OBX with OBX.3 of 31044-1
+        assertThat(observationResource).hasSize(1);  // TODO: Change this to 2 when card 688 is implemented, expect 2 Observations for the OBX with OBX.3 of 31044-1
         
         // Expecting only the above resources, no extras!
-        assertThat(e.size()).isEqualTo(3);
+        assertThat(e.size()).isEqualTo(4);
     }
 
     @Test
@@ -338,11 +338,11 @@ public class Hl7VXUMessageTest {
         List<Resource> observationResource = e.stream()
             .filter(v -> ResourceType.Observation == v.getResource().getResourceType())
             .map(BundleEntryComponent::getResource).collect(Collectors.toList());
-        assertThat(observationResource).hasSize(0); // TODO: Change this to 3 when card 688 is implemented, expect 2 Observations for the OBX with OBX.3 of 31044-1
+        assertThat(observationResource).hasSize(2); // TODO: Change this to 3 when card 688 is implemented, expect 2 Observations for the OBX with OBX.3 of 31044-1
 
         // TODO: When implemented, verify that the correct Observations are associated with the correct Immunizations.
         
         // Expecting only the above resources, no extras!
-        assertThat(e.size()).isEqualTo(4);
+        assertThat(e.size()).isEqualTo(6);
     }
 }

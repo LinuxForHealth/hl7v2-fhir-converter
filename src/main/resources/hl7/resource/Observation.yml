@@ -29,13 +29,13 @@ identifier_2:
    generateList: true
    expressionType: resource
    vars:
-      valueIn: OBX.21.1 
-      systemCX: OBX.21.2  
+      valueIn: OBX.21.1
+      systemCX: OBX.21.2
 
 status:
    type: OBSERVATION_STATUS
    default: unknown
-   valueOf: OBX.11
+   valueOf: OBX.11 | $statusCode
    expressionType: HL7Spec
 
 # When OBX's are missing or TX based, we don't want to create an Observation.
@@ -54,7 +54,11 @@ code:
       valueOf: datatype/CodeableConcept
       expressionType: resource
       specs: $obx3
- 
+
+   -  condition: $obx5 NOT_NULL
+      valueOf: datatype/CodeableConcept
+      expressionType: resource
+      specs: $obx5
 
 subject:
     valueOf: datatype/Reference
