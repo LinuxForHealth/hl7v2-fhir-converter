@@ -98,6 +98,8 @@ class Hl7FinancialInsuranceTest {
         List<Resource> organizations = ResourceUtils.getResourceList(e, ResourceType.Organization);
         assertThat(organizations).hasSize(1); // From Payor created by IN1
         Organization org = (Organization) organizations.get(0);
+
+        // Check organization Id's
         String organizationId = org.getId();
         assertThat(org.getName()).isEqualTo("Large Blue Organization"); // IN1.4
         assertThat(org.getIdentifier()).hasSize(1);
@@ -108,7 +110,7 @@ class Hl7FinancialInsuranceTest {
         assertThat(orgId1.getPeriod().getEndElement().toString()).containsPattern("2021-12-31T14:50:45"); // IN1.3.8
         DatatypeUtils.checkCommonCodeableConceptAssertions(orgId1.getType(), "IdType5", null, null, null); // IN1.3.5
 
-        // Basic check the Organization address. IN1.4 is a standard XAD address, which is tested exhaustively in other tests.  
+        // Check the Organization address. IN1.4 is a standard XAD address, which is tested exhaustively in other tests.  
         assertThat(org.getAddress()).hasSize(1);
         assertThat(org.getAddress().get(0).getLine().get(0).getValueAsString())
                 .isEqualTo("456 Ultramarine Lane"); // IN1.4.1
@@ -116,7 +118,7 @@ class Hl7FinancialInsuranceTest {
         assertThat(org.getAddress().get(0).getState()).isEqualTo("CA"); // IN1.4.4
         assertThat(org.getAddress().get(0).getPostalCode()).isEqualTo("ZIP5"); // IN1.4.5
 
-        // Basic check Organization contact name.  IN1.6 name is standard XPN, tested exhaustively in other tests.
+        // Check Organization contact name.  IN1.6 name is standard XPN, tested exhaustively in other tests.
         HumanName contactName = org.getContact().get(0).getName();
         assertThat(org.getContact()).hasSize(1);
         assertThat(contactName.getFamily()).isEqualTo("LastFake"); // IN1.6.1
@@ -130,7 +132,7 @@ class Hl7FinancialInsuranceTest {
         assertThat(contactName.getPeriod().getEndElement().toString()).containsPattern("2021-12-31T14:50:45"); // IN1.6.13
         assertThat(org.getContact().get(0).hasPurpose()).isFalse(); // Check there is no purpose. Don't need one, here.
 
-        // Basic Organization contact telecom.  IN1.7 is standard XTN, tested exhaustively in other tests.
+        // Check Organization contact telecom.  IN1.7 is standard XTN, tested exhaustively in other tests.
         assertThat(org.getContact().get(0).getTelecom()).hasSize(1);
         ContactPoint contactPoint = org.getContact().get(0).getTelecomFirstRep(); // telecom is type ContactPoint
         assertThat(contactPoint.getSystemElement().getCode()).hasToString("phone"); // default type hardcoded.
