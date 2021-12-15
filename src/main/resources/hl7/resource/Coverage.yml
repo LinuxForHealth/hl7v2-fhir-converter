@@ -1,0 +1,54 @@
+#
+# (C) Copyright IBM Corp. 2021, 2022
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+---
+# Coverage required fields
+#  Status
+#  Beneficiary (Patient)
+#  Payor
+
+resourceType: Coverage
+id:
+  type: STRING
+  valueOf: 'UUID.randomUUID()'
+  expressionType: JEXL
+
+# Status is required, but it comes from a non-table 2 char ST 
+# It MUST be one of: active | cancelled | draft | entered-in-error
+# For now, until we get a good mapping, assume all records are active
+status:
+   type: STRING
+   default: active
+   valueOf: $active
+   #   valueOf: IN1.45 value will come from IN1.45, but we don't yet have a mapping.
+   expressionType: HL7Spec
+   constants:
+     active: 'active'
+
+payor:
+   valueOf: resource/Organization
+   expressionType: reference
+   vars: 
+       orgName: String, IN1.4.1
+       orgIdentifier: String, IN1.3.1
+
+beneficiary:
+    valueOf: datatype/Reference
+    expressionType: resource
+    specs: $Patient
+
+class:
+   valueOf: secondary/Class
+   condition: $classValue NOT_NULL
+   generateList: true
+   expressionType: resource
+   vars: 
+      classValue: String, IN1.8
+      className: String, IN1.9.1
+   constants: 
+      typeSystem: 'http://terminology.hl7.org/CodeSystem/coverage-class'
+      typeCode: 'group'
+      typeDisplay: 'Group'
+

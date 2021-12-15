@@ -69,3 +69,13 @@ resources:
         - MSH
         - PID
         - PV1
+
+    - resourceName: Coverage
+      segment: .IN1
+      group: INSURANCE
+      resourcePath: resource/Coverage
+      repeats: true
+      additionalSegments:
+        - MSH
+        - PID
+        - PV1

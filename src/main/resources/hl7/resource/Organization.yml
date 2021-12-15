@@ -13,16 +13,16 @@ identifier:
    generateList: true  
    expressionType: resource
    vars:
-      id: CWE.1 | XON.10 | XON.3
+      id: CWE.1 | XON.10 | XON.3 | $orgIdentifier
       system: CWE.3
 name_v1:
    type: STRING
    condition: $idValue NULL
-   valueOf: CWE.2 | XON.1
+   valueOf: CWE.2 | XON.1 | $orgName
    required: true
    expressionType: HL7Spec
    vars:
-      idValue: CWE.1 | XON.10 | XON.3
+      idValue: CWE.1 | XON.10 | XON.3 
 name_v2:
    type: STRING
    condition: $idValue NOT_NULL
