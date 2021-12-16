@@ -91,7 +91,7 @@ class ConverterConfigurationTest {
         prop.put("additional.resources.location", "src/test/resources/additional_resources");
         prop.store(new FileOutputStream(configFile), null);
     }
-
+ 
     @Test
     void testConfigurationDefaultsAreUsed() throws IOException {
         File configFile = new File(folder, "config.properties");
