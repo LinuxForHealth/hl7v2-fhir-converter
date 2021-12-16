@@ -740,7 +740,7 @@ class Hl7ORUMessageTest {
 
         // Verify result reference
         List<Reference> obsRef = diag.getResult();
-        assertThat(obsRef).hasSize(1);
+        assertThat(obsRef).isNotEmpty().hasSize(1);
         assertThat(obsRef.get(0).isEmpty()).isFalse();
         // No attachment created since OBX with TX and no id is not first
         List<Attachment> attachments = diag.getPresentedForm();

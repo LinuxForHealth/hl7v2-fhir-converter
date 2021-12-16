@@ -82,7 +82,7 @@ class Hl7FinancialInsuranceTest {
                 + "|UA34567|Blue|||20201231145045|20211231145045||||||||||||||||||||||"
                 // IN1.36 to Identifier 4
                 // IN1.46 to Identifier 3
-                // IN1.47 to IN1.45 NOT REFERENCED
+                // IN1.47 to IN1.53 NOT REFERENCED
                 + "|MEMBER36||||||||||Value46|||||||\n";
 
         List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
