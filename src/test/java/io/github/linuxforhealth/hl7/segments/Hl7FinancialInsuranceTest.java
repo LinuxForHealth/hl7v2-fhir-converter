@@ -28,7 +28,7 @@ import io.github.linuxforhealth.hl7.segments.util.ResourceUtils;
  * Tests for IN1, Coverage, and related segments
  */
 class Hl7FinancialInsuranceTest {
-    // Suppress warnings about too many assertions in a test.  Justification: creating a FHIR message is very costly; we need to check many asserts per creation for efficiency.  
+    // Suppress warnings about too many assertions in a test. Justification: creating a FHIR message is very costly; we need to check many asserts per creation for efficiency.  
     @java.lang.SuppressWarnings("squid:S5961")
     @Test
     void testBasicInsuranceCoverageFields() throws IOException {
