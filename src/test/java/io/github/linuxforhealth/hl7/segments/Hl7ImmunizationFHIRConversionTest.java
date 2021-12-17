@@ -121,7 +121,7 @@ public class Hl7ImmunizationFHIRConversionTest {
                 + "ORC|RE||197027||CP|||||^Clerk^Myron|||||||RI2050\r"
                 + "RXA|0|1|20130531|20130531|48^HIB PRP-T^CVX|0.5|ML^^^||00^new immunization record^NIP001|^Sticker^Nurse|^^^RI2050||||33k2a|20131210|PMC^sanofi^MVX|00^Patient refusal^NIP002|||A\r"
                 + "RXR|C28161^IM^NCIT^IM^INTRAMUSCULAR^HL70162|RT^right thigh^HL70163\r"
-                + "OBX|1|CE|64994-7^vaccine fund pgm elig cat^LN|1|V02^VFC eligible Medicaid/MedicaidManaged Care^HL70064||||||F|||20130531|||VXC40^per imm^CDCPHINVS\r";
+                + "OBX|1|CWE|64994-7^vaccine fund pgm elig cat^LN|1|V02^VFC eligible Medicaid/MedicaidManaged Care^HL70064||||||F|||20130531|||VXC40^per imm^CDCPHINVS\r";
 
         Immunization immunization = ResourceUtils.getImmunization(hl7VUXmessageRep);
 
@@ -142,9 +142,9 @@ public class Hl7ImmunizationFHIRConversionTest {
         assertThat(immunization.getDoseQuantity().getCode()).isNull();
 
         assertThat(immunization.getProgramEligibilityFirstRep().getCodingFirstRep().getCode()).isEqualTo("V02");
-        assertThat(immunization.getProgramEligibilityFirstRep().getCodingFirstRep().getSystem()).isEqualTo("https://phinvads.cdc.gov/vads/ViewCodeSystem.action?id=2.16.840.1.113883.12.64#");
+        assertThat(immunization.getProgramEligibilityFirstRep().getCodingFirstRep().getSystem()).isEqualTo("urn:id:v2-0064");
+        assertThat(immunization.getProgramEligibilityFirstRep().getCodingFirstRep().getDisplay()).isEqualTo("VFC eligible Medicaid/MedicaidManaged Care");
         assertThat(immunization.getProgramEligibilityFirstRep().getText()).isEqualTo("VFC eligible Medicaid/MedicaidManaged Care");
-        assertThat(immunization.getFundingSource().getCodingFirstRep().getDisplay()).isNull();
 
         assertThat(immunization.hasFundingSource()).isFalse();
 
@@ -155,7 +155,7 @@ public class Hl7ImmunizationFHIRConversionTest {
                 + "ORC|RE||197027||PA|||||^Clerk^Myron|||||||RI2050\r"
                 + "RXA|0|1|20130531|20130531|48^HIB PRP-T^CVX|0.5|ML^^UCUM||00^new immunization record^NIP001|^Sticker^Nurse|^^^RI2050||||33k2a|20131210|PMC^sanofi^MVX||00^refusal|RE|A\r"
                 + "RXR|C28161^IM^NCIT^IM^INTRAMUSCULAR^HL70162|RT^right thigh^HL70163\r"
-                + "OBX|1|CE|30963-3^ VACCINE FUNDING SOURCE^LN|1|V02^VFC eligible Medicaid/MedicaidManaged Care^HL70064||||||F|||20130531|||VXC40^per imm^CDCPHINVS\r";
+                + "OBX|1|CWE|30963-3^ VACCINE FUNDING SOURCE^LN|1|V02^VFC eligible Medicaid/MedicaidManaged Care^HL70064||||||F|||20130531|||VXC40^per imm^CDCPHINVS\r";
 
         immunization = ResourceUtils.getImmunization(hl7VUXmessageRep);
 
@@ -181,10 +181,9 @@ public class Hl7ImmunizationFHIRConversionTest {
 
         // If OBX.3 is 30963-3 the OBX.5 is for funding source
         assertThat(immunization.getFundingSource().getCodingFirstRep().getCode()).isEqualTo("V02");
-        assertThat(immunization.getFundingSource().getCodingFirstRep().getSystem()).isEqualTo("https://phinvads.cdc.gov/vads/ViewCodeSystem.action?id=2.16.840.1.113883.12.64#");
+        assertThat(immunization.getFundingSource().getCodingFirstRep().getSystem()).isEqualTo("urn:id:v2-0064");
+        assertThat(immunization.getFundingSource().getCodingFirstRep().getDisplay()).isEqualTo("VFC eligible Medicaid/MedicaidManaged Care");
         assertThat(immunization.getFundingSource().getText()).isEqualTo("VFC eligible Medicaid/MedicaidManaged Care");
-        assertThat(immunization.getFundingSource().getCodingFirstRep().getDisplay()).isNull();
-
 
         assertThat(immunization.hasProgramEligibility()).isFalse();
 
