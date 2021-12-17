@@ -13,9 +13,9 @@ import java.util.stream.Collectors;
 
 import org.hl7.fhir.r4.model.Base;
 import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
-import org.hl7.fhir.r4.model.Condition;
 import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Coding;
+import org.hl7.fhir.r4.model.Condition;
 import org.hl7.fhir.r4.model.Property;
 import org.hl7.fhir.r4.model.Resource;
 import org.hl7.fhir.r4.model.ResourceType;
@@ -23,25 +23,28 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
+import io.github.linuxforhealth.hl7.segments.util.DatatypeUtils;
 import io.github.linuxforhealth.hl7.segments.util.ResourceUtils;
 
-public class HL7ConditionFHIRConversionTest {
+class HL7ConditionFHIRConversionTest {
 
     // --------------------- DIAGNOSIS UNIT TESTS (DG1) ---------------------
 
     // Tests the DG1 segment (diagnosis) with all supported message types.
     // This tests all the fields in the happy path.
+    // Suppress warnings about too many assertions in a test.  Justification: creating a FHIR message is very costly; we need to check many asserts per creation for efficiency.  
+    @java.lang.SuppressWarnings("squid:S5961")
     @ParameterizedTest
     @ValueSource(strings = { "MSH|^~\\&|||||||ADT^A01^ADT_A01|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6||||||\r",
-    // "MSH|^~\\&|||||||ADT^A03|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6||||||\r",
-    // "MSH|^~\\&|||||||ADT^A04|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6||||||\r",
-    "MSH|^~\\&|||||||ADT^A08|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6||||||\r",
+            // "MSH|^~\\&|||||||ADT^A03|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6||||||\r",
+            // "MSH|^~\\&|||||||ADT^A04|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6||||||\r",
+            "MSH|^~\\&|||||||ADT^A08|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6||||||\r",
     // "MSH|^~\\&|||||||ADT^A28^ADT^A28|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6||||||\r",
     // "MSH|^~\\&|||||||ADT^A31|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6||||||\r",
     // "MSH|^~\\&|||||||ORM^O01|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6||||||\r"
     // PPR_PC1, PPR_PC2, and PPR_PC3 create Conditions but they don't have a DG1 segment so they are tested in a different testcase.
     })
-    public void validateDiagnosis(String msh) {
+    void validateDiagnosis(String msh) {
 
         String hl7message = msh + "PID||||||||||||||||||||||||||||||\r"
                 + "PV1||I|||||||||||||||||1400|||||||||||||||||||||||||\r"
@@ -52,9 +55,7 @@ public class HL7ConditionFHIRConversionTest {
         // --- CONDITION TESTS ---
 
         // Find the condition from the FHIR bundle.
-        List<Resource> conditionResource = e.stream()
-                .filter(v -> ResourceType.Condition == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> conditionResource = ResourceUtils.getResourceList(e, ResourceType.Condition);
         assertThat(conditionResource).hasSize(1);
 
         // Get condition Resource
@@ -117,9 +118,7 @@ public class HL7ConditionFHIRConversionTest {
 
         // --- ENCOUNTER TESTS ---
 
-        List<Resource> encounterResource = e.stream()
-                .filter(v -> ResourceType.Encounter == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> encounterResource = ResourceUtils.getResourceList(e, ResourceType.Encounter);
         assertThat(encounterResource).hasSize(1);
 
         // Get the encounter resource
@@ -172,7 +171,7 @@ public class HL7ConditionFHIRConversionTest {
     // Tests the DG1 segment (diagnosis) with a full Entity Identifier (EI).
     // These values come from DG1.20.
     @Test
-    public void validateDiagnosisWithEIIdentifiers() {
+    void validateDiagnosisWithEIIdentifiers() {
 
         String hl7message = "MSH|^~\\&|||||||ADT^A01^ADT_A01|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6||||||\r"
                 + "PID||||||||||||||||||||||||||||||\r"
@@ -181,9 +180,7 @@ public class HL7ConditionFHIRConversionTest {
         List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
 
         // Find the condition from the FHIR bundle.
-        List<Resource> conditionResource = e.stream()
-                .filter(v -> ResourceType.Condition == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> conditionResource = ResourceUtils.getResourceList(e, ResourceType.Condition);
         assertThat(conditionResource).hasSize(1);
 
         // Get condition Resource
@@ -193,7 +190,7 @@ public class HL7ConditionFHIRConversionTest {
         Property identifierProperty = condition.getNamedProperty("identifier");
         List<Base> identifierList = identifierProperty.getValues();
 
-        // Verify we have 3 identifier
+        // Verify we have 3 identifiers
         // NOTE: The first identifier which is not related to condition is tested in the
         // identifier suite of unit tests.
         assertThat(identifierList).hasSize(3);
@@ -219,7 +216,7 @@ public class HL7ConditionFHIRConversionTest {
     // Tests multiple DG1 segments to verify we get multiple conditions with
     // references to the encounter.
     @Test
-    public void validateEncounterMultipleDiagnoses() {
+    void validateEncounterMultipleDiagnoses() {
 
         String hl7message = "MSH|^~\\&||||||S1|ADT^A01^ADT_A01||T|2.6|||||||||\r"
                 + "EVN|A04|20151008111200|20171013152901|O|OID1006|20171013153621|EVN1009\r"
@@ -227,46 +224,37 @@ public class HL7ConditionFHIRConversionTest {
                 + "PV1||I|||||||||||||||||1400|||||||||||||||||||||||||\r"
                 + "DG1|1|D1|V72.83^Other specified pre-operative examination^ICD-9^^^|Other specified pre-operative examination|20151008111200|A\r"
                 + "DG1|2|D2|R00.0^Tachycardia, unspecified^ICD-10^^^|Tachycardia, unspecified|20150725201300|A\r"
-                + "DG1|3|D3|R06.02^Shortness of breath^ICD-10^^^|Shortness of breath||A\r"
-                + "DG1|7|D8|J45.909^Unspecified asthma, uncomplicated^ICD-10^^^|Unspecified asthma, uncomplicated||A";
+                + "DG1|3|D3|R06.02^Shortness of breath^ICD-10^^^|Shortness of breath||A\r";
 
         List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
 
         // Find the condition from the FHIR bundle.
-        List<Resource> conditionResource = e.stream()
-                .filter(v -> ResourceType.Condition == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> conditionResource = ResourceUtils.getResourceList(e, ResourceType.Condition);
 
-        //Verify we have 4 conditions. 1 for each DG1.
-        assertThat(conditionResource).hasSize(4);
+        //Verify we have 3 conditions. 1 for each DG1.
+        assertThat(conditionResource).hasSize(3);
 
-        Condition condition = (Condition) conditionResource.get(1);
-        assertThat(condition.hasCode()).isTrue();
-        CodeableConcept condCC = condition.getCode();
-        assertThat(condCC.hasText()).isTrue();
-        assertThat(condCC.getText()).isEqualTo("Tachycardia, unspecified");
-        assertThat(condCC.hasCoding()).isTrue();
-        assertThat(condCC.getCoding().size()).isEqualTo(1);
+        // Check the Code of each condition
+        Condition condition = (Condition) conditionResource.get(0);
+        DatatypeUtils.checkCommonCodeableConceptAssertions(condition.getCode(), "V72.83", "Other specified pre-operative examination",
+        "http://terminology.hl7.org/CodeSystem/icd9", "Other specified pre-operative examination");
 
-        Coding condCoding = condCC.getCoding().get(0);
-        assertThat(condCoding.hasSystem()).isTrue();
-        assertThat(condCoding.getSystem()).isEqualTo("http://hl7.org/fhir/sid/icd-10-cm");
-        assertThat(condCoding.hasCode()).isTrue();
-        assertThat(condCoding.getCode()).isEqualTo("R00.0");
-        assertThat(condCoding.hasDisplay()).isTrue();
-        assertThat(condCoding.getDisplay()).isEqualTo("Tachycardia, unspecified");
-        assertThat(condCoding.hasVersion()).isFalse();
+        condition = (Condition) conditionResource.get(1);
+        DatatypeUtils.checkCommonCodeableConceptAssertions(condition.getCode(), "R00.0", "Tachycardia, unspecified",
+        "http://hl7.org/fhir/sid/icd-10-cm", "Tachycardia, unspecified");
+
+        condition = (Condition) conditionResource.get(2);
+        DatatypeUtils.checkCommonCodeableConceptAssertions(condition.getCode(), "R06.02", "Shortness of breath",
+        "http://hl7.org/fhir/sid/icd-10-cm", "Shortness of breath");
 
         // Verify encounter reference exists
         Base encounterProp = ResourceUtils.getValue(condition, "encounter");
         assertThat(ResourceUtils.getValueAsString(encounterProp, "reference").substring(0, 10)).isEqualTo("Encounter/");
-        
+
         //------------------------------------------------------//
 
         // Find the encounter from the FHIR bundle.
-        List<Resource> encounterResource = e.stream()
-        .filter(v -> ResourceType.Encounter == v.getResource().getResourceType())
-        .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> encounterResource = ResourceUtils.getResourceList(e, ResourceType.Encounter);
 
         //Verify we only have 1 encounter
         assertThat(encounterResource).hasSize(1);
@@ -276,8 +264,8 @@ public class HL7ConditionFHIRConversionTest {
 
         // Verify encounter.reasonReference has a reference for each condition.
         List<Base> reasonReferences = encounter.getNamedProperty("reasonReference").getValues();
-        // Therefore there should be 4.
-        assertThat(reasonReferences).hasSize(4);
+        // Therefore there should be 3.
+        assertThat(reasonReferences).hasSize(3);
 
         // And the references should be referencing conditions
         for (Base reasonReference : reasonReferences) {
@@ -290,7 +278,7 @@ public class HL7ConditionFHIRConversionTest {
     // Tests that the Encounter has the full aray of condition references in both
     // diagnosis and reasonReference.
     @Test
-    public void validateEncounterMultipleDiagnosesTestingMultipleDiagnosisAndReasonReferences() {
+    void validateEncounterMultipleDiagnosesTestingMultipleDiagnosisAndReasonReferences() {
 
         String hl7message = "MSH|^~\\&||||||S1|ADT^A01^ADT_A01||T|2.6|||||||||\r"
                 + "EVN|A04||||||\r"
@@ -308,9 +296,7 @@ public class HL7ConditionFHIRConversionTest {
         List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
 
         // Find the conditions from the FHIR bundle.
-        List<Resource> conditionResource = e.stream()
-                .filter(v -> ResourceType.Condition == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> conditionResource = ResourceUtils.getResourceList(e, ResourceType.Condition);
 
         // We should have 1 condition for each diagnosis therefore 8 for this message.
         assertThat(conditionResource).hasSize(8);
@@ -362,33 +348,31 @@ public class HL7ConditionFHIRConversionTest {
         }
 
     }
-    
+
     /**
-     * ICD-10-CM system for diagnosis 
+     * ICD-10-CM system for diagnosis
      */
     @Test
-    public void validateConditionICD10CM() {
+    void validateConditionICD10CM() {
 
         String hl7message = "MSH|^~\\&||||||S1|ADT^A01^ADT_A01||T|2.6|||||||||\r"
                 + "EVN|A01||||||\r"
                 + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\r"
                 + "PV1||I|||||||||||||||||1492|||||||||||||||||||||||||\r"
                 + "DG1|1|ICD-10-CM|M54.5^Low back pain^ICD-10-CM|Low back pain|20210407191342|A\r";
-        
+
         List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
 
         // Find the conditions from the FHIR bundle.
-        List<Resource> conditionResource = e.stream()
-                .filter(v -> ResourceType.Condition == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> conditionResource = ResourceUtils.getResourceList(e, ResourceType.Condition);
 
         // We should have 1 condition for each diagnosis therefore 1 for this message.
         assertThat(conditionResource).hasSize(1);
 
-       Condition c = (Condition) conditionResource.get(0);
-       assertEquals("M54.5", c.getCode().getCoding().get(0).getCode());
-       assertEquals("Low back pain", c.getCode().getCoding().get(0).getDisplay());
-       assertEquals("http://hl7.org/fhir/sid/icd-10-cm", c.getCode().getCoding().get(0).getSystem());
+        Condition c = (Condition) conditionResource.get(0);
+        assertEquals("M54.5", c.getCode().getCoding().get(0).getCode());
+        assertEquals("Low back pain", c.getCode().getCoding().get(0).getDisplay());
+        assertEquals("http://hl7.org/fhir/sid/icd-10-cm", c.getCode().getCoding().get(0).getSystem());
     }
 
     // --------------------- PROBLEM UNIT TESTS (PRB) ---------------------
@@ -400,18 +384,16 @@ public class HL7ConditionFHIRConversionTest {
     // "MSH|^~\\&|||||20040629164652|1|PPR^PC2|331|P|2.3.1||\r",
     // "MSH|^~\\&|||||20040629164652|1|PPR^PC3|331|P|2.3.1||\r",
     })
-    public void validateProblemHappyTestOne(String msh) {
+    void validateProblemHappyTestOne(String msh) {
 
         String hl7message = msh + "PID||||||||||||||||||||||||||||||\r"
                 + "PV1||I||||||||||||||||||||||||||||||||||||||||||\r"
                 + "PRB|AD|20170110074000|K80.00^Cholelithiasis^I10|53956|E1|1|20100907175347|20150907175347|20180310074000||||confirmed^Confirmed^http://terminology.hl7.org/CodeSystem/condition-ver-status|remission^Remission^http://terminology.hl7.org/CodeSystem/condition-clinical|20180310074000|20170102074000|textual representation of the time when the problem began|1^primary|ME^Medium|0.4|marginal|good|marginal|marginal|highly sensitive|some prb detail|\r";
 
         List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
-        
+
         // Find the condition from the FHIR bundle.
-        List<Resource> conditionResource = e.stream()
-                .filter(v -> ResourceType.Condition == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> conditionResource = ResourceUtils.getResourceList(e, ResourceType.Condition);
         assertThat(conditionResource).hasSize(1);
 
         // Get the condition Resource
@@ -481,7 +463,7 @@ public class HL7ConditionFHIRConversionTest {
     // "MSH|^~\\&|||||20040629164652|1|PPR^PC2|331|P|2.3.1||\r",
     // "MSH|^~\\&|||||20040629164652|1|PPR^PC3|331|P|2.3.1||\r",
     })
-    public void validateProblemHappyTestTwo(String msh) {
+    void validateProblemHappyTestTwo(String msh) {
 
         String hl7message = msh + "PID||||||||||||||||||||||||||||||\r"
                 + "PV1||I||||||||||||||||||||||||||||||||||||||||||\r"
@@ -489,74 +471,76 @@ public class HL7ConditionFHIRConversionTest {
 
         List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
 
-        // Find the condition from the FHIR bundle.
-        List<Resource> conditionResource = e.stream()
-                .filter(v -> ResourceType.Condition == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        // Find the conditions from the FHIR bundle.
+        List<Resource> conditionResource = ResourceUtils.getResourceList(e, ResourceType.Condition);
         assertThat(conditionResource).hasSize(1);
+        Condition condition = (Condition) conditionResource.get(0);
 
-        // Get the condition Resource
-        Resource condition = conditionResource.get(0);
+        // Verify code is set correctly.
+        DatatypeUtils.checkCommonCodeableConceptAssertions(condition.getCode(), "K80.00", "Cholelithiasis",
+                "http://hl7.org/fhir/sid/icd-10-cm", "Cholelithiasis");
 
-        // Verify code text is set correctly.
-        Base code = ResourceUtils.getValue(condition, "code");
-        assertThat(ResourceUtils.getValueAsString(code, "text")).isEqualTo("Cholelithiasis");
-
-        // Verify code coding fields are set correctly.
-        Base codeCoding = ResourceUtils.getValue(code, "coding");
-        assertThat(ResourceUtils.getValueAsString(codeCoding, "system"))
-                .isEqualTo("UriType[http://hl7.org/fhir/sid/icd-10-cm]");
-        assertThat(ResourceUtils.getValueAsString(codeCoding, "code")).isEqualTo("K80.00");
-
-        // Verify clinicalStatus text is set correctly
-        Base clinicalStatus = ResourceUtils.getValue(condition, "clinicalStatus");
-        assertThat(ResourceUtils.getValueAsString(clinicalStatus, "text")).isEqualTo("Remission");
-
-        // Verify clinicalStatus coding is set correctly
-        Base clinCoding = ResourceUtils.getValue(clinicalStatus, "coding");
-        assertThat(ResourceUtils.getValueAsString(clinCoding, "system"))
-                .isEqualTo("UriType[http://terminology.hl7.org/CodeSystem/condition-clinical]");
-        assertThat(ResourceUtils.getValueAsString(clinCoding, "code")).isEqualTo("remission");
-        assertThat(ResourceUtils.getValueAsString(clinCoding, "display")).isEqualTo("Remission");
+        // Verify clinicalStatus is set correctly
+        DatatypeUtils.checkCommonCodeableConceptAssertions(condition.getClinicalStatus(), "remission", "Remission",
+                "http://terminology.hl7.org/CodeSystem/condition-clinical", "Remission");
 
     }
 
-    // This tests verificationStatus and clincalStatus when they use a CWE but the
-    // code is invalid. We should be discarding these and not populating the
-    // optional field.
-    @Test
-    public void validateProblemWithInvalidValues() {
+    // This tests verificationStatus and clinicalStatus when they use a CWE but the code is
+    // invalid or missing. We should be discarding these and not populating the optional field.
+    @ParameterizedTest
+    @ValueSource(strings = {
+            // CASE 1:
+            // PRB.1 to PRB.4 required
+            // PRB.9 is EMPTY so B.14 does not activate a Resolved clinicalStatus
+            // PRB.14 is INVALID with 'BAD' so clinicalStatus is omitted
+            // PRB.13 is EMPTY so verificationStatus is omitted
+            "PRB|AD|20170110074000|K80.00^Cholelithiasis^I10|53956||||||||||BAD^Confirmed^http://terminology.hl7.org/CodeSystem/condition-ver-status|||||||||||||\r",
+            // CASE 2: Similar to CASE 1, but specific instance that caused problems in a test message.
+            // For verificationStatus 'C^Confirmed^Confirmation Status List':
+            // because 'C' is not a valid code we should be omitting this optional field.
+            // PRB.1 to PRB.4 required
+            // PRB.9 is EMPTY so B.14 does not activate a Resolved clinicalStatus
+            // PRB.14 is INVALID with 'C' so clinicalStatus is omitted
+            // PRB.13 is EMPTY so verificationStatus is omitted
+            "PRB|AD|20170110074000|K80.00^Cholelithiasis^I10|53956||||||||||C^Confirmed^Confirmation Status List|||||||||||||\r",
+            // This tests verificationStatus and clinicalStatus when they only have one value
+            // and it is invalid. We should be throwing these out and not populating these
+            // optional fields.
+            // CASE 3:
+            // PRB.1 to PRB.4 required
+            // PRB.9 is EMPTY so PRB.14 does not activate a Resolved clinicalStatus
+            // PRB.14 is INVALID so clinicalStatus is omitted
+            // PRB.13 is INVALID "BAD" so verificationStatus id omitted
+            "PRB|AD|20170110074000|K80.00^Cholelithiasis^I10|53956|||||||||BAD|INVALID|||||||||||||\r"
+    })
+    void validateProblemWithEmptyAndInvalidValues(String problemSegment) {
 
         String hl7message = "MSH|^~\\&|||||20040629164652|1|PPR^PC1|331|P|2.3.1||\r"
                 + "PID||||||||||||||||||||||||||||||\r"
                 + "PV1||I||||||||||||||||||||||||||||||||||||||||||\r"
-                + "PRB|AD|20170110074000|K80.00^Cholelithiasis^I10|53956|E1|1|20100907175347|20150907175347|||||BAD^Confirmed^http://terminology.hl7.org/CodeSystem/condition-ver-status|INVALID^Remission^http://terminology.hl7.org/CodeSystem/condition-clinical|20180310074000|20170102074000|textual representation of the time when the problem began|1^primary|ME^Medium|0.4|marginal|good|marginal|marginal|highly sensitive|some prb detail|\r";
+                + problemSegment;
 
         List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
 
         // Find the condition from the FHIR bundle.
-        List<Resource> conditionResource = e.stream()
-                .filter(v -> ResourceType.Condition == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> conditionResource = ResourceUtils.getResourceList(e, ResourceType.Condition);
         assertThat(conditionResource).hasSize(1);
-
-        // Get the condition Resource
-        Resource condition = conditionResource.get(0);
+        Condition condition = (Condition) conditionResource.get(0);
 
         // Verify verification status is omitted.
-        assertThat(condition.listChildrenByName("verificationStatus")).isEmpty();
+        assertThat(condition.hasVerificationStatus()).isFalse(); // PRB.13
 
         // Verify clinical status is omitted.
-        assertThat(condition.listChildrenByName("clinicalStatus")).isEmpty();
+        assertThat(condition.hasClinicalStatus()).isFalse(); // PRB.14 (& EMPTY PRB.9)
 
     }
 
-    // This tests verificationStatus and clincalStatus when they only have one value
-    // (for example 'confirmed'). This should work and create a coding for this
-    // field
+    // This tests verificationStatus and clinicalStatus when they only have one value
+    // (for example 'confirmed'). This should work and create a coding for this field
     // but there will be no text because the HL7 message isn't passing a display in.
     @Test
-    public void validateProblemTestingOneWordGoodStatus() {
+    void validateProblemTestingOneWordGoodStatus() {
 
         String hl7message = "MSH|^~\\&|||||20040629164652|1|PPR^PC1|331|P|2.3.1||\r"
                 + "PID||||||||||||||||||||||||||||||\r" + "PV1||I||||||||||||||||||||||||||||||||||||||||||\r"
@@ -565,72 +549,25 @@ public class HL7ConditionFHIRConversionTest {
         List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
 
         // Find the condition from the FHIR bundle.
-        List<Resource> conditionResource = e.stream()
-                .filter(v -> ResourceType.Condition == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> conditionResource = ResourceUtils.getResourceList(e, ResourceType.Condition);
         assertThat(conditionResource).hasSize(1);
+        Condition condition = (Condition) conditionResource.get(0);
 
-        // Get the condition Resource
-        Resource condition = conditionResource.get(0);
+        // Verify verificationStatus has a coding but no text
+        DatatypeUtils.checkCommonCodeableConceptAssertions(condition.getVerificationStatus(), "confirmed", "Confirmed",
+                "http://terminology.hl7.org/CodeSystem/condition-ver-status", null);
 
-        // Verify verification status text is omitted.
-        Base verificationStatus = ResourceUtils.getValue(condition, "verificationStatus");
-        assertThat(verificationStatus.listChildrenByName("text")).isEmpty();
-
-        // Verify verification status coding is set correctly
-        Base coding = ResourceUtils.getValue(verificationStatus, "coding");
-        assertThat(ResourceUtils.getValueAsString(coding, "system"))
-                .isEqualTo("UriType[http://terminology.hl7.org/CodeSystem/condition-ver-status]");
-        assertThat(ResourceUtils.getValueAsString(coding, "display")).isEqualTo("Confirmed");
-        assertThat(ResourceUtils.getValueAsString(coding, "code")).isEqualTo("confirmed");
-
-        // Verify clinical status text is omitted.
-        Base clinicalStatus = ResourceUtils.getValue(condition, "clinicalStatus");
-        assertThat(clinicalStatus.listChildrenByName("text")).isEmpty();
-
-        // Verify clinical status coding is set correctly
-        Base clinCoding = ResourceUtils.getValue(clinicalStatus, "coding");
-        assertThat(ResourceUtils.getValueAsString(clinCoding, "system"))
-                .isEqualTo("UriType[http://terminology.hl7.org/CodeSystem/condition-clinical]");
-        assertThat(ResourceUtils.getValueAsString(clinCoding, "code")).isEqualTo("remission");
-        assertThat(ResourceUtils.getValueAsString(clinCoding, "display")).isEqualTo("Remission");
+        // Verify clinicalStatus has a coding but no text
+        DatatypeUtils.checkCommonCodeableConceptAssertions(condition.getClinicalStatus(), "remission", "Remission",
+                "http://terminology.hl7.org/CodeSystem/condition-clinical", null);
 
     }
 
-    // This tests verifcationStatus 'C^Confirmed^Confirmation Status List' which is
-    // in one our test messages.
-    // Because 'C' is not a valid code we should be omitting this optional field.
-    @Test
-    public void validateProblemTestingBadClinicalStatusTestData() {
-
-        String hl7message = "MSH|^~\\&|||||20040629164652|1|PPR^PC1|331|P|2.3.1||\r"
-                + "PID||||||||||||||||||||||||||||||\r"
-                + "PV1||I||||||||||||||||||||||||||||||||||||||||||\r"
-                + "PRB|AD|20170110074000|K80.00^Cholelithiasis^I10|53956|E1|1|20100907175347|20150907175347|||||C^Confirmed^Confirmation Status List||textual representation of the time when the problem began|1^primary|ME^Medium|0.4|marginal|good|marginal|marginal|highly sensitive|some prb detail|\r";
-
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
-
-        // Find the condition from the FHIR bundle.
-        List<Resource> conditionResource = e.stream()
-                .filter(v -> ResourceType.Condition == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
-        assertThat(conditionResource).hasSize(1);
-
-        // Get the condition Resource
-        Resource condition = conditionResource.get(0);
-
-        // Verify verification status is omitted.
-        assertThat(condition.listChildrenByName("verificationStatus")).isEmpty();
-
-    }
-
-    // This tests verificationStatus 'C^Confirmed^Confirmation Status List' which is
-    // in one our test messages.
-    // But I editted the code to be correct in this case to verify we handle this
-    // stuation correctly.
+    // This tests verificationStatus 'C^Confirmed^Confirmation Status List' which is in one our test messages.
+    // But I edited the code to be correct in this case to verify we handle this stuation correctly.
     // Since display is in HL7 message we should have a text field with that value.
     @Test
-    public void validateProblemTestingGoodClinicalStatusTestData() {
+    void validateProblemTestingGoodClinicalStatusTestData() {
 
         String hl7message = "MSH|^~\\&|||||20040629164652|1|PPR^PC1|331|P|2.3.1||\r"
                 + "PID||||||||||||||||||||||||||||||\r"
@@ -640,60 +577,20 @@ public class HL7ConditionFHIRConversionTest {
         List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
 
         // Find the condition from the FHIR bundle.
-        List<Resource> conditionResource = e.stream()
-                .filter(v -> ResourceType.Condition == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> conditionResource = ResourceUtils.getResourceList(e, ResourceType.Condition);
         assertThat(conditionResource).hasSize(1);
+        Condition condition = (Condition) conditionResource.get(0);
 
-        // Get the condition Resource
-        Resource condition = conditionResource.get(0);
-
-        // Verify verification status text is set correctly.
-        Base verificationStatus = ResourceUtils.getValue(condition, "verificationStatus");
-        assertThat(ResourceUtils.getValueAsString(verificationStatus, "text")).isEqualTo("Confirmed");
-
-        // Verify verification status coding is set correctly
-        Base coding = ResourceUtils.getValue(verificationStatus, "coding");
-        assertThat(ResourceUtils.getValueAsString(coding, "system"))
-                .isEqualTo("UriType[http://terminology.hl7.org/CodeSystem/condition-ver-status]");
-        assertThat(ResourceUtils.getValueAsString(coding, "display")).isEqualTo("Confirmed");
-        assertThat(ResourceUtils.getValueAsString(coding, "code")).isEqualTo("confirmed");
+        // Verify verificationStatus has a coding and text
+        DatatypeUtils.checkCommonCodeableConceptAssertions(condition.getVerificationStatus(), "confirmed", "Confirmed",
+                "http://terminology.hl7.org/CodeSystem/condition-ver-status", "Confirmed");
 
     }
 
-    // This tests verificationStatus and clincalStatus when they only have one value
-    // and it is invalid. We should be throwing these out and not populating these
-    // optional fields.
-    @Test
-    public void validateProblemTestingOneWordBadStatus() {
-
-        String hl7message = "MSH|^~\\&|||||20040629164652|1|PPR^PC1|331|P|2.3.1||\r"
-                + "PID||||||||||||||||||||||||||||||\r"
-                + "PV1||I||||||||||||||||||||||||||||||||||||||||||\r"
-                + "PRB|AD|20170110074000|K80.00^Cholelithiasis^I10|53956|E1|1|20100907175347|20150907175347|||||BAD|INVALID|20180310074000|20170102074000|textual representation of the time when the problem began|1^primary|ME^Medium|0.4|marginal|good|marginal|marginal|highly sensitive|some prb detail|\r";
-
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
-
-        // Find the condition from the FHIR bundle.
-        List<Resource> conditionResource = e.stream()
-                .filter(v -> ResourceType.Condition == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
-        assertThat(conditionResource).hasSize(1);
-
-        // Get the condition Resource
-        Resource condition = conditionResource.get(0);
-
-        // Verify verification status is omitted.
-        assertThat(condition.listChildrenByName("verificationStatus")).isEmpty();
-
-        // Verify clinical status is omitted.
-        assertThat(condition.listChildrenByName("clinicalStatus")).isEmpty();
-    }
-
-    // This tests verificationStatus and clincalStatus when the system is wrong.
+    // This tests verificationStatus and clinicalStatus when the system is wrong.
     // We should ignore this bad system and use the correct one.
     @Test
-    public void validateProblemTestingBadSystem() {
+    void validateProblemTestingBadSystem() {
 
         String hl7message = "MSH|^~\\&|||||20040629164652|1|PPR^PC1|331|P|2.3.1||\r"
                 + "PID||||||||||||||||||||||||||||||\r"
@@ -703,35 +600,18 @@ public class HL7ConditionFHIRConversionTest {
         List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
 
         // Find the condition from the FHIR bundle.
-        List<Resource> conditionResource = e.stream()
-                .filter(v -> ResourceType.Condition == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> conditionResource = ResourceUtils.getResourceList(e, ResourceType.Condition);
         assertThat(conditionResource).hasSize(1);
+        Condition condition = (Condition) conditionResource.get(0);
 
-        // Get the condition Resource
-        Resource condition = conditionResource.get(0);
+        // Verify verificationStatus has a coding with correct system and text
+        DatatypeUtils.checkCommonCodeableConceptAssertions(condition.getVerificationStatus(), "confirmed", "Confirmed",
+                "http://terminology.hl7.org/CodeSystem/condition-ver-status", "Confirmed");
 
-        // Verify verification status text is set correctly.
-        Base verificationStatus = ResourceUtils.getValue(condition, "verificationStatus");
-        assertThat(ResourceUtils.getValueAsString(verificationStatus, "text")).isEqualTo("Confirmed");
+        // Verify clinicalStatus has a coding with correct system  and text
+        DatatypeUtils.checkCommonCodeableConceptAssertions(condition.getClinicalStatus(), "remission", "Remission",
+                "http://terminology.hl7.org/CodeSystem/condition-clinical", "Remission");
 
-        // Verify verification status coding is set correctly
-        Base coding = ResourceUtils.getValue(verificationStatus, "coding");
-        assertThat(ResourceUtils.getValueAsString(coding, "system"))
-                .isEqualTo("UriType[http://terminology.hl7.org/CodeSystem/condition-ver-status]");
-        assertThat(ResourceUtils.getValueAsString(coding, "display")).isEqualTo("Confirmed");
-        assertThat(ResourceUtils.getValueAsString(coding, "code")).isEqualTo("confirmed");
-
-        // Verify clinicalStatus text is set correctly
-        Base clinicalStatus = ResourceUtils.getValue(condition, "clinicalStatus");
-        assertThat(ResourceUtils.getValueAsString(clinicalStatus, "text")).isEqualTo("Remission");
-
-        // Verify clinicalStatus coding is set correctly
-        Base clinCoding = ResourceUtils.getValue(clinicalStatus, "coding");
-        assertThat(ResourceUtils.getValueAsString(clinCoding, "system"))
-                .isEqualTo("UriType[http://terminology.hl7.org/CodeSystem/condition-clinical]");
-        assertThat(ResourceUtils.getValueAsString(clinCoding, "code")).isEqualTo("remission");
-        assertThat(ResourceUtils.getValueAsString(clinCoding, "display")).isEqualTo("Remission");
     }
 
     // Tests a particular PRB segment that wasn't working properly recently regards
@@ -740,19 +620,19 @@ public class HL7ConditionFHIRConversionTest {
     // coding values (code, display, system) instead of seperating them out.
     //
     // "category": [
-    // {
-    // "coding": [
-    // {
-    // "code":
-    // "http://terminology.hl7.org/CodeSystem/condition-category,problem-list-item,Problem
-    // List Item"
-    // }
-    // ],
-    // "text": "problem-list-item"
-    // }
+    //   {
+    //   "coding": [
+    //     {
+    //       "code":
+    //          "http://terminology.hl7.org/CodeSystem/condition-category,problem-list-item,Problem
+    //           List Item"
+    //     }
+    //     ],
+    //   "text": "problem-list-item"
+    //   }
     // ]
     @Test
-    public void validateOverloadedCodeField() {
+    void validateOverloadedCodeField() {
 
         String hl7message = "MSH|^~\\&|||||20040629164652|1|PPR^PC1|331|P|2.3.1||\r"
                 + "PID||||||||||||||||||||||||||||||\r"
@@ -761,30 +641,21 @@ public class HL7ConditionFHIRConversionTest {
         List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
 
         // Find the condition from the FHIR bundle.
-        List<Resource> conditionResource = e.stream()
-                .filter(v -> ResourceType.Condition == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> conditionResource = ResourceUtils.getResourceList(e, ResourceType.Condition);
         assertThat(conditionResource).hasSize(1);
+        Condition condition = (Condition) conditionResource.get(0);
 
-        // Get the condition Resource
-        Resource condition = conditionResource.get(0);
-
-        // Verify category text is set correctly.
-        Base category = ResourceUtils.getValue(condition, "category");
-        assertThat(ResourceUtils.getValueAsString(category, "text")).isEqualTo("Problem List Item");
-
-        // Verify category coding fields are set correctly.
-        Base catCoding = ResourceUtils.getValue(category, "coding");
-        assertThat(ResourceUtils.getValueAsString(catCoding, "system"))
-                .isEqualTo("UriType[http://terminology.hl7.org/CodeSystem/condition-category]");
-        assertThat(ResourceUtils.getValueAsString(catCoding, "display")).isEqualTo("Problem List Item");
-        assertThat(ResourceUtils.getValueAsString(catCoding, "code")).isEqualTo("problem-list-item");
+        // Verify there is only one category and it has a coding with correct system and text
+        assertThat(condition.getCategory()).hasSize(1);
+        DatatypeUtils.checkCommonCodeableConceptAssertions(condition.getCategoryFirstRep(), "problem-list-item",
+                "Problem List Item",
+                "http://terminology.hl7.org/CodeSystem/condition-category", "Problem List Item");
 
     }
 
     // Tests multiple PRB segments to verify we get multiple conditions.
     @Test
-    public void validateProblemMultipleProblems() {
+    void validateProblemMultipleProblems() {
 
         String hl7message = "MSH|^~\\&|||||20040629164652|1|PPR^PC1|331|P|2.3.1||\r"
                 + "PID||||||||||||||||||||||||||||||\r"
@@ -794,9 +665,7 @@ public class HL7ConditionFHIRConversionTest {
         List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
 
         // Find the condition from the FHIR bundle.
-        List<Resource> conditionResource = e.stream()
-                .filter(v -> ResourceType.Condition == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> conditionResource = ResourceUtils.getResourceList(e, ResourceType.Condition);
         assertThat(conditionResource).hasSize(2);
     }
 
@@ -806,7 +675,7 @@ public class HL7ConditionFHIRConversionTest {
     @ValueSource(strings = {
             "PRB|AD|20170110074000|K80.00^Cholelithiasis^I10|53956|E1|1|20100907175347|20150907175347|||||||20180310074000|20180310074000||1^primary|ME^Medium|0.4|marginal|good|marginal|marginal|highly sensitive|some prb detail|\r",
             "PRB|AD|20170110074000|K80.00^Cholelithiasis^I10|53956|E1|1|20100907175347|20150907175347|||||||20180310074000|20180310074000|textual representation of the time when the problem began|1^primary|ME^Medium|0.4|marginal|good|marginal|marginal|highly sensitive|some prb detail|\r" })
-    public void validateProblemWithOnsetDateTimeWithNoOnsetString() {
+    void validateProblemWithOnsetDateTimeWithNoOnsetString() {
 
         String hl7message = "MSH|^~\\&|||||20040629164652|1|PPR^PC1|331|P|2.3.1||\r"
                 + "PID||||||||||||||||||||||||||||||\r"
@@ -815,9 +684,7 @@ public class HL7ConditionFHIRConversionTest {
         List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
 
         // Find the condition from the FHIR bundle.
-        List<Resource> conditionResource = e.stream()
-                .filter(v -> ResourceType.Condition == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> conditionResource = ResourceUtils.getResourceList(e, ResourceType.Condition);
         assertThat(conditionResource).hasSize(1);
 
         // Get the condition Resource
@@ -829,28 +696,55 @@ public class HL7ConditionFHIRConversionTest {
 
     }
 
-    // Tests that onset[x] is correctly set to PRB.17 if we have no PRB.16
+    // Tests (1) that onset[x] is correctly set to PRB.17 if we have no PRB.16
+    // Tests (2) that if PRB.9 is set and PRB.14 is null, default Condition.clinicalStatus to "resolved"
     @Test
-    public void validateProblemWithOnsetStringAndNoOnsetdate() {
+    void validateProblemWithOnsetStringAndNoOnsetdateClinicalStatusResolved() {
 
         String hl7message = "MSH|^~\\&|||||20040629164652|1|PPR^PC1|331|P|2.3.1||\r"
                 + "PID||||||||||||||||||||||||||||||\r"
-                + "PRB|AD|20170110074000|K80.00^Cholelithiasis^I10|53956|E1|1|20100907175347|20150907175347|||||||20180310074000||textual representation of the time when the problem began|1^primary|ME^Medium|0.4|marginal|good|marginal|marginal|highly sensitive|some prb detail|\r";
+                // Important fields:
+                // PRB.1 to PRB.4 required
+                // PRB.9 Actual Problem Resolution Date used in connection with EMPTY PRB.14 to trigger Resolved clinicalStatus
+                // PRB.17 to Onset
+                + "PRB|AD|20170110074000|K80.00^Cholelithiasis^I10|53956|||||20150907175347||||||||textual representation of the time when the problem began|||||||||||\r";
 
         List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
 
         // Find the condition from the FHIR bundle.
-        List<Resource> conditionResource = e.stream()
-                .filter(v -> ResourceType.Condition == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> conditionResource = ResourceUtils.getResourceList(e, ResourceType.Condition);
         assertThat(conditionResource).hasSize(1);
+        Condition condition = (Condition) conditionResource.get(0);
 
-        // Get the condition Resource
-        Resource condition = conditionResource.get(0);
+        // Verify clinicalStatus has a Resolved coding with correct system and text
+        DatatypeUtils.checkCommonCodeableConceptAssertions(condition.getClinicalStatus(), "resolved", "Resolved",
+                "http://terminology.hl7.org/CodeSystem/condition-clinical", null); // PRB.9 && EMPTY PRB.14
 
         // Verify onset is set correctly to PRB.17
-        assertThat(ResourceUtils.getValueAsString(condition, "onset"))
-                .isEqualTo("textual representation of the time when the problem began");
+        assertThat(condition.getOnset()).hasToString("textual representation of the time when the problem began"); // PRB.17
+    }
+
+    // Tests that if PRB.9 is set and PRB.14 is INVALID, default Condition.clinicalStatus to "resolved"
+    @Test
+    void validateProblemWithInvalidClinicalStatusAndResolutionDate() {
+
+        String hl7message = "MSH|^~\\&|||||20040629164652|1|PPR^PC1|331|P|2.3.1||\r"
+                + "PID||||||||||||||||||||||||||||||\r"
+                // Important fields:
+                // PRB.1 to PRB.4 required
+                // PRB.9 Actual Problem Resolution Date used in connection with INVALID PRB.14 to trigger Resolved clinicalStatus
+                + "PRB|AD|20170110074000|K80.00^Cholelithiasis^I10|53956|||||20150907175347|||||INVALID|||||||||||||\r";
+
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+
+        // Find the condition from the FHIR bundle.
+        List<Resource> conditionResource = ResourceUtils.getResourceList(e, ResourceType.Condition);
+        assertThat(conditionResource).hasSize(1);
+        Condition condition = (Condition) conditionResource.get(0);
+
+        // Verify clinicalStatus has a Resolved coding with correct system and text (based on PRB.9 and INVALID PRB.14)
+        DatatypeUtils.checkCommonCodeableConceptAssertions(condition.getClinicalStatus(), "resolved", "Resolved",
+                "http://terminology.hl7.org/CodeSystem/condition-clinical", null);
     }
 
 }
