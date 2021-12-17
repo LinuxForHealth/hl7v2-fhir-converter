@@ -74,11 +74,12 @@ vaccineCode_1:
    vars:
       code: RXA.5
 vaccineCode_2:
-   condition: $obx31 EQUALS 30956-7
+   condition: $obx31 EQUALS 30956-7 && $rxa5 NULL
    valueOf: datatype/CodeableConcept
    expressionType: resource
    specs: OBX.5
    vars:
+      rxa5: RXA.5
       obx31: String, OBX.3.1
 patient:
    valueOf: datatype/Reference
