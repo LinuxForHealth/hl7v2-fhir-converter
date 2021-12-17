@@ -438,7 +438,7 @@ class HL7ConditionFHIRConversionTest {
             // For verificationStatus 'C^Confirmed^Confirmation Status List':
             // because 'C' is not a valid code we should be omitting this optional field.
             // PRB.1 to PRB.4 required
-            // PRB.9 is EMPTY soPRB.14 does not activate a Resolved clinicalStatus
+            // PRB.9 is EMPTY so PRB.14 does not activate a Resolved clinicalStatus
             // PRB.14 is INVALID with 'C' so clinicalStatus is omitted
             // PRB.13 is EMPTY so verificationStatus is omitted
             "PRB|AD|20170110074000|K80.00^Cholelithiasis^I10|53956||||||||||C^Confirmed^Confirmation Status List|||||||||||||\r",
@@ -629,7 +629,7 @@ class HL7ConditionFHIRConversionTest {
             "PRB|AD|20170110074000|K80.00^Cholelithiasis^I10|53956||||||||||||20180310074000||\r",
             // PRB.1 to PRB.4 required
             // PRB.16 to onset date
-            // PRB.17 purposely empty 
+            // PRB.17 present
             "PRB|AD|20170110074000|K80.00^Cholelithiasis^I10|53956||||||||||||20180310074000|textual representation of the time when the problem began|\r" })
     void validateProblemWithOnsetDateTimeWithNoOnsetString(String segmentPRB) {
 
@@ -643,11 +643,10 @@ class HL7ConditionFHIRConversionTest {
         assertThat(conditionResource).hasSize(1);
 
         // Get the condition Resource
-        Resource condition = conditionResource.get(0);
+        Condition condition = (Condition) conditionResource.get(0);
 
         // Verify onset is set correctly to PRB.16
-        assertThat(ResourceUtils.getValueAsString(condition, "onset"))
-                .isEqualTo("DateTimeType[2018-03-10T07:40:00+08:00]");
+        assertThat(condition.getOnset().toString()).containsPattern("2018-03-10T07:40:00"); // PRB.16
 
     }
 
