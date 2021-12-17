@@ -6,7 +6,7 @@
 ---
 purpose:
    valueOf: datatype/CodeableConcept_var
-   condition: $code NOT_NULL || $display NOT_NULL || $system_code NOT_NULL || text NOT_NULL
+   condition: $code NOT_NULL || $display NOT_NULL || $system_code NOT_NULL || $text NOT_NULL
    generateList: true
    expressionType: resource
    vars: 
@@ -17,3 +17,11 @@ name:
   expressionType: resource
   specs: XCN | $contactNameXCN
 
+telecom:
+   condition: $contactPointXTN NOT_NULL
+   valueOf: datatype/ContactPoint
+   generateList: true
+   expressionType: resource
+   specs: $contactPointXTN
+   constants:
+      use: work

@@ -240,6 +240,12 @@ performer_2:
      performerValue2: OBX.23
      orgAddressXAD: OBX.24
      orgContactXCN: OBX.25
+   constants:  
+     # Observation Organization needs an ADMIN purpose
+     orgContactPurposeCode: 'ADMIN'
+     orgContactPurposeSystemCode: 'contactentity-type'
+     orgContactPurposeDisplay: 'Administrative'
+     orgContactPurposeText: 'Organization Medical Director'
 
 device:
    condition: $deviceValue NOT_NULL
