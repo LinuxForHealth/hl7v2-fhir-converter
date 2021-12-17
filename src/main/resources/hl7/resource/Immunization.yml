@@ -138,27 +138,20 @@ isSubpotent:
    vars:
       rxa20: String, RXA.20
 programEligibility:
-   valueOf: datatype/CodeableConcept_var
+   valueOf: datatype/CodeableConcept
    expressionType: resource
-   generateList: true
    condition: $obx3 EQUALS 64994-7
-   specs: OBX
+   specs: OBX.5
    vars:
-      obx3: STRING, OBX.3.1
-      code: STRING, OBX.5.1
-      text: STRING, OBX.5.2
-      system: STRING, OBX.5.3
+      obx3: String, OBX.3.1
 fundingSource:
-   valueOf: datatype/CodeableConcept_var
+   valueOf: datatype/CodeableConcept
    expressionType: resource
-   generateList: true
    condition: $obx3 EQUALS 30963-3
-   specs: OBX
+   specs: OBX.5
    vars:
-      obx3: STRING, OBX.3.1
-      code: STRING, OBX.5.1
-      text: STRING, OBX.5.2
-      system: STRING, OBX.5.3
+      obx3: String, OBX.3.1
+
 reasonCode:
    valueOf: datatype/CodeableConcept
    expressionType: resource
