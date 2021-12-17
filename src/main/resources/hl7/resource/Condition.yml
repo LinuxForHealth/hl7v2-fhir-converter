@@ -188,7 +188,7 @@ clinicalStatus_1:
 
 # If PRB 14 is empty or invalid, AND PRB.9 has data, set to "resolved"
 # CONDITION_CLINICAL_STATUS_FHIR returns null if the value is invalid or null.
-clinicalStatus:
+clinicalStatus_2:
   condition: $prb9 NOT_NULL && $validCoding NULL
   valueOf: datatype/CodeableConcept_var
   expressionType: resource
