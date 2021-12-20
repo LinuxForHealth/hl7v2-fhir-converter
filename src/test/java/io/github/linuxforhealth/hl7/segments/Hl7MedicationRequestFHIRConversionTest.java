@@ -25,13 +25,13 @@ import org.junit.jupiter.params.provider.ValueSource;
 import io.github.linuxforhealth.core.config.ConverterConfiguration;
 import io.github.linuxforhealth.hl7.segments.util.ResourceUtils;
 
-public class Hl7MedicationRequestFHIRConversionTest {
+class Hl7MedicationRequestFHIRConversionTest {
 
     // private static FHIRContext context = new FHIRContext(true, false);
     //     private static final Logger LOGGER = LoggerFactory.getLogger(Hl7MedicationRequestFHIRConversionTest.class);
 
     @Test
-    public void test_medicationreq_patient() {
+    void test_medicationreq_patient() {
         String hl7message = "MSH|^~\\&|APP|FAC|WHIA|IBM|20180622230000||RDE^O11^RDE_O11|MSGID221xx0xcnvMed31|T|2.6\n"
                 + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
                 + "PV1||I|6N^1234^A^GENHOS||||0100^ANDERSON,CARL|0148^ADDISON,JAMES||SUR|||||||0100^ANDERSON,CARL|S|V446911|A|||||||||||||||||||SF|K||||20180622230000\n"
@@ -61,7 +61,7 @@ public class Hl7MedicationRequestFHIRConversionTest {
     }
 
     @Test
-    public void test_medicationreq_status() {
+    void test_medicationreq_status() {
 
         //ORC.5 = A -> Expected medication status = (ACTIVE ORC.1 is present but ORC.5 takes precedence)
         String hl7message = "MSH|^~\\&|APP|FAC|WHIA|IBM|20180622230000||RDE^O11^RDE_O11|MSGID221xx0xcnvMed31|T|2.6\n"
@@ -188,7 +188,7 @@ public class Hl7MedicationRequestFHIRConversionTest {
 
     // Test that OMP_O09 messages don't create ServiceRequests, they create MedicationRequests
     @Test
-    public void medicationFromOMPTest() {
+    void medicationFromOMPTest() {
         // Minimal valid ORC message.  Requires RXO and RXR segments.
         String hl7message = "MSH|^~\\&|WHI_LOAD_GENERATOR|IBM_TORONTO_LAB|MEDORDER|IBM|20210101000000|90103687|OMP^O09|MSGID|T|2.6\n"
                 + "PID|||1234||DOE^JANE^|||F||||||||||||||||||||||\n"
@@ -216,7 +216,7 @@ public class Hl7MedicationRequestFHIRConversionTest {
             "MSH|^~\\&||||||S1|RDE^O11||T|2.6|||||||||\r",
             "MSH|^~\\&||||||S1|RDE^O25||T|2.6|||||||||\r",
     })
-    public void test_medicationCodeableConcept_authoredOn_and_intent_in_rde_with_rxO_with_rxe(String msh) {
+    void test_medicationCodeableConcept_authoredOn_and_intent_in_rde_with_rxO_with_rxe(String msh) {
 
         //AuthoredOn comes from ORC.9 (the backup value) No RXE.32
         String hl7message = msh
@@ -266,7 +266,7 @@ public class Hl7MedicationRequestFHIRConversionTest {
             "MSH|^~\\&||||||S1|RDE^O11||T|2.6|||||||||\r",
             "MSH|^~\\&||||||S1|RDE^O25||T|2.6|||||||||\r",
     })
-    public void test_medicationCodeableConcept_authoredOn_and_intent_in_rde_with_just_rxe(String msh) {
+    void test_medicationCodeableConcept_authoredOn_and_intent_in_rde_with_just_rxe(String msh) {
 
         //AuthoredOn comes from RXE.32
         String hl7message = msh
@@ -316,7 +316,7 @@ public class Hl7MedicationRequestFHIRConversionTest {
             // --UNCOMMENT BELOW WHEN CONVERTER SUPPORTS THIS MESSAGE TYPE-- 
             "MSH|^~\\&||||||S1|ORM^O01||T|2.6|||||||||\r",
     })
-    public void test_medicationCodeableConcept_and_intent_in_OMP_and_ORM(String msh) {
+    void test_medicationCodeableConcept_and_intent_in_OMP_and_ORM(String msh) {
 
         String hl7message = msh
                 + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
@@ -358,7 +358,7 @@ public class Hl7MedicationRequestFHIRConversionTest {
     // "MSH|^~\\&||||||S1|PPR^PC2||T|2.6|||||||||\r",
     // "MSH|^~\\&||||||S1|PPR^PC3||T|2.6|||||||||\r",
     })
-    public void test_medicationCodeableConcept_and_intent_in_PPR(String msh) {
+    void test_medicationCodeableConcept_and_intent_in_PPR(String msh) {
 
         String hl7message = msh
                 + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
@@ -402,7 +402,7 @@ public class Hl7MedicationRequestFHIRConversionTest {
     // "MSH|^~\\&||||||S1|PPR^PC2||T|2.6|||||||||\r",
     // "MSH|^~\\&||||||S1|PPR^PC3||T|2.6|||||||||\r",
     })
-    public void testMedicationRequestInPPRWithAPatientVisit() {
+    void testMedicationRequestInPPRWithAPatientVisit() {
 
         String hl7message = "MSH|^~\\&||||||S1|PPR^PC1||T|2.6|||||||||\r"
                 + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\r"
@@ -437,7 +437,7 @@ public class Hl7MedicationRequestFHIRConversionTest {
     }
 
     @Test
-    public void test_MedicationRequest_ReasonCode() {
+    void test_MedicationRequest_ReasonCode() {
         //reason code from RXE.27
         String hl7message = "MSH|^~\\&||||||S1|RDE^O11||T|2.6|||||||||\n"
                 + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
@@ -501,7 +501,7 @@ public class Hl7MedicationRequestFHIRConversionTest {
     }
 
     @Test
-    public void test_MedicationRequest_category_requester_and_dispenseRequest() {
+    void test_MedicationRequest_category_requester_and_dispenseRequest() {
         String hl7message = "MSH|^~\\&||||||S1|RDE^O11||T|2.6|||||||||\n"
                 + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
                 + "ORC|NW|||||E|10^BID^D4^^^R||20180622230000|||3122^PROVIDER^ORDERING^^^DR|||20190606193536||||||||||||||I\n"

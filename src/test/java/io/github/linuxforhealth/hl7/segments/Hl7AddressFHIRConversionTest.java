@@ -20,10 +20,10 @@ import org.junit.jupiter.api.Test;
 
 import io.github.linuxforhealth.hl7.segments.util.PatientUtils;
 
-public class Hl7AddressFHIRConversionTest {
+class Hl7AddressFHIRConversionTest {
 
   @Test
-  public void patient_address_extended_test() {
+  void patient_address_extended_test() {
 
     String patientAddress =
     "MSH|^~\\&|MIICEHRApplication|MIIC|MIIC|MIIC|201705130822||VXU^V04^VXU_V04|test1100|P|2.5.1|||AL|AL|||||Z22^CDCPHINVS|^^^^^MIIC^SR^^^MIIC|MIIC\n"
@@ -55,7 +55,7 @@ public class Hl7AddressFHIRConversionTest {
   }
 
   @Test
-  public void patient_address_date_ranges_test() {
+  void patient_address_date_ranges_test() {
 
     String patientAddress =
     "MSH|^~\\&|MIICEHRApplication|MIIC|MIIC|MIIC|201705130822||VXU^V04^VXU_V04|test1100|P|2.5.1|||AL|AL|||||Z22^CDCPHINVS|^^^^^MIIC^SR^^^MIIC|MIIC\n"
@@ -124,7 +124,7 @@ public class Hl7AddressFHIRConversionTest {
   // District / County conversion testing is unique because it behaves differently when there are multiple addresses
   // Use these tests to also test multiple addresses 
   // See Hl7RelatedGeneralUtils.getAddressDistrict for details on when district and county apply.
-  public void patient_address_district_and_multiple_address_conversion_test() {
+  void patient_address_district_and_multiple_address_conversion_test() {
 
     // When there is no county XAD.9 in the address, and there is only one address, use the PID county.
     String patientSingleAddressYesAddressCountyNoPatientCounty =
@@ -208,7 +208,7 @@ public class Hl7AddressFHIRConversionTest {
   }
 
   @Test
-  public void patient_postal_mail_test() {
+  void patient_postal_mail_test() {
 
     String patientAddressWithPostalMail =
     "MSH|^~\\&|MYEHR2.5|RI88140101|KIDSNET_IFL|RIHEALTH|20130531||VXU^V04^VXU_V04|20130531RI881401010105|P|2.6|||NE|AL||||||RI543763\n"

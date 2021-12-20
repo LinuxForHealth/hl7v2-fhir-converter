@@ -28,12 +28,12 @@ import io.github.linuxforhealth.hl7.ConverterOptions;
 import io.github.linuxforhealth.hl7.ConverterOptions.Builder;
 import io.github.linuxforhealth.hl7.HL7ToFHIRConverter;
 
-public class HL7EventTypeFHIRConversionTest {
+class HL7EventTypeFHIRConversionTest {
 
     private static final ConverterOptions OPTIONS = new Builder().withValidateResource().withPrettyPrint().build();
 
     @Test
-    public void validate_evn_segment() {
+    void validate_evn_segment() {
         String hl7message = "MSH|^~\\&|||||||ADT^A01^ADT_A01|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6||||||\r"
                 // + "EVN||||851||20210319134735|\r"  // TODO, not working with this value
                 + "EVN||||O||20210319134735|\r"
@@ -74,7 +74,7 @@ public class HL7EventTypeFHIRConversionTest {
     }
 
     @Test
-    public void validate_evn_segment_no_period_override() {
+    void validate_evn_segment_no_period_override() {
         String hl7message = "MSH|^~\\&|||||||ADT^A01^ADT_A01|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6||||||\r"
                 // + "EVN||||7525||20210319134735|\r"  // TODO, not working with this value
                 + "EVN||||O||20210319134735|\r"
@@ -117,7 +117,7 @@ public class HL7EventTypeFHIRConversionTest {
     }
 
     @Test
-    public void validateEVNsegmentWithOBXreference() {
+    void validateEVNsegmentWithOBXreference() {
         // When there is an OBX record, it should create a reason reference in the encounter segment
         String hl7message = "MSH|^~\\&|||||||ADT^A01^ADT_A01|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6||||||\r"
                 + "EVN||||7525|||\r"

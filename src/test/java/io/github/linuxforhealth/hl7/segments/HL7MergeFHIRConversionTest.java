@@ -24,11 +24,11 @@ import io.github.linuxforhealth.hl7.segments.util.ResourceUtils;
 
 /*** Tests the MRG segment ***/
 
-public class HL7MergeFHIRConversionTest {
+class HL7MergeFHIRConversionTest {
 
     // Test ADT_A34 with one MRG segment (the most it supports).
     @Test
-    public void validateHappyPathADT_A34WithMRG() {
+    void validateHappyPathADT_A34WithMRG() {
 
         String hl7message = "MSH|^~\\&|SENDING_APPLICATION|SENDING_FACILITY|RECEIVING_APPLICATION|RECEIVING_FACILITY|||ADT^A34||P|2.3||||\r"
                 + "EVN|A40|20110613122406637||01\r"
@@ -180,7 +180,7 @@ public class HL7MergeFHIRConversionTest {
 
     // Test ADT_A40 with one MRG segment.
     @Test
-    public void validateHappyPathADT_A40WithMRG() {
+    void validateHappyPathADT_A40WithMRG() {
 
         String hl7message = "MSH|^~\\&|REGADT|MCM|RSP1P8|MCM|200301051530|SEC|ADT^A40^ADT_A39|00000003|P|2.6\r"  
                 + "EVN|A40|200301051530\r"
@@ -275,7 +275,7 @@ public class HL7MergeFHIRConversionTest {
 
     // Tests ADT_A40 message with 2 MRG segments.
     @Test
-    public void validateTwoMRGs() {
+    void validateTwoMRGs() {
 
         String hl7message = "MSH|^~\\&|REGADT|MCM|RSP1P8|MCM|200301051530|SEC|ADT^A40^ADT_A39|00000003|P|2.6\r"
                 + "EVN|A40|200301051530\r"

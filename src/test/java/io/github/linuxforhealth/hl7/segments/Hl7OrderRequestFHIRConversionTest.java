@@ -31,14 +31,14 @@ import io.github.linuxforhealth.hl7.segments.util.ResourceUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class Hl7OrderRequestFHIRConversionTest {
+class Hl7OrderRequestFHIRConversionTest {
 
   private static FHIRContext context = new FHIRContext(true, false);
   private static final Logger LOGGER = LoggerFactory.getLogger(Hl7MedicationRequestFHIRConversionTest.class);
 
   // Read comments carefully.  Tests
   @Test
-  public void testBroadORCFields() {
+  void testBroadORCFields() {
 
     String hl7message =
 
@@ -146,7 +146,7 @@ public class Hl7OrderRequestFHIRConversionTest {
   // This test is a companion to testBroadORCFields.   ORC and OBR records often have repeated data; one taking priority over the other.
   // Read comments carefully.  This sometimes tests the secondary value and may be the opposite to the tests in testBroadORCFields.
   @Test
-  public void testBroadORCPlusOBRFields() {
+  void testBroadORCPlusOBRFields() {
 
     String hl7message = "MSH|^~\\&|||||20180924152907|34001|ORU^R01^ORU_R01|213|T|2.6|||||||||||\n"
         // PID.18 is used as backup identifier visit number because PV1.19 is empty
@@ -281,7 +281,7 @@ public class Hl7OrderRequestFHIRConversionTest {
   }
 
   @Test
-  public void testBroadORCPlusOBRFields2() {
+  void testBroadORCPlusOBRFields2() {
 
     String hl7message = "MSH|^~\\&|||||20180924152907|34001|ORU^R01^ORU_R01|213|T|2.6|||||||||||\n"
             // PID.18 is empty, MSH.7 will be used as identifier visit number 
@@ -332,7 +332,7 @@ public class Hl7OrderRequestFHIRConversionTest {
   }
 
   @Test
-  public void testAdditionalOBRFieldsNoORCSegment() {
+  void testAdditionalOBRFieldsNoORCSegment() {
 
     String hl7message =
 
@@ -386,7 +386,7 @@ public class Hl7OrderRequestFHIRConversionTest {
   // This test assures the MDM_T02 is properly enabled. 
   // It focuses on _differences_ in MDM not tested above, then does general confirmation of other fields
   @Test
-  public void testMDMT02ServiceRequest() {
+  void testMDMT02ServiceRequest() {
 
     String hl7message =
         "MSH|^~\\&|Epic|PQA|WHIA|IBM|20170920141233||MDM^T02^MDM_T02|M1005|D|2.6\r"

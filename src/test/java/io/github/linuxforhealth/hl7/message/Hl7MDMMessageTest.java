@@ -24,7 +24,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 import io.github.linuxforhealth.hl7.segments.util.ResourceUtils;
 
-public class Hl7MDMMessageTest {
+class Hl7MDMMessageTest {
 
     //An example message for reference:
     // "MSH|^~\\&|HNAM|W|RAD_IMAGING_REPORT|W|20180118111520||MDM^T06|<MESSAGEID>|P|2.6\n"
@@ -42,7 +42,7 @@ public class Hl7MDMMessageTest {
     // This test assures we don't have data mixing in the placer / filler identifiers.
     @ParameterizedTest
     @ValueSource(strings = { "MDM^T02", "MDM^T06" })
-    public void noMixingOfParamsInDocumentReference(String message) throws IOException {
+    void noMixingOfParamsInDocumentReference(String message) throws IOException {
         String hl7message = "MSH|^~\\&|HNAM|W|RAD_IMAGING_REPORT|W|20180118111520||MDM^T02|" + message + "|P|2.6\n"
                 + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
                 + "PV1|1|O|2GY^2417^W||||D||||||||||OTW|<HospitalID>|||||||||||||||||||||||||20180115102400|20180118104500\n"
@@ -153,7 +153,7 @@ public class Hl7MDMMessageTest {
 
     @ParameterizedTest
     @ValueSource(strings = { "MDM^T02", "MDM^T06" })
-    public void test_mdm_mininum_with_OBXtypeTXtoDocumenReference(String message) throws IOException {
+    void test_mdm_mininum_with_OBXtypeTXtoDocumenReference(String message) throws IOException {
         String hl7message = "MSH|^~\\&|HNAM|W|RAD_IMAGING_REPORT|W|20180118111520||" + message + "|<MESSAGEID>|P|2.6\r"
                 + "EVN||20150502090000|\r"
                 + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\r"
@@ -179,7 +179,7 @@ public class Hl7MDMMessageTest {
 
     @ParameterizedTest
     @ValueSource(strings = { "MDM^T02", "MDM^T06" })
-    public void test_mdm_mininum_with_OBXnotTX(String message) throws IOException {
+    void test_mdm_mininum_with_OBXnotTX(String message) throws IOException {
         String hl7message = "MSH|^~\\&|HNAM|W|RAD_IMAGING_REPORT|W|20180118111520||" + message + "|<MESSAGEID>|P|2.6\r"
                 + "EVN||20150502090000|\r"
                 + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\r"
@@ -208,7 +208,7 @@ public class Hl7MDMMessageTest {
 
     @ParameterizedTest
     @ValueSource(strings = { "MDM^T02", "MDM^T06" })
-    public void test_mdm_mininum_with_multiple_OBXtypeTXtoDocumentReference(String message) throws IOException {
+    void test_mdm_mininum_with_multiple_OBXtypeTXtoDocumentReference(String message) throws IOException {
         String hl7message = "MSH|^~\\&|HNAM|W|RAD_IMAGING_REPORT|W|20180118111520||" + message + "|<MESSAGEID>|P|2.6\r"
                 + "EVN||20150502090000|\r"
                 + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\r"
@@ -236,7 +236,7 @@ public class Hl7MDMMessageTest {
 
     @ParameterizedTest
     @ValueSource(strings = { "MDM^T02", "MDM^T06" })
-    public void test_mdm_mininum_with_multipleOBXnotTX(String message) throws IOException {
+    void test_mdm_mininum_with_multipleOBXnotTX(String message) throws IOException {
         String hl7message = "MSH|^~\\&|HNAM|W|RAD_IMAGING_REPORT|W|20180118111520||" + message + "|<MESSAGEID>|P|2.6\r"
                 + "EVN||20150502090000|\r"
                 + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\r"
@@ -267,7 +267,7 @@ public class Hl7MDMMessageTest {
 
     @ParameterizedTest
     @ValueSource(strings = { "MDM^T02", "MDM^T06" })
-    public void test_mdm_ORDER_group_and_OBXtypeTX(String message) throws IOException {
+    void test_mdm_ORDER_group_and_OBXtypeTX(String message) throws IOException {
         String hl7message = "MSH|^~\\&|HNAM|W|RAD_IMAGING_REPORT|W|20180118111520||" + message + "|<MESSAGEID>|P|2.6\r"
                 + "EVN||20150502090000|\r"
                 + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\r"
@@ -298,7 +298,7 @@ public class Hl7MDMMessageTest {
 
     @ParameterizedTest
     @ValueSource(strings = { "MDM^T02", "MDM^T06" })
-    public void test_mdm_ORDER_with_OBXnotTX(String message) throws IOException {
+    void test_mdm_ORDER_with_OBXnotTX(String message) throws IOException {
         // Also check NTE working for MDM messages.
         String hl7message = "MSH|^~\\&|HNAM|W|RAD_IMAGING_REPORT|W|20180118111520||" + message + "|<MESSAGEID>|P|2.6\r"
                 + "EVN||20150502090000|\r"
@@ -364,7 +364,7 @@ public class Hl7MDMMessageTest {
 
     @ParameterizedTest
     @ValueSource(strings = { "MDM^T02", "MDM^T06" })
-    public void test_mdm_multiple_ORDERs_and_multiple_OBXtypeTX(String message) throws IOException {
+    void test_mdm_multiple_ORDERs_and_multiple_OBXtypeTX(String message) throws IOException {
         String hl7message = "MSH|^~\\&|HNAM|W|RAD_IMAGING_REPORT|W|20180118111520||" + message + "|<MESSAGEID>|P|2.6\r"
                 + "EVN||20150502090000|\r"
                 + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\r"
@@ -401,7 +401,7 @@ public class Hl7MDMMessageTest {
 
     @ParameterizedTest
     @ValueSource(strings = { "MDM^T02", "MDM^T06" })
-    public void test_mdm_multiple_ORDERs_and_multiple_OBXnotTX(String message) throws IOException {
+    void test_mdm_multiple_ORDERs_and_multiple_OBXnotTX(String message) throws IOException {
         String hl7message = "MSH|^~\\&|HNAM|W|RAD_IMAGING_REPORT|W|20180118111520||" + message + "|<MESSAGEID>|P|2.6\r"
                 + "EVN||20150502090000|\r"
                 + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\r"

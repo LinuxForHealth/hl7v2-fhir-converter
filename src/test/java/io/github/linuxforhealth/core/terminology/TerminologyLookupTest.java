@@ -9,10 +9,10 @@ package io.github.linuxforhealth.core.terminology;
 import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.Test;
 
-public class TerminologyLookupTest {
+class TerminologyLookupTest {
 
   @Test
-  public void test() {
+  void test() {
     SimpleCode code =
         TerminologyLookup.lookup("v2-0396", "ICD10GM2012");
     assertThat(code).isNotNull();

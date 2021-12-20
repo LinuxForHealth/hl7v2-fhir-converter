@@ -27,7 +27,7 @@ import io.github.linuxforhealth.hl7.ConverterOptions;
 import io.github.linuxforhealth.hl7.ConverterOptions.Builder;
 import io.github.linuxforhealth.hl7.HL7ToFHIRConverter;
 
-public class Hl7RDEMessageTest {
+class Hl7RDEMessageTest {
     private static FHIRContext context = new FHIRContext();
     private static final ConverterOptions OPTIONS_PRETTYPRINT = new Builder().withBundleType(BundleType.COLLECTION)
             .withValidateResource().withPrettyPrint().build();
@@ -38,7 +38,7 @@ public class Hl7RDEMessageTest {
             "MSH|^~\\&|WHI_LOAD_GENERATOR|IBM_TORONTO_LAB||IBM|20210407191342|25739|RDE^O11|MSGID_f209e83f-20db-474d-a7ae-82e5c3894273|T|2.6\r",
             "MSH|^~\\&|WHI_LOAD_GENERATOR|IBM_TORONTO_LAB||IBM|20210407191342|25739|RDE^O25|MSGID_f209e83f-20db-474d-a7ae-82e5c3894273|T|2.6\r"
     })
-    public void test_RDE_medRequest_patient_present(String msh) throws IOException {
+    void test_RDE_medRequest_patient_present(String msh) throws IOException {
         String hl7message = msh
                 + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\r"
                 + "ORC|RE|||3200|||||20210407191342||2799^BY^VERIFIED||||20210407191342||||||ORDERING FAC NAME||||||||I\r"
@@ -74,7 +74,7 @@ public class Hl7RDEMessageTest {
             "MSH|^~\\&|WHI_LOAD_GENERATOR|IBM_TORONTO_LAB||IBM|20210407191342|25739|RDE^O25|MSGID_f209e83f-20db-474d-a7ae-82e5c3894273|T|2.6\r"
     })
     // In the HL7 spec RXR is required for these messages, however, we can handle having no RXR.
-    public void test_RDE_medRequest_patient_present_withoutRXR(String msh) throws IOException {
+    void test_RDE_medRequest_patient_present_withoutRXR(String msh) throws IOException {
         String hl7message = msh
                 + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\r"
                 + "ORC|RE|||3200|||||20210407191342||2799^BY^VERIFIED||||20210407191342||||||ORDERING FAC NAME||||||||I\r"
@@ -108,7 +108,7 @@ public class Hl7RDEMessageTest {
             "MSH|^~\\&|WHI_LOAD_GENERATOR|IBM_TORONTO_LAB||IBM|20210407191342|25739|RDE^O11|MSGID_f209e83f-20db-474d-a7ae-82e5c3894273|T|2.6\r",
             "MSH|^~\\&|WHI_LOAD_GENERATOR|IBM_TORONTO_LAB||IBM|20210407191342|25739|RDE^O25|MSGID_f209e83f-20db-474d-a7ae-82e5c3894273|T|2.6\r"
     })
-    public void test_RDE_medRequest_patient_encounter_present(String msh) throws IOException {
+    void test_RDE_medRequest_patient_encounter_present(String msh) throws IOException {
         String hl7message = msh
                 + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\r"
                 + "PV1||I|||||||||||||||||Visit_0a4d960d-c528-45c9-bb10-7e9929968247|||||||||||||||||||||||||20210407191342\r"
@@ -149,7 +149,7 @@ public class Hl7RDEMessageTest {
             "MSH|^~\\&|WHI_LOAD_GENERATOR|IBM_TORONTO_LAB||IBM|20210407191342|25739|RDE^O11|MSGID_f209e83f-20db-474d-a7ae-82e5c3894273|T|2.6\r",
             "MSH|^~\\&|WHI_LOAD_GENERATOR|IBM_TORONTO_LAB||IBM|20210407191342|25739|RDE^O25|MSGID_f209e83f-20db-474d-a7ae-82e5c3894273|T|2.6\r"
     })
-    public void test_RDE_medRequest_patient_encounter_withExtraSegments_present(String msh) throws IOException {
+    void test_RDE_medRequest_patient_encounter_withExtraSegments_present(String msh) throws IOException {
         String hl7message = msh
                 + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\r"
                 + "PD1|||||||||||01|N||||A\r"
@@ -192,7 +192,7 @@ public class Hl7RDEMessageTest {
             "MSH|^~\\&|WHI_LOAD_GENERATOR|IBM_TORONTO_LAB||IBM|20210407191342|25739|RDE^O11|MSGID_f209e83f-20db-474d-a7ae-82e5c3894273|T|2.6\r",
             "MSH|^~\\&|WHI_LOAD_GENERATOR|IBM_TORONTO_LAB||IBM|20210407191342|25739|RDE^O25|MSGID_f209e83f-20db-474d-a7ae-82e5c3894273|T|2.6\r"
     })
-    public void test_RDE_medRequest_patient_encounter_allergy_present(String msh) throws IOException {
+    void test_RDE_medRequest_patient_encounter_allergy_present(String msh) throws IOException {
         String hl7message = msh
                 + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\r"
                 + "PV1||I|||||||||||||||||Visit_0a4d960d-c528-45c9-bb10-7e9929968247|||||||||||||||||||||||||20210407191342\r"
@@ -239,7 +239,7 @@ public class Hl7RDEMessageTest {
             "MSH|^~\\&|WHI_LOAD_GENERATOR|IBM_TORONTO_LAB||IBM|20210407191342|25739|RDE^O11|MSGID_f209e83f-20db-474d-a7ae-82e5c3894273|T|2.6\r",
             "MSH|^~\\&|WHI_LOAD_GENERATOR|IBM_TORONTO_LAB||IBM|20210407191342|25739|RDE^O25|MSGID_f209e83f-20db-474d-a7ae-82e5c3894273|T|2.6\r"
     })
-    public void test_RDE_medRequest_patient_observation_present(String msh) throws IOException {
+    void test_RDE_medRequest_patient_observation_present(String msh) throws IOException {
         String hl7message = msh
                 + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\r"
                 + "ORC|RE|||3200|||||20210407191342||2799^BY^VERIFIED||||20210407191342||||||ORDERING FAC NAME||||||||I\r"
@@ -279,7 +279,7 @@ public class Hl7RDEMessageTest {
             "MSH|^~\\&|WHI_LOAD_GENERATOR|IBM_TORONTO_LAB||IBM|20210407191342|25739|RDE^O11|MSGID_f209e83f-20db-474d-a7ae-82e5c3894273|T|2.6\r",
             "MSH|^~\\&|WHI_LOAD_GENERATOR|IBM_TORONTO_LAB||IBM|20210407191342|25739|RDE^O25|MSGID_f209e83f-20db-474d-a7ae-82e5c3894273|T|2.6\r"
     })
-    public void test_RDE_medRequest_patient_encounter_observation_present(String msh) throws IOException {
+    void test_RDE_medRequest_patient_encounter_observation_present(String msh) throws IOException {
         String hl7message = msh
                 + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\r"
                 + "PV1||I|||||||||||||||||Visit_0a4d960d-c528-45c9-bb10-7e9929968247|||||||||||||||||||||||||20210407191342\r"
@@ -325,7 +325,7 @@ public class Hl7RDEMessageTest {
             "MSH|^~\\&|WHI_LOAD_GENERATOR|IBM_TORONTO_LAB||IBM|20210407191342|25739|RDE^O11|MSGID_f209e83f-20db-474d-a7ae-82e5c3894273|T|2.6\r",
             "MSH|^~\\&|WHI_LOAD_GENERATOR|IBM_TORONTO_LAB||IBM|20210407191342|25739|RDE^O25|MSGID_f209e83f-20db-474d-a7ae-82e5c3894273|T|2.6\r"
     })
-    public void test_RDE_medRequest_patient_encounter_allergy_observation_present(String msh) throws IOException {
+    void test_RDE_medRequest_patient_encounter_allergy_observation_present(String msh) throws IOException {
         String hl7message = msh
                 + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\r"
                 + "PV1||I|||||||||||||||||Visit_0a4d960d-c528-45c9-bb10-7e9929968247|||||||||||||||||||||||||20210407191342\r"

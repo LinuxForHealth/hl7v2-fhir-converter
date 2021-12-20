@@ -34,7 +34,7 @@ import io.github.linuxforhealth.hl7.segments.util.ResourceUtils;
 // High level note creation for other messages is done:
 // For MDM_T0x in test_mdm_ORDER_with_OBXnotTX
 
-public class Hl7NoteFHIRConverterTest {
+class Hl7NoteFHIRConverterTest {
 
     // Tests NTE creation for OBX (Observations) and ORC/OBRs (ServiceRequests)
     // Test associated Practitioners and references created. (NTE.4)
@@ -50,7 +50,7 @@ public class Hl7NoteFHIRConverterTest {
 
     @ParameterizedTest
     @MethodSource("provideParmsForNoteCreationServiceRequestMutipleOBX")
-    public void testNoteCreationServiceRequestMutipleOBX(String message, int numExpectedDiagnosticReports) {
+    void testNoteCreationServiceRequestMutipleOBX(String message, int numExpectedDiagnosticReports) {
         String hl7ORU = "MSH|^~\\&|||||20180924152907||" + message + "|213|T|2.3.1|||||||||||\n"
                 + "PID|||Pract1ID^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
                 // TODO: Future work, handle NTE's on PID
@@ -173,7 +173,7 @@ public class Hl7NoteFHIRConverterTest {
 
     @ParameterizedTest
     @MethodSource("parmsTestMedicationRequestNoteCreation")
-    public void testMedicationRequestNoteCreation(String message, String medicalRequestSegments) {
+    void testMedicationRequestNoteCreation(String message, String medicalRequestSegments) {
         // Minimal valid ORC message.  Requires RXO and RXR segments.
         String hl7message = "MSH|^~\\&||||IBM|20210101000000||" + message + "|MSGID|T|2.6\n"
                 + "PID|||1234||DOE^JANE^|||F||||||||||||||||||||||\n"
@@ -270,7 +270,7 @@ public class Hl7NoteFHIRConverterTest {
     // Test that multiple problems (PRB) each with multiple notes (NTE) are associated with the correct NTE / PRB 
     // and that there is no "bleed"
     @Test
-    public void testNoteCreationMutiplePPR() throws IOException {
+    void testNoteCreationMutiplePPR() throws IOException {
         // TODO: Add PC2 and PC3 tests in future            
         String message = "PPR^PC1";
         String hl7message = "MSH|^~\\&|SendTest1|Sendfac1|Receiveapp1|Receivefac1|200603081747|security|" + message

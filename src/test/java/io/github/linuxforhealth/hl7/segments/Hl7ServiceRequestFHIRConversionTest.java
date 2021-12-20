@@ -32,14 +32,14 @@ import io.github.linuxforhealth.hl7.HL7ToFHIRConverter;
  * Tests focused on Service Requests details created by different message events
  *
  */
-public class Hl7ServiceRequestFHIRConversionTest {
+class Hl7ServiceRequestFHIRConversionTest {
 
     private static FHIRContext context = new FHIRContext(true, false);
     private static final Logger LOGGER = LoggerFactory.getLogger(Hl7ServiceRequestFHIRConversionTest.class);
     private static final ConverterOptions OPTIONS = new Builder().withValidateResource().build();
 
     @Test
-    public void test_ppr_pc1_service_request() throws IOException {
+    void test_ppr_pc1_service_request() throws IOException {
         // Currently only tests limited items, TODO add tests for other field
 
         String hl7message = "MSH|^~\\&|SendTest1|Sendfac1|Receiveapp1|Receivefac1|202101010000|security|PPR^PC1^PPR_PC1|1|P^I|2.6||||||ASCII||\n"

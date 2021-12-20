@@ -30,7 +30,7 @@ import io.github.linuxforhealth.hl7.HL7ToFHIRConverter;
 import io.github.linuxforhealth.hl7.segments.util.PatientUtils;
 import io.github.linuxforhealth.hl7.segments.util.ResourceUtils;
 
-public class Hl7DocumentReferenceFHIRConversionTest {
+class Hl7DocumentReferenceFHIRConversionTest {
 
     private static FHIRContext context = new FHIRContext();
 
@@ -39,7 +39,7 @@ public class Hl7DocumentReferenceFHIRConversionTest {
     @ValueSource(strings = {
             "MDM^T02", "MDM^T06"
     })
-    public void doc_ref_has_all_fields_in_yaml(String segment) {
+    void doc_ref_has_all_fields_in_yaml(String segment) {
         //every field covered in the yaml should be listed here
         String documentReference = "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|" + segment
                 + "^MDM_T02|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6|56789^NID^UID|MCM||||\n"
@@ -71,7 +71,7 @@ public class Hl7DocumentReferenceFHIRConversionTest {
     @ValueSource(strings = {
             "MDM^T02", "MDM^T06"
     })
-    public void doc_ref_authenticator_and_author_test(String segment) {
+    void doc_ref_authenticator_and_author_test(String segment) {
         String documentReferenceMessage = "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|" + segment
                 + "^MDM_T02|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6|56789^NID^UID|MCM||||\n"
                 + "PID|1||000054321^^^MRN|||||||||||||M|CAT|||||N\n"
@@ -117,7 +117,7 @@ public class Hl7DocumentReferenceFHIRConversionTest {
     @ValueSource(strings = {
             "MDM^T02", "MDM^T06"
     })
-    public void doc_ref_content_test(String segment) {
+    void doc_ref_content_test(String segment) {
         String documentReferenceMessage = "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|" + segment
                 + "^MDM_T02|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6|56789^NID^UID|MCM||||\n"
                 + "PID|1||000054321^^^MRN|||||||||||||M|CAT|||||N\n"
@@ -184,7 +184,7 @@ public class Hl7DocumentReferenceFHIRConversionTest {
     @ValueSource(strings = {
             "MDM^T02", "MDM^T06"
     })
-    public void docRefContextAndServiceRequestPresenceTest(String segment) {
+    void docRefContextAndServiceRequestPresenceTest(String segment) {
         String documentReferenceMessage = "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|" + segment
                 + "^MDM_T02|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6|56789^NID^UID|MCM||||\n"
                 + "PID|1||000054321^^^MRN|||||||||||||M|CAT|||||N\n"
@@ -264,7 +264,7 @@ public class Hl7DocumentReferenceFHIRConversionTest {
     @ValueSource(strings = {
             "MDM^T02", "MDM^T06"
     })
-    public void doc_ref_date_test(String segment) {
+    void doc_ref_date_test(String segment) {
         String documentReferenceMessage = "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|" + segment
                 + "^MDM_T02|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6|56789^NID^UID|MCM||||\n"
                 + "PID|1||000054321^^^MRN|||||||||||||M|CAT|||||N\n"
@@ -283,7 +283,7 @@ public class Hl7DocumentReferenceFHIRConversionTest {
     @ValueSource(strings = {
             "MDM^T02", "MDM^T06"
     })
-    public void doc_ref_description_test(String segment) {
+    void doc_ref_description_test(String segment) {
         String documentReferenceMessage = "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|" + segment
                 + "^MDM_T02|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6|56789^NID^UID|MCM||||\n"
                 + "PID|1||000054321^^^MRN|||||||||||||M|CAT|||||N\n"
@@ -302,7 +302,7 @@ public class Hl7DocumentReferenceFHIRConversionTest {
     @ValueSource(strings = {
             "MDM^T02", "MDM^T06"
     })
-    public void doc_ref_doc_status_test(String segment) {
+    void doc_ref_doc_status_test(String segment) {
         String documentReferenceMessage = "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|" + segment
                 + "^MDM_T02|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6|56789^NID^UID|MCM||||\n"
                 + "PID|1||000054321^^^MRN|||||||||||||M|CAT|||||N\n"
@@ -352,7 +352,7 @@ public class Hl7DocumentReferenceFHIRConversionTest {
             "MDM^T02", "MDM^T06"
     })
     @Disabled("TODO: TXA-13 is not yet mapped in DocumentReference.yml")
-    public void doc_ref_relates_to_test(String segment) {
+    void doc_ref_relates_to_test(String segment) {
         String documentReferenceMessage = "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|" + segment
                 + "^MDM_T02|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6|56789^NID^UID|MCM||||\n"
                 + "PID|1||000054321^^^MRN|||||||||||||M|CAT|||||N\n"
@@ -390,7 +390,7 @@ public class Hl7DocumentReferenceFHIRConversionTest {
     @ValueSource(strings = {
             "MDM^T02", "MDM^T06"
     })
-    public void doc_ref_security_label_test(String segment) {
+    void doc_ref_security_label_test(String segment) {
         String documentReferenceMessage = "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|" + segment
                 + "^MDM_T02|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6|56789^NID^UID|MCM||||\n"
                 + "PID|1||000054321^^^MRN|||||||||||||M|CAT|||||N\n"
@@ -412,7 +412,7 @@ public class Hl7DocumentReferenceFHIRConversionTest {
     @ValueSource(strings = {
             "MDM^T02", "MDM^T06"
     })
-    public void doc_ref_status_test(String segment) {
+    void doc_ref_status_test(String segment) {
         // Check TXA.19
         // TXA.19 value maps to status; OBR.25 is ignored
         String documentReferenceMessage = "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|" + segment
@@ -463,7 +463,7 @@ public class Hl7DocumentReferenceFHIRConversionTest {
     @ValueSource(strings = {
             "MDM^T02", "MDM^T06"
     })
-    public void doc_ref_subject_test(String segment) {
+    void doc_ref_subject_test(String segment) {
         String documentReferenceMessage = "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|" + segment
                 + "^MDM_T02|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6|56789^NID^UID|MCM||||\n"
                 + "PID|1||000054321^^^MRN|||||||||||||M|CAT|||||N\n"
@@ -496,7 +496,7 @@ public class Hl7DocumentReferenceFHIRConversionTest {
     @ValueSource(strings = {
             "MDM^T02", "MDM^T06"
     })
-    public void doc_ref_master_identifier_test(String segment) {
+    void doc_ref_master_identifier_test(String segment) {
         // Test masterIdentifier uses the value(12.1) but does not require a system if 12.2 is empty
         String documentReference = "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|" + segment
                 + "^MDM_T02|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6|56789^NID^UID|MCM||||\n"
@@ -547,7 +547,7 @@ public class Hl7DocumentReferenceFHIRConversionTest {
     @ValueSource(strings = {
             "MDM^T02", "MDM^T06"
     })
-    public void doc_ref_type_test(String segment) {
+    void doc_ref_type_test(String segment) {
         String documentReferenceMessage = "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|" + segment
                 + "^MDM_T02|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6|56789^NID^UID|MCM||||\n"
                 + "PID|1||000054321^^^MRN|||||||||||||M|CAT|||||N\n"
@@ -569,7 +569,7 @@ public class Hl7DocumentReferenceFHIRConversionTest {
     @ValueSource(strings = {
             "PPR^PC1", /* "PPR^PC2", "PPR^PC3" */
     })
-    public void doc_ref_ppr_test(String messageType) {
+    void doc_ref_ppr_test(String messageType) {
         String documentReferenceMessage = "MSH|^~\\&|SendTest1|Sendfac1|Receiveapp1|Receivefac1|202101010000|security|"
                 + messageType + "|1|P^I|2.6||||||ASCII||\r"
                 + "PID|||1234^^^^MR||DOE^JANE^|||F|||||||||||||||||||||\r"
