@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2020
+ * (C) Copyright IBM Corp. 2020, 2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -39,11 +39,11 @@ public class Hl7DataHandlerUtil {
 
     /**
      * @param obj - object to return the string value of
-     * @param allComponents -
+     * @param allComponents - should all components be handled in same call?
      * @param separatorString - string to insert between items when obj is a list
      * @param trim - whether to trim (whitespace) from the result
      * @param separatorAtEnd - whether to add the separatorString after the final element when obj parm is a list
-     * @return
+     * @return The string value
      */
     public static String getStringValue(Object obj, boolean allComponents, String separatorString, boolean trim,
             boolean separatorAtEnd) {
