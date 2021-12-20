@@ -109,16 +109,14 @@ public class Hl7RelatedGeneralUtils {
     }
 
     public static String getImmunizationStatus(Object rxa18, Object rxa20, Object orc5) {
-        if (rxa20 != null){
-                return  SimpleDataValueResolver.getFHIRCode(rxa20.toString(), Immunization.ImmunizationStatus.class);
-        }
-        else if(rxa18 != null) {
+        if (rxa20 != null) {
+            return SimpleDataValueResolver.getFHIRCode(rxa20.toString(), Immunization.ImmunizationStatus.class);
+        } else if (rxa18 != null) {
             return "not-done";
-        }
-        else if  (orc5 != null){
-                return SimpleDataValueResolver.getFHIRCode(orc5.toString(), Immunization.ImmunizationStatus.class);
-        }
-        else return "completed";
+        } else if (orc5 != null) {
+            return SimpleDataValueResolver.getFHIRCode(orc5.toString(), Immunization.ImmunizationStatus.class);
+        } else
+            return "completed";
     }
 
     // DocumentReference.yml uses a required:true on status to control the creation of the DocumentReference.
@@ -223,8 +221,7 @@ public class Hl7RelatedGeneralUtils {
         String val = Hl7DataHandlerUtil.getStringValue(input);
         if (val != null) {
             String newVal = val.replaceAll("\\s", "_");
-            String system = "urn:id:" + newVal;
-            return system;
+            return "urn:id:" + newVal;
         } else
             return null;
     }
@@ -310,6 +307,11 @@ public class Hl7RelatedGeneralUtils {
      * if it is empty, and there is exactly one address (repeated) use the PID
      * county. PID-12 maps to patient.address.District "IF PID-11 LST.COUNT EQUALS 1
      * AND PID-11.9 IS NOT VALUED"
+     * 
+     * @param patientCountyPid12 County from PID.12
+     * @param addressCountyParishPid119 County parish from PID.11.9
+     * @param patient The patient segment
+     * @return Address district calculated
      */
     public static String getAddressDistrict(String patientCountyPid12, String addressCountyParishPid119,
             Object patient) {

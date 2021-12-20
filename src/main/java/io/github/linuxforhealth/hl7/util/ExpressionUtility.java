@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2020
+ * (C) Copyright IBM Corp. 2020, 2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -11,10 +11,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import io.github.linuxforhealth.api.EvaluationResult;
 import io.github.linuxforhealth.api.Expression;
 import io.github.linuxforhealth.api.InputDataExtractor;
@@ -43,10 +45,10 @@ public class ExpressionUtility {
     /**
      * Evaluates map of expression and generates ResourceEvaluationResult object.
      * 
-     * @param dataSource
-     * @param context
-     * @param baseValue
-     * @param expressionMap
+     * @param dataSource The data extractor to be used
+     * @param context The context in use
+     * @param baseValue The value to evaluate
+     * @param expressionMap Map of expressions
      * @return {@link ResourceEvaluationResult}
      */
     public static ResourceEvaluationResult evaluate(InputDataExtractor dataSource,
