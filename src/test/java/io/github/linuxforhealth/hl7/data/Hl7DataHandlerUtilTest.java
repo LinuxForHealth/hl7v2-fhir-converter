@@ -20,24 +20,24 @@ import ca.uhn.hl7v2.model.v26.group.ORU_R01_ORDER_OBSERVATION;
 import ca.uhn.hl7v2.model.v26.message.ORU_R01;
 import ca.uhn.hl7v2.model.v26.segment.OBX;
 
-public class Hl7DataHandlerUtilTest {
+class Hl7DataHandlerUtilTest {
 
     private static final String SOME_TEXT_VALUE = "SOME TEXT VALUE";
     private static final String SOME_OTHER_TEXT_VALUE = "SOME OTHER TEXT VALUE";
 
     @Test
-    public void test_getStringValue_returns_value() {
+    void test_getStringValue_returns_value() {
         String value = "any string value";
         assertThat(Hl7DataHandlerUtil.getStringValue(value)).isEqualTo(value);
     }
 
     @Test
-    public void test_getStringValue_returns_null_for_null_input() {
+    void test_getStringValue_returns_null_for_null_input() {
         assertThat(Hl7DataHandlerUtil.getStringValue(null)).isNull();
     }
 
     @Test
-    public void test_getStringValue_returns_value_for_hl7_primitive() throws DataTypeException {
+    void test_getStringValue_returns_value_for_hl7_primitive() throws DataTypeException {
         ORU_R01 message = new ORU_R01();
         TX tx = new TX(message);
         tx.setValue(SOME_TEXT_VALUE);
@@ -45,7 +45,7 @@ public class Hl7DataHandlerUtilTest {
     }
 
     @Test
-    public void test_getStringValue_returns_value_for_hl7_compositive() throws DataTypeException {
+    void test_getStringValue_returns_value_for_hl7_compositive() throws DataTypeException {
         ORU_R01 message = new ORU_R01();
         CWE ce = new CWE(message);
         ce.getIdentifier().setValue(SOME_TEXT_VALUE);
@@ -55,7 +55,7 @@ public class Hl7DataHandlerUtilTest {
     }
 
     @Test
-    public void test_getStringValue_returns_value_for_hl7_compositive_all_components()
+    void test_getStringValue_returns_value_for_hl7_compositive_all_components()
             throws DataTypeException {
         ORU_R01 message = new ORU_R01();
         CWE ce = new CWE(message);
@@ -67,7 +67,7 @@ public class Hl7DataHandlerUtilTest {
     }
 
     @Test
-    public void test_getStringValue_returns_value_for_hl7_varies() throws DataTypeException {
+    void test_getStringValue_returns_value_for_hl7_varies() throws DataTypeException {
         ORU_R01 message = new ORU_R01();
         ORU_R01_ORDER_OBSERVATION orderObservation = message.getPATIENT_RESULT().getORDER_OBSERVATION();
         ORU_R01_OBSERVATION observation = orderObservation.getOBSERVATION(0);
@@ -80,7 +80,7 @@ public class Hl7DataHandlerUtilTest {
     }
 
     @Test
-    public void test_getStringValue_returns_value_for_list_of_hl7_compositive()
+    void test_getStringValue_returns_value_for_list_of_hl7_compositive()
             throws DataTypeException {
         ORU_R01 message = new ORU_R01();
         CWE ce = new CWE(message);
@@ -97,7 +97,7 @@ public class Hl7DataHandlerUtilTest {
     }
 
     @Test
-    public void test_getStringValue_returns_value_for_list_of_hl7_compositive_all_components()
+    void test_getStringValue_returns_value_for_list_of_hl7_compositive_all_components()
             throws DataTypeException {
         ORU_R01 message = new ORU_R01();
         CWE ce = new CWE(message);

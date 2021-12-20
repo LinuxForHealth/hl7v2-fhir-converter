@@ -42,7 +42,7 @@ import io.github.linuxforhealth.hl7.segments.util.ResourceUtils;
 // The custom message is placed in src/test/resources/additional_custom_resources/hl7/message/CUSTOM_PAT.yml
 // The custom packages class is placed in src/test/java/custom_packages/2.6 and references the custom package /org/foo/hl7/custom/
 
-public class Hl7CustomMessageTest {
+class Hl7CustomMessageTest {
 
     // # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
     // NOTE VALIDATION IS INTENTIONALLY NOT USED BECAUSE WE ARE CREATING RESOURCES THAT ARE NOT STANDARD
@@ -57,21 +57,21 @@ public class Hl7CustomMessageTest {
     static String originalConfigHome;
   
     @BeforeAll
-    public static void saveConfigHomeProperty() {
+    static void saveConfigHomeProperty() {
       originalConfigHome = System.getProperty(CONF_PROP_HOME);
       ConverterConfiguration.reset();
       ResourceReader.reset();
     }
   
     @AfterEach
-    public void reset() {
+    void reset() {
       System.clearProperty(CONF_PROP_HOME);
       ConverterConfiguration.reset();
       ResourceReader.reset();
     }
   
     @AfterAll
-    public static void reloadPreviousConfigurations() {
+    static void reloadPreviousConfigurations() {
       if (originalConfigHome != null)
         System.setProperty(CONF_PROP_HOME, originalConfigHome);
       else
@@ -79,7 +79,7 @@ public class Hl7CustomMessageTest {
     }
 
     @Test
-    public void testCustomPatMessage() throws IOException {
+    void testCustomPatMessage() throws IOException {
 
         // Set up the config file
     	  commonConfigFileSetup();

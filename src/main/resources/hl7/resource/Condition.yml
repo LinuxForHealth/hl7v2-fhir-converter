@@ -167,6 +167,7 @@ extension_1:
       urlValue: condition-assertedDate
 
 # We don't populate this optional field if the value is invalid.
+# CONDITION_VERIFICATION_STATUS_FHIR filters only valid values.
 verificationStatus:
   condition: $coding NOT_NULL
   valueOf: datatype/CodeableConcept
@@ -176,13 +177,28 @@ verificationStatus:
     text: String, PRB.13.2
 
 # We don't populate this optional field if the value is invalid.
-clinicalStatus:
+# Use CONDITION_CLINICAL_STATUS_FHIR to filter out invalid values.
+clinicalStatus_1:
   condition: $coding NOT_NULL
   valueOf: datatype/CodeableConcept
   expressionType: resource
   vars:
     coding: CONDITION_CLINICAL_STATUS_FHIR, PRB.14
     text: String, PRB.14.2
+
+# If PRB 14 is empty or invalid, AND PRB.9 has data, set to "resolved"
+# CONDITION_CLINICAL_STATUS_FHIR returns null if the value is invalid or null.
+clinicalStatus_2:
+  condition: $prb9 NOT_NULL && $validCoding NULL
+  valueOf: datatype/CodeableConcept_var
+  expressionType: resource
+  vars:
+    validCoding: CONDITION_CLINICAL_STATUS_FHIR, PRB.14.1
+    prb9: PRB.9
+  constants: 
+    code: 'resolved' 
+    display: 'Resolved'
+    system: 'http://terminology.hl7.org/CodeSystem/condition-clinical'
 
 note:
    valueOf: datatype/Annotation

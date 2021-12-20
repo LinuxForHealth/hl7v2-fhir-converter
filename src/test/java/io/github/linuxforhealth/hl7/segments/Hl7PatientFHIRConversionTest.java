@@ -37,7 +37,7 @@ import io.github.linuxforhealth.hl7.HL7ToFHIRConverter;
 import io.github.linuxforhealth.hl7.segments.util.PatientUtils;
 import io.github.linuxforhealth.hl7.segments.util.ResourceUtils;
 
-public class Hl7PatientFHIRConversionTest {
+class Hl7PatientFHIRConversionTest {
 
   private static FHIRContext context = new FHIRContext(true, false);
   private static final Logger LOGGER = LoggerFactory.getLogger(Hl7PatientFHIRConversionTest.class);
@@ -61,7 +61,7 @@ public class Hl7PatientFHIRConversionTest {
     "MSH|^~\\&|hl7Integration|hl7Integration|||||RDE^O25|||2.6|\r",
     "MSH|^~\\&|hl7Integration|hl7Integration|||||VXU^V04|||2.6|\r",
     })
-    public void test_patient_additional_demographics(String msh) {
+    void test_patient_additional_demographics(String msh) {
         String hl7message = msh
                 + "PID|1||1234^^^AssigningAuthority^MR||TEST^PATIENT|\r"
                 + "PD1|||Sample Family Practice^^2222|1111^LastName^ClinicianFirstName^^^^Title||||||||||||A|\r"
@@ -90,7 +90,7 @@ public class Hl7PatientFHIRConversionTest {
      */
 
     @Test
-    public void patient_deceased_conversion_test() {
+    void patient_deceased_conversion_test() {
 
         String patientMsgDeceasedEmpty = "MSH|^~\\&|MIICEHRApplication|MIIC|MIIC|MIIC|201705130822||VXU^V04^VXU_V04|test1100|P|2.5.1|||AL|AL|||||Z22^CDCPHINVS|^^^^^MIIC^SR^^^MIIC|MIIC\n"
                 + "PID|1||12345678^^^^MR|ALTID|Mouse^Mickey^J^III^^^|Mother^Micky|20060504|M|Alias^Alias|2106-3^White^ HL70005|12345 testing ave^^Minneapolis^MN^55407^^^^MN053|USAA|^PRN^^^PH^555^5555555|^PRN^^^PH^555^666666|english|married|bhuddist|1234567_account|111-22-3333|||2186-5^not Hispanic or Latino^CDCREC|Born in USA|Y|2|USA||||\n";
@@ -156,7 +156,7 @@ public class Hl7PatientFHIRConversionTest {
     }
 
     @Test
-    public void patient_multiple_birth_conversion_test() {
+    void patient_multiple_birth_conversion_test() {
 
         /**
          * Simplified logic for multiple birth
@@ -222,7 +222,7 @@ public class Hl7PatientFHIRConversionTest {
     }
 
     @Test
-    public void patient_use_name_conversion_test() {
+    void patient_use_name_conversion_test() {
         String patientUseName = "MSH|^~\\&|MyEMR|DE-000001| |CAIRLO|20160701123030-0700||VXU^V04^VXU_V04|CA0001|P|2.6|||ER|AL|||||Z22^CDCPHINVS|DE-000001\r"
                 +
                 "PID|1||PA123456^^^MYEMR^MR||TestPatient^John^M^^^^B|MILLER^MARTHA^G^^^^M|20140227|M||2106-3^WHITE^CDCREC|1234 W FIRST ST^^BEVERLY HILLS^CA^90210^^H||^PRN^PH^^^555^5555555||ENG^English^HL70296|||||||2186-5^ not Hispanic or Latino^CDCREC||Y|2\r";
@@ -236,7 +236,7 @@ public class Hl7PatientFHIRConversionTest {
     }
 
     @Test
-    public void patientNameTest() {
+    void patientNameTest() {
         String patientHasMiddleName = "MSH|^~\\&|MyEMR|DE-000001| |CAIRLO|20160701123030-0700||VXU^V04^VXU_V04|CA0001|P|2.6|||ER|AL|||||Z22^CDCPHINVS|DE-000001\r"
                 // PID 5 fields (name) are extracted and tested
                 + "PID|1||PA123456^^^MYEMR^MR||JONES^GEORGE^Q^III^MR^^B||||||||||||||||||||\r";
@@ -259,7 +259,7 @@ public class Hl7PatientFHIRConversionTest {
     }
 
     @Test
-    public void patientGenderTest() {
+    void patientGenderTest() {
         String patientEmptyGenderField = "MSH|^~\\&|MyEMR|DE-000001| |CAIRLO|20160701123030-0700||VXU^V04^VXU_V04|CA0001|P|2.6|||ER|AL|||||Z22^CDCPHINVS|DE-000001\r"
                 +
                 "PID|0010||||DOE^JOHN^A^|||||||\r";
@@ -279,7 +279,7 @@ public class Hl7PatientFHIRConversionTest {
     }
 
     @Test
-    public void patientMaritalStatusTest() {
+    void patientMaritalStatusTest() {
         String marriedPatientWithVersion = "MSH|^~\\&|MyEMR|DE-000001| |CAIRLO|20160701123030-0700||VXU^V04^VXU_V04|CA0001|P|2.6|||ER|AL|||||Z22^CDCPHINVS|DE-000001\r"
                 +
                 "PID|1||12345678^^^MRN||TestPatient^Jane|||||||||||M^^^^^^47||||||\r";
@@ -310,7 +310,7 @@ public class Hl7PatientFHIRConversionTest {
     }
 
     @Test
-    public void patientCommunicationLanguage() {
+    void patientCommunicationLanguage() {
 
         String patientSpeaksEnglishWithSystem = "MSH|^~\\&|MyEMR|DE-000001| |CAIRLO|20160701123030-0700||VXU^V04^VXU_V04|CA0001|P|2.6|||ER|AL|||||Z22^CDCPHINVS|DE-000001\r"
                 +
@@ -466,7 +466,7 @@ public class Hl7PatientFHIRConversionTest {
 
     // Tests Data lineage for a ORU^R01 message
     @Test
-    public void verify_data_lineage_ORU() {
+    void verify_data_lineage_ORU() {
 
         String hl7message = "MSH|^~\\&|SendingApplication|Sending^Facility|Receiving-Application|ReceivingFacility|20060915210000||ORU^R01|1473973200100600|P|2.3|||NE|NE\n"
                 + "PID|1||1234^^^AssigningAuthority^MR||TEST^PATIENT|\n"
@@ -476,7 +476,7 @@ public class Hl7PatientFHIRConversionTest {
 
     // Tests Data lineage for a message with milliseconds in MSH-7
     @Test
-    public void verify_data_lineage_milliseconds_timestamp() {
+    void verify_data_lineage_milliseconds_timestamp() {
         String hl7message = "MSH|^~\\&|SendingApplication|Sending^Facility|Receiving-Application|ReceivingFacility|20060915210000.567||ORU^R01|1473973200100600|P|2.3|||NE|NE\n"
                 + "PID|1||1234^^^AssigningAuthority^MR||TEST^PATIENT|\n"
                 + "PD1|||Sample Family Practice^^2222|1111^LastName^ClinicianFirstName^^^^Title||||||||||||A|";
@@ -485,7 +485,7 @@ public class Hl7PatientFHIRConversionTest {
 
     // Tests Data lineage for a ADT^A01 message
     @Test
-    public void verify_data_lineage_ADT() {
+    void verify_data_lineage_ADT() {
         String hl7message = "MSH|^~\\&|SendingApplication|hl7Integration|||20060915210000||ADT^A01|1473973200100600||2.3|\r"
                 + "EVN|A01|20130617154644\r"
                 + "PID|1|465 306 5961|000010016^^^MR~000010017^^^MR~000010018^^^MR|407623|Wood^Patrick^^Sr^MR||19700101|female|||High Street^^Oxford^^Ox1 4DP~George St^^Oxford^^Ox1 5AP|||||||\r"
@@ -497,7 +497,7 @@ public class Hl7PatientFHIRConversionTest {
 
     // Tests Data lineage for a VXU^V04 message
     @Test
-    public void verify_data_lineage_VXU() {
+    void verify_data_lineage_VXU() {
         String hl7message = "MSH|^~\\&|SendingApplication|RI88140101|KIDSNET_IFL|RIHEALTH|20060915210000||VXU^V04|1473973200100600|P|2.3|||NE|AL||||||RI543763\r"
                 + "PID|1||432155^^^^MR||Patient^Johnny^New^^^^L|Smith^Sally|20130414|M||2106-3^White^HL70005|123 Any St^^Somewhere^WI^54000^^M\r"
                 + "NK1|1|Patient^Sally|MTH^mother^HL70063|123 Any St^^Somewhere^WI^54000^^M|^PRN^PH^^^608^5551212|||||||||||19820517||||eng^English^ISO639\r"

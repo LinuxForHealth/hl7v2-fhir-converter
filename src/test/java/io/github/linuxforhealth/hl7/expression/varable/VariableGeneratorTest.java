@@ -13,7 +13,7 @@ import io.github.linuxforhealth.hl7.expression.variable.DataTypeVariable;
 import io.github.linuxforhealth.hl7.expression.variable.ExpressionVariable;
 import io.github.linuxforhealth.hl7.expression.variable.VariableGenerator;
 
-public class VariableGeneratorTest {
+class VariableGeneratorTest {
 
   /**
    *
@@ -24,7 +24,7 @@ public class VariableGeneratorTest {
    * @throws IOException
    */
   @Test
-  public void parseDataTypeVariableWithAsterixAtEnd() throws IOException {
+  void parseDataTypeVariableWithAsterixAtEnd() throws IOException {
 	  String varName = "var1";
 	  String variableExpression = "STRING, OBX-5 *";
 	  DataTypeVariable v = (DataTypeVariable) VariableGenerator.parse(varName, variableExpression);	
@@ -44,7 +44,7 @@ public class VariableGeneratorTest {
   * @throws IOException
   */
   @Test
-  public void parseExpressionVariableWithAsterixAndEvaluatingJavaFunction() throws IOException {
+  void parseExpressionVariableWithAsterixAndEvaluatingJavaFunction() throws IOException {
 	  String varName = "var1";
 	  String variableExpression = "OBX.5 *, GeneralUtils.testFunction(x, y)";
 	  ExpressionVariable v = (ExpressionVariable) VariableGenerator.parse(varName, variableExpression);	

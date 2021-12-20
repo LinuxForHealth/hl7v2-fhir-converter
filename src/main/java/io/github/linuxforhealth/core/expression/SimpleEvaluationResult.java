@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2020
+ * (C) Copyright IBM Corp. 2020, 2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -19,7 +19,7 @@ import io.github.linuxforhealth.core.data.DataTypeUtil;
  * 
  *
  * @author pbhallam
- * @param <V>
+ * @param <V> The value to be evaluated
  * 
  */
 public class SimpleEvaluationResult<V> implements EvaluationResult {

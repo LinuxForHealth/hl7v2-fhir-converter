@@ -29,7 +29,7 @@ import io.github.linuxforhealth.hl7.ConverterOptions.Builder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class Hl7VXUMessageTest {
+class Hl7VXUMessageTest {
     private static FHIRContext context = new FHIRContext(true, false);
     private static final Logger LOGGER = LoggerFactory.getLogger(Hl7VXUMessageTest.class);
     private static final ConverterOptions OPTIONS_PRETTYPRINT = new Builder()
@@ -39,7 +39,7 @@ public class Hl7VXUMessageTest {
         .build();
 
     @Test
-    public void test_VXU_with_minimum_segments() throws IOException {
+    void test_VXU_with_minimum_segments() throws IOException {
   	    String hl7message =
   		    "MSH|^~\\&|EHR|12345^SiteName|MIIS|99990|20140701041038||VXU^V04^VXU_V04|MSG.Valid_01|P|2.6|||\r"
   		    + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\r";
@@ -55,7 +55,7 @@ public class Hl7VXUMessageTest {
     }
 
     @Test
-    public void test_VXU_with_patient_group_that_has_minimum_segments() throws IOException {
+    void test_VXU_with_patient_group_that_has_minimum_segments() throws IOException {
   	    String hl7message = 
             "MSH|^~\\&|EHR|12345^SiteName|MIIS|99990|20140701041038||VXU^V04^VXU_V04|MSG.Valid_01|P|2.6|||\r"
   		    + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\r"
@@ -74,7 +74,7 @@ public class Hl7VXUMessageTest {
     }
 
     @Test
-    public void test_VXU_with_patient_group_that_has_all_segments() throws IOException {
+    void test_VXU_with_patient_group_that_has_all_segments() throws IOException {
   	    String hl7message = 
             "MSH|^~\\&|EHR|12345^SiteName|MIIS|99990|20140701041038||VXU^V04^VXU_V04|MSG.Valid_01|P|2.6|||\r"
   		    + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\r"
@@ -95,7 +95,7 @@ public class Hl7VXUMessageTest {
     }
 
     @Test
-    public void test_VXU_with_full_patient_group_and_minimum_order_group() throws IOException {
+    void test_VXU_with_full_patient_group_and_minimum_order_group() throws IOException {
   	    String hl7message = 
             "MSH|^~\\&|EHR|12345^SiteName|MIIS|99990|20140701041038||VXU^V04^VXU_V04|MSG.Valid_01|P|2.6|||\r"
   		    + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\r"
@@ -120,7 +120,7 @@ public class Hl7VXUMessageTest {
     }
 
     @Test
-    public void test_VXU_with_minimum_patient_group_plus_order_group_without_OBX() throws IOException {
+    void test_VXU_with_minimum_patient_group_plus_order_group_without_OBX() throws IOException {
         String hl7message = 
             "MSH|^~\\&|EHR|12345^SiteName|MIIS|99990|20140701041038||VXU^V04^VXU_V04|MSG.Valid_01|P|2.6|||\r"
             + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\r"
@@ -144,7 +144,7 @@ public class Hl7VXUMessageTest {
   }
 
     @Test
-    public void test_VXU_with_minimum_patient_group_plus_order_group_with_OBX_but_no_observations() throws IOException {
+    void test_VXU_with_minimum_patient_group_plus_order_group_with_OBX_but_no_observations() throws IOException {
         String hl7message = 
             "MSH|^~\\&|EHR|12345^SiteName|MIIS|99990|20140701041038||VXU^V04^VXU_V04|MSG.Valid_01|P|2.6|||\r"
             + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\r"
@@ -172,7 +172,7 @@ public class Hl7VXUMessageTest {
 }
 
     @Test
-    public void test_VXU_with_minimum_patient_group_plus_order_group_with_OBX_with_observations() throws IOException {
+    void test_VXU_with_minimum_patient_group_plus_order_group_with_OBX_with_observations() throws IOException {
         String hl7message = 
             "MSH|^~\\&|EHR|12345^SiteName|MIIS|99990|20140701041038||VXU^V04^VXU_V04|MSG.Valid_01|P|2.6|||\r"
             + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\r"
@@ -201,7 +201,7 @@ public class Hl7VXUMessageTest {
     }
 
     @Test
-    public void test_VXU_with_minimum_patient_group_plus_multiple_order_groups() throws IOException {
+    void test_VXU_with_minimum_patient_group_plus_multiple_order_groups() throws IOException {
         String hl7message = 
             "MSH|^~\\&|EHR|12345^SiteName|MIIS|99990|20140701041038||VXU^V04^VXU_V04|MSG.Valid_01|P|2.6|||\r"
             + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\r"

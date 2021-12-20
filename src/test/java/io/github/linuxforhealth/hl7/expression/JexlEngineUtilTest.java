@@ -15,10 +15,10 @@ import org.junit.jupiter.api.Test;
 import io.github.linuxforhealth.core.data.JexlEngineUtil;
 
 
-public class JexlEngineUtilTest {
+class JexlEngineUtilTest {
 
   @Test
-  public void test() {
+  void test() {
     JexlEngineUtil engine= new JexlEngineUtil();
     Map<String, Object> context = new HashMap<>();
     context.put("var1", "s");
@@ -31,7 +31,7 @@ public class JexlEngineUtilTest {
 
 
   @Test
-  public void blank_expression_throws_exception() {
+  void blank_expression_throws_exception() {
     JexlEngineUtil wex = new JexlEngineUtil();
     Assertions.assertThrows(IllegalArgumentException.class, () -> {
         wex.evaluate("", new HashMap<>());
@@ -41,7 +41,7 @@ public class JexlEngineUtilTest {
 
 
   @Test
-  public void non_supported_expression_throws_exception() {
+  void non_supported_expression_throws_exception() {
     JexlEngineUtil wex = new JexlEngineUtil();
     Assertions.assertThrows(IllegalArgumentException.class, () -> {
         wex.evaluate("System.currentTimeMillis()", new HashMap<>());
@@ -51,7 +51,7 @@ public class JexlEngineUtilTest {
 
 
   @Test
-  public void non_supported_expression_combining_lines_throws_exception() {
+  void non_supported_expression_combining_lines_throws_exception() {
     JexlEngineUtil wex = new JexlEngineUtil();
     Assertions.assertThrows(IllegalArgumentException.class, () -> {
     	wex.evaluate("String.toString();System.exit(1); ", new HashMap<>());
@@ -59,7 +59,7 @@ public class JexlEngineUtilTest {
   }
 
   @Test
-  public void non_supported_expression_throws_exception_2() {
+  void non_supported_expression_throws_exception_2() {
     JexlEngineUtil wex = new JexlEngineUtil();
     Assertions.assertThrows(IllegalArgumentException.class, () -> {
     	wex.evaluate("String", new HashMap<>());
@@ -68,7 +68,7 @@ public class JexlEngineUtilTest {
 
 
   @Test
-  public void valid_expression_returns_value() {
+  void valid_expression_returns_value() {
     JexlEngineUtil wex = new JexlEngineUtil();
     Object b = wex.evaluate("String.toString() ", new HashMap<>());
     assertThat(b).isEqualTo(String.class.toString());
@@ -76,7 +76,7 @@ public class JexlEngineUtilTest {
 
 
   @Test
-  public void valid_NumUtils_expression_returns_value() {
+  void valid_NumUtils_expression_returns_value() {
     JexlEngineUtil wex = new JexlEngineUtil();
     Object b = wex.evaluate("NumberUtils.createFloat(\"1.2\")", new HashMap<>());
     assertThat(b).isEqualTo(NumberUtils.createFloat("1.2"));

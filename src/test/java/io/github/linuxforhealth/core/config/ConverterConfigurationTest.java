@@ -22,40 +22,39 @@ import org.junit.jupiter.api.io.TempDir;
 import io.github.linuxforhealth.core.Constants;
 import io.github.linuxforhealth.core.terminology.UrlLookup;
 
-public class ConverterConfigurationTest {
+class ConverterConfigurationTest {
 
+    private static final String CONF_PROP_HOME = "hl7converter.config.home";
 
-	private static final String CONF_PROP_HOME = "hl7converter.config.home";
-    
-	@TempDir
+    @TempDir
     static File folder;
-    
+
     static String originalConfigHome;
-    
+
     @BeforeAll
-    public static void saveConfigHomeProperty() {
-    	originalConfigHome = System.getProperty(CONF_PROP_HOME);
+    static void saveConfigHomeProperty() {
+        originalConfigHome = System.getProperty(CONF_PROP_HOME);
     }
 
     @AfterEach
-    public void reset() {
+    void reset() {
         System.clearProperty(CONF_PROP_HOME);
         ConverterConfiguration.reset();
         UrlLookup.reset();
     }
+
     @AfterAll
-    public static void reloadPreviousConfigurations() {
-    	if (originalConfigHome != null)
-    		System.setProperty(CONF_PROP_HOME, originalConfigHome);
-    	else
-    		System.clearProperty(CONF_PROP_HOME);
+    static void reloadPreviousConfigurations() {
+        if (originalConfigHome != null)
+            System.setProperty(CONF_PROP_HOME, originalConfigHome);
+        else
+            System.clearProperty(CONF_PROP_HOME);
         UrlLookup.reset();
     }
 
-
     @Test
-    public void test_that_additional_conceptmap_values_are_loaded() throws IOException {
-    	File configFile = new File(folder, "config.properties");
+    void test_that_additional_conceptmap_values_are_loaded() throws IOException {
+        File configFile = new File(folder, "config.properties");
         writeProperties(configFile);
         System.setProperty(CONF_PROP_HOME, configFile.getParent());
         ConverterConfiguration.reset();
@@ -68,9 +67,9 @@ public class ConverterConfigurationTest {
     }
 
     @Test
-    public void testConfigurationValuesAreSetAndRetrieved() throws IOException {
+    void testConfigurationValuesAreSetAndRetrieved() throws IOException {
         // Create our own properties file
-    	File configFile = new File(folder, "config.properties");
+        File configFile = new File(folder, "config.properties");
         writeProperties(configFile);
         System.setProperty(CONF_PROP_HOME, configFile.getParent());
         ConverterConfiguration.reset();
@@ -78,7 +77,8 @@ public class ConverterConfigurationTest {
         assertThat(theConvConfig.getResourceFolder()).isEqualTo("src/main/resources");
         assertThat(theConvConfig.getSupportedMessageTemplates()).hasSize(4); // Four messages supported.  (Proves we're using our created file, not the default.)
         assertThat(theConvConfig.getZoneId().getId()).isEqualTo("+08:00");
-        assertThat(theConvConfig.getAdditionalConceptmapFile()).isEqualTo("src/test/resources/additional_conceptmap.yml");
+        assertThat(theConvConfig.getAdditionalConceptmapFile())
+                .isEqualTo("src/test/resources/additional_conceptmap.yml");
         assertThat(theConvConfig.getAdditionalResourcesLocation()).isEqualTo("src/test/resources/additional_resources");
     }
 
@@ -91,10 +91,10 @@ public class ConverterConfigurationTest {
         prop.put("additional.resources.location", "src/test/resources/additional_resources");
         prop.store(new FileOutputStream(configFile), null);
     }
-
+ 
     @Test
-    public void testConfigurationDefaultsAreUsed() throws IOException {
-    	File configFile = new File(folder, "config.properties");
+    void testConfigurationDefaultsAreUsed() throws IOException {
+        File configFile = new File(folder, "config.properties");
         writePropertiesDefaultMessages(configFile);
         System.setProperty(CONF_PROP_HOME, configFile.getParent());
         ConverterConfiguration.reset();
@@ -114,7 +114,7 @@ public class ConverterConfigurationTest {
 
     /** Test will run 2nd due to alphabetical order, this order is important **/
     @Test
-    public void test_that_config_reset_reloads_configuration() throws IOException {
+    void test_that_config_reset_reloads_configuration() throws IOException {
         UrlLookup.reset(Constants.CODING_SYSTEM_MAPPING);
         String url = UrlLookup.getSystemUrl("LN");
         assertThat(url).isEqualTo("http://loinc.org");

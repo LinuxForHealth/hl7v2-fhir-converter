@@ -20,10 +20,10 @@ import ca.uhn.hl7v2.model.primitive.IS;
 import ca.uhn.hl7v2.model.v26.datatype.CX;
 import ca.uhn.hl7v2.model.v26.datatype.ST;
 import ca.uhn.hl7v2.model.v26.segment.AL1;
-public class HL7DataExtractorTest {
+class HL7DataExtractorTest {
 
   @Test
-  public void returns_segment_if_exists() throws IOException {
+  void returns_segment_if_exists() throws IOException {
     String message = "MSH|^~\\&|hl7Integration|hl7Integration|||||ADT^A01|||2.3|\r"
         + "PID|1|465 306 5961|000010016^^^MR~000010017^^^MR~000010018^^^MR|407623|Wood^Patrick^^^MR||19700101|female|||High Street^^Oxford^^Ox1 4DP~George St^^Oxford^^Ox1 5AP|||||||\r"
         + "NK1|1|Wood^John^^^MR|Father||999-9999\r";
@@ -40,7 +40,7 @@ public class HL7DataExtractorTest {
 
 
   @Test
-  public void returns_segment_if_exists_group() throws IOException {
+  void returns_segment_if_exists_group() throws IOException {
     String message =
         "MSH|^~\\&|SendTest1|Sendfac1|Receiveapp1|Receivefac1|200603081747|security|PPR^PC1^PPR_PC1|1|P^I|2.6||||||ASCII||\r"
             + "PID|||555444222111^^^MPI&GenHosp&L^MR||james^anderson||19600614|M||C|99 Oakland #106^^qwerty^OH^44889||^^^^^626^5641111|^^^^^626^5647654|||||343132266|||N\r"
@@ -60,7 +60,7 @@ public class HL7DataExtractorTest {
 
 
   @Test
-  public void returns_segment_if_exists_group_no_segment() throws IOException {
+  void returns_segment_if_exists_group_no_segment() throws IOException {
     String message =
         "MSH|^~\\&|SendTest1|Sendfac1|Receiveapp1|Receivefac1|200603081747|security|PPR^PC1^PPR_PC1|1|P^I|2.6||||||ASCII||\r"
             + "PID|||555444222111^^^MPI&GenHosp&L^MR||james^anderson||19600614|M||C|99 Oakland #106^^qwerty^OH^44889||^^^^^626^5641111|^^^^^626^5647654|||||343132266|||N\r"
@@ -80,7 +80,7 @@ public class HL7DataExtractorTest {
 
 
   @Test
-  public void get_group_then_segment_for_non_existing_segment() throws IOException {
+  void get_group_then_segment_for_non_existing_segment() throws IOException {
     String message =
         "MSH|^~\\&|SendTest1|Sendfac1|Receiveapp1|Receivefac1|200603081747|security|PPR^PC1^PPR_PC1|1|P^I|2.6||||||ASCII||\r"
             + "PID|||555444222111^^^MPI&GenHosp&L^MR||james^anderson||19600614|M||C|99 Oakland #106^^qwerty^OH^44889||^^^^^626^5641111|^^^^^626^5647654|||||343132266|||N\r"
@@ -104,7 +104,7 @@ public class HL7DataExtractorTest {
 
 
   @Test
-  public void returns_null_if_segment_does_not_exists() throws IOException {
+  void returns_null_if_segment_does_not_exists() throws IOException {
     String message = "MSH|^~\\&|hl7Integration|hl7Integration|||||ADT^A01|||2.3|\r"
         + "PID|1|465 306 5961|000010016^^^MR~000010017^^^MR~000010018^^^MR|407623|Wood^Patrick^^^MR||19700101|female|||High Street^^Oxford^^Ox1 4DP~George St^^Oxford^^Ox1 5AP|||||||\r"
         + "NK1|1|Wood^John^^^MR|Father||999-9999\r";
@@ -121,7 +121,7 @@ public class HL7DataExtractorTest {
 
 
   @Test
-  public void returns_null_if_segment_does_not_exists_when_querying_all_repititions()
+  void returns_null_if_segment_does_not_exists_when_querying_all_repititions()
       throws IOException {
     String message = "MSH|^~\\&|hl7Integration|hl7Integration|||||ADT^A01|||2.3|\r"
         + "PID|1|465 306 5961|000010016^^^MR~000010017^^^MR~000010018^^^MR|407623|Wood^Patrick^^^MR||19700101|female|||High Street^^Oxford^^Ox1 4DP~George St^^Oxford^^Ox1 5AP|||||||\r"
@@ -139,7 +139,7 @@ public class HL7DataExtractorTest {
 
 
   @Test
-  public void returns_null_if_segment_name_is_invalid() throws IOException {
+  void returns_null_if_segment_name_is_invalid() throws IOException {
     String message = "MSH|^~\\&|hl7Integration|hl7Integration|||||ADT^A01|||2.3|\r"
         + "PID|1|465 306 5961|000010016^^^MR~000010017^^^MR~000010018^^^MR|407623|Wood^Patrick^^^MR||19700101|female|||High Street^^Oxford^^Ox1 4DP~George St^^Oxford^^Ox1 5AP|||||||\r"
         + "NK1|1|Wood^John^^^MR|Father||999-9999\r";
@@ -157,7 +157,7 @@ public class HL7DataExtractorTest {
 
 
   @Test
-  public void returns_list_of_segment_for_repititions() throws IOException {
+  void returns_list_of_segment_for_repititions() throws IOException {
     String message = "MSH|^~\\&|hl7Integration|hl7Integration|||||ADT^A01|||2.3|\r"
         + "PID|1|465 306 5961|000010016^^^MR~000010017^^^MR~000010018^^^MR|407623|Wood^Patrick^^^MR||19700101|female|||High Street^^Oxford^^Ox1 4DP~George St^^Oxford^^Ox1 5AP|||||||\r"
         + "NK1|1|Wood^John^^^MR|Father||999-9999\r"
@@ -184,7 +184,7 @@ public class HL7DataExtractorTest {
 
 
   @Test
-  public void returns_requested_repetition_of_segment() throws IOException {
+  void returns_requested_repetition_of_segment() throws IOException {
     String message = "MSH|^~\\&|hl7Integration|hl7Integration|||||ADT^A01|||2.3|\r"
         + "PID|1|465 306 5961|000010016^^^MR~000010017^^^MR~000010018^^^MR|407623|Wood^Patrick^^^MR||19700101|female|||High Street^^Oxford^^Ox1 4DP~George St^^Oxford^^Ox1 5AP|||||||\r"
         + "NK1|1|Wood^John^^^MR|Father||999-9999\r"
@@ -210,7 +210,7 @@ public class HL7DataExtractorTest {
 
 
   @Test
-  public void returns_null_if_requested_repetition_of_segment_does_not_exists() throws IOException {
+  void returns_null_if_requested_repetition_of_segment_does_not_exists() throws IOException {
     String message = "MSH|^~\\&|hl7Integration|hl7Integration|||||ADT^A01|||2.3|\r"
         + "PID|1|465 306 5961|000010016^^^MR~000010017^^^MR~000010018^^^MR|407623|Wood^Patrick^^^MR||19700101|female|||High Street^^Oxford^^Ox1 4DP~George St^^Oxford^^Ox1 5AP|||||||\r"
         + "NK1|1|Wood^John^^^MR|Father||999-9999\r"
@@ -235,7 +235,7 @@ public class HL7DataExtractorTest {
 
 
   @Test
-  public void returns_field_value_for_specific_rep_if_exists() throws IOException {
+  void returns_field_value_for_specific_rep_if_exists() throws IOException {
     String message = "MSH|^~\\&|hl7Integration|hl7Integration|||||ADT^A01|||2.3|\r"
         + "PID|1|465 306 5961|000010016^^^MR~000010017^^^MR~000010018^^^MR|407623|Wood^Patrick^^^MR||19700101|female|||High Street^^Oxford^^Ox1 4DP~George St^^Oxford^^Ox1 5AP|||||||\r"
         + "NK1|1|Wood^John^^^MR|Father||999-9999\r";
@@ -259,7 +259,7 @@ public class HL7DataExtractorTest {
   }
 
   @Test
-  public void returns_all_field_values_if_exists() throws IOException {
+  void returns_all_field_values_if_exists() throws IOException {
     String message = "MSH|^~\\&|hl7Integration|hl7Integration|||||ADT^A01|||2.3|\r"
         + "PID|1|465 306 5961|000010016^^^MR~000010017^^^MR~000010018^^^MR|407623|Wood^Patrick^^^MR||19700101|female|||High Street^^Oxford^^Ox1 4DP~George St^^Oxford^^Ox1 5AP|||||||\r"
         + "NK1|1|Wood^John^^^MR|Father||999-9999\r";
@@ -286,7 +286,7 @@ public class HL7DataExtractorTest {
 
 
   @Test
-  public void returns_null_if_field_value_for_repitition_does_not_exists() throws IOException {
+  void returns_null_if_field_value_for_repitition_does_not_exists() throws IOException {
     String message = "MSH|^~\\&|hl7Integration|hl7Integration|||||ADT^A01|||2.3|\r"
         + "PID|1|465 306 5961|000010016^^^MR~000010017^^^MR~000010018^^^MR|407623|Wood^Patrick^^^MR||19700101|female|||High Street^^Oxford^^Ox1 4DP~George St^^Oxford^^Ox1 5AP|||||||\r"
         + "NK1|1|Wood^John^^^MR|Father||999-9999\r";
@@ -312,7 +312,7 @@ public class HL7DataExtractorTest {
 
 
   @Test
-  public void returns_component_value_for_specific_rep_if_exists() throws IOException {
+  void returns_component_value_for_specific_rep_if_exists() throws IOException {
     String message = "MSH|^~\\&|hl7Integration|hl7Integration|||||ADT^A01|||2.3|\r"
         + "PID|1|465 306 5961|000010016^^^MR~000010017^^^MR~000010018^^^MR|407623|Wood^Patrick^^^MR||19700101|female|||High Street^^Oxford^^Ox1 4DP~George St^^Oxford^^Ox1 5AP|||||||\r"
         + "NK1|1|Wood^John^^^MR|Father||999-9999\r";
@@ -335,7 +335,7 @@ public class HL7DataExtractorTest {
 
 
   @Test
-  public void returns_null_if_component_value_for_does_not_exists() throws IOException {
+  void returns_null_if_component_value_for_does_not_exists() throws IOException {
     String message = "MSH|^~\\&|hl7Integration|hl7Integration|||||ADT^A01|||2.3|\r"
         + "PID|1|465 306 5961|000010016^^^MR~000010017^^^MR~000010018^^^MR|407623|Wood^Patrick^^^MR||19700101|female|||High Street^^Oxford^^Ox1 4DP~George St^^Oxford^^Ox1 5AP|||||||\r"
         + "NK1|1|Wood^John^^^MR|Father||999-9999\r";
@@ -356,7 +356,7 @@ public class HL7DataExtractorTest {
 
 
   @Test
-  public void returns_component_and_subcomponent_value_for_specific_rep_if_exists()
+  void returns_component_and_subcomponent_value_for_specific_rep_if_exists()
       throws IOException {
     String message = "MSH|^~\\&|hl7Integration|hl7Integration|||||ADT^A01|||2.3|\r"
         + "PID|1|465 306 5961|000010016^^^MR~000010017^^^MR~000010018^^^MR|407623|Wood^Patrick^^^MR||19700101|female|||High Street^^Oxford^^Ox1 4DP~George St^^Oxford^^Ox1 5AP|||||||\r"
@@ -380,7 +380,7 @@ public class HL7DataExtractorTest {
 
 
   @Test
-  public void returns_null_if_component_subcomponent_value_for_does_not_exists()
+  void returns_null_if_component_subcomponent_value_for_does_not_exists()
       throws IOException {
     String message = "MSH|^~\\&|hl7Integration|hl7Integration|||||ADT^A01|||2.3|\r"
         + "PID|1|465 306 5961|000010016^^^MR~000010017^^^MR~000010018^^^MR|407623|Wood^Patrick^^^MR||19700101|female|||High Street^^Oxford^^Ox1 4DP~George St^^Oxford^^Ox1 5AP|||||||\r"
@@ -403,7 +403,7 @@ public class HL7DataExtractorTest {
 
 
   @Test
-  public void extracts_component_from_variable_type_primitive() throws IOException {
+  void extracts_component_from_variable_type_primitive() throws IOException {
     String message = "MSH|^~\\&|hl7Integration|hl7Integration|||||ADT^A01|||2.3|\r"
         + "PID|1|465 306 5961|000010016^^^MR~000010017^^^MR~000010018^^^MR|407623|Wood^Patrick^^^MR||19700101|female|||High Street^^Oxford^^Ox1 4DP~George St^^Oxford^^Ox1 5AP|||||||\r"
         + "NK1|1|Wood^John^^^MR|Father||999-9999\r"
@@ -426,7 +426,7 @@ public class HL7DataExtractorTest {
 
 
   @Test
-  public void extracts_component_from_variable_type_compositive() throws IOException {
+  void extracts_component_from_variable_type_compositive() throws IOException {
     String message = "MSH|^~\\&|hl7Integration|hl7Integration|||||ADT^A01|||2.3|\r"
         + "PID|1|465 306 5961|000010016^^^MR~000010017^^^MR~000010018^^^MR|407623|Wood^Patrick^^^MR||19700101|female|||High Street^^Oxford^^Ox1 4DP~George St^^Oxford^^Ox1 5AP|||||||\r"
         + "NK1|1|Wood^John^^^MR|Father||999-9999\r"
@@ -448,7 +448,7 @@ public class HL7DataExtractorTest {
 
 
   @Test
-  public void extracts_component_from_variable_type_compositive_with_subcomponent()
+  void extracts_component_from_variable_type_compositive_with_subcomponent()
       throws IOException {
     String message = "MSH|^~\\&|hl7Integration|hl7Integration|||||ADT^A01|||2.3|\r"
         + "PID|1|465 306 5961|000010016^^^MR~000010017^^^MR~000010018^^^MR|407623|Wood^Patrick^^^MR||19700101|female|||High Street^^Oxford^^Ox1 4DP~George St^^Oxford^^Ox1 5AP|||||||\r"
@@ -471,7 +471,7 @@ public class HL7DataExtractorTest {
 
 
   @Test
-  public void returns_null_from_variable_type_compositive_with_subcomponent_if_subcomponent_does_not_exists()
+  void returns_null_from_variable_type_compositive_with_subcomponent_if_subcomponent_does_not_exists()
       throws IOException {
     String message = "MSH|^~\\&|hl7Integration|hl7Integration|||||ADT^A01|||2.3|\r"
         + "PID|1|465 306 5961|000010016^^^MR~000010017^^^MR~000010018^^^MR|407623|Wood^Patrick^^^MR||19700101|female|||High Street^^Oxford^^Ox1 4DP~George St^^Oxford^^Ox1 5AP|||||||\r"

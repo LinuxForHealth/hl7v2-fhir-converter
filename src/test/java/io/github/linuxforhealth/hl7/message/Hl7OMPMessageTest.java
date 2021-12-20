@@ -26,7 +26,7 @@ import io.github.linuxforhealth.hl7.ConverterOptions;
 import io.github.linuxforhealth.hl7.ConverterOptions.Builder;
 import io.github.linuxforhealth.hl7.HL7ToFHIRConverter;
 
-public class Hl7OMPMessageTest {
+class Hl7OMPMessageTest {
     private static FHIRContext context = new FHIRContext();
     private static final ConverterOptions OPTIONS_PRETTYPRINT = new Builder().withBundleType(BundleType.COLLECTION)
             .withValidateResource().withPrettyPrint().build();
@@ -43,7 +43,7 @@ public class Hl7OMPMessageTest {
     // + "OBX|1|NM|Most Current Weight^Most current measured weight (actual)||90|kg\r"
 
     @Test
-    public void test_OMPO09_min_PATIENT_and_min_ORDER_groups() throws IOException {
+    void test_OMPO09_min_PATIENT_and_min_ORDER_groups() throws IOException {
         String hl7message = "MSH|^~\\&|WHI_LOAD_GENERATOR|IBM_TORONTO_LAB|MEDORDER|IBM|20210407191342|9022934|OMP^O09|MSGID_bae9ce6a-e35d-4ff5-8d50-c5dde19cc1aa|T|2.5.1\r"
                 + "PID|||1234^^^^MR||DOE^JANE^|||F|||||||||||||||||||||\r"
                 + "ORC|OP|1000|9999999||||^3 times daily^^20210401\r"
@@ -74,7 +74,7 @@ public class Hl7OMPMessageTest {
     }
 
     @Test
-    public void test_OMPO09_PATIENT_with_PATIENT_VISIT_and_min_ORDER_groups() throws IOException {
+    void test_OMPO09_PATIENT_with_PATIENT_VISIT_and_min_ORDER_groups() throws IOException {
         String hl7message = "MSH|^~\\&|WHI_LOAD_GENERATOR|IBM_TORONTO_LAB|MEDORDER|IBM|20210407191342|9022934|OMP^O09|MSGID_bae9ce6a-e35d-4ff5-8d50-c5dde19cc1aa|T|2.5.1\r"
                 + "PID|||1234^^^^MR||DOE^JANE^|||F|||||||||||||||||||||\r"
                 + "PV1||I|||||||||||||||||1400|||||||||||||||||||||||||199501102300\r"
@@ -111,7 +111,7 @@ public class Hl7OMPMessageTest {
     }
 
     @Test
-    public void test_OMPO09_full_PATIENT_with_PATIENT_VISIT_and_min_ORDER_groups() throws IOException {
+    void test_OMPO09_full_PATIENT_with_PATIENT_VISIT_and_min_ORDER_groups() throws IOException {
         String hl7message = "MSH|^~\\&|WHI_LOAD_GENERATOR|IBM_TORONTO_LAB|MEDORDER|IBM|20210407191342|9022934|OMP^O09|MSGID_bae9ce6a-e35d-4ff5-8d50-c5dde19cc1aa|T|2.5.1\r"
                 + "PID|||1234^^^^MR||DOE^JANE^|||F|||||||||||||||||||||\r"
                 + "PD1|||||||||||01|N||||A\r"
@@ -157,7 +157,7 @@ public class Hl7OMPMessageTest {
     }
 
     @Test
-    public void test_OMPO09_ORDER_with_multiple_OBSERVATIONS_with_OBXnonTX() throws IOException {
+    void test_OMPO09_ORDER_with_multiple_OBSERVATIONS_with_OBXnonTX() throws IOException {
         String hl7message = "MSH|^~\\&|WHI_LOAD_GENERATOR|IBM_TORONTO_LAB|MEDORDER|IBM|20210407191342|9022934|OMP^O09|MSGID_bae9ce6a-e35d-4ff5-8d50-c5dde19cc1aa|T|2.5.1\r"
                 + "PID|||1234^^^^MR||DOE^JANE^|||F|||||||||||||||||||||\r" //Even though PID is optional, I had to provide it in order to get results from the converter
                 //1st order
@@ -201,7 +201,7 @@ public class Hl7OMPMessageTest {
     }
 
     @Test
-    public void test_OMPO09_ORDER_with_multiple_OBSERVATIONS_with_OBXtypeTX() throws IOException {
+    void test_OMPO09_ORDER_with_multiple_OBSERVATIONS_with_OBXtypeTX() throws IOException {
         String hl7message = "MSH|^~\\&|WHI_LOAD_GENERATOR|IBM_TORONTO_LAB|MEDORDER|IBM|20210407191342|9022934|OMP^O09|MSGID_bae9ce6a-e35d-4ff5-8d50-c5dde19cc1aa|T|2.5.1\r"
                 + "PID|||1234^^^^MR||DOE^JANE^|||F|||||||||||||||||||||\r" //Even though PID is optional, I had to provide it in order to get results from the converter
                 + "ORC|OP|1000|9999999||||^3 times daily^^20210401\r"
@@ -244,7 +244,7 @@ public class Hl7OMPMessageTest {
     }
 
     @Test
-    public void test_OMPO09_with_multiple_ORDERs_with_and_without_OBXtypeTX() throws IOException {
+    void test_OMPO09_with_multiple_ORDERs_with_and_without_OBXtypeTX() throws IOException {
         String hl7message = "MSH|^~\\&|WHI_LOAD_GENERATOR|IBM_TORONTO_LAB|MEDORDER|IBM|20210407191342|9022934|OMP^O09|MSGID_bae9ce6a-e35d-4ff5-8d50-c5dde19cc1aa|T|2.5.1\r"
                 + "PID|||1234^^^^MR||DOE^JANE^|||F|||||||||||||||||||||\r" //Even though PID is optional, I had to provide it in order to get results from the converter
                 // first order group

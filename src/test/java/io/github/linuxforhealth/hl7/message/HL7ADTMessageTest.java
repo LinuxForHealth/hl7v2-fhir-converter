@@ -29,7 +29,7 @@ import io.github.linuxforhealth.hl7.ConverterOptions;
 import io.github.linuxforhealth.hl7.ConverterOptions.Builder;
 import io.github.linuxforhealth.hl7.HL7ToFHIRConverter;
 
-public class HL7ADTMessageTest {
+class HL7ADTMessageTest {
     private static FHIRContext context = new FHIRContext();
     private static final Logger LOGGER = LoggerFactory.getLogger(HL7ADTMessageTest.class);
     private static final ConverterOptions OPTIONS = new Builder().withValidateResource().build();
@@ -39,7 +39,7 @@ public class HL7ADTMessageTest {
     @ParameterizedTest
     // ADT_A01, ADT_A04, ADT_A08, ADT_A13 all use the same message structure so we can reuse adt_a01 tests for them.
     @ValueSource(strings = { "ADT^A01"/* , "ADT^A04" */, "ADT^A08"/* , "ADT^A13" */ })
-    public void test_adt_a01_mininum_segments(String message) throws IOException {
+    void test_adt_a01_mininum_segments(String message) throws IOException {
         String hl7message = "MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||" + message
                 + "|controlID|P|2.6\r"
                 + "EVN|A01|20150502090000|\r"
@@ -73,7 +73,7 @@ public class HL7ADTMessageTest {
     @ParameterizedTest
     // ADT_A01, ADT_A04, ADT_A08, ADT_A13 all use the same message structure so we can reuse adt_a01 tests for them.
     @ValueSource(strings = { "ADT^A01"/* , "ADT^A04" */, "ADT^A08"/* , "ADT^A13" */ })
-    public void test_adt_a01_minimum_plus_PROCEDURE_group(String message) throws IOException {
+    void test_adt_a01_minimum_plus_PROCEDURE_group(String message) throws IOException {
         String hl7message = "MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||" + message
                 + "|controlID|P|2.6\r"
                 + "EVN|A01|20150502090000|\r"
@@ -112,7 +112,7 @@ public class HL7ADTMessageTest {
     @ParameterizedTest
     // ADT_A01, ADT_A04, ADT_A08, ADT_A13 all use the same message structure so we can reuse adt_a01 tests for them.
     @ValueSource(strings = { "ADT^A01"/* , "ADT^A04" */, "ADT^A08"/* , "ADT^A13" */ })
-    public void test_adt_a01_full_with_OBXtypeTX_and_no_groups(String message) throws IOException {
+    void test_adt_a01_full_with_OBXtypeTX_and_no_groups(String message) throws IOException {
         String hl7message = "MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||" + message
                 + "|controlID|P|2.6\r"
                 + "EVN|A01|20150502090000|\r"
@@ -173,7 +173,7 @@ public class HL7ADTMessageTest {
     @ParameterizedTest
     // ADT_A01, ADT_A04, ADT_A08, ADT_A13 all use the same message structure so we can reuse adt_a01 tests for them.
     @ValueSource(strings = { "ADT^A01"/* , "ADT^A04" */, "ADT^A08"/* , "ADT^A13" */ })
-    public void test_adt_a01_full_plus_multiple_PROCEDURE_group(String message) throws IOException {
+    void test_adt_a01_full_plus_multiple_PROCEDURE_group(String message) throws IOException {
         String hl7message = "MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||" + message
                 + "|controlID|P|2.6\r"
                 + "EVN|A01|20150502090000|\r"
@@ -237,7 +237,7 @@ public class HL7ADTMessageTest {
 
     @Test
     @Disabled("adt-a02 not yet supported")
-    public void test_adta02_patient_encounter_present() throws IOException {
+    void test_adta02_patient_encounter_present() throws IOException {
         String hl7message = "MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||ADT^A02|controlID|P|2.6\n"
                 + "EVN|A01|20150502090000|\n"
                 + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
@@ -271,7 +271,7 @@ public class HL7ADTMessageTest {
 
     @Test
     @Disabled("adt-a03 not yet supported")
-    public void test_adta03_patient_encounter_present() throws IOException {
+    void test_adta03_patient_encounter_present() throws IOException {
         String hl7message = "MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||ADT^A03|controlID|P|2.6\n"
                 + "EVN|A01|20150502090000|\n"
                 + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
@@ -305,7 +305,7 @@ public class HL7ADTMessageTest {
     @Test
     @Disabled("adt-a28 not yet supported")
     //TODO: When this is supported, note that this should be updated to reflect adt_a05 structure
-    public void test_adta28_patient_encounter_present() throws IOException {
+    void test_adta28_patient_encounter_present() throws IOException {
         String hl7message = "MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||ADT^A28|controlID|P|2.6\n"
                 + "EVN|A01|20150502090000|\n"
                 + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
@@ -339,7 +339,7 @@ public class HL7ADTMessageTest {
     @Test
     @Disabled("adt-a31 not yet supported")
     //TODO: When this is supported, note that this should be updated to reflect adt_a05 structure
-    public void test_adta31_patient_encounter_present() throws IOException {
+    void test_adta31_patient_encounter_present() throws IOException {
         String hl7message = "MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||ADT^A31|controlID|P|2.6\n"
                 + "EVN|A01|20150502090000|\n"
                 + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
@@ -376,7 +376,7 @@ public class HL7ADTMessageTest {
                                                         * , "ADT^A35", "ADT^A36", "ADT^A46", "ADT^A47", "ADT^A48",
                                                         * "ADT^A49"
                                                         */ })
-    public void test_adt_a30_mininum_segments(String message) throws IOException {
+    void test_adt_a30_mininum_segments(String message) throws IOException {
         String hl7message = "MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||" + message
                 + "|controlID|P|2.6\r"
                 + "EVN|A01|20150502090000|\r"
@@ -412,7 +412,7 @@ public class HL7ADTMessageTest {
                                                         * , "ADT^A35", "ADT^A36", "ADT^A46", "ADT^A47", "ADT^A48",
                                                         * "ADT^A49"
                                                         */ })
-    public void test_adt_a30_full(String message) throws IOException {
+    void test_adt_a30_full(String message) throws IOException {
         String hl7message = "MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||" + message
                 + "|controlID|P|2.6\r"
                 + "EVN|A01|20150502090000|\r"
@@ -448,7 +448,7 @@ public class HL7ADTMessageTest {
     @ParameterizedTest
     // ADT_A39 structure is also used by ADT_A40, ADT_A41, ADT_A42.  We can reuse this for those messages if we choose to support them in the future.
     @ValueSource(strings = { /* "ADT^A39", */ "ADT^A40"/* , "ADT^A41", "ADT^A42" */ })
-    public void test_adt_a39_min_segments(String message) throws IOException {
+    void test_adt_a39_min_segments(String message) throws IOException {
         String hl7message = "MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||" + message
                 + "|controlID|P|2.6\r"
                 + "EVN|A01|20150502090000|\r"
@@ -481,7 +481,7 @@ public class HL7ADTMessageTest {
     @ParameterizedTest
     // ADT_A39 structure is also used by ADT_A40, ADT_A41, ADT_A42.  We can reuse this for those messages if we choose to support them in the future.
     @ValueSource(strings = { /* "ADT^A39", */ "ADT^A40"/* , "ADT^A41", "ADT^A42" */ })
-    public void test_adt_a39_min_with_multiple_PATIENT_groups(String message) throws IOException {
+    void test_adt_a39_min_with_multiple_PATIENT_groups(String message) throws IOException {
         String hl7message = "MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||" + message
                 + "|controlID|P|2.6\r"
                 + "EVN|A01|20150502090000|\r"
@@ -518,7 +518,7 @@ public class HL7ADTMessageTest {
     @ParameterizedTest
     // ADT_A39 structure is also used by ADT_A40, ADT_A41, ADT_A42.  We can reuse this for those messages if we choose to support them in the future.
     @ValueSource(strings = { /* "ADT^A39", */ "ADT^A40"/* , "ADT^A41", "ADT^A42" */ })
-    public void test_adt_a39_full_with_multiple_PATIENT_groups(String message) throws IOException {
+    void test_adt_a39_full_with_multiple_PATIENT_groups(String message) throws IOException {
         String hl7message = "MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||" + message
                 + "|controlID|P|2.6\r"
                 + "EVN|A01|20150502090000|\r"

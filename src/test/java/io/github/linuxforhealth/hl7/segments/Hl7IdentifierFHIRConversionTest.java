@@ -32,10 +32,10 @@ import io.github.linuxforhealth.hl7.segments.util.PatientUtils;
 import io.github.linuxforhealth.hl7.segments.util.ResourceUtils;
 import io.github.linuxforhealth.hl7.segments.util.DatatypeUtils;
 
-public class Hl7IdentifierFHIRConversionTest {
+class Hl7IdentifierFHIRConversionTest {
 
     @Test
-    public void patientIdentifiersTest() {
+    void patientIdentifiersTest() {
         String patientIdentifiers = "MSH|^~\\&|MIICEHRApplication|MIIC|MIIC|MIIC|201705130822||VXU^V04^VXU_V04|test1100|P|2.5.1|||AL|AL|||||Z22^CDCPHINVS|^^^^^MIIC^SR^^^MIIC|MIIC\n"
                 // Three ID's for testing, plus a SSN in field 19.
                 + "PID|1||MRN12345678^^^ID-XYZ^MR~111223333^^^USA^SS~MN1234567^^^MNDOT^DL|ALTID|Moose^Mickey^J^III^^^||20060504|M|||||||||||444556666|D-12445889-Z||||||||||\n";
@@ -113,7 +113,7 @@ public class Hl7IdentifierFHIRConversionTest {
     }
 
     @Test
-    public void patientIdentifiersSpecialCasesTest() {
+    void patientIdentifiersSpecialCasesTest() {
         String patientIdentifiersSpecialCases = "MSH|^~\\&|MIICEHRApplication|MIIC|MIIC|MIIC|201705130822||VXU^V04^VXU_V04|test1100|P|2.5.1|||AL|AL|||||Z22^CDCPHINVS|^^^^^MIIC^SR^^^MIIC|MIIC\n"
                 // First ID has blanks in the authority.  Second ID has no authority provided.  Third ID has an unknown CODE in the standard v2 table.
                 + "PID|1||MRN12345678^^^Regional Health ID^MR~111223333^^^^SS~A100071402^^^^AnUnknownCode|ALTID|Moose^Mickey^J^III^^^||20060504|M||||||||||||||||||||||\n";
@@ -171,7 +171,7 @@ public class Hl7IdentifierFHIRConversionTest {
     }
 
     @Test
-    public void allergyIdentifierTest() {
+    void allergyIdentifierTest() {
         // This identifier uses the logic from BUILD_IDENTIFIER_FROM_CWE (AL1.3) the three different messages test the three different outcomes
 
         // AL1-3.1 and AL1-3.3, concatenate together with a dash
@@ -226,7 +226,7 @@ public class Hl7IdentifierFHIRConversionTest {
     }
 
     @Test
-    public void conditionPrbIdentifierTest() {
+    void conditionPrbIdentifierTest() {
         // Test with PV1-19.1 for visit number, no PRB-4
         String withoutPRB4 = "MSH|^~\\&|||||20040629164652|1|PPR^PC1|331|P|2.3.1||\n"
                 + "PID|||10290^^^WEST^MR||||20040530|M||||||||||||||||||||||N\n"
@@ -285,7 +285,7 @@ public class Hl7IdentifierFHIRConversionTest {
     }
 
     @Test
-    public void conditionDg1IdentifierTest() {
+    void conditionDg1IdentifierTest() {
 
         String withoutDG120 = "MSH|^~\\&|||||||ADT^A01^ADT_A01|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6||||||\r"
                 + "PID|||10290^^^WEST^MR||||20040530|M||||||||||88654||||||||||||N\n"
@@ -410,7 +410,7 @@ public class Hl7IdentifierFHIRConversionTest {
     }
 
     @Test
-    public void observationIdentifierTest() {
+    void observationIdentifierTest() {
         // identifier uses the logic from BUILD_IDENTIFIER_FROM_CWE (OBX.3) and joins FILL or PLAC values with it
 
         // Filler from OBR-3; OBX-3.1/OBX-3.3
@@ -496,7 +496,7 @@ public class Hl7IdentifierFHIRConversionTest {
     }
 
     @Test
-    public void diagnosticReportIdentifierTest() {
+    void diagnosticReportIdentifierTest() {
         // Filler and placer from ORC
         String diagnosticReport = "MSH|^~\\&|PROSLOV|MYHOSPITAL|WHIA|IBM|20170825010500||ORU^R01|MSGID22102712|T|2.6\n"
                 + "PID|||1234||DOE^JANE^|||F||||||||||||||||||||||\n"
@@ -593,7 +593,7 @@ public class Hl7IdentifierFHIRConversionTest {
     }
 
     @Test
-    public void encounterIdentifierTest() {
+    void encounterIdentifierTest() {
         // Test: Visit number from PV1-19
         String encounterMsg = "MSH|^~\\&|MYEHR2.5|RI88140101|KIDSNET_IFL|RIHEALTH|20130531||VXU^V04^VXU_V04|20130531RI881401010105|P|2.6|||AL|NE|764|ASCII||||||^4086::132:2A57:3C28^IPv6\r"
                 + "EVN|A01|20130617154644||01\r"
@@ -688,7 +688,7 @@ public class Hl7IdentifierFHIRConversionTest {
     }
 
     @Test
-    public void immunizationIdentifierTest() {
+    void immunizationIdentifierTest() {
         // RXA-5.1 and RXA-5.3, concatenate together with a dash
         String field1AndField3 = "MSH|^~\\&|MYEHR2.5|RI88140101|KIDSNET_IFL|RIHEALTH|20130531||VXU^V04^VXU_V04|20130531RI881401010105|P|2.6|||AL|NE|764|ASCII||||||^4086::132:2A57:3C28^IPv6\r"
                 + "PID|1||432155^^^ANF^MR||Patient^Johnny^New^^^^L\r"
@@ -745,7 +745,7 @@ public class Hl7IdentifierFHIRConversionTest {
     }
 
     @Test
-    public void procedureIdentifierTest() {
+    void procedureIdentifierTest() {
         // with PR1 and PID segments used to create identifiers
         String procedureMsg = "MSH|^~\\&|HL7Soup|Instance1|MCM||200911021022|Security|ADT^A01^ADT_A01|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6|56789^NID^UID|MCM|CDP|^4086::132:2A57:3C28^IPV6|^4086::132:2A57:3C25^IPV6|\n"
                 + "PID|1||000054321^^^MRN|||||||||||||M|CAT|78654^^^ACME||||N\n"
@@ -818,7 +818,7 @@ public class Hl7IdentifierFHIRConversionTest {
     }
 
     @Test
-    public void documentReferenceIdentifierTest() {
+    void documentReferenceIdentifierTest() {
         // Filler and placer from ORC, extId from MSH-7
         String documentReference = "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|MDM^T02|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6|56789^NID^UID|MCM||||\n"
                 +
@@ -993,7 +993,7 @@ public class Hl7IdentifierFHIRConversionTest {
     }
 
     @Test
-    public void serviceRequestIdentifierTest1() {
+    void serviceRequestIdentifierTest1() {
         // Test 1 removed:  OMP_O09 messages do not create a service request
 
         // Test 2:
@@ -1114,7 +1114,7 @@ public class Hl7IdentifierFHIRConversionTest {
     // NOTE: ORU_RO1 records do not create the ServiceRequest directly.  They create a DiagnosticReport and it creates the ServiceRequest.
     // This test makes sure the specification for ORU_RO1.DiagnosticReport is specifying PID and PV1 correctly in AdditionalSegments.
     @Test
-    public void serviceRequestIdentifierTest2() {
+    void serviceRequestIdentifierTest2() {
         // Test 1:
         //  - Visit number with PV1.19
         //  - filler and placer from OBR
@@ -1302,7 +1302,7 @@ public class Hl7IdentifierFHIRConversionTest {
     }
 
     @Test
-    public void medicationRequestIdentifierTest() {
+    void medicationRequestIdentifierTest() {
         // Visit number from PID-18, extID from RXO-1.1
         String medicationRequest = "MSH|^~\\&|PROSLOV|MYHOSPITAL|WHIA|IBM|20170215080000||OMP^O09|MSGID005520|T|2.6|||AL|NE|764|ASCII||||||^4086::132:2A57:3C28^IPv6\r"
                 + "PID|1||000054321^^^MRN|||||||||||||||78654\r"
@@ -1521,7 +1521,7 @@ public class Hl7IdentifierFHIRConversionTest {
     }
 
     @Test
-    public void medicationAdministration_identifier_test() {
+    void medicationAdministration_identifier_test() {
         // TODO
         // Currently no messages generate MedicationAdministration resources
     }
