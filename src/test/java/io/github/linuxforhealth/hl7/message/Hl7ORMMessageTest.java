@@ -14,10 +14,10 @@ import org.hl7.fhir.r4.model.Resource;
 import org.hl7.fhir.r4.model.ResourceType;
 import org.junit.jupiter.api.Test;
 
-public class Hl7ORMMessageTest {
+class Hl7ORMMessageTest {
 
     @Test
-    public void test_ORMO01_patient_encounter_present() throws IOException {
+    void test_ORMO01_patient_encounter_present() throws IOException {
         String hl7message = "MSH|^~\\&|WHI_LOAD_GENERATOR|IBM_TORONTO_LAB|IBMWATSON_LAB|IBM|20210407191758||ORM^O01|MSGID_e30a3471-7afd-4aa2-a3d5-e93fd89d24b3|T|2.3\n"
                 + "PID|1||0a1f7838-4230-4752-b8f6-948b07c38b25^^^MRN||Patient^Load^Generator||19690720|M|Patient^Alias^Generator||9999^^CITY^STATE^ZIP^CAN|COUNTY|(866)845-0900|||||Account_0a1f7838-4230-4752-b8f6-948b07c38b25|123-456-7890||||BIRTH PLACE\n"
                 + "PV1||IP|^^^Toronto^^5642 Hilly Av||||2905^Doctor^Attending^M^IV^^M.D|5755^Doctor^Referring^^Sr|770542^Doctor^Consulting^Jr||||||||59367^Doctor^Admitting|IP^I|Visit_0a1f7838-4230-4752-b8f6-948b07c38b25|||||||||||||||||||||||||20210407191758\n"

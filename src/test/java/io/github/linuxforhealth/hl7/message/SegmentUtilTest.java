@@ -27,7 +27,7 @@ import io.github.linuxforhealth.hl7.parsing.HL7DataExtractor;
 import io.github.linuxforhealth.hl7.parsing.HL7HapiParser;
 import io.github.linuxforhealth.hl7.parsing.result.ParsingResult;
 
-public class SegmentUtilTest {
+class SegmentUtilTest {
     private static final String NORMAL_LV_CHAMBER_SIZE_WITH_MILD_CONCENTRIC_LVH = "NORMAL LV CHAMBER SIZE WITH MILD CONCENTRIC LVH";
 
     private static final ArrayList<String> ORDER_GROUP_LIST = Lists.newArrayList("PROBLEM", "ORDER", "ORDER_DETAIL",
@@ -97,7 +97,7 @@ public class SegmentUtilTest {
 
     // Tests for extracting segment from group
     @Test
-    public void test_single_order_group() throws HL7Exception {
+    void test_single_order_group() throws HL7Exception {
 
         Message hl7message = getMessage(messageSingleOrderGroup);
         HL7DataExtractor hl7DTE = new HL7DataExtractor(hl7message);
@@ -110,7 +110,7 @@ public class SegmentUtilTest {
     }
 
     @Test
-    public void test_single_problem_group_wrong_group_list_provided() throws HL7Exception {
+    void test_single_problem_group_wrong_group_list_provided() throws HL7Exception {
 
         Message hl7message = getMessage(messageSingleProblemGroup);
         HL7DataExtractor hl7DTE = new HL7DataExtractor(hl7message);
@@ -121,7 +121,7 @@ public class SegmentUtilTest {
     }
 
     @Test
-    public void test_single_problem_group() throws HL7Exception {
+    void test_single_problem_group() throws HL7Exception {
 
         Message hl7message = getMessage(messageSingleProblemGroup);
         HL7DataExtractor hl7DTE = new HL7DataExtractor(hl7message);
@@ -134,7 +134,7 @@ public class SegmentUtilTest {
     }
 
     @Test
-    public void test_parent_repeat() throws HL7Exception {
+    void test_parent_repeat() throws HL7Exception {
         Message hl7message = getMessage(messageRepeat);
         HL7DataExtractor hl7DTE = new HL7DataExtractor(hl7message);
         List<SegmentGroup> segmentGroups = SegmentExtractorUtil.extractSegmentGroups(ORDER_GROUP_LIST,
@@ -150,7 +150,7 @@ public class SegmentUtilTest {
     }
 
     @Test
-    public void test_parent_repeat_additional_segment_under_parent() throws HL7Exception {
+    void test_parent_repeat_additional_segment_under_parent() throws HL7Exception {
         Message hl7message = getMessage(messageRepeat);
         HL7DataExtractor hl7DTE = new HL7DataExtractor(hl7message);
         List<SegmentGroup> segmentGroups = SegmentExtractorUtil.extractSegmentGroups(ORDER_GROUP_LIST,
@@ -169,7 +169,7 @@ public class SegmentUtilTest {
     }
 
     @Test
-    public void test_parent_repeat_additional_segment_under_group() throws HL7Exception {
+    void test_parent_repeat_additional_segment_under_group() throws HL7Exception {
         Message hl7message = getMessage(messageRepeat);
         HL7DataExtractor hl7DTE = new HL7DataExtractor(hl7message);
         List<SegmentGroup> segmentGroups = SegmentExtractorUtil.extractSegmentGroups(ORDER_GROUP_LIST,
@@ -188,7 +188,7 @@ public class SegmentUtilTest {
     }
 
     @Test
-    public void test_parent_repeat_additional_segment_under_group_with_group_name()
+    void test_parent_repeat_additional_segment_under_group_with_group_name()
             throws HL7Exception {
         Message hl7message = getMessage(messageRepeatMultiplePRB);
         HL7DataExtractor hl7DTE = new HL7DataExtractor(hl7message);
@@ -214,7 +214,7 @@ public class SegmentUtilTest {
     }
 
     @Test
-    public void test_repeating_primary_segment_with_repeating_parent_group()
+    void test_repeating_primary_segment_with_repeating_parent_group()
             throws HL7Exception {
         String message = "MSH|^~\\\\&|SendTest1|Sendfac1|Receiveapp1|Receivefac1|200603081747|security|ORU^R01|MSGID000005|T|2.6\r"
                 + "PID||45483|45483||SMITH^SUZIE^||20160813|M|||123 MAIN STREET^^SCHENECTADY^NY^12345||(123)456-7890|||||^^^T||||||||||||\r"
@@ -258,7 +258,7 @@ public class SegmentUtilTest {
     // Test for extracting segments outside of group
 
     @Test
-    public void test_get_segments() throws HL7Exception {
+    void test_get_segments() throws HL7Exception {
 
         Message hl7message = getMessage(hl7ADTmessage);
         HL7DataExtractor hl7DTE = new HL7DataExtractor(hl7message);
@@ -281,7 +281,7 @@ public class SegmentUtilTest {
     }
 
     @Test
-    public void test_single_segment() throws HL7Exception {
+    void test_single_segment() throws HL7Exception {
 
         Message hl7message = getMessage(hl7ADTmessage);
         HL7DataExtractor hl7DTE = new HL7DataExtractor(hl7message);
@@ -297,7 +297,7 @@ public class SegmentUtilTest {
     }
 
     @Test
-    public void test_single_segment_with_additional_segment() throws HL7Exception {
+    void test_single_segment_with_additional_segment() throws HL7Exception {
 
         Message hl7message = getMessage(hl7ADTmessage);
         HL7DataExtractor hl7DTE = new HL7DataExtractor(hl7message);
@@ -317,7 +317,7 @@ public class SegmentUtilTest {
     }
 
     @Test
-    public void test_child_segment_with_additional_parent_segment() throws HL7Exception {
+    void test_child_segment_with_additional_parent_segment() throws HL7Exception {
         String message = "MSH|^~\\\\&|SendTest1|Sendfac1|Receiveapp1|Receivefac1|200603081747|security|ORU^R01|MSGID000005|T|2.6\r"
                 + "PID||45483|45483||SMITH^SUZIE^||20160813|M|||123 MAIN STREET^^SCHENECTADY^NY^12345||(123)456-7890|||||^^^T||||||||||||\r"
                 + "OBR|1||986^IA PHIMS Stage^2.16.840.1.114222.4.3.3.5.1.2^ISO|112^Final Echocardiogram Report|||20151009173644|||||||||||||002|||||F|||2740^Tsadok^Janetary~2913^Merrit^Darren^F~3065^Mahoney^Paul^J~4723^Loh^Robert^L~9052^Winter^Oscar^||||3065^Mahoney^Paul^J|\r"
@@ -344,7 +344,7 @@ public class SegmentUtilTest {
     }
 
     @Test
-    public void test_VUX_no_rep() throws HL7Exception {
+    void test_VUX_no_rep() throws HL7Exception {
         String hl7VUXmessageNoRep = "MSH|^~\\&|ImmunizationGenerator^1.4|^2|||20121217134645||VXU^V04^VXU_V04|64443|P^|2.5.1^^^^^^^^^^^^|||ER||||\r"
                 + "PID|||1234^^^^PI^||HASBRO^ANDY^JOHN^^^^L^|SLINKY^FUN^^^^^L^|20010606|M|||1564 MONROE^^BROOKLYN^HI^56808^^^^^^|||||||||||||||||||\r"
                 + "PD1|||||||||||01|N||||A\r"
@@ -375,7 +375,7 @@ public class SegmentUtilTest {
     }
 
     @Test
-    public void test_VUX_rep() throws HL7Exception {
+    void test_VUX_rep() throws HL7Exception {
         String hl7VUXmessageRep = "MSH|^~\\&|MYEHR2.5|RI88140101|KIDSNET_IFL|RIHEALTH|20130531||VXU^V04^VXU_V04|20130531RI881401010105|P|2.5.1|||NE|AL||||||RI543763\r"
                 + "PID|1||432155^^^^MR||Patient^Johnny^New^^^^L|Smith^Sally|20130414|M||2106-3^White^HL70005|123 Any St^^Somewhere^WI^54000^^M\r"
                 + "NK1|1|Patient^Sally|MTH^mother^HL70063|123 Any St^^Somewhere^WI^54000^^M|^PRN^PH^^^608^5551212|||||||||||19820517||||eng^English^ISO639\r"

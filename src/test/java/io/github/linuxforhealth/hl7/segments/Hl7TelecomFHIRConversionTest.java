@@ -14,10 +14,10 @@ import org.junit.jupiter.api.Test;
 
 import io.github.linuxforhealth.hl7.segments.util.PatientUtils;
 
-public class Hl7TelecomFHIRConversionTest {
+class Hl7TelecomFHIRConversionTest {
 
   @Test
-  public void patient_telcom_test() {
+  void patient_telcom_test() {
 
     String patientPhone = "MSH|^~\\&|MIICEHRApplication|MIIC|MIIC|MIIC|201705130822||VXU^V04^VXU_V04|test1100|P|2.5.1|||AL|AL|||||Z22^CDCPHINVS|^^^^^MIIC^SR^^^MIIC|MIIC\n"
         // Home has 2 phones and an email, work has one phone and two emails
@@ -77,7 +77,7 @@ public class Hl7TelecomFHIRConversionTest {
   }
 
   @Test
-  public void patient_no_telcom_test() {
+  void patient_no_telcom_test() {
 
     String patientNoPhone = "MSH|^~\\&|MIICEHRApplication|MIIC|MIIC|MIIC|201705130822||VXU^V04^VXU_V04|test1100|P|2.5.1|||AL|AL|||||Z22^CDCPHINVS|^^^^^MIIC^SR^^^MIIC|MIIC\n"
         + "PID|1||12345678^^^^MR|ALTID|Moose^Mickey^J^III^^^||20060504|M||||||||||||||||||||||\n";

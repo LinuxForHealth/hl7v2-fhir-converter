@@ -22,7 +22,7 @@ import io.github.linuxforhealth.hl7.message.HL7MessageData;
 import io.github.linuxforhealth.hl7.parsing.HL7DataExtractor;
 import io.github.linuxforhealth.hl7.parsing.HL7HapiParser;
 
-public class JELXExpressionTest {
+class JELXExpressionTest {
 
   private static final String SOME_VALUE = "SOME_VALUE";
   private static final String SOME_VALUE_1 = "SOME_VALUE_1";
@@ -30,7 +30,7 @@ public class JELXExpressionTest {
   private static final String SOME_VALUE_3 = "SOME_VALUE_3";
 
   @Test
-  public void test_simple() throws IOException {
+  void test_simple() throws IOException {
 
     String message = "MSH|^~\\&|hl7Integration|hl7Integration|||||ADT^A01|||2.3|\r"
         + "EVN|A01|20130617154644\r"
@@ -64,7 +64,7 @@ public class JELXExpressionTest {
 
 
   @Test
-  public void test_with_variables() throws IOException, DataTypeException {
+  void test_with_variables() throws IOException, DataTypeException {
 
     String message = "MSH|^~\\&|hl7Integration|hl7Integration|||||ADT^A01|||2.3|\r"
         + "EVN|A01|20130617154644\r"

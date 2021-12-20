@@ -21,7 +21,7 @@ import org.junit.jupiter.api.io.TempDir;
 import io.github.linuxforhealth.core.config.ConverterConfiguration;
 import io.github.linuxforhealth.hl7.message.HL7MessageModel;
 
-public class HL7ResourceReaderTest {
+class HL7ResourceReaderTest {
 
   private static final String CONF_PROP_HOME = "hl7converter.config.home";
 
@@ -31,19 +31,19 @@ public class HL7ResourceReaderTest {
   static String originalConfigHome;
 
   @BeforeAll
-  public static void saveConfigHomeProperty() {
+  static void saveConfigHomeProperty() {
     originalConfigHome = System.getProperty(CONF_PROP_HOME);
   }
 
   @AfterEach
-  public void reset() {
+  void reset() {
     System.clearProperty(CONF_PROP_HOME);
     ConverterConfiguration.reset();
     ResourceReader.reset();
   }
 
   @AfterAll
-  public static void reloadPreviousConfigurations() {
+  static void reloadPreviousConfigurations() {
     if (originalConfigHome != null)
       System.setProperty(CONF_PROP_HOME, originalConfigHome);
     else
@@ -53,7 +53,7 @@ public class HL7ResourceReaderTest {
   // This tests that messagetemplates are still loaded the old way via class path
   // Create a config without base.path.resource and additional.resources.location properties forcing the files to be found via classpath
   @Test
-  public void testGetMessageTemplatesViaClasspath() throws IOException {
+  void testGetMessageTemplatesViaClasspath() throws IOException {
     try {
       // Set up the config file
       File configFile = new File(folder, "config.properties");
@@ -74,7 +74,7 @@ public class HL7ResourceReaderTest {
 
   // This tests that messagetemplates are loaded the new way via configured path + alternate path
   @Test
-  public void testGetMessageTemplatesViaAdditionalLocation() throws IOException {
+  void testGetMessageTemplatesViaAdditionalLocation() throws IOException {
     try {
       // Set up the config file
       File configFile = new File(folder, "config.properties");
@@ -98,7 +98,7 @@ public class HL7ResourceReaderTest {
   // This tests that messagetemplates are loaded the new way via configured path + alternate path
   // AND that they are found when supported.hl7.messages is omitted and defaults to *
   @Test
-  public void testGetMessageTemplatesViaAdditionalLocationWithDefaultSupportedList() throws IOException {
+  void testGetMessageTemplatesViaAdditionalLocationWithDefaultSupportedList() throws IOException {
     try {
       // Set up the config file
       File configFile = new File(folder, "config.properties");

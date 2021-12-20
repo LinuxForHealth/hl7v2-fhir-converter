@@ -34,13 +34,13 @@ import io.github.linuxforhealth.fhir.FHIRContext;
 import io.github.linuxforhealth.hl7.resource.ResourceReader;
 import io.github.linuxforhealth.hl7.segments.util.ResourceUtils;
 
-public class Hl7MessageTest {
+class Hl7MessageTest {
     private static FHIRContext context = new FHIRContext(true, false);
     private static HL7MessageEngine engine = new HL7MessageEngine(context);
     private static final Logger LOGGER = LoggerFactory.getLogger(Hl7MessageTest.class);
 
     @Test
-    public void test_patient() throws IOException {
+    void test_patient() throws IOException {
 
         ResourceModel rsm = ResourceReader.getInstance().generateResourceModel("resource/Patient");
 
@@ -70,7 +70,7 @@ public class Hl7MessageTest {
     }
 
     @Test
-    public void test_patient_encounter() throws IOException {
+    void test_patient_encounter() throws IOException {
 
         ResourceModel rsm = ResourceReader.getInstance().generateResourceModel("resource/Patient");
         HL7FHIRResourceTemplateAttributes attributes = new HL7FHIRResourceTemplateAttributes.Builder()
@@ -116,7 +116,7 @@ public class Hl7MessageTest {
     }
 
     @Test
-    public void test_patient_encounter_only() throws IOException {
+    void test_patient_encounter_only() throws IOException {
 
         ResourceModel encounter = ResourceReader.getInstance().generateResourceModel("resource/Encounter");
         HL7FHIRResourceTemplateAttributes attributesEncounter = new HL7FHIRResourceTemplateAttributes.Builder()
@@ -146,7 +146,7 @@ public class Hl7MessageTest {
     }
 
     @Test
-    public void test_observation() throws IOException {
+    void test_observation() throws IOException {
         ResourceModel rsm = ResourceReader.getInstance().generateResourceModel("resource/Observation");
 
         HL7FHIRResourceTemplateAttributes attributes = new HL7FHIRResourceTemplateAttributes.Builder()
@@ -180,7 +180,7 @@ public class Hl7MessageTest {
     }
 
     @Test
-    public void test_observation_multiple() throws IOException {
+    void test_observation_multiple() throws IOException {
         ResourceModel rsm = ResourceReader.getInstance().generateResourceModel("resource/Observation");
 
         HL7FHIRResourceTemplateAttributes attributes = new HL7FHIRResourceTemplateAttributes.Builder()
@@ -217,7 +217,7 @@ public class Hl7MessageTest {
     }
 
     @Test
-    public void test_observation_NM_result() throws IOException {
+    void test_observation_NM_result() throws IOException {
 
         ResourceModel rsm = ResourceReader.getInstance().generateResourceModel("resource/Observation");
 
@@ -249,7 +249,7 @@ public class Hl7MessageTest {
     }
 
     @Test
-    public void test_condition() throws IOException {
+    void test_condition() throws IOException {
 
         ResourceModel rsm = ResourceReader.getInstance().generateResourceModel("resource/Condition");
 
@@ -277,7 +277,7 @@ public class Hl7MessageTest {
     }
 
     @Test
-    public void test_observation_condition() throws IOException {
+    void test_observation_condition() throws IOException {
 
         ResourceModel obsModel = ResourceReader.getInstance().generateResourceModel("resource/Observation");
         HL7FHIRResourceTemplateAttributes attributesObs = new HL7FHIRResourceTemplateAttributes.Builder()
@@ -332,7 +332,7 @@ public class Hl7MessageTest {
     }
 
     @Test
-    public void test_messageHeader_with_ADT() throws IOException {
+    void test_messageHeader_with_ADT() throws IOException {
 
         ResourceModel rsm = ResourceReader.getInstance().generateResourceModel("resource/MessageHeader");
 
@@ -386,7 +386,7 @@ public class Hl7MessageTest {
     }
 
     @Test
-    public void test_messageHeader_with_ORU() throws IOException {
+    void test_messageHeader_with_ORU() throws IOException {
 
         ResourceModel rsm = ResourceReader.getInstance().generateResourceModel("resource/MessageHeader");
 
@@ -440,7 +440,7 @@ public class Hl7MessageTest {
     }
 
     @Test
-    public void test_specimen() throws IOException {
+    void test_specimen() throws IOException {
         ResourceModel rsm = ResourceReader.getInstance().generateResourceModel("resource/Specimen");
 
         HL7FHIRResourceTemplateAttributes attributes = new HL7FHIRResourceTemplateAttributes.Builder()
@@ -470,7 +470,7 @@ public class Hl7MessageTest {
     }
 
     @Test
-    public void test_specimen_multiple() throws IOException {
+    void test_specimen_multiple() throws IOException {
 
         ResourceModel rsm = ResourceReader.getInstance().generateResourceModel("resource/Specimen");
 
@@ -501,7 +501,7 @@ public class Hl7MessageTest {
     }
 
     @Test
-    public void test_specimen_multiple_type_coding() throws IOException {
+    void test_specimen_multiple_type_coding() throws IOException {
 
         ResourceModel rsm = ResourceReader.getInstance().generateResourceModel("resource/Specimen");
 
@@ -533,7 +533,7 @@ public class Hl7MessageTest {
     }
 
     @Test
-    public void test_encounter_with_observation() throws IOException {
+    void test_encounter_with_observation() throws IOException {
 
         ResourceModel rsm = ResourceReader.getInstance().generateResourceModel("resource/Patient");
         HL7FHIRResourceTemplateAttributes attributes = new HL7FHIRResourceTemplateAttributes.Builder()

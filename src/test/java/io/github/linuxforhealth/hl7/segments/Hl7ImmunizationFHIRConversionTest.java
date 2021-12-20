@@ -22,10 +22,10 @@ import org.junit.jupiter.api.Test;
 
 import io.github.linuxforhealth.hl7.segments.util.ResourceUtils;
 
-public class Hl7ImmunizationFHIRConversionTest {
+class Hl7ImmunizationFHIRConversionTest {
 
     @Test
-    public void testImmunization() throws IOException {
+    void testImmunization() throws IOException {
 
         // RXA.20 is "completed" this takes precedence over rxa.18 having a value and orc.5
         String hl7VUXmessageRep = "MSH|^~\\&|MYEHR2.5|RI88140101|KIDSNET_IFL|RIHEALTH|20130531||VXU^V04^VXU_V04|20130531RI881401010105|P|2.5.1|||NE|AL||||||RI543763\r"
@@ -267,7 +267,7 @@ public class Hl7ImmunizationFHIRConversionTest {
     // The following checks for a situation where non-manufacturer RXA Immunizations interfered with the creation of manufacturer Immununization
     // The test will ensure the problem doesn't come back.
     @Test
-    public void testMultipleImmunizationsNoInterference() throws IOException {
+    void testMultipleImmunizationsNoInterference() throws IOException {
 
         String hl7VUXmessageRep = "MSH|^~\\&|||||20130531||VXU^V04^VXU_V04|20130531RI881401010105|P|2.5.1||||||||||\r"
                 + "PID|1||12345^^^^MR||TestPatient^Jane^^^^^L||||||\r"
