@@ -5,7 +5,7 @@
 #
 ---
 detail:
-   valueOf: resource/SimpleObservation
+   valueOf: resource/Observation_ImmunizationReaction
    expressionType: reference
    specs: OBX.5
 
