@@ -13,7 +13,6 @@ id:
   expressionType: JEXL
 
 identifier_1: #joins filler | placer | MSH.7 with whatever gets returned from BUILD_FROM_CWE. that magic happens in identifier_Observation
-  condition: $id NULL
   valueOf: datatype/Identifier_Observation
   generateList: true
   expressionType: resource
@@ -65,11 +64,6 @@ code:
       expressionType: resource
       specs: $obx3
 
-   -  condition: $obx5 NOT_NULL
-      valueOf: datatype/CodeableConcept
-      expressionType: resource
-      specs: $obx5
-
 subject:
     valueOf: datatype/Reference
     expressionType: resource
@@ -95,14 +89,14 @@ valueString:
     type: STRING_ALL
     valueOf: OBX.5
     expressionType: HL7Spec
-    vars: 
+    vars:
       obx2: STRING, OBX.2
-      
+
 valueQuantity_1:
     valueOf: datatype/Quantity
     expressionType: resource
     condition: $obx2 EQUALS NM
-    vars: 
+    vars:
       value: OBX.5
       unit: OBX.6.1
       code: OBX.6.1
@@ -112,11 +106,11 @@ valueQuantity_1:
 valueQuantity_2:
     valueOf: datatype/Quantity
     expressionType: resource
-    condition: $obx2 EQUALS SN && $separator NULL 
-    vars: 
+    condition: $obx2 EQUALS SN && $separator NULL
+    vars:
       value: OBX.5.2
-      unit: OBX.6.1 
-      code: OBX.6.1 
+      unit: OBX.6.1
+      code: OBX.6.1
       comparator: OBX.5.1
       obx2: STRING, OBX.2
       separator: STRING, OBX.5.3
@@ -125,10 +119,10 @@ valueQuantity_2:
 valueQuantity_3:
     valueOf: datatype/Quantity
     expressionType: resource
-    condition: $obx2 EQUALS SN && $separator NOT_NULL && $separator NOT_EQUALS ':' && $separator NOT_EQUALS '/' 
-    vars: 
+    condition: $obx2 EQUALS SN && $separator NOT_NULL && $separator NOT_EQUALS ':' && $separator NOT_EQUALS '/'
+    vars:
       value: OBX.5.2
-      unit: OBX.6.1 
+      unit: OBX.6.1
       code: OBX.6.1
       comparator: OBX.5.1
       obx2: STRING, OBX.2
@@ -151,7 +145,7 @@ valuePeriod:
    vars:
      code: OBX.5
      obx2: STRING, OBX.2
-     
+
 valueDateTime:
    condition: $obx2 EQUALS DT || $obx2 EQUALS DTM
    type: DATE_TIME
@@ -190,7 +184,7 @@ valueRatio_2:
      obx2: STRING, OBX.2
      separator: STRING, SN.3
 
-interpretation: 
+interpretation:
    valueOf: datatype/CodeableConcept
    expressionType: resource
    specs: OBX.8
@@ -221,7 +215,7 @@ method:
    expressionType: resource
    specs: OBX.17
 
-referenceRange: 
+referenceRange:
    valueOf: secondary/ReferenceRange
    condition: $textValue NOT_NULL
    generateList: true
@@ -269,7 +263,7 @@ category:
    valueOf: datatype/CodeableConcept_var
    generateList: true
    expressionType: resource
-   vars: 
+   vars:
       system: SYSTEM_URL, $system_code
       specimen: SPM.4
    constants:

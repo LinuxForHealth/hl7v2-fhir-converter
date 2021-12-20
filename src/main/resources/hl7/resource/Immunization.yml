@@ -172,6 +172,6 @@ reaction:
    valueOf: secondary/ImmunizationReaction
    generateList: true
    expressionType: resource
+   specs: OBX
    vars:
-      obx5: OBX.5
       obx31: String, OBX.3.1

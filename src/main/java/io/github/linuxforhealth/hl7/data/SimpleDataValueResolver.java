@@ -542,6 +542,12 @@ public class SimpleDataValueResolver {
 
 
     public static final ValueExtractor<Object, String> BUILD_IDENTIFIER_FROM_CWE = (Object value) -> {
+        if (value instanceof Varies){
+            Varies variesValue = ((Varies) value);
+            if(variesValue.getData() instanceof CWE) {
+                value = (CWE) variesValue.getData();
+            }
+        }
        if(value instanceof CWE) {
            CWE newValue = ((CWE) value);
            String identifier = newValue.getCwe1_Identifier().toString();
@@ -556,24 +562,7 @@ public class SimpleDataValueResolver {
                }
            } else return text;
        }
-       else if (value instanceof Varies){
-           Varies variesValue = ((Varies) value);
-           if(variesValue.getData() instanceof CWE) {
-               CWE cweValue = (CWE) variesValue.getData();
-               String identifier = cweValue.getCwe1_Identifier().toString();
-               String text = cweValue.getCwe2_Text().toString();
-               String codingSystem = cweValue.getCwe3_NameOfCodingSystem().toString();
-               if (identifier != null) {
-                   if (codingSystem != null) {
-                       String join = identifier + "-" + codingSystem;
-                       return join;
-                   } else {
-                       return identifier;
-                   }
-               } else return text;
 
-           }
-       }
        return null;
     };
 
