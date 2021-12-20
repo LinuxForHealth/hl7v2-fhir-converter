@@ -12,7 +12,7 @@ before sending a pull request so the feature can be discussed. This is to avoid
 you wasting your valuable time working on a feature that the project developers
 are not interested in accepting into the code base.
 
-### Fixing bugs
+### Fixing bugs 
 
 If you would like to fix a bug, please [raise an issue](https://github.com/LinuxForHealth/hl7v2-fhir-converter/issues) before sending a
 pull request so it can be tracked.
