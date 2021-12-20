@@ -3,6 +3,8 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 #
+# This is a simplified version of Observation that we use to get the Observation from Immunization.Reaction.Detail
+#
 #Observation resource
 ---
 
@@ -26,11 +28,6 @@ status:
    default: unknown
    expressionType: HL7Spec
 
-# When OBX's are missing or TX based, we don't want to create an Observation.
-# When TX, because content is already appended to an associated DiagnosticReport or DocumentReference
-# Logic: if OBX exists AND ( (OBX.2 exists AND OBX.2 is NOT TX) OR (OBX.2 is null/empty) ) AND OBX.3 NOT NULL CREATE the Observation.
-# 'code' is set 'required: true' to cause all or nothing creation logic
-# The expression is nested and values are passed to the nested so that BOTH values control the 'all or nothing'
 code:
    valueOf: datatype/CodeableConcept
    expressionType: resource
