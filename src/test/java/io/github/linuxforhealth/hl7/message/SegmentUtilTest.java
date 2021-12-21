@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2020
+ * (C) Copyright IBM Corp. 2020, 2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -334,8 +334,7 @@ class SegmentUtilTest {
                 hl7DTE,
                 Lists.newArrayList("PATIENT_RESULT", "ORDER_OBSERVATION"));
 
-        assertThat(segmentGroups).isNotNull();
-        assertThat(segmentGroups).hasSize(2);
+        assertThat(segmentGroups).isNotNull().hasSize(2);
 
         Segment obr = (Segment) segmentGroups.get(0).getAdditionalSegments().get("OBR").get(0);
         assertThat(obr.isEmpty()).isFalse();

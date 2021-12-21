@@ -14,15 +14,23 @@ import java.util.List;
 import java.util.TimeZone;
 import java.util.stream.Collectors;
 
-import org.hl7.fhir.r4.model.*;
 import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
-
+import org.hl7.fhir.r4.model.CodeableConcept;
+import org.hl7.fhir.r4.model.Extension;
+import org.hl7.fhir.r4.model.HumanName;
+import org.hl7.fhir.r4.model.Identifier;
+import org.hl7.fhir.r4.model.MedicationRequest;
 import org.hl7.fhir.r4.model.MedicationRequest.MedicationRequestStatus;
+import org.hl7.fhir.r4.model.Patient;
+import org.hl7.fhir.r4.model.Practitioner;
+import org.hl7.fhir.r4.model.Resource;
+import org.hl7.fhir.r4.model.ResourceType;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import io.github.linuxforhealth.core.config.ConverterConfiguration;
+import io.github.linuxforhealth.hl7.segments.util.DatatypeUtils;
 import io.github.linuxforhealth.hl7.segments.util.ResourceUtils;
 
 class Hl7MedicationRequestFHIRConversionTest {
@@ -501,7 +509,7 @@ class Hl7MedicationRequestFHIRConversionTest {
     }
 
     @Test
-    void test_MedicationRequest_category_requester_and_dispenseRequest() {
+    void testMedicationRequestCategoryRequesterAndDispenseRequest() {
         String hl7message = "MSH|^~\\&||||||S1|RDE^O11||T|2.6|||||||||\n"
                 + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
                 + "ORC|NW|||||E|10^BID^D4^^^R||20180622230000|||3122^PROVIDER^ORDERING^^^DR|||20190606193536||||||||||||||I\n"
@@ -530,36 +538,37 @@ class Hl7MedicationRequestFHIRConversionTest {
 
         //category comes from  ORC.29
         assertThat(medicationRequest.getCategory()).hasSize(1);
-        assertThat(medicationRequest.getCategory().get(0).hasCoding()).isTrue();
-        assertThat(medicationRequest.getCategory().get(0).getCodingFirstRep().getCode()).isEqualTo("inpatient");
-        assertThat(medicationRequest.getCategory().get(0).getCodingFirstRep().getSystem())
-                .isEqualTo("http://terminology.hl7.org/CodeSystem/medicationrequest-category");
-        assertThat(medicationRequest.getCategory().get(0).getCodingFirstRep().getDisplay()).isEqualTo("Inpatient");
+        DatatypeUtils.checkCommonCodeableConceptAssertions(medicationRequest.getCategory().get(0), "inpatient",
+                "Inpatient", "http://terminology.hl7.org/CodeSystem/medicationrequest-category",
+                null);
 
         //DispenseRequest.start comes from ORC.15
         assertThat(medicationRequest.getDispenseRequest().hasValidityPeriod()).isTrue();
         assertThat(medicationRequest.getDispenseRequest().getValidityPeriod().getStartElement().toString())
                 .containsPattern("2019-06-06");
+    }
 
-        hl7message = "MSH|^~\\&||||||S1|RDE^O11||T|2.6|||||||||\n"
+    @Test
+    void testMedicationRequestCategoryRequesterAndDispenseRequest2() {
+        String hl7message = "MSH|^~\\&||||||S1|RDE^O11||T|2.6|||||||||\n"
                 + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
                 + "ORC|NW|||||E|10^BID^D4^^^R||20180622230000||||||20190606193536||||||||||||||I\n"
                 + "RXE|^Q24H&0600^^20210330144208^^ROU|DUONEB3INH^3 ML PLAS CONT : IPRATROPIUM-ALBUTEROL 0.5-2.5 (3) MG/3ML IN SOLN^ADS^^^^^^ipratropium-albuterol (DUONEB) nebulizer solution 3 mL|3||mL|47||||1|PC||2213^ORDERING^PROVIDER||||||||||||||Wheezing^Wheezing^PRN||||^DUONEB|20180622230000||||||||\n";
 
-        e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
 
-        medicationRequestList = ResourceUtils.getResourceList(e, ResourceType.MedicationRequest);
+        List<Resource> medicationRequestList = ResourceUtils.getResourceList(e, ResourceType.MedicationRequest);
         assertThat(medicationRequestList).hasSize(1);
-        medicationRequest = ResourceUtils.getResourceMedicationRequest(medicationRequestList.get(0),
+        MedicationRequest medicationRequest = ResourceUtils.getResourceMedicationRequest(medicationRequestList.get(0),
                 ResourceUtils.context);
 
         // requester comes from RXE.13
-        requesterRef = medicationRequest.getRequester().getReference();
-        practBundle = ResourceUtils.getSpecificPractitionerFromBundleEntriesList(e, requesterRef);
+        String requesterRef = medicationRequest.getRequester().getReference();
+        Practitioner practBundle = ResourceUtils.getSpecificPractitionerFromBundleEntriesList(e, requesterRef);
 
-        practitionerIdentifier = practBundle.getIdentifierFirstRep();
-        practName = practBundle.getNameFirstRep();
-        CodeableConcept type = practitionerIdentifier.getType();
+        Identifier practitionerIdentifier = practBundle.getIdentifierFirstRep();
+        HumanName practName = practBundle.getNameFirstRep();
+        CodeableConcept practitionerIdentifierType = practitionerIdentifier.getType();
 
         //Check meta extension.display is null
         Extension ext = practBundle.getMeta().getExtension().get(0);
@@ -568,10 +577,9 @@ class Hl7MedicationRequestFHIRConversionTest {
 
         assertThat(cc.hasCoding()).isTrue();
         assertThat(cc.getCoding().get(0).getDisplay()).isNull();
-        assertThat(type.getCodingFirstRep().getCode().toString()).isEqualTo("DEA");
-        assertThat(type.getCodingFirstRep().getDisplay())
-                .isEqualTo("Drug Enforcement Administration registration number");
-        assertThat(type.getCodingFirstRep().getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/v2-0203");
+        DatatypeUtils.checkCommonCodeableConceptAssertions(practitionerIdentifierType, "DEA",
+                "Drug Enforcement Administration registration number", "http://terminology.hl7.org/CodeSystem/v2-0203",
+                null);
         assertThat(practitionerIdentifier.getValue()).isEqualTo("2213"); // RXE.13.1
         assertThat(practitionerIdentifier.getSystem()).isNull(); // RXE.13.9
         assertThat(practName.getFamily()).isEqualTo("ORDERING"); // RXE.13.2
