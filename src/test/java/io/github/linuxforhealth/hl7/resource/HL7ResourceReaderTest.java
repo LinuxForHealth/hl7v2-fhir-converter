@@ -65,7 +65,7 @@ class HL7ResourceReaderTest {
 
       // Get the templates
       Map<String, HL7MessageModel> messagetemplates = ResourceReader.getInstance().getMessageTemplates();
-      assertThat(messagetemplates.containsKey("ORU_R01")).isTrue();
+      assertThat(messagetemplates).containsKey("ORU_R01");
       assertThat(messagetemplates.containsKey("ADT_A09")).isFalse();
     } catch (IllegalArgumentException e) {
       throw new IllegalStateException("Failure to initialize the templates for the converter.", e);
@@ -88,8 +88,8 @@ class HL7ResourceReaderTest {
 
       // Get the templates ORU_R01 will be found in the base path and ADT_A09 will be found in the additional path
       Map<String, HL7MessageModel> messagetemplates = ResourceReader.getInstance().getMessageTemplates();
-      assertThat(messagetemplates.containsKey("ORU_R01")).isTrue(); // found in the base path
-      assertThat(messagetemplates.containsKey("ADT_A09")).isTrue(); // found in the additional path
+      assertThat(messagetemplates).containsKey("ORU_R01"); // found in the base path
+      assertThat(messagetemplates).containsKey("ADT_A09"); // found in the additional path
     } catch (IllegalArgumentException e) {
       throw new IllegalStateException("Failure to initialize the templates for the converter.", e);
     }
@@ -112,8 +112,8 @@ class HL7ResourceReaderTest {
 
       // Get the templates ORU_R01 will be found in the base path and ADT_A09 will be found in the additional path
       Map<String, HL7MessageModel> messagetemplates = ResourceReader.getInstance().getMessageTemplates();
-      assertThat(messagetemplates.containsKey("ORU_R01")).isTrue(); // found in the base path
-      assertThat(messagetemplates.containsKey("ADT_A09")).isTrue(); // found in the additional path
+      assertThat(messagetemplates).containsKey("ORU_R01"); // found in the base path
+      assertThat(messagetemplates).containsKey("ADT_A09"); // found in the additional path
     } catch (IllegalArgumentException e) {
       throw new IllegalStateException("Failure to initialize the templates for the converter.", e);
     }

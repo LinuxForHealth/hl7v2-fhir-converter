@@ -58,7 +58,7 @@ class ResourceExpressionTest {
 
         Map<String, Object> result = (Map<String, Object>) value.getValue();
         assertThat(result.get("use")).isNull();
-        assertThat(result.get("value")).isEqualTo("000010016");
+        assertThat(result).containsEntry("value", "000010016");
 
     }
 
@@ -116,7 +116,7 @@ class ResourceExpressionTest {
         assertThat(value).isNotNull();
         Map<String, Object> result = (Map<String, Object>) value.getValue();
         assertThat(result.get("use")).isNull();
-        assertThat(result.get("value")).isEqualTo("000010017");
+        assertThat(result).containsEntry("value", "000010017");
         assertThat(result.get("type")).isNull();
 
     }
@@ -149,7 +149,8 @@ class ResourceExpressionTest {
 
         Map<String, Object> result = (Map<String, Object>) results.get(0);
         assertThat(result.get("use")).isNull();
-        assertThat(result.get("value")).isEqualTo("000010016");
+        assertThat(result).containsEntry("value", "000010016");
+
         assertThat(result.get("system")).isNull();
         assertThat(result.get("type")).isNotNull();
 
@@ -179,7 +180,8 @@ class ResourceExpressionTest {
                 new SimpleEvaluationResult(s));
         Map<String, Object> result = (Map<String, Object>) value.getValue();
         assertThat(result.get("use")).isNull();
-        assertThat(result.get("value")).isEqualTo("1234");
+        assertThat(result).containsEntry("value", "1234");
+
         assertThat(result.get("system")).isNull();
 
     }
@@ -210,7 +212,8 @@ class ResourceExpressionTest {
         List<Map<String, Object>> result = (List<Map<String, Object>>) value.getValue();
         Map<String, Object> type = (Map<String, Object>) result.get(0).get("type");
 
-        assertThat(type.get("text")).isEqualTo("some text");
+        assertThat(type).containsEntry("text", "some text");
+
         assertThat(type.get("coding")).isNotNull();
         List<Object> list = (List) type.get("coding");
         SimpleCode scs = (SimpleCode) list.get(0);
@@ -245,7 +248,8 @@ class ResourceExpressionTest {
                 new SimpleEvaluationResult(s));
 
         List<Map<String, Object>> result = (List<Map<String, Object>>) value.getValue();
-        assertThat(result.get(0).get("text")).isEqualTo("some text");
+        assertThat(result.get(0)).containsEntry("text", "some text");
+
         assertThat(result.get(0).get("coding")).isNotNull();
         List<Object> list = (List) result.get(0).get("coding");
         SimpleCode scs = (SimpleCode) list.get(0);
@@ -319,7 +323,7 @@ class ResourceExpressionTest {
                 new SimpleEvaluationResult(s));
 
         List<Map<String, Object>> result = (List<Map<String, Object>>) value.getValue();
-        assertThat(result.get(0).get("name")).isEqualTo("sanofi");
+        assertThat(result.get(0)).containsEntry("name", "sanofi");
         assertThat(result.get(0).get("identifier")).isNull();
 
         LOGGER.debug("result=" + result);
@@ -389,9 +393,9 @@ class ResourceExpressionTest {
                 new SimpleEvaluationResult(s));
 
         List<Map<String, Object>> result = (List<Map<String, Object>>) value.getValue();
-        assertThat(result.get(0).get("name")).isEqualTo("sanofi");
+        assertThat(result.get(0)).containsEntry("name", "sanofi");
         List<Map<String, Object>> identifiers = (List<Map<String, Object>>) result.get(0).get("identifier");
-        assertThat(identifiers.get(0).get("value")).isEqualTo("PMC");
+        assertThat(identifiers.get(0)).containsEntry("value", "PMC");
 
         LOGGER.debug("result=" + result);
 

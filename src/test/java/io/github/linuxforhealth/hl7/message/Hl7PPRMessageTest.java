@@ -16,7 +16,6 @@ import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
 import org.hl7.fhir.r4.model.Resource;
 import org.hl7.fhir.r4.model.ResourceType;
 
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
@@ -102,7 +101,7 @@ class Hl7PPRMessageTest {
         assertThat(conditionResource).hasSize(1);
 
         List<Resource> docRefResource = ResourceUtils.getResourceList(e, ResourceType.DocumentReference);
-        assertThat(docRefResource).hasSize(0); //TODO: Expect this to be 1 when card #855 is completed
+        assertThat(docRefResource).isEmpty(); //TODO: Expect this to be 1 when card #855 is completed
 
         // Confirm that no extra resources are created
         assertThat(e.size()).isEqualTo(3); //TODO: Expect this to be 4 when card #855 is completed
