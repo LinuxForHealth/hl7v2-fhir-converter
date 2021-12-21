@@ -7,8 +7,7 @@ package io.github.linuxforhealth.hl7.segments;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.Arrays;
-import java.util.HashMap;
+import java.io.IOException;
 import java.util.List;
 
 import org.hl7.fhir.r4.model.AllergyIntolerance;
@@ -16,6 +15,7 @@ import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.Condition;
 import org.hl7.fhir.r4.model.DiagnosticReport;
+import org.hl7.fhir.r4.model.DocumentReference;
 import org.hl7.fhir.r4.model.Encounter;
 import org.hl7.fhir.r4.model.Identifier;
 import org.hl7.fhir.r4.model.Immunization;
@@ -24,16 +24,16 @@ import org.hl7.fhir.r4.model.Observation;
 import org.hl7.fhir.r4.model.Patient;
 import org.hl7.fhir.r4.model.Procedure;
 import org.hl7.fhir.r4.model.ServiceRequest;
-import org.hl7.fhir.r4.model.DocumentReference;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
+import io.github.linuxforhealth.hl7.segments.util.DatatypeUtils;
 import io.github.linuxforhealth.hl7.segments.util.PatientUtils;
 import io.github.linuxforhealth.hl7.segments.util.ResourceUtils;
-import io.github.linuxforhealth.hl7.segments.util.DatatypeUtils;
 
 class Hl7IdentifierFHIRConversionTest {
 
+    // Suppress warnings about too many assertions in a test.  Justification: creating a FHIR message is costly; we need to check many asserts per creation for efficiency.  
+    @java.lang.SuppressWarnings("squid:S5961")
     @Test
     void patientIdentifiersTest() {
         String patientIdentifiers = "MSH|^~\\&|MIICEHRApplication|MIIC|MIIC|MIIC|201705130822||VXU^V04^VXU_V04|test1100|P|2.5.1|||AL|AL|||||Z22^CDCPHINVS|^^^^^MIIC^SR^^^MIIC|MIIC\n"
@@ -153,7 +153,7 @@ class Hl7IdentifierFHIRConversionTest {
         DatatypeUtils.checkCommonCodeableConceptAssertions(cc, "SS", "Social Security number",
                 "http://terminology.hl7.org/CodeSystem/v2-0203", null);
 
-        // Third identifier - unknown code.  Create the following:
+        // Third identifier - handles an unknown code.  Create the following:
         // "identifier": [ {
         //         "type": {
         //           "text": "AnUnknownCode"
@@ -320,24 +320,27 @@ class Hl7IdentifierFHIRConversionTest {
         system = identifier.getSystem();
         assertThat(value).isEqualTo("C56.9-I10"); // DG1.3.1-DG1.3.3
         assertThat(system).isEqualTo("urn:id:extID");
+    }
 
+    @Test
+    void conditionDg1IdentifierTest2() {
         // Test PV1-19 for visit number; extId with DG1-3.1.
         // Also test DG1-20 creates additional identifiers.
         String withDG120 = "MSH|^~\\&|||||||ADT^A01^ADT_A01|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6||||||\r"
                 + "PID|||10290^^^WEST^MR||||20040530|M||||||||||||||||||||||N\n"
                 + "PV1||I||||||||SUR||||||||S|8846511^^^ACME|A|||||||||||||||||||SF|K||||20170215080000\n"
                 + "DG1|1|ICD10|B45678|Broken Arm|20210322154449|A|E123|R45|Y|J76|C|15|1458.98||1|123^DOE^JOHN^A^|C|Y|20210322154326|one^https://terminology.hl7.org/CodeSystem/two^three^https://terminology.hl7.org/CodeSystem/four|S1234|Parent Diagnosis|Value345|Group567|DiagnosisG45|Y\r";
-        condition = ResourceUtils.getCondition(withDG120);
+        Condition condition = ResourceUtils.getCondition(withDG120);
 
         // Expect 4 identifiers
         assertThat(condition.hasIdentifier()).isTrue();
         assertThat(condition.getIdentifier()).hasSize(4);
 
-        identifiers = condition.getIdentifier();
+        List<Identifier> identifiers = condition.getIdentifier();
         // Match the id's to position; we can't depend on an order.
-        posVN = getIdentifierPositionByValue("8846511", identifiers);
+        int posVN = getIdentifierPositionByValue("8846511", identifiers);
         assertThat(posVN).isNotSameAs(-1);
-        posExtId = getIdentifierPositionByValue("B45678", identifiers);
+        int posExtId = getIdentifierPositionByValue("B45678", identifiers);
         assertThat(posExtId).isNotSameAs(-1);
         int posExtDG20a = getIdentifierPositionByValue("one", identifiers);
         assertThat(posExtDG20a).isNotSameAs(-1);
@@ -345,12 +348,12 @@ class Hl7IdentifierFHIRConversionTest {
         assertThat(posExtDG20b).isNotSameAs(-1);
 
         // Identifier 1: Visit number
-        identifier = condition.getIdentifier().get(posVN);
-        value = identifier.getValue();
-        system = identifier.getSystem();
+        Identifier identifier = condition.getIdentifier().get(posVN);
+        String value = identifier.getValue();
+        String system = identifier.getSystem();
         assertThat(value).isEqualTo("8846511"); // PV1.19.1
         assertThat(system).isEqualTo("urn:id:ACME"); // PV1.19.4
-        type = identifier.getType();
+        CodeableConcept type = identifier.getType();
         DatatypeUtils.checkCommonCodeableConceptAssertions(type, "VN", "Visit number",
                 "http://terminology.hl7.org/CodeSystem/v2-0203", null);
 
@@ -374,30 +377,33 @@ class Hl7IdentifierFHIRConversionTest {
         system = identifier.getSystem();
         assertThat(value).isEqualTo("three"); // DG1.20.3
         assertThat(system).isEqualTo("https://terminology.hl7.org/CodeSystem/four"); // DG1.20.4
+    }
 
+    @Test
+    void conditionDg1IdentifierTest3() {
         String withDG132 = "MSH|^~\\&|||||201610015080000||ADT^A01^ADT_A01|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6||||||\r"
                 + "PID|||10290^^^WEST^MR||||20040530|M||||||||||||||||||||||N\n"
                 + "PV1||I||||||||SUR||||||||S||A|||||||||||||||||||SF|K||||20170215080000\n"
                 + "DG1|1|ICD10|^Ovarian Cancer|Test|20210322154449|A|E123|R45|Y|J76|C|15|1458.98||1|123^DOE^JOHN^A^|C|Y|20210322154326||S1234|Parent Diagnosis|Value345|Group567|DiagnosisG45|Y\r";
-        condition = ResourceUtils.getCondition(withDG132);
+        Condition condition = ResourceUtils.getCondition(withDG132);
 
         // Expect 2 identifiers
         assertThat(condition.hasIdentifier()).isTrue();
         assertThat(condition.getIdentifier()).hasSize(2);
-        identifiers = condition.getIdentifier();
+        List<Identifier> identifiers = condition.getIdentifier();
         // Match the id's to position; we can't depend on an order.
-        posVN = getIdentifierPositionByValue("201610015080000", identifiers);
+        int posVN = getIdentifierPositionByValue("201610015080000", identifiers);
         assertThat(posVN).isNotSameAs(-1);
-        posExtId = getIdentifierPositionByValue("Ovarian Cancer", identifiers);
+        int posExtId = getIdentifierPositionByValue("Ovarian Cancer", identifiers);
         assertThat(posExtId).isNotSameAs(-1);
 
         // Identifier 1: Visit number
-        identifier = condition.getIdentifier().get(posVN);
-        value = identifier.getValue();
-        system = identifier.getSystem();
+        Identifier identifier = condition.getIdentifier().get(posVN);
+        String value = identifier.getValue();
+        String system = identifier.getSystem();
         assertThat(value).isEqualTo("201610015080000"); // MSH.7
         assertThat(system).isNull();
-        type = identifier.getType();
+        CodeableConcept type = identifier.getType();
         DatatypeUtils.checkCommonCodeableConceptAssertions(type, "VN", "Visit number",
                 "http://terminology.hl7.org/CodeSystem/v2-0203", null);
 
@@ -544,29 +550,33 @@ class Hl7IdentifierFHIRConversionTest {
         DatatypeUtils.checkCommonCodeableConceptAssertions(type, "PLAC", "Placer Identifier",
                 "http://terminology.hl7.org/CodeSystem/v2-0203", null);
 
+    }
+
+    @Test
+    void diagnosticReportIdentifierTestFillerPlacerFromOBR() {
         // Filler and placer from OBR
-        diagnosticReport = "MSH|^~\\&|PROSLOV|MYHOSPITAL|WHIA|IBM|20170825010500||ORU^R01|MSGID22102712|T|2.6\n"
+        String diagnosticReport = "MSH|^~\\&|PROSLOV|MYHOSPITAL|WHIA|IBM|20170825010500||ORU^R01|MSGID22102712|T|2.6\n"
                 + "PID|||1234||DOE^JANE^|||F||||||||||||||||||||||\n"
                 + "ORC|NW|||PGN001|SC|D|1||20170825010500|MS|MS||||20170825010500|\n"
                 + "OBR|1|CC_000000^OE PHIMS Stage|CD_000000|2244^General Order|||20170825010500||||||Relevant Clinical Information|||||||002|||||F\n"
                 + "OBX|1|TX|||Impression: 1. Markedly intense metabolic activity corresponding with the area of nodular enhancement in the left oral cavity.||||||F|||20170825010500\n";
-        report = ResourceUtils.getDiagnosticReport(diagnosticReport);
+        DiagnosticReport report = ResourceUtils.getDiagnosticReport(diagnosticReport);
 
         // Expect 3 identifiers
         assertThat(report.hasIdentifier()).isTrue();
         assertThat(report.getIdentifier()).hasSize(3);
-        identifiers = report.getIdentifier();
+        List<Identifier> identifiers = report.getIdentifier();
         // Match the three id's to position; we can't depend on an order.
-        posExtId = getIdentifierPositionByValue("20170825010500", identifiers);
+        int posExtId = getIdentifierPositionByValue("20170825010500", identifiers);
         assertThat(posExtId).isNotSameAs(-1);
-        posFILLER = getIdentifierPositionByValue("CD_000000", identifiers);
+        int posFILLER = getIdentifierPositionByValue("CD_000000", identifiers);
         assertThat(posFILLER).isNotSameAs(-1);
-        posPLACER = getIdentifierPositionByValue("CC_000000", identifiers);
+        int posPLACER = getIdentifierPositionByValue("CC_000000", identifiers);
         assertThat(posPLACER).isNotSameAs(-1);
         // Identifier 1: extId with MSH-7
-        identifier = report.getIdentifier().get(posExtId);
-        value = identifier.getValue();
-        system = identifier.getSystem();
+        Identifier identifier = report.getIdentifier().get(posExtId);
+        String value = identifier.getValue();
+        String system = identifier.getSystem();
         assertThat(value).isEqualTo("20170825010500"); // MSH-7
         assertThat(system).isEqualTo("urn:id:extID");
 
@@ -576,7 +586,7 @@ class Hl7IdentifierFHIRConversionTest {
         system = identifier.getSystem();
         assertThat(value).isEqualTo("CD_000000"); // OBR-3.1
         assertThat(system).isNull(); // OBR-3.2 is empty
-        type = identifier.getType();
+        CodeableConcept type = identifier.getType();
         DatatypeUtils.checkCommonCodeableConceptAssertions(type, "FILL", "Filler Identifier",
                 "http://terminology.hl7.org/CodeSystem/v2-0203", null);
 
@@ -617,13 +627,17 @@ class Hl7IdentifierFHIRConversionTest {
         assertThat(coding.getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/v2-0203");
         assertThat(coding.getCode()).isEqualTo("VN");
         assertThat(coding.getDisplay()).isEqualTo("Visit number");
+    }
+
+    @Test
+    void encounterIdentifierVisitNumberFromPV1() {
 
         // Test: Visit number from PV1-19, plus PV1-50
         String encounterW2Identifiers = "MSH|^~\\&|MYEHR2.5|RI88140101|KIDSNET_IFL|RIHEALTH|20130531||VXU^V04^VXU_V04|20130531RI881401010105|P|2.6|||AL|NE|764|ASCII||||||^4086::132:2A57:3C28^IPv6\r"
                 + "EVN|A01|20130617154644||01\r"
                 + "PID|||12345^^^^MR||smith^john\r"
                 + "PV1||I||||||||SUR||||||||S|8846511|A|||||||||||||||||||SF|K||||20170215080000||||||POL8009|\r";
-        encounter = ResourceUtils.getEncounter(encounterW2Identifiers); //the first identifier is the same. the second Identifier comes from PV1.50
+        Encounter encounter = ResourceUtils.getEncounter(encounterW2Identifiers); //the first identifier is the same. the second Identifier comes from PV1.50
 
         // Expect 2 identifiers
         assertThat(encounter.hasIdentifier()).isTrue();
@@ -636,13 +650,13 @@ class Hl7IdentifierFHIRConversionTest {
         assertThat(posVN2).isNotSameAs(-1);
 
         // Identifier 1:
-        identifier = encounter.getIdentifier().get(posVN1);
-        value = identifier.getValue();
-        system = identifier.getSystem();
+        Identifier identifier = encounter.getIdentifier().get(posVN1);
+        String value = identifier.getValue();
+        String system = identifier.getSystem();
         assertThat(value).isEqualTo("8846511"); // PV1-19
         assertThat(system).isNull();
-        type = identifier.getType();
-        coding = type.getCoding().get(0);
+        CodeableConcept type = identifier.getType();
+        Coding coding = type.getCoding().get(0);
         assertThat(type.getText()).isNull();
         assertThat(coding.getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/v2-0203");
         assertThat(coding.getCode()).isEqualTo("VN");
@@ -660,26 +674,29 @@ class Hl7IdentifierFHIRConversionTest {
         assertThat(coding.getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/v2-0203");
         assertThat(coding.getCode()).isEqualTo("VN");
         assertThat(coding.getDisplay()).isEqualTo("Visit number");
+    }
 
+    @Test
+    void encounterIdentifierVisitNumberFromMSH7() {
         // Test: Visit number from MSH-7
-        encounterMsg = "MSH|^~\\&|MYEHR2.5|RI88140101|KIDSNET_IFL|RIHEALTH|20130531||VXU^V04^VXU_V04|20130531RI881401010105|P|2.6|||AL|NE|764|ASCII||||||^4086::132:2A57:3C28^IPv6\r"
+        String encounterMsg = "MSH|^~\\&|MYEHR2.5|RI88140101|KIDSNET_IFL|RIHEALTH|20130531||VXU^V04^VXU_V04|20130531RI881401010105|P|2.6|||AL|NE|764|ASCII||||||^4086::132:2A57:3C28^IPv6\r"
                 + "EVN|A01|20130617154644||01\r"
                 + "PID|||12345^^^^MR||smith^john\r"
                 + "PV1||I||||||||SUR||||||||S||A\r";
-        encounter = ResourceUtils.getEncounter(encounterMsg);
+        Encounter encounter = ResourceUtils.getEncounter(encounterMsg);
 
         // Expect a single identifier
         assertThat(encounter.hasIdentifier()).isTrue();
         assertThat(encounter.getIdentifier()).hasSize(1);
 
         // Identifier 1: Visit number
-        identifier = encounter.getIdentifier().get(0);
-        value = identifier.getValue();
-        system = identifier.getSystem();
+        Identifier identifier = encounter.getIdentifier().get(0);
+        String value = identifier.getValue();
+        String system = identifier.getSystem();
         assertThat(value).isEqualTo("20130531"); // MSH.7
         assertThat(system).isNull(); //PV1.19.4 and PID.18 is empty so system is null
-        type = identifier.getType();
-        coding = type.getCoding().get(0);
+        CodeableConcept type = identifier.getType();
+        Coding coding = type.getCoding().get(0);
         assertThat(type.getText()).isNull();
         assertThat(coding.getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/v2-0203");
         assertThat(coding.getCode()).isEqualTo("VN");
@@ -852,12 +869,12 @@ class Hl7IdentifierFHIRConversionTest {
         assertThat(system).isEqualTo("urn:id:extID");
 
         // Identifier 2: Filler
-        identifier = report.getIdentifier().get(posFILLER);
-        value = identifier.getValue();
-        system = identifier.getSystem();
+        Identifier identifier2 = report.getIdentifier().get(posFILLER);
+        value = identifier2.getValue();
+        system = identifier2.getSystem();
         assertThat(value).isEqualTo("FON001"); //ORC.3.1
         assertThat(system).isEqualTo("urn:id:OE"); // ORC.3.2
-        CodeableConcept type = identifier.getType();
+        CodeableConcept type = identifier2.getType();
         Coding coding = type.getCoding().get(0);
         assertThat(type.getText()).isNull();
         assertThat(coding.getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/v2-0203");
@@ -876,9 +893,12 @@ class Hl7IdentifierFHIRConversionTest {
         assertThat(coding.getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/v2-0203");
         assertThat(coding.getCode()).isEqualTo("PLAC");
         assertThat(coding.getDisplay()).isEqualTo("Placer Identifier");
+    }
 
+    @Test
+    void documentReferenceIdentifierTest2() {
         // Filler from OBR, placer from TXA-14
-        documentReference = "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|MDM^T02|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6|56789^NID^UID|MCM||||\n"
+        String documentReferenceMessage = "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|MDM^T02|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6|56789^NID^UID|MCM||||\n"
                 +
                 "PID|1||000054321^^^MRN|||||||||||||M|CAT|||||N\n" +
                 "PV1|1|I|||||||||||||||||||||||||||||||||||||||||||\n" +
@@ -886,43 +906,43 @@ class Hl7IdentifierFHIRConversionTest {
                 "OBR|1||CD_000000^OE|2244^General Order|||20170825010500||||||Relevant Clinical Information|||||||002|||||F|||550600^Tsadok550600^Janetary~660600^Merrit660600^Darren^F~770600^Das770600^Surjya^P~880600^Winter880600^Oscar^||||770600&Das770600&Surjya&P^^^6N^1234^A|\n"
                 +
                 "TXA|1||B45678|||||||||||PON001^IE||\n";
-        report = ResourceUtils.getDocumentReference(documentReference);
+        DocumentReference report = ResourceUtils.getDocumentReference(documentReferenceMessage);
 
         // Expect 3 identifiers
         assertThat(report.hasIdentifier()).isTrue();
         assertThat(report.getIdentifier()).hasSize(3);
 
-        identifiers = report.getIdentifier();
+        List<Identifier> identifiers = report.getIdentifier();
         // Match the three id's to position; we can't depend on an order.
-        posExtId = getIdentifierPositionByValue("200911021022", identifiers);
+        int posExtId = getIdentifierPositionByValue("200911021022", identifiers);
         assertThat(posExtId).isNotSameAs(-1);
-        posFILLER = getIdentifierPositionByValue("CD_000000", identifiers);
+        int posFILLER = getIdentifierPositionByValue("CD_000000", identifiers);
         assertThat(posFILLER).isNotSameAs(-1);
-        posPLACER = getIdentifierPositionByValue("PON001", identifiers);
+        int posPLACER = getIdentifierPositionByValue("PON001", identifiers);
         assertThat(posPLACER).isNotSameAs(-1);
 
         // Identifier 1: extID from MSH-7
-        identifier = report.getIdentifier().get(posExtId);
-        value = identifier.getValue();
-        system = identifier.getSystem();
+        Identifier identifier = report.getIdentifier().get(posExtId);
+        String value = identifier.getValue();
+        String system = identifier.getSystem();
         assertThat(value).isEqualTo("200911021022"); // MSH-7
         assertThat(system).isEqualTo("urn:id:extID");
 
         // Identifier 2: Filler
-        identifier = report.getIdentifier().get(posFILLER);
-        value = identifier.getValue();
-        system = identifier.getSystem();
+        Identifier identifier2 = report.getIdentifier().get(posFILLER);
+        value = identifier2.getValue();
+        system = identifier2.getSystem();
         assertThat(value).isEqualTo("CD_000000"); //OBR.3.1
         assertThat(system).isEqualTo("urn:id:OE"); // OBR.3.2
-        type = identifier.getType();
-        coding = type.getCoding().get(0);
+        CodeableConcept type = identifier2.getType();
+        Coding coding = type.getCoding().get(0);
         assertThat(type.getText()).isNull();
         assertThat(coding.getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/v2-0203");
         assertThat(coding.getCode()).isEqualTo("FILL");
         assertThat(coding.getDisplay()).isEqualTo("Filler Identifier");
 
         // Identifier 3: Placer
-        identifier3 = report.getIdentifier().get(posPLACER);
+        Identifier identifier3 = report.getIdentifier().get(posPLACER);
         value = identifier3.getValue();
         system = identifier3.getSystem();
         assertThat(value).isEqualTo("PON001"); // TXA-14.1
@@ -934,8 +954,12 @@ class Hl7IdentifierFHIRConversionTest {
         assertThat(coding.getCode()).isEqualTo("PLAC");
         assertThat(coding.getDisplay()).isEqualTo("Placer Identifier");
 
+    }
+
+    @Test
+    void documentReferenceIdentifierTest3() {
         // Placer from OBR, Filler from TXA-15
-        documentReference = "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|MDM^T02|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6|56789^NID^UID|MCM||||\n"
+        String documentReferenceMessage = "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|MDM^T02|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6|56789^NID^UID|MCM||||\n"
                 +
                 "PID|1||000054321^^^MRN|||||||||||||M|CAT|||||N\n" +
                 "PV1|1|I|||||||||||||||||||||||||||||||||||||||||||\n" +
@@ -943,36 +967,36 @@ class Hl7IdentifierFHIRConversionTest {
                 "OBR|1|CD_000000^OE||2244^General Order|||20170825010500||||||Relevant Clinical Information|||||||002|||||F|||550600^Tsadok550600^Janetary~660600^Merrit660600^Darren^F~770600^Das770600^Surjya^P~880600^Winter880600^Oscar^||||770600&Das770600&Surjya&P^^^6N^1234^A|\n"
                 +
                 "TXA|1||B45678||||||||||||FON001^IE\n";
-        report = ResourceUtils.getDocumentReference(documentReference);
+        DocumentReference report = ResourceUtils.getDocumentReference(documentReferenceMessage);
 
         // Expect 3 identifiers
         assertThat(report.hasIdentifier()).isTrue();
         assertThat(report.getIdentifier()).hasSize(3);
 
-        identifiers = report.getIdentifier();
+        List<Identifier> identifiers = report.getIdentifier();
         // Match the three id's to position; we can't depend on an order.
-        posExtId = getIdentifierPositionByValue("200911021022", identifiers);
+        int posExtId = getIdentifierPositionByValue("200911021022", identifiers);
         assertThat(posExtId).isNotSameAs(-1);
-        posFILLER = getIdentifierPositionByValue("FON001", identifiers);
+        int posFILLER = getIdentifierPositionByValue("FON001", identifiers);
         assertThat(posFILLER).isNotSameAs(-1);
-        posPLACER = getIdentifierPositionByValue("CD_000000", identifiers);
+        int posPLACER = getIdentifierPositionByValue("CD_000000", identifiers);
         assertThat(posPLACER).isNotSameAs(-1);
 
         // Identifier 1: extID from MSH-7
-        identifier = report.getIdentifier().get(posExtId);
-        value = identifier.getValue();
-        system = identifier.getSystem();
+        Identifier identifier = report.getIdentifier().get(posExtId);
+        String value = identifier.getValue();
+        String system = identifier.getSystem();
         assertThat(value).isEqualTo("200911021022"); // MSH-7
         assertThat(system).isEqualTo("urn:id:extID");
 
         // Identifier 2: Filler
-        identifier3 = report.getIdentifier().get(posFILLER);
+        Identifier identifier3 = report.getIdentifier().get(posFILLER);
         value = identifier3.getValue();
         system = identifier3.getSystem();
         assertThat(value).isEqualTo("FON001"); // TXA-15.1
         assertThat(system).isEqualTo("urn:id:IE"); // TXA.15.2
-        type = identifier3.getType();
-        coding = type.getCoding().get(0);
+        CodeableConcept type = identifier3.getType();
+        Coding coding = type.getCoding().get(0);
         assertThat(type.getText()).isNull();
         assertThat(coding.getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/v2-0203");
         assertThat(coding.getCode()).isEqualTo("FILL");
@@ -1051,12 +1075,15 @@ class Hl7IdentifierFHIRConversionTest {
         type = identifier.getType();
         DatatypeUtils.checkCommonCodeableConceptAssertions(type, "PLAC", "Placer Identifier",
                 "http://terminology.hl7.org/CodeSystem/v2-0203", null);
+    }
 
+    @Test
+    void serviceRequestIdentifierTest2() {
         // Test 3:
         //  - Visit number with PV1-19
         //  - filler from OBR
         //  - placer from ORC
-        serviceRequest = "MSH|^~\\&|SendTest1|Sendfac1|Receiveapp1|Receivefac1|200603081747|security|PPR^PC1^PPR_PC1|1|P^I|2.6||||||ASCII||\n"
+        String serviceRequest = "MSH|^~\\&|SendTest1|Sendfac1|Receiveapp1|Receivefac1|200603081747|security|PPR^PC1^PPR_PC1|1|P^I|2.6||||||ASCII||\n"
                 +
                 "PID|1||000054321^^^MRN|||||||||||||M|CAT|||||N\n" +
                 "PV1||I|6N^1234^A^GENERAL HOSPITAL2|||||||SUR||||||||S|8846511|A|||||||||||||||||||SF|K||||20170215080000\n"
@@ -1065,27 +1092,27 @@ class Hl7IdentifierFHIRConversionTest {
                 "ORC||PON001||||E|^Q6H^D10^^^R\n" +
                 "OBR|1||CD150920001336|||20150930000000|20150930164100|||||||||25055^MARCUSON^PATRICIA^L|||||||||F|||5755^DUNN^CHAD^B~25055^MARCUSON^PATRICIA^L|||WEAKNESS|DAS, SURJYA P||SHIELDS, SHARON A|||||||||";
 
-        serviceReq = ResourceUtils.getServiceRequest(serviceRequest);
+        ServiceRequest serviceReq = ResourceUtils.getServiceRequest(serviceRequest);
 
         // Expect 3 identifiers
         assertThat(serviceReq.hasIdentifier()).isTrue();
         assertThat(serviceReq.getIdentifier()).hasSize(3);
-        identifiers = serviceReq.getIdentifier();
+        List<Identifier> identifiers = serviceReq.getIdentifier();
         // Match the id's to position; we can't depend on an order.
-        posVN = getIdentifierPositionByValue("8846511", identifiers);
+        int posVN = getIdentifierPositionByValue("8846511", identifiers);
         assertThat(posVN).isNotSameAs(-1);
-        posFILLER = getIdentifierPositionByValue("CD150920001336", identifiers);
+        int posFILLER = getIdentifierPositionByValue("CD150920001336", identifiers);
         assertThat(posFILLER).isNotSameAs(-1);
-        posPLACER = getIdentifierPositionByValue("PON001", identifiers);
+        int posPLACER = getIdentifierPositionByValue("PON001", identifiers);
         assertThat(posPLACER).isNotSameAs(-1);
 
         // Identifier 1: visit number
-        identifier = serviceReq.getIdentifier().get(posVN);
-        value = identifier.getValue();
-        system = identifier.getSystem();
+        Identifier identifier = serviceReq.getIdentifier().get(posVN);
+        String value = identifier.getValue();
+        String system = identifier.getSystem();
         assertThat(value).isEqualTo("8846511"); // PV1.19
         assertThat(system).isNull();
-        type = identifier.getType();
+        CodeableConcept type = identifier.getType();
         DatatypeUtils.checkCommonCodeableConceptAssertions(type, "VN", "Visit number",
                 "http://terminology.hl7.org/CodeSystem/v2-0203", null);
 
@@ -1114,7 +1141,7 @@ class Hl7IdentifierFHIRConversionTest {
     // NOTE: ORU_RO1 records do not create the ServiceRequest directly.  They create a DiagnosticReport and it creates the ServiceRequest.
     // This test makes sure the specification for ORU_RO1.DiagnosticReport is specifying PID and PV1 correctly in AdditionalSegments.
     @Test
-    void serviceRequestIdentifierTest2() {
+    void serviceRequestIdentifierTest3() {
         // Test 1:
         //  - Visit number with PV1.19
         //  - filler and placer from OBR
@@ -1174,12 +1201,17 @@ class Hl7IdentifierFHIRConversionTest {
         type = identifier.getType();
         DatatypeUtils.checkCommonCodeableConceptAssertions(type, "PLAC", "Placer Identifier",
                 "http://terminology.hl7.org/CodeSystem/v2-0203", null);
+    }
 
+    // NOTE: ORU_RO1 records do not create the ServiceRequest directly.  They create a DiagnosticReport and it creates the ServiceRequest.
+    // This test makes sure the specification for ORU_RO1.DiagnosticReport is specifying PID and PV1 correctly in AdditionalSegments.
+    @Test
+    void serviceRequestIdentifierTest4() {
         // Test 2
         //  - Visit number with PID.18
         //  - filler from ORC
         //  - placer from ORC
-        serviceRequest = "MSH|^~\\&|||||20180924152907|34001|ORU^R01^ORU_R01|213|T|2.6|||||||||||\n"
+        String serviceRequest = "MSH|^~\\&|||||20180924152907|34001|ORU^R01^ORU_R01|213|T|2.6|||||||||||\n"
                 // PID.18 is used as backup identifier visit number because PV1.19 is empty
                 + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||665544||||||||||||\n"
                 // PV1.19 is empty and not used as visit number identifier 
@@ -1191,27 +1223,27 @@ class Hl7IdentifierFHIRConversionTest {
                 //  11. OBR.3 ignored as Filler
                 + "OBR|1|CD150920001336|CD150920001336|83036E^HEMOGLOBIN A1C^PACSEAP^^^^^^HEMOGLOBIN A1C||||||||||||||||||||||||||||||||||||||||||||\n";
 
-        serviceReq = ResourceUtils.getServiceRequest(serviceRequest);
+        ServiceRequest serviceReq = ResourceUtils.getServiceRequest(serviceRequest);
 
         // Expect 3 identifiers
         assertThat(serviceReq.hasIdentifier()).isTrue();
         assertThat(serviceReq.getIdentifier()).hasSize(3);
-        identifiers = serviceReq.getIdentifier();
+        List<Identifier> identifiers = serviceReq.getIdentifier();
         // Match the three id's to position; we can't depend on an order.
-        posVN = getIdentifierPositionByValue("665544", identifiers);
+        int posVN = getIdentifierPositionByValue("665544", identifiers);
         assertThat(posVN).isNotSameAs(-1);
-        posFILLER = getIdentifierPositionByValue("248648499", identifiers);
+        int posFILLER = getIdentifierPositionByValue("248648499", identifiers);
         assertThat(posFILLER).isNotSameAs(-1);
-        posPLACER = getIdentifierPositionByValue("248648498", identifiers);
+        int posPLACER = getIdentifierPositionByValue("248648498", identifiers);
         assertThat(posPLACER).isNotSameAs(-1);
 
         // Identifier 1: visit number should be set by PID.18
-        identifier = serviceReq.getIdentifier().get(posVN);
-        value = identifier.getValue();
-        system = identifier.getSystem();
+        Identifier identifier = serviceReq.getIdentifier().get(posVN);
+        String value = identifier.getValue();
+        String system = identifier.getSystem();
         assertThat(value).isEqualTo("665544"); // PID.18
         assertThat(system).isNull();
-        type = identifier.getType();
+        CodeableConcept type = identifier.getType();
         DatatypeUtils.checkCommonCodeableConceptAssertions(type, "VN", "Visit number",
                 "http://terminology.hl7.org/CodeSystem/v2-0203", null);
 
@@ -1234,12 +1266,17 @@ class Hl7IdentifierFHIRConversionTest {
         type = identifier.getType();
         DatatypeUtils.checkCommonCodeableConceptAssertions(type, "PLAC", "Placer Identifier",
                 "http://terminology.hl7.org/CodeSystem/v2-0203", null);
+    }
 
+    // NOTE: ORU_RO1 records do not create the ServiceRequest directly.  They create a DiagnosticReport and it creates the ServiceRequest.
+    // This test makes sure the specification for ORU_RO1.DiagnosticReport is specifying PID and PV1 correctly in AdditionalSegments.
+    @Test
+    void serviceRequestIdentifierTest5() {
         // Test 3:
         //  - MSH.7 as the visit number
         //  - filler from ORC
         //  - placer from ORC
-        serviceRequest = "MSH|^~\\&|||||20180924152907|34001|ORU^R01^ORU_R01|213|T|2.6|||||||||||\n"
+        String serviceRequest = "MSH|^~\\&|||||20180924152907|34001|ORU^R01^ORU_R01|213|T|2.6|||||||||||\n"
                 // PID.18 is empty so MSH.7 with be used as backup identifier visit number 
                 + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
                 // PV1.19 is empty so MSH.7 with be used as backup identifier visit number 
@@ -1251,7 +1288,7 @@ class Hl7IdentifierFHIRConversionTest {
                 //  11. OBR.3 ignored as Filler
                 + "OBR|1|||83036E^HEMOGLOBIN A1C^PACSEAP^^^^^^HEMOGLOBIN A1C|||||||||||||||||||||||||||||||||||||||||||\n";
 
-        serviceReq = ResourceUtils.getServiceRequest(serviceRequest);
+        ServiceRequest serviceReq = ResourceUtils.getServiceRequest(serviceRequest);
 
         // Expect 3 identifiers
         assertThat(serviceReq.hasIdentifier()).isTrue();
@@ -1260,22 +1297,22 @@ class Hl7IdentifierFHIRConversionTest {
         // Expect 3 identifiers
         assertThat(serviceReq.hasIdentifier()).isTrue();
         assertThat(serviceReq.getIdentifier()).hasSize(3);
-        identifiers = serviceReq.getIdentifier();
+        List<Identifier> identifiers = serviceReq.getIdentifier();
         // Match the three id's to position; we can't depend on an order.
-        posVN = getIdentifierPositionByValue("20180924152907", identifiers);
+        int posVN = getIdentifierPositionByValue("20180924152907", identifiers);
         assertThat(posVN).isNotSameAs(-1);
-        posFILLER = getIdentifierPositionByValue("222299", identifiers);
+        int posFILLER = getIdentifierPositionByValue("222299", identifiers);
         assertThat(posFILLER).isNotSameAs(-1);
-        posPLACER = getIdentifierPositionByValue("222298", identifiers);
+        int posPLACER = getIdentifierPositionByValue("222298", identifiers);
         assertThat(posPLACER).isNotSameAs(-1);
 
         // Identifier 1: visit number should be set by MSH.7
-        identifier = serviceReq.getIdentifier().get(posVN);
-        value = identifier.getValue();
-        system = identifier.getSystem();
+        Identifier identifier = serviceReq.getIdentifier().get(posVN);
+        String value = identifier.getValue();
+        String system = identifier.getSystem();
         assertThat(value).isEqualTo("20180924152907"); // MSH.7
         assertThat(system).isNull();
-        type = identifier.getType();
+        CodeableConcept type = identifier.getType();
         DatatypeUtils.checkCommonCodeableConceptAssertions(type, "VN", "Visit number",
                 "http://terminology.hl7.org/CodeSystem/v2-0203", null);
 
@@ -1361,33 +1398,37 @@ class Hl7IdentifierFHIRConversionTest {
         type = identifier.getType();
         DatatypeUtils.checkCommonCodeableConceptAssertions(type, "PLAC", "Placer Identifier",
                 "http://terminology.hl7.org/CodeSystem/v2-0203", null);
+    }
+
+    @Test
+    void medicationRequestIdentifierTest2() throws IOException {
 
         // Test: Visit number from PV1-19, extID from RXO-1.1 and RXO-1.3
-        medicationRequest = "MSH|^~\\&|PROSLOV|MYHOSPITAL|WHIA|IBM|20170215080000||OMP^O09|MSGID005520|T|2.6|||AL|NE|764|ASCII||||||^4086::132:2A57:3C28^IPv6\r"
+        String medicationRequest = "MSH|^~\\&|PROSLOV|MYHOSPITAL|WHIA|IBM|20170215080000||OMP^O09|MSGID005520|T|2.6|||AL|NE|764|ASCII||||||^4086::132:2A57:3C28^IPv6\r"
                 + "PID|1||000054321^^^MRN|||||||||||||||78654\r"
                 + "PV1||I|||||||||||||||||789789\r"
                 + "ORC|NW|||||E|10^BID^D4^^^R||20170215080000\r"
                 + "RXO|RX700001^DOCUSATE SODIUM 100 MG CAPSULE^ABC|100||mg|||||G||10||5|\r";
-        medReq = ResourceUtils.getMedicationRequest(medicationRequest);
+        MedicationRequest medReq = ResourceUtils.getMedicationRequest(medicationRequest);
 
         // Expect 2 identifiers
         assertThat(medReq.hasIdentifier()).isTrue();
         assertThat(medReq.getIdentifier()).hasSize(2);
 
-        identifiers = medReq.getIdentifier();
+        List<Identifier> identifiers = medReq.getIdentifier();
         // Match the id's to position; we can't depend on an order.
-        posVN = getIdentifierPositionByValue("789789", identifiers);
+        int posVN = getIdentifierPositionByValue("789789", identifiers);
         assertThat(posVN).isNotSameAs(-1);
-        posExtId = getIdentifierPositionByValue("RX700001-ABC", identifiers);
+        int posExtId = getIdentifierPositionByValue("RX700001-ABC", identifiers);
         assertThat(posExtId).isNotSameAs(-1);
 
         // Identifier 1: Visit number
-        identifier = medReq.getIdentifier().get(posVN);
-        value = identifier.getValue();
-        system = identifier.getSystem();
+        Identifier identifier = medReq.getIdentifier().get(posVN);
+        String value = identifier.getValue();
+        String system = identifier.getSystem();
         assertThat(value).isEqualTo("789789"); // PV1.19
         assertThat(system).isNull();
-        type = identifier.getType();
+        CodeableConcept type = identifier.getType();
         DatatypeUtils.checkCommonCodeableConceptAssertions(type, "VN", "Visit number",
                 "http://terminology.hl7.org/CodeSystem/v2-0203", null);
 
@@ -1398,33 +1439,38 @@ class Hl7IdentifierFHIRConversionTest {
         assertThat(value).isEqualTo("RX700001-ABC"); // RXO-1.1 and RXO-1.3
         assertThat(system).isEqualTo("urn:id:extID");
 
+    }
+
+    @Test
+    void medicationRequestIdentifierTest3() throws IOException {
+
         // Test: Visit number from MSH-7, extID from RXE-2
-        medicationRequest = "MSH|^~\\&|PROSLOV|MYHOSPITAL|WHIA|IBM|20170215080000||OMP^O09|MSGID005520|T|2.6|||AL|NE|764|ASCII||||||^4086::132:2A57:3C28^IPv6\r"
+        String medicationRequest = "MSH|^~\\&|PROSLOV|MYHOSPITAL|WHIA|IBM|20170215080000||OMP^O09|MSGID005520|T|2.6|||AL|NE|764|ASCII||||||^4086::132:2A57:3C28^IPv6\r"
                 + "PID|1||000054321^^^MRN\r"
                 + "PV1||I||||||||SUR||||||||S||A|||||||||||||||||||SF|K||||20170215080000\r"
                 + "ORC|NW||CD2017071101^RX|||E|10^BID^D4^^^R||20170215080000\r"
                 + "RXO|^DOCUSATE SODIUM 100 MG CAPSULE|100||mg|||||G||10||5|\r";
-        medReq = ResourceUtils.getMedicationRequest(medicationRequest);
+        MedicationRequest medReq = ResourceUtils.getMedicationRequest(medicationRequest);
 
         // Expect 3 identifiers
         assertThat(medReq.hasIdentifier()).isTrue();
         assertThat(medReq.getIdentifier()).hasSize(3);
-        identifiers = medReq.getIdentifier();
+        List<Identifier> identifiers = medReq.getIdentifier();
         // Match the id's to position; we can't depend on an order.
-        posVN = getIdentifierPositionByValue("20170215080000", identifiers);
+        int posVN = getIdentifierPositionByValue("20170215080000", identifiers);
         assertThat(posVN).isNotSameAs(-1);
-        posExtId = getIdentifierPositionByValue("DOCUSATE SODIUM 100 MG CAPSULE", identifiers);
+        int posExtId = getIdentifierPositionByValue("DOCUSATE SODIUM 100 MG CAPSULE", identifiers);
         assertThat(posExtId).isNotSameAs(-1);
         int posRX = getIdentifierPositionByValue("CD2017071101", identifiers);
         assertThat(posRX).isNotSameAs(-1);
 
         // Identifier 1: Visit number
-        identifier = medReq.getIdentifier().get(posVN);
-        value = identifier.getValue();
-        system = identifier.getSystem();
+        Identifier identifier = medReq.getIdentifier().get(posVN);
+        String value = identifier.getValue();
+        String system = identifier.getSystem();
         assertThat(value).isEqualTo("20170215080000"); // MSH-7
         assertThat(system).isNull();
-        type = identifier.getType();
+        CodeableConcept type = identifier.getType();
         DatatypeUtils.checkCommonCodeableConceptAssertions(type, "VN", "Visit number",
                 "http://terminology.hl7.org/CodeSystem/v2-0203", null);
 
@@ -1445,69 +1491,38 @@ class Hl7IdentifierFHIRConversionTest {
         DatatypeUtils.checkCommonCodeableConceptAssertions(type, "FILL", "Filler Identifier",
                 "http://terminology.hl7.org/CodeSystem/v2-0203", null);
 
+    }
+
+    @Test
+    void medicationRequestIdentifierTest4() throws IOException {
+
         // Test: Visit number from MSH-7, no RXO-1
-        medicationRequest = "MSH|^~\\&|PROSLOV|MYHOSPITAL|WHIA|IBM|20170215080000||RDE^O11^RDE_O11|MSGID005520|T|2.6|||AL|NE|764|ASCII||||||^4086::132:2A57:3C28^IPv6\r"
+        String medicationRequest = "MSH|^~\\&|PROSLOV|MYHOSPITAL|WHIA|IBM|20170215080000||RDE^O11^RDE_O11|MSGID005520|T|2.6|||AL|NE|764|ASCII||||||^4086::132:2A57:3C28^IPv6\r"
                 + "PID|1||000054321^^^MRN\r"
                 + "PV1||I||||||||SUR||||||||S||A|||||||||||||||||||SF|K||||20170215080000\r"
                 + "ORC|NW|||||E|10^BID^D4^^^R||20170215080000\r"
                 + "RXO|||||||||G||10||5|\r"
                 + "RXE|^^^20170923230000^^R|999^Ampicillin 250 MG TAB^NDC|100||mg|123^test^ABC||||10||5|";
-        medReq = ResourceUtils.getMedicationRequest(medicationRequest);
+        MedicationRequest medReq = ResourceUtils.getMedicationRequest(medicationRequest);
 
         // Expect 2 identifier
         assertThat(medReq.hasIdentifier()).isTrue();
         assertThat(medReq.getIdentifier()).hasSize(2);
 
-        identifiers = medReq.getIdentifier();
+        List<Identifier> identifiers = medReq.getIdentifier();
         // Match the id's to position; we can't depend on an order.
-        posVN = getIdentifierPositionByValue("20170215080000", identifiers);
+        int posVN = getIdentifierPositionByValue("20170215080000", identifiers);
         assertThat(posVN).isNotSameAs(-1);
-        posExtId = getIdentifierPositionByValue("999-NDC", identifiers);
+        int posExtId = getIdentifierPositionByValue("999-NDC", identifiers);
         assertThat(posExtId).isNotSameAs(-1);
 
         // Identifier 1: Visit number
-        identifier = medReq.getIdentifier().get(posVN);
-        value = identifier.getValue();
-        system = identifier.getSystem();
+        Identifier identifier = medReq.getIdentifier().get(posVN);
+        String value = identifier.getValue();
+        String system = identifier.getSystem();
         assertThat(value).isEqualTo("20170215080000"); // MSH-7
         assertThat(system).isNull();
-        type = identifier.getType();
-        DatatypeUtils.checkCommonCodeableConceptAssertions(type, "VN", "Visit number",
-                "http://terminology.hl7.org/CodeSystem/v2-0203", null);
-
-        // Identifier 2: extID based on RXE-2.1 and RXE-2.3
-        identifier = medReq.getIdentifier().get(posExtId);
-        value = identifier.getValue();
-        system = identifier.getSystem();
-        assertThat(value).isEqualTo("999-NDC"); // RXE-2.1 and RXE-2.3
-        assertThat(system).isEqualTo("urn:id:extID");
-
-        // Test: Visit number from PV1-19, extID from RXE-2.1 and RXE-2.3
-        medicationRequest = "MSH|^~\\&|PROSLOV|MYHOSPITAL|WHIA|IBM|20170215080000||RDE^O11^RDE_O11|MSGID005520|T|2.6|||AL|NE|764|ASCII||||||^4086::132:2A57:3C28^IPv6\r"
-                + "PID|1||000054321^^^MRN|||||||||||||||78654\r"
-                + "PV1||I|||||||||||||||||789789\r"
-                + "ORC|NW|||||E|10^BID^D4^^^R||20170215080000\r"
-                + "RXE|^^^20170923230000^^R|999^Ampicillin 250 MG TAB^NDC|100||mg|123^test^ABC||||10||5|";
-        medReq = ResourceUtils.getMedicationRequest(medicationRequest);
-
-        // Expect 2 identifiers
-        assertThat(medReq.hasIdentifier()).isTrue();
-        assertThat(medReq.getIdentifier()).hasSize(2);
-
-        identifiers = medReq.getIdentifier();
-        // Match the id's to position; we can't depend on an order.
-        posVN = getIdentifierPositionByValue("789789", identifiers);
-        assertThat(posVN).isNotSameAs(-1);
-        posExtId = getIdentifierPositionByValue("999-NDC", identifiers);
-        assertThat(posExtId).isNotSameAs(-1);
-
-        // Identifier 1: Visit number
-        identifier = medReq.getIdentifier().get(posVN);
-        value = identifier.getValue();
-        system = identifier.getSystem();
-        assertThat(value).isEqualTo("789789"); // PV1.19
-        assertThat(system).isNull();
-        type = identifier.getType();
+        CodeableConcept type = identifier.getType();
         DatatypeUtils.checkCommonCodeableConceptAssertions(type, "VN", "Visit number",
                 "http://terminology.hl7.org/CodeSystem/v2-0203", null);
 
@@ -1521,10 +1536,53 @@ class Hl7IdentifierFHIRConversionTest {
     }
 
     @Test
-    void medicationAdministration_identifier_test() {
-        // TODO
-        // Currently no messages generate MedicationAdministration resources
+    void medicationRequestIdentifierTest5() throws IOException {
+
+        // Test: Visit number from PV1-19, extID from RXE-2.1 and RXE-2.3
+        String medicationRequest = "MSH|^~\\&|PROSLOV|MYHOSPITAL|WHIA|IBM|20170215080000||RDE^O11^RDE_O11|MSGID005520|T|2.6|||AL|NE|764|ASCII||||||^4086::132:2A57:3C28^IPv6\r"
+                + "PID|1||000054321^^^MRN|||||||||||||||78654\r"
+                + "PV1||I|||||||||||||||||789789\r"
+                + "ORC|NW|||||E|10^BID^D4^^^R||20170215080000\r"
+                + "RXE|^^^20170923230000^^R|999^Ampicillin 250 MG TAB^NDC|100||mg|123^test^ABC||||10||5|";
+        MedicationRequest medReq = ResourceUtils.getMedicationRequest(medicationRequest);
+
+        // Expect 2 identifiers
+        assertThat(medReq.hasIdentifier()).isTrue();
+        assertThat(medReq.getIdentifier()).hasSize(2);
+
+        List<Identifier> identifiers = medReq.getIdentifier();
+        // Match the id's to position; we can't depend on an order.
+        int posVN = getIdentifierPositionByValue("789789", identifiers);
+        assertThat(posVN).isNotSameAs(-1);
+        int posExtId = getIdentifierPositionByValue("999-NDC", identifiers);
+        assertThat(posExtId).isNotSameAs(-1);
+
+        // Identifier 1: Visit number
+        Identifier identifier = medReq.getIdentifier().get(posVN);
+        String value = identifier.getValue();
+        String system = identifier.getSystem();
+        assertThat(value).isEqualTo("789789"); // PV1.19
+        assertThat(system).isNull();
+        CodeableConcept type = identifier.getType();
+        DatatypeUtils.checkCommonCodeableConceptAssertions(type, "VN", "Visit number",
+                "http://terminology.hl7.org/CodeSystem/v2-0203", null);
+
+        // Identifier 2: extID based on RXE-2.1 and RXE-2.3
+        identifier = medReq.getIdentifier().get(posExtId);
+        value = identifier.getValue();
+        system = identifier.getSystem();
+        assertThat(value).isEqualTo("999-NDC"); // RXE-2.1 and RXE-2.3
+        assertThat(system).isEqualTo("urn:id:extID");
+
     }
+
+    // TODO Add this when MedicationAdministration is supported
+    // @Test
+    // @Disabled("Currently no messages generate MedicationAdministration resources")
+    // void medicationAdministration_identifier_test() {
+    //     
+    //     // Currently no messages generate MedicationAdministration resources
+    // }
 
     private static int getIdentifierPositionByValue(String value, List<Identifier> identifiers) {
         for (int i = 0; i < identifiers.size(); i++) {

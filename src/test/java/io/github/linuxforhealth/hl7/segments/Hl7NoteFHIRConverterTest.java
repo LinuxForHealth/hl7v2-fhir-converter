@@ -48,6 +48,8 @@ class Hl7NoteFHIRConverterTest {
                 Arguments.of("ORM^O01", 0));
     }
 
+    // Suppress warnings about too many assertions in a test.  Justification: creating a FHIR message is very costly; we need to check many asserts per creation for efficiency.  
+    @java.lang.SuppressWarnings("squid:S5961")
     @ParameterizedTest
     @MethodSource("provideParmsForNoteCreationServiceRequestMutipleOBX")
     void testNoteCreationServiceRequestMutipleOBX(String message, int numExpectedDiagnosticReports) {
@@ -171,6 +173,8 @@ class Hl7NoteFHIRConverterTest {
                                 + "RXE|^Q24H&0600^^20210407191342^^ROU|0169-6339-10^insulin aspart (NOVOLOG) subcutaneous injection (CORRECTION SCALE INSULIN) 0-16 Units^NDC|0||Units|47^SOLN|||||||\n"));
     }
 
+    // Suppress warnings about too many assertions in a test.  Justification: creating a FHIR message is very costly; we need to check many asserts per creation for efficiency.  
+    @java.lang.SuppressWarnings("squid:S5961")
     @ParameterizedTest
     @MethodSource("parmsTestMedicationRequestNoteCreation")
     void testMedicationRequestNoteCreation(String message, String medicalRequestSegments) {

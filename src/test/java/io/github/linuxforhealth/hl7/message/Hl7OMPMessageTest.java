@@ -9,28 +9,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.stream.Collectors;
 
-import org.hl7.fhir.instance.model.api.IBaseResource;
-import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
-import org.hl7.fhir.r4.model.Bundle.BundleType;
 import org.hl7.fhir.r4.model.Resource;
 import org.hl7.fhir.r4.model.ResourceType;
 import org.junit.jupiter.api.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import io.github.linuxforhealth.fhir.FHIRContext;
-import io.github.linuxforhealth.hl7.ConverterOptions;
-import io.github.linuxforhealth.hl7.ConverterOptions.Builder;
-import io.github.linuxforhealth.hl7.HL7ToFHIRConverter;
+import io.github.linuxforhealth.hl7.segments.util.ResourceUtils;
 
 class Hl7OMPMessageTest {
-    private static FHIRContext context = new FHIRContext();
-    private static final ConverterOptions OPTIONS_PRETTYPRINT = new Builder().withBundleType(BundleType.COLLECTION)
-            .withValidateResource().withPrettyPrint().build();
-    private static final Logger LOGGER = LoggerFactory.getLogger(Hl7OMPMessageTest.class);
 
     // For reference, here is an example OMP_O09
     // "MSH|^~\\&|WHI_LOAD_GENERATOR|IBM_TORONTO_LAB|MEDORDER|IBM|20210407191342|9022934|OMP^O09|MSGID_bae9ce6a-e35d-4ff5-8d50-c5dde19cc1aa|T|2.5.1\r"
@@ -49,23 +36,12 @@ class Hl7OMPMessageTest {
                 + "ORC|OP|1000|9999999||||^3 times daily^^20210401\r"
                 + "RXO|50111032701^hydrALAZINE HCl 25 MG Oral Tablet^NDC^^^^^^hydrALAZINE (APRESOLINE) 25 MG TABS|||||||||||||||||||||||\r";
 
-        HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
-        String json = ftv.convert(hl7message, OPTIONS_PRETTYPRINT);
-        assertThat(json).isNotBlank();
-        LOGGER.debug("FHIR json result:\n" + json);
-        IBaseResource bundleResource = context.getParser().parseResource(json);
-        assertThat(bundleResource).isNotNull();
-        Bundle b = (Bundle) bundleResource;
-        List<BundleEntryComponent> e = b.getEntry();
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
 
-        List<Resource> patientResource = e.stream()
-                .filter(v -> ResourceType.Patient == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> patientResource = ResourceUtils.getResourceList(e, ResourceType.Patient);
         assertThat(patientResource).hasSize(1);
 
-        List<Resource> medicationRequestResource = e.stream()
-                .filter(v -> ResourceType.MedicationRequest == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> medicationRequestResource = ResourceUtils.getResourceList(e, ResourceType.MedicationRequest);
         assertThat(medicationRequestResource).hasSize(1);
 
         // Confirm that there are no extra resources created
@@ -81,28 +57,15 @@ class Hl7OMPMessageTest {
                 + "ORC|OP|1000|9999999||||^3 times daily^^20210401\r"
                 + "RXO|50111032701^hydrALAZINE HCl 25 MG Oral Tablet^NDC^^^^^^hydrALAZINE (APRESOLINE) 25 MG TABS|||||||||||||||||||||||\r";
 
-        HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
-        String json = ftv.convert(hl7message, OPTIONS_PRETTYPRINT);
-        assertThat(json).isNotBlank();
-        LOGGER.debug("FHIR json result:\n" + json);
-        IBaseResource bundleResource = context.getParser().parseResource(json);
-        assertThat(bundleResource).isNotNull();
-        Bundle b = (Bundle) bundleResource;
-        List<BundleEntryComponent> e = b.getEntry();
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
 
-        List<Resource> patientResource = e.stream()
-                .filter(v -> ResourceType.Patient == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> patientResource = ResourceUtils.getResourceList(e, ResourceType.Patient);
         assertThat(patientResource).hasSize(1);
 
-        List<Resource> encounterResource = e.stream()
-                .filter(v -> ResourceType.Encounter == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> encounterResource = ResourceUtils.getResourceList(e, ResourceType.Encounter);
         assertThat(encounterResource).hasSize(1);
 
-        List<Resource> medicationRequestResource = e.stream()
-                .filter(v -> ResourceType.MedicationRequest == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> medicationRequestResource = ResourceUtils.getResourceList(e, ResourceType.MedicationRequest);
         assertThat(medicationRequestResource).hasSize(1);
 
         // Confirm that there are no extra resources created
@@ -123,33 +86,18 @@ class Hl7OMPMessageTest {
                 + "ORC|OP|1000|9999999||||^3 times daily^^20210401\r"
                 + "RXO|50111032701^hydrALAZINE HCl 25 MG Oral Tablet^NDC^^^^^^hydrALAZINE (APRESOLINE) 25 MG TABS|||||||||||||||||||||||\r";
 
-        HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
-        String json = ftv.convert(hl7message, OPTIONS_PRETTYPRINT);
-        assertThat(json).isNotBlank();
-        LOGGER.debug("FHIR json result:\n" + json);
-        IBaseResource bundleResource = context.getParser().parseResource(json);
-        assertThat(bundleResource).isNotNull();
-        Bundle b = (Bundle) bundleResource;
-        List<BundleEntryComponent> e = b.getEntry();
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
 
-        List<Resource> patientResource = e.stream()
-                .filter(v -> ResourceType.Patient == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> patientResource = ResourceUtils.getResourceList(e, ResourceType.Patient);
         assertThat(patientResource).hasSize(1);
 
-        List<Resource> encounterResource = e.stream()
-                .filter(v -> ResourceType.Encounter == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> encounterResource = ResourceUtils.getResourceList(e, ResourceType.Encounter);
         assertThat(encounterResource).hasSize(1);
 
-        List<Resource> allergyResource = e.stream()
-                .filter(v -> ResourceType.AllergyIntolerance == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> allergyResource = ResourceUtils.getResourceList(e, ResourceType.AllergyIntolerance);
         assertThat(allergyResource).hasSize(3);
 
-        List<Resource> medicationRequestResource = e.stream()
-                .filter(v -> ResourceType.MedicationRequest == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> medicationRequestResource = ResourceUtils.getResourceList(e, ResourceType.MedicationRequest);
         assertThat(medicationRequestResource).hasSize(1);
 
         // Confirm that there are no extra resources created
@@ -171,28 +119,15 @@ class Hl7OMPMessageTest {
                 + "RXO|RX800006^Test15 SODIUM 100 MG CAPSULE|100||mg|||||G||10||5\r"
                 + "OBX|1|ST|TS-F-01-002^Endocrine Disorders^L||obs report||||||F\r";
 
-        HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
-        String json = ftv.convert(hl7message, OPTIONS_PRETTYPRINT);
-        assertThat(json).isNotBlank();
-        LOGGER.debug("FHIR json result:\n" + json);
-        IBaseResource bundleResource = context.getParser().parseResource(json);
-        assertThat(bundleResource).isNotNull();
-        Bundle b = (Bundle) bundleResource;
-        List<BundleEntryComponent> e = b.getEntry();
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
 
-        List<Resource> patientResource = e.stream()
-                .filter(v -> ResourceType.Patient == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> patientResource = ResourceUtils.getResourceList(e, ResourceType.Patient);
         assertThat(patientResource).hasSize(1);
 
-        List<Resource> medicationRequestResource = e.stream()
-                .filter(v -> ResourceType.MedicationRequest == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> medicationRequestResource = ResourceUtils.getResourceList(e, ResourceType.MedicationRequest);
         assertThat(medicationRequestResource).hasSize(2);
 
-        List<Resource> observationResource = e.stream()
-                .filter(v -> ResourceType.Observation == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> observationResource = ResourceUtils.getResourceList(e, ResourceType.Observation);
         assertThat(observationResource).hasSize(4);
 
         // Confirm that there are no extra resources created
@@ -214,29 +149,16 @@ class Hl7OMPMessageTest {
                 + "OBX|1|TX|1234^some text^SCT||First line: Sodium Report||||||F||\n"
                 + "OBX|2|TX|1234^some text^SCT||Second line: Sodium REPORT||||||F||\n";
 
-        HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
-        String json = ftv.convert(hl7message, OPTIONS_PRETTYPRINT);
-        assertThat(json).isNotBlank();
-        LOGGER.debug("FHIR json result:\n" + json);
-        IBaseResource bundleResource = context.getParser().parseResource(json);
-        assertThat(bundleResource).isNotNull();
-        Bundle b = (Bundle) bundleResource;
-        List<BundleEntryComponent> e = b.getEntry();
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
 
-        List<Resource> patientResource = e.stream()
-                .filter(v -> ResourceType.Patient == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> patientResource = ResourceUtils.getResourceList(e, ResourceType.Patient);
         assertThat(patientResource).hasSize(1);
 
-        List<Resource> medicationRequestResource = e.stream()
-                .filter(v -> ResourceType.MedicationRequest == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> medicationRequestResource = ResourceUtils.getResourceList(e, ResourceType.MedicationRequest);
         assertThat(medicationRequestResource).hasSize(2);
 
-        List<Resource> docRefResource = e.stream()
-                .filter(v -> ResourceType.DocumentReference == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
-        assertThat(docRefResource).hasSize(0);//TODO: This should be 2 when card 864 is completed
+        List<Resource> docRefResource = ResourceUtils.getResourceList(e, ResourceType.DocumentReference);
+        assertThat(docRefResource).isEmpty();//TODO: This should be 2 when card 864 is completed
 
         // Confirm that there are no extra resources created
         assertThat(e.size()).isEqualTo(3); //TODO: This should be 5 when card 864 is completed
@@ -262,34 +184,19 @@ class Hl7OMPMessageTest {
                 + "ORC|OP|1000|9999999||||^3 times daily^^20210401\r"
                 + "RXO|50111032701^hydrALAZINE HCl 25 MG Oral Tablet^NDC^^^^^^hydrALAZINE (APRESOLINE) 25 MG TABS|||||||||||||||||||||||\r";
 
-        HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
-        String json = ftv.convert(hl7message, OPTIONS_PRETTYPRINT);
-        assertThat(json).isNotBlank();
-        LOGGER.debug("FHIR json result:\n" + json);
-        IBaseResource bundleResource = context.getParser().parseResource(json);
-        assertThat(bundleResource).isNotNull();
-        Bundle b = (Bundle) bundleResource;
-        List<BundleEntryComponent> e = b.getEntry();
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
 
-        List<Resource> patientResource = e.stream()
-                .filter(v -> ResourceType.Patient == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> patientResource = ResourceUtils.getResourceList(e, ResourceType.Patient);
         assertThat(patientResource).hasSize(1);
 
-        List<Resource> medicationRequestResource = e.stream()
-                .filter(v -> ResourceType.MedicationRequest == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> medicationRequestResource = ResourceUtils.getResourceList(e, ResourceType.MedicationRequest);
         assertThat(medicationRequestResource).hasSize(3);
 
-        List<Resource> observationResource = e.stream()
-                .filter(v -> ResourceType.Observation == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> observationResource = ResourceUtils.getResourceList(e, ResourceType.Observation);
         assertThat(observationResource).hasSize(3);
 
-        List<Resource> docRefResource = e.stream()
-                .filter(v -> ResourceType.DocumentReference == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
-        assertThat(docRefResource).hasSize(0); //TODO: This should be 1 when card 864 is completed
+        List<Resource> docRefResource = ResourceUtils.getResourceList(e, ResourceType.DocumentReference);
+        assertThat(docRefResource).isEmpty(); //TODO: This should be 1 when card 864 is completed
 
         // Confirm that there are no extra resources created
         assertThat(e.size()).isEqualTo(7); //TODO: This should be 8 when card 864 is completed

@@ -37,8 +37,6 @@ import com.google.common.collect.Lists;
 
 import io.github.linuxforhealth.api.ResourceModel;
 import io.github.linuxforhealth.fhir.FHIRContext;
-import io.github.linuxforhealth.hl7.ConverterOptions;
-import io.github.linuxforhealth.hl7.ConverterOptions.Builder;
 import io.github.linuxforhealth.hl7.message.HL7FHIRResourceTemplate;
 import io.github.linuxforhealth.hl7.message.HL7FHIRResourceTemplateAttributes;
 import io.github.linuxforhealth.hl7.message.HL7MessageEngine;
@@ -49,8 +47,7 @@ import io.github.linuxforhealth.hl7.segments.util.ResourceUtils;
 
 class Hl7ObservationFHIRConversionTest {
     private static FHIRContext context = new FHIRContext();
-    private static HL7MessageEngine engine = new HL7MessageEngine(context);
-    private static final ConverterOptions OPTIONS = new Builder().withValidateResource().withPrettyPrint().build();
+    private static HL7MessageEngine customEngine = new HL7MessageEngine(context);
 
     private String baseMessage = "MSH|^~\\&|hl7Integration|hl7Integration|||||ADT^A01|||2.6|\r"
             + "EVN|A01|20130617154644\r"
@@ -70,15 +67,9 @@ class Hl7ObservationFHIRConversionTest {
     @Test
     void testObservationNmResult() throws IOException {
         String hl7message = baseMessage + "OBX|1|NM|0135-4^TotalProtein||7.3|gm/dl|5.9-8.4|||R|F";
-        String json = message.convert(hl7message, engine);
 
-        IBaseResource bundleResource = context.getParser().parseResource(json);
-        assertThat(bundleResource).isNotNull();
-        Bundle b = (Bundle) bundleResource;
-        List<BundleEntryComponent> e = b.getEntry();
-        List<Resource> obsResource = e.stream()
-                .filter(v -> ResourceType.Observation == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<Resource> obsResource = ResourceUtils.getResourceList(e, ResourceType.Observation);
         assertThat(obsResource).hasSize(1);
         Observation obs = (Observation) obsResource.get(0);
         assertThat(obs.getValueQuantity()).isNotNull();
@@ -374,11 +365,13 @@ class Hl7ObservationFHIRConversionTest {
             //"MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|PPR^PC3|||2.6||||||||2.6\r",
             "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|VXU^V04|||2.6||||||||2.6\r",
     })
+    // Suppress warnings about too many assertions in a test.  Justification: creating a FHIR message is very costly; we need to check many asserts per creation for efficiency.  
+    @java.lang.SuppressWarnings("squid:S5961")
     void extendedObservationTestMostMessages(String msh) throws IOException {
         String hl7message = msh
                 + "OBX|1|CWE|DQW^Some text 1^SNM3|100|DQW^Other text 2^SNM3|mm^Text 3^SNM3|56-98|IND|25|ST|F|20210322153839|LKJ|20210320153850|N56|1111^ClinicianLastName^ClinicianFirstName^^^^Title|Manual^Text the 4th^SNM3|Device_1234567^mySystem|20210322153925|Observation Site^Text 5^SNM3|INST^Instance Identifier System||Radiology^Radiological Services|467 Albany Hospital^^Albany^NY|Cardiology^ContactLastName^Jane^Q^^Dr.^MD\r";
 
-        String json = message.convert(hl7message, engine); // use special created engine
+        String json = message.convert(hl7message, customEngine); // use special created engine
 
         IBaseResource bundleResource = context.getParser().parseResource(json);
         assertThat(bundleResource).isNotNull();
@@ -492,6 +485,8 @@ class Hl7ObservationFHIRConversionTest {
 
     // A companion test to extendedObservationCWEtest that looks for edge cases
     @Test
+    // Suppress warnings about too many assertions in a test.  Justification: creating a FHIR message is very costly; we need to check many asserts per creation for efficiency.  
+    @java.lang.SuppressWarnings("squid:S5961")
     void extendedObservationUnusualRangesAndOtherTest() throws IOException {
         String ORU_r01 = "MSH|^~\\&|NIST Test Lab APP|NIST Lab Facility||NIST EHR Facility|20150926140551||ORU^R01|NIST-LOI_5.0_1.1-NG|T|2.5.1|||AL|AL|||||\r"
                 + "PID|1||||DOE^JANE||||||||||||\r"
@@ -550,6 +545,8 @@ class Hl7ObservationFHIRConversionTest {
             "MSH|^~\\&|WHI_LOAD_GENERATOR|IBM_TORONTO_LAB||IBM|20210407191342|25739|RDE^O11|MSGID_f209e83f-20db-474d-a7ae-82e5c3894273|T|2.6\r",
             "MSH|^~\\&|WHI_LOAD_GENERATOR|IBM_TORONTO_LAB||IBM|20210407191342|25739|RDE^O25|MSGID_f209e83f-20db-474d-a7ae-82e5c3894273|T|2.6\r"
     })
+    // Suppress warnings about too many assertions in a test.  Justification: creating a FHIR message is very costly; we need to check many asserts per creation for efficiency.  
+    @java.lang.SuppressWarnings("squid:S5961")
     void extendedObservationTestForRDEMessages(String msh) throws IOException {
 
         String hl7message = msh

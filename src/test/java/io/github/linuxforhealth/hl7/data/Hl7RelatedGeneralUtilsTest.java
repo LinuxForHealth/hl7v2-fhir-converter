@@ -208,7 +208,7 @@ class Hl7RelatedGeneralUtilsTest {
     }
 
     @Test
-    void test_getAddressUse() {
+    void test_getAddressUse1() {
         String ANYTHING = "anything";
         // Inputs are XAD.7 Type, XAD.16 Temp Indicator, XAD.17 Bad address indicator
         assertThat(Hl7RelatedGeneralUtils.getAddressUse("C", "", ANYTHING)).isEqualTo("temp");
@@ -229,6 +229,13 @@ class Hl7RelatedGeneralUtilsTest {
         assertThat(Hl7RelatedGeneralUtils.getAddressUse(null, ANYTHING, "Y")).isEqualTo("old");
         assertThat(Hl7RelatedGeneralUtils.getAddressUse(ANYTHING, null, "Y")).isEqualTo("old");
         assertThat(Hl7RelatedGeneralUtils.getAddressUse(null, null, "Y")).isEqualTo("old");
+        // More tests of getAddressUse in test_getAddressUse2
+    }
+
+    @Test
+    void test_getAddressUse2() {
+        String ANYTHING = "anything";
+        // Inputs are XAD.7 Type, XAD.16 Temp Indicator, XAD.17 Bad address indicator
         assertThat(Hl7RelatedGeneralUtils.getAddressUse("BA", ANYTHING, ANYTHING)).isEmpty();
         assertThat(Hl7RelatedGeneralUtils.getAddressUse("BA", null, ANYTHING)).isEmpty();
         assertThat(Hl7RelatedGeneralUtils.getAddressUse("H", ANYTHING, ANYTHING)).isEqualTo("home");

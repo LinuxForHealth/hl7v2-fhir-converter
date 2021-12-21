@@ -9,10 +9,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Base64;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.hl7.fhir.instance.model.api.IBaseResource;
-import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
 import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.DocumentReference;
@@ -26,8 +24,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import io.github.linuxforhealth.fhir.FHIRContext;
-import io.github.linuxforhealth.hl7.HL7ToFHIRConverter;
-import io.github.linuxforhealth.hl7.segments.util.PatientUtils;
 import io.github.linuxforhealth.hl7.segments.util.ResourceUtils;
 
 class Hl7DocumentReferenceFHIRConversionTest {
@@ -81,18 +77,10 @@ class Hl7DocumentReferenceFHIRConversionTest {
                 + "TXA|1||TEXT||||201801180346||<PHYSID1>^DOE^JANE^J^^MD||||||||||AV|||<PHYSID2>^DOE^JOHN^K^^MD||\n"
                 + "OBX|1|ST|100||This is content|||||||X\n";
 
-        HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
-        String json = ftv.convert(documentReferenceMessage, PatientUtils.OPTIONS);
+        List<BundleEntryComponent> e = ResourceUtils
+                .createFHIRBundleFromHL7MessageReturnEntryList(documentReferenceMessage);
 
-        assertThat(json).isNotBlank();
-        IBaseResource bundleResource = context.getParser().parseResource(json);
-        assertThat(bundleResource).isNotNull();
-        Bundle bundle = (Bundle) bundleResource;
-        List<Bundle.BundleEntryComponent> e = bundle.getEntry();
-
-        List<Resource> documentReferenceList = e.stream()
-                .filter(v -> ResourceType.DocumentReference == v.getResource().getResourceType())
-                .map(Bundle.BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> documentReferenceList = ResourceUtils.getResourceList(e, ResourceType.DocumentReference);
         String s = context.getParser().encodeResourceToString(documentReferenceList.get(0));
         Class<? extends IBaseResource> klass = DocumentReference.class;
 
@@ -100,8 +88,8 @@ class Hl7DocumentReferenceFHIRConversionTest {
         String requesterRefAuthor = documentReference.getAuthor().get(0).getReference();
         String requesterRefAuthenticator = documentReference.getAuthenticator().getReference();
 
-        Practitioner practAuthor = ResourceUtils.getSpecificPractitionerFromBundle(bundle, requesterRefAuthor);
-        Practitioner practAuthenticator = ResourceUtils.getSpecificPractitionerFromBundle(bundle,
+        Practitioner practAuthor = ResourceUtils.getSpecificPractitionerFromBundleEntriesList(e, requesterRefAuthor);
+        Practitioner practAuthenticator = ResourceUtils.getSpecificPractitionerFromBundleEntriesList(e,
                 requesterRefAuthenticator);
 
         assertThat(documentReference.hasAuthor()).isTrue();
@@ -197,25 +185,17 @@ class Hl7DocumentReferenceFHIRConversionTest {
                 + "TXA|1||TEXT|20180117144200|5566^PAPLast^PAPFirst^J^^MD||201801180346||<PHYSID1>||||||||||AV|||<PHYSID2>||\n"
                 // OBX is type ST so an observation will be created
                 + "OBX|1|ST|100||This is content|||||||X\n";
-        HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
-        String json = ftv.convert(documentReferenceMessage, PatientUtils.OPTIONS);
-        assertThat(json).isNotBlank();
+        List<BundleEntryComponent> e = ResourceUtils
+                .createFHIRBundleFromHL7MessageReturnEntryList(documentReferenceMessage);
 
-        IBaseResource bundleResource = context.getParser().parseResource(json);
-        assertThat(bundleResource).isNotNull();
-        Bundle bundle = (Bundle) bundleResource;
-        List<Bundle.BundleEntryComponent> e = bundle.getEntry();
-
-        List<Resource> documentReferenceList = e.stream()
-                .filter(v -> ResourceType.DocumentReference == v.getResource().getResourceType())
-                .map(Bundle.BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> documentReferenceList = ResourceUtils.getResourceList(e, ResourceType.DocumentReference);
         String s = context.getParser().encodeResourceToString(documentReferenceList.get(0));
         Class<? extends IBaseResource> klass = DocumentReference.class;
 
         DocumentReference documentReference = (DocumentReference) context.getParser().parseResource(klass, s);
         String requesterRef = documentReference.getContext().getRelatedFirstRep().getReference();
 
-        Practitioner practBundle = ResourceUtils.getSpecificPractitionerFromBundle(bundle, requesterRef);
+        Practitioner practBundle = ResourceUtils.getSpecificPractitionerFromBundleEntriesList(e, requesterRef);
 
         DocumentReference.DocumentReferenceContextComponent refContext = documentReference.getContext();
         assertThat(refContext.getPeriod().getStartElement().toString()).containsPattern("2018-01-17T14:42:00"); // TXA.4
@@ -232,31 +212,21 @@ class Hl7DocumentReferenceFHIRConversionTest {
         // Expected are DocumentReference, ServiceRequest, Observation, 3 Practitioners, Patient, and Encounter
         assertThat(e.size()).isEqualTo(8);
 
-        List<Resource> patientResource = e.stream()
-                .filter(v -> ResourceType.Patient == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> patientResource = ResourceUtils.getResourceList(e, ResourceType.Patient);
         assertThat(patientResource).hasSize(1);
 
-        List<Resource> encounterResource = e.stream()
-                .filter(v -> ResourceType.Encounter == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> encounterResource = ResourceUtils.getResourceList(e, ResourceType.Encounter);
         assertThat(encounterResource).hasSize(1);
 
-        List<Resource> practitionerResource = e.stream()
-                .filter(v -> ResourceType.Practitioner == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> practitionerResource = ResourceUtils.getResourceList(e, ResourceType.Practitioner);
         assertThat(practitionerResource).hasSize(3);
 
         // Verify one Observation is created (from the ST)
-        List<Resource> obsResource = e.stream()
-                .filter(v -> ResourceType.Observation == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> obsResource = ResourceUtils.getResourceList(e, ResourceType.Observation);
         assertThat(obsResource).hasSize(1); // TODO: When NTE is implemented, then update this.
 
         // Confirm that associated ServiceRequest is created.
-        List<Resource> serviceRequestList = e.stream()
-                .filter(v -> ResourceType.ServiceRequest == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> serviceRequestList = ResourceUtils.getResourceList(e, ResourceType.ServiceRequest);
         assertThat(serviceRequestList).hasSize(1);
     }
 
@@ -361,26 +331,19 @@ class Hl7DocumentReferenceFHIRConversionTest {
                 + "OBR|1||||||20170825010500|||||||||||||002|||||F||||||||\n"
                 + "TXA|1||TEXT|||20180117144200|201801180346||<PHYSID1>||||4466^TRANSCLast^TRANSCFirst^J||||||AV|||<PHYSID2>||\n"
                 + "OBX|1|SN|||||||||X";
-        HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
-        String json = ftv.convert(documentReferenceMessage, PatientUtils.OPTIONS);
-        assertThat(json).isNotBlank();
-        IBaseResource bundleResource = context.getParser().parseResource(json);
-        assertThat(bundleResource).isNotNull();
-        Bundle bundle = (Bundle) bundleResource;
-        List<Bundle.BundleEntryComponent> e = bundle.getEntry();
+        List<BundleEntryComponent> e = ResourceUtils
+                .createFHIRBundleFromHL7MessageReturnEntryList(documentReferenceMessage);
 
-        List<Resource> documentReferenceList = e.stream()
-                .filter(v -> ResourceType.DocumentReference == v.getResource().getResourceType())
-                .map(Bundle.BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> documentReferenceList = ResourceUtils.getResourceList(e, ResourceType.DocumentReference);
         String s = context.getParser().encodeResourceToString(documentReferenceList.get(0));
         Class<? extends IBaseResource> klass = DocumentReference.class;
 
         DocumentReference documentReference = (DocumentReference) context.getParser().parseResource(klass, s);
         String requesterRef = documentReference.getContext().getRelatedFirstRep().getReference();
-        Practitioner practBundle = ResourceUtils.getSpecificPractitionerFromBundle(bundle, requesterRef);
+        Practitioner practBundle = ResourceUtils.getSpecificPractitionerFromBundleEntriesList(e, requesterRef);
 
         DocumentReference.DocumentReferenceRelatesToComponent relatesTo = documentReference.getRelatesToFirstRep();
-        assertThat(relatesTo.getCode().toString()).isEqualTo("appends");
+        assertThat(relatesTo.getCode()).hasToString("appends");
         Identifier practitionerIdentifier = practBundle.getIdentifierFirstRep();
         assertThat(practitionerIdentifier.getValue()).isEqualTo("4466"); // TXA-13.1
         assertThat(practitionerIdentifier.getSystem()).isEqualTo("TRANSCLast"); // TXA-13.2
@@ -471,18 +434,10 @@ class Hl7DocumentReferenceFHIRConversionTest {
                 + "ORC|NW|||PGN001|SC|D|1|||MS|MS|||||\n" + "OBR|1||||||20170825010500|||||||||||||002|||||F||||||||\n"
                 + "TXA|1||TEXT||||201801180346||<PHYSID1>||||||||||AV|||<PHYSID2>||\n"
                 + "OBX|1|SN|||||||||X";
-        HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
-        String json = ftv.convert(documentReferenceMessage, PatientUtils.OPTIONS);
-        assertThat(json).isNotBlank();
+        List<BundleEntryComponent> e = ResourceUtils
+                .createFHIRBundleFromHL7MessageReturnEntryList(documentReferenceMessage);
 
-        IBaseResource bundleResource = context.getParser().parseResource(json);
-        assertThat(bundleResource).isNotNull();
-        Bundle bundle = (Bundle) bundleResource;
-        List<Bundle.BundleEntryComponent> e = bundle.getEntry();
-
-        List<Resource> documentReferenceList = e.stream()
-                .filter(v -> ResourceType.DocumentReference == v.getResource().getResourceType())
-                .map(Bundle.BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> documentReferenceList = ResourceUtils.getResourceList(e, ResourceType.DocumentReference);
         String s = context.getParser().encodeResourceToString(documentReferenceList.get(0));
         Class<? extends IBaseResource> klass = DocumentReference.class;
 

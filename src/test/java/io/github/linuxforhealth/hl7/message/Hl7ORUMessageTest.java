@@ -571,7 +571,7 @@ class Hl7ORUMessageTest {
 
         //Verify no observations are created
         List<Resource> obsResource = ResourceUtils.getResourceList(e, ResourceType.Observation);
-        assertThat(obsResource).hasSize(0); // TODO: When NTE is implemented, then update this to one.
+        assertThat(obsResource).isEmpty(); // TODO: When NTE is implemented, then update this to one.
 
         ///////////////////////////////////////////
         // Now confirm content of the diagnosticReport because we don't have separate tests for DiagnosticReport
@@ -656,7 +656,7 @@ class Hl7ORUMessageTest {
     // Suppress warnings about too many assertions in a test.  Justification: creating a FHIR message is very costly; we need to check many asserts per creation for efficiency.  
     @java.lang.SuppressWarnings("squid:S5961")
     void test_oru_multipleOBXWithMixedType() throws IOException {
-        
+
         HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
         String json = ftv.convert(new File("src/test/resources/ORU-multiline-short-mixed.hl7"), OPTIONS_PRETTYPRINT);
         assertThat(json).isNotBlank();
