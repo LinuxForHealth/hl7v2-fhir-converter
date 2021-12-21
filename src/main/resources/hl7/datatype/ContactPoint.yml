@@ -59,6 +59,13 @@ use_2:
      constants:
          mobile: "mobile"      
 
+period:
+    valueOf: datatype/Period
+    expressionType: resource
+    vars:
+       start: XTN.13
+       end: XTN.14
+
 rank: 
      type: STRING
      valueOf: XTN.18

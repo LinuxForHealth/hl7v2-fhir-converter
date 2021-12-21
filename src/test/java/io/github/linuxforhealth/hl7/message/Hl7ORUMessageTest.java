@@ -15,7 +15,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
-import java.util.stream.Collectors;
 
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r4.model.Attachment;
@@ -41,7 +40,7 @@ import io.github.linuxforhealth.hl7.HL7ToFHIRConverter;
 import io.github.linuxforhealth.hl7.segments.util.DatatypeUtils;
 import io.github.linuxforhealth.hl7.segments.util.ResourceUtils;
 
-public class Hl7ORUMessageTest {
+class Hl7ORUMessageTest {
     private static FHIRContext context = new FHIRContext();
     private static final Logger LOGGER = LoggerFactory.getLogger(Hl7ORUMessageTest.class);
     private static final ConverterOptions OPTIONS = new Builder().withValidateResource().build();
@@ -52,37 +51,25 @@ public class Hl7ORUMessageTest {
             .build();
 
     // DiagnosticReports are only created from ORU messages so the test of DiagnosticReport content is included in this test module.
-
+    // Suppress warnings about too many assertions in a test.  Justification: creating a FHIR message is very costly; we need to check many asserts per creation for efficiency.  
+    @java.lang.SuppressWarnings("squid:S5961")
     @Test
     // Test the minimum scenario where the least possible segments and resource info are provided in the message
-    public void test_oru_patient_diagReport() throws IOException {
+    void test_oru_patient_diagReport() throws IOException {
         String hl7message = "MSH|^~\\\\&|SendTest1|Sendfac1|Receiveapp1|Receivefac1|200603081747|security|ORU^R01|MSGID000005|T|2.6\r"
                 + "PID||45483|45483||SMITH^SUZIE^||20160813|M|||123 MAIN STREET^^SCHENECTADY^NY^12345||(123)456-7890|||||^^^T||||||||||||\r"
                 + "OBR|1||986^IA PHIMS Stage^2.16.840.1.114222.4.3.3.5.1.2^ISO|1051-2^New Born Screening^LN|||20151009173644|||||||||||||002|||||F|||2740^Tsadok^Janetary~2913^Merrit^Darren^F~3065^Mahoney^Paul^J~4723^Loh^Robert^L~9052^Winter^Oscar^|||||\r";
 
-        HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
-        String json = ftv.convert(hl7message, OPTIONS_PRETTYPRINT);
-        assertThat(json).isNotBlank();
-        LOGGER.debug("FHIR json result:\n" + json);
-        IBaseResource bundleResource = context.getParser().parseResource(json);
-        assertThat(bundleResource).isNotNull();
-        Bundle b = (Bundle) bundleResource;
-        List<BundleEntryComponent> e = b.getEntry();
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
 
         // Verify correct resources created
-        List<Resource> patientResource = e.stream()
-                .filter(v -> ResourceType.Patient == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> patientResource = ResourceUtils.getResourceList(e, ResourceType.Patient);
         assertThat(patientResource).hasSize(1);
 
-        List<Resource> diagnosticReport = e.stream()
-                .filter(v -> ResourceType.DiagnosticReport == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> diagnosticReport = ResourceUtils.getResourceList(e, ResourceType.DiagnosticReport);
         assertThat(diagnosticReport).hasSize(1);
 
-        List<Resource> servReqResource = e.stream()
-                .filter(v -> ResourceType.ServiceRequest == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> servReqResource = ResourceUtils.getResourceList(e, ResourceType.ServiceRequest);
         assertThat(servReqResource).hasSize(1);
 
         // Expecting only the above resources, no extras!
@@ -127,10 +114,12 @@ public class Hl7ORUMessageTest {
 
     }
 
+    // Suppress warnings about too many assertions in a test.  Justification: creating a FHIR message is very costly; we need to check many asserts per creation for efficiency.  
+    @java.lang.SuppressWarnings("squid:S5961")
     @Test
     // Test multiple OBX (non TX) put into Observation resources. 
     // Observation resources are created instead of attachments in the diagReport because they are not type TX.
-    public void test_oru_with_multiple_observations() throws IOException {
+    void test_oru_with_multiple_observations() throws IOException {
         String hl7message = "MSH|^~\\\\&|SendTest1|Sendfac1|Receiveapp1|Receivefac1|200603081747|security|ORU^R01|MSGID000005|T|2.6\r"
                 + "PID||45483|45483||SMITH^SUZIE^||20160813|M|||123 MAIN STREET^^SCHENECTADY^NY^12345||(123)456-7890|||||^^^T||||||||||||\r"
                 // OBR.24 creates a DiagnosticReport.category
@@ -138,39 +127,22 @@ public class Hl7ORUMessageTest {
                 + "OBX|1|ST|TS-F-01-002^Endocrine Disorders^L||obs report||||||F\r"
                 + "OBX|2|ST|GA-F-01-024^Galactosemia^L||ECHOCARDIOGRAPHIC REPORT||||||F\r";
 
-        HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
-        String json = ftv.convert(hl7message, OPTIONS_PRETTYPRINT);
-        assertThat(json).isNotBlank();
-        LOGGER.debug("FHIR json result:\n" + json);
-        IBaseResource bundleResource = context.getParser().parseResource(json);
-        assertThat(bundleResource).isNotNull();
-        Bundle b = (Bundle) bundleResource;
-        List<BundleEntryComponent> e = b.getEntry();
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
 
         // Verify correct resources created
-        List<Resource> patientResource = e.stream()
-                .filter(v -> ResourceType.Patient == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> patientResource = ResourceUtils.getResourceList(e, ResourceType.Patient);
         assertThat(patientResource).hasSize(1);
 
-        List<Resource> obsResource = e.stream()
-                .filter(v -> ResourceType.Observation == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> obsResource = ResourceUtils.getResourceList(e, ResourceType.Observation);
         assertThat(obsResource).hasSize(2);
 
-        List<Resource> practitionerResource = e.stream()
-                .filter(v -> ResourceType.Practitioner == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> practitionerResource = ResourceUtils.getResourceList(e, ResourceType.Practitioner);
         assertThat(practitionerResource).hasSize(1);
 
-        List<Resource> diagnosticReport = e.stream()
-                .filter(v -> ResourceType.DiagnosticReport == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> diagnosticReport = ResourceUtils.getResourceList(e, ResourceType.DiagnosticReport);
         assertThat(diagnosticReport).hasSize(1);
 
-        List<Resource> servReqResource = e.stream()
-                .filter(v -> ResourceType.ServiceRequest == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> servReqResource = ResourceUtils.getResourceList(e, ResourceType.ServiceRequest);
         assertThat(servReqResource).hasSize(1);
 
         // Expecting only the above resources, no extras!
@@ -236,52 +208,35 @@ public class Hl7ORUMessageTest {
 
     }
 
+    // Suppress warnings about too many assertions in a test.  Justification: creating a FHIR message is very costly; we need to check many asserts per creation for efficiency.  
+    @java.lang.SuppressWarnings("squid:S5961")
     @Test
-    public void test_orur01_with_encounter_present() throws IOException {
+    void test_orur01_with_encounter_present() throws IOException {
         String hl7message = "MSH|^~\\&|PROSLOV|MYHOSPITAL|WHIA|IBM|20180520230000||ORU^R01|MSGID006552|T|2.6\r"
                 + "PID|1||000065432^^^MRN^MR||ROSTENKOWSKI^BERNADETTE^||19840823|Female||1002-5|382 OTHERSTREET AVE^^PASADENA^LA^223343||4582143248||^French|S||53811||||U|||||||\r"
                 + "PV1|1|O|||||9905^Adams^John|9906^Yellow^William^F|9907^Blue^Oren^J||||||||9908^Green^Mircea^||2462201|||||||||||||||||||||||||20180520230000\r"
                 + "OBR|1||bbf1993ab|1122^Final Echocardiogram Report|||20180520230000|||||||||||||002|||||F|||550469^Tsadok550469^Janetary~660469^Merrit660469^Darren^F~770469^Das770469^Surjya^P~880469^Winter880469^Oscar^||||770469&Das770469&Surjya&P^^^6N^1234^A|\r"
                 + "OBX|1|NM|2552^HRTRTMON|1|115||||||F|||20180520230000|||\r";
 
-        HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
-        String json = ftv.convert(hl7message, OPTIONS);
-        assertThat(json).isNotBlank();
-        LOGGER.debug("FHIR json result:\n" + json);
-        IBaseResource bundleResource = context.getParser().parseResource(json);
-        assertThat(bundleResource).isNotNull();
-        Bundle b = (Bundle) bundleResource;
-        List<BundleEntryComponent> e = b.getEntry();
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
 
         // Verify that the right resources are created
-        List<Resource> patientResource = e.stream()
-                .filter(v -> ResourceType.Patient == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> patientResource = ResourceUtils.getResourceList(e, ResourceType.Patient);
         assertThat(patientResource).hasSize(1);
 
-        List<Resource> encounterResource = e.stream()
-                .filter(v -> ResourceType.Encounter == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> encounterResource = ResourceUtils.getResourceList(e, ResourceType.Encounter);
         assertThat(encounterResource).hasSize(1);
 
-        List<Resource> obsResource = e.stream()
-                .filter(v -> ResourceType.Observation == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> obsResource = ResourceUtils.getResourceList(e, ResourceType.Observation);
         assertThat(obsResource).hasSize(1);
 
-        List<Resource> diagnosticReport = e.stream()
-                .filter(v -> ResourceType.DiagnosticReport == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> diagnosticReport = ResourceUtils.getResourceList(e, ResourceType.DiagnosticReport);
         assertThat(diagnosticReport).hasSize(1);
 
-        List<Resource> servReqResource = e.stream()
-                .filter(v -> ResourceType.ServiceRequest == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> servReqResource = ResourceUtils.getResourceList(e, ResourceType.ServiceRequest);
         assertThat(servReqResource).hasSize(1);
 
-        List<Resource> practitionerResource = e.stream()
-                .filter(v -> ResourceType.Practitioner == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> practitionerResource = ResourceUtils.getResourceList(e, ResourceType.Practitioner);
         assertThat(practitionerResource).hasSize(5);
 
         // Expecting only the above resources, no extras!
@@ -344,8 +299,10 @@ public class Hl7ORUMessageTest {
 
     }
 
+    // Suppress warnings about too many assertions in a test.  Justification: creating a FHIR message is very costly; we need to check many asserts per creation for efficiency.  
+    @java.lang.SuppressWarnings("squid:S5961")
     @Test
-    public void test_oru_with_multiple_reports() throws IOException {
+    void test_oru_with_multiple_reports() throws IOException {
         String hl7message = "MSH|^~\\\\&|SendTest1|Sendfac1|Receiveapp1|Receivefac1|200603081747|security|ORU^R01|MSGID000005|T|2.6\r"
                 + "PID||45483|45483||SMITH^SUZIE^||20160813|M|||123 MAIN STREET^^SCHENECTADY^NY^12345||(123)456-7890|||||^^^T||||||||||||\r"
                 + "OBR|1||986^IA PHIMS Stage^2.16.840.1.114222.4.3.3.5.1.2^ISO|112^Final Echocardiogram Report|||20151009173644|||||||||||||002|||||F|||2740^Tsadok^Janetary~2913^Merrit^Darren^F~3065^Mahoney^Paul^J~4723^Loh^Robert^L~9052^Winter^Oscar^||||3068^JOHN^Paul^J|\r"
@@ -355,40 +312,22 @@ public class Hl7ORUMessageTest {
                 + "OBX|1|CWE|625-4^Bacteria identified in Stool by Culture^LN^^^^2.33^^result1|1|27268008^Salmonella^SCT^^^^20090731^^Salmonella species|||A^A^HL70078^^^^2.5|||P|||20120301|||^^^^^^^^Bacterial Culture||201203140957||||||\r"
                 + "OBX|2|ST|TS-F-01-002^Endocrine Disorders^L||ECHOCARDIOGRAPHIC REPORT Group 2||||||F\r";
 
-        HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
-        String json = ftv.convert(hl7message, OPTIONS_PRETTYPRINT);
-        assertThat(json).isNotBlank();
-        LOGGER.debug("FHIR json result:\n" + json);
-        IBaseResource bundleResource = context.getParser().parseResource(json);
-        assertThat(bundleResource).isNotNull();
-        Bundle b = (Bundle) bundleResource;
-        assertThat(b.getType()).isEqualTo(BundleType.COLLECTION);
-        List<BundleEntryComponent> e = b.getEntry();
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
 
         // Verify that the right resources are being created
-        List<Resource> patientResource = e.stream()
-                .filter(v -> ResourceType.Patient == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> patientResource = ResourceUtils.getResourceList(e, ResourceType.Patient);
         assertThat(patientResource).hasSize(1);
 
-        List<Resource> obsResource = e.stream()
-                .filter(v -> ResourceType.Observation == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> obsResource = ResourceUtils.getResourceList(e, ResourceType.Observation);
         assertThat(obsResource).hasSize(4);
 
-        List<Resource> practitionerResource = e.stream()
-                .filter(v -> ResourceType.Practitioner == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> practitionerResource = ResourceUtils.getResourceList(e, ResourceType.Practitioner);
         assertThat(practitionerResource).hasSize(2);
 
-        List<Resource> diagnosticReport = e.stream()
-                .filter(v -> ResourceType.DiagnosticReport == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> diagnosticReport = ResourceUtils.getResourceList(e, ResourceType.DiagnosticReport);
         assertThat(diagnosticReport).hasSize(2);
 
-        List<Resource> servReqResource = e.stream()
-                .filter(v -> ResourceType.ServiceRequest == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> servReqResource = ResourceUtils.getResourceList(e, ResourceType.ServiceRequest);
         assertThat(servReqResource).hasSize(2);
 
         // Expecting only the above resources, no extras!
@@ -488,52 +427,35 @@ public class Hl7ORUMessageTest {
         }
     }
 
+    // Suppress warnings about too many assertions in a test.  Justification: creating a FHIR message is very costly; we need to check many asserts per creation for efficiency.  
+    @java.lang.SuppressWarnings("squid:S5961")
     @Test
-    public void test_oru_with_specimen() throws IOException {
+    void test_oru_with_specimen() throws IOException {
         String hl7message = "MSH|^~\\\\&|SendTest1|Sendfac1|Receiveapp1|Receivefac1|200603081747|security|ORU^R01|MSGID000005|T|2.6\r"
                 + "PID||45483|45483||SMITH^SUZIE^||20160813|M|||123 MAIN STREET^^SCHENECTADY^NY^12345||(123)456-7890|||||^^^T||||||||||||\r"
                 + "OBR|1||986^IA PHIMS Stage^2.16.840.1.114222.4.3.3.5.1.2^ISO|1051-2^New Born Screening^LN|||20151009173644|||||||||||||002|||||F|||2740^Tsadok^Janetary~2913^Merrit^Darren^F~3065^Mahoney^Paul^J~4723^Loh^Robert^L~9052^Winter^Oscar^||||3065^Mahoney^Paul^J|\r"
                 + "OBX|1|ST|TS-F-01-002^Endocrine Disorders^L||obs report||||||F\r"
                 + "SPM|1|SpecimenID||BLD|||||||P||||||201410060535|201410060821||Y||||||1\r";
 
-        HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
-        String json = ftv.convert(hl7message, OPTIONS_PRETTYPRINT);
-        assertThat(json).isNotBlank();
-        LOGGER.debug("FHIR json result:\n" + json);
-        IBaseResource bundleResource = context.getParser().parseResource(json);
-        assertThat(bundleResource).isNotNull();
-        Bundle b = (Bundle) bundleResource;
-        List<BundleEntryComponent> e = b.getEntry();
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
 
         // Verify that the right resources are created
-        List<Resource> patientResource = e.stream()
-                .filter(v -> ResourceType.Patient == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> patientResource = ResourceUtils.getResourceList(e, ResourceType.Patient);
         assertThat(patientResource).hasSize(1);
 
-        List<Resource> diagnosticReport = e.stream()
-                .filter(v -> ResourceType.DiagnosticReport == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> diagnosticReport = ResourceUtils.getResourceList(e, ResourceType.DiagnosticReport);
         assertThat(diagnosticReport).hasSize(1);
 
-        List<Resource> servReqResource = e.stream()
-                .filter(v -> ResourceType.ServiceRequest == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> servReqResource = ResourceUtils.getResourceList(e, ResourceType.ServiceRequest);
         assertThat(servReqResource).hasSize(1);
 
-        List<Resource> obsResource = e.stream()
-                .filter(v -> ResourceType.Observation == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> obsResource = ResourceUtils.getResourceList(e, ResourceType.Observation);
         assertThat(obsResource).hasSize(1);
 
-        List<Resource> practitionerResource = e.stream()
-                .filter(v -> ResourceType.Practitioner == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> practitionerResource = ResourceUtils.getResourceList(e, ResourceType.Practitioner);
         assertThat(practitionerResource).hasSize(1);
 
-        List<Resource> specimenResource = e.stream()
-                .filter(v -> ResourceType.Practitioner == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> specimenResource = ResourceUtils.getResourceList(e, ResourceType.Practitioner);
         assertThat(specimenResource).hasSize(1);
 
         // Expecting only the above resources, no extras! 
@@ -603,8 +525,10 @@ public class Hl7ORUMessageTest {
      * The OBX type TX are added to the presentedForm as an attachment for the diagnostic
      * @throws IOException
      */
+    // Suppress warnings about too many assertions in a test.  Justification: creating a FHIR message is very costly; we need to check many asserts per creation for efficiency.  
+    @java.lang.SuppressWarnings("squid:S5961")
     @Test
-    public void test_oru_multipleOBXofDifferentTypes() throws IOException {
+    void test_oru_multipleOBXofDifferentTypes() throws IOException {
         HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
         String json = ftv.convert(new File("src/test/resources/ORU-multiline-short.hl7"), OPTIONS_PRETTYPRINT);
         assertThat(json).isNotBlank();
@@ -619,51 +543,35 @@ public class Hl7ORUMessageTest {
         List<BundleEntryComponent> e = b.getEntry();
 
         // Verify that the right resources have been created
-        List<Resource> patientResource = e.stream()
-                .filter(v -> ResourceType.Patient == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> patientResource = ResourceUtils.getResourceList(e, ResourceType.Patient);
         assertThat(patientResource).hasSize(1);
 
-        List<Resource> encounterResource = e.stream()
-                .filter(v -> ResourceType.Encounter == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> encounterResource = ResourceUtils.getResourceList(e, ResourceType.Encounter);
         assertThat(encounterResource).hasSize(1);
 
-        List<Resource> organizationResource = e.stream()
-                .filter(v -> ResourceType.Organization == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> organizationResource = ResourceUtils.getResourceList(e, ResourceType.Organization);
         // We expect an organization created from an Encounter.serviceProvider reference 
         assertThat(organizationResource).hasSize(1);
 
-        List<Resource> practitionerResource = e.stream()
-                .filter(v -> ResourceType.Practitioner == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> practitionerResource = ResourceUtils.getResourceList(e, ResourceType.Practitioner);
         assertThat(practitionerResource).hasSize(4);
 
-        List<Resource> messageHeader = e.stream()
-                .filter(v -> ResourceType.MessageHeader == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> messageHeader = ResourceUtils.getResourceList(e, ResourceType.MessageHeader);
         assertThat(messageHeader).hasSize(1);
 
         //Verify Diagnostic Report is created as expected
-        List<Resource> reportResource = e.stream()
-                .filter(v -> ResourceType.DiagnosticReport == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> reportResource = ResourceUtils.getResourceList(e, ResourceType.DiagnosticReport);
         assertThat(reportResource).hasSize(1);
 
-        List<Resource> servReqResource = e.stream()
-                .filter(v -> ResourceType.ServiceRequest == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> servReqResource = ResourceUtils.getResourceList(e, ResourceType.ServiceRequest);
         assertThat(servReqResource).hasSize(1);
 
         // Verify there are no extra resources created
         assertThat(e.size()).isEqualTo(10);
 
         //Verify no observations are created
-        List<Resource> obsResource = e.stream()
-                .filter(v -> ResourceType.Observation == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
-        assertThat(obsResource).hasSize(0); // TODO: When NTE is implemented, then update this to one.
+        List<Resource> obsResource = ResourceUtils.getResourceList(e, ResourceType.Observation);
+        assertThat(obsResource).isEmpty(); // TODO: When NTE is implemented, then update this to one.
 
         ///////////////////////////////////////////
         // Now confirm content of the diagnosticReport because we don't have separate tests for DiagnosticReport
@@ -745,7 +653,10 @@ public class Hl7ORUMessageTest {
      * @throws IOException
      */
     @Test
-    public void test_oru_multipleOBXWithMixedType() throws IOException {
+    // Suppress warnings about too many assertions in a test.  Justification: creating a FHIR message is very costly; we need to check many asserts per creation for efficiency.  
+    @java.lang.SuppressWarnings("squid:S5961")
+    void test_oru_multipleOBXWithMixedType() throws IOException {
+
         HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
         String json = ftv.convert(new File("src/test/resources/ORU-multiline-short-mixed.hl7"), OPTIONS_PRETTYPRINT);
         assertThat(json).isNotBlank();
@@ -759,47 +670,31 @@ public class Hl7ORUMessageTest {
         List<BundleEntryComponent> e = b.getEntry();
 
         // Verify that the right resources have been created
-        List<Resource> patientResource = e.stream()
-                .filter(v -> ResourceType.Patient == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> patientResource = ResourceUtils.getResourceList(e, ResourceType.Patient);
         assertThat(patientResource).hasSize(1);
 
-        List<Resource> encounterResource = e.stream()
-                .filter(v -> ResourceType.Encounter == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> encounterResource = ResourceUtils.getResourceList(e, ResourceType.Encounter);
         assertThat(encounterResource).hasSize(1);
 
-        List<Resource> organizationResource = e.stream()
-                .filter(v -> ResourceType.Organization == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> organizationResource = ResourceUtils.getResourceList(e, ResourceType.Organization);
         // We expect an organization created from an Encounter.serviceProvider reference 
         assertThat(organizationResource).hasSize(1);
 
-        List<Resource> practitionerResource = e.stream()
-                .filter(v -> ResourceType.Practitioner == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> practitionerResource = ResourceUtils.getResourceList(e, ResourceType.Practitioner);
         assertThat(practitionerResource).hasSize(4);
 
-        List<Resource> messageHeader = e.stream()
-                .filter(v -> ResourceType.MessageHeader == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> messageHeader = ResourceUtils.getResourceList(e, ResourceType.MessageHeader);
         assertThat(messageHeader).hasSize(1);
 
         // Verify one Observation is created (from the ST, not the TX)
-        List<Resource> obsResource = e.stream()
-                .filter(v -> ResourceType.Observation == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> obsResource = ResourceUtils.getResourceList(e, ResourceType.Observation);
         assertThat(obsResource).hasSize(1); // TODO: When NTE is implemented, then update this.
 
         // Verify Diagnostic Report is created as expected
-        List<Resource> reportResource = e.stream()
-                .filter(v -> ResourceType.DiagnosticReport == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> reportResource = ResourceUtils.getResourceList(e, ResourceType.DiagnosticReport);
         assertThat(reportResource).hasSize(1);
 
-        List<Resource> servReqResource = e.stream()
-                .filter(v -> ResourceType.ServiceRequest == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> servReqResource = ResourceUtils.getResourceList(e, ResourceType.ServiceRequest);
         assertThat(servReqResource).hasSize(1);
 
         // Verify there are no extra resources created
@@ -845,8 +740,7 @@ public class Hl7ORUMessageTest {
 
         // Verify result reference
         List<Reference> obsRef = diag.getResult();
-        assertThat(obsRef).isNotEmpty();
-        assertThat(obsRef).hasSize(1);
+        assertThat(obsRef).isNotEmpty().hasSize(1);
         assertThat(obsRef.get(0).isEmpty()).isFalse();
         // No attachment created since OBX with TX and no id is not first
         List<Attachment> attachments = diag.getPresentedForm();
@@ -868,7 +762,7 @@ public class Hl7ORUMessageTest {
     }
 
     @Test
-    public void test_ORU_r01_without_status() throws IOException {
+    void test_ORU_r01_without_status() throws IOException {
         String ORU_r01 = "MSH|^~\\&|NIST Test Lab APP|NIST Lab Facility||NIST EHR Facility|20150926140551||ORU^R01|NIST-LOI_5.0_1.1-NG|T|2.5.1|||AL|AL|||||\r"
                 + "PID|1||PATID5421^^^NISTMPI^MR||Wilson^Patrice^Natasha^^^^L||19820304|F||2106-3^White^HL70005|144 East 12th Street^^Los Angeles^CA^90012^^H||^PRN^PH^^^203^2290210|||||||||N^Not Hispanic or Latino^HL70189\r"
                 + "ORC|NW|ORD448811^NIST EHR|R-511^NIST Lab Filler||||||20120628070100|||5742200012^Radon^Nicholas^^^^^^NPI^L^^^NPI\r"
@@ -885,9 +779,7 @@ public class Hl7ORUMessageTest {
         assertThat(bundleResource).isNotNull();
         Bundle b = (Bundle) bundleResource;
         List<BundleEntryComponent> e = b.getEntry();
-        List<Resource> diagnosticReport = e.stream()
-                .filter(v -> ResourceType.DiagnosticReport == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> diagnosticReport = ResourceUtils.getResourceList(e, ResourceType.DiagnosticReport);
         assertThat(diagnosticReport).hasSize(1);
 
         String s = context.getParser().encodeResourceToString(diagnosticReport.get(0));

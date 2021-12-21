@@ -11,8 +11,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
 import org.apache.commons.lang3.StringUtils;
+
 import com.fasterxml.jackson.core.type.TypeReference;
+
 import io.github.linuxforhealth.core.Constants;
 import io.github.linuxforhealth.core.ObjectMapperUtil;
 import io.github.linuxforhealth.core.config.ConverterConfiguration;
@@ -36,35 +39,49 @@ public class UrlLookup {
 
     /**
      * Get the extension URL
+     * 
+     * @param value The key for URL lookup
+     * @return URL result
      */
     public static String getExtensionUrl(String value) {
-      return getUrl(Constants.EXTENSION_URL_MAPPING, value);
+        return getUrl(Constants.EXTENSION_URL_MAPPING, value);
     }
 
     /**
      * Get the system associated with the value for the coding system.
+     * 
+     * @param value The key for System lookup
+     * @return System result
      */
     public static String getSystemUrl(String value) {
         return getUrl(Constants.CODING_SYSTEM_MAPPING, value);
     }
 
-
     /**
-     * Get the system associated with the value for the coding system.
+     * Get the system associated with the value for the coding system. Look in the extension URL mapping if not found.
+     * 
+     * @param value The key for System lookup
+     * @return System result
      */
     public static String getAssociatedUrl(String value) {
-      String url = getUrl(Constants.CODING_SYSTEM_MAPPING, value);
-      if (url == null) {
-        url = getUrl(Constants.EXTENSION_URL_MAPPING, value);
-      }
-      return url;
+        String url = getUrl(Constants.CODING_SYSTEM_MAPPING, value);
+        if (url == null) {
+            url = getUrl(Constants.EXTENSION_URL_MAPPING, value);
+        }
+        return url;
     }
+
     /**
      * Get the system associated with the value for the URL set.
+     *      
+     * @param urlType Which mapping type to use
+     * @param value The key for System lookup
+     * @return System result
      */
     public static String getUrl(String urlType, String value) {
         Map<String, CodingSystem> urlMap = getUrlMap(urlType);
-        if (StringUtils.startsWith(value, "http://") || StringUtils.startsWith(value, "https://") || StringUtils.startsWith(value, "urn")) {
+        if (StringUtils.startsWith(value, "http://") || StringUtils.startsWith(value, "https://")
+                || StringUtils.startsWith(value, "urn")) {
             return value;
         } else if (value != null) {
             CodingSystem system = urlMap.get(StringUtils.upperCase(value));
@@ -84,10 +101,9 @@ public class UrlLookup {
         getUrlMap(Constants.EXTENSION_URL_MAPPING);
     }
 
-
     public static void init() {
-      getUrlMap(Constants.CODING_SYSTEM_MAPPING);
-      getUrlMap(Constants.EXTENSION_URL_MAPPING);
+        getUrlMap(Constants.CODING_SYSTEM_MAPPING);
+        getUrlMap(Constants.EXTENSION_URL_MAPPING);
     }
 
     public static void reset(String urlType) {

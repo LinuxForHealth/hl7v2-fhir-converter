@@ -47,14 +47,14 @@ import io.github.linuxforhealth.hl7.HL7ToFHIRConverter;
 import io.github.linuxforhealth.hl7.segments.util.DatatypeUtils;
 import io.github.linuxforhealth.hl7.segments.util.ResourceUtils;
 
-public class Hl7EncounterFHIRConversionTest {
+class Hl7EncounterFHIRConversionTest {
 
     private static FHIRContext context = new FHIRContext(true, false);
     private static final Logger LOGGER = LoggerFactory.getLogger(Hl7EncounterFHIRConversionTest.class);
     private static final ConverterOptions OPTIONS = new Builder().withValidateResource().withPrettyPrint().build();
 
     @Test
-    public void test_encounter_visitdescription_present() {
+    void test_encounter_visitdescription_present() {
         String hl7message = "MSH|^~\\&|WHI_LOAD_GENERATOR|IBM_TORONTO_LAB||IBM|20210330144208|8078780|ADT^A01|MSGID_4e1c575f-6c6d-47b2-ab9f-829f20c96db2|T|2.3\n"
                 + "EVN||20210330144208||ADT_EVENT|007|20210309140700\n"
                 + "PID|1||0a8a1752-e336-43e1-bf7f-0c8f6f437ca3^^^MRN||Patient^Load^Generator||19690720|M|Patient^Alias^Generator|AA|9999^^CITY^STATE^ZIP^CAN|COUNTY|(866)845-0900||ENGLISH^ENGLISH|SIN|NONE|Account_0a8a1752-e336-43e1-bf7f-0c8f6f437ca3|123-456-7890|||N|BIRTH PLACE|N||||||N\n"
@@ -96,7 +96,7 @@ public class Hl7EncounterFHIRConversionTest {
     }
 
     @Test
-    public void test_encounter_visitdescription_missing() {
+    void test_encounter_visitdescription_missing() {
         String hl7message = "MSH|^~\\&|WHI_LOAD_GENERATOR|IBM_TORONTO_LAB||IBM|20210330144208|8078780|ADT^A01|MSGID_4e1c575f-6c6d-47b2-ab9f-829f20c96db2|T|2.3\n"
                 + "EVN||20210330144208||ADT_EVENT|007|20210309140700\n"
                 + "PID|1||0a8a1752-e336-43e1-bf7f-0c8f6f437ca3^^^MRN||Patient^Load^Generator||19690720|M|Patient^Alias^Generator|AA|9999^^CITY^STATE^ZIP^CAN|COUNTY|(866)845-0900||ENGLISH^ENGLISH|SIN|NONE|Account_0a8a1752-e336-43e1-bf7f-0c8f6f437ca3|123-456-7890|||N|BIRTH PLACE|N||||||N\n"
@@ -136,7 +136,7 @@ public class Hl7EncounterFHIRConversionTest {
             "RDE^O11", "RDE^O25",
             "VXU^V04"
     })
-    public void test_encounter_with_serviceProvider_from_PV2(String message) {
+    void test_encounter_with_serviceProvider_from_PV2(String message) {
         String hl7message = "MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||" + message
                 + "|controlID|P|2.6\r"
                 + "EVN||20210330144208||ADT_EVENT|007|20210309140700\r"
@@ -183,7 +183,7 @@ public class Hl7EncounterFHIRConversionTest {
             "RDE^O11", "RDE^O25",
             "VXU^V04"
     })
-    public void test_encounter_PV1_serviceProvider(String message) {
+    void test_encounter_PV1_serviceProvider(String message) {
         String hl7message = "MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||" + message
                 + "|controlID|P|2.6\r"
                 + "EVN||20210330144208||ADT_EVENT|007|20210309140700\r"
@@ -229,7 +229,7 @@ public class Hl7EncounterFHIRConversionTest {
             "RDE^O11", "RDE^O25",
             "VXU^V04"
     })
-    public void test_encounter_with_serviceProvider_from_PV1_3_4(String message) {
+    void test_encounter_with_serviceProvider_from_PV1_3_4(String message) {
         String hl7message = "MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||" + message
                 + "|controlID|P|2.6\r"
                 + "EVN|A01|20150502090000|\r"
@@ -264,7 +264,7 @@ public class Hl7EncounterFHIRConversionTest {
     }
 
     @Test
-    public void test_encounter_PV2_serviceProvider_idfix() {
+    void test_encounter_PV2_serviceProvider_idfix() {
         String hl7message = "MSH|^~\\&|WHI_LOAD_GENERATOR|IBM_TORONTO_LAB||IBM|20210330144208|8078780|ADT^A01|MSGID_4e1c575f-6c6d-47b2-ab9f-829f20c96db2|T|2.3\n"
                 + "EVN||20210330144208||ADT_EVENT|007|20210309140700\n"
                 + "PID|1||0a8a1752-e336-43e1-bf7f-0c8f6f437ca3^^^MRN||Patient^Load^Generator||19690720|M|Patient^Alias^Generator|AA|9999^^CITY^STATE^ZIP^CAN|COUNTY|(866)845-0900||ENGLISH^ENGLISH|SIN|NONE|Account_0a8a1752-e336-43e1-bf7f-0c8f6f437ca3|123-456-7890|||N|BIRTH PLACE|N||||||N\n"
@@ -298,7 +298,7 @@ public class Hl7EncounterFHIRConversionTest {
     }
 
     @Test
-    public void test_encounter_class() {
+    void test_encounter_class() {
         // PV1.2 has mapped value and should returned fhir value
         String hl7message = "MSH|^~\\&|PROSOLV|SENTARA|WHIA|IBM|20151008111200|S1|ADT^A01^ADT_A01|MSGID000001|T|2.6|10092|PRPA008|AL|AL|100|8859/1|ENGLISH|ARM|ARM5007\n"
                 + "EVN|A04|20151008111200|20171013152901|O|OID1006|20171013153621|EVN1009\n"
@@ -329,7 +329,7 @@ public class Hl7EncounterFHIRConversionTest {
     }
 
     @Test
-    public void testEncounterReasonCode() {
+    void testEncounterReasonCode() {
         // EVN.4 and PV2.3 for reasonCode; both with known codes
         String hl7message = "MSH|^~\\&|||||20151008111200||ADT^A01^ADT_A01|MSGID000001|T|2.6|||||||||\n"
                 + "EVN|A04|20151008111200||O|||\n"
@@ -377,7 +377,7 @@ public class Hl7EncounterFHIRConversionTest {
     }
 
     @Test
-    public void testEncounterLength() {
+    void testEncounterLength() {
 
         // Both start PV1.44 and end PV1.45 must be present to use either value as part of length
         // When both are present, the calculation value is provided in "Minutes"
@@ -433,7 +433,7 @@ public class Hl7EncounterFHIRConversionTest {
     }
 
     @Test
-    public void testEncounterModeOfArrival() {
+    void testEncounterModeOfArrival() {
         String hl7message = "MSH|^~\\&|PROSOLV|SENTARA|WHIA|IBM|20151008111200|S1|ADT^A01^ADT_A01|MSGID000001|T|2.6|10092|PRPA008|AL|AL|100|8859/1|ENGLISH|ARM|ARM5007\n"
                 + "EVN|A04|20151008111200|20171013152901|O|OID1006|20171013153621|EVN1009\n"
                 + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
@@ -460,7 +460,7 @@ public class Hl7EncounterFHIRConversionTest {
     }
 
     @Test
-    public void test_encounter_modeOfarrival_invalid_singlevalue() {
+    void test_encounter_modeOfarrival_invalid_singlevalue() {
         String hl7message = "MSH|^~\\&|WHI_LOAD_GENERATOR|IBM_TORONTO_LAB||IBM|20210330144208|8078780|ADT^A01|MSGID_4e1c575f-6c6d-47b2-ab9f-829f20c96db2|T|2.3\n"
                 + "EVN||20210330144208||ADT_EVENT|007|20210309140700\n"
                 + "PID|1||0a8a1752-e336-43e1-bf7f-0c8f6f437ca3^^^MRN||Patient^Load^Generator||19690720|M|Patient^Alias^Generator|AA|9999^^CITY^STATE^ZIP^CAN|COUNTY|(866)845-0900||ENGLISH^ENGLISH|SIN|NONE|Account_0a8a1752-e336-43e1-bf7f-0c8f6f437ca3|123-456-7890|||N|BIRTH PLACE|N||||||N\n"
@@ -487,7 +487,7 @@ public class Hl7EncounterFHIRConversionTest {
     }
 
     @Test
-    public void test_encounter_modeOfarrival_invalid_with_codeAndDisplay() {
+    void test_encounter_modeOfarrival_invalid_with_codeAndDisplay() {
         String hl7message = "MSH|^~\\&|WHI_LOAD_GENERATOR|IBM_TORONTO_LAB||IBM|20210330144208|8078780|ADT^A01|MSGID_4e1c575f-6c6d-47b2-ab9f-829f20c96db2|T|2.3\n"
                 + "EVN||20210330144208||ADT_EVENT|007|20210309140700\n"
                 + "PID|1||0a8a1752-e336-43e1-bf7f-0c8f6f437ca3^^^MRN||Patient^Load^Generator||19690720|M|Patient^Alias^Generator|AA|9999^^CITY^STATE^ZIP^CAN|COUNTY|(866)845-0900||ENGLISH^ENGLISH|SIN|NONE|Account_0a8a1752-e336-43e1-bf7f-0c8f6f437ca3|123-456-7890|||N|BIRTH PLACE|N||||||N\n"
@@ -513,7 +513,7 @@ public class Hl7EncounterFHIRConversionTest {
     }
 
     @Test
-    public void test_encounter_modeOfarrival_invalid_with_system() {
+    void test_encounter_modeOfarrival_invalid_with_system() {
         String hl7message = "MSH|^~\\&|WHI_LOAD_GENERATOR|IBM_TORONTO_LAB||IBM|20210330144208|8078780|ADT^A01|MSGID_4e1c575f-6c6d-47b2-ab9f-829f20c96db2|T|2.3\n"
                 + "EVN||20210330144208||ADT_EVENT|007|20210309140700\n"
                 + "PID|1||0a8a1752-e336-43e1-bf7f-0c8f6f437ca3^^^MRN||Patient^Load^Generator||19690720|M|Patient^Alias^Generator|AA|9999^^CITY^STATE^ZIP^CAN|COUNTY|(866)845-0900||ENGLISH^ENGLISH|SIN|NONE|Account_0a8a1752-e336-43e1-bf7f-0c8f6f437ca3|123-456-7890|||N|BIRTH PLACE|N||||||N\n"
@@ -550,7 +550,7 @@ public class Hl7EncounterFHIRConversionTest {
             "RDE^O11", "RDE^O25",
             "VXU^V04"
     })
-    public void test_encounter_PV2segment_missing(String message) {
+    void test_encounter_PV2segment_missing(String message) {
         String hl7message = "MSH|^~\\&|WHI_LOAD_GENERATOR|IBM_TORONTO_LAB||IBM|20210330144208|8078780|" + message
                 + "|MSGID_4e1c575f-6c6d-47b2-ab9f-829f20c96db2|T|2.3\n"
                 + "EVN||20210330144208||ADT_EVENT|007|20210309140700\n"
@@ -569,7 +569,7 @@ public class Hl7EncounterFHIRConversionTest {
     }
 
     @Test
-    public void testEncounterParticipantList() {
+    void testEncounterParticipantList() {
         String hl7message = "MSH|^~\\&|WHI_LOAD_GENERATOR||||20210330144208||ADT^A01|MSGID_4e1c575f-6c6d-47b2-ab9f-829f20c96db2|T|2.3\n"
                 + "EVN||20210330144208||||\n"
                 + "PID|1||ABC12345^^^MRN||DOE^JANE|||||||||||||||\n"
@@ -661,7 +661,7 @@ public class Hl7EncounterFHIRConversionTest {
      * Sparse data test. Only one participant is created.
      */
     @Test
-    public void testEncounterParticipantMissing() {
+    void testEncounterParticipantMissing() {
         String hl7message = "MSH|^~\\&|WHI_LOAD_GENERATOR||||20210330144208||ADT^A01|MSGID_4e1c575f-6c6d-47b2-ab9f-829f20c96db2|T|2.3\n"
                 + "EVN||20210330144208||||\n"
                 + "PID|1||ABC12345^^^MRN||DOE^JANE|||||||||||||||\n"
@@ -700,7 +700,7 @@ public class Hl7EncounterFHIRConversionTest {
      * Testing Encounter correctly references Observation
      */
     @Test
-    public void testEncounterReferencesObservation() throws IOException {
+    void testEncounterReferencesObservation() throws IOException {
         String hl7message = "MSH|^~\\&|hl7Integration|hl7Integration|||||ADT^A01|||2.6|\n"
                 + "PID|||1234^^^^MR||DOE^JANE^|||F|||||||||||||||||||||\n"
                 + "PV1|1|O|Location||||||||||||||||261938_6_201306171546|||||||||||||||||||||||||20130617134644|||||||||\n"
@@ -729,7 +729,7 @@ public class Hl7EncounterFHIRConversionTest {
      * Testing Encounter correctly references Observation AND Diagnosis when both are present.
      */
     @Test
-    public void testEncounterReferencesObservationAndDiagnosis() throws IOException {
+    void testEncounterReferencesObservationAndDiagnosis() throws IOException {
         String hl7message = "MSH|^~\\&|hl7Integration|hl7Integration|||||ADT^A01|||2.6|\n"
                 + "PID|||1234^^^^MR||DOE^JANE^|||F|||||||||||||||||||||\n"
                 + "PV1|1|O|Location||||||||||||||||261938_6_201306171546|||||||||||||||||||||||||20130617134644|||||||||\n"

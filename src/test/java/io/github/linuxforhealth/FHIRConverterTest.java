@@ -44,15 +44,14 @@ import io.github.linuxforhealth.hl7.HL7ToFHIRConverter;
 import io.github.linuxforhealth.hl7.parsing.HL7DataExtractor;
 import io.github.linuxforhealth.hl7.parsing.HL7HapiParser;
 
-public class FHIRConverterTest {
+class FHIRConverterTest {
     private static final String HL7_FILE_UNIX_NEWLINE = "src/test/resources/sample_unix.hl7";
     private static final String HL7_FILE_WIN_NEWLINE = "src/test/resources/sample_win.hl7";
-    private static final String HL7_FILE_WIN_NEWLINE_BATCH = "src/test/resources/sample_win_batch.hl7";
     private static final ConverterOptions OPTIONS = new Builder().withValidateResource().withPrettyPrint().build();
     private static final Logger LOGGER = LoggerFactory.getLogger(FHIRConverterTest.class);
 
     @Test
-    public void test_patient_encounter() throws IOException {
+    void test_patient_encounter() throws IOException {
 
         String hl7message = "MSH|^~\\&|SE050|050|PACS|050|20120912011230||ADT^A01|102|T|2.6|||AL|NE|764|ASCII||||||^4086::132:2A57:3C28^IPv6\r"
                 + "EVN||201209122222\r"
@@ -69,7 +68,7 @@ public class FHIRConverterTest {
     }
 
     @Test
-    public void test_patient_encounter_no_message_header() throws IOException {
+    void test_patient_encounter_no_message_header() throws IOException {
 
         String hl7message = "MSH|^~\\&|SE050|050|PACS|050|20120912011230||ADT^A01|102|T|2.6|||AL|NE|764|ASCII||||||\r"
                 + "EVN||201209122222\r"
@@ -87,7 +86,7 @@ public class FHIRConverterTest {
     }
 
     @Test
-    public void convert_hl7_from_file_to_fhir_unix_line_endings() throws IOException {
+    void convert_hl7_from_file_to_fhir_unix_line_endings() throws IOException {
         HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
         String json = ftv.convert(new File(HL7_FILE_UNIX_NEWLINE));
         verifyResult(json, BundleType.COLLECTION);
@@ -95,7 +94,7 @@ public class FHIRConverterTest {
     }
 
     @Test
-    public void convert_hl7_from_file_to_fhir_wiin_line_endings() throws IOException {
+    void convert_hl7_from_file_to_fhir_wiin_line_endings() throws IOException {
         HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
         ConverterOptions options = new Builder().withBundleType(BundleType.COLLECTION).withValidateResource().build();
 
@@ -105,7 +104,7 @@ public class FHIRConverterTest {
     }
 
     @Test
-    public void test_valid_message_but_unsupported_message_throws_exception() throws IOException {
+    void test_valid_message_but_unsupported_message_throws_exception() throws IOException {
         String hl7message = "MSH|^~\\&|MESA_ADT|XYZ_ADMITTING|MESA_IS|XYZ_HOSPITAL|201612291501||ADT^A18^ADT_A18|101166|P|2.3.1\n"
                 + "EVN|A18|201604211000||||201604210950\n"
                 + "PID|1||000010004^^^ST01A^MR~000010014^^^ST01B^MR~000010024^^^ST01^MR~000029970^^^EHIS^PI~999999999^^^SSA^SS||SENTARA10004^PAT^L||19251008|F||Caucasian||||||Married|Protestant|1002523||||||||||||PV1|1|O|||||2740^Tsadok^Janetary|2913^Merrit^Darren^F|3065^Mahoney^Paul^J||||||||9052^Winter^Oscar^||1001918\n"
@@ -120,7 +119,7 @@ public class FHIRConverterTest {
     }
 
     @Test
-    public void test_dosage_output() throws IOException {
+    void test_dosage_output() throws IOException {
         String hl7message = "MSH|^~\\&|MyEMR|DE-000001| |CAIRLO|20160701123030-0700||VXU^V04^VXU_V04|CA0001|P|2.6|||ER|AL|||||Z22^CDCPHINVS|DE-000001\r"
                 +
                 "PID|1||PA123456^^^MYEMR^MR||JONES^GEORGE^M^JR^^^L|MILLER^MARTHA^G^^^^M|20140227|M||2106-3^WHITE^CDCREC|1234 W FIRST ST^^BEVERLY HILLS^CA^90210^^H||^PRN^PH^^^555^5555555||ENG^English^HL70296|||||||2186-5^ not Hispanic or Latino^CDCREC||Y|2\r"
@@ -153,7 +152,7 @@ public class FHIRConverterTest {
     }
 
     @Test
-    public void test_invalid_message_throws_error() throws IOException {
+    void test_invalid_message_throws_error() throws IOException {
         String hl7message = "some text";
 
         HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
@@ -164,7 +163,7 @@ public class FHIRConverterTest {
     }
 
     @Test
-    public void test_blank_message_throws_error() throws IOException {
+    void test_blank_message_throws_error() throws IOException {
         String hl7message = "";
 
         HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
@@ -176,7 +175,7 @@ public class FHIRConverterTest {
 
     @Test
     // Test an example of a message with message structure specified
-    public void test_adt_40_message_with_adt_a39_structure_specified() throws Exception {
+    void test_adt_40_message_with_adt_a39_structure_specified() throws Exception {
         Message hl7message = null;
         // Test that an ADT A40 message with MSH-9.3 of 'ADT_A39' is successfully parsed and converted as an ADT A40 message.
         // Note that ADT_A39 is the expected structure of an ADT_A40 message.
@@ -219,7 +218,7 @@ public class FHIRConverterTest {
 
     @Test
     // Test an example of a message with no message structure specifed
-    public void test_adt_40_message() throws Exception {
+    void test_adt_40_message() throws Exception {
         Message hl7message = null;
         // Test that an ADT A40 message with no MSH-9.3 is successfully parsed and converted.
         String hl7messageString = "MSH|^~\\&|REGADT|MCM|RSP1P8|MCM|200301051530|SEC|ADT^A40|00000003|P|2.6\n" +
@@ -263,7 +262,7 @@ public class FHIRConverterTest {
     /*
      * This tests some of coding systems of interest or potential problems
      */
-    public void testCodingSystems() throws FHIRException {
+    void testCodingSystems() throws FHIRException {
         String hl7VUXmessageRep = "MSH|^~\\&|MYEHR2.5|RI88140101|KIDSNET_IFL|RIHEALTH|201305330||VXU^V04^VXU_V04|20130531RI881401010105|P|2.6|||AL|NE|764|ASCII||||||^4086::132:2A57:3C28^IPv6\r"
                 + "EVN|A01|20130617154644||01\r"
                 + "PID|1||12345678^^^MYEMR^MR||TestPatient^John|||M|\r"

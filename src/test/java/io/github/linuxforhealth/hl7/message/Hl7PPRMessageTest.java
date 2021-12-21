@@ -16,18 +16,17 @@ import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
 import org.hl7.fhir.r4.model.Resource;
 import org.hl7.fhir.r4.model.ResourceType;
 
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 
 import io.github.linuxforhealth.hl7.segments.util.ResourceUtils;
 
-public class Hl7PPRMessageTest {
+class Hl7PPRMessageTest {
 
     @ParameterizedTest
     @ValueSource(strings = { "PPR^PC1", /* "PPR^PC2", "PPR^PC3" */ })
-    public void test_ppr_pc1_with_min_VISIT_and_PROBLEM_groups(String message) throws IOException {
+    void test_ppr_pc1_with_min_VISIT_and_PROBLEM_groups(String message) throws IOException {
         String hl7message =
             "MSH|^~\\&|SendTest1|Sendfac1|Receiveapp1|Receivefac1|200603081747|security|" + message + "|1|P^I|2.6||||||ASCII||\r"
             + "PID|||555444222111^^^MPI&GenHosp&L^MR||james^anderson|||M||||||||||||||\r"
@@ -48,7 +47,7 @@ public class Hl7PPRMessageTest {
 
     @ParameterizedTest
     @ValueSource(strings = { "PPR^PC1", /* "PPR^PC2", "PPR^PC3" */ })
-    public void test_ppr_pc1_with_min_VISIT_and_PROBLEM_with_multiple_PROBLEM_OBSERVATION_groups(String message) throws IOException {
+    void test_ppr_pc1_with_min_VISIT_and_PROBLEM_with_multiple_PROBLEM_OBSERVATION_groups(String message) throws IOException {
         String hl7message =
             "MSH|^~\\&|SendTest1|Sendfac1|Receiveapp1|Receivefac1|200603081747|security|" + message + "|1|P^I|2.6||||||ASCII||\r"
             + "PID|||555444222111^^^MPI&GenHosp&L^MR||james^anderson|||M||||||||||||||\r"
@@ -79,7 +78,7 @@ public class Hl7PPRMessageTest {
 
     @ParameterizedTest
     @ValueSource(strings = { "PPR^PC1", /* "PPR^PC2", "PPR^PC3" */ })
-    public void test_ppr_pc1_with_min_VISIT_and_PROBLEM_with_multiple_PROBLEM_OBSERVATION_groups_OBXtypeTX(String message) throws IOException {
+    void test_ppr_pc1_with_min_VISIT_and_PROBLEM_with_multiple_PROBLEM_OBSERVATION_groups_OBXtypeTX(String message) throws IOException {
         String hl7message =
             "MSH|^~\\&|SendTest1|Sendfac1|Receiveapp1|Receivefac1|200603081747|security|" + message + "|1|P^I|2.6||||||ASCII||\r"
             + "PID|||555444222111^^^MPI&GenHosp&L^MR||james^anderson|||M||||||||||||||\r"
@@ -102,7 +101,7 @@ public class Hl7PPRMessageTest {
         assertThat(conditionResource).hasSize(1);
 
         List<Resource> docRefResource = ResourceUtils.getResourceList(e, ResourceType.DocumentReference);
-        assertThat(docRefResource).hasSize(0); //TODO: Expect this to be 1 when card #855 is completed
+        assertThat(docRefResource).isEmpty(); //TODO: Expect this to be 1 when card #855 is completed
 
         // Confirm that no extra resources are created
         assertThat(e.size()).isEqualTo(3); //TODO: Expect this to be 4 when card #855 is completed
@@ -110,7 +109,7 @@ public class Hl7PPRMessageTest {
     
     @ParameterizedTest
     @ValueSource(strings = { "PPR^PC1", /* "PPR^PC2", "PPR^PC3" */ })
-    public void test_ppr_pc1_with_full_VISIT_and_PROBLEM_with_min_ORDER_groups(String message) throws IOException {
+    void test_ppr_pc1_with_full_VISIT_and_PROBLEM_with_min_ORDER_groups(String message) throws IOException {
         String hl7message =
             "MSH|^~\\&|SendTest1|Sendfac1|Receiveapp1|Receivefac1|200603081747|security|" + message + "|1|P^I|2.6||||||ASCII||\r"
             + "PID|||555444222111^^^MPI&GenHosp&L^MR||james^anderson|||M||||||||||||||\r"
@@ -144,7 +143,7 @@ public class Hl7PPRMessageTest {
 
     @ParameterizedTest
     @ValueSource(strings = { "PPR^PC1", /* "PPR^PC2", "PPR^PC3" */ })
-    public void test_ppr_pc1_with_multiple_PROBLEM_with_ORDER_groups(String message) throws IOException {
+    void test_ppr_pc1_with_multiple_PROBLEM_with_ORDER_groups(String message) throws IOException {
         String hl7message =
             "MSH|^~\\&|SendTest1|Sendfac1|Receiveapp1|Receivefac1|200603081747|security|" + message + "|1|P^I|2.6||||||ASCII||\r"
             + "PID|||555444222111^^^MPI&GenHosp&L^MR||james^anderson|||M||||||||||||||\r"
@@ -180,7 +179,7 @@ public class Hl7PPRMessageTest {
 
     @ParameterizedTest
     @ValueSource(strings = { "PPR^PC1", /* "PPR^PC2", "PPR^PC3" */ })
-    public void test_ppr_pc1_with_VISIT_and_PROBLEM_with_ORDER_group_with_OBXnonTX(String message) throws IOException {
+    void test_ppr_pc1_with_VISIT_and_PROBLEM_with_ORDER_group_with_OBXnonTX(String message) throws IOException {
         String hl7message = 
             "MSH|^~\\&|SendTest1|Sendfac1|Receiveapp1|Receivefac1|200603081747|security|" + message + "|1|P^I|2.6||||||ASCII||\r"
             + "PID|||555444222111^^^MPI&GenHosp&L^MR||james^anderson|||M||||||||||||||\r"
@@ -222,7 +221,7 @@ public class Hl7PPRMessageTest {
 
     @ParameterizedTest
     @ValueSource(strings = { "PPR^PC1", /* "PPR^PC2", "PPR^PC3" */ })
-    public void test_ppr_pc1_with_VISIT_and_PROBLEM_with_ORDER_group_withOBXtypeTX(String message) throws IOException {
+    void test_ppr_pc1_with_VISIT_and_PROBLEM_with_ORDER_group_withOBXtypeTX(String message) throws IOException {
         String hl7message =
             "MSH|^~\\&|SendTest1|Sendfac1|Receiveapp1|Receivefac1|200603081747|security|" + message + "|1|P^I|2.6||||||ASCII||\r"
             + "PID|||555444222111^^^MPI&GenHosp&L^MR||james^anderson|||M||||||||||||||\r"
@@ -266,7 +265,7 @@ public class Hl7PPRMessageTest {
 
     @ParameterizedTest
     @ValueSource(strings = { "PPR^PC1", /* "PPR^PC2", "PPR^PC3" */ })
-    public void test_ppr_pc1_with_VISIT_and_PROBLEM_with_multiple_full_ORDER_groups_OBXtypeTX(String message) throws IOException {
+    void test_ppr_pc1_with_VISIT_and_PROBLEM_with_multiple_full_ORDER_groups_OBXtypeTX(String message) throws IOException {
         String hl7message =
             "MSH|^~\\&|SendTest1|Sendfac1|Receiveapp1|Receivefac1|200603081747|security|" + message + "|1|P^I|2.6||||||ASCII||\r"
             + "PID|||555444222111^^^MPI&GenHosp&L^MR||james^anderson|||M||||||||||||||\r"
@@ -316,7 +315,7 @@ public class Hl7PPRMessageTest {
 
     @ParameterizedTest
     @ValueSource(strings = { "PPR^PC1", /* "PPR^PC2", "PPR^PC3" */ })
-    public void test_ppr_pc1_with_VISIT_and_PROBLEM_with_multiple_full_ORDER_groups_OBXnotTX(String message) throws IOException {
+    void test_ppr_pc1_with_VISIT_and_PROBLEM_with_multiple_full_ORDER_groups_OBXnotTX(String message) throws IOException {
         String hl7message =
             "MSH|^~\\&|SendTest1|Sendfac1|Receiveapp1|Receivefac1|200603081747|security|" + message + "|1|P^I|2.6||||||ASCII||\r"
             + "PID|||555444222111^^^MPI&GenHosp&L^MR||james^anderson|||M||||||||||||||\r"
@@ -372,7 +371,7 @@ public class Hl7PPRMessageTest {
 
     @ParameterizedTest
     @ValueSource(strings = { "PPR^PC1", /* "PPR^PC2", "PPR^PC3" */ })
-    public void test_ppr_pc1_with_VISIT_and_PROBLEM_with_multiple_PROBLEM_OBSERVATIONs_and_multiple_full_ORDER_groups(String message) throws IOException {
+    void test_ppr_pc1_with_VISIT_and_PROBLEM_with_multiple_PROBLEM_OBSERVATIONs_and_multiple_full_ORDER_groups(String message) throws IOException {
         String hl7message =
             "MSH|^~\\&|SendTest1|Sendfac1|Receiveapp1|Receivefac1|200603081747|security|" + message + "|1|P^I|2.6||||||ASCII||\r"
             + "PID|||555444222111^^^MPI&GenHosp&L^MR||james^anderson|||M||||||||||||||\r"

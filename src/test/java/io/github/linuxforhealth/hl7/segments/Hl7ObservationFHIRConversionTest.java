@@ -37,8 +37,6 @@ import com.google.common.collect.Lists;
 
 import io.github.linuxforhealth.api.ResourceModel;
 import io.github.linuxforhealth.fhir.FHIRContext;
-import io.github.linuxforhealth.hl7.ConverterOptions;
-import io.github.linuxforhealth.hl7.ConverterOptions.Builder;
 import io.github.linuxforhealth.hl7.message.HL7FHIRResourceTemplate;
 import io.github.linuxforhealth.hl7.message.HL7FHIRResourceTemplateAttributes;
 import io.github.linuxforhealth.hl7.message.HL7MessageEngine;
@@ -47,10 +45,9 @@ import io.github.linuxforhealth.hl7.resource.ResourceReader;
 import io.github.linuxforhealth.hl7.segments.util.DatatypeUtils;
 import io.github.linuxforhealth.hl7.segments.util.ResourceUtils;
 
-public class Hl7ObservationFHIRConversionTest {
+class Hl7ObservationFHIRConversionTest {
     private static FHIRContext context = new FHIRContext();
-    private static HL7MessageEngine engine = new HL7MessageEngine(context);
-    private static final ConverterOptions OPTIONS = new Builder().withValidateResource().withPrettyPrint().build();
+    private static HL7MessageEngine customEngine = new HL7MessageEngine(context);
 
     private String baseMessage = "MSH|^~\\&|hl7Integration|hl7Integration|||||ADT^A01|||2.6|\r"
             + "EVN|A01|20130617154644\r"
@@ -68,17 +65,11 @@ public class Hl7ObservationFHIRConversionTest {
     private HL7MessageModel message = new HL7MessageModel("ADT", Lists.newArrayList(observation));
 
     @Test
-    public void testObservationNmResult() throws IOException {
+    void testObservationNmResult() throws IOException {
         String hl7message = baseMessage + "OBX|1|NM|0135-4^TotalProtein||7.3|gm/dl|5.9-8.4|||R|F";
-        String json = message.convert(hl7message, engine);
 
-        IBaseResource bundleResource = context.getParser().parseResource(json);
-        assertThat(bundleResource).isNotNull();
-        Bundle b = (Bundle) bundleResource;
-        List<BundleEntryComponent> e = b.getEntry();
-        List<Resource> obsResource = e.stream()
-                .filter(v -> ResourceType.Observation == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<Resource> obsResource = ResourceUtils.getResourceList(e, ResourceType.Observation);
         assertThat(obsResource).hasSize(1);
         Observation obs = (Observation) obsResource.get(0);
         assertThat(obs.getValueQuantity()).isNotNull();
@@ -105,7 +96,7 @@ public class Hl7ObservationFHIRConversionTest {
      * @throws IOException
      */
     @Test
-    public void testObservationSN_valueQuantity_result() throws IOException {
+    void testObservationSN_valueQuantity_result() throws IOException {
         String hl7message = baseMessage + "OBX|1|SN|28-1^Ampicillin Islt MIC^LN||<^0.06|ug/mL^^UCUM|||";
 
         List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
@@ -131,7 +122,7 @@ public class Hl7ObservationFHIRConversionTest {
      * @throws IOException
      */
     @Test
-    public void testObservationSN_valueQuantity_equals_comparator_result() throws IOException {
+    void testObservationSN_valueQuantity_equals_comparator_result() throws IOException {
         String hl7message = baseMessage
                 + "OBX|1|SN|24467-3^CD3+CD4+ (T4 helper) cells [#/volume] in Blood^LN||=^440|{Cells}/uL^cells per microliter^UCUM|649-1346 cells/mcL|L|||F";
 
@@ -175,7 +166,7 @@ public class Hl7ObservationFHIRConversionTest {
      * @throws IOException
      */
     @Test
-    public void testObservationSN_valueQuantity_notnull_separator_result() throws IOException {
+    void testObservationSN_valueQuantity_notnull_separator_result() throws IOException {
         String hl7message = baseMessage
                 + "OBX|1|SN|24467-3^CD3+CD4+ (T4 helper) cells [#/volume] in Blood^LN||=^440^.|{Cells}/uL^cells per microliter^UCUM|||||F";
 
@@ -195,7 +186,7 @@ public class Hl7ObservationFHIRConversionTest {
     }
 
     @Test
-    public void testObservationSN_valueQuantity_missing_comparator_result() throws IOException {
+    void testObservationSN_valueQuantity_missing_comparator_result() throws IOException {
         String hl7message = baseMessage + "OBX|1|SN|1554-5^GLUCOSE||^182|mg/dl|70_105||||F";
 
         List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
@@ -228,7 +219,7 @@ public class Hl7ObservationFHIRConversionTest {
     }
 
     @Test
-    public void testObservationSN_valueRatio_colon_result() throws IOException {
+    void testObservationSN_valueRatio_colon_result() throws IOException {
         String hl7message = baseMessage + "OBX|1|SN|111^LabWithRatio||^2^:^3|";
 
         List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
@@ -243,7 +234,7 @@ public class Hl7ObservationFHIRConversionTest {
     }
 
     @Test
-    public void testObservationSN_valueRatio_slash_result() throws IOException {
+    void testObservationSN_valueRatio_slash_result() throws IOException {
         String hl7message = baseMessage + "OBX|1|SN|111^LabWithRatio||^2^/^3|";
 
         List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
@@ -258,7 +249,7 @@ public class Hl7ObservationFHIRConversionTest {
     }
 
     @Test
-    public void testObservationSTResult() throws IOException {
+    void testObservationSTResult() throws IOException {
         String hl7message = baseMessage
                 + "OBX|1|ST|^Type of protein feed^L||Fourth Line: HYPERDYNAMIC LV SYSTOLIC FUNCTION, VISUAL EF 80%||||||F||||Alex||";
 
@@ -274,7 +265,7 @@ public class Hl7ObservationFHIRConversionTest {
     }
 
     @Test
-    public void testObservationSTMultiplePartsResult() throws IOException {
+    void testObservationSTMultiplePartsResult() throws IOException {
         String hl7message = baseMessage
                 + "OBX|1|ST|^Type of protein feed^L||HYPERDYNAMIC LV SYSTOLIC FUNCTION, VISUAL EF 80%~Fifth line, as part of a repeated field||||||F||";
 
@@ -291,7 +282,7 @@ public class Hl7ObservationFHIRConversionTest {
 
     // NOTE that even though we are testing for it CE is not part of HL7 V2.6
     @Test
-    public void testObservationCeResultUnknownSystem() throws IOException {
+    void testObservationCeResultUnknownSystem() throws IOException {
         String hl7message = baseMessage
                 + "OBX|1|CE|93000&CMP^LIN^CPT4|11|1305^No significant change was found^MEIECG";
 
@@ -311,7 +302,7 @@ public class Hl7ObservationFHIRConversionTest {
     }
 
     @Test
-    public void testObservationCeResultKnownSystem() throws IOException {
+    void testObservationCeResultKnownSystem() throws IOException {
         String hl7message = baseMessage
                 + "OBX|1|CE|93000&CMP^LIN^CPT4|11|1305^No significant change was found^LN";
 
@@ -331,7 +322,7 @@ public class Hl7ObservationFHIRConversionTest {
     }
 
     @Test
-    public void testObservationStNullResult() throws IOException {
+    void testObservationStNullResult() throws IOException {
         String hl7message = baseMessage
                 + "OBX|1|ST|14151-5^HCO3 BldCo-sCnc^LN|TEST|||||||F|||20210311122016|||||20210311122153||||";
 
@@ -374,11 +365,13 @@ public class Hl7ObservationFHIRConversionTest {
             //"MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|PPR^PC3|||2.6||||||||2.6\r",
             "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|VXU^V04|||2.6||||||||2.6\r",
     })
-    public void extendedObservationTestMostMessages(String msh) throws IOException {
+    // Suppress warnings about too many assertions in a test.  Justification: creating a FHIR message is very costly; we need to check many asserts per creation for efficiency.  
+    @java.lang.SuppressWarnings("squid:S5961")
+    void extendedObservationTestMostMessages(String msh) throws IOException {
         String hl7message = msh
                 + "OBX|1|CWE|DQW^Some text 1^SNM3|100|DQW^Other text 2^SNM3|mm^Text 3^SNM3|56-98|IND|25|ST|F|20210322153839|LKJ|20210320153850|N56|1111^ClinicianLastName^ClinicianFirstName^^^^Title|Manual^Text the 4th^SNM3|Device_1234567^mySystem|20210322153925|Observation Site^Text 5^SNM3|INST^Instance Identifier System||Radiology^Radiological Services|467 Albany Hospital^^Albany^NY|Cardiology^ContactLastName^Jane^Q^^Dr.^MD\r";
 
-        String json = message.convert(hl7message, engine); // use special created engine
+        String json = message.convert(hl7message, customEngine); // use special created engine
 
         IBaseResource bundleResource = context.getParser().parseResource(json);
         assertThat(bundleResource).isNotNull();
@@ -492,7 +485,9 @@ public class Hl7ObservationFHIRConversionTest {
 
     // A companion test to extendedObservationCWEtest that looks for edge cases
     @Test
-    public void extendedObservationUnusualRangesAndOtherTest() throws IOException {
+    // Suppress warnings about too many assertions in a test.  Justification: creating a FHIR message is very costly; we need to check many asserts per creation for efficiency.  
+    @java.lang.SuppressWarnings("squid:S5961")
+    void extendedObservationUnusualRangesAndOtherTest() throws IOException {
         String ORU_r01 = "MSH|^~\\&|NIST Test Lab APP|NIST Lab Facility||NIST EHR Facility|20150926140551||ORU^R01|NIST-LOI_5.0_1.1-NG|T|2.5.1|||AL|AL|||||\r"
                 + "PID|1||||DOE^JANE||||||||||||\r"
                 + "ORC|NW|ORD448811^NIST EHR|R-511^NIST Lab Filler||||||20120628070100|||5742200012^Radon^Nicholas^^^^^^NPI^L^^^NPI\r"
@@ -550,7 +545,9 @@ public class Hl7ObservationFHIRConversionTest {
             "MSH|^~\\&|WHI_LOAD_GENERATOR|IBM_TORONTO_LAB||IBM|20210407191342|25739|RDE^O11|MSGID_f209e83f-20db-474d-a7ae-82e5c3894273|T|2.6\r",
             "MSH|^~\\&|WHI_LOAD_GENERATOR|IBM_TORONTO_LAB||IBM|20210407191342|25739|RDE^O25|MSGID_f209e83f-20db-474d-a7ae-82e5c3894273|T|2.6\r"
     })
-    public void extendedObservationTestForRDEMessages(String msh) throws IOException {
+    // Suppress warnings about too many assertions in a test.  Justification: creating a FHIR message is very costly; we need to check many asserts per creation for efficiency.  
+    @java.lang.SuppressWarnings("squid:S5961")
+    void extendedObservationTestForRDEMessages(String msh) throws IOException {
 
         String hl7message = msh
                 + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"

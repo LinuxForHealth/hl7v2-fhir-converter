@@ -1,0 +1,27 @@
+#
+# (C) Copyright IBM Corp. 2021, 2022
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+---
+value: 
+     type: STRING
+     valueOf: $classValue
+     expressionType: HL7Spec
+     required: true
+
+type: 
+   valueOf: datatype/CodeableConcept_var
+   # generateList: true
+   expressionType: resource
+   required: true
+   vars: 
+      system: $typeSystem
+      code: $typeCode
+      display: $typeDisplay
+
+name:
+     type: STRING
+     valueOf: $className
+     expressionType: HL7Spec
+

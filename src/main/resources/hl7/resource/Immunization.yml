@@ -43,13 +43,44 @@ statusReason_2:
       code: "PATOBJ"
       display: "Patient Refusal"
       system: "http://terminology.hl7.org/CodeSystem/v3-ActReason"
-vaccineCode:
+statusReason_3:
+   valueOf: datatype/CodeableConcept_var
+   expressionType: resource
+   condition: $rxa18 NULL && $rxa20 NULL && $obx31 EQUALS 30945-0
+   vars:
+      rxa18: RXA.18
+      rxa20: RXA.20
+      obx31: String, OBX.3.1
+   constants:
+      code: "MEDPREC"
+      display: "medical precaution"
+      system: "http://terminology.hl7.org/CodeSystem/v3-ActReason"
+statusReason_4:
+   valueOf: datatype/CodeableConcept_var
+   expressionType: resource
+   condition: $rxa18 NULL && $rxa20 NULL && $obx31 EQUALS 59784-9
+   vars:
+      rxa18: RXA.18
+      rxa20: RXA.20
+      obx31: String, OBX.3.1
+   constants:
+      code: "IMMUNE"
+      display: "immunity"
+      system: "http://terminology.hl7.org/CodeSystem/v3-ActReason"
+vaccineCode_1:
    valueOf: datatype/CodeableConcept
-   required: true
    expressionType: resource
    specs: RXA.5
    vars:
       code: RXA.5
+vaccineCode_2:
+   condition: $obx31 EQUALS 30956-7 && $rxa5 NULL
+   valueOf: datatype/CodeableConcept
+   expressionType: resource
+   specs: OBX.5
+   vars:
+      rxa5: RXA.5
+      obx31: String, OBX.3.1
 patient:
    valueOf: datatype/Reference
    required: true
@@ -138,27 +169,20 @@ isSubpotent:
    vars:
       rxa20: String, RXA.20
 programEligibility:
-   valueOf: datatype/CodeableConcept_var
+   valueOf: datatype/CodeableConcept
    expressionType: resource
-   generateList: true
    condition: $obx3 EQUALS 64994-7
-   specs: OBX
+   specs: OBX.5
    vars:
-      obx3: STRING, OBX.3.1
-      code: STRING, OBX.5.1
-      text: STRING, OBX.5.2
-      system: STRING, OBX.5.3
+      obx3: String, OBX.3.1
 fundingSource:
-   valueOf: datatype/CodeableConcept_var
+   valueOf: datatype/CodeableConcept
    expressionType: resource
-   generateList: true
    condition: $obx3 EQUALS 30963-3
-   specs: OBX
+   specs: OBX.5
    vars:
-      obx3: STRING, OBX.3.1
-      code: STRING, OBX.5.1
-      text: STRING, OBX.5.2
-      system: STRING, OBX.5.3
+      obx3: String, OBX.3.1
+
 reasonCode:
    valueOf: datatype/CodeableConcept
    expressionType: resource
@@ -167,6 +191,14 @@ recorded:
    type: DATE_TIME
    valueOf: RXA.22
    expressionType: HL7Spec
+reaction:
+   condition: $obx31 EQUALS 31044-1
+   valueOf: secondary/ImmunizationReaction
+   generateList: true
+   expressionType: resource
+   specs: OBX
+   vars:
+      obx31: String, OBX.3.1
 education:
    condition: $obx5 NOT_NULL
    valueOf: secondary/Education

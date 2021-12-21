@@ -13,22 +13,22 @@ import ca.uhn.hl7v2.model.v26.group.ORU_R01_ORDER_OBSERVATION;
 import ca.uhn.hl7v2.model.v26.message.ORU_R01;
 import ca.uhn.hl7v2.model.v26.segment.OBX;
 
-public class GeneralUtilTest {
+class GeneralUtilTest {
     private static final String SOME_TEXT_VALUE = "SOME TEXT VALUE";
 
     @Test
-    public void test_getDataType_returns_value() {
+    void test_getDataType_returns_value() {
         String value = "any string value";
         assertThat(DataTypeUtil.getDataType(value)).isEqualTo(String.class.getSimpleName());
     }
 
     @Test
-    public void test_getDataType_returns_null_for_null_input() {
+    void test_getDataType_returns_null_for_null_input() {
         assertThat(DataTypeUtil.getDataType(null)).isNull();
     }
 
     @Test
-    public void test_getDataType_returns_value_for_hl7_primitive() throws DataTypeException {
+    void test_getDataType_returns_value_for_hl7_primitive() throws DataTypeException {
         ORU_R01 message = new ORU_R01();
         TX tx = new TX(message);
         tx.setValue(SOME_TEXT_VALUE);
@@ -36,7 +36,7 @@ public class GeneralUtilTest {
     }
 
     @Test
-    public void test_getDataTypee_returns_value_for_hl7_compositive() throws DataTypeException {
+    void test_getDataTypee_returns_value_for_hl7_compositive() throws DataTypeException {
         ORU_R01 message = new ORU_R01();
         CWE ce = new CWE(message);
         ce.getIdentifier().setValue("SOME Identifier");
@@ -46,7 +46,7 @@ public class GeneralUtilTest {
     }
 
     @Test
-    public void test_getDataType_returns_value_for_hl7_varies() throws DataTypeException {
+    void test_getDataType_returns_value_for_hl7_varies() throws DataTypeException {
         ORU_R01 message = new ORU_R01();
         ORU_R01_ORDER_OBSERVATION orderObservation = message.getPATIENT_RESULT().getORDER_OBSERVATION();
         ORU_R01_OBSERVATION observation = orderObservation.getOBSERVATION(0);

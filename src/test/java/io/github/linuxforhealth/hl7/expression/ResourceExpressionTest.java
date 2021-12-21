@@ -29,7 +29,7 @@ import io.github.linuxforhealth.hl7.message.HL7MessageData;
 import io.github.linuxforhealth.hl7.parsing.HL7DataExtractor;
 import io.github.linuxforhealth.hl7.parsing.HL7HapiParser;
 
-public class ResourceExpressionTest {
+class ResourceExpressionTest {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ResourceExpressionTest.class);
 
@@ -40,7 +40,7 @@ public class ResourceExpressionTest {
             + "PV1|1||Location||||||||||||||||261938_6_201306171546|||||||||||||||||||||||||20130617134644|||||||||";
 
     @Test
-    public void test1_segment() throws IOException {
+    void test1_segment() throws IOException {
 
         Message hl7message = getMessage(message);
         HL7DataExtractor hl7DTE = new HL7DataExtractor(hl7message);
@@ -58,12 +58,12 @@ public class ResourceExpressionTest {
 
         Map<String, Object> result = (Map<String, Object>) value.getValue();
         assertThat(result.get("use")).isNull();
-        assertThat(result.get("value")).isEqualTo("000010016");
+        assertThat(result).containsEntry("value", "000010016");
 
     }
 
     @Test
-    public void test_component_required_missing() throws IOException {
+    void test_component_required_missing() throws IOException {
         String message = "MSH|^~\\&|hl7Integration|hl7Integration|||||ADT^A01|||2.3|\r"
                 + "EVN|A01|20130617154644\r"
                 + "PID|1|465 306 5961||407623|Wood^Patrick^^^MR||19700101|female|||High Street^^Oxford^^Ox1 4DP~George St^^Oxford^^Ox1 5AP|||||||\r"
@@ -90,7 +90,7 @@ public class ResourceExpressionTest {
     }
 
     @Test
-    public void test_picks_next_value_from_rep_if_first_fails_condition_or_check()
+    void test_picks_next_value_from_rep_if_first_fails_condition_or_check()
             throws IOException {
         String message = "MSH|^~\\&|hl7Integration|hl7Integration|||||ADT^A01|||2.3|\r"
                 + "EVN|A01|20130617154644\r"
@@ -116,13 +116,13 @@ public class ResourceExpressionTest {
         assertThat(value).isNotNull();
         Map<String, Object> result = (Map<String, Object>) value.getValue();
         assertThat(result.get("use")).isNull();
-        assertThat(result.get("value")).isEqualTo("000010017");
+        assertThat(result).containsEntry("value", "000010017");
         assertThat(result.get("type")).isNull();
 
     }
 
     @Test
-    public void test1_segment_rep() throws IOException {
+    void test1_segment_rep() throws IOException {
         String message = "MSH|^~\\&|hl7Integration|hl7Integration|||||ADT^A01|||2.3|\r"
                 + "EVN|A01|20130617154644\r"
                 + "PID|1|465 306 5961|000010016^^^SY1^MR~000010017^^^SY2^SS~000010018^^^MR|407623|Wood^Patrick^^^MR||19700101|female|||High Street^^Oxford^^Ox1 4DP~George St^^Oxford^^Ox1 5AP|||||||\r"
@@ -149,14 +149,15 @@ public class ResourceExpressionTest {
 
         Map<String, Object> result = (Map<String, Object>) results.get(0);
         assertThat(result.get("use")).isNull();
-        assertThat(result.get("value")).isEqualTo("000010016");
+        assertThat(result).containsEntry("value", "000010016");
+
         assertThat(result.get("system")).isNull();
         assertThat(result.get("type")).isNotNull();
 
     }
 
     @Test
-    public void test1_segment_identifier_obx() throws IOException {
+    void test1_segment_identifier_obx() throws IOException {
         String message = "MSH|^~\\&|hl7Integration|hl7Integration|||||ADT^A01|||2.3|\r"
                 + "EVN|A01|20130617154644\r"
                 + "PID|1|465 306 5961|000010016^^^MR~000010017^^^MR~000010018^^^MR|407623|Wood^Patrick^^^MR||19700101|female|||High Street^^Oxford^^Ox1 4DP~George St^^Oxford^^Ox1 5AP|||||||\r"
@@ -179,13 +180,14 @@ public class ResourceExpressionTest {
                 new SimpleEvaluationResult(s));
         Map<String, Object> result = (Map<String, Object>) value.getValue();
         assertThat(result.get("use")).isNull();
-        assertThat(result.get("value")).isEqualTo("1234");
+        assertThat(result).containsEntry("value", "1234");
+
         assertThat(result.get("system")).isNull();
 
     }
 
     @Test
-    public void testSegmentIdentifierObxCc() throws IOException {
+    void testSegmentIdentifierObxCc() throws IOException {
         String message = "MSH|^~\\&|hl7Integration|hl7Integration|||||ADT^A01|||2.3|\r"
                 + "EVN|A01|20130617154644\r"
                 + "PID|1|465 306 5961|12345678^^^MR|407623|TestPatient^John^^MR||19700101|male||||||||||\r"
@@ -210,7 +212,8 @@ public class ResourceExpressionTest {
         List<Map<String, Object>> result = (List<Map<String, Object>>) value.getValue();
         Map<String, Object> type = (Map<String, Object>) result.get(0).get("type");
 
-        assertThat(type.get("text")).isEqualTo("some text");
+        assertThat(type).containsEntry("text", "some text");
+
         assertThat(type.get("coding")).isNotNull();
         List<Object> list = (List) type.get("coding");
         SimpleCode scs = (SimpleCode) list.get(0);
@@ -221,7 +224,7 @@ public class ResourceExpressionTest {
     }
 
     @Test
-    public void testSegmentIdentifierObxCcKnownSystem() throws IOException {
+    void testSegmentIdentifierObxCcKnownSystem() throws IOException {
         String message = "MSH|^~\\&|hl7Integration|hl7Integration|||||ADT^A01|||2.3|\r"
                 + "EVN|A01|20130617154644\r"
                 + "PID|1|465 306 5961|123456^^^MR|407623|TestPatient^John^^^MR||19700101|male||||||||||\r"
@@ -245,7 +248,8 @@ public class ResourceExpressionTest {
                 new SimpleEvaluationResult(s));
 
         List<Map<String, Object>> result = (List<Map<String, Object>>) value.getValue();
-        assertThat(result.get(0).get("text")).isEqualTo("some text");
+        assertThat(result.get(0)).containsEntry("text", "some text");
+
         assertThat(result.get(0).get("coding")).isNotNull();
         List<Object> list = (List) result.get(0).get("coding");
         SimpleCode scs = (SimpleCode) list.get(0);
@@ -256,7 +260,7 @@ public class ResourceExpressionTest {
     }
 
     @Test
-    public void testCodeableConceptFromISTtype() throws IOException {
+    void testCodeableConceptFromISTtype() throws IOException {
         String message = "MSH|^~\\&|hl7Integration|hl7Integration|||||ADT^A01|||2.3|\r"
                 + "EVN|A01|20130617154644\r"
                 + "PID|1|465 306 5961|000010016^^^MR~000010017^^^MR~000010018^^^MR|407623|TestPatient^Jane|19700101|female||||||||||\r"
@@ -290,7 +294,7 @@ public class ResourceExpressionTest {
     }
 
     @Test
-    public void test_organization_creation_with_missing_id_value() throws IOException {
+    void test_organization_creation_with_missing_id_value() throws IOException {
         String message = "MSH|^~\\&|MYEHR2.5|RI88140101|KIDSNET_IFL|RIHEALTH|20130531||VXU^V04^VXU_V04|20130531RI881401010105|P|2.5.1|||NE|AL||||||RI543763\r"
                 + "PID|1||432155^^^^MR||Patient^Johnny^New^^^^L|Smith^Sally|20130414|M||2106-3^White^HL70005|123 Any St^^Somewhere^WI^54000^^M\r"
                 + "NK1|1|Patient^Sally|MTH^mother^HL70063|123 Any St^^Somewhere^WI^54000^^M|^PRN^PH^^^608^5551212|||||||||||19820517||||eng^English^ISO639\r"
@@ -319,7 +323,7 @@ public class ResourceExpressionTest {
                 new SimpleEvaluationResult(s));
 
         List<Map<String, Object>> result = (List<Map<String, Object>>) value.getValue();
-        assertThat(result.get(0).get("name")).isEqualTo("sanofi");
+        assertThat(result.get(0)).containsEntry("name", "sanofi");
         assertThat(result.get(0).get("identifier")).isNull();
 
         LOGGER.debug("result=" + result);
@@ -327,7 +331,7 @@ public class ResourceExpressionTest {
     }
 
     @Test
-    public void test_organization_creation_with_missing_id_and_name_value() throws IOException {
+    void test_organization_creation_with_missing_id_and_name_value() throws IOException {
         String message = "MSH|^~\\&|MYEHR2.5|RI88140101|KIDSNET_IFL|RIHEALTH|20130531||VXU^V04^VXU_V04|20130531RI881401010105|P|2.5.1|||NE|AL||||||RI543763\r"
                 + "PID|1||432155^^^^MR||Patient^Johnny^New^^^^L|Smith^Sally|20130414|M||2106-3^White^HL70005|123 Any St^^Somewhere^WI^54000^^M\r"
                 + "NK1|1|Patient^Sally|MTH^mother^HL70063|123 Any St^^Somewhere^WI^54000^^M|^PRN^PH^^^608^5551212|||||||||||19820517||||eng^English^ISO639\r"
@@ -360,7 +364,7 @@ public class ResourceExpressionTest {
     }
 
     @Test
-    public void test_organization_creation_with_mo_missing_value() throws IOException {
+    void test_organization_creation_with_mo_missing_value() throws IOException {
         String message = "MSH|^~\\&|MYEHR2.5|RI88140101|KIDSNET_IFL|RIHEALTH|20130531||VXU^V04^VXU_V04|20130531RI881401010105|P|2.5.1|||NE|AL||||||RI543763\r"
                 + "PID|1||432155^^^^MR||Patient^Johnny^New^^^^L|Smith^Sally|20130414|M||2106-3^White^HL70005|123 Any St^^Somewhere^WI^54000^^M\r"
                 + "NK1|1|Patient^Sally|MTH^mother^HL70063|123 Any St^^Somewhere^WI^54000^^M|^PRN^PH^^^608^5551212|||||||||||19820517||||eng^English^ISO639\r"
@@ -389,9 +393,9 @@ public class ResourceExpressionTest {
                 new SimpleEvaluationResult(s));
 
         List<Map<String, Object>> result = (List<Map<String, Object>>) value.getValue();
-        assertThat(result.get(0).get("name")).isEqualTo("sanofi");
+        assertThat(result.get(0)).containsEntry("name", "sanofi");
         List<Map<String, Object>> identifiers = (List<Map<String, Object>>) result.get(0).get("identifier");
-        assertThat(identifiers.get(0).get("value")).isEqualTo("PMC");
+        assertThat(identifiers.get(0)).containsEntry("value", "PMC");
 
         LOGGER.debug("result=" + result);
 

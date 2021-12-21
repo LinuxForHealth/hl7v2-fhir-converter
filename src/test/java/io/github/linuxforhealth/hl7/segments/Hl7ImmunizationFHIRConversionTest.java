@@ -15,6 +15,7 @@ import java.util.Map;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Immunization;
 import org.hl7.fhir.r4.model.Organization;
+import org.hl7.fhir.r4.model.Observation;
 import org.hl7.fhir.r4.model.Practitioner;
 import org.hl7.fhir.r4.model.Resource;
 import org.hl7.fhir.r4.model.ResourceType;
@@ -22,10 +23,12 @@ import org.junit.jupiter.api.Test;
 
 import io.github.linuxforhealth.hl7.segments.util.ResourceUtils;
 
-public class Hl7ImmunizationFHIRConversionTest {
+class Hl7ImmunizationFHIRConversionTest {
 
+    // Suppress warnings about too many assertions in a test.  Justification: creating a FHIR message is very costly; we need to check many asserts per creation for efficiency.
+    @java.lang.SuppressWarnings("squid:S5961")
     @Test
-    public void testImmunization() throws IOException {
+    void testImmunizationRXA20Priority() throws IOException {
 
         // RXA.20 is "completed" this takes precedence over rxa.18 having a value and orc.5
         String hl7VUXmessageRep = "MSH|^~\\&|MYEHR2.5|RI88140101|KIDSNET_IFL|RIHEALTH|20130531||VXU^V04^VXU_V04|20130531RI881401010105|P|2.5.1|||NE|AL||||||RI543763\r"
@@ -33,7 +36,7 @@ public class Hl7ImmunizationFHIRConversionTest {
                 + "ORC|RE||197027||ER|||||^Clerk^Myron||MD67895^Pediatric^MARY^^^^MD^^RIA|||||RI2050\r" //ORC.5 is here to prove RXA.20 is taking precedence
                 + "RXA|0|1|20130531|20130531|48^HIB PRP-T^CVX|0.5|ML^^ISO+||00^new immunization record^NIP001|^Sticker^Nurse|^^^RI2050||||33k2a|20131210|PMC^sanofi^MVX|00^Patient refusal^NIP002||PA|A|20120901041038\r"
                 + "RXR|C28161^IM^NCIT^IM^INTRAMUSCULAR^HL70162|RT^right thigh^HL70163\r"
-                + "OBX|1|CE|64994-7^vaccine fund pgm elig cat^LN|1|V02^VFC eligible Medicaid/MedicaidManaged Care^HL70064||||||F|||20130531|||VXC40^per imm^CDCPHINVS\r";
+                + "OBX|1|CWE|31044-1^Reaction^LN|1|VXC9^Persistent, inconsolable crying lasting > 3 hours within 48 hours of dose^CDCPHINVS||||||F|||20130531|||VXC40^per imm^CDCPHINVS\r";
 
         List<Bundle.BundleEntryComponent> e = ResourceUtils
                 .createFHIRBundleFromHL7MessageReturnEntryList(hl7VUXmessageRep);
@@ -71,7 +74,7 @@ public class Hl7ImmunizationFHIRConversionTest {
 
         //dose Quantity with an unknown system
         assertThat(resource.hasDoseQuantity()).isTrue();
-        assertThat(resource.getDoseQuantity().getValue().toString()).isEqualTo("0.5");
+        assertThat(resource.getDoseQuantity().getValue()).hasToString("0.5");
         assertThat(resource.getDoseQuantity().getUnit()).isEqualTo("ML");
         assertThat(resource.getDoseQuantity().getCode()).isEqualTo("ML");
         assertThat(resource.getDoseQuantity().getSystem()).isEqualTo("urn:id:ISO+");
@@ -83,10 +86,10 @@ public class Hl7ImmunizationFHIRConversionTest {
                 .isEqualTo("OP"); // ORC.12
         assertThat(resource.getPerformer().get(0).getFunction().getText())
                 .isEqualTo("Ordering Provider"); // ORC.12
-        assertThat(resource.getPerformer().get(0).getActor().getReference().isEmpty()).isFalse(); // ORC.12
+        assertThat(resource.getPerformer().get(0).getActor().getReference()).isNotEmpty(); // ORC.12
         assertThat(practBundle1.getNameFirstRep().getText()).isEqualTo("MARY Pediatric");
         assertThat(practBundle1.getNameFirstRep().getFamily()).isEqualTo("Pediatric");
-        assertThat(practBundle1.getNameFirstRep().getGiven().get(0).toString()).isEqualTo("MARY");
+        assertThat(practBundle1.getNameFirstRep().getGiven().get(0)).hasToString("MARY");
         assertThat(practBundle1.getIdentifierFirstRep().getValue()).isEqualTo("MD67895");
 
         String requesterRef2 = resource.getPerformer().get(1).getActor().getReference();
@@ -98,7 +101,23 @@ public class Hl7ImmunizationFHIRConversionTest {
         assertThat(resource.getPerformer().get(1).getActor().isEmpty()).isFalse(); // RXA.10
         assertThat(practBundle2.getNameFirstRep().getText()).isEqualTo("Nurse Sticker");
         assertThat(practBundle2.getNameFirstRep().getFamily()).isEqualTo("Sticker");
-        assertThat(practBundle2.getNameFirstRep().getGiven().get(0).toString()).isEqualTo("Nurse");
+        assertThat(practBundle2.getNameFirstRep().getGiven().get(0)).hasToString("Nurse");
+
+        // Immunization.Reaction Date (OBX.14) and Detail (OBX.5 if OBX 3 is 31044-1)
+        assertThat(resource.getReactionFirstRep().getDateElement().toString()).contains("2013-05-31"); //OBX.14
+        assertThat(resource.getReactionFirstRep().getDetail().hasReference()).isTrue(); //OBX.5
+        // Looking for one Observation that matches the Reaction.Detail reference
+        String reactionDetail = resource.getReactionFirstRep().getDetail().getReference();
+        List<Resource> observations = ResourceUtils.getResourceList(e, ResourceType.Observation);
+        assertThat(observations).hasSize(1);
+        Observation obs = ResourceUtils.getResourceObservation(observations.get(0), ResourceUtils.context);
+        assertThat(obs.getId()).isEqualTo(reactionDetail);
+        assertThat(obs.getCode().getCodingFirstRep().getDisplay()).isEqualTo("Persistent, inconsolable crying lasting > 3 hours within 48 hours of dose");
+        assertThat(obs.getCode().getCodingFirstRep().getCode()).isEqualTo("VXC9");
+        assertThat(obs.getCode().getCodingFirstRep().getSystem()).isEqualTo("urn:id:CDCPHINVS");
+        assertThat(obs.getCode().getText()).isEqualTo("Persistent, inconsolable crying lasting > 3 hours within 48 hours of dose");
+        assertThat(obs.getIdentifierFirstRep().getValue()).isEqualTo("197027-VXC9-CDCPHINVS");
+        assertThat(obs.getIdentifierFirstRep().getSystem()).isEqualTo("urn:id:extID");
 
         // Looking for one Organization that matches the manufacturer reference
         List<Resource> organizations = ResourceUtils.getResourceList(e, ResourceType.Organization);
@@ -112,16 +131,21 @@ public class Hl7ImmunizationFHIRConversionTest {
         List<Resource> serviceRequestList = ResourceUtils.getResourceList(e, ResourceType.ServiceRequest);
         // Confirm that a serviceRequest was not created.
         assertThat(serviceRequestList).isEmpty();
+    }
+
+    @Test
+    void testImmunizationReturnOnlyRXA10() throws IOException {
 
         // Test should only return RXA.10, ORC.12  is empty
         // RXA.18 is not empty which signals that the status is not-done. ORC.5 is here to show precedence
         // Since status is "not-done" we show the Status reason (RXA.18)
-        hl7VUXmessageRep = "MSH|^~\\&|MYEHR2.5|RI88140101|KIDSNET_IFL|RIHEALTH|20130531||VXU^V04^VXU_V04|20130531RI881401010105|P|2.5.1|||NE|AL||||||RI543763\r"
+        String hl7VUXmessageRep = "MSH|^~\\&|MYEHR2.5|RI88140101|KIDSNET_IFL|RIHEALTH|20130531||VXU^V04^VXU_V04|20130531RI881401010105|P|2.5.1|||NE|AL||||||RI543763\r"
                 + "PID|1||12345^^^^MR||TestPatient^Jane^^^^^L||||||\r"
                 + "ORC|RE||197027||CP|||||^Clerk^Myron|||||||RI2050\r"
                 + "RXA|0|1|20130531|20130531|48^HIB PRP-T^CVX|0.5|ML^^^||00^new immunization record^NIP001|^Sticker^Nurse|^^^RI2050||||33k2a|20131210|PMC^sanofi^MVX|00^Patient refusal^NIP002|||A\r"
                 + "RXR|C28161^IM^NCIT^IM^INTRAMUSCULAR^HL70162|RT^right thigh^HL70163\r"
-                + "OBX|1|DT|69764-9^HIB Info Sheet^LN|1|19981216||||||F|||20130531|||VXC40^per imm^CDCPHINVS\r";
+                + "OBX|1|CWE|64994-7^vaccine fund pgm elig cat^LN|1|V02^VFC eligible Medicaid/MedicaidManaged Care^HL70064||||||F|||20130531|||VXC40^per imm^CDCPHINVS\r"
+                + "OBX|2|DT|69764-9^HIB Info Sheet^LN|1|19981216||||||F|||20130531|||VXC40^per imm^CDCPHINVS\r";
 
         Immunization immunization = ResourceUtils.getImmunization(hl7VUXmessageRep);
 
@@ -136,24 +160,42 @@ public class Hl7ImmunizationFHIRConversionTest {
 
         //dose Quantity without a system
         assertThat(immunization.hasDoseQuantity()).isTrue();
-        assertThat(immunization.getDoseQuantity().getValue().toString()).isEqualTo("0.5");
+        assertThat(immunization.getDoseQuantity().getValue()).hasToString("0.5");
         assertThat(immunization.getDoseQuantity().getUnit()).isEqualTo("ML");
         assertThat(immunization.getDoseQuantity().getSystem()).isNull();
         assertThat(immunization.getDoseQuantity().getCode()).isNull();
 
+        assertThat(immunization.getProgramEligibilityFirstRep().getCodingFirstRep().getCode()).isEqualTo("V02");
+        assertThat(immunization.getProgramEligibilityFirstRep().getCodingFirstRep().getSystem())
+                .isEqualTo("urn:id:v2-0064");
+        assertThat(immunization.getProgramEligibilityFirstRep().getCodingFirstRep().getDisplay())
+                .isEqualTo("VFC eligible Medicaid/MedicaidManaged Care");
+        assertThat(immunization.getProgramEligibilityFirstRep().getText())
+                .isEqualTo("VFC eligible Medicaid/MedicaidManaged Care");
+
+        assertThat(immunization.hasFundingSource()).isFalse();
+        assertThat(immunization.hasReaction()).isFalse();
         //Education.DocumentType (OBX.5) shows under the condition that OBX.3.1 has 69764-9 as the code
         assertThat(immunization.getEducationFirstRep().getDocumentType()).isEqualTo("19981216");
 
+    }
+
+    @Test
+    void testImmunizationUsePATOBJ() throws IOException {
+
+
+
         // Test should only return RXA.10, ORC.12  is empty
         // If RXA.20 is RE but RXA.18 is blank then we use PATOBJ from v3ActReason
-        hl7VUXmessageRep = "MSH|^~\\&|MYEHR2.5|RI88140101|KIDSNET_IFL|RIHEALTH|20130531||VXU^V04^VXU_V04|20130531RI881401010105|P|2.5.1|||NE|AL||||||RI543763\r"
+        String hl7VUXmessageRep = "MSH|^~\\&|MYEHR2.5|RI88140101|KIDSNET_IFL|RIHEALTH|20130531||VXU^V04^VXU_V04|20130531RI881401010105|P|2.5.1|||NE|AL||||||RI543763\r"
                 + "PID|1||12345^^^^MR||TestPatient^Jane^^^^^L||||||\r"
                 + "ORC|RE||197027||PA|||||^Clerk^Myron|||||||RI2050\r"
                 + "RXA|0|1|20130531|20130531|48^HIB PRP-T^CVX|0.5|ML^^UCUM||00^new immunization record^NIP001|^Sticker^Nurse|^^^RI2050||||33k2a|20131210|PMC^sanofi^MVX||00^refusal|RE|A\r"
                 + "RXR|C28161^IM^NCIT^IM^INTRAMUSCULAR^HL70162|RT^right thigh^HL70163\r"
-                + "OBX|1|CE|29768-9^VIS Publication Date^LN|1|19981216||||||F|||20130531|||VXC40^per imm^CDCPHINVS\r";
+                + "OBX|1|CWE|30963-3^ VACCINE FUNDING SOURCE^LN|1|V02^VFC eligible Medicaid/MedicaidManaged Care^HL70064||||||F|||20130531|||VXC40^per imm^CDCPHINVS\r"
+                + "OBX|2|CE|29768-9^VIS Publication Date^LN|1|19981216||||||F|||20130531|||VXC40^per imm^CDCPHINVS\r";
 
-        immunization = ResourceUtils.getImmunization(hl7VUXmessageRep);
+        Immunization immunization = ResourceUtils.getImmunization(hl7VUXmessageRep);
 
         assertThat(immunization.hasReasonCode()).isTrue();
         assertThat(immunization.getReasonCodeFirstRep().getCodingFirstRep().getCode()).isEqualTo("00");
@@ -167,50 +209,128 @@ public class Hl7ImmunizationFHIRConversionTest {
         assertThat(immunization.getStatusReason().getCodingFirstRep().getSystem())
                 .isEqualTo("http://terminology.hl7.org/CodeSystem/v3-ActReason");
         assertThat(immunization.getStatusReason().getCodingFirstRep().getDisplay()).isEqualTo("Patient Refusal");
-        assertThat(resource.getStatusReason().getText()).isEqualTo("Patient refusal");
+        assertThat(immunization.getStatusReason().getText()).isEqualTo("Patient refusal");
 
         //dose Quantity with a known system
         assertThat(immunization.hasDoseQuantity()).isTrue();
-        assertThat(immunization.getDoseQuantity().getValue().toString()).isEqualTo("0.5");
+        assertThat(immunization.getDoseQuantity().getValue()).hasToString("0.5");
         assertThat(immunization.getDoseQuantity().getUnit()).isEqualTo("ML");
         assertThat(immunization.getDoseQuantity().getSystem()).isEqualTo("http://unitsofmeasure.org");
 
         //Education.PublicationDate shows under the condition that OBX.3.1 has 29768-9 as the code
         assertThat(immunization.getEducationFirstRep().hasPublicationDate()).isTrue();
 
+        // If OBX.3 is 30963-3 the OBX.5 is for funding source
+        assertThat(immunization.getFundingSource().getCodingFirstRep().getCode()).isEqualTo("V02");
+        assertThat(immunization.getFundingSource().getCodingFirstRep().getSystem()).isEqualTo("urn:id:v2-0064");
+        assertThat(immunization.getFundingSource().getCodingFirstRep().getDisplay())
+                .isEqualTo("VFC eligible Medicaid/MedicaidManaged Care");
+        assertThat(immunization.getFundingSource().getText()).isEqualTo("VFC eligible Medicaid/MedicaidManaged Care");
+
+        assertThat(immunization.hasProgramEligibility()).isFalse();
+        assertThat(immunization.hasReaction()).isFalse();
+
+    }
+
+    @Test
+    void testImmunizationTestORC5BackupForRXA20() throws IOException {
+
         //ORC.5 backs up RXA.20 and RXA.18
-        hl7VUXmessageRep = "MSH|^~\\&|MYEHR2.5|RI88140101|KIDSNET_IFL|RIHEALTH|20130531||VXU^V04^VXU_V04|20130531RI881401010105|P|2.5.1|||NE|AL||||||RI543763\r"
+        String hl7VUXmessageRep = "MSH|^~\\&|MYEHR2.5|RI88140101|KIDSNET_IFL|RIHEALTH|20130531||VXU^V04^VXU_V04|20130531RI881401010105|P|2.5.1|||NE|AL||||||RI543763\r"
                 + "PID|1||12345^^^^MR||TestPatient^Jane^^^^^L||||||\r"
                 + "ORC|||197027||PA|||||^Clerk^Myron|||||||RI2050\r"
                 + "RXA|0|1|20130531|20130531|48^HIB PRP-T^CVX|999|ML^^UCUM||00^new immunization record^NIP001|^Sticker^Nurse|^^^RI2050||||33k2a|20131210|PMC^sanofi^MVX||00^refusal||A\r"
                 + "RXR|C28161^IM^NCIT^IM^INTRAMUSCULAR^HL70162|RT^right thigh^HL70163\r"
-                + "OBX|1|CE|64994-7^vaccine fund pgm elig cat^LN|1|V02^VFC eligible Medicaid/MedicaidManaged Care^HL70064||||||F|||20130531|||VXC40^per imm^CDCPHINVS\r";
+                + "OBX|1|CE|64994-6^vaccine fund pgm elig cat^LN|1|V02^VFC eligible Medicaid/MedicaidManaged Care^HL70064||||||F|||20130531|||VXC40^per imm^CDCPHINVS\r";
 
-        immunization = ResourceUtils.getImmunization(hl7VUXmessageRep);
+        Immunization immunization = ResourceUtils.getImmunization(hl7VUXmessageRep);
         //dose Quantity with 999 as the value which should return null;
         assertThat(immunization.hasDoseQuantity()).isFalse();
         assertThat(immunization.getStatus().getDisplay()).isEqualTo("completed"); //ORC.5 backs up RXA.20 and RXA.18
         assertThat(immunization.hasStatusReason()).isFalse();
 
+        assertThat(immunization.hasReaction()).isFalse();
+        assertThat(immunization.hasProgramEligibility()).isFalse();
+        assertThat(immunization.hasFundingSource()).isFalse();
+
+    }
+
+    @Test
+    void testImmunizationDefaultCompleted() throws IOException {
         //Status defaults to completed RXA.20,RXA.18 and ORC.5 are empty
-        hl7VUXmessageRep = "MSH|^~\\&|MYEHR2.5|RI88140101|KIDSNET_IFL|RIHEALTH|20130531||VXU^V04^VXU_V04|20130531RI881401010105|P|2.5.1|||NE|AL||||||RI543763\r"
+        //Status reason is MEDPREC when OBX.3 is 30945-0 RXA-18 and RXA-20 not provided
+        String hl7VUXmessageRep = "MSH|^~\\&|MYEHR2.5|RI88140101|KIDSNET_IFL|RIHEALTH|20130531||VXU^V04^VXU_V04|20130531RI881401010105|P|2.5.1|||NE|AL||||||RI543763\r"
                 + "PID|1||12345^^^^MR||TestPatient^Jane^^^^^L||||||\r"
                 + "ORC|||197027|||||||^Clerk^Myron|||||||RI2050\r"
                 + "RXA|0|1|20130531|20130531|48^HIB PRP-T^CVX|999|ML^^UCUM||00^new immunization record^NIP001|^Sticker^Nurse|^^^RI2050||||33k2a|20131210|PMC^sanofi^MVX||00^refusal||A\r"
                 + "RXR|C28161^IM^NCIT^IM^INTRAMUSCULAR^HL70162|RT^right thigh^HL70163\r"
-                + "OBX|1|CE|64994-7^vaccine fund pgm elig cat^LN|1|V02^VFC eligible Medicaid/MedicaidManaged Care^HL70064||||||F|||20130531|||VXC40^per imm^CDCPHINVS\r";
+                + "OBX|1|CE|30945-0^contraindication^LN|1|V02^VFC eligible Medicaid/MedicaidManaged Care^HL70064||||||F|||20130531|||VXC40^per imm^CDCPHINVS\r";
 
-        immunization = ResourceUtils.getImmunization(hl7VUXmessageRep);
+        Immunization immunization = ResourceUtils.getImmunization(hl7VUXmessageRep);
+
+        assertThat(immunization.getStatus().getDisplay()).isEqualTo("completed"); //Status defaults to completed
+        assertThat(immunization.hasStatusReason()).isTrue();
+        assertThat(immunization.getStatusReason().getCodingFirstRep().getCode()).isEqualTo("MEDPREC");
+        assertThat(immunization.getStatusReason().getCodingFirstRep().getSystem())
+                .isEqualTo("http://terminology.hl7.org/CodeSystem/v3-ActReason");
+        assertThat(immunization.getStatusReason().getCodingFirstRep().getDisplay()).isEqualTo("medical precaution");
+
+    }
+
+    @Test
+    void testImmunizationReasonImmune() throws IOException {
+        //Status reason is IMMUNE when OBX.3 is 59784-9 and RXA-18 and RXA-20 not provided
+        String hl7VUXmessageRep = "MSH|^~\\&|MYEHR2.5|RI88140101|KIDSNET_IFL|RIHEALTH|20130531||VXU^V04^VXU_V04|20130531RI881401010105|P|2.5.1|||NE|AL||||||RI543763\r"
+                + "PID|1||12345^^^^MR||TestPatient^Jane^^^^^L||||||\r"
+                + "ORC|||197027|||||||^Clerk^Myron|||||||RI2050\r"
+                + "RXA|0|1|20130531|20130531|48^HIB PRP-T^CVX|999|ML^^UCUM||00^new immunization record^NIP001|^Sticker^Nurse|^^^RI2050||||33k2a|20131210|PMC^sanofi^MVX||00^refusal||A\r"
+                + "RXR|C28161^IM^NCIT^IM^INTRAMUSCULAR^HL70162|RT^right thigh^HL70163\r"
+                + "OBX|1|CE|59784-9^Disease with presumed immunity^LN|1|V02^VFC eligible Medicaid/MedicaidManaged Care^HL70064||||||F|||20130531|||VXC40^per imm^CDCPHINVS\r";
+
+        Immunization immunization = ResourceUtils.getImmunization(hl7VUXmessageRep);
+
+        assertThat(immunization.getStatus().getDisplay()).isEqualTo("completed"); //Status defaults to completed
+        assertThat(immunization.hasStatusReason()).isTrue();
+        assertThat(immunization.getStatusReason().getCodingFirstRep().getCode()).isEqualTo("IMMUNE");
+        assertThat(immunization.getStatusReason().getCodingFirstRep().getSystem())
+                .isEqualTo("http://terminology.hl7.org/CodeSystem/v3-ActReason");
+        assertThat(immunization.getStatusReason().getCodingFirstRep().getDisplay()).isEqualTo("immunity");
+
+    }
+
+    @Test
+    void testImmunizationOBX3is309567() throws IOException {
+        // When OBX.3 is 30956-7 and RXA.5 is not provided we get a vaccine code from OBX.5
+        String hl7VUXmessageRep = "MSH|^~\\&|MYEHR2.5|RI88140101|KIDSNET_IFL|RIHEALTH|20130531||VXU^V04^VXU_V04|20130531RI881401010105|P|2.5.1|||NE|AL||||||RI543763\r"
+                + "PID|1||12345^^^^MR||TestPatient^Jane^^^^^L||||||\r"
+                + "ORC|||197027|||||||^Clerk^Myron|||||||RI2050\r"
+                + "RXA|0|1|20130531|20130531||999|ML^^UCUM||00^new immunization record^NIP001|^Sticker^Nurse|^^^RI2050||||33k2a|20131210|PMC^sanofi^MVX||00^refusal||A\r"
+                + "RXR|C28161^IM^NCIT^IM^INTRAMUSCULAR^HL70162|RT^right thigh^HL70163\r"
+                + "OBX|1|CWE|30956-7^vaccine type^LN|1|107^DTAP^CVX||||||F|||20130531|||VXC40^per imm^CDCPHINVS\r";
+
+        Immunization immunization = ResourceUtils.getImmunization(hl7VUXmessageRep);
 
         assertThat(immunization.getStatus().getDisplay()).isEqualTo("completed"); //Status defaults to completed
         assertThat(immunization.hasStatusReason()).isFalse();
+        assertThat(immunization.hasReaction()).isFalse();
+        assertThat(immunization.hasProgramEligibility()).isFalse();
+        assertThat(immunization.hasFundingSource()).isFalse();
+
+        // When OBX.3 is 30956-7 we get a vaccine code
+        assertThat(immunization.hasVaccineCode()).isTrue();
+        assertThat(immunization.getVaccineCode().getCodingFirstRep().getCode()).isEqualTo("107");
+        assertThat(immunization.getVaccineCode().getCodingFirstRep().getDisplay()).isEqualTo("DTAP");
+        assertThat(immunization.getVaccineCode().getCodingFirstRep().getSystem())
+                .isEqualTo("http://hl7.org/fhir/sid/cvx");
+        assertThat(immunization.getVaccineCode().getText()).isEqualTo("DTAP");
+
     }
     // TODO: 10/15/21 RXA-9 (also mapped to primarySource)
 
     // The following checks for a situation where non-manufacturer RXA Immunizations interfered with the creation of manufacturer Immununization
     // The test will ensure the problem doesn't come back.
     @Test
-    public void testMultipleImmunizationsNoInterference() throws IOException {
+    void testMultipleImmunizationsNoInterference() throws IOException {
 
         String hl7VUXmessageRep = "MSH|^~\\&|||||20130531||VXU^V04^VXU_V04|20130531RI881401010105|P|2.5.1||||||||||\r"
                 + "PID|1||12345^^^^MR||TestPatient^Jane^^^^^L||||||\r"

@@ -23,3 +23,16 @@ system_2:
    valueOf: $join
    vars:
       join: $systemCX, GeneralUtils.noWhiteSpace(join)
+
+use:
+   condition: $use NOT_NULL 
+   type: STRING
+   valueOf: $use
+
+period:
+    condition: $start NOT_NULL || $end NOT_NULL 
+    valueOf: datatype/Period
+    expressionType: resource
+    vars: 
+       start: $start
+       end: $end   

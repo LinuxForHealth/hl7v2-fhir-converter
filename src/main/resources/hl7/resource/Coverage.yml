@@ -1,0 +1,120 @@
+#
+# (C) Copyright IBM Corp. 2021, 2022
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+---
+# Coverage required fields
+#  Status
+#  Beneficiary (Patient)
+#  Payor
+
+resourceType: Coverage
+id:
+  type: STRING
+  valueOf: 'UUID.randomUUID()'
+  expressionType: JEXL
+
+identifier_1:
+  condition: $valueIn NOT_NULL
+  valueOf: datatype/Identifier_var
+  generateList: true
+  expressionType: resource
+  vars:
+    valueIn: IN1.2.1
+    systemCX: IN1.2.3
+  constants:
+    system: "http://terminology.hl7.org/CodeSystem/v2-0203"
+    code: "XV"
+    display: "Health Plan Identifier"
+
+identifier_2:
+  condition: $valueIn NOT_NULL
+  valueOf: datatype/Identifier_var
+  generateList: true
+  expressionType: resource
+  vars:
+    valueIn: IN1.2.4
+    systemCX: IN1.2.6
+  constants:
+    system: "http://terminology.hl7.org/CodeSystem/v2-0203"
+    code: "XV"
+    display: "Health Plan Identifier" 
+
+identifier_3:
+  condition: $valueIn NOT_NULL
+  valueOf: datatype/Identifier_var
+  generateList: true
+  expressionType: resource
+  vars:
+    valueIn: IN1.46
+    # No system set for this identifier
+  constants:
+    system: "http://terminology.hl7.org/CodeSystem/v2-0203"
+    code: "XV"
+    display: "Health Plan Identifier" 
+    use: "old"    
+
+identifier_4:
+  condition: $valueIn NOT_NULL
+  valueOf: datatype/Identifier_var
+  generateList: true
+  expressionType: resource
+  vars:
+    valueIn: IN1.36
+    # No system set for this identifier
+  constants:
+    system: "http://terminology.hl7.org/CodeSystem/v2-0203"
+    code: "MB"
+    display: "Member Number"         
+
+# Status is required, but it comes from a non-table 2 char ST 
+# It MUST be one of: active | cancelled | draft | entered-in-error
+# For now, until we get a good mapping, assume all records are active
+status:
+   type: STRING
+   default: active
+   valueOf: $active
+   #   valueOf: IN1.45 value will come from IN1.45, but we don't yet have a mapping.
+   expressionType: HL7Spec
+   constants:
+     active: 'active'
+
+payor:
+   valueOf: resource/Organization
+   expressionType: reference
+   vars: 
+       orgName: String, IN1.4.1
+       orgIdValue: String, IN1.3.1
+       orgIdSystem: String, IN1.3.4
+       orgIdTypeCode: String, IN1.3.5
+       orgIdStart: IN1.3.7
+       orgIdEnd: IN1.3.8
+       orgAddressXAD: IN1.5
+       orgContactXCN: IN1.6
+       orgContactPointXTN: IN1.7
+
+beneficiary:
+    valueOf: datatype/Reference
+    expressionType: resource
+    specs: $Patient
+
+class:
+   valueOf: secondary/Class
+   condition: $classValue NOT_NULL
+   generateList: true
+   expressionType: resource
+   vars: 
+      classValue: String, IN1.8
+      className: String, IN1.9.1
+   constants: 
+      typeSystem: 'http://terminology.hl7.org/CodeSystem/coverage-class'
+      typeCode: 'group'
+      typeDisplay: 'Group'
+
+period:
+    valueOf: datatype/Period
+    expressionType: resource
+    vars:
+       start: IN1.12
+       end: IN1.13

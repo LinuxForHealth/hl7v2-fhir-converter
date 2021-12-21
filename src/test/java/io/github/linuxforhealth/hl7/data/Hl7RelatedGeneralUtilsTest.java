@@ -15,12 +15,12 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class Hl7RelatedGeneralUtilsTest {
+class Hl7RelatedGeneralUtilsTest {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Hl7RelatedGeneralUtilsTest.class);
 
     @Test
-    public void testConcatenateWithChar() {
+    void testConcatenateWithChar() {
 
         ArrayList<Object> objects = new ArrayList<Object>();
         String st = "AA";
@@ -51,48 +51,48 @@ public class Hl7RelatedGeneralUtilsTest {
     }
 
     @Test
-    public void test_generate_name() {
+    void test_generate_name() {
         String name = Hl7RelatedGeneralUtils.generateName("prefix", "first", "M", "family", "suffix");
         assertThat(name).isEqualTo("prefix first M family suffix");
         LOGGER.debug("name=" + name);
     }
 
     @Test
-    public void test_generate_name_prefix_suffix_missing() {
+    void test_generate_name_prefix_suffix_missing() {
         String name = Hl7RelatedGeneralUtils.generateName(null, "first", "M", "family", null);
         assertThat(name).isEqualTo("first M family");
     }
 
     @Test
-    public void test_get_encounter_var1() {
+    void test_get_encounter_var1() {
         // if var1 is not null then EncounterStatus.FINISHED
         String name = Hl7RelatedGeneralUtils.getEncounterStatus("var1", "var2", "var3");
         assertThat(name).isEqualTo(EncounterStatus.FINISHED.toCode());
     }
 
     @Test
-    public void test_get_encounter_var2() {
+    void test_get_encounter_var2() {
 
         String name = Hl7RelatedGeneralUtils.getEncounterStatus(null, "var2", "var3");
         assertThat(name).isEqualTo(EncounterStatus.ARRIVED.toCode());
     }
 
     @Test
-    public void test_get_encounter_var3() {
+    void test_get_encounter_var3() {
 
         String name = Hl7RelatedGeneralUtils.getEncounterStatus(null, null, "var3");
         assertThat(name).isEqualTo(EncounterStatus.CANCELLED.toCode());
     }
 
     @Test
-    public void test_get_encounter_all_vars_null() {
+    void test_get_encounter_all_vars_null() {
 
         String name = Hl7RelatedGeneralUtils.getEncounterStatus(null, null, null);
         assertThat(name).isEqualTo(EncounterStatus.UNKNOWN.toCode());
     }
 
     @Test
-    public void test_date_diff_valid_values_same_dates() {
+    void test_date_diff_valid_values_same_dates() {
 
         long diff = Hl7RelatedGeneralUtils.diffDateMin("2007-11-04T01:32:06.345+09:00",
                 "2007-11-04T01:32:06.345+09:00");
@@ -100,7 +100,7 @@ public class Hl7RelatedGeneralUtilsTest {
     }
 
     @Test
-    public void test_date_diff_valid_values_1min_ahead() {
+    void test_date_diff_valid_values_1min_ahead() {
 
         long diff = Hl7RelatedGeneralUtils.diffDateMin("2007-11-04T01:32:06.345+09:00",
                 "2007-11-04T01:33:06.345+09:00");
@@ -108,7 +108,7 @@ public class Hl7RelatedGeneralUtilsTest {
     }
 
     @Test
-    public void test_date_diff_valid_values_no_min() {
+    void test_date_diff_valid_values_no_min() {
 
         Long diff = Hl7RelatedGeneralUtils.diffDateMin("2007-11-05",
                 "2007-11-04T01:33:06.345+20:00");
@@ -116,14 +116,14 @@ public class Hl7RelatedGeneralUtilsTest {
     }
 
     @Test
-    public void test_date_diff_null_values() {
+    void test_date_diff_null_values() {
 
         Long diff = Hl7RelatedGeneralUtils.diffDateMin(null, "2007-11-04T01:33:06.345+09:00");
         assertThat(diff).isNull();
     }
 
     @Test
-    public void test_date_diff_incorrect_date_format() {
+    void test_date_diff_incorrect_date_format() {
 
         Long diff = Hl7RelatedGeneralUtils.diffDateMin("2007-11-04T01:33:06890",
                 "2007-11-04T01:33:06.345+09:00");
@@ -131,7 +131,7 @@ public class Hl7RelatedGeneralUtilsTest {
     }
 
     @Test
-    public void test_splitting_values() {
+    void test_splitting_values() {
 
         String val = Hl7RelatedGeneralUtils.split("5.9-8.4", "-", 0);
         assertThat(val).isEqualTo("5.9");
@@ -140,7 +140,7 @@ public class Hl7RelatedGeneralUtilsTest {
     // ExtractHigh and ExtractLow assumes if there are two or more values, the first is low, the second is high,
     // but if there is only one value, it is the high
     @Test
-    public void testExtractHigh() {
+    void testExtractHigh() {
 
         String aString = "27.0-55.2";
         String resultValue = Hl7RelatedGeneralUtils.extractHigh(aString);
@@ -168,7 +168,7 @@ public class Hl7RelatedGeneralUtilsTest {
     // the first is low, the second is high, but if there is only one value, it is the high
     // See extensive notes near the methods. 
     @Test
-    public void testExtractLow() {
+    void testExtractLow() {
 
         String aString = "27.0-55.2";
         String resultValue = Hl7RelatedGeneralUtils.extractLow(aString);
@@ -193,7 +193,7 @@ public class Hl7RelatedGeneralUtilsTest {
     }
 
     @Test
-    public void test_makeStringArray() {
+    void test_makeStringArray() {
         // Test for 2
         List<String> stringArray = Hl7RelatedGeneralUtils.makeStringArray("banana", "peach");
         assertThat(stringArray.size()).isEqualTo(2);
@@ -208,7 +208,7 @@ public class Hl7RelatedGeneralUtilsTest {
     }
 
     @Test
-    public void test_getAddressUse() {
+    void test_getAddressUse1() {
         String ANYTHING = "anything";
         // Inputs are XAD.7 Type, XAD.16 Temp Indicator, XAD.17 Bad address indicator
         assertThat(Hl7RelatedGeneralUtils.getAddressUse("C", "", ANYTHING)).isEqualTo("temp");
@@ -229,6 +229,13 @@ public class Hl7RelatedGeneralUtilsTest {
         assertThat(Hl7RelatedGeneralUtils.getAddressUse(null, ANYTHING, "Y")).isEqualTo("old");
         assertThat(Hl7RelatedGeneralUtils.getAddressUse(ANYTHING, null, "Y")).isEqualTo("old");
         assertThat(Hl7RelatedGeneralUtils.getAddressUse(null, null, "Y")).isEqualTo("old");
+        // More tests of getAddressUse in test_getAddressUse2
+    }
+
+    @Test
+    void test_getAddressUse2() {
+        String ANYTHING = "anything";
+        // Inputs are XAD.7 Type, XAD.16 Temp Indicator, XAD.17 Bad address indicator
         assertThat(Hl7RelatedGeneralUtils.getAddressUse("BA", ANYTHING, ANYTHING)).isEmpty();
         assertThat(Hl7RelatedGeneralUtils.getAddressUse("BA", null, ANYTHING)).isEmpty();
         assertThat(Hl7RelatedGeneralUtils.getAddressUse("H", ANYTHING, ANYTHING)).isEqualTo("home");
@@ -256,7 +263,7 @@ public class Hl7RelatedGeneralUtilsTest {
     }
 
     @Test
-    public void test_getAddressType() {
+    void test_getAddressType() {
         String ANYTHING = "anything";
         // Inputs are XAD.7 Type, XAD.18 Type 
         assertThat(Hl7RelatedGeneralUtils.getAddressType(ANYTHING, "M")).isEqualTo("postal");
@@ -277,7 +284,7 @@ public class Hl7RelatedGeneralUtilsTest {
     }
 
     @Test
-    public void test_getAddressDistrict() {
+    void test_getAddressDistrict() {
         String ANYTHING = "anything";
 
         // Inputs are XAD.7 Type, XAD.18 Type 
@@ -292,7 +299,7 @@ public class Hl7RelatedGeneralUtilsTest {
     // Note: Utility  Hl7RelatedGeneralUtils.getAddressDistrict is more effectively tested as part of Patient Address testing
 
     @Test
-    public void getFormattedTelecomNumberValue() {
+    void getFormattedTelecomNumberValue() {
         // Empty values return nothing
         assertThat(Hl7RelatedGeneralUtils.getFormattedTelecomNumberValue("", "", "", "", "", "")).isEmpty();
         // Everything empty except XTN1 returns XTN1.
@@ -351,7 +358,7 @@ public class Hl7RelatedGeneralUtilsTest {
     }
 
     @Test
-    public void testGetFormatAsId() {
+    void testGetFormatAsId() {
 
         // Inputs are any string
         assertThat(Hl7RelatedGeneralUtils.formatAsId("Mayo Clinic")).isEqualTo("mayo.clinic");
