@@ -191,3 +191,11 @@ recorded:
    type: DATE_TIME
    valueOf: RXA.22
    expressionType: HL7Spec
+reaction:
+   condition: $obx31 EQUALS 31044-1
+   valueOf: secondary/ImmunizationReaction
+   generateList: true
+   expressionType: resource
+   specs: OBX
+   vars:
+      obx31: String, OBX.3.1
