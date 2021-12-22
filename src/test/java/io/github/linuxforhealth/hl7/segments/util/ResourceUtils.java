@@ -45,11 +45,12 @@ public class ResourceUtils {
 
     public static FHIRContext context = new FHIRContext();
     private static final Logger LOGGER = LoggerFactory.getLogger(ResourceUtils.class);
-    private static final ConverterOptions OPTIONS = new Builder().withValidateResource().withPrettyPrint().build();
+    private static final ConverterOptions OPTIONS = new Builder().withPrettyPrint().build();
 
     public static List<BundleEntryComponent> createFHIRBundleFromHL7MessageReturnEntryList(String inputSegment) {
         HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
         String json = ftv.convert(inputSegment, OPTIONS);
+        System.out.println(json);
         assertThat(json).isNotBlank();
         LOGGER.debug("FHIR json result:\n" + json);
         FHIRContext context = new FHIRContext();

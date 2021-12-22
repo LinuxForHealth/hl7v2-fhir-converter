@@ -175,8 +175,6 @@ class Hl7ImmunizationFHIRConversionTest {
 
         assertThat(immunization.hasFundingSource()).isFalse();
         assertThat(immunization.hasReaction()).isFalse();
-        //Education.DocumentType (OBX.5) shows under the condition that OBX.3.1 has 69764-9 as the code
-        assertThat(immunization.getEducationFirstRep().getDocumentType()).isEqualTo("19981216");
 
     }
 
@@ -192,8 +190,7 @@ class Hl7ImmunizationFHIRConversionTest {
                 + "ORC|RE||197027||PA|||||^Clerk^Myron|||||||RI2050\r"
                 + "RXA|0|1|20130531|20130531|48^HIB PRP-T^CVX|0.5|ML^^UCUM||00^new immunization record^NIP001|^Sticker^Nurse|^^^RI2050||||33k2a|20131210|PMC^sanofi^MVX||00^refusal|RE|A\r"
                 + "RXR|C28161^IM^NCIT^IM^INTRAMUSCULAR^HL70162|RT^right thigh^HL70163\r"
-                + "OBX|1|CWE|30963-3^ VACCINE FUNDING SOURCE^LN|1|V02^VFC eligible Medicaid/MedicaidManaged Care^HL70064||||||F|||20130531|||VXC40^per imm^CDCPHINVS\r"
-                + "OBX|2|CE|29768-9^VIS Publication Date^LN|1|19981216||||||F|||20130531|||VXC40^per imm^CDCPHINVS\r";
+                + "OBX|1|CWE|30963-3^ VACCINE FUNDING SOURCE^LN|1|V02^VFC eligible Medicaid/MedicaidManaged Care^HL70064||||||F|||20130531|||VXC40^per imm^CDCPHINVS\r";
 
         Immunization immunization = ResourceUtils.getImmunization(hl7VUXmessageRep);
 
@@ -216,9 +213,6 @@ class Hl7ImmunizationFHIRConversionTest {
         assertThat(immunization.getDoseQuantity().getValue()).hasToString("0.5");
         assertThat(immunization.getDoseQuantity().getUnit()).isEqualTo("ML");
         assertThat(immunization.getDoseQuantity().getSystem()).isEqualTo("http://unitsofmeasure.org");
-
-        //Education.PublicationDate shows under the condition that OBX.3.1 has 29768-9 as the code
-        assertThat(immunization.getEducationFirstRep().hasPublicationDate()).isTrue();
 
         // If OBX.3 is 30963-3 the OBX.5 is for funding source
         assertThat(immunization.getFundingSource().getCodingFirstRep().getCode()).isEqualTo("V02");
@@ -371,5 +365,26 @@ class Hl7ImmunizationFHIRConversionTest {
             assertThat(mapDrugNameToMfgRefId.get(mapMfgNameToDrugName.get(org.getName()))).contains(org.getId());
         }
 
+    }
+
+    @Test
+    void testEducation() throws IOException {
+
+
+        String hl7VUXmessageRep = "MSH|^~\\&|MYEHR2.5|RI88140101|KIDSNET_IFL|RIHEALTH|20130531||VXU^V04^VXU_V04|20130531RI881401010105|P|2.5.1|||NE|AL||||||RI543763\r"
+                + "PID|1||12345^^^^MR||TestPatient^Jane^^^^^L||||||\r"
+                + "ORC|RE||197027||CP|||||^Clerk^Myron|||||||RI2050\r"
+                + "RXA|0|1|20130531|20130531|48^HIB PRP-T^CVX|0.5|ML^^^||00^new immunization record^NIP001|^Sticker^Nurse|^^^RI2050||||33k2a|20131210|PMC^sanofi^MVX|00^Patient refusal^NIP002|||A\r"
+                + "RXR|C28161^IM^NCIT^IM^INTRAMUSCULAR^HL70162|RT^right thigh^HL70163\r"
+                + "OBX|1|DTM|29768-9^VIS Publication Date^LN|1|19981216||||||F|||20130531|||VXC40^per imm^CDCPHINVS\r"
+                + "OBX|2|ST|69764-9^HIB Info Sheet^LN|1|PDF||||||F|||20130531|||VXC40^per imm^CDCPHINVS\r";
+
+        Immunization immunization = ResourceUtils.getImmunization(hl7VUXmessageRep);
+
+        //Education.DocumentType (OBX.5) shows under the condition that OBX.3.1 has 69764-9 as the code
+        assertThat(immunization.getEducation().get(1).getDocumentType()).isEqualTo("PDF");
+
+        //Education.PublicationDate shows under the condition that OBX.3.1 has 29768-9 as the code
+        assertThat(immunization.getEducationFirstRep().hasPublicationDate()).isTrue();
     }
 }

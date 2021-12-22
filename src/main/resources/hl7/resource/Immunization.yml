@@ -182,7 +182,6 @@ fundingSource:
    specs: OBX.5
    vars:
       obx3: String, OBX.3.1
-
 reasonCode:
    valueOf: datatype/CodeableConcept
    expressionType: resource
@@ -206,3 +205,42 @@ education:
    expressionType: resource
    vars:
       obx5: OBX.5
+
+#education:
+#   generateList: true
+#   expressionType: nested
+#   specs: OBX
+#   vars:
+#      reference: String, OBX.4
+# - expressionType: nested
+#   expressionsMap:
+#      publicationDate:
+#         condition: $obx4 EQUALS $reference && $obx31 EQUALS 29768-9
+#         type: DATE_TIME
+#         valueOf: OBX.5
+#         expressionType: HL7Spec
+#         specs: OBX
+#         vars:
+#            obx4: String, OBX.4
+#            obx31: String, OBX.3.1
+#
+#   - expressionType: nested
+#     expressionsMap:
+#      documentType:
+#         type: STRING
+#         valueOf: $notSpecified
+#         expressionType: HL7Spec
+#         constants:
+#            notSpecified: "unspecified"
+#
+#   - expressionType: nested
+#     expressionsMap:
+#      presentationDate:
+#         condition: $obx4 EQUALS $reference && $obx31 EQUALS 29768-7
+#         type: DATE_TIME
+#         valueOf: OBX.5
+#         expressionType: HL7Spec
+#         specs: OBX
+#         vars:
+#            obx4: String, OBX.4
+#            obx31: String, OBX.3.1
