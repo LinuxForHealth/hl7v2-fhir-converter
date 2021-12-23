@@ -589,4 +589,53 @@ class Hl7MedicationRequestFHIRConversionTest {
         assertThat(practName.getText()).isEqualTo("PROVIDER ORDERING"); // RXE.13
     }
 
+    @Test
+    void dispenseRequestTest() {
+        // Get DispenseRequested
+        String hl7message = "MSH|^~\\&|WHI_LOAD_GENERATOR|IBM_TORONTO_LAB|MEDORDER|IBM|20210101000000|90103687|OMP^O09|MSGID|T|2.6\n"
+                + "PID|||1234||DOE^JANE^|||F||||||||||||||||||||||\n"
+                + "PV1||I|^^^Toronto^^5642 Hilly Av||||||770542^Doctor^Consulting^Jr||||||||||Visit_111|||||||||||||||||||||||||20210101000000\n"
+                + "ORC|OP|1234|1234|0827|||||20210101000000||||||20210101000000||||||ORDERING FAC NAME||(9\n"
+                + "RXO|00054418425^Dexamethasone 4 MG Oral Tablet^NDC^^^^^^dexamethasone (DECADRON) 4 MG TABS||||||Take 1 tablet by mouth every 6 (six) hours.||G||4|tablet^tablet|0|222^JONES^JON^E.|||||||||7^PC|^DECADRON\n"
+                + "RXR|PO^Oral\n";
+
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+
+        List<Resource> medicationRequestList = ResourceUtils.getResourceList(e, ResourceType.MedicationRequest);
+        // Confirm that one medicationRequest was created.
+        assertThat(medicationRequestList).hasSize(1);
+        MedicationRequest medicationRequest = ResourceUtils.getResourceMedicationRequest(medicationRequestList.get(0),
+                ResourceUtils.context);
+
+        MedicationRequest.MedicationRequestDispenseRequestComponent disReq = medicationRequest.getDispenseRequest();
+
+        // dispenseRequest.Quantity comes from RXO.11, RXO.12.1 and default system
+        assertThat(disReq.getQuantity().getValue().toString()).isEqualTo("4.0");
+        assertThat(disReq.getQuantity().getUnit()).isEqualTo("tablet");
+        assertThat(disReq.getQuantity().getSystem()).isEqualTo("http://unitsofmeasure.org");
+
+        hl7message = "MSH|^~\\&||||||S1|RDE^O11||T|2.6|||||||||\n"
+                + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
+                + "ORC|NW|||||E|10^BID^D4^^^R||20180622230000||||||||||||||||||||I\n"
+                + "RXE|^Q24H&0600^^20210330144208^^ROU|DUONEB3INH^3 ML PLAS CONT : IPRATROPIUM-ALBUTEROL 0.5-2.5 (3) MG/3ML IN SOLN^ADS^^^^^^ipratropium-albuterol (DUONEB) nebulizer solution 3 mL|3||mL|47||||1|PC^^measureofunits||2213^ORDERING^PROVIDER||||||||||||||Wheezing^Wheezing^PRN||||^DUONEB|20180622230000||||||7|7|7\n";
+
+        e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+
+        medicationRequestList = ResourceUtils.getResourceList(e, ResourceType.MedicationRequest);
+        // Confirm that one medicationRequest was created.
+        assertThat(medicationRequestList).hasSize(1);
+        medicationRequest = ResourceUtils.getResourceMedicationRequest(medicationRequestList.get(0),
+                ResourceUtils.context);
+
+       disReq = medicationRequest.getDispenseRequest();
+
+        // dispenseRequest.Quantity comes from RXE.10, RXE.11.1 and RXE.11.3
+        assertThat(disReq.getQuantity().getValue().toString()).isEqualTo("1.0");
+        assertThat(disReq.getQuantity().getUnit()).isEqualTo("PC");
+        assertThat(disReq.getQuantity().getSystem()).isEqualTo("urn:id:measureofunits");
+
+        // dispenseRequest.InitialFIll.Quantity comes from RXE.39
+        assertThat(disReq.getInitialFill().getQuantity().getValue().toString()).isEqualTo("7.0");
+
+    }
 }

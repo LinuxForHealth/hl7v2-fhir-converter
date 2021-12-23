@@ -164,3 +164,10 @@ note:
   expressionType: resource
   vars:
     annotationText: NTE.3 *&, GeneralUtils.concatenateWithChar(annotationText, '  \n')  
+
+#dosageInstruction: ## not-working correctly just yet
+#  valueOf: secondary/Dosage
+#  expressionType: resource
+#  vars:
+#    num: RXO.23.1 | RXE.19.1
+#    unit: RXO.23.2 | RXE.19.2

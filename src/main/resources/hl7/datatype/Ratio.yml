@@ -19,3 +19,6 @@ denominator:
       value: $denominator
       unit: $denunit
   
+#system:
+#  type: STRING
+#  valueOf: $unitSystem
