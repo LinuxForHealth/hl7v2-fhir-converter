@@ -14,6 +14,7 @@ initialFill:
   expressionType: resource
   specs: RXE
 
+# Quantity can come from to segments. The first one is RXO if neither RXO.11 && RXO.12.3 are present we fallback to RXE (RXE.10  RXE.11.3)
 quantity_1:
   condition: $rxo11 NOT_NULL && $rxo123 NULL
   valueOf: datatype/Quantity
