@@ -1,0 +1,19 @@
+# (C) Copyright IBM Corp. 2021
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+---
+maxDosePerPeriod:
+  valueOf: datatype/Ratio
+  expressionType: resource
+  vars:
+    numerator: $num
+    numunit: $unit
+    denominator: $denomVal
+    denunit: $denomUnit
+    unitSystem: $unitSys
+  constants:
+      unitSys: "http://unitsofmeasure.org"
+      denomUnit: "day"
+      denomVal: "1"
+
