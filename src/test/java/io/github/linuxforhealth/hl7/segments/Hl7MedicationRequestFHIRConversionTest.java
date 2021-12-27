@@ -23,6 +23,7 @@ import org.hl7.fhir.r4.model.MedicationRequest;
 import org.hl7.fhir.r4.model.MedicationRequest.MedicationRequestStatus;
 import org.hl7.fhir.r4.model.Patient;
 import org.hl7.fhir.r4.model.Practitioner;
+import org.hl7.fhir.r4.model.Ratio;
 import org.hl7.fhir.r4.model.Resource;
 import org.hl7.fhir.r4.model.ResourceType;
 import org.junit.jupiter.api.Test;
@@ -646,4 +647,67 @@ class Hl7MedicationRequestFHIRConversionTest {
             assertThat(disReq.getInitialFill().getQuantity().getValue().toString()).isEqualTo("7.0");
     }
 
+    @Test
+    void dosageInstructionTestMaxDosePerPeriodRXO() {
+        // Test dosageInstruction.maxDosePerPeriod from RXO.23
+        String hl7message = "MSH|^~\\\\&|||||20210101000000||OMP^O09|MSGID|T|2.6\n"
+                + "PID|||1234||DOE^JANE^|||F||||||||||||||||||||||\n"
+                + "PV1||I|^^^Toronto^^5642 Hilly Av||||||770542^Doctor^Consulting^Jr||||||||||Visit_111|||||||||||||||||||||||||20210101000000\n"
+                + "ORC|OP|1234|1234|0827|||||20210101000000||||||20210101000000||||||ORDERING FAC NAME||(9\n"
+                + "RXO|00054418425^Dexamethasone 4 MG Oral Tablet^NDC^^^^^^dexamethasone (DECADRON) 4 MG TABS|||||"
+                // split and concatenate RXO for easier understanding
+                + "|Take 1 tablet by mouth every 6 (six) hours.||G||4|tablet^tablet|0|222^JONES^JON^E.|||||||||7^PC|^DECADRON\n" // RXO 23 is on this line
+                + "RXR|PO^Oral\n";
+
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+
+        List<Resource> medicationRequestList = ResourceUtils.getResourceList(e, ResourceType.MedicationRequest);
+        // Confirm that one medicationRequest was created.
+        assertThat(medicationRequestList).hasSize(1);
+        MedicationRequest medicationRequest = ResourceUtils.getResourceMedicationRequest(medicationRequestList.get(0),
+                ResourceUtils.context);
+
+        Ratio maxDose = medicationRequest.getDosageInstructionFirstRep().getMaxDosePerPeriod();
+
+        // dosageInstruction.maxDosePerPeriod.numerator(RXO.23)
+        assertThat(maxDose.getNumerator().getValue().toString()).isEqualTo("7.0");
+        assertThat(maxDose.getNumerator().getUnit()).isEqualTo("PC");
+        assertThat(maxDose.getNumerator().getSystem()).isEqualTo("http://unitsofmeasure.org");
+
+        // dosageInstruction.maxDosePerPeriod.denominator
+        assertThat(maxDose.getDenominator().getValue().toString()).isEqualTo("1.0");
+        assertThat(maxDose.getDenominator().getUnit()).isEqualTo("day");
+        assertThat(maxDose.getDenominator().getSystem()).isEqualTo("http://unitsofmeasure.org");
+    }
+
+    @Test
+    void dosageInstructionTestMaxDosePerPeriodRXE() {
+        // Test dosageInstruction.maxDosePerPeriod
+        String hl7message = "MSH|^~\\&||||||S1|RDE^O11||T|2.6|||||||||\n"
+                + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
+                + "ORC|NW|||||E|10^BID^D4^^^R||20180622230000||||||||||||||||||||I\n"
+                + "RXE|^Q24H&0600^^20210330144208^^ROU|DUONEB3INH^3 ML PLAS CONT : IPRATROPIUM-ALBUTEROL 0.5-2.5 (3) MG/3ML IN SOLN^ADS^^^^^^ipratropium-albuterol (DUONEB) nebulizer solution 3 mL|3||mL|47|||"
+                // split and concatenate RXE for easier understanding
+                + "|1|PC^^measureofunits||2213^ORDERING^PROVIDER||||||5^PC||||||||Wheezing^Wheezing^PRN||||^DUONEB|20180622230000||||||7|7|7\n"; // RXE.19 is on this line
+
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+
+        List<Resource> medicationRequestList = ResourceUtils.getResourceList(e, ResourceType.MedicationRequest);
+        // Confirm that one medicationRequest was created.
+        assertThat(medicationRequestList).hasSize(1);
+        MedicationRequest medicationRequest = ResourceUtils.getResourceMedicationRequest(medicationRequestList.get(0),
+                ResourceUtils.context);
+
+        Ratio maxDose = medicationRequest.getDosageInstructionFirstRep().getMaxDosePerPeriod();
+
+        // dosageInstruction.maxDosePerPeriod.numerator(RXE.19)
+        assertThat(maxDose.getNumerator().getValue().toString()).isEqualTo("5.0");
+        assertThat(maxDose.getNumerator().getUnit()).isEqualTo("PC");
+        assertThat(maxDose.getNumerator().getSystem()).isEqualTo("http://unitsofmeasure.org");
+
+        // dosageInstruction.maxDosePerPeriod.denominator
+        assertThat(maxDose.getDenominator().getValue().toString()).isEqualTo("1.0");
+        assertThat(maxDose.getDenominator().getUnit()).isEqualTo("day");
+        assertThat(maxDose.getDenominator().getSystem()).isEqualTo("http://unitsofmeasure.org");
+    }
 }

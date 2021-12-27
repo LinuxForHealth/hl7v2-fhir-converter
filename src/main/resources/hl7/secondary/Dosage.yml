@@ -9,7 +9,11 @@ maxDosePerPeriod:
   vars:
     numerator: $num
     numunit: $unit
+    denominator: $denomVal
+    denunit: $denomUnit
     unitSystem: $unitSys
-    constants:
+  constants:
       unitSys: "http://unitsofmeasure.org"
+      denomUnit: "day"
+      denomVal: "1"
 
