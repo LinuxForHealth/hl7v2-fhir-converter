@@ -3,12 +3,14 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 ---
-maxDosePerPeriod:
+maxDosePerPeriod_1:
+  condition: $rxo23  NOT_NULL
   valueOf: datatype/Ratio
   expressionType: resource
   vars:
-    numerator: $num
-    numunit: $unit
+    rxo23: RXO.23
+    numerator: RXO.23.1
+    numunit: RXO.23.2
     denominator: $denomVal
     denunit: $denomUnit
     unitSystem: $unitSys
@@ -17,3 +19,38 @@ maxDosePerPeriod:
       denomUnit: "day"
       denomVal: "1"
 
+maxDosePerPeriod_2:
+  condition: $rxo19  NOT_NULL
+  valueOf: datatype/Ratio
+  expressionType: resource
+  vars:
+    rxe19: RXO.19
+    numerator: RXE.19.1
+    numunit: RXE.19.2
+    denominator: $denomVal
+    denunit: $denomUnit
+    unitSystem: $unitSys
+  constants:
+    unitSys: "http://unitsofmeasure.org"
+    denomUnit: "day"
+    denomVal: "1"
+
+text:
+  type: PATIENT_INSTRUCTION
+  expressionType: HL7Spec
+  specs: RXO.6 | RXE.21
+
+patientInstruction:
+  type: PATIENT_INSTRUCTION
+  expressionType: HL7Spec
+  specs: RXO.7 | RXE.7
+
+route:
+  valueOf: datatype/CodeableConcept
+  expressionType: resource
+  specs: RXO.5 | RXE.6
+
+doseAndRate:
+  valueOf: secondary/DoseAndRate
+  expressionType: resource
+  generateList: true

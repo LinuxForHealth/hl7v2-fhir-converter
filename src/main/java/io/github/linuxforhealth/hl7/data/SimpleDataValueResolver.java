@@ -684,6 +684,23 @@ public class SimpleDataValueResolver {
         }
     };
 
+    public static final ValueExtractor<Object, String> PATIENT_INSTRUCTION = (Object value) -> {
+       if (value instanceof CWE){
+           CWE cwe = (CWE) value;
+           String cwe1 = cwe.getCwe1_Identifier().toString();
+           String cwe2 = cwe.getCwe2_Text().toString();
+           if ( cwe1 != null  ){
+               if (cwe2 != null) {
+                   return cwe1 + ":" + cwe2;
+               }
+           }
+           else if (cwe1 == null){
+               return cwe2;
+           }
+       }
+        return  null;
+    };
+
     private SimpleDataValueResolver() {
     }
 

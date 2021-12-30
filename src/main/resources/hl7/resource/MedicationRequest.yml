@@ -165,21 +165,7 @@ note:
   vars:
     annotationText: NTE.3 *&, GeneralUtils.concatenateWithChar(annotationText, '  \n')  
 
-dosageInstruction_1:
-  condition: $rxo23 NOT_NULL
+dosageInstruction:
   valueOf: secondary/Dosage
   expressionType: resource
-  vars:
-    num: RXO.23.1 | RXE.19.1
-    unit: RXO.23.2 | RXE.19.2
-    rxo23: RXO.23
 
-dosageInstruction_2:
-  condition: $rxe19 NOT_NULL  && $rxo23 NULL
-  valueOf: secondary/Dosage
-  expressionType: resource
-  vars:
-    num: RXO.23.1 | RXE.19.1
-    unit: RXO.23.2 | RXE.19.2
-    rxo23: RXO.23
-    rxe19: RXE.19

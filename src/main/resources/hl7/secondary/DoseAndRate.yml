@@ -1,0 +1,68 @@
+# (C) Copyright IBM Corp. 2021
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+---
+rateRatio_1:
+  condition: $rxo21 NOT_NULL
+  valueOf: datatype/Ratio
+  expressionType: resource
+  vars:
+    rxo21: RXO.21
+    numerator: RXO.21
+    numunit: RXO.22.1
+    denominator: $denomVal
+    denunit: RXO.17 | $denomUnit
+    unitSystem: RXO.22.3 | $unitSys
+  constants:
+    unitSys: "http://unitsofmeasure.org"
+    denomUnit: "day"
+    denomVal: "1"
+
+rateRatio_2:
+  condition: $rxe23 NOT_NULL && $rxo21 NULL
+  valueOf: datatype/Ratio
+  expressionType: resource
+  vars:
+    rxo21: RXO.21
+    rxe23: RXE.23
+    numerator: RXE.23
+    numunit: RXE.24.1
+    denominator: $denomVal
+    denunit: RXE.22 | $denomUnit
+    unitSystem: RXE.24.3 | $unitSys
+  constants:
+    unitSys: "http://unitsofmeasure.org"
+    denomUnit: "day"
+    denomVal: "1"
+
+doseQuantity_1:
+  condition: $rxo2 NOT_NULL && $rxo3 NULL
+  valueOf: datatype/Quantity
+  expressionType: resource
+  specs: RXO
+  vars:
+    rxo2: RXO.2
+    rxo3: RXO.3
+    value: RXO.2
+    unit: RXO.4.1
+    resolvedSystem: RXO.4.3 | $unitSys
+  constants:
+    unitSys: "http://unitsofmeasure.org"
+
+doseQuantity_2:
+  condition: $rxo2 NULL && $rxe3 NOT_NULL && $rxe4 NULL
+  valueOf: datatype/Quantity
+  expressionType: resource
+  specs: RXE
+  vars:
+    rxo2: RXO.2
+    rxe3: RXE.3
+    rxe4: RXE.4
+    value: DOSE_VALUE, RXE.3
+    unit: RXE.5.1
+    resolvedSystem: RXE.5.3 | $unitSys
+  constants:
+    unitSys: "http://unitsofmeasure.org"
+
+# TODO: doseRange:
