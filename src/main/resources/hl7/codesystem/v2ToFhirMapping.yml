@@ -390,3 +390,30 @@ MedicationRequestStatus:
 MedicationRequestCategory:
   I: inpatient
   O: outpatient
+
+# HL7 Table 0063 > V3 Role code which is to be used for FHIR subscriber-relationship
+V3RoleCode:
+  BRO: BRO
+# CGV: no good match for Care giver
+  CHD: CHILD
+# DEP: no good match for Handicapped dependent
+  DOM: DOMPART
+  EXF: EXT  
+  FCH: CHLDFOST 
+  FND: FRND
+  FTH: FTH 
+  GCH: GRNDCHILD
+# GRD: no good match for Guardian
+  GRP: GRPRN
+  MTH: MTH
+  NCH: NCHILD 
+# NON: no good match for None
+  OTH: O     
+  PAR: PRN
+  SCH: STPCHLD
+  SEL: ONESELF
+  SIB: SIB
+  SIS: SIS
+  SPO: SPS
+  UNK: U
+# WRD: no good match for Ward of the court  
