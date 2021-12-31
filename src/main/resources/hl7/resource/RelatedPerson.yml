@@ -4,8 +4,14 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 resourceType: RelatedPerson
+#
 # Represents data that needs to be extracted for a RelatedPerson Resource in FHIR
 # reference: https://build.fhir.org/relatedperson.html
+# 
+# - NOTE- 
+# Related person gets many values from scope, so they do not need to be passed in: 
+#  IN1 and sub-fields
+#  $Patient 
 id:
    type: STRING
    valueOf: UUID.randomUUID()
@@ -17,7 +23,7 @@ identifier:
    generateList: true
    expressionType: resource
    vars:
-      valueIn: String, IN1.49.1 | $relatedId
+      valueIn: String, IN1.49.1 
    constants:
       system: http://terminology.hl7.org/CodeSystem/v2-0203
       code: XV
@@ -27,7 +33,7 @@ patient:
    valueOf: datatype/Reference
    expressionType: resource
    generateList: true
-   specs: $patientRef
+   specs: $Patient
 
 relationship:
    valueOf: datatype/CodeableConcept
@@ -42,22 +48,22 @@ name:
    valueOf: datatype/HumanName
    generateList: true
    expressionType: resource
-   specs: IN1.16 | $relatedNameXPN
+   specs: IN1.16 
 
 birthDate:
    type: DATE
-   valueOf: IN1.18 | relatedBirthDTM
+   valueOf: IN1.18 
    expressionType: HL7Spec
 
 gender:
    type: ADMINISTRATIVE_GENDER
-   valueOf: IN1.43 | $relatedGender
+   valueOf: IN1.43 
    expressionType: HL7Spec
 
 address:
    valueOf: datatype/Address
    generateList: true
    expressionType: resource
-   specs: IN1.19 | relatedAddressXAD
+   specs: IN1.19 
 
 

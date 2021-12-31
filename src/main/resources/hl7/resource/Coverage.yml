@@ -100,14 +100,10 @@ subscriber_1:
    valueOf: resource/RelatedPerson
    expressionType: reference
    vars: 
-       relatedRelationshipStr: String, IN1.17
-       relatedRelationshipCWE: IN1.17
-       relatedNameXPN: IN1.16
-       relatedBirthDTM: IN1.18
-       relatedAddressXAD: IN1.19
-       relatedGender: IN1.43
-       relatedId: IN1.49.1
-       patientRef: $Patient
+      relatedRelationshipStr: String, IN1.17
+      # Related person gets many values from scope, so they do not need to be passed in
+      #  IN1 and sub-fields
+      #  $Patient  
 
 # If the subscriber is SEL (self), then reference the patient
 subscriber_2:
