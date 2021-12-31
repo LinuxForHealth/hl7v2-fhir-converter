@@ -10,7 +10,7 @@ import org.apache.commons.lang3.EnumUtils;
 
 public enum SimpleDataTypeMapper {
 
-  BOOLEAN(SimpleDataValueResolver.BOOLEAN),
+  BOOLEAN(SimpleDataValueResolver.BOOLEAN), 
   INTEGER(SimpleDataValueResolver.INTEGER),
   STRING(SimpleDataValueResolver.STRING),
   STRING_ALL(SimpleDataValueResolver.STRING_ALL),
@@ -66,6 +66,7 @@ public enum SimpleDataTypeMapper {
   ACT_ENCOUNTER(SimpleDataValueResolver.ACT_ENCOUNTER_CODE_FHIR),
   PERSON_DISPLAY_NAME(SimpleDataValueResolver.PERSON_DISPLAY_NAME),
   DOC_REF_DOC_STATUS(SimpleDataValueResolver.DOC_REF_DOC_STATUS_CODE_FHIR),
+  POLICYHOLDER_RELATIONSHIP(SimpleDataValueResolver.POLICYHOLDER_RELATIONSHIP),
   ENCOUNTER_MODE_ARRIVAL_DISPLAY(SimpleDataValueResolver.ENCOUNTER_MODE_ARRIVAL_DISPLAY);
 
   private ValueExtractor<Object, ?> valueResolver;

@@ -55,7 +55,7 @@ class HL7ConditionFHIRConversionTest {
                 + "DG1|1||C56.9^Ovarian Cancer^I10||20210322154449|A|||||||||1|123^DOE^JOHN^A^|||20210322154326|V45|||||\r";
 
         List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
-        // Verfify no extraneous resources
+        // Verify no extraneous resources
         // Expect encounter, patient, practitioner, condition
         assertThat(e).hasSize(4);
 

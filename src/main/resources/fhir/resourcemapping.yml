@@ -22,3 +22,4 @@ ServiceRequest: org.hl7.fhir.r4.model.ServiceRequest
 MedicationRequest: org.hl7.fhir.r4.model.MedicationRequest
 Device: org.hl7.fhir.r4.model.Device
 Coverage: org.hl7.fhir.r4.model.Coverage
+RelatedPerson: org.hl7.fhir.r4.model.RelatedPerson

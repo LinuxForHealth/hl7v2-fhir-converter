@@ -350,4 +350,23 @@ class SimpleDataValueResolverTest {
         assertThat(SimpleDataValueResolver.PV1_DURATION_LENGTH.apply("A string")).isNull();
     }
 
+    @Test
+    void testPolicyholderRelationship() {
+
+        // Check supported known input code
+        SimpleCode coding = SimpleDataValueResolver.POLICYHOLDER_RELATIONSHIP.apply("PAR");
+        assertThat(coding).isNotNull();
+        assertThat(coding.getCode()).isEqualTo("PRN");
+        assertThat(coding.getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/v3-RoleCode");
+        assertThat(coding.getDisplay()).isEqualTo("parent");
+
+        // Check unsupported unknown input code
+        // Even though CGV is a valid HL7 code, there is no mapping
+        coding = SimpleDataValueResolver.POLICYHOLDER_RELATIONSHIP.apply("CGV");
+        assertThat(coding.getCode()).isNull();
+        assertThat(coding.getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/v3-RoleCode");
+        assertThat(coding.getDisplay()).isEqualTo(
+                "Invalid input: code 'CGV' could not be mapped to values in system 'http://terminology.hl7.org/CodeSystem/v3-RoleCode' with original display 'null' and version 'null'.");
+    }
+
 }
