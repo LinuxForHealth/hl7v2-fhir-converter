@@ -604,7 +604,7 @@ class Hl7MedicationRequestFHIRConversionTest {
         MedicationRequest.MedicationRequestDispenseRequestComponent disReq = medicationRequest.getDispenseRequest();
 
         // dispenseRequest.Quantity comes from RXO.11, RXO.12.1 and default system
-        assertThat(disReq.getQuantity().getValue().toString()).isEqualTo("4.0");
+        assertThat(disReq.getQuantity().getValue()).hasToString("4.0");
         assertThat(disReq.getQuantity().getUnit()).isEqualTo("tablet");
         assertThat(disReq.getQuantity().getSystem()).isEqualTo("http://unitsofmeasure.org");
 
@@ -634,12 +634,12 @@ class Hl7MedicationRequestFHIRConversionTest {
         MedicationRequest.MedicationRequestDispenseRequestComponent disReq = medicationRequest.getDispenseRequest();
 
             // dispenseRequest.Quantity comes from RXE.10, RXE.11.1 and RXE.11.3
-            assertThat(disReq.getQuantity().getValue().toString()).isEqualTo("1.0");
+            assertThat(disReq.getQuantity().getValue()).hasToString("1.0");
             assertThat(disReq.getQuantity().getUnit()).isEqualTo("PC");
             assertThat(disReq.getQuantity().getSystem()).isEqualTo("urn:id:measureofunits");
 
             // dispenseRequest.InitialFIll.Quantity comes from RXE.39
-            assertThat(disReq.getInitialFill().getQuantity().getValue().toString()).isEqualTo("7.0");
+            assertThat(disReq.getInitialFill().getQuantity().getValue()).hasToString("7.0");
 
         // Verify no extraneous resources
         // Expect MedicationRequest, Patient
@@ -669,12 +669,12 @@ class Hl7MedicationRequestFHIRConversionTest {
         Ratio maxDose = medicationRequest.getDosageInstructionFirstRep().getMaxDosePerPeriod();
 
         // dosageInstruction.maxDosePerPeriod.numerator(RXO.23)
-        assertThat(maxDose.getNumerator().getValue().toString()).isEqualTo("7.0");
+        assertThat(maxDose.getNumerator().getValue()).hasToString("7.0");
         assertThat(maxDose.getNumerator().getUnit()).isEqualTo("PC");
         assertThat(maxDose.getNumerator().getSystem()).isEqualTo("http://unitsofmeasure.org");
 
         // dosageInstruction.maxDosePerPeriod.denominator
-        assertThat(maxDose.getDenominator().getValue().toString()).isEqualTo("1.0");
+        assertThat(maxDose.getDenominator().getValue()).hasToString("1.0");
         assertThat(maxDose.getDenominator().getUnit()).isEqualTo("day");
         assertThat(maxDose.getDenominator().getSystem()).isEqualTo("http://unitsofmeasure.org");
 
@@ -704,12 +704,12 @@ class Hl7MedicationRequestFHIRConversionTest {
         Ratio maxDose = medicationRequest.getDosageInstructionFirstRep().getMaxDosePerPeriod();
 
         // dosageInstruction.maxDosePerPeriod.numerator(RXE.19)
-        assertThat(maxDose.getNumerator().getValue().toString()).isEqualTo("5.0");
+        assertThat(maxDose.getNumerator().getValue().toString()).hasToString("5.0");
         assertThat(maxDose.getNumerator().getUnit()).isEqualTo("PC");
         assertThat(maxDose.getNumerator().getSystem()).isEqualTo("http://unitsofmeasure.org");
 
         // dosageInstruction.maxDosePerPeriod.denominator
-        assertThat(maxDose.getDenominator().getValue().toString()).isEqualTo("1.0");
+        assertThat(maxDose.getDenominator().getValue()).hasToString("1.0");
         assertThat(maxDose.getDenominator().getUnit()).isEqualTo("day");
         assertThat(maxDose.getDenominator().getSystem()).isEqualTo("http://unitsofmeasure.org");
 
@@ -921,12 +921,12 @@ class Hl7MedicationRequestFHIRConversionTest {
         Ratio rateRatio = medicationRequest.getDosageInstructionFirstRep().getDoseAndRateFirstRep().getRateRatio();
 
         // dosageInstruction.doseAndRate.rateRatio.numerator(RXO.21)
-        assertThat(rateRatio.getNumerator().getValue().toString()).isEqualTo("6.0"); //RXO.21
+        assertThat(rateRatio.getNumerator().getValue()).hasToString("6.0"); //RXO.21
         assertThat(rateRatio.getNumerator().getUnit()).isEqualTo("PC"); //RXO.22.1
         assertThat(rateRatio.getNumerator().getSystem()).isEqualTo("http://unitsofmeasure.org"); //RXO.22.3
 
         // dosageInstruction.doseAndRate.rateRatio.denominator
-        assertThat(rateRatio.getDenominator().getValue().toString()).isEqualTo("1.0");
+        assertThat(rateRatio.getDenominator().getValue()).hasToString("1.0");
         assertThat(rateRatio.getDenominator().getUnit()).isEqualTo("day");
         assertThat(rateRatio.getDenominator().getSystem()).isEqualTo("http://unitsofmeasure.org");
 
@@ -956,12 +956,12 @@ class Hl7MedicationRequestFHIRConversionTest {
         Ratio rateRatio = medicationRequest.getDosageInstructionFirstRep().getDoseAndRateFirstRep().getRateRatio();
 
         // dosageInstruction.doseAndRate.rateRatio.numerator(RXE.23)
-        assertThat(rateRatio.getNumerator().getValue().toString()).isEqualTo("7.0"); //RXE.23
+        assertThat(rateRatio.getNumerator().getValue()).hasToString("7.0"); //RXE.23
         assertThat(rateRatio.getNumerator().getUnit()).isEqualTo("PC"); //RXE.24
         assertThat(rateRatio.getNumerator().getSystem()).isEqualTo("http://unitsofmeasure.org"); //Defaulted
 
         // dosageInstruction.doseAndRate.rateRatio.denominator
-        assertThat(rateRatio.getDenominator().getValue().toString()).isEqualTo("1.0");
+        assertThat(rateRatio.getDenominator().getValue()).hasToString("1.0");
         assertThat(rateRatio.getDenominator().getUnit()).isEqualTo("day"); //RXE.22
         assertThat(rateRatio.getDenominator().getSystem()).isEqualTo("http://unitsofmeasure.org");
 
@@ -993,7 +993,7 @@ class Hl7MedicationRequestFHIRConversionTest {
         Quantity doseQuantity  = medicationRequest.getDosageInstructionFirstRep().getDoseAndRateFirstRep().getDoseQuantity();
 
         // dosageInstruction.doseAndRate.doseQuantity RXO.2
-        assertThat(doseQuantity.getValue().toString()).isEqualTo("100.0"); //RXO.2
+        assertThat(doseQuantity.getValue()).hasToString("100.0"); //RXO.2
         assertThat(doseQuantity.getUnit()).isEqualTo("CC"); //RXO.4.1
         assertThat(doseQuantity.getSystem()).isEqualTo("http://unitsofmeasure.org"); //default
 
@@ -1023,7 +1023,7 @@ class Hl7MedicationRequestFHIRConversionTest {
         Quantity doseQuantity  = medicationRequest.getDosageInstructionFirstRep().getDoseAndRateFirstRep().getDoseQuantity();
 
         // dosageInstruction.doseAndRate.doseQuantity RXE.3
-        assertThat(doseQuantity.getValue().toString()).isEqualTo("3.0"); //RXE.3
+        assertThat(doseQuantity.getValue()).hasToString("3.0"); //RXE.3
         assertThat(doseQuantity.getUnit()).isEqualTo("mL"); //RXE.5.1
         assertThat(doseQuantity.getSystem()).isEqualTo("http://unitsofmeasure.org"); //default
 
@@ -1041,8 +1041,7 @@ class Hl7MedicationRequestFHIRConversionTest {
                 + "ORC|OP||||||||||||||20210101000000||||||||\n"
                 + "RXO|00054418425^Dexamethasone 4 MG Oral Tablet^NDC^^^^^^dexamethasone (DECADRON) 4 MG TABS|100|150|CC|" // RXO.2 3 and 4 are on this line ("100|150|CC")
                 // split and concatenate RXO for easier understanding
-                + "|^Take 1 tablet by mouth every 6 (six) hours.|||G||4|tablet^tablet|0|222^JONES^JON^E.|||day||||6|PC^^http://unitsofmeasure.org||^DECADRON\n"
-                + "RXR|PO^Oral\n";
+                + "|||||||||||||||||||\n";
 
         List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
 
@@ -1054,13 +1053,13 @@ class Hl7MedicationRequestFHIRConversionTest {
 
         Range doseRange = medicationRequest.getDosageInstructionFirstRep().getDoseAndRateFirstRep().getDoseRange();
 
-        // dosageInstruction.doseAndRate.doseRange.low(RXO.2)
-        assertThat(doseRange.getLow().getValue().toString()).isEqualTo("100.0");
+        // doseRange.low(RXO.2)
+        assertThat(doseRange.getLow().getValue()).hasToString("100.0");
         assertThat(doseRange.getLow().getUnit()).isEqualTo("CC"); //RXO.4
         assertThat(doseRange.getLow().getSystem()).isEqualTo("http://unitsofmeasure.org"); //Defaulted
 
-        // dosageInstruction.doseAndRate.doseRange.high(RXO.3)
-        assertThat(doseRange.getHigh().getValue().toString()).isEqualTo("150.0");
+        // doseRange.high(RXO.3)
+        assertThat(doseRange.getHigh().getValue()).hasToString("150.0");
         assertThat(doseRange.getHigh().getUnit()).isEqualTo("CC"); //RXO.4
         assertThat(doseRange.getHigh().getSystem()).isEqualTo("http://unitsofmeasure.org");
 
@@ -1077,7 +1076,7 @@ class Hl7MedicationRequestFHIRConversionTest {
                 + "ORC|NW|||||E|||||||||||||||||||||||I\n"
                 + "RXE||DUONEB3INH^3 ML PLAS CONT : IPRATROPIUM-ALBUTEROL 0.5-2.5 (3) MG/3ML IN SOLN^ADS^^^^^^ipratropium-albuterol (DUONEB) nebulizer solution 3 mL|3|6|mL||||"// RXE.3 4 and 5 are on this line ("|3|6|mL|")
                 // split and concatenate RXE for easier understanding
-                + "|1|PC^^measureofunits|||||||day|||||7|PC|||Wheezing^Wheezing^PRN||||||||||7|7|7\n";
+                + "||||||||||||||||||||||||||||||\n";
 
         List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
 
@@ -1089,13 +1088,13 @@ class Hl7MedicationRequestFHIRConversionTest {
 
         Range doseRange = medicationRequest.getDosageInstructionFirstRep().getDoseAndRateFirstRep().getDoseRange();
 
-        // dosageInstruction.doseAndRate.doseRange.low(RXE.3)
-        assertThat(doseRange.getLow().getValue().toString()).isEqualTo("3.0");
+        // doseRange.low(RXE.3)
+        assertThat(doseRange.getLow().getValue()).hasToString("3.0");
         assertThat(doseRange.getLow().getUnit()).isEqualTo("mL"); //RXE.5
         assertThat(doseRange.getLow().getSystem()).isEqualTo("http://unitsofmeasure.org"); //Defaulted
 
-        // dosageInstruction.doseAndRate.doseRange.high(RXE.4)
-        assertThat(doseRange.getHigh().getValue().toString()).isEqualTo("6.0");
+        // doseRange.high(RXE.4)
+        assertThat(doseRange.getHigh().getValue()).hasToString("6.0");
         assertThat(doseRange.getHigh().getUnit()).isEqualTo("mL"); //RXE.5
         assertThat(doseRange.getHigh().getSystem()).isEqualTo("http://unitsofmeasure.org");
 
