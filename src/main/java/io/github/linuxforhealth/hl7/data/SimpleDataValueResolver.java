@@ -34,7 +34,6 @@ import org.hl7.fhir.r4.model.AllergyIntolerance.AllergyIntoleranceCategory;
 import org.hl7.fhir.r4.model.AllergyIntolerance.AllergyIntoleranceCriticality;
 import org.hl7.fhir.r4.model.DiagnosticReport.DiagnosticReportStatus;
 import org.hl7.fhir.r4.model.Enumerations.AdministrativeGender;
-import org.hl7.fhir.r4.model.Immunization.ImmunizationStatus;
 import org.hl7.fhir.r4.model.MedicationRequest;
 import org.hl7.fhir.r4.model.Observation.ObservationStatus;
 import org.hl7.fhir.r4.model.ServiceRequest.ServiceRequestStatus;
@@ -45,11 +44,11 @@ import org.hl7.fhir.r4.model.codesystems.ConditionCategory;
 import org.hl7.fhir.r4.model.codesystems.MessageReasonEncounter;
 import org.hl7.fhir.r4.model.codesystems.NameUse;
 import org.hl7.fhir.r4.model.codesystems.V3ReligiousAffiliation;
+import org.hl7.fhir.r4.model.codesystems.V3RoleCode;
 import org.hl7.fhir.r4.model.codesystems.DiagnosisRole;
 import org.hl7.fhir.r4.model.codesystems.ConditionClinical;
 import org.hl7.fhir.r4.model.codesystems.ConditionVerStatus;
 import org.hl7.fhir.r4.model.codesystems.CompositionStatus;
-import org.hl7.fhir.r5.model.Enumerations;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -355,6 +354,23 @@ public class SimpleDataValueResolver {
 
     public static final ValueExtractor<Object, String> ENCOUNTER_MODE_ARRIVAL_DISPLAY = (Object value) -> {
         return getFHIRCode(Hl7DataHandlerUtil.getStringValue(value), "EncounterModeOfArrivalDisplay");
+    };
+
+    public static final ValueExtractor<Object, SimpleCode> POLICYHOLDER_RELATIONSHIP = (Object value) -> {
+        String val = Hl7DataHandlerUtil.getStringValue(value);
+        String text = Hl7DataHandlerUtil.getOriginalDisplayText(value);
+        String code = getFHIRCode(val, V3RoleCode.class);
+        String version = Hl7DataHandlerUtil.getVersion(value);
+        if (code != null) {
+            V3RoleCode relationship = V3RoleCode.fromCode(code);
+            return new SimpleCode(code, relationship.getSystem(), relationship.getDisplay(), version);
+        } else {
+            // If code is null, it means the code wasn't known in our table, and can't be looked up.
+            // Make a message in the display.
+            String theSystem = V3RoleCode.PRN.getSystem();
+            return new SimpleCode(null, theSystem,
+                    String.format(INVALID_CODE_MESSAGE_FULL, val, theSystem, text, version));
+        }
     };
 
     public static final ValueExtractor<Object, SimpleCode> MARITAL_STATUS = (Object value) -> {

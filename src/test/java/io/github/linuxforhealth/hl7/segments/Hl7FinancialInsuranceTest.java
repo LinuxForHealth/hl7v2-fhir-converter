@@ -13,10 +13,12 @@ import java.util.List;
 import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
 import org.hl7.fhir.r4.model.ContactPoint;
 import org.hl7.fhir.r4.model.Coverage;
+import org.hl7.fhir.r4.model.Enumerations;
 import org.hl7.fhir.r4.model.HumanName;
 import org.hl7.fhir.r4.model.Identifier;
 import org.hl7.fhir.r4.model.Organization;
 import org.hl7.fhir.r4.model.Patient;
+import org.hl7.fhir.r4.model.RelatedPerson;
 import org.hl7.fhir.r4.model.Resource;
 import org.hl7.fhir.r4.model.ResourceType;
 import org.junit.jupiter.api.Test;
@@ -42,6 +44,7 @@ class Hl7FinancialInsuranceTest {
                 // IN1.2.1, IN1.2.3 to Identifier 1
                 // IN1.2.4, IN1.2.6 to Identifier 2
                 + "IN1|1|Value1^^System3^Value4^^System6"
+                // Thorough organization testing.
                 // IN1.3 to Organization Identifier 
                 //    IN1.3.1 to Organization Identifier.value
                 //    IN1.3.4 to Organization Identifier.system
@@ -78,11 +81,12 @@ class Hl7FinancialInsuranceTest {
                 // IN1.9.1 to Coverage.class.name
                 // IN1.12 to Coverage.period.start
                 // IN1.13 to Coverage.period.end
-                // IN1.14 to IN1.35 NOT REFERENCED
+                // IN1.17 is purposely empty - no Related Person should be created.
+                // IN1.14 through IN1.35 NOT REFERENCED
                 + "|UA34567|Blue|||20201231145045|20211231145045||||||||||||||||||||||"
                 // IN1.36 to Identifier 4
                 // IN1.46 to Identifier 3
-                // IN1.47 to IN1.53 NOT REFERENCED
+                // IN1.47 through IN1.53 NOT REFERENCED
                 + "|MEMBER36||||||||||Value46|||||||\n";
 
         List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
@@ -176,7 +180,6 @@ class Hl7FinancialInsuranceTest {
         // Confirm Coverage Beneficiary references to Patient, and Payor references to Organization
         assertThat(coverage.getBeneficiary().getReference()).isEqualTo(patientId);
         assertThat(coverage.getPayorFirstRep().getReference()).isEqualTo(organizationId);
-
         // Only one Coverage Class expected.  (getClass_ is correct name for method)
         assertThat(coverage.getClass_()).hasSize(1);
         assertThat(coverage.getClass_FirstRep().getName()).isEqualTo("Blue"); // IN1.9.1
@@ -188,7 +191,203 @@ class Hl7FinancialInsuranceTest {
         assertThat(coverage.getPeriod().getStartElement().toString()).containsPattern("2020-12-31T14:50:45"); // IN1.12
         assertThat(coverage.getPeriod().getEndElement().toString()).containsPattern("2021-12-31T14:50:45"); // IN1.13
 
+        // Expect no RelatedPerson because IN1.17 was empty
+        List<Resource> relatedPersons = ResourceUtils.getResourceList(e, ResourceType.RelatedPerson);
+        assertThat(relatedPersons).isEmpty(); // IN1.17 empty
+
         // Confirm there are no unaccounted for resources
+        // Expected: Coverage, Organization, Patient, Encounter
+        assertThat(e).hasSize(4);
+    }
+
+    // Suppress warnings about too many assertions in a test.  Justification: creating a FHIR message is very costly; we need to check many asserts per creation for efficiency.  
+    @java.lang.SuppressWarnings("squid:S5961")
+    @Test
+    // Tests IN1.17 coverage by related person. A related person should be created and cross-referenced.
+    void testInsuranceCoverageByRelatedFields() throws IOException {
+
+        String hl7message = "MSH|^~\\&|||||20151008111200||ADT^A01^ADT_A01|MSGID000001|T|2.6|||||||||\n"
+                + "EVN||20210407191342||||||\n"
+                + "PID|||MR1^^^XYZ^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
+                + "PV1||I||||||||||||||||||||||||||||||||||||||||||\n"
+                // IN1 Segment is split and concatenated for easier understanding. (| precedes numbered field.)
+                // IN1.2.1, IN1.2.3 to Identifier 1
+                // IN1.2.4, IN1.2.6 to Identifier 2
+                + "IN1|1|Value1^^System3^Value4^^System6"
+                // Minimal Organization. Required for Payor, which is required.
+                // Organization deep test in testBasicInsuranceCoverageFields
+                // IN1.3 to Organization Identifier 
+                //    IN1.3.1 to Organization Identifier.value
+                //    IN1.3.4 to Organization Identifier.system
+                // INI.4 to Organization Name (required to inflate organization)
+                // IN1.5 to 15 NOT REFERENCED (See test testBasicInsuranceCoverageFields)
+                + "|IdValue1^^^IdSystem4^^^^|Large Blue Organization|||||||||||"
+                // IN1.16 to RelatedPerson.name
+                //    IN1.16.1 to RelatedPerson Name .family
+                //    IN1.16.2 to RelatedPerson Name .given (first)
+                //    IN1.16.5 to RelatedPerson Name .prefix
+                // IN1.17 to Coverage.relationship and RelatedPerson.relationship. 
+                // IN1.18 to RelatedPerson.birthDate
+                // IN1.19 to RelatedPerson.address (All XAD standard fields)
+                // IN1.20 through IN1.35 NOT REFERENCED
+                + "|DoeFake^Judy^^^Rev.|PAR|19780429|19 Rose St^^Faketown^CA^ZIP5||||||||||||||||"
+                // IN1.36 to Identifier 4
+                // IN1.43 to RelatedPerson.gender
+                // IN1.46 to Identifier 3
+                // IN1.49 to RelatedPerson.identifier
+                // IN1.50 through IN1.53 NOT REFERENCED
+                + "|MEMBER36|||||||F|||Value46|||J494949||||\n";
+
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+
+        List<Resource> encounters = ResourceUtils.getResourceList(e, ResourceType.Encounter);
+        assertThat(encounters).hasSize(1); // From PV1
+
+        List<Resource> patients = ResourceUtils.getResourceList(e, ResourceType.Patient);
+        assertThat(patients).hasSize(1); // From PID
+        Patient patient = (Patient) patients.get(0);
+        String patientId = patient.getId();
+
+        List<Resource> organizations = ResourceUtils.getResourceList(e, ResourceType.Organization);
+        assertThat(organizations).hasSize(1); // From Payor created by IN1
+        // Organization org = (Organization) organizations.get(0);
+
+        List<Resource> coverages = ResourceUtils.getResourceList(e, ResourceType.Coverage);
+        assertThat(coverages).hasSize(1); // From IN1 segment
+        Coverage coverage = (Coverage) coverages.get(0);
+
+        // Confirm Coverage Identifiers
+        assertThat(coverage.getIdentifier()).hasSize(4);
+        // Coverage Identifiers deep check in testBasicInsuranceCoverageFields
+
+        // Confirm Coverage Beneficiary references to Patient, and Payor references to Organization
+        assertThat(coverage.getBeneficiary().getReference()).isEqualTo(patientId);
+        assertThat(coverage.getPayorFirstRep().getReference()).isEqualTo(organizations.get(0).getId());
+
+        // Expect one RelatedPerson
+        List<Resource> relatedPersons = ResourceUtils.getResourceList(e, ResourceType.RelatedPerson);
+        assertThat(relatedPersons).hasSize(1); // From IN1.16 through IN1.19; IN1.43; INI.49 
+        RelatedPerson related = (RelatedPerson) relatedPersons.get(0);
+
+        // Check RelatedPerson identifier
+        assertThat(related.getIdentifier()).hasSize(1);
+        assertThat(related.getIdentifier().get(0).getValue()).isEqualTo("J494949"); // IN1.49
+        assertThat(related.getIdentifier().get(0).getSystem()).isNull();
+        DatatypeUtils.checkCommonCodeableConceptAssertions(related.getIdentifier().get(0).getType(), "XV",
+                "Health Plan Identifier",
+                "http://terminology.hl7.org/CodeSystem/v2-0203", null);
+
+        // Check RelatedPerson name. IN1.16 name is standard XPN, tested exhaustively in other tests.        
+        assertThat(related.getName()).hasSize(1);
+        HumanName relatedName = related.getName().get(0);
+        assertThat(relatedName.getFamily()).isEqualTo("DoeFake"); // IN1.16.1
+        assertThat(relatedName.getGiven().get(0).getValueAsString()).isEqualTo("Judy"); // IN1.16.2
+        assertThat(relatedName.getPrefixAsSingleString()).hasToString("Rev."); // IN1.16.6
+        assertThat(relatedName.getText()).isEqualTo("Rev. Judy DoeFake"); // from IN1.16 aggregate
+
+        // Check RelatedPerson birth and gender
+        assertThat(related.getBirthDateElement().toString()).containsPattern("1978-04-29"); // IN1.18
+        Enumerations.AdministrativeGender gen = related.getGender();
+        assertThat(gen).isNotNull().isEqualTo(Enumerations.AdministrativeGender.FEMALE); // IN1.43
+
+        // Check the RelatedPerson address. IN1.19 is a standard XAD address, which is tested exhaustively in other tests.  
+        assertThat(related.getAddress()).hasSize(1);
+        assertThat(related.getAddress().get(0).getLine().get(0).getValueAsString())
+                .isEqualTo("19 Rose St"); // IN1.19.1
+        assertThat(related.getAddress().get(0).getCity()).isEqualTo("Faketown"); // IN1.19.3
+        assertThat(related.getAddress().get(0).getState()).isEqualTo("CA"); // IN1.19.4
+        assertThat(related.getAddress().get(0).getPostalCode()).isEqualTo("ZIP5"); // IN1.19.5
+
+        // Check coverage relationship
+        DatatypeUtils.checkCommonCodeableConceptAssertions(coverage.getRelationship(), "PRN",
+                "parent",
+                "http://terminology.hl7.org/CodeSystem/v3-RoleCode", null); // IN1.17
+
+        // Check relatedPerson relationship
+        assertThat(related.getRelationship()).hasSize(1);
+        DatatypeUtils.checkCommonCodeableConceptAssertions(related.getRelationship().get(0), "PRN",
+                "parent",
+                "http://terminology.hl7.org/CodeSystem/v3-RoleCode", null); // IN1.17
+
+        // Confirm the Coverage (subscriber) references the RelatedPerson
+        assertThat(coverage.getSubscriber().getReference()).isEqualTo(related.getId());
+        // Confirm the RelatedPerson references the Patient
+        assertThat(related.getPatient().getReference()).isEqualTo(patientId);
+
+        // Confirm there are no unaccounted for resources
+        // Expected: Coverage, Organization, Patient, Encounter, RelatedPerson
+        assertThat(e).hasSize(5);
+    }
+
+    // Suppress warnings about too many assertions in a test.  Justification: creating a FHIR message is very costly; we need to check many asserts per creation for efficiency.  
+    @java.lang.SuppressWarnings("squid:S5961")
+    @Test
+    // Tests IN1.17 coverage by one's self. A related person should not be created.  But the patient should be referenced.
+    void testInsuranceCoverageOfSelf() throws IOException {
+
+        String hl7message = "MSH|^~\\&|||||20151008111200||ADT^A01^ADT_A01|MSGID000001|T|2.6|||||||||\n"
+                + "EVN||20210407191342||||||\n"
+                + "PID|||MR1^^^XYZ^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
+                + "PV1||I||||||||||||||||||||||||||||||||||||||||||\n"
+                // IN1 Segment is split and concatenated for easier understanding. (| precedes numbered field.)
+                // IN1.2.1, IN1.2.3 to Identifier 1
+                // IN1.2.4, IN1.2.6 to Identifier 2
+                + "IN1|1|Value1^^System3^Value4^^System6"
+                // Minimal Organization. Required for Payor, which is required.
+                // Organization deep test in testBasicInsuranceCoverageFields
+                // IN1.3 to Organization Identifier 
+                //    IN1.3.1 to Organization Identifier.value
+                //    IN1.3.4 to Organization Identifier.system
+                // IN1.4 to Organization Name
+                // IN1.5 to 15 NOT REFERENCED (See test testBasicInsuranceCoverageFields)
+                + "|IdValue1^^^IdSystem4^^^^|Large Blue Organization|||||||||||"
+                // IN1.16 empty because IN1.17 is SEL
+                // IN1.17 to Coverage.relationship.  SEL (self) should create relationship of ONESELF, and reference to patient. 
+                // IN1.18 through IN1.35 NOT REFERENCED
+                + "||SEL||||||||||||||||||"
+                // IN1.36 to Identifier 4
+                // IN1.46 to Identifier 3
+                // IN1.47 through IN1.53 NOT REFERENCED
+                + "|MEMBER36||||||||||Value46|||||||\n";
+
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+
+        List<Resource> encounters = ResourceUtils.getResourceList(e, ResourceType.Encounter);
+        assertThat(encounters).hasSize(1); // From PV1
+
+        List<Resource> patients = ResourceUtils.getResourceList(e, ResourceType.Patient);
+        assertThat(patients).hasSize(1); // From PID
+        Patient patient = (Patient) patients.get(0);
+        String patientId = patient.getId();
+
+        List<Resource> organizations = ResourceUtils.getResourceList(e, ResourceType.Organization);
+        assertThat(organizations).hasSize(1); // From Payor created by IN1
+
+        List<Resource> coverages = ResourceUtils.getResourceList(e, ResourceType.Coverage);
+        assertThat(coverages).hasSize(1); // From IN1 segment
+        Coverage coverage = (Coverage) coverages.get(0);
+
+        // Confirm Coverage Identifiers
+        assertThat(coverage.getIdentifier()).hasSize(4);
+        // Coverage Identifiers deep check in testBasicInsuranceCoverageFields
+
+        // Confirm Coverage Subscriber references to Patient
+        assertThat(coverage.getSubscriber().getReference()).isEqualTo(patientId);
+        // Confirm Coverage Beneficiary references to Patient, and Payor references to Organization
+        assertThat(coverage.getBeneficiary().getReference()).isEqualTo(patientId);
+        assertThat(coverage.getPayorFirstRep().getReference()).isEqualTo(organizations.get(0).getId());
+
+        // Expect no RelatedPerson because IN1.17 was self
+        List<Resource> relatedPersons = ResourceUtils.getResourceList(e, ResourceType.RelatedPerson);
+        assertThat(relatedPersons).isEmpty(); // No related person should be created because IN1.17 was SEL
+
+        // Check coverage.relationship
+        DatatypeUtils.checkCommonCodeableConceptAssertions(coverage.getRelationship(), "ONESELF",
+                "self",
+                "http://terminology.hl7.org/CodeSystem/v3-RoleCode", null); // IN1.17
+
+        // Confirm there are no unaccounted for resources
+        // Expected: Coverage, Organization, Patient, Encounter
         assertThat(e).hasSize(4);
     }
 

@@ -94,6 +94,36 @@ payor:
        orgContactXCN: IN1.6
        orgContactPointXTN: IN1.7
 
+# If the subscriber is not SEL (self), then create the related person
+subscriber_1:
+   condition: $relatedRelationshipStr NOT_NULL && $relatedRelationshipStr NOT_EQUALS SEL
+   valueOf: resource/RelatedPerson
+   expressionType: reference
+   vars: 
+      relatedRelationshipStr: String, IN1.17
+      # Related person gets many values from scope, so they do not need to be passed in
+      #  IN1 and sub-fields
+      #  $Patient  
+
+# If the subscriber is SEL (self), then reference the patient
+subscriber_2:
+    condition: $relatedRelationshipStr NOT_NULL && $relatedRelationshipStr EQUALS SEL
+    valueOf: datatype/Reference
+    expressionType: resource
+    specs: $Patient
+    vars: 
+      relatedRelationshipStr: String, IN1.17            
+
+# Relationship may be SEL (self)
+relationship:
+   valueOf: datatype/CodeableConcept
+   expressionType: resource
+   generateList: true
+   condition: $coding NOT_NULL
+   vars:
+      coding: POLICYHOLDER_RELATIONSHIP, IN1.17
+      text: String, IN1.17.2      
+
 beneficiary:
     valueOf: datatype/Reference
     expressionType: resource
