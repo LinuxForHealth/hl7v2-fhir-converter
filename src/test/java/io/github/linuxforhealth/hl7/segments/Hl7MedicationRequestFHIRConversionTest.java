@@ -629,7 +629,7 @@ class Hl7MedicationRequestFHIRConversionTest {
                     + "ORC|NW|||||E|10^BID^D4^^^R||20180622230000||||||||||||||||||||I\n"
                     + "RXE||DUONEB3INH^3 ML PLAS CONT : IPRATROPIUM-ALBUTEROL 0.5-2.5 (3) MG/3ML IN SOLN^ADS^^^^^^ipratropium-albuterol (DUONEB) nebulizer solution 3 mL|||||||"
                     // split and concatenate RXE for easier understanding
-                    + "|1|PC^^measureofunits||0||||||||||||||||||||||||||7|\n"; // RXE 10 & 11 & 13 are on this line
+                    + "|1|PC^^measureofunits|0|||||||||||||||||||||||||||7|\n"; // RXE 10 & 11 & 12 are on this line
 
         List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
 
@@ -649,7 +649,7 @@ class Hl7MedicationRequestFHIRConversionTest {
             // dispenseRequest.InitialFIll.Quantity comes from RXE.39
             assertThat(disReq.getInitialFill().getQuantity().getValue().toString()).isEqualTo("7.0");
 
-            // dispenseRequest.NumberOfRepeatsAllowed RXE.13
+            // dispenseRequest.NumberOfRepeatsAllowed RXE.12
             assertThat(disReq.getNumberOfRepeatsAllowed()).hasToString("0");
     }
 

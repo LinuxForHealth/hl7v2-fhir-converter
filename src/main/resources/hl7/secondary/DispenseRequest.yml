@@ -76,4 +76,4 @@ numberOfRepeatsAllowed:
   valueOf: $number
   expressionType: HL7Spec
   vars:
-    number: RXO.13 | RXE.13
+    number: RXO.13 | RXE.12
