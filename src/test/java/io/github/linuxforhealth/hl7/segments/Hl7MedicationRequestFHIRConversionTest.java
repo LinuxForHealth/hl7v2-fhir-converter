@@ -232,7 +232,7 @@ class Hl7MedicationRequestFHIRConversionTest {
                 + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
                 + "ORC|NW|F800006^OE|P800006^RX|||E|10^BID^D4^^^R||20180622230000\n"
                 + "RXO|RX800006^Test15 SODIUM 100 MG CAPSULE^NDC||100||mg|||||G||10||5\n"
-                + "RXE|^Q24H&0600^^20210330144208^^ROU|DUONEB3INH^3 ML PLAS CONT : IPRATROPIUM-ALBUTEROL 0.5-2.5 (3) MG/3ML IN SOLN^ADS^^^^^^ipratropium-albuterol (DUONEB) nebulizer solution 3 mL|3||mL|47||||1|PC||||||||||||||||||||^DUONEB|||||||||\n";
+                + "RXE||DUONEB3INH^3 ML PLAS CONT : IPRATROPIUM-ALBUTEROL 0.5-2.5 (3) MG/3ML IN SOLN^ADS^^^^^^ipratropium-albuterol (DUONEB) nebulizer solution 3 mL||||||||||||||||||||||||||||||||||||||\n";
 
         List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
 
@@ -256,7 +256,7 @@ class Hl7MedicationRequestFHIRConversionTest {
         String intent = medicationRequest.getIntent().toString();
         assertThat(intent).isEqualTo("ORDER");
 
-        //Very medicationCodeableConcept is set correctly
+        //Very medicationCodeableConcept is set correctly RXE.2
         assertThat(medicationRequest.hasMedicationCodeableConcept()).isTrue();
         CodeableConcept medCC = medicationRequest.getMedicationCodeableConcept();
         assertThat(medCC.getText()).isEqualTo("3 ML PLAS CONT : IPRATROPIUM-ALBUTEROL 0.5-2.5 (3) MG/3ML IN SOLN");
@@ -281,7 +281,7 @@ class Hl7MedicationRequestFHIRConversionTest {
         String hl7message = msh
                 + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
                 + "ORC|NW|F800006^OE|P800006^RX|||E|10^BID^D4^^^R||20190622160000\n"
-                + "RXE|^Q24H&0600^^20210330144208^^ROU|DUONEB3INH^3 ML PLAS CONT : IPRATROPIUM-ALBUTEROL 0.5-2.5 (3) MG/3ML IN SOLN^ADS^^^^^^ipratropium-albuterol (DUONEB) nebulizer solution 3 mL|3||mL|47||||1|PC||||||||||||||||||||^DUONEB|20180622230000||||||||\n";
+                + "RXE|||3||mL|47||||1|PC||||||||||||||||||||DUONEB3INH^3 ML PLAS CONT : IPRATROPIUM-ALBUTEROL 0.5-2.5 (3) MG/3ML IN SOLN^ADS^^^^^^ipratropium-albuterol (DUONEB) nebulizer solution 3 mL|20180622230000||||||||\n"; //RXE.31
 
         List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
 
@@ -305,7 +305,7 @@ class Hl7MedicationRequestFHIRConversionTest {
         String intent = medicationRequest.getIntent().toString();
         assertThat(intent).isEqualTo("ORDER");
 
-        //Very medicationCodeableConcept is set correctly
+        //Very medicationCodeableConcept is set correctly RXE.31
         assertThat(medicationRequest.hasMedicationCodeableConcept()).isTrue();
         CodeableConcept medCC = medicationRequest.getMedicationCodeableConcept();
         assertThat(medCC.getText()).isEqualTo("3 ML PLAS CONT : IPRATROPIUM-ALBUTEROL 0.5-2.5 (3) MG/3ML IN SOLN");
@@ -599,7 +599,7 @@ class Hl7MedicationRequestFHIRConversionTest {
                 + "ORC|OP|1234|1234|0827|||||20210101000000||||||20210101000000||||||ORDERING FAC NAME||(9\n"
                 + "RXO|00054418425^Dexamethasone 4 MG Oral Tablet^NDC^^^^^^dexamethasone (DECADRON) 4 MG TABS|||||"
                 // split and concatenate RXO for easier understanding
-                + "|Take 1 tablet by mouth every 6 (six) hours.||G||4|tablet^tablet|0|222^JONES^JON^E.|||||||||7^PC|^DECADRON\n" // RXO 11 & 12 are on this line
+                + "|||||4|tablet^tablet|0|||||||||||\n" // RXO 11,12 and 13 are on this line ("|4|tablet^tablet|0|")
                 + "RXR|PO^Oral\n";
 
         List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
@@ -616,6 +616,9 @@ class Hl7MedicationRequestFHIRConversionTest {
         assertThat(disReq.getQuantity().getValue().toString()).isEqualTo("4.0");
         assertThat(disReq.getQuantity().getUnit()).isEqualTo("tablet");
         assertThat(disReq.getQuantity().getSystem()).isEqualTo("http://unitsofmeasure.org");
+
+        // dispenseRequest.NumberOfRepeatsAllowed RXO.13
+        assertThat(disReq.getNumberOfRepeatsAllowed()).hasToString("0");
     }
 
     @Test
@@ -624,9 +627,9 @@ class Hl7MedicationRequestFHIRConversionTest {
         String hl7message = "MSH|^~\\&||||||S1|RDE^O11||T|2.6|||||||||\n"
                     + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
                     + "ORC|NW|||||E|10^BID^D4^^^R||20180622230000||||||||||||||||||||I\n"
-                    + "RXE|^Q24H&0600^^20210330144208^^ROU|DUONEB3INH^3 ML PLAS CONT : IPRATROPIUM-ALBUTEROL 0.5-2.5 (3) MG/3ML IN SOLN^ADS^^^^^^ipratropium-albuterol (DUONEB) nebulizer solution 3 mL|3||mL|47|||"
+                    + "RXE||DUONEB3INH^3 ML PLAS CONT : IPRATROPIUM-ALBUTEROL 0.5-2.5 (3) MG/3ML IN SOLN^ADS^^^^^^ipratropium-albuterol (DUONEB) nebulizer solution 3 mL|||||||"
                     // split and concatenate RXE for easier understanding
-                    + "|1|PC^^measureofunits||2213^ORDERING^PROVIDER||||||||||||||Wheezing^Wheezing^PRN||||^DUONEB|20180622230000||||||7|7|7\n"; // RXE 10 & 11 are on this line
+                    + "|1|PC^^measureofunits||0||||||||||||||||||||||||||7|\n"; // RXE 10 & 11 & 13 are on this line
 
         List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
 
@@ -645,6 +648,9 @@ class Hl7MedicationRequestFHIRConversionTest {
 
             // dispenseRequest.InitialFIll.Quantity comes from RXE.39
             assertThat(disReq.getInitialFill().getQuantity().getValue().toString()).isEqualTo("7.0");
+
+            // dispenseRequest.NumberOfRepeatsAllowed RXE.13
+            assertThat(disReq.getNumberOfRepeatsAllowed()).hasToString("0");
     }
 
     @Test
