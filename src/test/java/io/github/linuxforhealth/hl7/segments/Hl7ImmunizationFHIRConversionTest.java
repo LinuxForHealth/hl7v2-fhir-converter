@@ -181,8 +181,6 @@ class Hl7ImmunizationFHIRConversionTest {
     @Test
     void testImmunizationUsePATOBJ() throws IOException {
 
-
-
         // Test should only return RXA.10, ORC.12  is empty
         // If RXA.20 is RE but RXA.18 is blank then we use PATOBJ from v3ActReason
         String hl7VUXmessageRep = "MSH|^~\\&|MYEHR2.5|RI88140101|KIDSNET_IFL|RIHEALTH|20130531||VXU^V04^VXU_V04|20130531RI881401010105|P|2.5.1|||NE|AL||||||RI543763\r"
@@ -206,7 +204,6 @@ class Hl7ImmunizationFHIRConversionTest {
         assertThat(immunization.getStatusReason().getCodingFirstRep().getSystem())
                 .isEqualTo("http://terminology.hl7.org/CodeSystem/v3-ActReason");
         assertThat(immunization.getStatusReason().getCodingFirstRep().getDisplay()).isEqualTo("Patient Refusal");
-        assertThat(immunization.getStatusReason().getText()).isEqualTo("Patient refusal");
 
         //dose Quantity with a known system
         assertThat(immunization.hasDoseQuantity()).isTrue();
