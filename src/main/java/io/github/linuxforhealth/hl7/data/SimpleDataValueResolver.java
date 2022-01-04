@@ -34,7 +34,6 @@ import org.hl7.fhir.r4.model.AllergyIntolerance.AllergyIntoleranceCategory;
 import org.hl7.fhir.r4.model.AllergyIntolerance.AllergyIntoleranceCriticality;
 import org.hl7.fhir.r4.model.DiagnosticReport.DiagnosticReportStatus;
 import org.hl7.fhir.r4.model.Enumerations.AdministrativeGender;
-import org.hl7.fhir.r4.model.Immunization.ImmunizationStatus;
 import org.hl7.fhir.r4.model.MedicationRequest;
 import org.hl7.fhir.r4.model.Observation.ObservationStatus;
 import org.hl7.fhir.r4.model.ServiceRequest.ServiceRequestStatus;
@@ -45,11 +44,11 @@ import org.hl7.fhir.r4.model.codesystems.ConditionCategory;
 import org.hl7.fhir.r4.model.codesystems.MessageReasonEncounter;
 import org.hl7.fhir.r4.model.codesystems.NameUse;
 import org.hl7.fhir.r4.model.codesystems.V3ReligiousAffiliation;
+import org.hl7.fhir.r4.model.codesystems.V3RoleCode;
 import org.hl7.fhir.r4.model.codesystems.DiagnosisRole;
 import org.hl7.fhir.r4.model.codesystems.ConditionClinical;
 import org.hl7.fhir.r4.model.codesystems.ConditionVerStatus;
 import org.hl7.fhir.r4.model.codesystems.CompositionStatus;
-import org.hl7.fhir.r5.model.Enumerations;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,13 +60,10 @@ import io.github.linuxforhealth.core.terminology.TerminologyLookup;
 import io.github.linuxforhealth.core.terminology.UrlLookup;
 import io.github.linuxforhealth.hl7.data.date.DateUtil;
 
-
-
 public class SimpleDataValueResolver {
     private static final Logger LOGGER = LoggerFactory.getLogger(SimpleDataValueResolver.class);
     private static final String INVALID_CODE_MESSAGE_FULL = "Invalid input: code '%s' could not be mapped to values in system '%s' with original display '%s' and version '%s'.";
     private static final String INVALID_CODE_MESSAGE_SHORT = "Invalid input: code '%s' could not be mapped to values in system '%s'.";
-
 
     public static final ValueExtractor<Object, String> DATE = (Object value) -> {
         String val = Hl7DataHandlerUtil.getStringValue(value);
@@ -125,7 +121,8 @@ public class SimpleDataValueResolver {
                 }
             } catch (UnsupportedTemporalTypeException e) {
                 LOGGER.warn("Cannot evaluate time difference.");
-                LOGGER.debug("Cannot evaluate time difference for start: {} , end: {} reason {} ", start, end, e.getMessage());
+                LOGGER.debug("Cannot evaluate time difference for start: {} , end: {} reason {} ", start, end,
+                        e.getMessage());
                 return null;
             }
         }
@@ -164,8 +161,7 @@ public class SimpleDataValueResolver {
             valfamily = Hl7DataHandlerUtil.getStringValue(xcn.getFamilyName());
             valsuffix = Hl7DataHandlerUtil.getStringValue(xcn.getSuffixEgJRorIII());
 
-        }
-        else if (value instanceof PPN) {
+        } else if (value instanceof PPN) {
             PPN ppn = (PPN) value;
             valprefix = Hl7DataHandlerUtil.getStringValue(ppn.getPrefixEgDR());
             valfirst = Hl7DataHandlerUtil.getStringValue(ppn.getGivenName());
@@ -192,8 +188,8 @@ public class SimpleDataValueResolver {
         String name = sb.toString();
         if (StringUtils.isNotBlank(name)) {
             return name.trim();
-        }
-        else return null;
+        } else
+            return null;
     };
 
     public static final ValueExtractor<Object, String> ADMINISTRATIVE_GENDER_CODE_FHIR = (Object value) -> {
@@ -209,7 +205,7 @@ public class SimpleDataValueResolver {
     };
 
     public static final ValueExtractor<Object, String> MEDREQ_STATUS_CODE_FHIR = (Object value) -> {
-    	String val = Hl7DataHandlerUtil.getStringValue(value);
+        String val = Hl7DataHandlerUtil.getStringValue(value);
         String code = getFHIRCode(val, MedicationRequest.MedicationRequestStatus.class);
         if (code != null) {
             return code;
@@ -222,7 +218,8 @@ public class SimpleDataValueResolver {
         String code = getFHIRCode(val, MedicationRequestCategory.class);
         if (code != null) {
             MedicationRequestCategory category = MedicationRequestCategory.fromCode(code);
-            return new SimpleCode(code, "http://terminology.hl7.org/CodeSystem/medicationrequest-category", category.getDisplay()); // category.getSystem() returns http://hl7.org/fhir/medication-request-category which is invalid so we hardcode the system with the proper url
+            return new SimpleCode(code, "http://terminology.hl7.org/CodeSystem/medicationrequest-category",
+                    category.getDisplay()); // category.getSystem() returns http://hl7.org/fhir/medication-request-category which is invalid so we hardcode the system with the proper url
         } else
             return null;
     };
@@ -231,7 +228,7 @@ public class SimpleDataValueResolver {
         String val = Hl7DataHandlerUtil.getStringValue(value);
         return getFHIRCode(val, ObservationStatus.class);
     };
-   
+
     public static final ValueExtractor<Object, SimpleCode> OBSERVATION_STATUS_FHIR = (Object value) -> {
         String val = Hl7DataHandlerUtil.getStringValue(value);
         String code = getFHIRCode(val, ObservationStatus.class);
@@ -241,11 +238,11 @@ public class SimpleDataValueResolver {
         } else {
             // If code is null, it means the code wasn't known in our table, and can't be looked up.
             // Make a message in the display.
-            String theSystem = ObservationStatus.REGISTERED.getSystem();  
+            String theSystem = ObservationStatus.REGISTERED.getSystem();
             return new SimpleCode(null, theSystem, String.format(INVALID_CODE_MESSAGE_SHORT, val, theSystem));
         }
     };
-    
+
     public static final ValueExtractor<Object, String> SERVICE_REQUEST_STATUS = (Object value) -> {
         String val = Hl7DataHandlerUtil.getStringValue(value);
         return getFHIRCode(val, ServiceRequestStatus.class);
@@ -261,8 +258,7 @@ public class SimpleDataValueResolver {
         }
     };
 
-    public static final ValueExtractor<Object, SimpleCode> RELIGIOUS_AFFILIATION_FHIR_CC =
-        (Object value) -> {
+    public static final ValueExtractor<Object, SimpleCode> RELIGIOUS_AFFILIATION_FHIR_CC = (Object value) -> {
         String val = Hl7DataHandlerUtil.getStringValue(value);
         String code = getFHIRCode(val, V3ReligiousAffiliation.class);
         String text = Hl7DataHandlerUtil.getOriginalDisplayText(value);
@@ -274,13 +270,13 @@ public class SimpleDataValueResolver {
         } else {
             // // If code is null, it means the code wasn't known in our table, and can't be looked up.
             // // Make a message in the display.
-            String religionSystem = V3ReligiousAffiliation._1028.getSystem(); 
-            return new SimpleCode(null, religionSystem, String.format(INVALID_CODE_MESSAGE_FULL, val, religionSystem, text, version));
-          }
+            String religionSystem = V3ReligiousAffiliation._1028.getSystem();
+            return new SimpleCode(null, religionSystem,
+                    String.format(INVALID_CODE_MESSAGE_FULL, val, religionSystem, text, version));
+        }
     };
 
-    public static final ValueExtractor<Object, SimpleCode> DIAGNOSIS_USE =
-        (Object value) -> {
+    public static final ValueExtractor<Object, SimpleCode> DIAGNOSIS_USE = (Object value) -> {
         String val = Hl7DataHandlerUtil.getStringValue(value);
         String code = getFHIRCode(val, DiagnosisRole.class);
         if (code != null) {
@@ -291,18 +287,16 @@ public class SimpleDataValueResolver {
         }
     };
 
-    public static final ValueExtractor<Object, SimpleCode> CONDITION_CLINICAL_STATUS_FHIR =
-        (Object value) -> {
+    public static final ValueExtractor<Object, SimpleCode> CONDITION_CLINICAL_STATUS_FHIR = (Object value) -> {
         String val = Hl7DataHandlerUtil.getStringValue(value);
 
         //Test to see if val is a valid code.
         ConditionClinical use = null;
         try {
             use = ConditionClinical.fromCode(val);
-            LOGGER.info("Found ConditionClinical code for '{}'.",val);
-        }
-        catch(FHIRException e) {
-            LOGGER.warn("Could not find ConditionClinical code for '{}'.",val);
+            LOGGER.info("Found ConditionClinical code for '{}'.", val);
+        } catch (FHIRException e) {
+            LOGGER.warn("Could not find ConditionClinical code for '{}'.", val);
         }
 
         if (use != null) { // if it is then setup the simple code
@@ -312,18 +306,16 @@ public class SimpleDataValueResolver {
         }
     };
 
-    public static final ValueExtractor<Object, SimpleCode> CONDITION_VERIFICATION_STATUS_FHIR =
-        (Object value) -> {
+    public static final ValueExtractor<Object, SimpleCode> CONDITION_VERIFICATION_STATUS_FHIR = (Object value) -> {
         String val = Hl7DataHandlerUtil.getStringValue(value);
 
-         //Test to see if val is a valid code.
+        //Test to see if val is a valid code.
         ConditionVerStatus use = null;
-        try{
+        try {
             use = ConditionVerStatus.fromCode(val);
-            LOGGER.info("Found ConditionVerStatus code for '{}'.",val);
-        }
-        catch(FHIRException e) {
-            LOGGER.warn("Could not find ConditionVerStatus code for '{}'.",val);
+            LOGGER.info("Found ConditionVerStatus code for '{}'.", val);
+        } catch (FHIRException e) {
+            LOGGER.warn("Could not find ConditionVerStatus code for '{}'.", val);
         }
         if (use != null) { // if it is then setup the simple code
             return new SimpleCode(val, use.getSystem(), use.getDisplay());
@@ -336,13 +328,13 @@ public class SimpleDataValueResolver {
         String val = Hl7DataHandlerUtil.getStringValue(value);
         String code = getFHIRCode(val, V3ActCode.class);
         String version = Hl7DataHandlerUtil.getVersion(value);
-        if(code != null){
+        if (code != null) {
             V3ActCode act = V3ActCode.fromCode(code);
-            return new SimpleCode( code , act.getSystem(), act.getDisplay(), version);
+            return new SimpleCode(code, act.getSystem(), act.getDisplay(), version);
         } else if (val != null) { // if code does not map but is present, use the "val" as the code
-            return new SimpleCode(val, null,  null);
-        }
-        else return null;
+            return new SimpleCode(val, null, null);
+        } else
+            return null;
     };
 
     public static final ValueExtractor<Object, String> SPECIMEN_STATUS_CODE_FHIR = (Object value) -> {
@@ -360,28 +352,44 @@ public class SimpleDataValueResolver {
         return getFHIRCode(val, NameUse.class);
     };
 
-
     public static final ValueExtractor<Object, String> ENCOUNTER_MODE_ARRIVAL_DISPLAY = (Object value) -> {
         return getFHIRCode(Hl7DataHandlerUtil.getStringValue(value), "EncounterModeOfArrivalDisplay");
     };
-    
-  public static final ValueExtractor<Object, SimpleCode> MARITAL_STATUS =
-      (Object value) -> {
+
+    public static final ValueExtractor<Object, SimpleCode> POLICYHOLDER_RELATIONSHIP = (Object value) -> {
+        String val = Hl7DataHandlerUtil.getStringValue(value);
+        String text = Hl7DataHandlerUtil.getOriginalDisplayText(value);
+        String code = getFHIRCode(val, V3RoleCode.class);
+        String version = Hl7DataHandlerUtil.getVersion(value);
+        if (code != null) {
+            V3RoleCode relationship = V3RoleCode.fromCode(code);
+            return new SimpleCode(code, relationship.getSystem(), relationship.getDisplay(), version);
+        } else {
+            // If code is null, it means the code wasn't known in our table, and can't be looked up.
+            // Make a message in the display.
+            String theSystem = V3RoleCode.PRN.getSystem();
+            return new SimpleCode(null, theSystem,
+                    String.format(INVALID_CODE_MESSAGE_FULL, val, theSystem, text, version));
+        }
+    };
+
+    public static final ValueExtractor<Object, SimpleCode> MARITAL_STATUS = (Object value) -> {
         String val = Hl7DataHandlerUtil.getStringValue(value);
         String text = Hl7DataHandlerUtil.getOriginalDisplayText(value);
         String code = getFHIRCode(val, V3MaritalStatus.class);
         String version = Hl7DataHandlerUtil.getVersion(value);
-        if(code != null){
+        if (code != null) {
             V3MaritalStatus mar = V3MaritalStatus.fromCode(code);
             return new SimpleCode(code, mar.getSystem(), mar.getDisplay(), version);
         } else {
-          // If code is null, it means the code wasn't known in our table, and can't be looked up.
-          // Make a message in the display.
-          String theSystem = V3MaritalStatus.M.getSystem(); 
-          return new SimpleCode(null, theSystem, String.format(INVALID_CODE_MESSAGE_FULL, val, theSystem, text, version));
+            // If code is null, it means the code wasn't known in our table, and can't be looked up.
+            // Make a message in the display.
+            String theSystem = V3MaritalStatus.M.getSystem();
+            return new SimpleCode(null, theSystem,
+                    String.format(INVALID_CODE_MESSAGE_FULL, val, theSystem, text, version));
         }
-  };
-  
+    };
+
     public static final ValueExtractor<Object, Boolean> BOOLEAN = (Object value) -> {
         String val = Hl7DataHandlerUtil.getStringValue(value);
         if (null == val) {
@@ -442,10 +450,10 @@ public class SimpleDataValueResolver {
             // Found table and a code. Try looking it up.
             SimpleCode coding = TerminologyLookup.lookup(table, code);
             // A non-null, non-empty value in display means a good code from lookup.
-            if (coding != null && coding.getDisplay()!=null && !coding.getDisplay().isEmpty()) {
+            if (coding != null && coding.getDisplay() != null && !coding.getDisplay().isEmpty()) {
                 return coding;
-            } 
-        }    
+            }
+        }
         // All other situations return null.  
         return null;
     };
@@ -462,11 +470,11 @@ public class SimpleDataValueResolver {
             // Found table and a code. Try looking it up.
             SimpleCode coding = TerminologyLookup.lookup(table, code);
             // A non-null, non-empty value in display means a good code from lookup.
-            if (coding != null && coding.getDisplay()!=null && !coding.getDisplay().isEmpty()) {
+            if (coding != null && coding.getDisplay() != null && !coding.getDisplay().isEmpty()) {
                 return coding;
-            } else { 
+            } else {
                 // Otherwise, must be a user-defined code, so return the code without a system
-                return new SimpleCode(code, null, null, null) ;
+                return new SimpleCode(code, null, null, null);
             }
         } else if (table == null && code != null) {
             // Handle a code with unknown table
@@ -482,11 +490,11 @@ public class SimpleDataValueResolver {
         if (value instanceof CWE) {
             CWE cwe = (CWE) value;
             String table = Hl7DataHandlerUtil.getStringValue(cwe.getCwe6_NameOfAlternateCodingSystem());
-            String code = Hl7DataHandlerUtil.getStringValue(cwe.getCwe4_AlternateIdentifier()); 
+            String code = Hl7DataHandlerUtil.getStringValue(cwe.getCwe4_AlternateIdentifier());
             String text = Hl7DataHandlerUtil.getStringValue(cwe.getCwe5_AlternateText());
             String version = Hl7DataHandlerUtil.getStringValue(cwe.getCwe8_AlternateCodingSystemVersionID());
             return commonCodingSystemV2(table, code, text, version);
-        } 
+        }
         return null;
     };
 
@@ -502,20 +510,20 @@ public class SimpleDataValueResolver {
     // For OBX.5 and other dynamic encoded fields, the real class is wrapped in the Varies class, and must be extracted from data
     private static final Object checkForAndUnwrapVariesObject(Object value) {
         if (value instanceof Varies) {
-            Varies v = (Varies)value;
+            Varies v = (Varies) value;
             value = v.getData();
         }
-        return value;    
+        return value;
     }
 
-    private static final SimpleCode commonCodingSystemV2 (String table, String code, String text, String version) {
+    private static final SimpleCode commonCodingSystemV2(String table, String code, String text, String version) {
         if (table != null && code != null) {
             // Found table and a code. Try looking it up.
             SimpleCode coding = TerminologyLookup.lookup(table, code);
             if (coding != null) {
                 String display = coding.getDisplay();
                 // Successful display confirms a valid code and system 
-                if (display != null ) {
+                if (display != null) {
 
                     if (display.isEmpty()) {
                         // We have a table, code, but unknown display, so we can't tell if it's good, use the original display text
@@ -526,11 +534,12 @@ public class SimpleDataValueResolver {
                     return coding;
                 } else {
                     // Display was not found; create an error message in the display text
-                    return new SimpleCode(null, coding.getSystem(), String.format(INVALID_CODE_MESSAGE_FULL, code, coding.getSystem(), text, version));
+                    return new SimpleCode(null, coding.getSystem(),
+                            String.format(INVALID_CODE_MESSAGE_FULL, code, coding.getSystem(), text, version));
                 }
-            } else { 
+            } else {
                 // No success looking up the code, build our own fall-back system using table name
-                return new SimpleCode(code, "urn:id:"+table, text, version) ;
+                return new SimpleCode(code, "urn:id:" + table, text, version);
             }
         } else if (code != null) {
             // A code but no system: build a simple systemless code
@@ -540,30 +549,30 @@ public class SimpleDataValueResolver {
         }
     }
 
-
     public static final ValueExtractor<Object, String> BUILD_IDENTIFIER_FROM_CWE = (Object value) -> {
-        if (value instanceof Varies){
+        if (value instanceof Varies) {
             Varies variesValue = ((Varies) value);
-            if(variesValue.getData() instanceof CWE) {
+            if (variesValue.getData() instanceof CWE) {
                 value = (CWE) variesValue.getData();
             }
         }
-       if(value instanceof CWE) {
-           CWE newValue = ((CWE) value);
-           String identifier = newValue.getCwe1_Identifier().toString();
-           String text = newValue.getCwe2_Text().toString();
-           String codingSystem = newValue.getCwe3_NameOfCodingSystem().toString();
-           if (identifier != null) {
-               if (codingSystem != null) {
-                   String join = identifier + "-" + codingSystem;
-                   return join;
-               } else {
-                   return identifier;
-               }
-           } else return text;
-       }
+        if (value instanceof CWE) {
+            CWE newValue = ((CWE) value);
+            String identifier = newValue.getCwe1_Identifier().toString();
+            String text = newValue.getCwe2_Text().toString();
+            String codingSystem = newValue.getCwe3_NameOfCodingSystem().toString();
+            if (identifier != null) {
+                if (codingSystem != null) {
+                    String join = identifier + "-" + codingSystem;
+                    return join;
+                } else {
+                    return identifier;
+                }
+            } else
+                return text;
+        }
 
-       return null;
+        return null;
     };
 
     public static final ValueExtractor<Object, String> ALLERGY_INTOLERANCE_CRITICALITY_CODE_FHIR = (Object value) -> {
@@ -584,21 +593,20 @@ public class SimpleDataValueResolver {
     public static final ValueExtractor<Object, String> DOSE_VALUE = (Object value) -> {
         String val = Hl7DataHandlerUtil.getStringValue(value);
 
-        if (val.startsWith("999") ){
+        if (val.startsWith("999")) {
             // 999 is used when the vaccination is refused. In this case we should return null.
             return null;
-        }
-        else return val;
+        } else
+            return val;
 
     };
 
     public static final ValueExtractor<Object, String> DOSE_SYSTEM = (Object value) -> {
         String val = Hl7DataHandlerUtil.getStringValue(value);
         String url = UrlLookup.getAssociatedUrl(val);
-        if (url != null){
+        if (url != null) {
             return url;
-        }
-        else {
+        } else {
             if (val != null && val.length() > 0) {
                 return "urn:id:" + val.replace(" ", "_");
             }
@@ -608,9 +616,8 @@ public class SimpleDataValueResolver {
 
     public static final ValueExtractor<Object, String> SYSTEM_URL = (Object value) -> {
         String val = Hl7DataHandlerUtil.getStringValue(value);
-      return UrlLookup.getAssociatedUrl(val);
+        return UrlLookup.getAssociatedUrl(val);
     };
-
 
     // Convert an authority string to a valid system value
     // Prepend "urn:id:"; convert any spaces to underscores
@@ -669,7 +676,6 @@ public class SimpleDataValueResolver {
         return null;
     };
 
-
     public static final ValueExtractor<Object, SimpleCode> MESSAGE_REASON_ENCOUNTER = (Object value) -> {
         String val = Hl7DataHandlerUtil.getStringValue(value);
         String code = getFHIRCode(val, MessageReasonEncounter.class);
@@ -677,11 +683,27 @@ public class SimpleDataValueResolver {
             MessageReasonEncounter en = MessageReasonEncounter.fromCode(code);
             return new SimpleCode(code, en.getSystem(), en.getDisplay());
         } else {
-          // If code is null, it means the code wasn't known in our table, and can't be looked up.
-          // Make a message in the display.
-          String theSystem = MessageReasonEncounter.ADMIT.getSystem();  
-          return new SimpleCode(null, theSystem, String.format(INVALID_CODE_MESSAGE_SHORT, val, theSystem));
+            // If code is null, it means the code wasn't known in our table, and can't be looked up.
+            // Make a message in the display.
+            String theSystem = MessageReasonEncounter.ADMIT.getSystem();
+            return new SimpleCode(null, theSystem, String.format(INVALID_CODE_MESSAGE_SHORT, val, theSystem));
         }
+    };
+
+    public static final ValueExtractor<Object, String> PATIENT_INSTRUCTION = (Object value) -> {
+        if (value instanceof CWE) {
+            CWE cwe = (CWE) value;
+            String cwe1 = cwe.getCwe1_Identifier().toString();
+            String cwe2 = cwe.getCwe2_Text().toString();
+            if (cwe1 != null) {
+                if (cwe2 != null) {
+                    return cwe1 + ":" + cwe2;
+                }
+            } else if (cwe1 == null) {
+                return cwe2;
+            }
+        }
+        return null;
     };
 
     private SimpleDataValueResolver() {
@@ -715,7 +737,7 @@ public class SimpleDataValueResolver {
     }
 
     public static String getFHIRCode(String hl7Value, Class<?> fhirConceptClassName) {
-    	return getFHIRCode(hl7Value,fhirConceptClassName.getSimpleName());
+        return getFHIRCode(hl7Value, fhirConceptClassName.getSimpleName());
     }
 
     public static String getFHIRCode(String hl7Value, String fhirMappingConceptName) {

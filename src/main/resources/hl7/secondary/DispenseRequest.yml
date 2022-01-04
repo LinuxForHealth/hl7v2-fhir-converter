@@ -8,3 +8,65 @@ validityPeriod:
   expressionType: resource
   vars:
     start: $timestamp
+
+initialFill:
+  valueOf: secondary/InitialFill
+  expressionType: resource
+  specs: RXE
+
+# Quantity can come from to segments. The first one is RXO if neither RXO.11 && RXO.12.3 are present we fallback to RXE (RXE.10  RXE.11.3)
+quantity_1:
+  condition: $rxo11 NOT_NULL && $rxo123 NULL
+  valueOf: datatype/Quantity
+  expressionType: resource
+  specs: RXO.11 | RXO.12
+  vars:
+    rxo11: RXO.11
+    rxo123: RXO.12.3
+    value: RXO.11
+    unit: RXO.12.1
+    resolvedSystem: $uom
+  constants:
+    uom: "http://unitsofmeasure.org"
+
+quantity_2:
+  condition: $rxo11 NOT_NULL && $rxo123 NOT_NULL
+  valueOf: datatype/Quantity
+  expressionType: resource
+  specs: RXO.11 | RXO.12
+  vars:
+    rxo11: RXO.11
+    rxo123: RXO.12.3
+    value: RXO.11
+    unit: RXO.12.1
+    sys: RXO.12.3
+
+quantity_3:
+  condition: $rxo11 NULL && $rxe10 NOT_NULL && $rxe113 NULL
+  valueOf: datatype/Quantity
+  expressionType: resource
+  specs: RXE.10 | RXE.11
+  vars:
+    rxo11: RXO.11
+    rxe113: RXE.11.3
+    rxe10: RXE.10
+    value: RXE.10
+    unit: RXE.11.1
+    resolvedSystem: $uom
+  constants:
+    uom: "http://unitsofmeasure.org"
+
+quantity_4:
+  condition: $rxo11 NULL && $rxe10 NOT_NULL && $rxe113 NOT_NULL
+  valueOf: datatype/Quantity
+  expressionType: resource
+  specs: RXE.10 | RXE.11
+  vars:
+    rxo11: RXO.11
+    rxe113: RXE.11.3
+    rxe10: RXE.10
+    value: RXE.10
+    unit: RXE.11.1
+    sys: RXE.11.3
+  constants:
+    urn: "urn:id:"
