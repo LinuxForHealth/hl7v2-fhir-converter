@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 ---
-rateRatio_1:
+rateRatio_1: # gets rateRatio from RXO
   condition: $rxo21 NOT_NULL
   valueOf: datatype/Ratio
   expressionType: resource
@@ -19,7 +19,7 @@ rateRatio_1:
     denomUnit: "day"
     denomVal: "1"
 
-rateRatio_2:
+rateRatio_2: # gets rateRatio from RXE
   condition: $rxe23 NOT_NULL && $rxo21 NULL
   valueOf: datatype/Ratio
   expressionType: resource
@@ -36,7 +36,7 @@ rateRatio_2:
     denomUnit: "day"
     denomVal: "1"
 
-doseQuantity_1:
+doseQuantity_1: # gets doseQuantity from RXO
   condition: $rxo2 NOT_NULL && $rxo3 NULL
   valueOf: datatype/Quantity
   expressionType: resource
@@ -50,7 +50,7 @@ doseQuantity_1:
   constants:
     unitSys: "http://unitsofmeasure.org"
 
-doseQuantity_2:
+doseQuantity_2: # gets doseQuantity from RXE
   condition: $rxo2 NULL && $rxe3 NOT_NULL && $rxe4 NULL
   valueOf: datatype/Quantity
   expressionType: resource
@@ -65,4 +65,35 @@ doseQuantity_2:
   constants:
     unitSys: "http://unitsofmeasure.org"
 
-# TODO: doseRange:
+doseRange_1: # gets doseRange from RXO
+  condition: $rxo2 NOT_NULL && $rxo3 NOT_NULL
+  valueOf: datatype/Range
+  expressionType: resource
+  vars:
+    rxo2: RXO.2
+    rxo3: RXO.3
+    highVal: RXO.3
+    highUnit: RXO.4.1
+    lowVal: RXO.2
+    lowUnit: RXO.4.1
+    unitSystem: RXO.4.3 | $unitSys
+  constants:
+    unitSys: "http://unitsofmeasure.org"
+    val: "1"
+
+doseRange_2: # gets doseRange from RXE
+  condition: $rxo2 NULL && $rxe3 NOT_NULL && $rxe4 NOT_NULL
+  valueOf: datatype/Range
+  expressionType: resource
+  vars:
+    rxo2: RXO.2
+    rxe3: RXE.3
+    rxe4: RXE.4
+    highVal: RXE.4
+    highUnit: RXE.5.1
+    lowVal: RXE.3
+    lowUnit: RXE.5.1
+    unitSystem: RXE.5.3 | $unitSys
+  constants:
+    unitSys: "http://unitsofmeasure.org"
+    val: "1"

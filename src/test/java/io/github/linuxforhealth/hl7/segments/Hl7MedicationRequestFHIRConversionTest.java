@@ -14,19 +14,9 @@ import java.util.List;
 import java.util.TimeZone;
 import java.util.stream.Collectors;
 
+import org.hl7.fhir.r4.model.*;
 import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
-import org.hl7.fhir.r4.model.CodeableConcept;
-import org.hl7.fhir.r4.model.Extension;
-import org.hl7.fhir.r4.model.HumanName;
-import org.hl7.fhir.r4.model.Identifier;
-import org.hl7.fhir.r4.model.MedicationRequest;
 import org.hl7.fhir.r4.model.MedicationRequest.MedicationRequestStatus;
-import org.hl7.fhir.r4.model.Patient;
-import org.hl7.fhir.r4.model.Practitioner;
-import org.hl7.fhir.r4.model.Ratio;
-import org.hl7.fhir.r4.model.Quantity;
-import org.hl7.fhir.r4.model.Resource;
-import org.hl7.fhir.r4.model.ResourceType;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -596,8 +586,8 @@ class Hl7MedicationRequestFHIRConversionTest {
         // Get DispenseRequest from RXO segment(RXO.11, RXO.12.1 and default system)
         String hl7message = "MSH|^~\\\\&|||||20210101000000||OMP^O09|MSGID|T|2.6\n"
                 + "PID|||1234||DOE^JANE^|||F||||||||||||||||||||||\n"
-                + "PV1||I|^^^Toronto^^5642 Hilly Av||||||770542^Doctor^Consulting^Jr||||||||||Visit_111|||||||||||||||||||||||||20210101000000\n"
-                + "ORC|OP|1234|1234|0827|||||20210101000000||||||20210101000000||||||ORDERING FAC NAME||(9\n"
+                + "PV1||I|||||||||||||||||Visit_111|||||||||||||||||||||||||20210101000000\n"
+                + "ORC|OP||||||||||||||20210101000000||||||||\n"
                 + "RXO|00054418425^Dexamethasone 4 MG Oral Tablet^NDC^^^^^^dexamethasone (DECADRON) 4 MG TABS|||||"
                 // split and concatenate RXO for easier understanding
                 + "|Take 1 tablet by mouth every 6 (six) hours.||G||4|tablet^tablet|0|222^JONES^JON^E.|||||||||7^PC|^DECADRON\n" // RXO 11 & 12 are on this line
@@ -617,6 +607,10 @@ class Hl7MedicationRequestFHIRConversionTest {
         assertThat(disReq.getQuantity().getValue().toString()).isEqualTo("4.0");
         assertThat(disReq.getQuantity().getUnit()).isEqualTo("tablet");
         assertThat(disReq.getQuantity().getSystem()).isEqualTo("http://unitsofmeasure.org");
+
+        // Verify no extraneous resources
+        // Expect MedicationRequest, Patient, and Encounter
+        assertThat(e).hasSize(3);
     }
 
     @Test
@@ -624,10 +618,10 @@ class Hl7MedicationRequestFHIRConversionTest {
         // Get DispenseRequest from RXE segment (RXE.10, RXE.11.1 and RXE.11.3)
         String hl7message = "MSH|^~\\&||||||S1|RDE^O11||T|2.6|||||||||\n"
                     + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
-                    + "ORC|NW|||||E|10^BID^D4^^^R||20180622230000||||||||||||||||||||I\n"
-                    + "RXE|^Q24H&0600^^20210330144208^^ROU|DUONEB3INH^3 ML PLAS CONT : IPRATROPIUM-ALBUTEROL 0.5-2.5 (3) MG/3ML IN SOLN^ADS^^^^^^ipratropium-albuterol (DUONEB) nebulizer solution 3 mL|3||mL|47|||"
+                    + "ORC|NW|||||E|||||||||||||||||||||||I\n"
+                    + "RXE||DUONEB3INH^3 ML PLAS CONT : IPRATROPIUM-ALBUTEROL 0.5-2.5 (3) MG/3ML IN SOLN^ADS^^^^^^ipratropium-albuterol (DUONEB) nebulizer solution 3 mL|||||||"
                     // split and concatenate RXE for easier understanding
-                    + "|1|PC^^measureofunits||2213^ORDERING^PROVIDER||||||||||||||Wheezing^Wheezing^PRN||||^DUONEB|20180622230000||||||7|7|7\n"; // RXE 10 & 11 are on this line
+                    + "|1|PC^^measureofunits||||||||||||||||||||^DUONEB|||||||7|7|7\n"; // RXE 10 & 11 are on this line
 
         List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
 
@@ -646,6 +640,10 @@ class Hl7MedicationRequestFHIRConversionTest {
 
             // dispenseRequest.InitialFIll.Quantity comes from RXE.39
             assertThat(disReq.getInitialFill().getQuantity().getValue().toString()).isEqualTo("7.0");
+
+        // Verify no extraneous resources
+        // Expect MedicationRequest, Patient
+        assertThat(e).hasSize(2);
     }
 
     @Test
@@ -653,8 +651,8 @@ class Hl7MedicationRequestFHIRConversionTest {
         // Test dosageInstruction.maxDosePerPeriod from RXO.23
         String hl7message = "MSH|^~\\\\&|||||20210101000000||OMP^O09|MSGID|T|2.6\n"
                 + "PID|||1234||DOE^JANE^|||F||||||||||||||||||||||\n"
-                + "PV1||I|^^^Toronto^^5642 Hilly Av||||||770542^Doctor^Consulting^Jr||||||||||Visit_111|||||||||||||||||||||||||20210101000000\n"
-                + "ORC|OP|1234|1234|0827|||||20210101000000||||||20210101000000||||||ORDERING FAC NAME||(9\n"
+                + "PV1||I|||||||||||||||||Visit_111|||||||||||||||||||||||||20210101000000\n"
+                + "ORC|OP||||||||||||||20210101000000||||||||\n"
                 + "RXO|00054418425^Dexamethasone 4 MG Oral Tablet^NDC^^^^^^dexamethasone (DECADRON) 4 MG TABS|||||"
                 // split and concatenate RXO for easier understanding
                 + "|Take 1 tablet by mouth every 6 (six) hours.||G||4|tablet^tablet|0|222^JONES^JON^E.|||||||||7^PC|^DECADRON\n" // RXO 23 is on this line
@@ -679,6 +677,10 @@ class Hl7MedicationRequestFHIRConversionTest {
         assertThat(maxDose.getDenominator().getValue().toString()).isEqualTo("1.0");
         assertThat(maxDose.getDenominator().getUnit()).isEqualTo("day");
         assertThat(maxDose.getDenominator().getSystem()).isEqualTo("http://unitsofmeasure.org");
+
+        // Verify no extraneous resources
+        // Expect MedicationRequest, Patient, and Encounter
+        assertThat(e).hasSize(3);
     }
 
     @Test
@@ -686,10 +688,10 @@ class Hl7MedicationRequestFHIRConversionTest {
         // Test dosageInstruction.maxDosePerPeriod
         String hl7message = "MSH|^~\\&||||||S1|RDE^O11||T|2.6|||||||||\n"
                 + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
-                + "ORC|NW|||||E|10^BID^D4^^^R||20180622230000||||||||||||||||||||I\n"
-                + "RXE|^Q24H&0600^^20210330144208^^ROU|DUONEB3INH^3 ML PLAS CONT : IPRATROPIUM-ALBUTEROL 0.5-2.5 (3) MG/3ML IN SOLN^ADS^^^^^^ipratropium-albuterol (DUONEB) nebulizer solution 3 mL|3||mL|47|||"
+                + "ORC|NW|||||E|||||||||||||||||||||||I\n"
+                + "RXE||DUONEB3INH^3 ML PLAS CONT : IPRATROPIUM-ALBUTEROL 0.5-2.5 (3) MG/3ML IN SOLN^ADS^^^^^^ipratropium-albuterol (DUONEB) nebulizer solution 3 mL|3||||||"
                 // split and concatenate RXE for easier understanding
-                + "|1|PC^^measureofunits||2213^ORDERING^PROVIDER||||||5^PC||||||||Wheezing^Wheezing^PRN||||^DUONEB|20180622230000||||||7|7|7\n"; // RXE.19 is on this line
+                + "|1|||||||||5^PC||||||||Wheezing^Wheezing^PRN||||^DUONEB|||||||7|7|7\n"; // RXE.19 is on this line
 
         List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
 
@@ -710,6 +712,10 @@ class Hl7MedicationRequestFHIRConversionTest {
         assertThat(maxDose.getDenominator().getValue().toString()).isEqualTo("1.0");
         assertThat(maxDose.getDenominator().getUnit()).isEqualTo("day");
         assertThat(maxDose.getDenominator().getSystem()).isEqualTo("http://unitsofmeasure.org");
+
+        // Verify no extraneous resources
+        // Expect MedicationRequest, Patient
+        assertThat(e).hasSize(2);
     }
 
     @Test
@@ -717,8 +723,8 @@ class Hl7MedicationRequestFHIRConversionTest {
         // Test dosageInstruction.patietInstruction (RXO.7)
         String hl7message = "MSH|^~\\\\&|||||20210101000000||OMP^O09|MSGID|T|2.6\n"
                 + "PID|||1234||DOE^JANE^|||F||||||||||||||||||||||\n"
-                + "PV1||I|^^^Toronto^^5642 Hilly Av||||||770542^Doctor^Consulting^Jr||||||||||Visit_111|||||||||||||||||||||||||20210101000000\n"
-                + "ORC|OP|1234|1234|0827|||||20210101000000||||||20210101000000||||||ORDERING FAC NAME||(9\n"
+                + "PV1||I|||||||||||||||||Visit_111|||||||||||||||||||||||||20210101000000\n"
+                + "ORC|OP||||||||||||||20210101000000||||||||\n"
                 + "RXO|00054418425^Dexamethasone 4 MG Oral Tablet^NDC^^^^^^dexamethasone (DECADRON) 4 MG TABS|||||"
                 // split and concatenate RXO for easier understanding
                 + "|^Take 1 tablet by mouth every 6 (six) hours.||G||4|tablet^tablet|0|222^JONES^JON^E.|||||||||7^PC|^DECADRON\n" // RXO.7 is on this line ("^Take 1 tablet by mouth every 6 (six) hours.")
@@ -736,6 +742,10 @@ class Hl7MedicationRequestFHIRConversionTest {
 
         // dosageInstruction.patientInstruction (RXO.7.2)
         assertThat(patInstruct).isEqualTo("Take 1 tablet by mouth every 6 (six) hours.");
+
+        // Verify no extraneous resources
+        // Expect MedicationRequest, Patient, and Encounter
+        assertThat(e).hasSize(3);
     }
 
     @Test
@@ -743,10 +753,10 @@ class Hl7MedicationRequestFHIRConversionTest {
         // Test dosageInstruction.patietInstruction (RXE.7)
         String hl7message = "MSH|^~\\&||||||S1|RDE^O11||T|2.6|||||||||\n"
                 + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
-                + "ORC|NW|||||E|10^BID^D4^^^R||20180622230000||||||||||||||||||||I\n"
-                + "RXE|^Q24H&0600^^20210330144208^^ROU|DUONEB3INH^3 ML PLAS CONT : IPRATROPIUM-ALBUTEROL 0.5-2.5 (3) MG/3ML IN SOLN^ADS^^^^^^ipratropium-albuterol (DUONEB) nebulizer solution 3 mL|3||mL|47|333^Take 1 tablet by mouth every 6 (six) hours.||" // RXE.7 is on this line ("333^Take 1 tablet by mouth every 6 (six) hours.")
+                + "ORC|NW|||||E|||||||||||||||||||||||I\n"
+                + "RXE||DUONEB3INH^3 ML PLAS CONT : IPRATROPIUM-ALBUTEROL 0.5-2.5 (3) MG/3ML IN SOLN^ADS^^^^^^ipratropium-albuterol (DUONEB) nebulizer solution 3 mL|||||333^Take 1 tablet by mouth every 6 (six) hours.||" // RXE.7 is on this line ("333^Take 1 tablet by mouth every 6 (six) hours.")
                 // split and concatenate RXE for easier understanding
-                + "|1|PC^^measureofunits||2213^ORDERING^PROVIDER||||||5^PC||||||||Wheezing^Wheezing^PRN||||^DUONEB|20180622230000||||||7|7|7\n";
+                + "|1|||||||||5^PC||||||||Wheezing^Wheezing^PRN||||^DUONEB|||||||7|7|7\n";
 
         List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
 
@@ -760,6 +770,10 @@ class Hl7MedicationRequestFHIRConversionTest {
 
         // dosageInstruction.patientInstruction (RXE.7.1 and 7.2 separated by a ':')
         assertThat(patInstruct).isEqualTo("333:Take 1 tablet by mouth every 6 (six) hours.");
+
+        // Verify no extraneous resources
+        // Expect MedicationRequest, Patient
+        assertThat(e).hasSize(2);
     }
 
     @Test
@@ -767,8 +781,8 @@ class Hl7MedicationRequestFHIRConversionTest {
         // Test dosageInstruction.text (RXO.6)
         String hl7message = "MSH|^~\\\\&|||||20210101000000||OMP^O09|MSGID|T|2.6\n"
                 + "PID|||1234||DOE^JANE^|||F||||||||||||||||||||||\n"
-                + "PV1||I|^^^Toronto^^5642 Hilly Av||||||770542^Doctor^Consulting^Jr||||||||||Visit_111|||||||||||||||||||||||||20210101000000\n"
-                + "ORC|OP|1234|1234|0827|||||20210101000000||||||20210101000000||||||ORDERING FAC NAME||(9\n"
+                + "PV1||I|||||||||||||||||Visit_111|||||||||||||||||||||||||20210101000000\n"
+                + "ORC|OP||||||||||||||20210101000000||||||||\n"
                 + "RXO|00054418425^Dexamethasone 4 MG Oral Tablet^NDC^^^^^^dexamethasone (DECADRON) 4 MG TABS||||"
                 // split and concatenate RXO for easier understanding
                 + "|^Take 1 tablet by mouth every 6 (six) hours.|||G||4|tablet^tablet|0|222^JONES^JON^E.|||||||||7^PC|^DECADRON\n" // RXO.6 is on this line ("^Take 1 tablet by mouth every 6 (six) hours.")
@@ -786,6 +800,10 @@ class Hl7MedicationRequestFHIRConversionTest {
 
         // dosageInstruction.text (RXO.6.2)
         assertThat(txt).isEqualTo("Take 1 tablet by mouth every 6 (six) hours.");
+
+        // Verify no extraneous resources
+        // Expect MedicationRequest, Patient, and Encounter
+        assertThat(e).hasSize(3);
     }
 
     @Test
@@ -793,10 +811,10 @@ class Hl7MedicationRequestFHIRConversionTest {
         // Test dosageInstruction.text (RXE.21)
         String hl7message = "MSH|^~\\&||||||S1|RDE^O11||T|2.6|||||||||\n"
                 + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
-                + "ORC|NW|||||E|10^BID^D4^^^R||20180622230000||||||||||||||||||||I\n"
-                + "RXE|^Q24H&0600^^20210330144208^^ROU|DUONEB3INH^3 ML PLAS CONT : IPRATROPIUM-ALBUTEROL 0.5-2.5 (3) MG/3ML IN SOLN^ADS^^^^^^ipratropium-albuterol (DUONEB) nebulizer solution 3 mL|3||mL|47|||"
+                + "ORC|NW|||||E|||||||||||||||||||||||I\n"
+                + "RXE||DUONEB3INH^3 ML PLAS CONT : IPRATROPIUM-ALBUTEROL 0.5-2.5 (3) MG/3ML IN SOLN^ADS^^^^^^ipratropium-albuterol (DUONEB) nebulizer solution 3 mL|||||||"
                 // split and concatenate RXE for easier understanding
-                + "|1|PC^^measureofunits||2213^ORDERING^PROVIDER||||||5^PC||333^Take 1 tablet by mouth every 6 (six) hours.||||||Wheezing^Wheezing^PRN||||^DUONEB|20180622230000||||||7|7|7\n"; // RXE.21 is on this line ("333^Take 1 tablet by mouth every 6 (six) hours.")
+                + "|1|||||||||5^PC||333^Take 1 tablet by mouth every 6 (six) hours.|||||||||||||||||7|7|7\n"; // RXE.21 is on this line ("333^Take 1 tablet by mouth every 6 (six) hours.")
 
         List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
 
@@ -810,6 +828,10 @@ class Hl7MedicationRequestFHIRConversionTest {
 
         // dosageInstruction.text (RXE.21.1 and 21.2 separated by a ':')
         assertThat(txt).isEqualTo("333:Take 1 tablet by mouth every 6 (six) hours.");
+
+        // Verify no extraneous resources
+        // Expect MedicationRequest, Patient
+        assertThat(e).hasSize(2);
     }
 
     @Test
@@ -817,8 +839,8 @@ class Hl7MedicationRequestFHIRConversionTest {
         // Test dosageInstruction.Route (RXO.5)
         String hl7message = "MSH|^~\\\\&|||||20210101000000||OMP^O09|MSGID|T|2.6\n"
                 + "PID|||1234||DOE^JANE^|||F||||||||||||||||||||||\n"
-                + "PV1||I|^^^Toronto^^5642 Hilly Av||||||770542^Doctor^Consulting^Jr||||||||||Visit_111|||||||||||||||||||||||||20210101000000\n"
-                + "ORC|OP|1234|1234|0827|||||20210101000000||||||20210101000000||||||ORDERING FAC NAME||(9\n"
+                + "PV1||I|||||||||||||||||Visit_111|||||||||||||||||||||||||20210101000000\n"
+                + "ORC|OP||||||||||||||20210101000000||||||||\n"
                 + "RXO|00054418425^Dexamethasone 4 MG Oral Tablet^NDC^^^^^^dexamethasone (DECADRON) 4 MG TABS||||6064005^Topical route^http://snomed.info/sct" // RXO.5 is on this line ("6064005^Topical route^http://snomed.info/sct")
                 // split and concatenate RXO for easier understanding
                 + "|^Take 1 tablet by mouth every 6 (six) hours.|||G||4|tablet^tablet|0|222^JONES^JON^E.|||||||||7^PC|^DECADRON\n"
@@ -840,6 +862,9 @@ class Hl7MedicationRequestFHIRConversionTest {
         assertThat(route.getCodingFirstRep().getSystem()).isEqualTo("http://snomed.info/sct"); //5.3
         assertThat(route.getText()).isEqualTo("Topical route"); //5.2
 
+        // Verify no extraneous resources
+        // Expect MedicationRequest, Patient, and Encounter
+        assertThat(e).hasSize(3);
     }
 
     @Test
@@ -847,10 +872,10 @@ class Hl7MedicationRequestFHIRConversionTest {
         // Test dosageInstruction.Route (RXE.6)
         String hl7message = "MSH|^~\\&||||||S1|RDE^O11||T|2.6|||||||||\n"
                 + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
-                + "ORC|NW|||||E|10^BID^D4^^^R||20180622230000||||||||||||||||||||I\n"
-                + "RXE|^Q24H&0600^^20210330144208^^ROU|DUONEB3INH^3 ML PLAS CONT : IPRATROPIUM-ALBUTEROL 0.5-2.5 (3) MG/3ML IN SOLN^ADS^^^^^^ipratropium-albuterol (DUONEB) nebulizer solution 3 mL|3||mL|6064005|||"// RXE.6 is on this line ("6064005")
+                + "ORC|NW|||||E|||||||||||||||||||||||I\n"
+                + "RXE||DUONEB3INH^3 ML PLAS CONT : IPRATROPIUM-ALBUTEROL 0.5-2.5 (3) MG/3ML IN SOLN^ADS^^^^^^ipratropium-albuterol (DUONEB) nebulizer solution 3 mL||||6064005|||"// RXE.6 is on this line ("6064005")
                 // split and concatenate RXE for easier understanding
-                + "|1|PC^^measureofunits||2213^ORDERING^PROVIDER||||||5^PC||333^Take 1 tablet by mouth every 6 (six) hours.||||||Wheezing^Wheezing^PRN||||^DUONEB|20180622230000||||||7|7|7\n";
+                + "|1|PC^^measureofunits||||||||5^PC||||||||||||^DUONEB|20180622230000||||||7|7|7\n";
 
         List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
 
@@ -868,6 +893,9 @@ class Hl7MedicationRequestFHIRConversionTest {
         assertThat(route.getCodingFirstRep().getSystem()).isNull(); //6.3
         assertThat(route.getText()).isNull(); //6.2
 
+        // Verify no extraneous resources
+        // Expect MedicationRequest, Patient
+        assertThat(e).hasSize(2);
     }
 
     @Test
@@ -875,8 +903,8 @@ class Hl7MedicationRequestFHIRConversionTest {
         // Test dosageInstruction.RateRatio (RXO.21)
         String hl7message = "MSH|^~\\\\&|||||20210101000000||OMP^O09|MSGID|T|2.6\n"
                 + "PID|||1234||DOE^JANE^|||F||||||||||||||||||||||\n"
-                + "PV1||I|^^^Toronto^^5642 Hilly Av||||||770542^Doctor^Consulting^Jr||||||||||Visit_111|||||||||||||||||||||||||20210101000000\n"
-                + "ORC|OP|1234|1234|0827|||||20210101000000||||||20210101000000||||||ORDERING FAC NAME||(9\n"
+                + "PV1||I|||||||||||||||||Visit_111|||||||||||||||||||||||||20210101000000\n"
+                + "ORC|OP||||||||||||||20210101000000||||||||\n"
                 + "RXO|00054418425^Dexamethasone 4 MG Oral Tablet^NDC^^^^^^dexamethasone (DECADRON) 4 MG TABS||||6064005^Topical route^http://snomed.info/sct"
                 // split and concatenate RXO for easier understanding
                 + "|^Take 1 tablet by mouth every 6 (six) hours.|||G||4|tablet^tablet|0|222^JONES^JON^E.|||day||||6|PC^^http://unitsofmeasure.org||^DECADRON\n" // RXO.21 and RXO.22 (6|PC^^http://unitsofmeasure.org)
@@ -902,6 +930,9 @@ class Hl7MedicationRequestFHIRConversionTest {
         assertThat(rateRatio.getDenominator().getUnit()).isEqualTo("day");
         assertThat(rateRatio.getDenominator().getSystem()).isEqualTo("http://unitsofmeasure.org");
 
+        // Verify no extraneous resources
+        // Expect MedicationRequest, Patient, and Encounter
+        assertThat(e).hasSize(3);
     }
 
     @Test
@@ -909,10 +940,10 @@ class Hl7MedicationRequestFHIRConversionTest {
         // Test dosageInstruction.RateRatio (RXE.23)
         String hl7message = "MSH|^~\\&||||||S1|RDE^O11||T|2.6|||||||||\n"
                 + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
-                + "ORC|NW|||||E|10^BID^D4^^^R||20180622230000||||||||||||||||||||I\n"
-                + "RXE|^Q24H&0600^^20210330144208^^ROU|DUONEB3INH^3 ML PLAS CONT : IPRATROPIUM-ALBUTEROL 0.5-2.5 (3) MG/3ML IN SOLN^ADS^^^^^^ipratropium-albuterol (DUONEB) nebulizer solution 3 mL|3||mL||||"
+                + "ORC|NW|||||E|||||||||||||||||||||||I\n"
+                + "RXE||DUONEB3INH^3 ML PLAS CONT : IPRATROPIUM-ALBUTEROL 0.5-2.5 (3) MG/3ML IN SOLN^ADS^^^^^^ipratropium-albuterol (DUONEB) nebulizer solution 3 mL|||||||"
                 // split and concatenate RXE for easier understanding
-                + "|1|PC^^measureofunits||2213^ORDERING^PROVIDER|||||day|||333^Take 1 tablet by mouth every 6 (six) hours.||7|PC|||Wheezing^Wheezing^PRN||||^DUONEB|20180622230000||||||7|7|7\n"; // RXE.23 and 24 are on this line (7|PC)
+                + "|1||||||||day|||||7|PC|||Wheezing^Wheezing^PRN||||^DUONEB|20180622230000||||||7|7|7\n"; // RXE.23 and 24 are on this line (7|PC)
 
         List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
 
@@ -934,6 +965,9 @@ class Hl7MedicationRequestFHIRConversionTest {
         assertThat(rateRatio.getDenominator().getUnit()).isEqualTo("day"); //RXE.22
         assertThat(rateRatio.getDenominator().getSystem()).isEqualTo("http://unitsofmeasure.org");
 
+        // Verify no extraneous resources
+        // Expect MedicationRequest, Patient
+        assertThat(e).hasSize(2);
     }
 
     @Test
@@ -941,8 +975,8 @@ class Hl7MedicationRequestFHIRConversionTest {
         // Test dosageInstruction.DoseQuantity (RXO.2)
         String hl7message = "MSH|^~\\\\&|||||20210101000000||OMP^O09|MSGID|T|2.6\n"
                 + "PID|||1234||DOE^JANE^|||F||||||||||||||||||||||\n"
-                + "PV1||I|^^^Toronto^^5642 Hilly Av||||||770542^Doctor^Consulting^Jr||||||||||Visit_111|||||||||||||||||||||||||20210101000000\n"
-                + "ORC|OP|1234|1234|0827|||||20210101000000||||||20210101000000||||||ORDERING FAC NAME||(9\n"
+                + "PV1||I|||||||||||||||||Visit_111|||||||||||||||||||||||||20210101000000\n"
+                + "ORC|OP||||||||||||||20210101000000||||||||\n"
                 + "RXO|00054418425^Dexamethasone 4 MG Oral Tablet^NDC^^^^^^dexamethasone (DECADRON) 4 MG TABS|100||CC|" // RXO.2 and 4 are on this line (100||CC)
                 // split and concatenate RXO for easier understanding
                 + "|^Take 1 tablet by mouth every 6 (six) hours.|||G||4|tablet^tablet|0|222^JONES^JON^E.|||day||||6|PC^^http://unitsofmeasure.org||^DECADRON\n"
@@ -963,6 +997,9 @@ class Hl7MedicationRequestFHIRConversionTest {
         assertThat(doseQuantity.getUnit()).isEqualTo("CC"); //RXO.4.1
         assertThat(doseQuantity.getSystem()).isEqualTo("http://unitsofmeasure.org"); //default
 
+        // Verify no extraneous resources
+        // Expect MedicationRequest, Patient, and Encounter
+        assertThat(e).hasSize(3);
     }
 
     @Test
@@ -970,10 +1007,10 @@ class Hl7MedicationRequestFHIRConversionTest {
         // Test dosageInstruction.DoseQuantity (RXE.3)
         String hl7message = "MSH|^~\\&||||||S1|RDE^O11||T|2.6|||||||||\n"
                 + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
-                + "ORC|NW|||||E|10^BID^D4^^^R||20180622230000||||||||||||||||||||I\n"
-                + "RXE|^Q24H&0600^^20210330144208^^ROU|DUONEB3INH^3 ML PLAS CONT : IPRATROPIUM-ALBUTEROL 0.5-2.5 (3) MG/3ML IN SOLN^ADS^^^^^^ipratropium-albuterol (DUONEB) nebulizer solution 3 mL|3||mL||||"// RXE.3 and 5 are on this line ("|3||mL|")
+                + "ORC|NW|||||E|||||||||||||||||||||||I\n"
+                + "RXE||DUONEB3INH^3 ML PLAS CONT : IPRATROPIUM-ALBUTEROL 0.5-2.5 (3) MG/3ML IN SOLN^ADS^^^^^^ipratropium-albuterol (DUONEB) nebulizer solution 3 mL|3||mL||||"// RXE.3 and 5 are on this line ("|3||mL|")
                 // split and concatenate RXE for easier understanding
-                + "|1|PC^^measureofunits||2213^ORDERING^PROVIDER|||||day|||333^Take 1 tablet by mouth every 6 (six) hours.||7|PC|||Wheezing^Wheezing^PRN||||^DUONEB|20180622230000||||||7|7|7\n";
+                + "|1|PC^^measureofunits|||||||day|||||7|PC|||Wheezing^Wheezing^PRN||||||||||7|7|7\n";
 
         List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
 
@@ -990,5 +1027,80 @@ class Hl7MedicationRequestFHIRConversionTest {
         assertThat(doseQuantity.getUnit()).isEqualTo("mL"); //RXE.5.1
         assertThat(doseQuantity.getSystem()).isEqualTo("http://unitsofmeasure.org"); //default
 
+        // Verify no extraneous resources
+        // Expect MedicationRequest, Patient
+        assertThat(e).hasSize(2);
+    }
+
+    @Test
+    void dosageInstructionTestDoseRangeRXO() {
+        // Test dosageInstruction.DoseRange (RXO.2)
+        String hl7message = "MSH|^~\\\\&|||||20210101000000||OMP^O09|MSGID|T|2.6\n"
+                + "PID|||1234||DOE^JANE^|||F||||||||||||||||||||||\n"
+                + "PV1||I|||||||||||||||||Visit_111|||||||||||||||||||||||||20210101000000\n"
+                + "ORC|OP||||||||||||||20210101000000||||||||\n"
+                + "RXO|00054418425^Dexamethasone 4 MG Oral Tablet^NDC^^^^^^dexamethasone (DECADRON) 4 MG TABS|100|150|CC|" // RXO.2 3 and 4 are on this line ("100|150|CC")
+                // split and concatenate RXO for easier understanding
+                + "|^Take 1 tablet by mouth every 6 (six) hours.|||G||4|tablet^tablet|0|222^JONES^JON^E.|||day||||6|PC^^http://unitsofmeasure.org||^DECADRON\n"
+                + "RXR|PO^Oral\n";
+
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+
+        List<Resource> medicationRequestList = ResourceUtils.getResourceList(e, ResourceType.MedicationRequest);
+        // Confirm that one medicationRequest was created.
+        assertThat(medicationRequestList).hasSize(1);
+        MedicationRequest medicationRequest = ResourceUtils.getResourceMedicationRequest(medicationRequestList.get(0),
+                ResourceUtils.context);
+
+        Range doseRange = medicationRequest.getDosageInstructionFirstRep().getDoseAndRateFirstRep().getDoseRange();
+
+        // dosageInstruction.doseAndRate.doseRange.low(RXO.2)
+        assertThat(doseRange.getLow().getValue().toString()).isEqualTo("100.0");
+        assertThat(doseRange.getLow().getUnit()).isEqualTo("CC"); //RXO.4
+        assertThat(doseRange.getLow().getSystem()).isEqualTo("http://unitsofmeasure.org"); //Defaulted
+
+        // dosageInstruction.doseAndRate.doseRange.high(RXO.3)
+        assertThat(doseRange.getHigh().getValue().toString()).isEqualTo("150.0");
+        assertThat(doseRange.getHigh().getUnit()).isEqualTo("CC"); //RXO.4
+        assertThat(doseRange.getHigh().getSystem()).isEqualTo("http://unitsofmeasure.org");
+
+        // Verify no extraneous resources
+        // Expect MedicationRequest, Patient, and Encounter
+        assertThat(e).hasSize(3);
+    }
+
+    @Test
+    void dosageInstructionTestDoseRangeRXE() {
+        // Test dosageInstruction.DoseRange (RXE.3)
+        String hl7message = "MSH|^~\\&||||||S1|RDE^O11||T|2.6|||||||||\n"
+                + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
+                + "ORC|NW|||||E|||||||||||||||||||||||I\n"
+                + "RXE||DUONEB3INH^3 ML PLAS CONT : IPRATROPIUM-ALBUTEROL 0.5-2.5 (3) MG/3ML IN SOLN^ADS^^^^^^ipratropium-albuterol (DUONEB) nebulizer solution 3 mL|3|6|mL||||"// RXE.3 4 and 5 are on this line ("|3|6|mL|")
+                // split and concatenate RXE for easier understanding
+                + "|1|PC^^measureofunits|||||||day|||||7|PC|||Wheezing^Wheezing^PRN||||||||||7|7|7\n";
+
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+
+        List<Resource> medicationRequestList = ResourceUtils.getResourceList(e, ResourceType.MedicationRequest);
+        // Confirm that one medicationRequest was created.
+        assertThat(medicationRequestList).hasSize(1);
+        MedicationRequest medicationRequest = ResourceUtils.getResourceMedicationRequest(medicationRequestList.get(0),
+                ResourceUtils.context);
+
+        Range doseRange = medicationRequest.getDosageInstructionFirstRep().getDoseAndRateFirstRep().getDoseRange();
+
+        // dosageInstruction.doseAndRate.doseRange.low(RXE.3)
+        assertThat(doseRange.getLow().getValue().toString()).isEqualTo("3.0");
+        assertThat(doseRange.getLow().getUnit()).isEqualTo("mL"); //RXE.5
+        assertThat(doseRange.getLow().getSystem()).isEqualTo("http://unitsofmeasure.org"); //Defaulted
+
+        // dosageInstruction.doseAndRate.doseRange.high(RXE.4)
+        assertThat(doseRange.getHigh().getValue().toString()).isEqualTo("6.0");
+        assertThat(doseRange.getHigh().getUnit()).isEqualTo("mL"); //RXE.5
+        assertThat(doseRange.getHigh().getSystem()).isEqualTo("http://unitsofmeasure.org");
+
+        // Verify no extraneous resources
+        // Expect MedicationRequest, Patient
+        assertThat(e).hasSize(2);
     }
 }
