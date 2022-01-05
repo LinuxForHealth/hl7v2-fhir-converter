@@ -14,9 +14,20 @@ import java.util.List;
 import java.util.TimeZone;
 import java.util.stream.Collectors;
 
-import org.hl7.fhir.r4.model.*;
 import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
+import org.hl7.fhir.r4.model.CodeableConcept;
+import org.hl7.fhir.r4.model.Extension;
+import org.hl7.fhir.r4.model.HumanName;
+import org.hl7.fhir.r4.model.Identifier;
+import org.hl7.fhir.r4.model.MedicationRequest;
 import org.hl7.fhir.r4.model.MedicationRequest.MedicationRequestStatus;
+import org.hl7.fhir.r4.model.Patient;
+import org.hl7.fhir.r4.model.Practitioner;
+import org.hl7.fhir.r4.model.Ratio;
+import org.hl7.fhir.r4.model.Range;
+import org.hl7.fhir.r4.model.Quantity;
+import org.hl7.fhir.r4.model.Resource;
+import org.hl7.fhir.r4.model.ResourceType;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -223,7 +234,7 @@ class Hl7MedicationRequestFHIRConversionTest {
                 + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
                 + "ORC|NW|F800006^OE|P800006^RX|||E|10^BID^D4^^^R||20180622230000\n"
                 + "RXO|RX800006^Test15 SODIUM 100 MG CAPSULE^NDC||100||mg|||||G||10||5\n"
-                + "RXE|^Q24H&0600^^20210330144208^^ROU|DUONEB3INH^3 ML PLAS CONT : IPRATROPIUM-ALBUTEROL 0.5-2.5 (3) MG/3ML IN SOLN^ADS^^^^^^ipratropium-albuterol (DUONEB) nebulizer solution 3 mL|3||mL|47||||1|PC||||||||||||||||||||^DUONEB|||||||||\n";
+                + "RXE||DUONEB3INH^3 ML PLAS CONT : IPRATROPIUM-ALBUTEROL 0.5-2.5 (3) MG/3ML IN SOLN^ADS||||||||||||||||||||||||||||||||||||||\n";
 
         List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
 
@@ -247,7 +258,7 @@ class Hl7MedicationRequestFHIRConversionTest {
         String intent = medicationRequest.getIntent().toString();
         assertThat(intent).isEqualTo("ORDER");
 
-        //Very medicationCodeableConcept is set correctly
+        //Very medicationCodeableConcept is set correctly RXE.2
         assertThat(medicationRequest.hasMedicationCodeableConcept()).isTrue();
         CodeableConcept medCC = medicationRequest.getMedicationCodeableConcept();
         assertThat(medCC.getText()).isEqualTo("3 ML PLAS CONT : IPRATROPIUM-ALBUTEROL 0.5-2.5 (3) MG/3ML IN SOLN");
@@ -272,7 +283,7 @@ class Hl7MedicationRequestFHIRConversionTest {
         String hl7message = msh
                 + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
                 + "ORC|NW|F800006^OE|P800006^RX|||E|10^BID^D4^^^R||20190622160000\n"
-                + "RXE|^Q24H&0600^^20210330144208^^ROU|DUONEB3INH^3 ML PLAS CONT : IPRATROPIUM-ALBUTEROL 0.5-2.5 (3) MG/3ML IN SOLN^ADS^^^^^^ipratropium-albuterol (DUONEB) nebulizer solution 3 mL|3||mL|47||||1|PC||||||||||||||||||||^DUONEB|20180622230000||||||||\n";
+                + "RXE|||3||mL|47||||1|PC||||||||||||||||||||DUONEB3INH^3 ML PLAS CONT : IPRATROPIUM-ALBUTEROL 0.5-2.5 (3) MG/3ML IN SOLN^ADS|20180622230000||||||||\n"; //RXE.31
 
         List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
 
@@ -296,7 +307,7 @@ class Hl7MedicationRequestFHIRConversionTest {
         String intent = medicationRequest.getIntent().toString();
         assertThat(intent).isEqualTo("ORDER");
 
-        //Very medicationCodeableConcept is set correctly
+        //Very medicationCodeableConcept is set correctly RXE.31
         assertThat(medicationRequest.hasMedicationCodeableConcept()).isTrue();
         CodeableConcept medCC = medicationRequest.getMedicationCodeableConcept();
         assertThat(medCC.getText()).isEqualTo("3 ML PLAS CONT : IPRATROPIUM-ALBUTEROL 0.5-2.5 (3) MG/3ML IN SOLN");
@@ -442,7 +453,7 @@ class Hl7MedicationRequestFHIRConversionTest {
         String hl7message = "MSH|^~\\&||||||S1|RDE^O11||T|2.6|||||||||\n"
                 + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
                 + "ORC|NW|F800006^OE|P800006^RX|||E|10^BID^D4^^^R||20180622230000|||||||4338008^Wheezing^PRN\n"
-                + "RXE|^Q24H&0600^^20210330144208^^ROU|DUONEB3INH^3 ML PLAS CONT : IPRATROPIUM-ALBUTEROL 0.5-2.5 (3) MG/3ML IN SOLN^ADS^^^^^^ipratropium-albuterol (DUONEB) nebulizer solution 3 mL|3||mL|47||||1|PC|||||||||134006|||||||Wheezing^Wheezing^PRN||||^DUONEB|20180622230000||||||||\n";
+                + "RXE|^Q24H&0600^^20210330144208^^ROU|DUONEB3INH^3 ML PLAS CONT : IPRATROPIUM-ALBUTEROL 0.5-2.5 (3) MG/3ML IN SOLN^ADS|3||mL|47||||1|PC|||||||||134006|||||||Wheezing^Wheezing^PRN||||^DUONEB|20180622230000||||||||\n";
 
         List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
 
@@ -483,7 +494,7 @@ class Hl7MedicationRequestFHIRConversionTest {
         hl7message = "MSH|^~\\&||||||S1|RDE^O11||T|2.6|||||||||\n"
                 + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
                 + "ORC|NW|F800006^OE|P800006^RX|||E|10^BID^D4^^^R||20180622230000|||||||4338008^Wheezing^PRN\n"
-                + "RXE|^Q24H&0600^^20210330144208^^ROU|DUONEB3INH^3 ML PLAS CONT : IPRATROPIUM-ALBUTEROL 0.5-2.5 (3) MG/3ML IN SOLN^ADS^^^^^^ipratropium-albuterol (DUONEB) nebulizer solution 3 mL|3||mL|47||||1|PC||||||||||||||||||||^DUONEB|20180622230000||||||||\n";
+                + "RXE|^Q24H&0600^^20210330144208^^ROU|DUONEB3INH^3 ML PLAS CONT : IPRATROPIUM-ALBUTEROL 0.5-2.5 (3) MG/3ML IN SOLN^ADS|3||mL|47||||1|PC||||||||||||||||||||^DUONEB|20180622230000||||||||\n";
 
         e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
 
@@ -505,7 +516,7 @@ class Hl7MedicationRequestFHIRConversionTest {
         String hl7message = "MSH|^~\\&||||||S1|RDE^O11||T|2.6|||||||||\n"
                 + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
                 + "ORC|NW|||||E|10^BID^D4^^^R||20180622230000|||3122^PROVIDER^ORDERING^^^DR|||20190606193536||||||||||||||I\n"
-                + "RXE|^Q24H&0600^^20210330144208^^ROU|DUONEB3INH^3 ML PLAS CONT : IPRATROPIUM-ALBUTEROL 0.5-2.5 (3) MG/3ML IN SOLN^ADS^^^^^^ipratropium-albuterol (DUONEB) nebulizer solution 3 mL|3||mL|47||||1|PC||||||||||||||||Wheezing^Wheezing^PRN||||^DUONEB|20180622230000||||||||\n";
+                + "RXE|^Q24H&0600^^20210330144208^^ROU|DUONEB3INH^3 ML PLAS CONT : IPRATROPIUM-ALBUTEROL 0.5-2.5 (3) MG/3ML IN SOLN^ADS|3||mL|47||||1|PC||||||||||||||||Wheezing^Wheezing^PRN||||^DUONEB|20180622230000||||||||\n";
 
         List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
 
@@ -545,7 +556,7 @@ class Hl7MedicationRequestFHIRConversionTest {
         String hl7message = "MSH|^~\\&||||||S1|RDE^O11||T|2.6|||||||||\n"
                 + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
                 + "ORC|NW|||||E|10^BID^D4^^^R||20180622230000||||||20190606193536||||||||||||||I\n"
-                + "RXE|^Q24H&0600^^20210330144208^^ROU|DUONEB3INH^3 ML PLAS CONT : IPRATROPIUM-ALBUTEROL 0.5-2.5 (3) MG/3ML IN SOLN^ADS^^^^^^ipratropium-albuterol (DUONEB) nebulizer solution 3 mL|3||mL|47||||1|PC||2213^ORDERING^PROVIDER||||||||||||||Wheezing^Wheezing^PRN||||^DUONEB|20180622230000||||||||\n";
+                + "RXE|^Q24H&0600^^20210330144208^^ROU|DUONEB3INH^3 ML PLAS CONT : IPRATROPIUM-ALBUTEROL 0.5-2.5 (3) MG/3ML IN SOLN^ADS|3||mL|47||||1|PC||2213^ORDERING^PROVIDER||||||||||||||Wheezing^Wheezing^PRN||||^DUONEB|20180622230000||||||||\n";
 
         List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
 
@@ -590,7 +601,7 @@ class Hl7MedicationRequestFHIRConversionTest {
                 + "ORC|OP||||||||||||||20210101000000||||||||\n"
                 + "RXO|00054418425^Dexamethasone 4 MG Oral Tablet^NDC^^^^^^dexamethasone (DECADRON) 4 MG TABS|||||"
                 // split and concatenate RXO for easier understanding
-                + "|Take 1 tablet by mouth every 6 (six) hours.||G||4|tablet^tablet|0|222^JONES^JON^E.|||||||||7^PC|^DECADRON\n" // RXO 11 & 12 are on this line
+                + "|||||4|tablet^tablet|0|||||||||||\n" // RXO 11,12 and 13 are on this line ("|4|tablet^tablet|0|")
                 + "RXR|PO^Oral\n";
 
         List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
@@ -608,6 +619,9 @@ class Hl7MedicationRequestFHIRConversionTest {
         assertThat(disReq.getQuantity().getUnit()).isEqualTo("tablet");
         assertThat(disReq.getQuantity().getSystem()).isEqualTo("http://unitsofmeasure.org");
 
+        // dispenseRequest.NumberOfRepeatsAllowed RXO.13
+        assertThat(disReq.getNumberOfRepeatsAllowed()).hasToString("0");
+
         // Verify no extraneous resources
         // Expect MedicationRequest, Patient, and Encounter
         assertThat(e).hasSize(3);
@@ -618,10 +632,10 @@ class Hl7MedicationRequestFHIRConversionTest {
         // Get DispenseRequest from RXE segment (RXE.10, RXE.11.1 and RXE.11.3)
         String hl7message = "MSH|^~\\&||||||S1|RDE^O11||T|2.6|||||||||\n"
                     + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
-                    + "ORC|NW|||||E|||||||||||||||||||||||I\n"
-                    + "RXE||DUONEB3INH^3 ML PLAS CONT : IPRATROPIUM-ALBUTEROL 0.5-2.5 (3) MG/3ML IN SOLN^ADS^^^^^^ipratropium-albuterol (DUONEB) nebulizer solution 3 mL|||||||"
+                    + "ORC|NW|||||E|10^BID^D4^^^R||20180622230000||||||||||||||||||||I\n"
+                    + "RXE||DUONEB3INH^3 ML PLAS CONT : IPRATROPIUM-ALBUTEROL 0.5-2.5 (3) MG/3ML IN SOLN^ADS|||||||"
                     // split and concatenate RXE for easier understanding
-                    + "|1|PC^^measureofunits||||||||||||||||||||^DUONEB|||||||7|7|7\n"; // RXE 10 & 11 are on this line
+                    + "|1|PC^^measureofunits|0|||||||||||||||||||||||||||7|\n"; // RXE 10 & 11 & 12 are on this line
 
         List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
 
@@ -639,11 +653,15 @@ class Hl7MedicationRequestFHIRConversionTest {
             assertThat(disReq.getQuantity().getSystem()).isEqualTo("urn:id:measureofunits");
 
             // dispenseRequest.InitialFIll.Quantity comes from RXE.39
+            assertThat(disReq.getInitialFill().getQuantity().getValue().toString()).isEqualTo("7.0");
+
+            // dispenseRequest.NumberOfRepeatsAllowed RXE.12
+            assertThat(disReq.getNumberOfRepeatsAllowed()).hasToString("0");
             assertThat(disReq.getInitialFill().getQuantity().getValue()).hasToString("7.0");
 
-        // Verify no extraneous resources
-        // Expect MedicationRequest, Patient
-        assertThat(e).hasSize(2);
+            // Verify no extraneous resources
+            // Expect MedicationRequest, Patient
+            assertThat(e).hasSize(2);
     }
 
     @Test
@@ -688,8 +706,8 @@ class Hl7MedicationRequestFHIRConversionTest {
         // Test dosageInstruction.maxDosePerPeriod
         String hl7message = "MSH|^~\\&||||||S1|RDE^O11||T|2.6|||||||||\n"
                 + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
-                + "ORC|NW|||||E|||||||||||||||||||||||I\n"
-                + "RXE||DUONEB3INH^3 ML PLAS CONT : IPRATROPIUM-ALBUTEROL 0.5-2.5 (3) MG/3ML IN SOLN^ADS^^^^^^ipratropium-albuterol (DUONEB) nebulizer solution 3 mL|3||||||"
+                + "ORC|NW|||||E|10^BID^D4^^^R||20180622230000||||||||||||||||||||I\n"
+                + "RXE|^Q24H&0600^^20210330144208^^ROU|DUONEB3INH^3 ML PLAS CONT : IPRATROPIUM-ALBUTEROL 0.5-2.5 (3) MG/3ML IN SOLN^ADS|3||mL|47|||"
                 // split and concatenate RXE for easier understanding
                 + "|1|||||||||5^PC||||||||Wheezing^Wheezing^PRN||||^DUONEB|||||||7|7|7\n"; // RXE.19 is on this line
 
