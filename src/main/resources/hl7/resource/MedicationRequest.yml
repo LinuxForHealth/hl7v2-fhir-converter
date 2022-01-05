@@ -119,6 +119,14 @@ medicationCodeableConcept_3:
   vars:
     rxC: RXC.2
 
+medicationCodeableConcept_4:
+  condition: $rxE NOT_NULL
+  valueOf: datatype/CodeableConcept
+  expressionType: resource
+  specs: RXE.31
+  vars:
+    rxE: RXE.31
+
 authoredOn:
   type: DATE_TIME
   valueOf: $val
@@ -130,7 +138,7 @@ reasonCode:
   valueOf: datatype/CodeableConcept
   generateList: true
   expressionType: resource
-  specs: RXE.27 | RXO.20 | ORC.16
+  specs: RXO.20 | RXE.27 | ORC.16
 
 requester_1:
   condition: $rxe13 NOT_NULL

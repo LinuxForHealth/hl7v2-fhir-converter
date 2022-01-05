@@ -70,3 +70,10 @@ quantity_4:
     sys: RXE.11.3
   constants:
     urn: "urn:id:"
+
+numberOfRepeatsAllowed:
+  type: INTEGER
+  valueOf: $number
+  expressionType: HL7Spec
+  vars:
+    number: RXO.13 | RXE.12
