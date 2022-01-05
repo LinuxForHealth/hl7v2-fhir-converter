@@ -189,7 +189,7 @@ reasonCode:
    specs: RXA.19
 recorded:
    type: DATE_TIME
-   valueOf: RXA.22
+   valueOf: RXA.22 | ORC.9
    expressionType: HL7Spec
 reaction:
    condition: $obx31 EQUALS 31044-1

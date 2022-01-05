@@ -33,7 +33,7 @@ class Hl7ImmunizationFHIRConversionTest {
         // RXA.20 is "completed" this takes precedence over rxa.18 having a value and orc.5
         String hl7VUXmessageRep = "MSH|^~\\&|MYEHR2.5|RI88140101|KIDSNET_IFL|RIHEALTH|20130531||VXU^V04^VXU_V04|20130531RI881401010105|P|2.5.1|||NE|AL||||||RI543763\r"
                 + "PID|1||12345^^^^MR||TestPatient^Jane^^^^^L||||||\r"
-                + "ORC|RE||197027||ER|||||^Clerk^Myron||MD67895^Pediatric^MARY^^^^MD^^RIA|||||RI2050\r" //ORC.5 is here to prove RXA.20 is taking precedence
+                + "ORC|RE||197027||ER||||20130905041038|^Clerk^Myron||MD67895^Pediatric^MARY^^^^MD^^RIA|||||RI2050\r" //ORC.5 is here to prove RXA.20 is taking precedence/ ORC.9 is here to prove RXA.22 is taking precedence
                 + "RXA|0|1|20130531|20130531|48^HIB PRP-T^CVX|0.5|ML^^ISO+||00^new immunization record^NIP001|^Sticker^Nurse|^^^RI2050||||33k2a|20131210|PMC^sanofi^MVX|00^Patient refusal^NIP002||PA|A|20120901041038\r"
                 + "RXR|C28161^IM^NCIT^IM^INTRAMUSCULAR^HL70162|RT^right thigh^HL70163\r"
                 + "OBX|1|CWE|31044-1^Reaction^LN|1|VXC9^Persistent, inconsolable crying lasting > 3 hours within 48 hours of dose^CDCPHINVS||||||F|||20130531|||VXC40^per imm^CDCPHINVS\r";
@@ -137,11 +137,12 @@ class Hl7ImmunizationFHIRConversionTest {
     void testImmunizationReturnOnlyRXA10() throws IOException {
 
         // Test should only return RXA.10, ORC.12  is empty
+        // ORC.9 (Backup for RXA.22) has recorded date
         // RXA.18 is not empty which signals that the status is not-done. ORC.5 is here to show precedence
         // Since status is "not-done" we show the Status reason (RXA.18)
         String hl7VUXmessageRep = "MSH|^~\\&|MYEHR2.5|RI88140101|KIDSNET_IFL|RIHEALTH|20130531||VXU^V04^VXU_V04|20130531RI881401010105|P|2.5.1|||NE|AL||||||RI543763\r"
                 + "PID|1||12345^^^^MR||TestPatient^Jane^^^^^L||||||\r"
-                + "ORC|RE||197027||CP|||||^Clerk^Myron|||||||RI2050\r"
+                + "ORC|RE||197027||CP||||20120901041038|^Clerk^Myron|||||||RI2050\r"
                 + "RXA|0|1|20130531|20130531|48^HIB PRP-T^CVX|0.5|ML^^^||00^new immunization record^NIP001|^Sticker^Nurse|^^^RI2050||||33k2a|20131210|PMC^sanofi^MVX|00^Patient refusal^NIP002|||A\r"
                 + "RXR|C28161^IM^NCIT^IM^INTRAMUSCULAR^HL70162|RT^right thigh^HL70163\r"
                 + "OBX|1|CWE|64994-7^vaccine fund pgm elig cat^LN|1|V02^VFC eligible Medicaid/MedicaidManaged Care^HL70064||||||F|||20130531|||VXC40^per imm^CDCPHINVS\r";
@@ -156,6 +157,8 @@ class Hl7ImmunizationFHIRConversionTest {
         assertThat(immunization.getStatusReason().getCodingFirstRep().getCode()).isEqualTo("00");
         assertThat(immunization.getStatusReason().getCodingFirstRep().getSystem()).isEqualTo("urn:id:NIP002");
         assertThat(immunization.getStatusReason().getCodingFirstRep().getDisplay()).isEqualTo("Patient refusal");
+        assertThat(immunization.hasRecorded()).isTrue(); //ORC.9
+        assertThat(immunization.getRecordedElement().toString()).contains("2012-09-01"); //ORC.9
 
         //dose Quantity without a system
         assertThat(immunization.hasDoseQuantity()).isTrue();
