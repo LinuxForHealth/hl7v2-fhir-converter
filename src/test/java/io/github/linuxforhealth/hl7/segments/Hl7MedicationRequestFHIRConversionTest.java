@@ -925,7 +925,7 @@ class Hl7MedicationRequestFHIRConversionTest {
                 + "ORC|OP||||||||||||||20210101000000||||||||\n"
                 + "RXO|00054418425^Dexamethasone 4 MG Oral Tablet^NDC^^^^^^dexamethasone (DECADRON) 4 MG TABS||||6064005^Topical route^http://snomed.info/sct"
                 // split and concatenate RXO for easier understanding
-                + "|^Take 1 tablet by mouth every 6 (six) hours.|||G||4|tablet^tablet|0|222^JONES^JON^E.|||day||||6|PC^^http://unitsofmeasure.org||^DECADRON\n" // RXO.21 and RXO.22 (6|PC^^http://unitsofmeasure.org)
+                + "|^Take 1 tablet by mouth every 6 (six) hours.|||G||4|tablet^tablet|0|222^JONES^JON^E.|||mL||||6|PC^^http://unitsofmeasure.org||^DECADRON\n" // RXO.21 and RXO.22 (6|PC^^http://unitsofmeasure.org)
                 + "RXR|PO^Oral\n";
 
         List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
@@ -945,7 +945,7 @@ class Hl7MedicationRequestFHIRConversionTest {
 
         // dosageInstruction.doseAndRate.rateRatio.denominator
         assertThat(rateRatio.getDenominator().getValue()).hasToString("1.0");
-        assertThat(rateRatio.getDenominator().getUnit()).isEqualTo("day");
+        assertThat(rateRatio.getDenominator().getUnit()).isEqualTo("mL");
         assertThat(rateRatio.getDenominator().getSystem()).isEqualTo("http://unitsofmeasure.org");
 
         // Verify no extraneous resources
@@ -961,7 +961,7 @@ class Hl7MedicationRequestFHIRConversionTest {
                 + "ORC|NW|||||E|||||||||||||||||||||||I\n"
                 + "RXE||DUONEB3INH^3 ML PLAS CONT : IPRATROPIUM-ALBUTEROL 0.5-2.5 (3) MG/3ML IN SOLN^ADS^^^^^^ipratropium-albuterol (DUONEB) nebulizer solution 3 mL|||||||"
                 // split and concatenate RXE for easier understanding
-                + "|1||||||||day|||||7|PC|||Wheezing^Wheezing^PRN||||^DUONEB|20180622230000||||||7|7|7\n"; // RXE.23 and 24 are on this line (7|PC)
+                + "|1|||||||||||||7|PC|||Wheezing^Wheezing^PRN||||^DUONEB|20180622230000||||||7|7|7\n"; // RXE.23 and 24 are on this line (7|PC)
 
         List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
 
@@ -980,7 +980,7 @@ class Hl7MedicationRequestFHIRConversionTest {
 
         // dosageInstruction.doseAndRate.rateRatio.denominator
         assertThat(rateRatio.getDenominator().getValue()).hasToString("1.0");
-        assertThat(rateRatio.getDenominator().getUnit()).isEqualTo("day"); //RXE.22
+        assertThat(rateRatio.getDenominator().getUnit()).isNull();
         assertThat(rateRatio.getDenominator().getSystem()).isEqualTo("http://unitsofmeasure.org");
 
         // Verify no extraneous resources

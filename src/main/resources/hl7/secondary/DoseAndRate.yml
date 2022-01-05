@@ -12,11 +12,10 @@ rateRatio_1: # gets rateRatio from RXO
     numerator: RXO.21
     numunit: RXO.22.1
     denominator: $denomVal
-    denunit: RXO.17 | $denomUnit
+    denunit: RXO.17
     unitSystem: RXO.22.3 | $unitSys
   constants:
     unitSys: "http://unitsofmeasure.org"
-    denomUnit: "day"
     denomVal: "1"
 
 rateRatio_2: # gets rateRatio from RXE
@@ -29,11 +28,10 @@ rateRatio_2: # gets rateRatio from RXE
     numerator: RXE.23
     numunit: RXE.24.1
     denominator: $denomVal
-    denunit: RXE.22 | $denomUnit
+    denunit: RXE.22
     unitSystem: RXE.24.3 | $unitSys
   constants:
     unitSys: "http://unitsofmeasure.org"
-    denomUnit: "day"
     denomVal: "1"
 
 doseQuantity_1: # gets doseQuantity from RXO
@@ -79,7 +77,6 @@ doseRange_1: # gets doseRange from RXO
     unitSystem: RXO.4.3 | $unitSys
   constants:
     unitSys: "http://unitsofmeasure.org"
-    val: "1"
 
 doseRange_2: # gets doseRange from RXE
   condition: $rxo2 NULL && $rxe3 NOT_NULL && $rxe4 NOT_NULL
@@ -96,4 +93,3 @@ doseRange_2: # gets doseRange from RXE
     unitSystem: RXE.5.3 | $unitSys
   constants:
     unitSys: "http://unitsofmeasure.org"
-    val: "1"
