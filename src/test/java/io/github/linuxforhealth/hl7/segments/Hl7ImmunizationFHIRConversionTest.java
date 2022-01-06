@@ -31,9 +31,11 @@ class Hl7ImmunizationFHIRConversionTest {
     void testImmunizationRXA20Priority() throws IOException {
 
         // RXA.20 is "completed" this takes precedence over rxa.18 having a value and orc.5
+        //ORC.5 is here to prove RXA.20 is taking precedence
+        // ORC.9 is here to prove RXA.22 is taking precedence
         String hl7VUXmessageRep = "MSH|^~\\&|EHR|12345^SiteName|MIIS|99990|20140701041038||VXU^V04^VXU_V04|MSG.Valid_01|P|2.6|||\n"
                 + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\r"
-                + "ORC|RE||197027||ER||||20130905041038|||MD67895^Pediatric^MARY^^^^MD^^RIA|||||\r" //ORC.5 is here to prove RXA.20 is taking precedence/ ORC.9 is here to prove RXA.22 is taking precedence
+                + "ORC|RE||197027||ER||||20130905041038|||MD67895^Pediatric^MARY^^^^MD^^RIA|||||\r"
                 + "RXA|||20130531||48^HIB PRP-T^CVX|0.5|ML^^ISO+||00^new immunization record^NIP001|^Sticker^Nurse|^^^RI2050||||33k2a|20131210|PMC^sanofi^MVX|00^Patient refusal^NIP002||PA|A|20120901041038\r"
                 + "OBX|1|CWE|31044-1^Reaction^LN|1|VXC9^Persistent, inconsolable crying lasting > 3 hours within 48 hours of dose^CDCPHINVS||||||F|||20130531|||VXC40^per imm^CDCPHINVS\r";
 
