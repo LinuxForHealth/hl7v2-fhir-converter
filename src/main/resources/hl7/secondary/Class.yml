@@ -23,6 +23,6 @@ type:
 
 name:
      type: STRING
-     valueOf: XON.1 | $className
+     valueOf: XON.1
      expressionType: HL7Spec
 
