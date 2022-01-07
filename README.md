@@ -37,7 +37,7 @@ The converter supports the following message segments:
 * RXA - Pharmacy/Treatment Administration
 * RXC - Pharmacy/Treatment Component Order
 * RXE - Pharmacy/Treatment Encoded Order
-* RXO - Pharmacy/Treatment Order
+* RXO - Pharmacy/Treatment Order (Ignored for RDE messages; RXE used instead)
 * RXR - Pharmacy/Treatment Route
 * SPM - Specimen
 * TXA - Transcription Document Header
