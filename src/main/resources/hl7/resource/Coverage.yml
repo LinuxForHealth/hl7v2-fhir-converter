@@ -112,7 +112,12 @@ subscriber_2:
     expressionType: resource
     specs: $Patient
     vars: 
-      relatedRelationshipStr: String, IN1.17            
+      relatedRelationshipStr: String, IN1.17     
+
+subscriberId:  
+   type: STRING
+   valueOf: IN1.36
+   expressionType: HL7Spec
 
 # Relationship may be SEL (self)
 relationship:
@@ -129,18 +134,18 @@ beneficiary:
     expressionType: resource
     specs: $Patient
 
-class:
+class_1:
    valueOf: secondary/Class
-   condition: $classValue NOT_NULL
    generateList: true
    expressionType: resource
    vars: 
       classValue: String, IN1.8
-      className: String, IN1.9.1
-   constants: 
-      typeSystem: 'http://terminology.hl7.org/CodeSystem/coverage-class'
-      typeCode: 'group'
-      typeDisplay: 'Group'
+
+class_2:
+   valueOf: secondary/Class
+   generateList: true
+   expressionType: resource
+   specs: IN1.9
 
 period:
     valueOf: datatype/Period
@@ -148,3 +153,8 @@ period:
     vars:
        start: IN1.12
        end: IN1.13
+
+order:
+   type: INTEGER
+   valueOf: IN1.22 | IN1.1
+   expressionType: HL7Spec

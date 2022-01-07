@@ -134,13 +134,13 @@ class HL7ConditionFHIRConversionTest {
 
         // Verify name text, family, and given are set correctly.
         assertThat(practitioner.getName()).hasSize(1);
-        assertThat(practitioner.getNameFirstRep().getText()).isEqualTo("JOHN A DOE"); // DG1.17
-        assertThat(practitioner.getNameFirstRep().getFamily()).isEqualTo("DOE"); // DG1.17.2
-        assertThat(practitioner.getNameFirstRep().getGivenAsSingleString()).isEqualTo("JOHN A"); // DG1.17.3
+        assertThat(practitioner.getNameFirstRep().getText()).isEqualTo("JOHN A DOE"); // DG1.16
+        assertThat(practitioner.getNameFirstRep().getFamily()).isEqualTo("DOE"); // DG1.16.2
+        assertThat(practitioner.getNameFirstRep().getGivenAsSingleString()).isEqualTo("JOHN A"); // DG1.16.3
 
         // Verify asserter (practitioner) identifier is set correctly.
         assertThat(practitioner.getIdentifier()).hasSize(1);
-        assertThat(practitioner.getIdentifierFirstRep().getValue()).isEqualTo("123"); // DG1.17.1
+        assertThat(practitioner.getIdentifierFirstRep().getValue()).isEqualTo("123"); // DG1.16.1
 
     }
 
