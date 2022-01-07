@@ -81,7 +81,7 @@ class Hl7FinancialInsuranceTest {
                 + "|^^^^^333^4444444^^^^^^20201231145045^20211231145045^^^^1"
                 // IN1.8 to list element Coverage.class.value
                 // IN1.9.1 (1) to list element Coverage.class.name
-                // IN1.9.10 (1) to list element Coverage.class.value
+                // IN1.9.10 (1) to list element Coverage.class.value 
                 // IN1.9.1 (2) to list element Coverage.class.name and value (because IN1.9.10 (2) does not exist)
                 + "|UA34567|NameBlue^^^^^^^^^IDBlue~NameGreen||"
                 // IN1.12 to Coverage.period.start

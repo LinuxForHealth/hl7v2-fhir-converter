@@ -21,7 +21,7 @@ type:
       code: 'group'
       display: 'Group'
 
-name: 
+name:
      type: STRING
      valueOf: XON.1
      expressionType: HL7Spec
