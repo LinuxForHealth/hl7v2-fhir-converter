@@ -45,7 +45,7 @@ public class ResourceUtils {
 
     public static FHIRContext context = new FHIRContext();
     private static final Logger LOGGER = LoggerFactory.getLogger(ResourceUtils.class);
-    private static final ConverterOptions OPTIONS = new Builder().withPrettyPrint().build();
+    private static final ConverterOptions OPTIONS = new Builder().withValidateResource().withPrettyPrint().build();
 
     public static List<BundleEntryComponent> createFHIRBundleFromHL7MessageReturnEntryList(String inputSegment) {
         HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
