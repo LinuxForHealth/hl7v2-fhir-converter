@@ -24,6 +24,8 @@ import org.hl7.fhir.r4.model.RelatedPerson;
 import org.hl7.fhir.r4.model.Resource;
 import org.hl7.fhir.r4.model.ResourceType;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import io.github.linuxforhealth.hl7.segments.util.DatatypeUtils;
 import io.github.linuxforhealth.hl7.segments.util.ResourceUtils;
@@ -36,9 +38,8 @@ class Hl7FinancialInsuranceTest {
     @java.lang.SuppressWarnings("squid:S5961")
     @Test
     void testBasicInsuranceCoverageFields() throws IOException {
-        // Currently only tests limited items, other fields to be added
-
-        String hl7message = "MSH|^~\\&|||||20151008111200||ADT^A01^ADT_A01|MSGID000001|T|2.6|||||||||\n"
+        // Tests fields listed below.  
+        String hl7message = "MSH|^~\\&|||||20151008111200||DFT^P03^DFT_P03|MSGID000001|T|2.6|||||||||\n"
                 + "EVN||20210407191342||||||\n"
                 + "PID|||MR1^^^XYZ^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
                 + "PV1||I||||||||||||||||||||||||||||||||||||||||||\n"
@@ -236,12 +237,17 @@ class Hl7FinancialInsuranceTest {
 
     // Suppress warnings about too many assertions in a test.  Justification: creating a FHIR message is very costly; we need to check many asserts per creation for efficiency.  
     @java.lang.SuppressWarnings("squid:S5961")
-    @Test
+    @ParameterizedTest
+    // Tests IN1 for different message types. 
+    // The breadth of this test is sufficent for multiple message type coverage, so other tests are not parameterized.
+    @ValueSource(strings = {
+            "DFT^P03^DFT_P03", "ADT^A01^ADT_A01"
+    })
     // Tests IN1.17 coverage by related person. A related person should be created and cross-referenced.
     // Also tests backup field for coverage.order
-    void testInsuranceCoverageByRelatedFields() throws IOException {
+    void testInsuranceCoverageByRelatedFields(String messageType) throws IOException {
 
-        String hl7message = "MSH|^~\\&|||||20151008111200||ADT^A01^ADT_A01|MSGID000001|T|2.6|||||||||\n"
+        String hl7message = "MSH|^~\\&|||||20151008111200||"+messageType+"|MSGID000001|T|2.6|||||||||\n"
                 + "EVN||20210407191342||||||\n"
                 + "PID|||MR1^^^XYZ^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
                 + "PV1||I||||||||||||||||||||||||||||||||||||||||||\n"
@@ -286,7 +292,6 @@ class Hl7FinancialInsuranceTest {
 
         List<Resource> organizations = ResourceUtils.getResourceList(e, ResourceType.Organization);
         assertThat(organizations).hasSize(1); // From Payor created by IN1
-        // Organization org = (Organization) organizations.get(0);
 
         List<Resource> coverages = ResourceUtils.getResourceList(e, ResourceType.Coverage);
         assertThat(coverages).hasSize(1); // From IN1 segment
@@ -364,7 +369,7 @@ class Hl7FinancialInsuranceTest {
     // Tests IN1.17 coverage by one's self. A related person should not be created.  But the patient should be referenced.
     void testInsuranceCoverageOfSelf() throws IOException {
 
-        String hl7message = "MSH|^~\\&|||||20151008111200||ADT^A01^ADT_A01|MSGID000001|T|2.6|||||||||\n"
+        String hl7message = "MSH|^~\\&|||||20151008111200||DFT^P03^DFT_P03|MSGID000001|T|2.6|||||||||\n"
                 + "EVN||20210407191342||||||\n"
                 + "PID|||MR1^^^XYZ^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
                 + "PV1||I||||||||||||||||||||||||||||||||||||||||||\n"
