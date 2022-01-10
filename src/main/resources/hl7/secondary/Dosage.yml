@@ -1,33 +1,16 @@
-# (C) Copyright IBM Corp. 2021
+# (C) Copyright IBM Corp. 2021, 2022
 #
 # SPDX-License-Identifier: Apache-2.0
 #
 ---
-maxDosePerPeriod_1: # gets max dose from RXO
-  condition: $rxo23 NOT_NULL
+maxDosePerPeriod_1: # gets max dose from RXO or RXE if RXO is not present
+  condition: $condition1 NOT_NULL
   valueOf: datatype/Ratio
   expressionType: resource
   vars:
-    rxo23: RXO.23
-    numerator: RXO.23.1
-    numunit: RXO.23.2
-    denominator: $denomVal
-    denunit: $denomUnit
-    unitSystem: $unitSys
-  constants:
-    unitSys: "http://unitsofmeasure.org"
-    denomUnit: "day"
-    denomVal: "1"
-
-maxDosePerPeriod_2: # gets max dose from RXE
-  condition: $rxe19 NOT_NULL && $rxo23 NULL
-  valueOf: datatype/Ratio
-  expressionType: resource
-  vars:
-    rxe19: RXE.19
-    rxo23: RXO.23
-    numerator: RXE.19.1
-    numunit: RXE.19.2
+    condition1: RXO.23 | RXE.19
+    numerator: RXO.23.1 | RXE.19.1
+    numunit: RXO.23.2 | RXE.19.1
     denominator: $denomVal
     denunit: $denomUnit
     unitSystem: $unitSys
