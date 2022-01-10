@@ -23,8 +23,9 @@
 
     <parent>
         <groupId>net.fhirfactory.pegacorn</groupId>
-        <artifactId>pegacorn</artifactId>
+        <artifactId>pegacorn-ponos</artifactId>
         <version>1.5.0-SNAPSHOT</version>
+        <relativePath>../pegacorn-ponos</relativePath>
     </parent>
 
     <artifactId>pegacorn-hl7v2-fhir-converter</artifactId>
