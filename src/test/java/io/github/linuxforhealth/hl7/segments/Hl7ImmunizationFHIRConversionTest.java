@@ -142,7 +142,7 @@ class Hl7ImmunizationFHIRConversionTest {
         String hl7VUXmessageRep = "MSH|^~\\&|EHR|12345^SiteName|MIIS|99990|20140701041038||VXU^V04^VXU_V04|MSG.Valid_01|P|2.6|||\n"
                 + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\r"
                 + "ORC|RE||197027||CP||||20120901041038|^Clerk^Myron|||||||\r"
-                + "RXA|||20130531|||0.5|ML^^^|||^Sticker^Nurse||||||||00^Patient refusal^NIP002|||\r"
+                + "RXA|||20130531||48^HIB PRP-T^CVX|0.5|ML^^^|||^Sticker^Nurse||||||||00^Patient refusal^NIP002|||\r"
                 + "OBX|1|CWE|64994-7^vaccine fund pgm elig cat^LN|1|V02^VFC eligible Medicaid/MedicaidManaged Care^HL70064\r";
 
         Immunization immunization = ResourceUtils.getImmunization(hl7VUXmessageRep);
@@ -186,7 +186,7 @@ class Hl7ImmunizationFHIRConversionTest {
         String hl7VUXmessageRep = "MSH|^~\\&|EHR|12345^SiteName|MIIS|99990|20140701041038||VXU^V04^VXU_V04|MSG.Valid_01|P|2.6|||\n"
                 + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\r"
                 + "ORC|RE||197027||PA|||||^Clerk^Myron|||||||RI2050\r"
-                + "RXA|||20130531|||0.5|ML^^UCUM||||||||||||00^refusal|RE\r"
+                + "RXA|||20130531||48^HIB PRP-T^CVX|0.5|ML^^UCUM||||||||||||00^refusal|RE\r"
                 + "OBX|1|CWE|30963-3^ VACCINE FUNDING SOURCE^LN|1|V02^VFC eligible Medicaid/MedicaidManaged Care^HL70064\r";
 
         Immunization immunization = ResourceUtils.getImmunization(hl7VUXmessageRep);
@@ -229,7 +229,7 @@ class Hl7ImmunizationFHIRConversionTest {
         String hl7VUXmessageRep = "MSH|^~\\&|EHR|12345^SiteName|MIIS|99990|20140701041038||VXU^V04^VXU_V04|MSG.Valid_01|P|2.6|||\n"
                 + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\r"
                 + "ORC|||197027||PA|||||^Clerk^Myron|||||||RI2050\r"
-                + "RXA|0|1|20130531|||999|ML^^UCUM||||||||||||||A\r";
+                + "RXA|0|1|20130531||48^HIB PRP-T^CVX|999|ML^^UCUM||||||||||||||A\r";
 
         Immunization immunization = ResourceUtils.getImmunization(hl7VUXmessageRep);
         //dose Quantity with 999 as the value which should return null;
@@ -250,7 +250,7 @@ class Hl7ImmunizationFHIRConversionTest {
         String hl7VUXmessageRep = "MSH|^~\\&|MYEHR2.5|RI88140101|KIDSNET_IFL|RIHEALTH|20130531||VXU^V04^VXU_V04|20130531RI881401010105|P|2.5.1|||NE|AL||||||RI543763\r"
                 + "PID|1||12345^^^^MR||TestPatient^Jane^^^^^L||||||\r"
                 + "ORC|||197027|||||||^Clerk^Myron|||||||RI2050\r"
-                + "RXA|0|1|20130531|||999|||1|\r"
+                + "RXA|0|1|20130531||48^HIB PRP-T^CVX|999|||1|\r"
                 + "OBX|1|CE|30945-0^contraindication^LN|1|V02^VFC eligible Medicaid/MedicaidManaged Care^HL70064||||||F||||||\r";
 
         Immunization immunization = ResourceUtils.getImmunization(hl7VUXmessageRep);
@@ -270,7 +270,7 @@ class Hl7ImmunizationFHIRConversionTest {
         String hl7VUXmessageRep = "MSH|^~\\&|EHR|12345^SiteName|MIIS|99990|20140701041038||VXU^V04^VXU_V04|MSG.Valid_01|P|2.6|||\n"
                 + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\r"
                 + "ORC|||197027|||||||^Clerk^Myron|||||||RI2050\r"
-                + "RXA|0|1|20130531\r"
+                + "RXA|0|1|20130531||48^HIB PRP-T^CVX\r"
                 + "OBX|1|CE|59784-9^Disease with presumed immunity^LN|1|V02^VFC eligible Medicaid/MedicaidManaged Care^HL70064\r";
 
         Immunization immunization = ResourceUtils.getImmunization(hl7VUXmessageRep);
