@@ -998,11 +998,11 @@ class Hl7MedicationRequestFHIRConversionTest {
                 + "ORC|NW|||||E|||||||||||||||||||||||I\n"
                 + "RXE||DUONEB3INH^3 ML PLAS CONT : IPRATROPIUM-ALBUTEROL 0.5-2.5 (3) MG/3ML IN SOLN^ADS|||||||||||||||||||"
                 // Split and concatenate RXE for easier understanding
-                // RXE.22 dosageInstruction.doseAndRate.rateRatio.denominator purposely empty
+                // RXE.22 dosageInstruction.doseAndRate.rateRatio.denominator.unit
                 // RXE.23 to dosageInstruction.doseAndRate.rateRatio.numerator.value
                 // RXE.24 to dosageInstruction.doseAndRate.rateRatio.numerator.unit 
                 // RXE.24.3 empty to cause default in dosageInstruction.doseAndRate.rateRatio.numerator.system  
-                + "||7|PC||||||||||||||||\n"; 
+                + "|PC|7|PC||||||||||||||||\n";
         List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
 
         List<Resource> medicationRequestList = ResourceUtils.getResourceList(e, ResourceType.MedicationRequest);
@@ -1020,11 +1020,78 @@ class Hl7MedicationRequestFHIRConversionTest {
 
         // dosageInstruction.doseAndRate.rateRatio.denominator
         assertThat(rateRatio.getDenominator().getValue()).hasToString("1.0");
-        assertThat(rateRatio.getDenominator().getUnit()).isNull(); //RXE.22
+        assertThat(rateRatio.getDenominator().getUnit()).isEqualTo("PC"); //RXE.22
         assertThat(rateRatio.getDenominator().getSystem()).isEqualTo("http://unitsofmeasure.org");
 
         // Verify no extraneous resources
         // Expect MedicationRequest, Patient
+        assertThat(e).hasSize(2);
+    }
+
+    @Test
+    void dosageInstructionTestRateQuantityRXO() {
+        // Test dosageInstruction.rateQuantity where RXO.21 exists and RXO.17 does not exist -> use RXO segment, no range
+
+        String hl7message = "MSH|^~\\\\&|||||20210101000000||OMP^O09|MSGID|T|2.6\n"
+                + "PID|||1234||DOE^JANE^|||F||||||||||||||||||||||\n"
+                + "PV1||||||||||||||||||||||||||||||||||||||||||||\n"
+                + "ORC|OP||||||||||||||||||||||\n"
+                // RXO.21 to MedicationRequest.dosageInstruction.doseAndRate.rateQuantity.value
+                // RXO.22.1 to MedicationRequest.dosageInstruction.doseAndRate.rateQuantity.unit
+                // RXO.22.3 purposely empty to check that default system is used
+                + "RXO|||||||||||||||||||||6|PC||||||||\n";
+
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+
+        List<Resource> medicationRequestList = ResourceUtils.getResourceList(e, ResourceType.MedicationRequest);
+        // Confirm that one medicationRequest was created.
+        assertThat(medicationRequestList).hasSize(1);
+        MedicationRequest medicationRequest = ResourceUtils.getResourceMedicationRequest(medicationRequestList.get(0),
+                ResourceUtils.context);
+
+        Quantity rateQuantity  = medicationRequest.getDosageInstructionFirstRep().getDoseAndRateFirstRep().getRateQuantity();
+
+        // dosageInstruction.doseAndRate.rateQuantity RXO.21
+        assertThat(rateQuantity.getValue()).hasToString("6.0"); //RXO.21
+        assertThat(rateQuantity.getUnit()).isEqualTo("PC"); //RXO.22.1
+        assertThat(rateQuantity.getSystem()).isEqualTo("http://unitsofmeasure.org"); //default
+
+        // Verify no extraneous resources
+        // Expect MedicationRequest, and Patient
+        assertThat(e).hasSize(2);
+    }
+
+    @Test
+    void dosageInstructionTestRateQuantityRXE() {
+        // Test dosageInstruction.rateQuantity where RXE.23 exists and RXE.22 does not exist -> use RXE segment, no range
+
+        String hl7message = "MSH|^~\\&||||||S1|RDE^O11||T|2.6|||||||||\n"
+                + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
+                + "ORC|NW|||||E|||||||||||||||||||||||I\n"
+                + "RXE||DUONEB3INH^3 ML PLAS CONT : IPRATROPIUM-ALBUTEROL 0.5-2.5 (3) MG/3ML IN SOLN^ADS|||||||||||||||||||"
+                // Split and concatenate RXE for easier understanding
+                // RXE.23 to MedicationRequest.dosageInstruction.doseAndRate.rateQuantity.value
+                // RXE.24.1 to MedicationRequest.dosageInstruction.doseAndRate.rateQuantity.unit
+                // RXE.24.3 purposely empty to check that default system is used
+                + "||7|PC^^http://unitsofmeasure.org||||||||||||||||\n";
+
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+
+        List<Resource> medicationRequestList = ResourceUtils.getResourceList(e, ResourceType.MedicationRequest);
+        // Confirm that one medicationRequest was created.
+        assertThat(medicationRequestList).hasSize(1);
+        MedicationRequest medicationRequest = ResourceUtils.getResourceMedicationRequest(medicationRequestList.get(0),
+                ResourceUtils.context);
+
+        Quantity rateQuantity  = medicationRequest.getDosageInstructionFirstRep().getDoseAndRateFirstRep().getRateQuantity();
+
+        // dosageInstruction.doseAndRate.rateQuantity RXE.23
+        assertThat(rateQuantity.getValue()).hasToString("7.0"); //RXO.23
+        assertThat(rateQuantity.getUnit()).isEqualTo("PC"); //RXO.24.1
+        assertThat(rateQuantity.getSystem()).isEqualTo("http://unitsofmeasure.org"); //RXO.24.3
+
+        // Verify no extraneous resources
+        // Expect MedicationRequest, and Patient
         assertThat(e).hasSize(2);
     }
 

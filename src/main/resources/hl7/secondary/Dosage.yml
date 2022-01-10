@@ -55,3 +55,4 @@ doseAndRate:
   valueOf: secondary/DoseAndRate
   expressionType: resource
   generateList: true
+  specs: RXO | RXE
