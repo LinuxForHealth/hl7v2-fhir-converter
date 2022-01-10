@@ -79,7 +79,7 @@ class Hl7DFTMessageTest {
         assertThat(relatedPersons).hasSize(1); // From IN1.16 through IN1.19; IN1.43; INI.49 
 
         List<Resource> serviceRequests = ResourceUtils.getResourceList(e, ResourceType.ServiceRequest);
-        assertThat(serviceRequests).hasSize(1);
+        assertThat(serviceRequests).hasSize(1);  // From ORC / OBR
         ServiceRequest serviceRequest = ResourceUtils.getResourceServiceRequest(serviceRequests.get(0),
                 ResourceUtils.context);
         assertThat(serviceRequest.getNote()).hasSize(1);
@@ -87,7 +87,7 @@ class Hl7DFTMessageTest {
                 "TEST ORC/OBR NOTE AA");
 
         List<Resource> observations = ResourceUtils.getResourceList(e, ResourceType.Observation);
-        assertThat(observations).hasSize(1);
+        assertThat(observations).hasSize(1); // From OBX
         Observation observation = ResourceUtils.getResourceObservation(observations.get(0), ResourceUtils.context);
         assertThat(observation.getNote()).hasSize(1);
         assertThat(observation.getNote().get(0).getTextElement().getValueAsString())
