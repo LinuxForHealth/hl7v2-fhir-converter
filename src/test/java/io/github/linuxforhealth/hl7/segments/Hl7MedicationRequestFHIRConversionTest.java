@@ -1039,7 +1039,7 @@ class Hl7MedicationRequestFHIRConversionTest {
                 // RXO.21 to MedicationRequest.dosageInstruction.doseAndRate.rateQuantity.value
                 // RXO.22.1 to MedicationRequest.dosageInstruction.doseAndRate.rateQuantity.unit
                 // RXO.22.3 purposely empty to check that default system is used
-                + "RXO|||||48^HIB PRP-T^CVX||||||||||||||||6|PC||||||||\n";
+                + "RXO|00054418425^Dexamethasone 4 MG Oral Tablet^NDC||||||||||||||||||||6|PC||||||||\n";
 
         List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
 

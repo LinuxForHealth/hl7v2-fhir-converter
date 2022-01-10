@@ -290,7 +290,7 @@ class Hl7ImmunizationFHIRConversionTest {
         String hl7VUXmessageRep = "MSH|^~\\&|EHR|12345^SiteName|MIIS|99990|20140701041038||VXU^V04^VXU_V04|MSG.Valid_01|P|2.6|||\n"
                 + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\r"
                 + "ORC|||197027|||||||^Clerk^Myron|||||||RI2050\r"
-                + "RXA|0|1|20130531||48^HIB PRP-T^CVX\r"
+                + "RXA|0|1|20130531\r"
                 + "OBX|1|CWE|30956-7^vaccine type^LN|1|107^DTAP^CVX\r";
 
         Immunization immunization = ResourceUtils.getImmunization(hl7VUXmessageRep);
