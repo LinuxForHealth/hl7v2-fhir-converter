@@ -962,7 +962,7 @@ class Hl7MedicationRequestFHIRConversionTest {
                 // RXO.17.3 empty will cause default system
                 // RXO.21 to dosageInstruction.doseAndRate.rateRatio.numerator.value
                 // RXO.22 to dosageInstruction.doseAndRate.rateRatio.numerator.unit
-                + "|mL||||6|PC^^http://unitsofmeasure.org||\n";
+                + "|mL||||6|PC^^UCUM||\n";
 
 
         List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);

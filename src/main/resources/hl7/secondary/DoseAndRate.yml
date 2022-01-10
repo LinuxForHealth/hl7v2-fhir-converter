@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 ---
-rateRatio: # gets rateRatio from RXO or RXE if RXO is not present
+rateRatio: # Use a ratio when RXO.17 (or RXE.22) and RXO.21 (or RXE.23) is present
   condition: $condition1 NOT_NULL && $condition2 NOT_NULL
   valueOf: datatype/Ratio
   expressionType: resource
@@ -32,7 +32,7 @@ rateQuantity: # gets rateQuantity from from RXO or RXE if RXO is not present
   constants:
     unitSys: "http://unitsofmeasure.org"
 
-doseQuantity: # gets doseQuantity from from RXO or RXE if RXO is not present
+doseQuantity: # Use Quantity when RXO.17 (or RXE.22) is absent
   condition: $condition1 NOT_NULL && $condition2 NULL
   valueOf: datatype/Quantity
   expressionType: resource
@@ -46,7 +46,7 @@ doseQuantity: # gets doseQuantity from from RXO or RXE if RXO is not present
     unitSys: "http://unitsofmeasure.org"
 
 
-doseRange: # gets doseRange from RXO or RXE if RXO is not present
+doseRange: # Use a Range when low value RXO.2 (RXE.3) and high value RXO.3 (RXE.4) are both present
   condition: $condition1 NOT_NULL && $condition2 NOT_NULL
   valueOf: datatype/Range
   expressionType: resource

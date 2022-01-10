@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 ---
-maxDosePerPeriod_1: # gets max dose from RXO or RXE if RXO is not present
+maxDosePerPeriod_1: # gets max dose from RXO or RXE whichever is present
   condition: $condition1 NOT_NULL
   valueOf: datatype/Ratio
   expressionType: resource
