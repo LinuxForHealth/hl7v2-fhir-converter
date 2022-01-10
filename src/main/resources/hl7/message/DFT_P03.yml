@@ -45,4 +45,28 @@ resources:
     additionalSegments:
       - MSH
       - PID
+
+  - resourceName: ServiceRequest
+    segment: .ORC
+    group: COMMON_ORDER
+    resourcePath: resource/ServiceRequest
+    repeats: true
+    isReferenced: true
+    additionalSegments:
+      - .ORDER.OBR
+      - .ORDER.NTE
+      - MSH
       - PV1
+      - PID  
+
+  - resourceName: Observation
+    segment: .OBSERVATION.OBX
+    group: COMMON_ORDER
+    resourcePath: resource/Observation
+    repeats: true
+    isReferenced: true
+    additionalSegments:
+      - MSH
+      - .ORC
+      - .ORDER.OBR
+      - .OBSERVATION.NTE   

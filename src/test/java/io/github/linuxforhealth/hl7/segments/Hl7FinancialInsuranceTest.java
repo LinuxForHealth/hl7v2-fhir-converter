@@ -43,6 +43,11 @@ class Hl7FinancialInsuranceTest {
                 + "EVN||20210407191342||||||\n"
                 + "PID|||MR1^^^XYZ^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
                 + "PV1||I||||||||||||||||||||||||||||||||||||||||||\n"
+                // FT1 added for completeness; required in specification, but not used (ignored) by templates
+                // FT1.4 is required transaction date (currently not used)
+                // FT1.6 is required transaction type (currently not used)
+                // FT1.7 is required transaction code (currently not used)
+                + "FT1||||20201231145045||CG|FAKE|||||||||||||||||||||||||||||||||||||\n"
                 // IN1 Segment is split and concatenated for easier understanding. (| precedes numbered field.)
                 // IN1.2.1, IN1.2.3 to Identifier 1
                 // IN1.2.4, IN1.2.6 to Identifier 2
@@ -251,6 +256,11 @@ class Hl7FinancialInsuranceTest {
                 + "EVN||20210407191342||||||\n"
                 + "PID|||MR1^^^XYZ^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
                 + "PV1||I||||||||||||||||||||||||||||||||||||||||||\n"
+                // FT1 added for completeness; required in specification, but not used (ignored) by templates
+                // FT1.4 is required transaction date (currently not used)
+                // FT1.6 is required transaction type (currently not used)
+                // FT1.7 is required transaction code (currently not used)
+                + "FT1||||20201231145045||CG|FAKE|||||||||||||||||||||||||||||||||||||\n"
                 // IN1 Segment is split and concatenated for easier understanding. (| precedes numbered field.)
                 // IN1.2.1, IN1.2.3 to Identifier 1
                 // IN1.2.4, IN1.2.6 to Identifier 2
@@ -373,6 +383,11 @@ class Hl7FinancialInsuranceTest {
                 + "EVN||20210407191342||||||\n"
                 + "PID|||MR1^^^XYZ^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
                 + "PV1||I||||||||||||||||||||||||||||||||||||||||||\n"
+                // FT1 added for completeness; required in specification, but not used (ignored) by templates
+                // FT1.4 is required transaction date (currently not used)
+                // FT1.6 is required transaction type (currently not used)
+                // FT1.7 is required transaction code (currently not used)
+                + "FT1||||20201231145045||CG|FAKE|||||||||||||||||||||||||||||||||||||\n"
                 // IN1 Segment is split and concatenated for easier understanding. (| precedes numbered field.)
                 // IN1.2.1, IN1.2.3 to Identifier 1
                 // IN1.2.4, IN1.2.6 to Identifier 2
