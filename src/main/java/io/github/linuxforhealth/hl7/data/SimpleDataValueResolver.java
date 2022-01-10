@@ -507,6 +507,20 @@ public class SimpleDataValueResolver {
         return commonCodingSystemV2(table, code, text, version);
     };
 
+    public static final ValueExtractor<Object, String> UNIT_SYSTEM = (Object value) -> {
+        value = checkForAndUnwrapVariesObject(value);
+        String table = Hl7DataHandlerUtil.getTableNumber(value);
+        String code = Hl7DataHandlerUtil.getStringValue(value);
+        String text = Hl7DataHandlerUtil.getOriginalDisplayText(value);
+        String version = Hl7DataHandlerUtil.getVersion(value);
+
+        SimpleCode codingSystem = commonCodingSystemV2(table, code, text, version);
+        if (codingSystem.getSystem() != null) {
+            return codingSystem.getSystem();
+        }
+        return "http://unitsofmeasure.org";
+    };
+
     // For OBX.5 and other dynamic encoded fields, the real class is wrapped in the Varies class, and must be extracted from data
     private static final Object checkForAndUnwrapVariesObject(Object value) {
         if (value instanceof Varies) {
