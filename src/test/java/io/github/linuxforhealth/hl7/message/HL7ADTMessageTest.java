@@ -184,24 +184,43 @@ class HL7ADTMessageTest {
     }
 
     @Test
-    @Disabled("adt-a03 not yet supported")
-    void test_adta03_patient_encounter_present() throws IOException {
+    void test_adta03_resources_present() throws IOException {
         String hl7message = "MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||ADT^A03|controlID|P|2.6\n"
                 + "EVN|A01|20150502090000|\n"
-                + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
-                + "NK1|1|Kennedy^Joe|FTH|||+44 201 12345678||\n"
-                + "PV1||I||||||||SUR||||||||S|VisitNumber^^^ACME|A||||||||||||||||||||||||20150502090000|\n";
+                + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\r"
+                + "PD1|||||||||||01|N||||A\r"
+                + "PV1||I||||||||SUR||||||||S|VisitNumber^^^ACME|A||||||||||||||||||||||||20150502090000|\n"
+                + "PV2|||||||||||||||||||||||||AI|||||||||||||C|\n"
+                + "AL1|1|DA|1605^acetaminophen^L|MO|Muscle Pain~hair loss\r"
+                + "AL1|1|DA|1605^acetaminophen^L|MO|Muscle Pain~hair loss\r"
+                + "DG1|1||B45678|||A|\r"
+                + "PR1|1|ICD10|B45678|Fix break|20210322155008|A|75||V46|80|||32|1|D22|G45|1|G|P98|X|0|0\r"
+                + "PR1|1|ICD10|B45678|Fix break|20210322155008|A|75||V46|80|||32|1|D22|G45|1|G|P98|X|0|0\r"
+                + "OBX|1|NM|111^TotalProtein||7.5|gm/dl|5.9-8.4||||F\r"
+                + "OBX|2|ST|100||Observation content|||||||X\r";
 
         List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
 
-        // Expecting 2 total resources
-        assertThat(e.size()).isEqualTo(2);
+        // Expecting 9 total resources
+        assertThat(e.size()).isEqualTo(9);
 
         List<Resource> patientResource = ResourceUtils.getResourceList(e, ResourceType.Patient);
-        assertThat(patientResource).hasSize(1);
+        assertThat(patientResource).hasSize(1); // from PID and PD1
 
         List<Resource> encounterResource = ResourceUtils.getResourceList(e, ResourceType.Encounter);
-        assertThat(encounterResource).hasSize(1);
+        assertThat(encounterResource).hasSize(1); // from EVN, PV1, and PV2
+
+        List<Resource> observationResource = ResourceUtils.getResourceList(e, ResourceType.Observation);
+        assertThat(observationResource).hasSize(2); // from OBX
+
+        List<Resource> allergyIntoleranceResource = ResourceUtils.getResourceList(e, ResourceType.AllergyIntolerance);
+        assertThat(allergyIntoleranceResource).hasSize(2); // from AL1
+
+        List<Resource> conditionResource = ResourceUtils.getResourceList(e, ResourceType.Condition);
+        assertThat(conditionResource).hasSize(1); // from DG1
+
+        List<Resource> procedureResource = ResourceUtils.getResourceList(e, ResourceType.Procedure);
+        assertThat(procedureResource).hasSize(2); //from PROCEDURE.PR1
 
     }
 
