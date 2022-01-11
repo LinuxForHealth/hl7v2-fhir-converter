@@ -23,11 +23,14 @@ identifier:
    generateList: true
    expressionType: resource
    vars:
+      # For identifier.value
       valueIn: String, IN1.49.1 
-   constants:
-      system: http://terminology.hl7.org/CodeSystem/v2-0203
-      code: XV
-      display: "Health Plan Identifier"
+      # For identifier.system; systemCX will process and remove spaces
+      systemCX: IN1.49.4
+      # For identifier.type, code, system, & display.
+      # Because IN1.49.5 is an ID code, this will create a correct coding
+      # because it knows the table from position and looks up the display
+      coding: CODING_SYSTEM_V2_IDENTIFIER, IN1.49.5
 
 patient: 
    valueOf: datatype/Reference

@@ -250,8 +250,8 @@ class Hl7FinancialInsuranceTest {
     })
     // Tests IN1.17 coverage by related person. A related person should be created and cross-referenced.
     // Also tests backup field for coverage.order
-    void testInsuranceCoverageByRelatedFields(String messageType) throws IOException {
 
+    void testInsuranceCoverageByRelatedFields(String messageType) throws IOException {
         String hl7message = "MSH|^~\\&|||||20151008111200||"+messageType+"|MSGID000001|T|2.6|||||||||\n"
                 + "EVN||20210407191342||||||\n"
                 + "PID|||MR1^^^XYZ^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
@@ -287,8 +287,12 @@ class Hl7FinancialInsuranceTest {
                 // IN1.43 to RelatedPerson.gender
                 // IN1.46 to Identifier 3
                 // IN1.49 to RelatedPerson.identifier
+                //    IN1.49.1 to RelatedPerson.identifier.value
+                //    IN1.49.4 to RelatedPerson.identifier.system
+                //    IN1.49.5 to RelatedPerson.identifier.type.code (must be from terminology.hl7.org/3.0.0/CodeSystem-v2-0203.html)
+                //      NOTE: Purposely XX to ensure we are doing a lookup, and not getting bleed from other hard-coded XV uses
                 // IN1.50 through IN1.53 NOT REFERENCED
-                + "|MEMBER36|||||||F|||Value46|||J494949||||\n";
+                + "|MEMBER36|||||||F|||Value46|||J494949^^^Large HMO^XX||||\n";
 
         List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
 
@@ -322,10 +326,10 @@ class Hl7FinancialInsuranceTest {
 
         // Check RelatedPerson identifier
         assertThat(related.getIdentifier()).hasSize(1);
-        assertThat(related.getIdentifier().get(0).getValue()).isEqualTo("J494949"); // IN1.49
-        assertThat(related.getIdentifier().get(0).getSystem()).isNull();
-        DatatypeUtils.checkCommonCodeableConceptAssertions(related.getIdentifier().get(0).getType(), "XV",
-                "Health Plan Identifier",
+        assertThat(related.getIdentifier().get(0).getValue()).isEqualTo("J494949"); // IN1.49.1
+        assertThat(related.getIdentifier().get(0).getSystem()).isEqualTo("urn:id:Large_HMO"); // IN1.49.4
+        DatatypeUtils.checkCommonCodeableConceptAssertions(related.getIdentifier().get(0).getType(), "XX", // IN1.49.5
+                "Organization identifier",
                 "http://terminology.hl7.org/CodeSystem/v2-0203", null);
 
         // Check RelatedPerson name. IN1.16 name is standard XPN, tested exhaustively in other tests.        
