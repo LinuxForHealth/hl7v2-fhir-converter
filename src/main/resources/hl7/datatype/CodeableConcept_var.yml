@@ -12,6 +12,11 @@ coding:
     valueOf: datatype/Coding
     expressionType: resource
     condition: $code NOT_NULL
+    # Coding uses these scope vars: 
+    # $code
+    # $system
+    # $display
+    # $version
 
 text:  
      valueOf: $text
