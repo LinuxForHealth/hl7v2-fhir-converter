@@ -1,5 +1,5 @@
 #
-# (C) Copyright IBM Corp. 2020, 2021
+# (C) Copyright IBM Corp. 2020, 2022
 #
 # SPDX-License-Identifier: Apache-2.0
 #
@@ -23,7 +23,8 @@ identifier:
    generateList: true
    expressionType: resource
    vars:
-      # For identifier.value
+      # For identifier.value; required for valid identifier, 
+      # does not require and not dependent on IN1.49.4 or IN1.49.5
       valueIn: String, IN1.49.1 
       # For identifier.system; systemCX will process and remove spaces
       systemCX: IN1.49.4

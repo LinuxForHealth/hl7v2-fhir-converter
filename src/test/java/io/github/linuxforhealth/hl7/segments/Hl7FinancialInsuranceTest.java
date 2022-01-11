@@ -329,7 +329,7 @@ class Hl7FinancialInsuranceTest {
         assertThat(related.getIdentifier().get(0).getValue()).isEqualTo("J494949"); // IN1.49.1
         assertThat(related.getIdentifier().get(0).getSystem()).isEqualTo("urn:id:Large_HMO"); // IN1.49.4
         DatatypeUtils.checkCommonCodeableConceptAssertions(related.getIdentifier().get(0).getType(), "XX", // IN1.49.5
-                "Organization identifier",
+                "Organization identifier", // Display value looked up from code 'XX'
                 "http://terminology.hl7.org/CodeSystem/v2-0203", null);
 
         // Check RelatedPerson name. IN1.16 name is standard XPN, tested exhaustively in other tests.        
