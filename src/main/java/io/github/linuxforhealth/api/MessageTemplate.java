@@ -27,10 +27,10 @@ public interface  MessageTemplate<T> {
    *
    * @param data - Input
    * @param engine - {@link MessageEngine}
-   * @return String -JSON representation of FHIR bundle
+   * @return Bundle - {@link Bundle}
    *
    */
-  String convert(T data, MessageEngine engine);
+  Bundle convert(T data, MessageEngine engine);
 
   /**
    * Name of the message
@@ -45,16 +45,6 @@ public interface  MessageTemplate<T> {
    * @return {@link List} of {@link FHIRResourceTemplate}
    */
   List<FHIRResourceTemplate> getResources();
-
-  /**
-   * Takes input and converts it to FHIR bundle resource
-   *
-   * @param data - Input
-   * @param engine - {@link MessageEngine}
-   * @return Bundle - {@link Bundle} FHIR bundle
-   *
-   */
-  Bundle convertToBundle(T data, MessageEngine engine);
 
 
 }

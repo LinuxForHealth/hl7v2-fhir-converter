@@ -127,7 +127,8 @@ public class HL7ToFHIRConverter {
             String messageType = HL7DataExtractor.getMessageType(hl7message);
             HL7MessageModel hl7MessageTemplateModel = messagetemplates.get(messageType);
             if (hl7MessageTemplateModel != null) {
-                return hl7MessageTemplateModel.convert(hl7message, engine);
+                Bundle bundle = hl7MessageTemplateModel.convert(hl7message, engine);
+                return engine.getFHIRContext().encodeResourceToString(bundle);
             } else {
                 throw new UnsupportedOperationException("Message type not yet supported " + messageType);
             }
@@ -157,7 +158,7 @@ public class HL7ToFHIRConverter {
             String messageType = HL7DataExtractor.getMessageType(hl7message);
             HL7MessageModel hl7MessageTemplateModel = messagetemplates.get(messageType);
             if (hl7MessageTemplateModel != null) {
-                return hl7MessageTemplateModel.convertToBundle(hl7message, engine);
+                return hl7MessageTemplateModel.convert(hl7message, engine);
             } else {
                 throw new UnsupportedOperationException("Message type not yet supported " + messageType);
             }

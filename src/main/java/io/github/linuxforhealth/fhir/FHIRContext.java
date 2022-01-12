@@ -62,9 +62,6 @@ public class FHIRContext {
     }
 
     public String encodeResourceToString(Bundle bundle){
-        if (validateResource){
-            validate(bundle);
-        }
         return this.parser.encodeResourceToString(bundle);
     }
 
