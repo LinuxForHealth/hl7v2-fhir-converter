@@ -220,7 +220,7 @@ education:
             obx31: String, OBX.3.1
 
      documentType_1:
-        condition: $obx4 EQUALS $reference && $obx31 NOT_EQUALS 69764-9
+         condition: $obx4 EQUALS $reference && $obx31 NOT_EQUALS 69764-9
          type: STRING
          valueOf: $notSpecified
          expressionType: HL7Spec
