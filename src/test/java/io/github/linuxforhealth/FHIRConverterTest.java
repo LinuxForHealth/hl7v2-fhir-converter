@@ -15,20 +15,13 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import ca.uhn.fhir.context.FhirContext;
 import org.apache.commons.io.IOUtils;
 import org.hl7.fhir.exceptions.FHIRException;
 import org.hl7.fhir.instance.model.api.IBaseResource;
-import org.hl7.fhir.r4.model.Bundle;
+import org.hl7.fhir.r4.model.*;
 import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
 import org.hl7.fhir.r4.model.Bundle.BundleType;
-import org.hl7.fhir.r4.model.CodeableConcept;
-import org.hl7.fhir.r4.model.Coding;
-import org.hl7.fhir.r4.model.Identifier;
-import org.hl7.fhir.r4.model.Immunization;
-import org.hl7.fhir.r4.model.Organization;
-import org.hl7.fhir.r4.model.Quantity;
-import org.hl7.fhir.r4.model.Resource;
-import org.hl7.fhir.r4.model.ResourceType;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -49,6 +42,26 @@ class FHIRConverterTest {
     private static final String HL7_FILE_WIN_NEWLINE = "src/test/resources/sample_win.hl7";
     private static final ConverterOptions OPTIONS = new Builder().withValidateResource().withPrettyPrint().build();
     private static final Logger LOGGER = LoggerFactory.getLogger(FHIRConverterTest.class);
+
+    @Test
+    void test_patient_encounter_bundle_Return() throws IOException {
+
+        String hl7message = "MSH|^~\\&|SE050|050|PACS|050|20120912011230||ADT^A01|102|T|2.6|||AL|NE|764|ASCII||||||^4086::132:2A57:3C28^IPv6\r"
+                + "EVN||201209122222\r"
+                + "PID|0010||PID1234^5^M11^A^MR^HOSP~1234568965^^^USA^SS||DOE^JOHN^A^||19800202|F||W|111 TEST_STREET_NAME^^TEST_CITY^NY^111-1111^USA||(905)111-1111|||S|ZZ|12^^^124|34-13-312||||TEST_BIRTH_PLACE\r"
+                + "PV1|1|ff|yyy|EL|ABC||200^ATTEND_DOC_FAMILY_TEST^ATTEND_DOC_GIVEN_TEST|201^REFER_DOC_FAMILY_TEST^REFER_DOC_GIVEN_TEST|202^CONSULTING_DOC_FAMILY_TEST^CONSULTING_DOC_GIVEN_TEST|MED|||||B6|E|272^ADMITTING_DOC_FAMILY_TEST^ADMITTING_DOC_GIVEN_TEST||48390|||||||||||||||||||||||||201409122200|20150206031726\r"
+                + "OBX|1|TX|1234||ECHOCARDIOGRAPHIC REPORT||||||F|||||2740^TRDSE^Janetary~2913^MRTTE^Darren^F~3065^MGHOBT^Paul^J~4723^LOTHDEW^Robert^L|\r"
+                + "AL1|1|DRUG|00000741^OXYCODONE||HYPOTENSION\r" + "AL1|2|DRUG|00001433^TRAMADOL||SEIZURES~VOMITING\r"
+                + "PRB|AD|200603150625|aortic stenosis|53692||2||200603150625";
+
+        HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
+        Bundle bundle = ftv.convertToBundle(hl7message, OPTIONS);
+
+        List<List<Identifier>> o = bundle.getEntry().stream().filter(entry -> ResourceType.Patient == entry.getResource().getResourceType()).map(entry -> ((Patient)entry.getResource()).getIdentifier()).collect(Collectors.toList());
+
+        verifyResult( FhirContext.forR4().newJsonParser().encodeResourceToString(bundle), Constants.DEFAULT_BUNDLE_TYPE);
+
+    }
 
     @Test
     void test_patient_encounter() throws IOException {

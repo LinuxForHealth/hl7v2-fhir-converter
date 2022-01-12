@@ -42,6 +42,16 @@ public class HL7MessageModel implements MessageTemplate<Message> {
 
   }
 
+  private void handleException(Exception e){
+    StackTraceElement[] stackTrace = e.getStackTrace();
+    StringBuilder classAndStack = new StringBuilder();
+    classAndStack.append(e.getClass()+"\n");
+    for(int i=0; i < stackTrace.length; i++) {
+      classAndStack.append(stackTrace[i] +"\n");
+    }
+    LOGGER.error("Error transforming HL7 message. {}",classAndStack);
+  }
+
 
 
   public String convert(String message, MessageEngine engine) throws IOException {
@@ -65,6 +75,48 @@ public class HL7MessageModel implements MessageTemplate<Message> {
 
   }
 
+  public Bundle convertToBundle(String message, MessageEngine engine) throws IOException{
+    Preconditions.checkArgument(StringUtils.isNotBlank(message),
+            "Input Hl7 message cannot be blank");
+    HL7HapiParser hparser = null;
+    try {
+      hparser = new HL7HapiParser();
+
+      Message hl7message = hparser.getParser().parse(message);
+      return convertToBundle(hl7message, engine);
+
+
+    } catch (HL7Exception e) {
+      throw new IllegalArgumentException("Cannot parse the message.", e);
+    } finally {
+      if (hparser != null) {
+        hparser.getContext().close();
+      }
+    }
+  }
+
+  public Bundle convertToBundle(Message message, MessageEngine engine){
+    Preconditions.checkArgument(message != null, "Input Hl7 message cannot be null");
+    Preconditions.checkArgument(engine != null, "MessageEngine cannot be null");
+
+    HL7DataExtractor hl7DTE = new HL7DataExtractor(message);
+    HL7MessageData dataSource = new HL7MessageData(hl7DTE);
+
+    Bundle bundle = null;
+
+    // Catch any exceptions and log them without the message.
+    // NOTE: We have seen PHI in these exception messages.
+    try {
+      bundle = engine.transform(dataSource, this.getResources(), new HashMap<>());
+      engine.getFHIRContext().validate(bundle);
+    }
+    catch(Exception e) {
+      // Print stack class and trace without the error message.
+      handleException(e);
+    }
+
+    return bundle;
+  }
 
   @Override
   public String convert(Message message, MessageEngine engine) {
@@ -84,13 +136,7 @@ public class HL7MessageModel implements MessageTemplate<Message> {
     }
     catch(Exception e) {
         // Print stack class and trace without the error message.
-        StackTraceElement[] stackTrace = e.getStackTrace();
-        StringBuilder classAndStack = new StringBuilder();
-        classAndStack.append(e.getClass()+"\n");
-        for(int i=0; i < stackTrace.length; i++) {
-        	classAndStack.append(stackTrace[i] +"\n");
-        }
-        LOGGER.error("Error transforming HL7 message. {}",classAndStack);
+       handleException(e);
     }
 
     return result;
