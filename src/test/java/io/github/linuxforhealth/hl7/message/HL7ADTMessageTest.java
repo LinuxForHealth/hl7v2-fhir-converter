@@ -184,11 +184,11 @@ class HL7ADTMessageTest {
     }
 
     @Test
-    void testAdtA03AllResourcesPresent() throws IOException {
+    void testAdtA03AllSegmentsAndMultipleGroups() throws IOException {
         String hl7message = "MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||ADT^A03|controlID|P|2.6\n"
                 + "EVN|A01|20150502090000|\n"
-                + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\r"
                 + "PID|||1234^^^^MR\r"
+                + "PD1|||||||||||01|N||||A\r"
                 + "PV1||I||||||||SUR||||||||S|VisitNumber^^^ACME|A||||||||||||||||||||||||20150502090000|\n"
                 + "PV2|||||||||||||||||||||||||AI|||||||||||||C|\n"
                 + "AL1|1||1605^acetaminophen^L\r"
@@ -198,12 +198,14 @@ class HL7ADTMessageTest {
                 + "PR1|1||B45678||20210322155008\r"
                 + "OBX||NM|111^TotalProtein\r"
                 + "OBX||ST|100\r"
+                + "IN1||||Large Blue Organization|456 Ultramarine Lane^^Faketown^CA^ZIP5\n"
+                + "IN1||||Large Blue Organization|456 Ultramarine Lane^^Faketown^CA^ZIP5\n"
                 + "IN1||||Large Blue Organization|456 Ultramarine Lane^^Faketown^CA^ZIP5\n";
 
         List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
 
         // Expecting 9 total resources
-        assertThat(e.size()).isEqualTo(11);
+        assertThat(e.size()).isEqualTo(15);
 
         List<Resource> patientResource = ResourceUtils.getResourceList(e, ResourceType.Patient);
         assertThat(patientResource).hasSize(1); // from PID and PD1
@@ -224,15 +226,15 @@ class HL7ADTMessageTest {
         assertThat(procedureResource).hasSize(2); //from PROCEDURE.PR1
 
         List<Resource> insuranceResource = ResourceUtils.getResourceList(e, ResourceType.Coverage);
-        assertThat(insuranceResource).hasSize(1); //from INSURANCE.IN1
+        assertThat(insuranceResource).hasSize(3); //from INSURANCE.IN1
 
         List<Resource> organizationResource = ResourceUtils.getResourceList(e, ResourceType.Organization);
-        assertThat(organizationResource).hasSize(1); //from INSURANCE.IN1
+        assertThat(organizationResource).hasSize(3); //from INSURANCE.IN1
 
     }
 
     @Test
-    void testAdtA03AllResourcesNoGroupsPresent() throws IOException {
+    void testAdtA03AllSegmentsNoGroupsPresent() throws IOException {
         String hl7message = "MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||ADT^A03|controlID|P|2.6\n"
                 + "EVN|A01|20150502090000|\n"
                 + "PID|||1234^^^^MR\r"
