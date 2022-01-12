@@ -1,16 +1,18 @@
 /*
- * (C) Copyright IBM Corp. 2021
+ * (C) Copyright IBM Corp. 2021, 2022
  *
  * SPDX-License-Identifier: Apache-2.0
  */
 package io.github.linuxforhealth.hl7.segments;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.IOException;
 import java.util.List;
 
 import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
+import org.hl7.fhir.r4.model.Coverage.ClassComponent;
 import org.hl7.fhir.r4.model.ContactPoint;
 import org.hl7.fhir.r4.model.Coverage;
 import org.hl7.fhir.r4.model.Enumerations;
@@ -22,6 +24,8 @@ import org.hl7.fhir.r4.model.RelatedPerson;
 import org.hl7.fhir.r4.model.Resource;
 import org.hl7.fhir.r4.model.ResourceType;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import io.github.linuxforhealth.hl7.segments.util.DatatypeUtils;
 import io.github.linuxforhealth.hl7.segments.util.ResourceUtils;
@@ -34,12 +38,16 @@ class Hl7FinancialInsuranceTest {
     @java.lang.SuppressWarnings("squid:S5961")
     @Test
     void testBasicInsuranceCoverageFields() throws IOException {
-        // Currently only tests limited items, other fields to be added
-
-        String hl7message = "MSH|^~\\&|||||20151008111200||ADT^A01^ADT_A01|MSGID000001|T|2.6|||||||||\n"
+        // Tests fields listed below.  
+        String hl7message = "MSH|^~\\&|||||20151008111200||DFT^P03^DFT_P03|MSGID000001|T|2.6|||||||||\n"
                 + "EVN||20210407191342||||||\n"
                 + "PID|||MR1^^^XYZ^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
                 + "PV1||I||||||||||||||||||||||||||||||||||||||||||\n"
+                // FT1 added for completeness; required in specification, but not used (ignored) by templates
+                // FT1.4 is required transaction date (currently not used)
+                // FT1.6 is required transaction type (currently not used)
+                // FT1.7 is required transaction code (currently not used)
+                + "FT1||||20201231145045||CG|FAKE|||||||||||||||||||||||||||||||||||||\n"
                 // IN1 Segment is split and concatenated for easier understanding. (| precedes numbered field.)
                 // IN1.2.1, IN1.2.3 to Identifier 1
                 // IN1.2.4, IN1.2.6 to Identifier 2
@@ -77,14 +85,19 @@ class Hl7FinancialInsuranceTest {
                 //    IN1.7.14 to Organization Contact Name .period.end
                 //    IN1.7.18 to Organization Contact telecom .rank 
                 + "|^^^^^333^4444444^^^^^^20201231145045^20211231145045^^^^1"
-                // IN1.8 to Coverage.class.value
-                // IN1.9.1 to Coverage.class.name
+                // IN1.8 to list element Coverage.class.value
+                // IN1.9.1 (1) to list element Coverage.class.name
+                // IN1.9.10 (1) to list element Coverage.class.value 
+                // IN1.9.1 (2) to list element Coverage.class.name and value (because IN1.9.10 (2) does not exist)
+                + "|UA34567|NameBlue^^^^^^^^^IDBlue~NameGreen||"
                 // IN1.12 to Coverage.period.start
                 // IN1.13 to Coverage.period.end
                 // IN1.17 is purposely empty - no Related Person should be created.
-                // IN1.14 through IN1.35 NOT REFERENCED
-                + "|UA34567|Blue|||20201231145045|20211231145045||||||||||||||||||||||"
+                // IN1.22 to Coverage.order takes priority over IN1.1
+                // IN1.23 through IN1.35 NOT REFERENCED
+                + "|20201231145045|20211231145045|||||||||5|||||||||||||"
                 // IN1.36 to Identifier 4
+                // IN1.36 also to subscriberId
                 // IN1.46 to Identifier 3
                 // IN1.47 through IN1.53 NOT REFERENCED
                 + "|MEMBER36||||||||||Value46|||||||\n";
@@ -177,15 +190,20 @@ class Hl7FinancialInsuranceTest {
                 "Member Number",
                 "http://terminology.hl7.org/CodeSystem/v2-0203", null);
 
+        // Confirm SubscriberId
+        assertThat(coverage.getSubscriberId()).isEqualTo("MEMBER36"); // IN1.36
+
+        // Confirm coverage.Order
+        assertThat(coverage.getOrder()).isEqualTo(5); // IN1.22 takes priority over IN1.1
+
         // Confirm Coverage Beneficiary references to Patient, and Payor references to Organization
         assertThat(coverage.getBeneficiary().getReference()).isEqualTo(patientId);
         assertThat(coverage.getPayorFirstRep().getReference()).isEqualTo(organizationId);
         // Only one Coverage Class expected.  (getClass_ is correct name for method)
-        assertThat(coverage.getClass_()).hasSize(1);
-        assertThat(coverage.getClass_FirstRep().getName()).isEqualTo("Blue"); // IN1.9.1
-        assertThat(coverage.getClass_FirstRep().getValue()).isEqualTo("UA34567"); // IN1.8
-        DatatypeUtils.checkCommonCodeableConceptVersionedAssertions(coverage.getClass_FirstRep().getType(), "group",
-                "Group", "http://terminology.hl7.org/CodeSystem/coverage-class", null, null);
+        assertThat(coverage.getClass_()).hasSize(3);
+        checkCoverageClassExistsWithCorrectValueAndName(coverage.getClass_(), "UA34567", null); // IN1.8  Only has value
+        checkCoverageClassExistsWithCorrectValueAndName(coverage.getClass_(), "IDBlue", "NameBlue"); // IN1.9 (1)
+        checkCoverageClassExistsWithCorrectValueAndName(coverage.getClass_(), "NameGreen", "NameGreen"); // IN1.9 (2) Name is also used for value
 
         // Confirm Coverage period
         assertThat(coverage.getPeriod().getStartElement().toString()).containsPattern("2020-12-31T14:50:45"); // IN1.12
@@ -200,16 +218,49 @@ class Hl7FinancialInsuranceTest {
         assertThat(e).hasSize(4);
     }
 
+    // Checks that a Coverage.Class with the right Value and Name and Type exist in the list
+    private void checkCoverageClassExistsWithCorrectValueAndName(List<ClassComponent> classes_, String value,
+            String name) {
+        for (ClassComponent c : classes_) {
+            // Find our class in the list
+            if (c.getValue().equals(value)) {
+                // Value is required
+                assertThat(c.getValue()).isEqualTo(value);
+                if (name != null) {
+                    assertThat(c.getName()).isEqualTo(name);
+                } else {
+                    assertThat(c.getName()).isNull();
+                }
+                DatatypeUtils.checkCommonCodeableConceptVersionedAssertions(c.getType(), "group",
+                        "Group", "http://terminology.hl7.org/CodeSystem/coverage-class", null, null);
+                return;
+            }
+        }
+        // if our class is not in the list, fail the check
+        fail("No Coverage.Class with value: " + value);
+    }
+
     // Suppress warnings about too many assertions in a test.  Justification: creating a FHIR message is very costly; we need to check many asserts per creation for efficiency.  
     @java.lang.SuppressWarnings("squid:S5961")
-    @Test
+    @ParameterizedTest
+    // Tests IN1 for different message types. 
+    // The breadth of this test is sufficent for multiple message type coverage, so other tests are not parameterized.
+    @ValueSource(strings = {
+            "DFT^P03^DFT_P03", "ADT^A01^ADT_A01"
+    })
     // Tests IN1.17 coverage by related person. A related person should be created and cross-referenced.
-    void testInsuranceCoverageByRelatedFields() throws IOException {
+    // Also tests backup field for coverage.order
 
-        String hl7message = "MSH|^~\\&|||||20151008111200||ADT^A01^ADT_A01|MSGID000001|T|2.6|||||||||\n"
+    void testInsuranceCoverageByRelatedFields(String messageType) throws IOException {
+        String hl7message = "MSH|^~\\&|||||20151008111200||"+messageType+"|MSGID000001|T|2.6|||||||||\n"
                 + "EVN||20210407191342||||||\n"
                 + "PID|||MR1^^^XYZ^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
                 + "PV1||I||||||||||||||||||||||||||||||||||||||||||\n"
+                // FT1 added for completeness; required in specification, but not used (ignored) by templates
+                // FT1.4 is required transaction date (currently not used)
+                // FT1.6 is required transaction type (currently not used)
+                // FT1.7 is required transaction code (currently not used)
+                + "FT1||||20201231145045||CG|FAKE|||||||||||||||||||||||||||||||||||||\n"
                 // IN1 Segment is split and concatenated for easier understanding. (| precedes numbered field.)
                 // IN1.2.1, IN1.2.3 to Identifier 1
                 // IN1.2.4, IN1.2.6 to Identifier 2
@@ -229,14 +280,19 @@ class Hl7FinancialInsuranceTest {
                 // IN1.17 to Coverage.relationship and RelatedPerson.relationship. 
                 // IN1.18 to RelatedPerson.birthDate
                 // IN1.19 to RelatedPerson.address (All XAD standard fields)
-                // IN1.20 through IN1.35 NOT REFERENCED
+                // IN1.22 purposely empty to show that IN1.1 is secondary for Coverage.order
+                // IN1.23 through IN1.35 NOT REFERENCED
                 + "|DoeFake^Judy^^^Rev.|PAR|19780429|19 Rose St^^Faketown^CA^ZIP5||||||||||||||||"
                 // IN1.36 to Identifier 4
                 // IN1.43 to RelatedPerson.gender
                 // IN1.46 to Identifier 3
                 // IN1.49 to RelatedPerson.identifier
+                //    IN1.49.1 to RelatedPerson.identifier.value
+                //    IN1.49.4 to RelatedPerson.identifier.system
+                //    IN1.49.5 to RelatedPerson.identifier.type.code (must be from terminology.hl7.org/3.0.0/CodeSystem-v2-0203.html)
+                //      NOTE: Purposely XX to ensure we are doing a lookup, and not getting bleed from other hard-coded XV uses
                 // IN1.50 through IN1.53 NOT REFERENCED
-                + "|MEMBER36|||||||F|||Value46|||J494949||||\n";
+                + "|MEMBER36|||||||F|||Value46|||J494949^^^Large HMO^XX||||\n";
 
         List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
 
@@ -250,7 +306,6 @@ class Hl7FinancialInsuranceTest {
 
         List<Resource> organizations = ResourceUtils.getResourceList(e, ResourceType.Organization);
         assertThat(organizations).hasSize(1); // From Payor created by IN1
-        // Organization org = (Organization) organizations.get(0);
 
         List<Resource> coverages = ResourceUtils.getResourceList(e, ResourceType.Coverage);
         assertThat(coverages).hasSize(1); // From IN1 segment
@@ -271,10 +326,10 @@ class Hl7FinancialInsuranceTest {
 
         // Check RelatedPerson identifier
         assertThat(related.getIdentifier()).hasSize(1);
-        assertThat(related.getIdentifier().get(0).getValue()).isEqualTo("J494949"); // IN1.49
-        assertThat(related.getIdentifier().get(0).getSystem()).isNull();
-        DatatypeUtils.checkCommonCodeableConceptAssertions(related.getIdentifier().get(0).getType(), "XV",
-                "Health Plan Identifier",
+        assertThat(related.getIdentifier().get(0).getValue()).isEqualTo("J494949"); // IN1.49.1
+        assertThat(related.getIdentifier().get(0).getSystem()).isEqualTo("urn:id:Large_HMO"); // IN1.49.4
+        DatatypeUtils.checkCommonCodeableConceptAssertions(related.getIdentifier().get(0).getType(), "XX", // IN1.49.5
+                "Organization identifier", // Display value looked up from code 'XX'
                 "http://terminology.hl7.org/CodeSystem/v2-0203", null);
 
         // Check RelatedPerson name. IN1.16 name is standard XPN, tested exhaustively in other tests.        
@@ -314,6 +369,9 @@ class Hl7FinancialInsuranceTest {
         // Confirm the RelatedPerson references the Patient
         assertThat(related.getPatient().getReference()).isEqualTo(patientId);
 
+        // Confirm coverage.Order
+        assertThat(coverage.getOrder()).isEqualTo(1); // IN1.1 backup for missing IN1.22
+
         // Confirm there are no unaccounted for resources
         // Expected: Coverage, Organization, Patient, Encounter, RelatedPerson
         assertThat(e).hasSize(5);
@@ -325,10 +383,15 @@ class Hl7FinancialInsuranceTest {
     // Tests IN1.17 coverage by one's self. A related person should not be created.  But the patient should be referenced.
     void testInsuranceCoverageOfSelf() throws IOException {
 
-        String hl7message = "MSH|^~\\&|||||20151008111200||ADT^A01^ADT_A01|MSGID000001|T|2.6|||||||||\n"
+        String hl7message = "MSH|^~\\&|||||20151008111200||DFT^P03^DFT_P03|MSGID000001|T|2.6|||||||||\n"
                 + "EVN||20210407191342||||||\n"
                 + "PID|||MR1^^^XYZ^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
                 + "PV1||I||||||||||||||||||||||||||||||||||||||||||\n"
+                // FT1 added for completeness; required in specification, but not used (ignored) by templates
+                // FT1.4 is required transaction date (currently not used)
+                // FT1.6 is required transaction type (currently not used)
+                // FT1.7 is required transaction code (currently not used)
+                + "FT1||||20201231145045||CG|FAKE|||||||||||||||||||||||||||||||||||||\n"
                 // IN1 Segment is split and concatenated for easier understanding. (| precedes numbered field.)
                 // IN1.2.1, IN1.2.3 to Identifier 1
                 // IN1.2.4, IN1.2.6 to Identifier 2

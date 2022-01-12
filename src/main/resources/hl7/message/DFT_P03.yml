@@ -1,0 +1,72 @@
+#
+# (C) Copyright IBM Corp. 2022
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+# FHIR Resources to extract from DFT_P03 message
+# 
+################################
+# NOTE: FT1 is not currently utilized. FT1 records are ignored.
+---
+resources:
+  - resourceName: MessageHeader
+    segment: MSH
+    resourcePath: resource/MessageHeader
+    repeats: false
+    isReferenced: false
+    additionalSegments: 
+      - EVN
+
+  - resourceName: Patient
+    segment: PID
+    resourcePath: resource/Patient
+    isReferenced: true
+    repeats: false
+    additionalSegments:
+      - PD1
+      - MSH
+
+  - resourceName: Encounter
+    segment: PV1
+    resourcePath: resource/Encounter
+    repeats: false
+    isReferenced: true
+    additionalSegments:
+      - PV2
+      - EVN
+      - MSH
+      - DG1
+
+  - resourceName: Coverage
+    segment: .IN1
+    group: INSURANCE
+    resourcePath: resource/Coverage
+    repeats: true
+    additionalSegments:
+      - MSH
+      - PID
+
+  - resourceName: ServiceRequest
+    segment: .ORC
+    group: COMMON_ORDER
+    resourcePath: resource/ServiceRequest
+    repeats: true
+    isReferenced: true
+    additionalSegments:
+      - .ORDER.OBR
+      - .ORDER.NTE
+      - MSH
+      - PV1
+      - PID  
+
+  - resourceName: Observation
+    segment: .OBSERVATION.OBX
+    group: COMMON_ORDER
+    resourcePath: resource/Observation
+    repeats: true
+    isReferenced: true
+    additionalSegments:
+      - MSH
+      - .ORC
+      - .ORDER.OBR
+      - .OBSERVATION.NTE   

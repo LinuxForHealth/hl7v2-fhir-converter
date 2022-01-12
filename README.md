@@ -9,6 +9,7 @@ The converter supports the following message types/events:
 * ADT_A08 - Patient Administration: Update Patient Information
 * ADT_A34 - Patient Administration: Merge Patient Information - Patient ID Only
 * ADT_A40 - Patient Administration: Merge Patient - Patient Identifier List
+* DFT_P03 - Post Detail Financial Transaction (does not convert FT1)
 * MDM_T02 - Original Document Notifcication and Content
 * MDM_T06 - Document Addendum Notification and Content
 * OMP_O09 - Pharmacy/Treatment Order
@@ -23,6 +24,7 @@ The converter supports the following message segments:
 * AL1 - Patient Allergy Information
 * DG1 - Diagnosis
 * EVN - Event Type
+* IN1 - Insurance
 * MRG - Merge Patient Information
 * MSH - Message Header
 * NTE - Notes and Comments
@@ -37,7 +39,7 @@ The converter supports the following message segments:
 * RXA - Pharmacy/Treatment Administration
 * RXC - Pharmacy/Treatment Component Order
 * RXE - Pharmacy/Treatment Encoded Order
-* RXO - Pharmacy/Treatment Order
+* RXO - Pharmacy/Treatment Order (Ignored for RDE messages; RXE used instead)
 * RXR - Pharmacy/Treatment Route
 * SPM - Specimen
 * TXA - Transcription Document Header

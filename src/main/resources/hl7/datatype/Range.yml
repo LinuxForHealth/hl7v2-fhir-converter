@@ -5,17 +5,17 @@
 #
 ---
 low:
-    valueOf: datatype/Quantity
-    expressionType: resource
-    vars:
-      value: $lowVal
-      unit: $lowUnit
-      resolvedSystem: $unitSystem
+  valueOf: datatype/Quantity
+  expressionType: resource
+  vars:
+    value: $lowVal
+    unit: $lowUnit
+    resolvedSystem: $unitSystem
 
 high:
-    valueOf: datatype/Quantity
-    expressionType: resource
-    vars:
-      value: $highVal
-      unit: $highUnit
-      resolvedSystem: $unitSystem
+  valueOf: datatype/Quantity
+  expressionType: resource
+  vars:
+    value: $highVal
+    unit: $highUnit
+    resolvedSystem: $unitSystem

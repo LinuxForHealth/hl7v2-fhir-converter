@@ -5,26 +5,26 @@
 #
 ---
 low:
-   condition: value NOT_NULL
-   valueOf: datatype/Quantity
-   expressionType: resource
-   vars:
-     value: $low
-     unit: $unit
+  condition: value NOT_NULL
+  valueOf: datatype/Quantity
+  expressionType: resource
+  vars:
+    value: $low
+    unit: $unit
 high:
-   condition: value NOT_NULL
-   valueOf: datatype/Quantity
-   expressionType: resource
-   vars:
-     value: $high
-     unit: $unit
+  condition: value NOT_NULL
+  valueOf: datatype/Quantity
+  expressionType: resource
+  vars:
+    value: $high
+    unit: $unit
 type:
-    type: STRING
-    valueOf: $type
+  type: STRING
+  valueOf: $type
 appliesTo:
-    type: STRING
-    valueOf: $appliesto
+  type: STRING
+  valueOf: $appliesto
 
 text:
-    type: STRING
-    valueOf: $textValue
+  type: STRING
+  valueOf: $textValue
