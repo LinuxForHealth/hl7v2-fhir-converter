@@ -18,9 +18,6 @@ import java.util.stream.Collectors;
 import org.apache.commons.io.IOUtils;
 import org.hl7.fhir.exceptions.FHIRException;
 import org.hl7.fhir.instance.model.api.IBaseResource;
-import org.hl7.fhir.r4.model.Bundle;
-import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
-import org.hl7.fhir.r4.model.Bundle.BundleType;
 import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.Identifier;
@@ -29,6 +26,9 @@ import org.hl7.fhir.r4.model.Organization;
 import org.hl7.fhir.r4.model.Quantity;
 import org.hl7.fhir.r4.model.Resource;
 import org.hl7.fhir.r4.model.ResourceType;
+import org.hl7.fhir.r4.model.Bundle;
+import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
+import org.hl7.fhir.r4.model.Bundle.BundleType;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -49,6 +49,25 @@ class FHIRConverterTest {
     private static final String HL7_FILE_WIN_NEWLINE = "src/test/resources/sample_win.hl7";
     private static final ConverterOptions OPTIONS = new Builder().withValidateResource().withPrettyPrint().build();
     private static final Logger LOGGER = LoggerFactory.getLogger(FHIRConverterTest.class);
+
+    @Test
+    void test_patient_encounter_bundle_return() throws IOException {
+
+        String hl7message =  "MSH|^~\\&|REGADT|MCM|RSP1P8|MCM|200301051530|SEC|ADT^A40^ADT_A39|00000003|P|2.6\n" +
+                "PID|||MR1^^^XYZ||MAIDENNAME^EVE\n" +
+                "MRG|MR2^^^XYZ\n";
+
+        HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
+        Bundle b = ftv.convertToBundle(hl7message, OPTIONS);
+
+        assertThat(b.getType()).isEqualTo(BundleType.COLLECTION);
+
+        List<Resource> patientResource = b.getEntry().stream()
+                .filter(v -> ResourceType.Patient == v.getResource().getResourceType())
+                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        assertThat(patientResource).hasSize(2);
+
+    }
 
     @Test
     void test_patient_encounter() throws IOException {

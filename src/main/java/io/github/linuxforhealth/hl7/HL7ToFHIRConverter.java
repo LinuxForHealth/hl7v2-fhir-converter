@@ -127,6 +127,37 @@ public class HL7ToFHIRConverter {
             String messageType = HL7DataExtractor.getMessageType(hl7message);
             HL7MessageModel hl7MessageTemplateModel = messagetemplates.get(messageType);
             if (hl7MessageTemplateModel != null) {
+                Bundle bundle = hl7MessageTemplateModel.convert(hl7message, engine);
+                return engine.getFHIRContext().encodeResourceToString(bundle);
+            } else {
+                throw new UnsupportedOperationException("Message type not yet supported " + messageType);
+            }
+        } else {
+            throw new IllegalArgumentException("Parsed HL7 message was null.");
+        }
+    }
+
+    /**
+     * Converts the input HL7 message (String data) into FHIR bundle resource.
+     *
+     * @param hl7MessageData Message to convert
+     * @param options Options for conversion
+     *
+     * @return Bundle {@link Bundle} resource.
+     * @throws UnsupportedOperationException - if message type is not supported
+     */
+    public Bundle convertToBundle(String hl7MessageData, ConverterOptions options) {
+        Preconditions.checkArgument(StringUtils.isNotBlank(hl7MessageData),
+                "Input HL7 message cannot be blank");
+        Preconditions.checkArgument(options != null, "options cannot be null.");
+        FHIRContext context = new FHIRContext(options.isPrettyPrint(), options.isValidateResource());
+        HL7MessageEngine engine = new HL7MessageEngine(context, options.getBundleType());
+
+        Message hl7message = getHl7Message(hl7MessageData);
+        if (hl7message != null) {
+            String messageType = HL7DataExtractor.getMessageType(hl7message);
+            HL7MessageModel hl7MessageTemplateModel = messagetemplates.get(messageType);
+            if (hl7MessageTemplateModel != null) {
                 return hl7MessageTemplateModel.convert(hl7message, engine);
             } else {
                 throw new UnsupportedOperationException("Message type not yet supported " + messageType);
