@@ -1,14 +1,30 @@
 #
-# (C) Copyright IBM Corp. 2020
+# (C) Copyright IBM Corp. 2020, 2022
 #
 # SPDX-License-Identifier: Apache-2.0
 #
 # Creates an identifier, you must provide all the values and variables, including those for CodeableConcept_var
 ---
-type: 
+
+# Used when a coding is not available but separate values are
+type_1: 
+   condition: $code NOT_NULL && $coding NULL
    valueOf: datatype/CodeableConcept_var
    generateList: true
    expressionType: resource
+    # CodeableConcept_var uses these scope vars: 
+    # $code (for CodeableConcept.Coding.code)
+    # $system (for CodeableConcept.Coding.system)
+    # $display (for CodeableConcept.Coding.display)
+    # $version (for CodeableConcept.Coding.version)
+    # $text (for CodeableConcept.text)
+
+# Used when a coding is available
+type_2:
+    condition: $coding NOT_NULL && $code NULL 
+    valueOf: datatype/CodeableConcept
+    generateList: true
+    expressionType: resource
     
 value:
    type: STRING
