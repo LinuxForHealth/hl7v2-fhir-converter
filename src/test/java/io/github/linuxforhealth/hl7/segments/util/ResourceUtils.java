@@ -51,7 +51,6 @@ public class ResourceUtils {
         HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
         String json = ftv.convert(inputSegment, OPTIONS);
         assertThat(json).isNotBlank();
-        System.out.println(json);
         LOGGER.debug("FHIR json result:\n" + json);
         FHIRContext context = new FHIRContext();
         IBaseResource bundleResource = context.getParser().parseResource(json);
