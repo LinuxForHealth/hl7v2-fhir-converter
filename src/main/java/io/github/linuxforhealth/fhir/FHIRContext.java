@@ -61,7 +61,11 @@ public class FHIRContext {
         return validator;
     }
 
-    public String encodeResourceToString(Bundle bundle) {
+    public String encodeResourceToString(Bundle bundle){
+        return this.parser.encodeResourceToString(bundle);
+    }
+
+    public void validate(Bundle bundle) {
         if (validateResource) {
             ValidationResult result = getValidator().validateWithResult(bundle);
             // The result object now contains the validation results
@@ -83,8 +87,9 @@ public class FHIRContext {
                 }
 
             }
+
         }
-        return this.parser.encodeResourceToString(bundle);
+
     }
 
     private static void initValidator() {
