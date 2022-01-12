@@ -199,6 +199,9 @@ reaction:
    vars:
       obx31: String, OBX.3.1
 
+# We need a way to grab a list of of OBX segments and group them by a specific field. In our case that field is OBX.4
+# More info in ImmunizationFhirConversionTest.testEducation
+# If OBX.3 signifies a documentType. show that documentType. if not default the document to "Unspecified" document type is required
 education:
    generateList: true
    expressionType: nested
@@ -216,12 +219,26 @@ education:
             obx4: String, OBX.4
             obx31: String, OBX.3.1
 
-     documentType:
+     documentType_1:
+        condition: $obx4 EQUALS $reference && $obx31 NOT_EQUALS 69764-9
          type: STRING
          valueOf: $notSpecified
          expressionType: HL7Spec
+         vars:
+            obx4: String, OBX.4
+            obx31: String, OBX.3.1
          constants:
             notSpecified: "unspecified"
+
+     documentType_2:
+        condition: $obx4 EQUALS $reference && $obx31 EQUALS 69764-9
+        type: STRING
+        valueOf: OBX.5
+        expressionType: HL7Spec
+        vars:
+           obx4: String, OBX.4
+           obx31: String, OBX.3.1
+
 
      presentationDate:
          condition: $obx4 EQUALS $reference && $obx31 EQUALS 29769-7
