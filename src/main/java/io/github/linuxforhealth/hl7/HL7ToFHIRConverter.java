@@ -116,25 +116,10 @@ public class HL7ToFHIRConverter {
      * @throws UnsupportedOperationException - if message type is not supported
      */
     public String convert(String hl7MessageData, ConverterOptions options) {
-        Preconditions.checkArgument(StringUtils.isNotBlank(hl7MessageData),
-                "Input HL7 message cannot be blank");
-        Preconditions.checkArgument(options != null, "options cannot be null.");
-        FHIRContext context = new FHIRContext(options.isPrettyPrint(), options.isValidateResource());
-        HL7MessageEngine engine = new HL7MessageEngine(context, options.getBundleType());
 
-        Message hl7message = getHl7Message(hl7MessageData);
-        if (hl7message != null) {
-            String messageType = HL7DataExtractor.getMessageType(hl7message);
-            HL7MessageModel hl7MessageTemplateModel = messagetemplates.get(messageType);
-            if (hl7MessageTemplateModel != null) {
-                Bundle bundle = hl7MessageTemplateModel.convert(hl7message, engine);
-                return engine.getFHIRContext().encodeResourceToString(bundle);
-            } else {
-                throw new UnsupportedOperationException("Message type not yet supported " + messageType);
-            }
-        } else {
-            throw new IllegalArgumentException("Parsed HL7 message was null.");
-        }
+        HL7MessageEngine engine = getMessageEngine(options);
+        Bundle bundle = convertToBundle(hl7MessageData, options);
+        return engine.getFHIRContext().encodeResourceToString(bundle);
     }
 
     /**
@@ -149,9 +134,7 @@ public class HL7ToFHIRConverter {
     public Bundle convertToBundle(String hl7MessageData, ConverterOptions options) {
         Preconditions.checkArgument(StringUtils.isNotBlank(hl7MessageData),
                 "Input HL7 message cannot be blank");
-        Preconditions.checkArgument(options != null, "options cannot be null.");
-        FHIRContext context = new FHIRContext(options.isPrettyPrint(), options.isValidateResource());
-        HL7MessageEngine engine = new HL7MessageEngine(context, options.getBundleType());
+        HL7MessageEngine engine = getMessageEngine(options);
 
         Message hl7message = getHl7Message(hl7MessageData);
         if (hl7message != null) {
@@ -165,6 +148,13 @@ public class HL7ToFHIRConverter {
         } else {
             throw new IllegalArgumentException("Parsed HL7 message was null.");
         }
+    }
+
+    private HL7MessageEngine getMessageEngine(ConverterOptions options){
+        Preconditions.checkArgument(options != null, "options cannot be null.");
+        FHIRContext context = new FHIRContext(options.isPrettyPrint(), options.isValidateResource());
+
+        return new HL7MessageEngine(context, options.getBundleType());
     }
 
     private static Message getHl7Message(String data) {
