@@ -61,7 +61,7 @@ Reuse existing resources other resources from from [src/main/resources/hl7/resou
 
 ### Validate the New Message
 
-You want to start with a valid HL7 message.  Generate or obtain a valid HL7 v2 message/triggering event. The message can be validated using the HAPI libraries packaged with the converter library. The example below demonstrates default HAPI validation within a JUnit5 test case context. _It only validates your proposed message, it does not convert the message or test it's conversion._
+You want to start with a valid HL7 message.  Generate or obtain a valid HL7 v2 message/triggering event. The message can be validated using the HAPI libraries packaged with the converter library. The example below demonstrates default HAPI validation within a JUnit5 test case context. _It only validates your proposed message, it does not convert the message or test its conversion._
 
 ```java
 package com.linuxforhealth.example;
