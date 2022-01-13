@@ -124,16 +124,19 @@ An good example of End-to-end test cases are found in [/src/test/java/io/github/
 
 The learning curve can feel steep for a new developer.  Suggestions for "ramping up":
 
-1. Download the project
-1. Set up your environment for Java development. We have contributors using VS Code, Eclipse, and IntelliJ.
-1. Run command gradle clean build. This will confirm your libraries are set up correctly and your development environment is working. (Be prepared that testing step has 500+ tests and may take 10 minutes or more to complete.)
-1. Select a unit test and run it. This will confirm your unit test set up is working. For example, you could try: Hl7FinancialInsuranceTest.java
-1. Set localDevEnv = true in gradle.properties. This will help you see your changes without doing a full build.
-1. View the json created from the conversion in the test. The easiest way to do this is put a breakpoint immediately after the command .convert, which returns json. For most tests this is in a common method: createFHIRBundleFromHL7MessageReturnEntryList in ResourceUtils.java.
-1. Use the debugger to step through the asserts of the test. View the associated data structures.
-1. Look at the templates that make your test run.
-1. Find the message in src/main/resources/hl7/message. e.g. DFT_P03.yml
-1. Find the segments created by the message in src/test/java/io/github/linuxforhealth/hl7/segments. For example: Coverage.yml and Organization.yml and RelatedPerson.yml.
-1. Observe how the Segment.Fields, such and IN1.17 map to resources.
-1. Make a small change to one of the tests. Change the input HL7 and see how the output works. Repeat.
+1.  Download the project
+2. Set up your environment for Java development.  We have contributors using VS Code, Eclipse, and IntelliJ.
+3. Run command `gradle clean build`.  This will confirm your libraries are set up correctly and your development environment is working. (Be prepared that testing step has 500+ tests and may take 10 minutes or more to complete.)
+4. Select a unit test and run it.  This will confirm your unit test set up is working.  For example, you could try: [Hl7FinancialInsuranceTest.java](src/test/java/io/github/linuxforhealth/hl7/message/Hl7FinancialInsuranceTest.java)
+5. Set `localDevEnv = true` in `gradle.properties`.  This will help you see your changes without doing a full build.
+6. View the json created from the conversion in the test.  The easiest way to do this is put a breakpoint immediately after the command `.convert`, which returns json. For most tests this is in a common method: `createFHIRBundleFromHL7MessageReturnEntryList` in `ResourceUtils.java`.
+7. Use the debugger to step through the asserts of the test.  View the associated data structures.
+8. Look at the templates that make your test run.
+9. Find the message in [src/main/resources/hl7/message](src/main/resources/hl7/message). e.g. DFT_P03.yml
+10. Find the segments created by the message in [src/test/java/io/github/linuxforhealth/hl7/segments](src/test/java/io/github/linuxforhealth/hl7/segments).  For example: Coverage.yml and Organization.yml and RelatedPerson.yml.
+11. Observe how the Segment.Fields, such and IN1.17 map to resources.
+12. Make a small change to one of the tests.  Change the input HL7 and see how the output works.  Repeat.
+
+
+
 
