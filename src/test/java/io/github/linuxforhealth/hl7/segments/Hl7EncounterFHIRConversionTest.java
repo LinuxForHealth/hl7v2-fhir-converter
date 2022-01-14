@@ -20,20 +20,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.hl7.fhir.instance.model.api.IBaseResource;
-import org.hl7.fhir.r4.model.Bundle;
+import org.hl7.fhir.r4.model.*;
 import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
-import org.hl7.fhir.r4.model.CodeableConcept;
-import org.hl7.fhir.r4.model.Coding;
-import org.hl7.fhir.r4.model.Duration;
-import org.hl7.fhir.r4.model.Encounter;
 import org.hl7.fhir.r4.model.Encounter.EncounterParticipantComponent;
-import org.hl7.fhir.r4.model.Extension;
-import org.hl7.fhir.r4.model.Narrative;
-import org.hl7.fhir.r4.model.Organization;
-import org.hl7.fhir.r4.model.Practitioner;
-import org.hl7.fhir.r4.model.Reference;
-import org.hl7.fhir.r4.model.Resource;
-import org.hl7.fhir.r4.model.ResourceType;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -430,6 +419,55 @@ class Hl7EncounterFHIRConversionTest {
                 + "PV1|1|E||||||||||||||||||||||||||||||||||||||||||20161014|20161015|||||||\n";
         encounter = ResourceUtils.getEncounter(hl7message);
         assertThat(encounter.hasLength()).isFalse();
+    }
+
+    @Test
+    void testEncounterPeriod() {
+
+        // Both start PV1.44 (EVN.6 and EVN.2 are here to PV1.44 takes precedence) and end PV1.45 are present
+        String hl7message = "MSH|^~\\&|PROSOLV||||20151008111200||ADT^A01^ADT_A01|MSGID000001|T|2.6|||||||||\n"
+                + "EVN|A04|20151008111200|||||20151008111200\n"
+                + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
+                // PV1.44 present; PV1.45 present
+                + "PV1|1|E||||||||||||||||||||||||||||||||||||||||||20161013154626|20161014154634|||||||\n";
+        Encounter encounter = ResourceUtils.getEncounter(hl7message);
+        assertThat(encounter.hasPeriod()).isTrue();
+        Period encounterPeriod = encounter.getPeriod();
+        assertThat(encounterPeriod.hasStart()).isTrue();
+        assertThat(encounterPeriod.hasEnd()).isTrue();
+        assertThat(encounterPeriod.getStart().toString()).contains("2016-10-13");
+        assertThat(encounterPeriod.getEnd().toString()).contains("2016-10-14");
+
+        // If PV1.44(Start) is missing we fall back to either EVN.6 or EVN.2 in this case EVN.6 is present and takes precedence over EVN.2
+        hl7message = "MSH|^~\\&|PROSOLV||||20151008111200||ADT^A01^ADT_A01|MSGID000001|T|2.6|||||||||\n"
+                + "EVN|A04|20201008111211||||20151008111200|\n"
+                + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
+                // PV1.44 empty; PV1.45 present
+                + "PV1|1|E|||||||||||||||||||||||||||||||||||||||||||20171018154634|||||||\n"
+                // PV2.11 present
+                + "PV2|||||||||||3|||||||||||||||||||||||||||||||||||||||||||||||\n";
+        encounter = ResourceUtils.getEncounter(hl7message);
+        assertThat(encounter.hasPeriod()).isTrue();
+        encounterPeriod = encounter.getPeriod();
+        assertThat(encounterPeriod.hasStart()).isTrue();
+        assertThat(encounterPeriod.hasEnd()).isTrue();
+        assertThat(encounterPeriod.getStart().toString()).contains("2015-10-08");
+        assertThat(encounterPeriod.getEnd().toString()).contains("2017-10-18");
+
+        // If PV1.44(Start) AND EVN.6(Start) is missing we fall back to EVN.2 for start no value present for period.End
+        hl7message = "MSH|^~\\&|PROSOLV||||20151008111200||ADT^A01^ADT_A01|MSGID000001|T|2.6|||||||||\n"
+                + "EVN|A04|20151008111200|||||\n"
+                + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
+                // PV1.44 empty; PV1.45 empty
+                + "PV1|1|E||||||||||||||||||||||||||||||||||||||||||||||||||\n"
+                + "PV2|||vomits|||||||||||||||||||||||||||||||||||||||||||||||||||||||\n";
+        encounter = ResourceUtils.getEncounter(hl7message);
+        assertThat(encounter.hasPeriod()).isTrue();
+        encounterPeriod = encounter.getPeriod();
+        assertThat(encounterPeriod.hasStart()).isTrue();
+        assertThat(encounterPeriod.hasEnd()).isFalse();
+        assertThat(encounterPeriod.getStart().toString()).contains("2015-10-08");
+        assertThat(encounterPeriod.getEnd()).isNull();
     }
 
     @Test
