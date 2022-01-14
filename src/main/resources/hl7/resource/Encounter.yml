@@ -75,7 +75,7 @@ period:
     valueOf: datatype/Period
     expressionType: resource
     vars: 
-       start: PV1.44 | EVN.6
+       start: PV1.44 | EVN.6 | EVN.2
        end: PV1.45
 
 length:
