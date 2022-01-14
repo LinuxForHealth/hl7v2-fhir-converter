@@ -435,8 +435,8 @@ class Hl7EncounterFHIRConversionTest {
         Period encounterPeriod = encounter.getPeriod();
         assertThat(encounterPeriod.hasStart()).isTrue();
         assertThat(encounterPeriod.hasEnd()).isTrue();
-        assertThat(encounterPeriod.getStart().toString()).contains("2016-10-13");
-        assertThat(encounterPeriod.getEnd().toString()).contains("2016-10-14");
+        assertThat(encounterPeriod.getStartElement().toString()).contains("2016-10-13");
+        assertThat(encounterPeriod.getEndElement().toString()).contains("2016-10-14");
 
         // If PV1.44(Start) is missing we fall back to either EVN.6 or EVN.2 in this case EVN.6 is present and takes precedence over EVN.2
         hl7message = "MSH|^~\\&|PROSOLV||||20151008111200||ADT^A01^ADT_A01|MSGID000001|T|2.6|||||||||\n"
@@ -451,8 +451,8 @@ class Hl7EncounterFHIRConversionTest {
         encounterPeriod = encounter.getPeriod();
         assertThat(encounterPeriod.hasStart()).isTrue();
         assertThat(encounterPeriod.hasEnd()).isTrue();
-        assertThat(encounterPeriod.getStart().toString()).contains("2015-10-08");
-        assertThat(encounterPeriod.getEnd().toString()).contains("2017-10-18");
+        assertThat(encounterPeriod.getStartElement().toString()).contains("2015-10-08");
+        assertThat(encounterPeriod.getEndElement().toString()).contains("2017-10-18");
 
         // If PV1.44(Start) AND EVN.6(Start) is missing we fall back to EVN.2 for start no value present for period.End
         hl7message = "MSH|^~\\&|PROSOLV||||20151008111200||ADT^A01^ADT_A01|MSGID000001|T|2.6|||||||||\n"
@@ -466,7 +466,7 @@ class Hl7EncounterFHIRConversionTest {
         encounterPeriod = encounter.getPeriod();
         assertThat(encounterPeriod.hasStart()).isTrue();
         assertThat(encounterPeriod.hasEnd()).isFalse();
-        assertThat(encounterPeriod.getStart().toString()).contains("2015-10-08");
+        assertThat(encounterPeriod.getStartElement().toString()).contains("2015-10-08");
         assertThat(encounterPeriod.getEnd()).isNull();
     }
 
