@@ -58,7 +58,7 @@ class FHIRConverterTest {
                 "MRG|MR2^^^XYZ\n";
 
         HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
-        Bundle b = ftv.convertToBundle(hl7message, OPTIONS);
+        Bundle b = ftv.convertToBundle(hl7message, OPTIONS, null);
 
         assertThat(b.getType()).isEqualTo(BundleType.COLLECTION);
 

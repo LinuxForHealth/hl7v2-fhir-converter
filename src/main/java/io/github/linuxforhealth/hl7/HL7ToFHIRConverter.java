@@ -118,7 +118,7 @@ public class HL7ToFHIRConverter {
     public String convert(String hl7MessageData, ConverterOptions options) {
 
         HL7MessageEngine engine = getMessageEngine(options);
-        Bundle bundle = convertToBundle(hl7MessageData, options);
+        Bundle bundle = convertToBundle(hl7MessageData, options, engine);
         return engine.getFHIRContext().encodeResourceToString(bundle);
     }
 
@@ -127,14 +127,16 @@ public class HL7ToFHIRConverter {
      *
      * @param hl7MessageData Message to convert
      * @param options Options for conversion
-     *
+     * @param engine Hl7Message engine
      * @return Bundle {@link Bundle} resource.
      * @throws UnsupportedOperationException - if message type is not supported
      */
-    public Bundle convertToBundle(String hl7MessageData, ConverterOptions options) {
+    public Bundle convertToBundle(String hl7MessageData, ConverterOptions options, HL7MessageEngine engine) {
         Preconditions.checkArgument(StringUtils.isNotBlank(hl7MessageData),
                 "Input HL7 message cannot be blank");
-        HL7MessageEngine engine = getMessageEngine(options);
+        if(engine == null) {
+            engine = getMessageEngine(options);
+        }
 
         Message hl7message = getHl7Message(hl7MessageData);
         if (hl7message != null) {
