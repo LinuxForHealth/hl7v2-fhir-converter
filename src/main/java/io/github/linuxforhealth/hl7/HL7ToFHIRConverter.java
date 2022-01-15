@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2020, 2021
+ * (C) Copyright IBM Corp. 2020, 2022
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -25,6 +25,7 @@ import com.google.common.base.Preconditions;
 import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Message;
 import ca.uhn.hl7v2.util.Hl7InputStreamMessageStringIterator;
+import io.github.linuxforhealth.core.config.ConverterConfiguration;
 import io.github.linuxforhealth.core.terminology.TerminologyLookup;
 import io.github.linuxforhealth.core.terminology.UrlLookup;
 import io.github.linuxforhealth.fhir.FHIRContext;
@@ -138,6 +139,11 @@ public class HL7ToFHIRConverter {
             engine = getMessageEngine(options);
         }
 
+        // If zoneIdText has been provide via run properties, it overrides the default and any value from the config file.
+        if (options.getZoneIdText()!=null) {
+            ConverterConfiguration.getInstance().setZoneId(options.getZoneIdText());
+        }
+
         Message hl7message = getHl7Message(hl7MessageData);
         if (hl7message != null) {
             String messageType = HL7DataExtractor.getMessageType(hl7message);
@@ -154,7 +160,7 @@ public class HL7ToFHIRConverter {
 
     private HL7MessageEngine getMessageEngine(ConverterOptions options){
         Preconditions.checkArgument(options != null, "options cannot be null.");
-        FHIRContext context = new FHIRContext(options.isPrettyPrint(), options.isValidateResource());
+        FHIRContext context = new FHIRContext(options.isPrettyPrint(), options.isValidateResource(), options.getProperties());
 
         return new HL7MessageEngine(context, options.getBundleType());
     }

@@ -27,6 +27,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
+import io.github.linuxforhealth.hl7.ConverterOptions;
+import io.github.linuxforhealth.hl7.ConverterOptions.Builder;
 import io.github.linuxforhealth.hl7.segments.util.DatatypeUtils;
 import io.github.linuxforhealth.hl7.segments.util.ResourceUtils;
 
@@ -377,11 +379,10 @@ class Hl7FinancialInsuranceTest {
         assertThat(e).hasSize(5);
     }
 
-    // Suppress warnings about too many assertions in a test.  Justification: creating a FHIR message is very costly; we need to check many asserts per creation for efficiency.  
-    @java.lang.SuppressWarnings("squid:S5961")
     @Test
     // Tests IN1.17 coverage by one's self. A related person should not be created.  But the patient should be referenced.
-    void testInsuranceCoverageOfSelf() throws IOException {
+    // Tests Organization ID created with a TENANT prepend.
+    void testInsuranceCoverageOfSelfAndTenant() throws IOException {
 
         String hl7message = "MSH|^~\\&|||||20151008111200||DFT^P03^DFT_P03|MSGID000001|T|2.6|||||||||\n"
                 + "EVN||20210407191342||||||\n"
@@ -396,13 +397,12 @@ class Hl7FinancialInsuranceTest {
                 // IN1.2.1, IN1.2.3 to Identifier 1
                 // IN1.2.4, IN1.2.6 to Identifier 2
                 + "IN1|1|Value1^^System3^Value4^^System6"
-                // Minimal Organization. Required for Payor, which is required.
-                // Organization deep test in testBasicInsuranceCoverageFields
+                // Minimal Organization to test TENANT prepend. 
                 // IN1.3 to Organization Identifier 
                 //    IN1.3.1 to Organization Identifier.value
-                //    IN1.3.4 to Organization Identifier.system
+                //    IN1.3.4 to Organization Identifier.system, will be prepended by TENANT from options
                 // IN1.4 to Organization Name
-                // IN1.5 to 15 NOT REFERENCED (See test testBasicInsuranceCoverageFields)
+                // IN1.5 to 15 NOT REFERENCED (Tested in testBasicInsuranceCoverageFields)
                 + "|IdValue1^^^IdSystem4^^^^|Large Blue Organization|||||||||||"
                 // IN1.16 empty because IN1.17 is SEL
                 // IN1.17 to Coverage.relationship.  SEL (self) should create relationship of ONESELF, and reference to patient. 
@@ -413,7 +413,9 @@ class Hl7FinancialInsuranceTest {
                 // IN1.47 through IN1.53 NOT REFERENCED
                 + "|MEMBER36||||||||||Value46|||||||\n";
 
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        // TENANT prepend is passed through the options.  
+        ConverterOptions customOptionsWithTenant = new Builder().withValidateResource().withPrettyPrint().withProperty("TENANT", "TenantId").build();        
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message, customOptionsWithTenant);
 
         List<Resource> encounters = ResourceUtils.getResourceList(e, ResourceType.Encounter);
         assertThat(encounters).hasSize(1); // From PV1
@@ -425,6 +427,16 @@ class Hl7FinancialInsuranceTest {
 
         List<Resource> organizations = ResourceUtils.getResourceList(e, ResourceType.Organization);
         assertThat(organizations).hasSize(1); // From Payor created by IN1
+        Organization org = (Organization) organizations.get(0);
+
+        // Check organization Id's
+        assertThat(org.getName()).isEqualTo("Large Blue Organization"); // IN1.4
+        assertThat(org.getIdentifier()).hasSize(1);
+        Identifier orgId1 = org.getIdentifierFirstRep();
+        assertThat(orgId1.getValue()).isEqualTo("TenantId.IdValue1"); // Options TENANT + IN1.3.1
+        assertThat(orgId1.getSystem()).isEqualTo("urn:id:IdSystem4"); // IN1.3.4
+        assertThat(orgId1.hasPeriod()).isFalse(); // IN1.3.7 & IN1.3.7 empty
+        assertThat(orgId1.hasType()).isFalse(); // IN1.3.5 empty
 
         List<Resource> coverages = ResourceUtils.getResourceList(e, ResourceType.Coverage);
         assertThat(coverages).hasSize(1); // From IN1 segment

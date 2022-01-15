@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2020, 2021
+ * (C) Copyright IBM Corp. 2020, 2022
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -136,6 +136,17 @@ public class ConverterConfiguration {
 
   public ZoneId getZoneId() {
     return zoneId;
+  }
+
+  // Allow override of ZoneId
+  public void setZoneId(String zoneText) {
+    try {
+      zoneId = ZoneId.of(zoneText);
+    } catch (DateTimeException e) {
+      LOGGER.warn("Cannot create ZoneId");
+      LOGGER.debug("Cannot create ZoneId from :" + zoneText, e);
+      // Leave zoneId as it was.
+    }
   }
 
   public String getAdditionalConceptmapFile() {

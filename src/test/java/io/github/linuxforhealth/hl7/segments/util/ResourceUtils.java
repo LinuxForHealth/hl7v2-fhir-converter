@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2021
+ * (C) Copyright IBM Corp. 2021, 2022
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -45,11 +45,15 @@ public class ResourceUtils {
 
     public static FHIRContext context = new FHIRContext();
     private static final Logger LOGGER = LoggerFactory.getLogger(ResourceUtils.class);
-    private static final ConverterOptions OPTIONS = new Builder().withValidateResource().withPrettyPrint().build();
+    private static final ConverterOptions STANDARD_OPTIONS = new Builder().withValidateResource().withPrettyPrint()/*.withZoneIdText("America/Los_Angeles").withProperty("TENANT", "BJCBJC")*/.build(); //.withProperty("TENANT", "BJCBJC")
 
     public static List<BundleEntryComponent> createFHIRBundleFromHL7MessageReturnEntryList(String inputSegment) {
+        return createFHIRBundleFromHL7MessageReturnEntryList(inputSegment, STANDARD_OPTIONS);
+    }
+
+    public static List<BundleEntryComponent> createFHIRBundleFromHL7MessageReturnEntryList(String inputSegment, ConverterOptions options ) {
         HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
-        String json = ftv.convert(inputSegment, OPTIONS);
+        String json = ftv.convert(inputSegment, options);
         assertThat(json).isNotBlank();
         LOGGER.debug("FHIR json result:\n" + json);
         FHIRContext context = new FHIRContext();

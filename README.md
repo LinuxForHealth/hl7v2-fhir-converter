@@ -51,6 +51,8 @@ If you need another message type/event . . .  contributions are welcome! See [CO
 * [Templating Configuration](./TEMPLATING.md)
 * [Development Guide](./DEVELOPMENT.md)
 * [HL7 to FHIR Conversion Design](./HL7FHIR.md)
+* [Techniques](./TECHNIQUES.md)
+* [Coding and Testing Best Practices](./BEST_PRACTICES.md)
 
 ## Development Quickstart
 
@@ -68,7 +70,7 @@ cd hl7v2-fhir-converter
 ./gradlew build
 ```
 
-## Using The Converter In A Java Application
+## Using the Converter in a Java Application
 
 The HL7 to FHIR converter library is available as a maven dependency. 
 
@@ -121,6 +123,16 @@ The config.properties file location is searched in the following order:
    ``` -Dhl7converter.config.home=/opt/converter/config_home_folder/```
 
 * Lastly, the local classpath resource folder will be searched for config.properties
+
+## Converter Runtime Parameters
+
+The converter allows passing of certain parameters at run time through the options.
+ 
+| Parameter Name           | Description                                                                                                                                                                       | Example Call on Options Creation                    |
+| ----------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------- |
+| ZoneIdText     | ZoneId override, passed as a valid ZoneId text string.  It is converted to a ZoneId.                                                            | options.withZoneIdText("+07:00")      |
+| Property (Key/Value)  | A string property expressed as a key / value pair.  Properties become available as variables to the templates.  A property `TENANT` with value `myTenantId` is utilized in templates as `$TENANT`.             | options.withProperty("TENANT","myTenantId")      |
+
 
 ### PHI (Protected Health Information)
 

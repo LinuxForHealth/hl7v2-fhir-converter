@@ -1,12 +1,14 @@
 /*
- * (C) Copyright IBM Corp. 2020, 2021
+ * (C) Copyright IBM Corp. 2020, 2022
  *
  * SPDX-License-Identifier: Apache-2.0
  */
 package io.github.linuxforhealth.fhir;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.common.hapi.validation.validator.FhirInstanceValidator;
@@ -30,22 +32,40 @@ public class FHIRContext {
     private IParser parser;
     private static FhirValidator validator;
     private boolean validateResource;
+    private HashMap<String, String> properties = new HashMap<>();
 
     /**
      * Constructor for FHIRContext
      * 
      * @param isPrettyPrint Should PrettyPrint be applied to output formatting
      * @param validateResource Should the output be FHIR validated
+     * @param properties Run-time properties in a Map or Key / value pairs
+     * 
+     */
+    public FHIRContext(boolean isPrettyPrint, boolean validateResource, Map<String,String> properties) {
+        parser = CTX.newJsonParser();
+        parser.setPrettyPrint(isPrettyPrint);
+        this.validateResource = validateResource;
+        this.properties = (HashMap<String, String>) properties;
+
+    }
+
+    /**
+     * Constructor for FHIRContext
+     * 
+     * @param isPrettyPrint Should PrettyPrint be applied to output formatting
+     * @param validateResource Should the output be FHIR validated
+     * 
      */
     public FHIRContext(boolean isPrettyPrint, boolean validateResource) {
         parser = CTX.newJsonParser();
         parser.setPrettyPrint(isPrettyPrint);
         this.validateResource = validateResource;
-
+        this.properties = new HashMap<>();
     }
 
     public FHIRContext() {
-        this(Constants.DEFAULT_PRETTY_PRINT, false);
+        this(Constants.DEFAULT_PRETTY_PRINT, false, new HashMap<>());
     }
 
     public IParser getParser() {
@@ -59,6 +79,10 @@ public class FHIRContext {
     public static FhirValidator getValidator() {
         initValidator();
         return validator;
+    }
+
+    public Map<String, String> getProperties() {
+        return properties;
     }
 
     public String encodeResourceToString(Bundle bundle){
