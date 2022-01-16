@@ -233,7 +233,6 @@ public class HL7MessageEngine implements MessageEngine {
     private static String getResultIdentifier(FHIRResourceTemplate resTemplate,
             ResourceResult result) {
 
-        // BJCBJC if (result != null && result.getGroupId() != null && !result.getGroupId().startsWith("OBSERVATION_")) {
         if (result != null && result.getGroupId() != null) {
             return resTemplate.getResourceName() + "_" + result.getGroupId();
         } else {

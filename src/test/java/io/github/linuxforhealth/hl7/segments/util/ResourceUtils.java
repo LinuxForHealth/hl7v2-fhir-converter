@@ -45,7 +45,7 @@ public class ResourceUtils {
 
     public static FHIRContext context = new FHIRContext();
     private static final Logger LOGGER = LoggerFactory.getLogger(ResourceUtils.class);
-    private static final ConverterOptions STANDARD_OPTIONS = new Builder().withValidateResource().withPrettyPrint()/*.withZoneIdText("America/Los_Angeles").withProperty("TENANT", "BJCBJC")*/.build(); //.withProperty("TENANT", "BJCBJC")
+    private static final ConverterOptions STANDARD_OPTIONS = new Builder().withValidateResource().withPrettyPrint().build(); 
 
     public static List<BundleEntryComponent> createFHIRBundleFromHL7MessageReturnEntryList(String inputSegment) {
         return createFHIRBundleFromHL7MessageReturnEntryList(inputSegment, STANDARD_OPTIONS);
