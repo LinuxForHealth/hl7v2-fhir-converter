@@ -99,6 +99,15 @@ public class ConverterOptions {
         return zoneIdText;
     }
 
+    /**
+     * getProperty looks up the value for a property of key
+     * 
+     * @key isPrettyPrint Should PrettyPrint be applied to output formatting
+     * 
+     * @return the value associated with the key or NULL if the key is not found
+     * 
+     */
+
     public String getProperty(String key) {
         Preconditions.checkArgument(key != null, "Property key cannot be null");
         return properties.get(key);

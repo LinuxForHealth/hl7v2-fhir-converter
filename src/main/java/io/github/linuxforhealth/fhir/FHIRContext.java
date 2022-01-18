@@ -32,14 +32,14 @@ public class FHIRContext {
     private IParser parser;
     private static FhirValidator validator;
     private boolean validateResource;
-    private HashMap<String, String> properties = new HashMap<>();
+    private HashMap<String, String> properties;
 
     /**
      * Constructor for FHIRContext
      * 
      * @param isPrettyPrint Should PrettyPrint be applied to output formatting
      * @param validateResource Should the output be FHIR validated
-     * @param properties Run-time properties in a Map or Key / value pairs
+     * @param properties Run-time properties in a Map of Key / Value String pairs
      * 
      */
     public FHIRContext(boolean isPrettyPrint, boolean validateResource, Map<String,String> properties) {
@@ -58,10 +58,7 @@ public class FHIRContext {
      * 
      */
     public FHIRContext(boolean isPrettyPrint, boolean validateResource) {
-        parser = CTX.newJsonParser();
-        parser.setPrettyPrint(isPrettyPrint);
-        this.validateResource = validateResource;
-        this.properties = new HashMap<>();
+        this(isPrettyPrint, validateResource, new HashMap<>());
     }
 
     public FHIRContext() {

@@ -138,7 +138,7 @@ public class ConverterConfiguration {
     return zoneId;
   }
 
-  // Allow override of ZoneId
+  // Allow override of the ZoneId used for TimeZone operations
   public void setZoneId(String zoneText) {
     try {
       zoneId = ZoneId.of(zoneText);

@@ -82,6 +82,7 @@ class ConverterConfigurationTest {
         assertThat(theConvConfig.getAdditionalResourcesLocation()).isEqualTo("src/test/resources/additional_resources");
 
         // Test that ZoneId can be overridden
+        assertThat(theConvConfig.getZoneId().getId()).isEqualTo("+08:00"); // Double check value before the set (previouly checked line 79)
         theConvConfig.setZoneId("+07:00");
         assertThat(theConvConfig.getZoneId().getId()).isEqualTo("+07:00");
 
