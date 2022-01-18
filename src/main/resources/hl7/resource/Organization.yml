@@ -73,7 +73,6 @@ address:
 
 contact: 
    valueOf: secondary/Contact
-   condition: $orgContactXCN NOT_NULL
    generateList: true
    expressionType: resource
    specs: $orgContactXCN
