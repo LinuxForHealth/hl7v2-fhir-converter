@@ -126,7 +126,7 @@ relationship:
    generateList: true
    condition: $coding NOT_NULL
    vars:
-      coding: POLICYHOLDER_RELATIONSHIP, IN1.17
+      coding: SUBSCRIBER_RELATIONSHIP, IN1.17
       text: String, IN1.17.2      
 
 beneficiary:

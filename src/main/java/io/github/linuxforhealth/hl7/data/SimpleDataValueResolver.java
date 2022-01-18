@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2020, 2021
+ * (C) Copyright IBM Corp. 2020, 2022
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -43,6 +43,7 @@ import org.hl7.fhir.r4.model.codesystems.V3MaritalStatus;
 import org.hl7.fhir.r4.model.codesystems.ConditionCategory;
 import org.hl7.fhir.r4.model.codesystems.MessageReasonEncounter;
 import org.hl7.fhir.r4.model.codesystems.NameUse;
+import org.hl7.fhir.r4.model.codesystems.SubscriberRelationship;
 import org.hl7.fhir.r4.model.codesystems.V3ReligiousAffiliation;
 import org.hl7.fhir.r4.model.codesystems.V3RoleCode;
 import org.hl7.fhir.r4.model.codesystems.DiagnosisRole;
@@ -356,20 +357,31 @@ public class SimpleDataValueResolver {
         return getFHIRCode(Hl7DataHandlerUtil.getStringValue(value), "EncounterModeOfArrivalDisplay");
     };
 
+    // Maps 0063 to values in http://terminology.hl7.org/CodeSystem/subscriber-relationship
     public static final ValueExtractor<Object, SimpleCode> POLICYHOLDER_RELATIONSHIP = (Object value) -> {
         String val = Hl7DataHandlerUtil.getStringValue(value);
-        String text = Hl7DataHandlerUtil.getOriginalDisplayText(value);
         String code = getFHIRCode(val, V3RoleCode.class);
         String version = Hl7DataHandlerUtil.getVersion(value);
         if (code != null) {
             V3RoleCode relationship = V3RoleCode.fromCode(code);
             return new SimpleCode(code, relationship.getSystem(), relationship.getDisplay(), version);
         } else {
-            // If code is null, it means the code wasn't known in our table, and can't be looked up.
-            // Make a message in the display.
-            String theSystem = V3RoleCode.PRN.getSystem();
-            return new SimpleCode(null, theSystem,
-                    String.format(INVALID_CODE_MESSAGE_FULL, val, theSystem, text, version));
+            // If code is not found in our mapping, return the code itself with no system or display. 
+            return new SimpleCode(val, null, null, null);
+        }
+    };
+
+    // Maps 0063 to values in http://terminology.hl7.org/CodeSystem/subscriber-relationship
+    public static final ValueExtractor<Object, SimpleCode> SUBSCRIBER_RELATIONSHIP = (Object value) -> {
+        String val = Hl7DataHandlerUtil.getStringValue(value);
+        String code = getFHIRCode(val, SubscriberRelationship.class);
+        String version = Hl7DataHandlerUtil.getVersion(value);
+        if (code != null) {
+            SubscriberRelationship relationship = SubscriberRelationship.fromCode(code);
+            return new SimpleCode(code, relationship.getSystem(), relationship.getDisplay(), version);
+        } else {
+            // If code is not found in our mapping, return the code itself with no system or display. 
+            return new SimpleCode(val, null, null, null);
         }
     };
 
@@ -517,8 +529,8 @@ public class SimpleDataValueResolver {
         SimpleCode codingSystem = commonCodingSystemV2(table, code, text, version);
         if (codingSystem.getSystem() != null) {
             return codingSystem.getSystem();
-        }
-        return "http://unitsofmeasure.org";
+        }return "http://unitsofmeasure.org";
+        
     };
 
     // For OBX.5 and other dynamic encoded fields, the real class is wrapped in the Varies class, and must be extracted from data

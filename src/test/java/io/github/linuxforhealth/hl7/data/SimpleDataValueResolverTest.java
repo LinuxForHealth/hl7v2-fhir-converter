@@ -361,12 +361,29 @@ class SimpleDataValueResolverTest {
         assertThat(coding.getDisplay()).isEqualTo("parent");
 
         // Check unsupported unknown input code
-        // Even though CGV is a valid HL7 code, there is no mapping
-        coding = SimpleDataValueResolver.POLICYHOLDER_RELATIONSHIP.apply("CGV");
-        assertThat(coding.getCode()).isNull();
-        assertThat(coding.getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/v3-RoleCode");
-        assertThat(coding.getDisplay()).isEqualTo(
-                "Invalid input: code 'CGV' could not be mapped to values in system 'http://terminology.hl7.org/CodeSystem/v3-RoleCode' with original display 'null' and version 'null'.");
+        // Because CGV has no mapping, we pass it without a system.
+        coding = SimpleDataValueResolver.POLICYHOLDER_RELATIONSHIP.apply("PET");
+        assertThat(coding.getCode()).isEqualTo("PET");
+        assertThat(coding.getSystem()).isNull();
+        assertThat(coding.getDisplay()).isNull();
+    }
+
+    @Test
+    void testSubscriberRelationship() {
+
+        // Check supported known input code
+        SimpleCode coding = SimpleDataValueResolver.SUBSCRIBER_RELATIONSHIP.apply("CHD");
+        assertThat(coding).isNotNull();
+        assertThat(coding.getCode()).isEqualTo("child");
+        assertThat(coding.getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/subscriber-relationship");
+        assertThat(coding.getDisplay()).isEqualTo("Child");
+
+        // Check unsupported unknown input code
+        // Because GOAT has no mapping, we pass it without a system.
+        coding = SimpleDataValueResolver.POLICYHOLDER_RELATIONSHIP.apply("GOAT");
+        assertThat(coding.getCode()).isEqualTo("GOAT");
+        assertThat(coding.getSystem()).isNull();
+        assertThat(coding.getDisplay()).isNull();
     }
 
 }
