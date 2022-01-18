@@ -457,10 +457,10 @@ class Hl7FinancialInsuranceTest {
         List<Resource> relatedPersons = ResourceUtils.getResourceList(e, ResourceType.RelatedPerson);
         assertThat(relatedPersons).isEmpty(); // No related person should be created because IN1.17 was SEL
 
-        // Check coverage.relationship
-        DatatypeUtils.checkCommonCodeableConceptAssertions(coverage.getRelationship(), "ONESELF",
-                "self",
-                "http://terminology.hl7.org/CodeSystem/v3-RoleCode", null); // IN1.17
+        // Check coverage.relationship (from SubscriberRelationship mapping)
+        DatatypeUtils.checkCommonCodeableConceptAssertions(coverage.getRelationship(), "self",
+                "Self",
+                "http://terminology.hl7.org/CodeSystem/subscriber-relationship", null); // IN1.17
 
         // Confirm there are no unaccounted for resources
         // Expected: Coverage, Organization, Patient, Encounter
