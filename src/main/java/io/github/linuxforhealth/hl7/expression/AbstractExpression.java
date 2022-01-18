@@ -172,14 +172,14 @@ public abstract class AbstractExpression implements Expression {
 
     List<Object> result = new ArrayList<>();
     List<ResourceValue> additionalresourcesresult = new ArrayList<>();
-    List<Object> baseSpecvalues =  // BJCBJC this is key.  I should have two spec values.
+    List<Object> baseSpecvalues =  
         getSpecValues(dataSource, localContextValues, baseinputValue, this.getspecs());
     LOGGER.debug("Base values evaluated {} -----  values {} ", this, baseSpecvalues);
 
 
     if (!baseSpecvalues.isEmpty()) {
       for (Object o : baseSpecvalues) {
-        EvaluationResult gen = generateValue(dataSource, localContextValues,  // BJCBJC SHould give me a value
+        EvaluationResult gen = generateValue(dataSource, localContextValues,  
             EvaluationResultFactory.getEvaluationResult(o));
 
         if (gen != null && gen.getValue() != null && !gen.isEmpty()) {
@@ -238,7 +238,7 @@ public abstract class AbstractExpression implements Expression {
     EvaluationResult specValues;
     if (specs == null || specs.isEmpty()) {
       specValues = baseinputValue;
-    } else {  //BJCBJC could put breakpoint here
+    } else { 
       specValues = SpecificationUtil.extractMultipleValuesForSpec(specs, dataSource,
           ImmutableMap.copyOf(contextValues));
     }

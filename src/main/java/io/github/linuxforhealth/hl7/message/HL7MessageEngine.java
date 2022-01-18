@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2020, 2021
+ * (C) Copyright IBM Corp. 2020, 2022
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -39,6 +39,7 @@ import io.github.linuxforhealth.core.Constants;
 import io.github.linuxforhealth.core.ObjectMapperUtil;
 import io.github.linuxforhealth.core.exception.RequiredConstraintFailureException;
 import io.github.linuxforhealth.core.expression.EvaluationResultFactory;
+import io.github.linuxforhealth.core.expression.SimpleEvaluationResult;
 import io.github.linuxforhealth.core.resource.ResourceResult;
 import io.github.linuxforhealth.core.resource.SimpleResourceValue;
 import io.github.linuxforhealth.fhir.FHIRContext;
@@ -97,6 +98,12 @@ public class HL7MessageEngine implements MessageEngine {
         HL7MessageData hl7DataInput = (HL7MessageData) dataInput;
         Bundle bundle = initBundle();
         Map<String, EvaluationResult> localContextValues = new HashMap<>(contextValues);
+
+        // Add run-time properties to localContextVariables
+        for (Map.Entry<String,String> entry : getFHIRContext().getProperties().entrySet()){
+            localContextValues.put(entry.getKey(), new SimpleEvaluationResult<String>(entry.getValue()));
+        }
+ 
         List<ResourceResult> resourceResultsWithEvalLater = new ArrayList<>();
         for (FHIRResourceTemplate genericTemplate : resources) {
             HL7FHIRResourceTemplate hl7ResourceTemplate = (HL7FHIRResourceTemplate) genericTemplate;
@@ -226,7 +233,6 @@ public class HL7MessageEngine implements MessageEngine {
     private static String getResultIdentifier(FHIRResourceTemplate resTemplate,
             ResourceResult result) {
 
-        // BJCBJC if (result != null && result.getGroupId() != null && !result.getGroupId().startsWith("OBSERVATION_")) {
         if (result != null && result.getGroupId() != null) {
             return resTemplate.getResourceName() + "_" + result.getGroupId();
         } else {

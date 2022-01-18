@@ -1,5 +1,5 @@
-# Coding and Testing Best Practices for
-##General
+# Coding and Testing Best Practices
+## General
 In addition to general Java best practices, these are additional requirements and recommendations 
 for keeping the increasingly large converter code maintable.  
 

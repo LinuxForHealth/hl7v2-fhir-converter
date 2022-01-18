@@ -51,6 +51,8 @@ If you need another message type/event . . .  contributions are welcome! See [CO
 * [Templating Configuration](./TEMPLATING.md)
 * [Development Guide](./DEVELOPMENT.md)
 * [HL7 to FHIR Conversion Design](./HL7FHIR.md)
+* [Techniques](./TECHNIQUES.md)
+* [Coding and Testing Best Practices](./BEST_PRACTICES.md)
 
 ## Development Quickstart
 
@@ -68,7 +70,7 @@ cd hl7v2-fhir-converter
 ./gradlew build
 ```
 
-## Using The Converter In A Java Application
+## Using the Converter in a Java Application
 
 The HL7 to FHIR converter library is available as a maven dependency. 
 
@@ -107,7 +109,7 @@ The converter configuration file, config.properties, supports the following sett
 | ----------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------- |
 | base.path.resource      | Path to resource templates (optional). If not specified the library's default resources under src/resources are used.                                                            | /opt/converter/resources        |
 | supported.hl7.messages  | Comma delimited list of hl7 message/event types. An asterisk `*` may be used to indicate all messages found in sub-directory `/hl7/messages` under the `base.path.resource` and sub-directory `/hl7/messages` under `additional.resources.location` are supported. If not specified, defaults to `*`.                                                                                                                             | ADT_A01, ORU_R01, PPR_PC1       |
-| default.zoneid          | ISO 8601 timezone offset (optional). The zoneid is applied to translations when the target FHIR resource field requires a timezone, but the source HL7 field does not include it. | +08:00                          |
+| default.zoneid          | ISO 8601 timezone offset (optional). The zoneid is converted to java.time.ZoneId and applied to translations when the target FHIR resource field requires a timezone, but the source HL7 field does not include it.  Requires a valid string value for java.time.ZoneId. | +08:00                          |
 | additional.conceptmap   | Path to additional concept map configuration. Concept maps are used for mapping one code system to another.                                                                       | /opt/converter/concept-map.yaml |
 | additional.resources.location  | Path to additional resources. These supplement those `base.path.resource`.                                                                         | /opt/supplemental/resources|
 
@@ -121,6 +123,16 @@ The config.properties file location is searched in the following order:
    ``` -Dhl7converter.config.home=/opt/converter/config_home_folder/```
 
 * Lastly, the local classpath resource folder will be searched for config.properties
+
+## Converter Runtime Parameters
+
+The converter allows passing of certain parameters at run time through the options.
+ 
+| Parameter Name           | Description                                                                                                                                                                       | Example Call on Options Creation                    |
+| ----------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------- |
+| ZoneIdText     | ZoneId override for the ISO 8601 timezone offset. Overrides default.zoneid in config.properties. Requires a valid ZoneId text value, which is converted to a java.time.ZoneId.            | options.withZoneIdText("+07:00")      |
+| Property (Key/Value)  | A string property expressed as a key / value pair.  Properties become available as variables to the templates.  A property `TENANT` with value `myTenantId` is utilized in templates as `$TENANT`.             | options.withProperty("TENANT","myTenantId")      |
+
 
 ### PHI (Protected Health Information)
 

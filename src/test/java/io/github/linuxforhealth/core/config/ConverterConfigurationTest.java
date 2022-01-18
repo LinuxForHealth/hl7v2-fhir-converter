@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2020, 2021
+ * (C) Copyright IBM Corp. 2020, 2022
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -80,6 +80,15 @@ class ConverterConfigurationTest {
         assertThat(theConvConfig.getAdditionalConceptmapFile())
                 .isEqualTo("src/test/resources/additional_conceptmap.yml");
         assertThat(theConvConfig.getAdditionalResourcesLocation()).isEqualTo("src/test/resources/additional_resources");
+
+        // Test that ZoneId can be overridden
+        assertThat(theConvConfig.getZoneId().getId()).isEqualTo("+08:00"); // Double check value before the set (previouly checked line 79)
+        theConvConfig.setZoneId("+07:00");
+        assertThat(theConvConfig.getZoneId().getId()).isEqualTo("+07:00");
+
+        // Test that a BAD ZoneId does not override and does not change existing value
+        theConvConfig.setZoneId("BAD_ZONE_ID");
+        assertThat(theConvConfig.getZoneId().getId()).isEqualTo("+07:00");
     }
 
     private void writeProperties(File configFile) throws FileNotFoundException, IOException {

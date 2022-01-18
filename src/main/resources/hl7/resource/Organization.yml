@@ -1,5 +1,5 @@
 #
-# (C) Copyright IBM Corp. 2020, 2021
+# (C) Copyright IBM Corp. 2020, 2022
 #
 # SPDX-License-Identifier: Apache-2.0
 #
@@ -17,9 +17,10 @@ identifier_1:
    vars:
       id: CWE.1 | XON.10 | XON.3
       system: CWE.3 
-# Used by IN1/Coverage (Insurance) organizations, which have a more complex identifier    
-identifier_2:
-   condition: $orgIdValue NOT_NULL
+# Used by IN1/Coverage (Insurance) organizations, which have a more complex identifier
+# This handles case when no $TENANT value is available        
+identifier_2a:
+   condition: $orgIdValue NOT_NULL && $TENANT NULL
    valueOf: datatype/Identifier_var
    generateList: true  
    expressionType: resource
@@ -28,7 +29,22 @@ identifier_2:
       systemCX: $orgIdSystem
       start: $orgIdStart
       end: $orgIdEnd
-      code: $orgIdTypeCode      
+      code: $orgIdTypeCode
+# Used by IN1/Coverage (Insurance) organizations, which have a more complex identifier
+# This handles case when $TENANT is passed at run time          
+identifier_2b:
+   condition: $orgIdValue NOT_NULL && $TENANT NOT_NULL
+   valueOf: datatype/Identifier_var
+   generateList: true  
+   expressionType: resource
+   vars:
+      valueIn: $TENANT + $period + $orgIdValue
+      systemCX: $orgIdSystem
+      start: $orgIdStart
+      end: $orgIdEnd
+      code: $orgIdTypeCode  
+   constants:
+      period: '.'                 
 name_v1:
    type: STRING
    condition: $idValue NULL
