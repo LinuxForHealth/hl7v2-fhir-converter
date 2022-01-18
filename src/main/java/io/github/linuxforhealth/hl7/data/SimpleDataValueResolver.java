@@ -357,7 +357,7 @@ public class SimpleDataValueResolver {
         return getFHIRCode(Hl7DataHandlerUtil.getStringValue(value), "EncounterModeOfArrivalDisplay");
     };
 
-    // Maps 0063 to values in http://terminology.hl7.org/CodeSystem/subscriber-relationship
+    // Maps 0063 to values in http://terminology.hl7.org/CodeSystem/v3-RoleCode
     public static final ValueExtractor<Object, SimpleCode> POLICYHOLDER_RELATIONSHIP = (Object value) -> {
         String val = Hl7DataHandlerUtil.getStringValue(value);
         String code = getFHIRCode(val, V3RoleCode.class);
