@@ -14,6 +14,7 @@ import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import ca.uhn.hl7v2.model.v26.datatype.CX;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringEscapeUtils;
 import org.apache.commons.text.StringTokenizer;
@@ -215,15 +216,6 @@ public class Hl7RelatedGeneralUtils {
             }
         }
         return null;
-    }
-
-    public static String noWhiteSpace(Object input) {
-        String val = Hl7DataHandlerUtil.getStringValue(input);
-        if (val != null) {
-            String newVal = val.replaceAll("\\s", "_");
-            return "urn:id:" + newVal;
-        } else
-            return null;
     }
 
     // Concatenates strings with a delimeter character(s) 

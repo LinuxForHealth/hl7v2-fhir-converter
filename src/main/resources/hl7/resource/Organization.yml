@@ -25,7 +25,7 @@ identifier_2:
    expressionType: resource
    vars:
       valueIn: $orgIdValue
-      systemCX: $orgIdSystem
+      systemCX: NO_WHITESPACE, $orgIdSystem
       start: $orgIdStart
       end: $orgIdEnd
       code: $orgIdTypeCode      

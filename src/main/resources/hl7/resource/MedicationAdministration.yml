@@ -16,7 +16,7 @@ identifier_1:
   expressionType: resource
   vars:
     valueIn: PV1.19.1 | PID.18.1 | MSH.7
-    systemCX: PV1.19.4 | PID.18.4
+    systemCX: NO_WHITESPACE, PV1.19 | PID.18
   constants:
     system: "http://terminology.hl7.org/CodeSystem/v2-0203"
     code: "VN"

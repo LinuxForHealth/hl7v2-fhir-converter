@@ -35,10 +35,8 @@ system_1:
    valueOf: $systemId
 
 system_2:
-   condition: $systemCX NOT_NULL 
-   valueOf: $join
-   vars:
-      join: $systemCX, GeneralUtils.noWhiteSpace(join)
+  type: STRING
+  valueOf: $systemCX
 
 use:
    condition: $use NOT_NULL 

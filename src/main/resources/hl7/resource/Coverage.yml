@@ -22,7 +22,7 @@ identifier_1:
   expressionType: resource
   vars:
     valueIn: IN1.2.1
-    systemCX: IN1.2.3
+    systemCX: NO_WHITESPACE, IN1.2
   constants:
     system: "http://terminology.hl7.org/CodeSystem/v2-0203"
     code: "XV"
@@ -35,7 +35,7 @@ identifier_2:
   expressionType: resource
   vars:
     valueIn: IN1.2.4
-    systemCX: IN1.2.6
+    systemCX: NO_WHITESPACE, IN1
   constants:
     system: "http://terminology.hl7.org/CodeSystem/v2-0203"
     code: "XV"
@@ -86,7 +86,7 @@ payor:
    vars: 
        orgName: String, IN1.4.1
        orgIdValue: String, IN1.3.1
-       orgIdSystem: String, IN1.3.4
+       orgIdSystem: IN1.3
        orgIdTypeCode: String, IN1.3.5
        orgIdStart: IN1.3.7
        orgIdEnd: IN1.3.8

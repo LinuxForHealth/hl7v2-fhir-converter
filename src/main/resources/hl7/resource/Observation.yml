@@ -29,7 +29,7 @@ identifier_2:
    expressionType: resource
    vars:
       valueIn: OBX.21.1
-      systemCX: OBX.21.2
+      systemCX: NO_WHITESPACE, OBX.21
 identifier_3:
   condition: $id NOT_NULL
   valueOf: datatype/Identifier_Observation

@@ -69,7 +69,8 @@ public enum SimpleDataTypeMapper {
   DOC_REF_DOC_STATUS(SimpleDataValueResolver.DOC_REF_DOC_STATUS_CODE_FHIR),
   POLICYHOLDER_RELATIONSHIP(SimpleDataValueResolver.POLICYHOLDER_RELATIONSHIP),
   UNIT_SYSTEM(SimpleDataValueResolver.UNIT_SYSTEM),
-  ENCOUNTER_MODE_ARRIVAL_DISPLAY(SimpleDataValueResolver.ENCOUNTER_MODE_ARRIVAL_DISPLAY);
+  ENCOUNTER_MODE_ARRIVAL_DISPLAY(SimpleDataValueResolver.ENCOUNTER_MODE_ARRIVAL_DISPLAY),
+  NO_WHITESPACE(SimpleDataValueResolver.NO_WHITESPACE);
 
   private ValueExtractor<Object, ?> valueResolver;
 

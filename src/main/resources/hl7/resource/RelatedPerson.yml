@@ -27,7 +27,7 @@ identifier:
       # does not require and not dependent on IN1.49.4 or IN1.49.5
       valueIn: String, IN1.49.1 
       # For identifier.system; systemCX will process and remove spaces
-      systemCX: IN1.49.4
+      systemCX: NO_WHITESPACE, IN1.49
       # For identifier.type, code, system, & display.
       # Because IN1.49.5 is an ID code, this will create a correct coding
       # because it knows the table from position and looks up the display

@@ -341,6 +341,22 @@ class HL7ADTMessageTest {
     }
 
     @Test
+    void testADTResources() throws IOException {
+        String hl7message = "MSH|^~\\&|PROSOLV|SENTARA|WHIA|IBM|20151008130307||ADT^A03^ADT_A03|MSGID000003|T|2.6\n" +
+                "EVN|A03|20151008130307|||\n" +
+                "PID|||PID-adt-a03-discharge-outpatient^^^^MR||DOE^JANE^|\n" +
+                "PV1|1|O||R|||2740^Tsadok^Janetary|2913^Merrit^Darren^F|3065^Mahoney^Paul^J||||||||9052^Winter^Oscar^||1001918||||||||||||||||||||||||||20151008140307|\n" +
+                "DG1|1||V72.83^Other specified pre-operative examination^ICD-9^^^|Other specified pre-operative examination|20151008130307|A|||||||||||||\n" +
+                "DG1|2||R06.02^Shortness of breath^ICD-10^^^|Shortness of breath|20151008130307|A|||||||||||||";
+
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+
+        List<Resource> conditionResource = ResourceUtils.getResourceList(e, ResourceType.Condition);
+
+
+    }
+
+    @Test
     @Disabled("adt-a28 not yet supported")
     //TODO: When this is supported, note that this should be updated to reflect adt_a05 structure
     void testAdtA28PatientEncounterPresent() throws IOException {

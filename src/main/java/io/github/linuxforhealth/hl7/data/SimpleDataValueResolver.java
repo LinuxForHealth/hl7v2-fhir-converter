@@ -21,8 +21,12 @@ import java.time.temporal.UnsupportedTemporalTypeException;
 import ca.uhn.hl7v2.model.v26.datatype.CWE;
 import ca.uhn.hl7v2.model.v26.datatype.PPN;
 import ca.uhn.hl7v2.model.v26.datatype.XCN;
-import ca.uhn.hl7v2.model.v26.segment.PV1;
+import ca.uhn.hl7v2.model.v26.datatype.CX;
+import ca.uhn.hl7v2.model.v26.datatype.EI;
 import ca.uhn.hl7v2.model.v26.datatype.DTM;
+import ca.uhn.hl7v2.model.v26.segment.PV1;
+import ca.uhn.hl7v2.model.v26.segment.IN1;
+
 
 import ca.uhn.hl7v2.model.Varies;
 import org.apache.commons.lang3.BooleanUtils;
@@ -388,6 +392,35 @@ public class SimpleDataValueResolver {
             return new SimpleCode(null, theSystem,
                     String.format(INVALID_CODE_MESSAGE_FULL, val, theSystem, text, version));
         }
+    };
+
+    public static final ValueExtractor<Object, String> NO_WHITESPACE = (Object value) -> {
+        String val = null;
+        if (value instanceof CX) {
+            CX cxVal = (CX) value;
+            val = Hl7DataHandlerUtil.getStringValue(cxVal.getCx4_AssigningAuthority());
+        }
+        else if (value instanceof CWE) {
+            CWE cweVal = (CWE) value;
+            val = Hl7DataHandlerUtil.getStringValue(cweVal.getCwe3_NameOfCodingSystem());
+        }
+        else if (value instanceof EI) {
+            EI eiVal = (EI) value;
+            val = Hl7DataHandlerUtil.getStringValue(eiVal.getEi2_NamespaceID());
+        }
+        else if (value instanceof IN1) { // There is one Identifier that is expecting the System value to come from cwe 6
+            // separating it from the other CWE(If statement) to prevent a leak
+            IN1 segment = (IN1) value;
+            CWE cweVal = segment.getIn12_InsurancePlanID();
+            val = Hl7DataHandlerUtil.getStringValue(cweVal.getCwe6_NameOfAlternateCodingSystem());
+        }
+        if (val != null) {
+            String newVal = val.replaceAll("\\s", "_");
+            return "urn:id:" + newVal;
+        }
+
+        return null;
+
     };
 
     public static final ValueExtractor<Object, Boolean> BOOLEAN = (Object value) -> {
