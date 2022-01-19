@@ -350,10 +350,8 @@ V3ReligiousAffiliation:
   # Unknown
   # VAR:   NO REASONABLE MATCH
 
-DiagnosisRole:
+DiagnosisRole: # maps DG1.6 to Encounter.diagnosis.use
    A: AD
-   F: DD # F stands for final DD stands for discharge Diagnosis which is the final diagnosis before being discharged
-   W: CC # When the patient presents with a chief complaint, such as cough, the provider considers the most common diseases that present with cough, forming a working differential diagnosis list
 
 MedicationRequestStatus:
    AF: active
