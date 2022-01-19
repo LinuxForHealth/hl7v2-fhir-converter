@@ -56,7 +56,7 @@ class Hl7FinancialInsuranceTest {
                 + "IN1|1|Value1^^System3^Value4^^System6"
                 // Thorough organization testing.
                 // IN1.3 to Organization Identifier 
-                //    IN1.3.1 to Organization Identifier.value
+                //    IN1.3.1 to Organization Identifier.value   NOTE: no external TENANT set. 
                 //    IN1.3.4 to Organization Identifier.system
                 //    IN1.3.5 to Organization Identifier.type.code
                 //    IN1.3.7 to Organization Identifier.period.start
@@ -123,7 +123,8 @@ class Hl7FinancialInsuranceTest {
         assertThat(org.getName()).isEqualTo("Large Blue Organization"); // IN1.4
         assertThat(org.getIdentifier()).hasSize(1);
         Identifier orgId1 = org.getIdentifierFirstRep();
-        assertThat(orgId1.getValue()).isEqualTo("IdValue1"); // IN1.3.1
+        // Note: in the next assert, no TENANT value set; confirm default (nothing) was used.  See testInsuranceCoverageOfSelfAndTenant for test of setting TENANT.
+        assertThat(orgId1.getValue()).isEqualTo("IdValue1"); // IN1.3.1 
         assertThat(orgId1.getSystem()).isEqualTo("urn:id:IdSystem4"); // IN1.3.4
         assertThat(orgId1.getPeriod().getStartElement().toString()).containsPattern("2020-12-31T14:50:45"); // IN1.3.7
         assertThat(orgId1.getPeriod().getEndElement().toString()).containsPattern("2021-12-31T14:50:45"); // IN1.3.8
@@ -270,7 +271,7 @@ class Hl7FinancialInsuranceTest {
                 // Minimal Organization. Required for Payor, which is required.
                 // Organization deep test in testBasicInsuranceCoverageFields
                 // IN1.3 to Organization Identifier 
-                //    IN1.3.1 to Organization Identifier.value
+                //    IN1.3.1 to Organization Identifier.value  (No TENANT set; uses default (nothing).)
                 //    IN1.3.4 to Organization Identifier.system
                 // INI.4 to Organization Name (required to inflate organization)
                 // IN1.5 to 15 NOT REFERENCED (See test testBasicInsuranceCoverageFields)
@@ -356,9 +357,9 @@ class Hl7FinancialInsuranceTest {
         assertThat(related.getAddress().get(0).getPostalCode()).isEqualTo("ZIP5"); // IN1.19.5
 
         // Check coverage relationship
-        DatatypeUtils.checkCommonCodeableConceptAssertions(coverage.getRelationship(), "PRN",
-                "parent",
-                "http://terminology.hl7.org/CodeSystem/v3-RoleCode", null); // IN1.17
+        DatatypeUtils.checkCommonCodeableConceptAssertions(coverage.getRelationship(), "parent",
+                "Parent",
+                "http://terminology.hl7.org/CodeSystem/subscriber-relationship", null); // IN1.17
 
         // Check relatedPerson relationship
         assertThat(related.getRelationship()).hasSize(1);
@@ -456,10 +457,10 @@ class Hl7FinancialInsuranceTest {
         List<Resource> relatedPersons = ResourceUtils.getResourceList(e, ResourceType.RelatedPerson);
         assertThat(relatedPersons).isEmpty(); // No related person should be created because IN1.17 was SEL
 
-        // Check coverage.relationship
-        DatatypeUtils.checkCommonCodeableConceptAssertions(coverage.getRelationship(), "ONESELF",
-                "self",
-                "http://terminology.hl7.org/CodeSystem/v3-RoleCode", null); // IN1.17
+        // Check coverage.relationship (from SubscriberRelationship mapping)
+        DatatypeUtils.checkCommonCodeableConceptAssertions(coverage.getRelationship(), "self",
+                "Self",
+                "http://terminology.hl7.org/CodeSystem/subscriber-relationship", null); // IN1.17
 
         // Confirm there are no unaccounted for resources
         // Expected: Coverage, Organization, Patient, Encounter

@@ -1,11 +1,11 @@
 #
-# (C) Copyright IBM Corp. 2021
+# (C) Copyright IBM Corp. 2021, 2022
 #
 # SPDX-License-Identifier: Apache-2.0
 # 
 # HL7 FHIR Data Type ContactPoint was previously called Telecom
 ---
-# system is phone or email depeding on a value in email address (XTN.4)
+# system is phone or email depending on a value in email address (XTN.4)
 system_1:
      condition: $emailValue NULL
      type: STRING
@@ -20,7 +20,7 @@ system_2:
      vars: 
           emailValue: XTN.4
 
-# value is phone number or email addresss depeding on a value in email address (XTN.4)
+# value is phone number or email address depending on a value in email address (XTN.4)
 value_1:
      condition: $emailValue NULL
      type: STRING

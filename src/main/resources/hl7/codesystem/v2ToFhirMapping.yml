@@ -391,7 +391,7 @@ MedicationRequestCategory:
   I: inpatient
   O: outpatient
 
-# HL7 Table 0063 > V3 Role code which is to be used for FHIR subscriber-relationship
+# HL7 Table 0063 > V3 Role code (used for POLICYHOLDER_RELATIONSHIP)
 V3RoleCode:
   BRO: BRO
 # CGV: no good match for Care giver
@@ -416,4 +416,33 @@ V3RoleCode:
   SIS: SIS
   SPO: SPS
   UNK: U
+# WRD: no good match for Ward of the court  
+
+# HL7 Table 0063 > HAPI SubscriberRelationship code 
+# OTHER is mapped for any connection that is blood or legal (e.g. grandparent, guardian)
+# Nothing is mapped for non-legally binding connections (e.g. friend, manager)
+SubscriberRelationship:
+  BRO: other
+  CGV: other  # Caregiver
+  CHD: child
+  DEP: other  # Handicapped dependent
+  DOM: common  # Life partner ~ common law spouse
+  EXF: other   # Extended family
+  FCH: child 
+# FND: no good match for Friend
+  FTH: parent # Father
+  GCH: other
+  GRD: other # Guardian
+  GRP: other
+  MTH: parent
+  NCH: child # Natural child 
+# NON: no good match for None
+  OTH: other     
+  PAR: parent
+  SCH: child # Step-child
+  SEL: self
+  SIB: other
+  SIS: other
+  SPO: spouse
+# UNK: no good match for Unknown
 # WRD: no good match for Ward of the court  
