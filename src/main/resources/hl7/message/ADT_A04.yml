@@ -6,52 +6,77 @@
 # FHIR Resources to extract from ADT_A04 message
 ---
 resources:
-    - resourceName: MessageHeader
-      segment: MSH
-      resourcePath: resource/MessageHeader
-      repeats: false
-      isReferenced: false
-      additionalSegments: 
-             - EVN
-   
-    - resourceName: Patient
-      segment: PID
-      resourcePath: resource/Patient
-      repeats: false
-      isReferenced: true
-      additionalSegments:
-             - PD1
-             - MSH
+  - resourceName: MessageHeader
+    segment: MSH
+    resourcePath: resource/MessageHeader
+    repeats: false
+    isReferenced: false
+    additionalSegments:
+      - EVN
 
-    - resourceName: Encounter
-      segment: PV1
-      resourcePath: resource/Encounter
-      repeats: false
-      isReferenced: true
-      additionalSegments:
-             - PV2
-             - EVN
-             - MSH
-             - OBX
+  - resourceName: Patient
+    segment: PID
+    resourcePath: resource/Patient
+    repeats: false
+    isReferenced: true
+    additionalSegments:
+      - PD1
+      - MSH
 
-    - resourceName: Observation
-      segment: OBX
-      resourcePath: resource/Observation
-      repeats: true
-      isReferenced: true
-      additionalSegments:
-             - MSH
 
-    - resourceName: AllergyIntolerance
-      segment: AL1
-      resourcePath: resource/AllergyIntolerance
-      repeats: true
-      additionalSegments:
-             - MSH
+  - resourceName: Encounter
+    segment: PV1
+    resourcePath: resource/Encounter
+    repeats: false
+    isReferenced: true
+    additionalSegments:
+      - PV2
+      - EVN
+      - MSH
+      - DG1
 
-    - resourceName: Condition
-      segment: DG1
-      resourcePath: resource/Condition
-      repeats: true
-      additionalSegments:
-             - MSH
+  - resourceName: Condition
+    segment: DG1
+    resourcePath: resource/Condition
+    isReferenced: true
+    repeats: true
+    additionalSegments:
+      - MSH
+      - PID
+      - PV1
+
+  - resourceName: Observation
+    segment: OBX
+    resourcePath: resource/Observation
+    repeats: true
+    isReferenced: true
+    additionalSegments:
+      - MSH
+
+  - resourceName: AllergyIntolerance
+    segment: AL1
+    resourcePath: resource/AllergyIntolerance
+    repeats: true
+    additionalSegments:
+      - MSH
+
+  - resourceName: Procedure
+    segment: .PR1
+    group: PROCEDURE
+    resourcePath: resource/Procedure
+    repeats: true
+    additionalSegments:
+      - .ROL
+      - MSH
+      - PID
+      - PV1
+
+  - resourceName: Coverage
+    segment: .IN1
+    group: INSURANCE
+    resourcePath: resource/Coverage
+    repeats: true
+    additionalSegments:
+      - MSH
+      - PID
+      - PV1

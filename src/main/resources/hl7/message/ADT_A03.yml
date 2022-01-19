@@ -30,18 +30,20 @@ resources:
       repeats: false
       isReferenced: true
       additionalSegments:
-             - PV2
-             - EVN
-             - MSH
-             - OBX
+        - PV2
+        - EVN
+        - MSH
+        - DG1
 
     - resourceName: Condition
       segment: DG1
       resourcePath: resource/Condition
-      repeats: true
       isReferenced: true
+      repeats: true
       additionalSegments:
         - MSH
+        - PID
+        - PV1
 
     - resourceName: Observation
       segment: OBX
