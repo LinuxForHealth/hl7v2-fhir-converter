@@ -277,17 +277,6 @@ public class SimpleDataValueResolver {
         }
     };
 
-    public static final ValueExtractor<Object, SimpleCode> DIAGNOSIS_USE = (Object value) -> {
-        String val = Hl7DataHandlerUtil.getStringValue(value);
-        String code = getFHIRCode(val, DiagnosisRole.class);
-        if (code != null) {
-            DiagnosisRole use = DiagnosisRole.fromCode(code);
-            return new SimpleCode(code, use.getSystem(), use.getDisplay());
-        } else {
-            return new SimpleCode(val, null, null);
-        }
-    };
-
     public static final ValueExtractor<Object, SimpleCode> CONDITION_CLINICAL_STATUS_FHIR = (Object value) -> {
         String val = Hl7DataHandlerUtil.getStringValue(value);
 
