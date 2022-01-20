@@ -18,17 +18,23 @@ public class VariableUtils {
 
 
   public static String getVarName(String name) {
+    String varName = name;
     if (isVar(name) && StringUtils.contains(name, ".")) {
       StringTokenizer stk = new StringTokenizer(name, ".");
-      return StringUtils.removeStart(stk.nextToken(), "$");
+      varName = StringUtils.removeStart(stk.nextToken(), "$");
     } else if (isVar(name)) {
-      return StringUtils.removeStart(name, "$");
-    } else {
-      return name;
+      varName = StringUtils.removeStart(name, "$");
     }
 
+    if (StringUtils.endsWith(varName, "?")) {
+      varName = StringUtils.removeEnd(varName, "?");
+    }
+    return varName;
   }
 
+  public static boolean isFuzzyMatch(String value) {
+    return StringUtils.isNotBlank(value) && value.endsWith("?");
+  }
 
 
 

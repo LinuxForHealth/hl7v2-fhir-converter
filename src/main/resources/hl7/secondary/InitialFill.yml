@@ -1,0 +1,11 @@
+# (C) Copyright IBM Corp. 2021
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+---
+quantity:
+  valueOf: datatype/Quantity
+  expressionType: resource
+  specs: RXE.39
+  vars:
+    value: RXE.39

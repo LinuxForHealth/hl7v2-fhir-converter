@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2020
+ * (C) Copyright IBM Corp. 2020, 2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -21,6 +21,7 @@ import io.github.linuxforhealth.api.EvaluationResult;
 import io.github.linuxforhealth.api.Expression;
 import io.github.linuxforhealth.api.InputDataExtractor;
 import io.github.linuxforhealth.api.ResourceValue;
+import io.github.linuxforhealth.core.Constants;
 import io.github.linuxforhealth.core.ObjectMapperUtil;
 import io.github.linuxforhealth.core.exception.DataExtractionException;
 import io.github.linuxforhealth.core.exception.RequiredConstraintFailureException;
@@ -44,10 +45,10 @@ public class ExpressionUtility {
     /**
      * Evaluates map of expression and generates ResourceEvaluationResult object.
      * 
-     * @param dataSource
-     * @param context
-     * @param baseValue
-     * @param expressionMap
+     * @param dataSource The data extractor to be used
+     * @param context The context in use
+     * @param baseValue The value to evaluate
+     * @param expressionMap Map of expressions
      * @return {@link ResourceEvaluationResult}
      */
     public static ResourceEvaluationResult evaluate(InputDataExtractor dataSource,
@@ -57,6 +58,7 @@ public class ExpressionUtility {
         try {
             Map<String, Expression> expressionsToEvaluateLater = new HashMap<>();
             Map<String, EvaluationResult> localContext = new HashMap<>(context);
+            localContext.put(Constants.NULL_VAR_NAME, new EmptyEvaluationResult());
             // initialize the map and list to collect values
             List<ResourceValue> additionalResolveValues = new ArrayList<>();
             Map<String, Object> resolveValues = new HashMap<>();
@@ -77,12 +79,13 @@ public class ExpressionUtility {
                     new PendingExpressionState(expressionsToEvaluateLater, context));
 
         } catch (RequiredConstraintFailureException e) {
-            LOGGER.warn("Resource Constraint condition not satisfied , exception {}", e.getMessage());
+            LOGGER.warn("Resource Constraint condition not satisfied.");
             LOGGER.debug("Resource Constraint condition not satisfied, exception", e);
             return null;
 
         } catch (IllegalArgumentException | IllegalStateException | DataExtractionException e) {
-            LOGGER.error("Exception during  resource evaluation reason ", e);
+            LOGGER.error("Exception during resource evaluation");
+            LOGGER.debug("Exception during resource evaluation reason ", e);
             return null;
 
         }
@@ -175,12 +178,13 @@ public class ExpressionUtility {
             return new ResourceEvaluationResult(resolveValues, additionalResolveValues);
 
         } catch (RequiredConstraintFailureException e) {
-            LOGGER.warn("Resource Constraint condition not satisfied , exception {}", e.getMessage());
+            LOGGER.warn("Resource Constraint condition not satisfied.");
             LOGGER.debug("Resource Constraint condition not satisfied, exception", e);
             return null;
 
         } catch (IllegalArgumentException | IllegalStateException | DataExtractionException e) {
-            LOGGER.error("Exception during  resource evaluation reason ", e);
+            LOGGER.error("Exception during resource evaluation.");
+            LOGGER.debug("Exception during resource evaluation reason ", e);
             return null;
 
         }

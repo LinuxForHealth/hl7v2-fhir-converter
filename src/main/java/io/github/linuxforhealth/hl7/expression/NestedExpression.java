@@ -11,9 +11,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import com.google.common.base.Preconditions;
+
 import io.github.linuxforhealth.api.EvaluationResult;
 import io.github.linuxforhealth.api.Expression;
 import io.github.linuxforhealth.api.InputDataExtractor;
@@ -67,10 +70,11 @@ public class NestedExpression extends AbstractExpression {
   @Override
   protected EvaluationResult evaluateExpression(InputDataExtractor dataSource,
       Map<String, EvaluationResult> contextValues, EvaluationResult baseValue) {
-    LOGGER.info("Evaluating child expressions {}", this.getExpressionAttr().getName());
+    LOGGER.info("Evalutating expression");
+    LOGGER.debug("Evaluating child expressions {}", this.getExpressionAttr().getName());
     ResourceEvaluationResult result = ExpressionUtility.evaluate(dataSource, contextValues, baseValue,
         this.childexpressions);
-    if (result.getResolveValues() == null || result.getResolveValues().isEmpty()) {
+	if (result == null || result.getResolveValues() == null || result.getResolveValues().isEmpty()) {
       return EvaluationResultFactory.getEvaluationResult(null);
     } else {
       if (this.generateMap) {

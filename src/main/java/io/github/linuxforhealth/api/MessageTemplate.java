@@ -5,6 +5,8 @@
  */
 package io.github.linuxforhealth.api;
 
+import org.hl7.fhir.r4.model.Bundle;
+
 import java.util.List;
 
 /**
@@ -25,10 +27,10 @@ public interface  MessageTemplate<T> {
    *
    * @param data - Input
    * @param engine - {@link MessageEngine}
-   * @return String -JSON representation of FHIR bundle
+   * @return Bundle - {@link Bundle}
    *
    */
-  String convert(T data, MessageEngine engine);
+  Bundle convert(T data, MessageEngine engine);
 
   /**
    * Name of the message

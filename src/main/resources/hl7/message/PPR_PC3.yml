@@ -29,10 +29,11 @@ resources:
     repeats: false
     additionalSegments:
             - .PV2
-            - PID
             - MSH
+            - PID
             - PROBLEM.PROBLEM_OBSERVATION.OBX
     
+  # This OBX is for the Problem Observation
   - resourceName: Observation
     segment: .PROBLEM_OBSERVATION.OBX
     group: PROBLEM
@@ -40,7 +41,10 @@ resources:
     repeats: true
     isReferenced: true
     additionalSegments:
-            - MSH
+      - .ORDER.ORC
+      - .ORDER.ORDER_DETAIL.OBR
+      - MSH
+      - .PROBLEM_OBSERVATION.NTE
 
   - resourceName: Condition
     segment: .PRB
@@ -51,18 +55,34 @@ resources:
       - MSH
       - PID
       - PATIENT_VISIT.PV1
+      - .NTE
 
   - resourceName: ServiceRequest
-    segment: .ORDER.ORC
-    group: PROBLEM
+    segment: .ORC
+    group: PROBLEM.ORDER
     resourcePath: resource/ServiceRequest
     repeats: true
+    isReferenced: true
     additionalSegments:
-      - .ORDER.ORDER_DETAIL.OBR
-      - .ORDER.ORDER_DETAIL.ORDER_OBSERVATION.OBX
+      - .ORDER_DETAIL.OBR
+      - .ORDER_DETAIL.NTE
+      - .ORDER_DETAIL.ORDER_OBSERVATION.OBX
       - PATIENT_VISIT.PV1
       - MSH
       - PID
+
+  # This OBX is for the Order Observation
+  - resourceName: Observation
+    segment: .ORDER_DETAIL.ORDER_OBSERVATION.OBX
+    group: PROBLEM.ORDER
+    resourcePath: resource/Observation
+    repeats: true
+    isReferenced: true
+    additionalSegments:
+      - .ORC
+      - .ORDER_DETAIL.OBR
+      - MSH
+      - .ORDER_DETAIL.ORDER_OBSERVATION.NTE    
 
   - resourceName: MedicationRequest
     segment: .ORDER_DETAIL.RXO
@@ -71,6 +91,17 @@ resources:
     repeats: true
     additionalSegments:
       - MSH
+      - PID
       - .ORC
-      - PATIENT.PATIENT_VISIT.PV1
-      - PATIENT.PID
+      - PATIENT_VISIT.PV1
+
+  - resourceName: DocumentReference
+    segment: .ORC
+    group: PROBLEM.ORDER
+    resourcePath: resource/DocumentReference
+    additionalSegments:
+      - .ORDER_DETAIL.OBR
+      - .ORDER_DETAIL.ORDER_OBSERVATION.OBX
+      - PATIENT_VISIT.PV1
+      - MSH
+      - PID

@@ -32,7 +32,6 @@ resources:
       additionalSegments:
           - .PV2
           - MSH
-          - .OBSERVATION.OBX
       
     - resourceName: Observation
       segment: .OBSERVATION.OBX
@@ -67,6 +66,9 @@ resources:
           - .NTE
           - .OBSERVATION.OBX
           - MSH
+          - PATIENT_RESULT.PATIENT.PID
+          - PATIENT_RESULT.PATIENT.VISIT.PV1
+          # NOTE:  PID and PV1 are passed because they are used by the created Service Request
 
   # ServiceRequest is created as a result of creating the DiagnosticReport.
   # There will always be a DiagnosticReport before a ServiceRequest.

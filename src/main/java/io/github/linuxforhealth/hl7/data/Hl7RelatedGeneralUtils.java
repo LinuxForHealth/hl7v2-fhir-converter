@@ -10,24 +10,27 @@ import java.time.temporal.Temporal;
 import java.time.temporal.UnsupportedTemporalTypeException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringEscapeUtils;
 import org.apache.commons.text.StringTokenizer;
+import org.hl7.fhir.r4.model.Enumerations;
+import org.hl7.fhir.r4.model.Immunization;
 import org.hl7.fhir.r4.model.codesystems.EncounterStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Segment;
 import ca.uhn.hl7v2.model.Type;
 import io.github.linuxforhealth.hl7.data.date.DateUtil;
 
-
 public class Hl7RelatedGeneralUtils {
     private static final Logger LOGGER = LoggerFactory.getLogger(Hl7RelatedGeneralUtils.class);
-    
+
     private Hl7RelatedGeneralUtils() {
     }
 
@@ -54,7 +57,8 @@ public class Hl7RelatedGeneralUtils {
     // .* any number of characters
     private static final String REGEX_FIRST_TWO_NUMBERS_AMID_OTHER_TEXT = "^\\D*?([\\d.]+)\\D*([\\d.]*).*";
     // Compile this into a pattern for reuse
-    private static final Pattern PATTERN_FIRST_TWO_NUMBERS_AMID_OTHER_TEXT = Pattern.compile(REGEX_FIRST_TWO_NUMBERS_AMID_OTHER_TEXT);
+    private static final Pattern PATTERN_FIRST_TWO_NUMBERS_AMID_OTHER_TEXT = Pattern
+            .compile(REGEX_FIRST_TWO_NUMBERS_AMID_OTHER_TEXT);
 
     // ExtractLow - see comments above
     public static String extractLow(Object input) {
@@ -63,9 +67,9 @@ public class Hl7RelatedGeneralUtils {
             Matcher m = PATTERN_FIRST_TWO_NUMBERS_AMID_OTHER_TEXT.matcher(val);
 
             // Only the low (first) number if there is also a high (second) number
-            if (m.find() && !m.group(2).isEmpty()){
-                    return m.group(1);
-            } 
+            if (m.find() && !m.group(2).isEmpty()) {
+                return m.group(1);
+            }
             return null;
         }
         return null;
@@ -78,11 +82,11 @@ public class Hl7RelatedGeneralUtils {
             Matcher m = PATTERN_FIRST_TWO_NUMBERS_AMID_OTHER_TEXT.matcher(val);
 
             // If one number, it is the high.  If two numbers, the second is high.
-            if(m.find()) {
-                if (!m.group(2).isEmpty()){
+            if (m.find()) {
+                if (!m.group(2).isEmpty()) {
                     return m.group(2);
                 } else {
-                    return m.group(1);   
+                    return m.group(1);
                 }
             }
             return null;
@@ -91,7 +95,8 @@ public class Hl7RelatedGeneralUtils {
     }
 
     public static String getEncounterStatus(Object var1, Object var2, Object var3) {
-        LOGGER.info("Generating encounter status from var1{}, var2 {}, var3 {}", var1, var2, var3);
+        LOGGER.info("Generating encounter status");
+        LOGGER.debug("Generating encounter status from var1{}, var2 {}, var3 {}", var1, var2, var3);
         EncounterStatus status = EncounterStatus.UNKNOWN;
         if (var1 != null) {
             status = EncounterStatus.FINISHED;
@@ -103,9 +108,48 @@ public class Hl7RelatedGeneralUtils {
         return status.toCode();
     }
 
+    public static String getImmunizationStatus(Object rxa18, Object rxa20, Object orc5) {
+        if (rxa20 != null) {
+            return SimpleDataValueResolver.getFHIRCode(rxa20.toString(), Immunization.ImmunizationStatus.class);
+        } else if (rxa18 != null) {
+            return "not-done";
+        } else if (orc5 != null) {
+            return SimpleDataValueResolver.getFHIRCode(orc5.toString(), Immunization.ImmunizationStatus.class);
+        } else
+            return "completed";
+    }
+
+    // DocumentReference.yml uses a required:true on status to control the creation of the DocumentReference.
+    // It depends on this getDocumentReferenceStatus returning a status value ONLY when a DocumentReference should be created.
+    // Together with the required:true, this creates logic for messages (MDM, PPR, ORM, OMP) that create DocumentReferences 
+    // a) when there is a TXA, create a DocRef
+    // b) when there is no TXA, and there is an ORC with OBX of type TX, create a DocRef
+    // c) otherwise when there is no TXA create no DocRef
+    // Observation creation is controlled by different code
+    public static String getDocumentReferenceStatus(Object txa, Object txa19, Object orc, Object obr25, Object obx2) {
+        LOGGER.info("Generating DocumentReference status");
+        LOGGER.debug("Generating DocumentReference status from txa{}, txa19 {}, orc {}, obr25 {}, obx2 {}, ", txa,
+                txa19, orc, obr25, obx2);
+
+        if (txa != null || (orc != null && Objects.equals(Hl7DataHandlerUtil.getStringValue(obx2), "TX"))) {
+            String val = Hl7DataHandlerUtil.getStringValue(txa19);
+            if (val == null) {
+                val = Hl7DataHandlerUtil.getStringValue(obr25);
+            }
+            String code = SimpleDataValueResolver.getFHIRCode(val, Enumerations.DocumentReferenceStatus.class);
+            if (code != null) {
+                return code;
+            } else {
+                return "current";
+            }
+        }
+        return null;
+    }
+
     public static String generateName(Object prefix, Object first, Object middle, Object family, Object suffix) {
-        LOGGER.info("Generating name from  from prefix {}, first {}, middle {}, family {} ,suffix {}", prefix, first, middle,
-                family, suffix);
+        LOGGER.info("Generating name");
+        LOGGER.debug("Generating name from  from prefix {}, first {}, middle {}, family {} ,suffix {}", prefix, first,
+                middle, family, suffix);
         StringBuilder sb = new StringBuilder();
         String valprefix = Hl7DataHandlerUtil.getStringValue(prefix);
         String valfirst = Hl7DataHandlerUtil.getStringValue(first);
@@ -114,7 +158,6 @@ public class Hl7RelatedGeneralUtils {
         String valsuffix = Hl7DataHandlerUtil.getStringValue(suffix);
 
         if (valprefix != null) {
-
             sb.append(valprefix).append(" ");
         }
         if (valfirst != null) {
@@ -135,7 +178,6 @@ public class Hl7RelatedGeneralUtils {
         } else {
             return null;
         }
-
     }
 
     /**
@@ -145,19 +187,19 @@ public class Hl7RelatedGeneralUtils {
      * @param end DateTime
      * @return Minutes in Long
      */
-
     public static Long diffDateMin(Object start, Object end) {
-        LOGGER.info("Generating time diff in min  from var1 {}, var2 {}", start, end);
+        LOGGER.info("Generating time diff");
+        LOGGER.debug("Generating time diff in min  from var1 {}, var2 {}", start, end);
         try {
             Temporal date1 = DateUtil.getTemporal(Hl7DataHandlerUtil.getStringValue(start));
             Temporal date2 = DateUtil.getTemporal(Hl7DataHandlerUtil.getStringValue(end));
-            LOGGER.info("temporal dates start: {} , end: {} ", date1, date2);
+            LOGGER.info("computing temporal dates");
+            LOGGER.debug("temporal dates start: {} , end: {} ", date1, date2);
             if (date1 != null && date2 != null) {
                 return ChronoUnit.MINUTES.between(date1, date2);
             }
         } catch (UnsupportedTemporalTypeException e) {
-            LOGGER.warn("Cannot evaluate time difference for start: {} , end: {} reason {} ", start, end,
-                    e.getMessage());
+            LOGGER.warn("Cannot evaluate time difference.");
             LOGGER.debug("Cannot evaluate time difference for start: {} , end: {} ", start, end, e);
             return null;
         }
@@ -171,53 +213,57 @@ public class Hl7RelatedGeneralUtils {
             if (stk.getTokenList().size() > index) {
                 return stk.getTokenList().get(index);
             }
-
         }
         return null;
     }
 
     public static String noWhiteSpace(Object input) {
         String val = Hl7DataHandlerUtil.getStringValue(input);
-        if(val != null) {
+        if (val != null) {
             String newVal = val.replaceAll("\\s", "_");
-            String system = "urn:id:" + newVal;
-
-            return system;
-        }
-        else return null;
+            return "urn:id:" + newVal;
+        } else
+            return null;
     }
 
+    // Concatenates strings with a delimeter character(s) 
+    // Used for NTEs and OBX of type TX
     public static String concatenateWithChar(Object input, String delimiterChar) {
-        // Engine converts the delimiter character to a String; need to fix escaped characters
-        // as they become 2 separate characters rather than 1. 
-        // Currently handling '\n' specifically, have not found a more general solution.
-        String delimiter = delimiterChar;
-        if (delimiterChar.equals("\\n")) {
-            delimiter = Character.toString('\n');
-        }
+        // Engine converts the delimiter character(s) to a String.
+        // We need to fix escaped characters because YAML parsing sees every character as literal 
+        // and passes them in as 2 separate characters rather than 1. 
+        // Example '\n' is not reduced to 10 linefeed, but comes in as 92 78, a literal backslash n
+        // We want to replace 92 78 '\n' as 10 linefeed, 
+        // but want input double backslash 92 92 78 '\\n' to remain as literal 
+        // Currently only \n linefeed is handled.
 
-        return Hl7DataHandlerUtil.getStringValue(input, true, delimiter, false);
+        // Use this regex: r"(?<!\\)\\n|\n" but must double up backslashes in java string
+        String delimiter = delimiterChar.replaceAll("(?<!\\\\)\\\\n|\\n", "\n");
+        return Hl7DataHandlerUtil.getStringValue(input, true, delimiter, false, false);
     }
 
     public static List<String> makeStringArray(String... strs) {
         List<String> result = new ArrayList<>();
-
         for (String str : strs)
             if (str != null)
                 result.add(str);
-
         return result;
     }
-    public static String formatAsId(Object input)
-    {
-        // This replaces any special character (letters, numbers, dashes, or periods) with an underscore
-        String stringValue = Hl7DataHandlerUtil.getStringValue(input).trim();
-        stringValue = stringValue.replaceAll("[^a-zA-Z0-9\\-\\.]", "_");
-        return StringUtils.left(stringValue, 64);
+
+    public static String formatAsId(Object input) {
+        if (input != null) {
+            // This replaces any special character (other than letters, numbers, dashes, or periods) with a period
+            // Then lower-cases, and truncates to 64 characters.
+            String stringValue = Hl7DataHandlerUtil.getStringValue(input).trim();
+            stringValue = stringValue.replaceAll("[^a-zA-Z0-9\\-\\.]", ".").toLowerCase();
+            return StringUtils.left(stringValue, 64);
+        }
+        return null;
     }
 
     public static String getAddressUse(String xad7Type, String xad16Temp, String xad17Bad) {
-        LOGGER.info("Calculating address Use from XAD.7 {}, XAD.16 {}, XAD.17 {}", xad7Type, xad16Temp, xad17Bad);
+        LOGGER.info("Calculating Address Use");
+        LOGGER.debug("Calculating address Use from XAD.7 {}, XAD.16 {}, XAD.17 {}", xad7Type, xad16Temp, xad17Bad);
 
         String addressUse = "";
         if (xad16Temp != null && xad16Temp.equalsIgnoreCase("Y")
@@ -239,7 +285,8 @@ public class Hl7RelatedGeneralUtils {
     }
 
     public static String getAddressType(String xad7Type, String xad18Type) {
-        LOGGER.info("Calculating address Type from XAD.7 {}, XAD.18 {}", xad7Type, xad18Type);
+        LOGGER.info("Calculating Address Type");
+        LOGGER.debug("Calculating address Type from XAD.7 {}, XAD.18 {}", xad7Type, xad18Type);
 
         String addressType = "";
         if (xad18Type != null && xad18Type.equalsIgnoreCase("M")
@@ -260,10 +307,16 @@ public class Hl7RelatedGeneralUtils {
      * if it is empty, and there is exactly one address (repeated) use the PID
      * county. PID-12 maps to patient.address.District "IF PID-11 LST.COUNT EQUALS 1
      * AND PID-11.9 IS NOT VALUED"
+     * 
+     * @param patientCountyPid12 County from PID.12
+     * @param addressCountyParishPid119 County parish from PID.11.9
+     * @param patient The patient segment
+     * @return Address district calculated
      */
     public static String getAddressDistrict(String patientCountyPid12, String addressCountyParishPid119,
             Object patient) {
-        LOGGER.info("getAddressCountyParish for {}", patient);
+        LOGGER.info("Calculating AddressCountyParish");
+        LOGGER.debug("getAddressCountyParish for {}", patient);
 
         String returnDistrict = addressCountyParishPid119;
         if (returnDistrict == null) {
@@ -273,25 +326,20 @@ public class Hl7RelatedGeneralUtils {
                 if (addresses.length == 1) {
                     returnDistrict = patientCountyPid12;
                 }
-
             } catch (HL7Exception e) {
                 // Do nothing. Just eat the error.
                 // Let the initial value stand
             }
-
         }
 
         return returnDistrict;
     }
-
-
 
     // Takes all the pieces of ContactPoint/telecom number from XTN, formats to a user friendly
     // ContactPoint/Telecom number based on rules documented in the steps
     public static String getFormattedTelecomNumberValue(String xtn1Old, String xtn5Country, String xtn6Area,
             String xtn7Local, String xtn8Extension, String xtn12Unformatted) {
         String returnValue = "";
-
         // If the local number exists...
         if (xtn7Local != null && xtn7Local.length() > 0) {
             returnValue = formatCountryAndArea(xtn5Country, xtn6Area) + formatLocalNumber(xtn7Local);
@@ -310,13 +358,11 @@ public class Hl7RelatedGeneralUtils {
         return returnValue;
     }
 
-
     public static String getNarrativeDiv(String text) {
-
-    	String divText = "<div xmlns=\"http://www.w3.org/1999/xhtml\"><p>%s</p></div>";
-    	return String.format(divText, StringEscapeUtils.escapeHtml4(text).replace("~", "<br />"));    
+        String divText = "<div xmlns=\"http://www.w3.org/1999/xhtml\"><p>%s</p></div>";
+        return String.format(divText, StringEscapeUtils.escapeHtml4(text).replace("~", "<br />"));
     }
-    
+
     // Private method to split and format the 7 digit local telecom number
     private static String formatLocalNumber(String localNumber) {
         // Split after the 3rd digit, add a space, add the rest of the number
@@ -339,6 +385,5 @@ public class Hl7RelatedGeneralUtils {
         }
         return returnValue;
     }
-    
 
 }

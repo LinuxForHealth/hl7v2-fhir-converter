@@ -105,7 +105,8 @@ public class HL7DataBasedResourceDeserializer extends JsonDeserializer<HL7DataBa
         try {
           e = generateExpression(expAttr);
         } catch (IllegalStateException e1) {
-          LOGGER.error("deserialization failure {} expression type {}", entry, expAttr.getExpressionType(), e1);
+          LOGGER.error("deserialization failure expression type {}", expAttr.getExpressionType());
+          LOGGER.debug("deserialization failure expression type {}", expAttr.getExpressionType(), e1);
           e = null;
         }
 

@@ -22,28 +22,47 @@ identifier_1: #joins filler | placer | MSH.7 with whatever gets returned from BU
   constants:
       sys: "urn:id:extID"
       joinChar: '-'
-
 identifier_2:
    condition: $valueIn NOT_NULL
    valueOf: datatype/Identifier_var
    generateList: true
    expressionType: resource
    vars:
-      valueIn: OBX.21.1 
-      systemCX: OBX.21.2  
-
+      valueIn: OBX.21.1
+      systemCX: OBX.21.2
+identifier_3:
+  condition: $id NOT_NULL
+  valueOf: datatype/Identifier_Observation
+  generateList: true
+  expressionType: resource
+  vars:
+    obx3: BUILD_IDENTIFIER_FROM_CWE, OBX.5
+    fillpla: STRING, ORC.3.1 | OBR.3.1 | ORC.2.1 | OBR.2.1 | MSH.7
+  constants:
+    sys: "urn:id:extID"
+    joinChar: '-'
 status:
    type: OBSERVATION_STATUS
    default: unknown
    valueOf: OBX.11
    expressionType: HL7Spec
 
+# When OBX's are missing or TX based, we don't want to create an Observation.
+# When TX, because content is already appended to an associated DiagnosticReport or DocumentReference
+# Logic: if OBX exists AND ( (OBX.2 exists AND OBX.2 is NOT TX) OR (OBX.2 is null/empty) ) AND OBX.3 NOT NULL CREATE the Observation.
+# 'code' is set 'required: true' to cause all or nothing creation logic
+# The expression is nested and values are passed to the nested so that BOTH values control the 'all or nothing'
 code:
-   valueOf: datatype/CodeableConcept
-   expressionType: resource
-   specs: OBX.3
+   expressionType: nested
    required: true
-
+   vars:
+     obx3: OBX.3
+     obx2: STRING, OBX.2
+   expressions:
+   -  condition: $obx3 NOT_NULL && $obx2 NOT_EQUALS_STRING TX
+      valueOf: datatype/CodeableConcept
+      expressionType: resource
+      specs: $obx3
 
 subject:
     valueOf: datatype/Reference
@@ -55,32 +74,29 @@ encounter:
     expressionType: resource
     specs: $Encounter
 
-
 effectiveDateTime:
      type: DATE_TIME
      valueOf: OBX.14 | OBX.19
      expressionType: HL7Spec
-
 
 issued:
      type: DATE_TIME
      valueOf: OBR.22 | OBX.19
      expressionType: HL7Spec
 
-
 valueString:
-    condition: $obx2 EQUALS TX || $obx2 EQUALS ST
+    condition: $obx2 EQUALS ST
     type: STRING_ALL
     valueOf: OBX.5
     expressionType: HL7Spec
-    vars: 
+    vars:
       obx2: STRING, OBX.2
-      
+
 valueQuantity_1:
     valueOf: datatype/Quantity
     expressionType: resource
     condition: $obx2 EQUALS NM
-    vars: 
+    vars:
       value: OBX.5
       unit: OBX.6.1
       code: OBX.6.1
@@ -90,11 +106,11 @@ valueQuantity_1:
 valueQuantity_2:
     valueOf: datatype/Quantity
     expressionType: resource
-    condition: $obx2 EQUALS SN && $separator NULL 
-    vars: 
+    condition: $obx2 EQUALS SN && $separator NULL
+    vars:
       value: OBX.5.2
-      unit: OBX.6.1 
-      code: OBX.6.1 
+      unit: OBX.6.1
+      code: OBX.6.1
       comparator: OBX.5.1
       obx2: STRING, OBX.2
       separator: STRING, OBX.5.3
@@ -103,10 +119,10 @@ valueQuantity_2:
 valueQuantity_3:
     valueOf: datatype/Quantity
     expressionType: resource
-    condition: $obx2 EQUALS SN && $separator NOT_NULL && $separator NOT_EQUALS ':' && $separator NOT_EQUALS '/' 
-    vars: 
+    condition: $obx2 EQUALS SN && $separator NOT_NULL && $separator NOT_EQUALS ':' && $separator NOT_EQUALS '/'
+    vars:
       value: OBX.5.2
-      unit: OBX.6.1 
+      unit: OBX.6.1
       code: OBX.6.1
       comparator: OBX.5.1
       obx2: STRING, OBX.2
@@ -129,7 +145,7 @@ valuePeriod:
    vars:
      code: OBX.5
      obx2: STRING, OBX.2
-     
+
 valueDateTime:
    condition: $obx2 EQUALS DT || $obx2 EQUALS DTM
    type: DATE_TIME
@@ -168,7 +184,7 @@ valueRatio_2:
      obx2: STRING, OBX.2
      separator: STRING, SN.3
 
-interpretation: 
+interpretation:
    valueOf: datatype/CodeableConcept
    expressionType: resource
    specs: OBX.8
@@ -180,14 +196,14 @@ note_1:
    specs: OBX
    vars:
       obx3: STRING, OBX.3.1
-      text: STRING, OBX.5
+      annotationText: STRING, OBX.5
 
 note_2:
    valueOf: datatype/Annotation
-   generateList: true
-   condition: NTE NOT_NULL
+   condition: $annotationText NOT_NULL
    expressionType: resource
-   specs: NTE
+   vars:
+      annotationText: NTE.3 *&, GeneralUtils.concatenateWithChar(annotationText, '  \n')
 
 bodySite:
    valueOf: datatype/CodeableConcept
@@ -199,7 +215,7 @@ method:
    expressionType: resource
    specs: OBX.17
 
-referenceRange: 
+referenceRange:
    valueOf: secondary/ReferenceRange
    condition: $textValue NOT_NULL
    generateList: true
@@ -232,6 +248,12 @@ performer_2:
      performerValue2: OBX.23
      orgAddressXAD: OBX.24
      orgContactXCN: OBX.25
+   constants:  
+     # Observation Organization needs an ADMIN purpose
+     orgContactPurposeCode: 'ADMIN'
+     orgContactPurposeSystemCode: 'contactentity-type'
+     orgContactPurposeDisplay: 'Administrative'
+     orgContactPurposeText: 'Organization Medical Director'
 
 device:
    condition: $deviceValue NOT_NULL
@@ -247,7 +269,7 @@ category:
    valueOf: datatype/CodeableConcept_var
    generateList: true
    expressionType: resource
-   vars: 
+   vars:
       system: SYSTEM_URL, $system_code
       specimen: SPM.4
    constants:

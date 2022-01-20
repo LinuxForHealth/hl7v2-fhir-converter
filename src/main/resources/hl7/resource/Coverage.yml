@@ -1,0 +1,160 @@
+#
+# (C) Copyright IBM Corp. 2021, 2022
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+---
+# Coverage required fields
+#  Status
+#  Beneficiary (Patient)
+#  Payor
+
+resourceType: Coverage
+id:
+  type: STRING
+  valueOf: 'UUID.randomUUID()'
+  expressionType: JEXL
+
+identifier_1:
+  condition: $valueIn NOT_NULL
+  valueOf: datatype/Identifier_var
+  generateList: true
+  expressionType: resource
+  vars:
+    valueIn: IN1.2.1
+    systemCX: IN1.2.3
+  constants:
+    system: "http://terminology.hl7.org/CodeSystem/v2-0203"
+    code: "XV"
+    display: "Health Plan Identifier"
+
+identifier_2:
+  condition: $valueIn NOT_NULL
+  valueOf: datatype/Identifier_var
+  generateList: true
+  expressionType: resource
+  vars:
+    valueIn: IN1.2.4
+    systemCX: IN1.2.6
+  constants:
+    system: "http://terminology.hl7.org/CodeSystem/v2-0203"
+    code: "XV"
+    display: "Health Plan Identifier" 
+
+identifier_3:
+  condition: $valueIn NOT_NULL
+  valueOf: datatype/Identifier_var
+  generateList: true
+  expressionType: resource
+  vars:
+    valueIn: IN1.46
+    # No system set for this identifier
+  constants:
+    system: "http://terminology.hl7.org/CodeSystem/v2-0203"
+    code: "XV"
+    display: "Health Plan Identifier" 
+    use: "old"    
+
+identifier_4:
+  condition: $valueIn NOT_NULL
+  valueOf: datatype/Identifier_var
+  generateList: true
+  expressionType: resource
+  vars:
+    valueIn: IN1.36
+    # No system set for this identifier
+  constants:
+    system: "http://terminology.hl7.org/CodeSystem/v2-0203"
+    code: "MB"
+    display: "Member Number"         
+
+# Status is required, but it comes from a non-table 2 char ST 
+# It MUST be one of: active | cancelled | draft | entered-in-error
+# For now, until we get a good mapping, assume all records are active
+status:
+   type: STRING
+   default: active
+   valueOf: $active
+   #   valueOf: IN1.45 value will come from IN1.45, but we don't yet have a mapping.
+   expressionType: HL7Spec
+   constants:
+     active: 'active'
+
+payor:
+   valueOf: resource/Organization
+   expressionType: reference
+   vars: 
+       orgName: String, IN1.4.1
+       orgIdValue: String, IN1.3.1
+       orgIdSystem: String, IN1.3.4
+       orgIdTypeCode: String, IN1.3.5
+       orgIdStart: IN1.3.7
+       orgIdEnd: IN1.3.8
+       orgAddressXAD: IN1.5
+       orgContactXCN: IN1.6
+       orgContactPointXTN: IN1.7
+
+# If the subscriber is not SEL (self), then create the related person
+subscriber_1:
+   condition: $relatedRelationshipStr NOT_NULL && $relatedRelationshipStr NOT_EQUALS SEL
+   valueOf: resource/RelatedPerson
+   expressionType: reference
+   vars: 
+      relatedRelationshipStr: String, IN1.17
+      # Related person gets many values from scope, so they do not need to be passed in
+      #  IN1 and sub-fields
+      #  $Patient  
+
+# If the subscriber is SEL (self), then reference the patient
+subscriber_2:
+    condition: $relatedRelationshipStr NOT_NULL && $relatedRelationshipStr EQUALS SEL
+    valueOf: datatype/Reference
+    expressionType: resource
+    specs: $Patient
+    vars: 
+      relatedRelationshipStr: String, IN1.17     
+
+subscriberId:  
+   type: STRING
+   valueOf: IN1.36
+   expressionType: HL7Spec
+
+# Relationship may be SEL (self)
+relationship:
+   valueOf: datatype/CodeableConcept
+   expressionType: resource
+   generateList: true
+   condition: $coding NOT_NULL
+   vars:
+      coding: SUBSCRIBER_RELATIONSHIP, IN1.17
+      text: String, IN1.17.2      
+
+beneficiary:
+    valueOf: datatype/Reference
+    expressionType: resource
+    specs: $Patient
+
+class_1:
+   valueOf: secondary/Class
+   generateList: true
+   expressionType: resource
+   vars: 
+      classValue: String, IN1.8
+
+class_2:
+   valueOf: secondary/Class
+   generateList: true
+   expressionType: resource
+   specs: IN1.9
+
+period:
+    valueOf: datatype/Period
+    expressionType: resource
+    vars:
+       start: IN1.12
+       end: IN1.13
+
+order:
+   type: INTEGER
+   valueOf: IN1.22 | IN1.1
+   expressionType: HL7Spec

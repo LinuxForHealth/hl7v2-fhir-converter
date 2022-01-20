@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2020
+ * (C) Copyright IBM Corp. 2020, 2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -71,21 +71,27 @@ public class ResourceReader {
   }
 
   /**
-   * Loads a file based resource using a two pass approach. The first pass attempts to load the
-   * resource from the file system. if the file is not found on the file system, the resource is
+   * Loads a file based resource using a three pass approach. The first pass attempts to load the
+   * resource from the file system. The second attempts to load it from the alternate resource path.
+   * on the file system. If the file is not found on the file system, the resource is
    * loaded from the classpath.
    * 
    * @param resourcePath The relative path to the resource (hl7/, fhir/, etc)
    * @return The resource as a String
    */
   public String getResource(String resourcePath) {
-    Path filePath = Paths.get(converterConfig.getResourceFolder(), resourcePath);
-    String resource;
+    Path resourceFolderFilePath = Paths.get(converterConfig.getResourceFolder(), resourcePath);
+    Path alternateResourceFolderFilePath = Paths.get(converterConfig.getAdditionalResourcesLocation(), resourcePath);
+    String resource = null;
 
     try {
-      if (filePath != null && filePath.toFile().exists()) {
-        resource = loadFileResource(filePath.toFile());
-      } else {
+      if (resourceFolderFilePath != null && resourceFolderFilePath.toFile().exists()) {
+        resource = loadFileResource(resourceFolderFilePath.toFile());
+      } 
+      if (resource == null && alternateResourceFolderFilePath != null && alternateResourceFolderFilePath.toFile().exists()) {
+        resource = loadFileResource(alternateResourceFolderFilePath.toFile());
+      } 
+      if (resource == null) {
         resource = loadClassPathResource(resourcePath);
       }
     } catch (IOException ioEx) {
@@ -95,10 +101,21 @@ public class ResourceReader {
     return resource;
   }
 
+  /**
+   * Returns all message templates in the configured location(s)
+   * Relies on the values in config.properties.
+   * 
+   * @return Map of messages, by message title.
+   */
   public Map<String, HL7MessageModel> getMessageTemplates() {
     Map<String, HL7MessageModel> messagetemplates = new HashMap<>();
-    List<String> supportedMessageTemplates =
-        ConverterConfiguration.getInstance().getSupportedMessageTemplates();
+    List<String> supportedMessageTemplates = ConverterConfiguration.getInstance().getSupportedMessageTemplates();
+    if (hasWildcard(supportedMessageTemplates)) {
+      // Code currently assumes we do no use the list of supported messages, once we see an *.
+      // In future if needed to merge, it would go here.
+      supportedMessageTemplates.clear();
+      supportedMessageTemplates = findAllMessageTemplateNames();
+    }
     for (String template : supportedMessageTemplates) {
       HL7MessageModel rm = getMessageModel(template);
       messagetemplates.put(com.google.common.io.Files.getNameWithoutExtension(template),
@@ -107,12 +124,47 @@ public class ResourceReader {
     return messagetemplates;
   }
 
+  private boolean hasWildcard(List<String> supportedMessageTemplates) {
+    for (String template : supportedMessageTemplates) {
+      if (template.contains("*")) {
+        return true;
+      }
+    }
+    return false;
+  }
 
+  private List<String> findAllMessageTemplateNames() {
+
+    // Get the base templates
+    List<String> foundTemplates = new ArrayList<>();
+    File folder = new File(
+        converterConfig.getResourceFolder() + '/' + Constants.HL7_BASE_PATH + Constants.MESSAGE_BASE_PATH);
+    File[] listOfFiles = folder.listFiles();
+    for (int i = 0; listOfFiles != null && i < listOfFiles.length; i++) {
+      if (listOfFiles[i].isFile()) {
+        foundTemplates.add(listOfFiles[i].getName());
+      }
+    }
+
+    // Add the extended templates
+    // Current code assumes the extended templates are exclusive of the base templates.
+    // In future, if there is to be a priority, or one can override the other, changes needed here to merge extended templates.
+    folder = new File(
+        converterConfig.getAdditionalResourcesLocation() + '/' + Constants.HL7_BASE_PATH + Constants.MESSAGE_BASE_PATH);
+    listOfFiles = folder.listFiles();
+    for (int i = 0; listOfFiles != null && i < listOfFiles.length; i++) {
+      if (listOfFiles[i].isFile()) {
+        foundTemplates.add(listOfFiles[i].getName());
+      }
+    }
+
+    return foundTemplates;
+  }
 
   private HL7MessageModel getMessageModel(String templateName) {
-
-    String templateFileContent =
-        getResourceInHl7Folder(Constants.MESSAGE_BASE_PATH + templateName + ".yml");
+    // Allow for names that already have .yml extension
+    String yamlizedTemplateName = templateName.endsWith(".yml") ? templateName : templateName + ".yml";
+    String templateFileContent = getResourceInHl7Folder(Constants.MESSAGE_BASE_PATH + yamlizedTemplateName);
     if (StringUtils.isNotBlank(templateFileContent)) {
       try {
 
@@ -122,9 +174,10 @@ public class ResourceReader {
         JsonNode resourceNodes = parent.get("resources");
         Preconditions.checkState(resourceNodes != null && !resourceNodes.isEmpty(),
             "List of resources from Parent node from template file cannot be null or empty");
-        List<HL7FHIRResourceTemplateAttributes> templateAttributes =
-            ObjectMapperUtil.getYAMLInstance().convertValue(resourceNodes,
-                new TypeReference<List<HL7FHIRResourceTemplateAttributes>>() {});
+        List<HL7FHIRResourceTemplateAttributes> templateAttributes = ObjectMapperUtil.getYAMLInstance().convertValue(
+            resourceNodes,
+            new TypeReference<List<HL7FHIRResourceTemplateAttributes>>() {
+            });
 
         List<HL7FHIRResourceTemplate> templates = new ArrayList<>();
 
@@ -156,7 +209,6 @@ public class ResourceReader {
       throw new IllegalArgumentException("Error encountered in processing the template" + path, e);
     }
 
-
   }
 
   public static ResourceReader getInstance() {
@@ -166,13 +218,12 @@ public class ResourceReader {
     return reader;
   }
 
-
-
-  public String getResourceInHl7Folder(String path) {
-
-    return getResource(Constants.HL7_BASE_PATH + path);
+  public static void reset() {
+    reader = null;
   }
 
-
+  public String getResourceInHl7Folder(String path) {
+    return getResource(Constants.HL7_BASE_PATH + path);
+  }
 
 }

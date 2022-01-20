@@ -22,31 +22,71 @@ identifier_1:
       code: "VN"
       display: "Visit number"
 
-identifier_2:
+# The logic for Filler appears it should be:     
+#  valueIn: ORC.3.1 | OBR.3.1
+#  systemCX: ORC.3.2 | OBR.3.2    
+# But if ORC.3.1 has a value and ORC.3.2 is empty but OBR.3.2 has a value,
+# it results in mismatched code and system values.
+# The code below forces the value and the system to be of the same pair.
+# Similar settings for Placer.
+
+identifier_2a:
    condition: $valueIn NOT_NULL
    valueOf: datatype/Identifier_var
    generateList: true
+   useGroup: true
    expressionType: resource
    vars:
-      valueIn: ORC.3.1 | OBR.3.1
-      systemCX: ORC.3.2 | OBR.3.2
+      valueIn: ORC.3.1
+      systemCX: ORC.3.2
    constants:
       system: "http://terminology.hl7.org/CodeSystem/v2-0203"
       code: "FILL"
       display: "Filler Identifier"
 
-identifier_3:
+identifier_2b:
+   condition: $valueInORC NULL && $valueIn NOT_NULL
+   valueOf: datatype/Identifier_var
+   generateList: true
+   useGroup: true
+   expressionType: resource
+   vars:
+      valueIn: OBR.3.1
+      systemCX: OBR.3.2
+      valueInORC: ORC.3.1
+   constants:
+      system: "http://terminology.hl7.org/CodeSystem/v2-0203"
+      code: "FILL"
+      display: "Filler Identifier"      
+
+identifier_3a:
    condition: $valueIn NOT_NULL
    valueOf: datatype/Identifier_var
    generateList: true
+   useGroup: true
    expressionType: resource
    vars:
-      valueIn: ORC.2.1 | OBR.2.1
-      systemCX: ORC.2.2 | OBR.2.2
+      valueIn: ORC.2.1
+      systemCX: ORC.2.2 
    constants:
       system: "http://terminology.hl7.org/CodeSystem/v2-0203"
       code: "PLAC"
       display: "Placer Identifier"
+
+identifier_3b:
+   condition:  $valueInORC NULL && $valueIn NOT_NULL
+   valueOf: datatype/Identifier_var
+   generateList: true
+   useGroup: true
+   expressionType: resource
+   vars:
+      valueIn: OBR.2.1
+      systemCX: OBR.2.2
+      valueInORC: ORC.2.1
+   constants:
+      system: "http://terminology.hl7.org/CodeSystem/v2-0203"
+      code: "PLAC"
+      display: "Placer Identifier"      
 
 status:
    type: SERVICE_REQUEST_STATUS
@@ -59,20 +99,15 @@ intent:
    valueOf: $default
    expressionType: HL7Spec
    constants:
-      default: "filler-order"
+      default: "order"
 
 subject:
    valueOf: datatype/Reference
    expressionType: resource
    specs: $Patient
 
-requisition:
-   valueOf: datatype/Identifier_var
-   expressionType: resource
-   specs: ORC.4
-   vars:
-      valueIn: ORC.4.1
-      systemCX:  ORC.4.2
+# Requisition was removed because PGN does not currently validate with HAPI HL7 parser using system http://terminology.hl7.org/CodeSystem/v2-0203.
+# The only known possible alternative system: http://terminology.hl7.org/2.1.0/CodeSystem/v2-0203 fails to validate with HAPI FHIR validator.
 
 authoredOn:
    type: DATE_TIME
@@ -91,6 +126,7 @@ requester:
    specs: ORC.12 | OBR.16
    vars:
       request: ORC.12 | OBR.16
+      referenceDisplay: PERSON_DISPLAY_NAME, ORC.12 | OBR.16
 
 reasonCode:
    condition: $reasonCWE NOT_NULL 
@@ -107,4 +143,11 @@ code:
    expressionType: resource
    specs: OBR.4
    vars:
-      codeCWE: OBR.4       
+      codeCWE: OBR.4 
+
+note:
+   valueOf: datatype/Annotation
+   condition: $annotationText NOT_NULL
+   expressionType: resource
+   vars:
+      annotationText: NTE.3 *&, GeneralUtils.concatenateWithChar(annotationText, '  \n')            

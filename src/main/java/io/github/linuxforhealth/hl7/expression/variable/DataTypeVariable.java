@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2020
+ * (C) Copyright IBM Corp. 2020, 2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -7,12 +7,12 @@ package io.github.linuxforhealth.hl7.expression.variable;
 
 import java.util.List;
 import java.util.Map;
+
 import io.github.linuxforhealth.api.EvaluationResult;
 import io.github.linuxforhealth.api.InputDataExtractor;
 import io.github.linuxforhealth.core.expression.EvaluationResultFactory;
 import io.github.linuxforhealth.hl7.data.SimpleDataTypeMapper;
 import io.github.linuxforhealth.hl7.data.ValueExtractor;
-
 
 /**
  * Defines variable type that supports extracting values from spec to a particular data type.
@@ -22,60 +22,51 @@ import io.github.linuxforhealth.hl7.data.ValueExtractor;
  */
 public class DataTypeVariable extends SimpleVariable {
 
-  private String valueType;
-  private ValueExtractor<Object, ?> resolver;
+    private String valueType;
+    private ValueExtractor<Object, ?> resolver;
 
+    /**
+     * 
+     * @param name The name of the variable Example: "var1"
+     * @param valueType The type of value
+     * @param spec A list of tokens in the expression
+     * @param extractMultiple Whether to extract multiple expressions
+     */
+    public DataTypeVariable(String name, String valueType, List<String> spec,
+            boolean extractMultiple) {
+        super(name, spec, extractMultiple, false);
 
-  /**
-   * 
-   * @param name
-   * @param valueType
-   * @param spec
-   * @param extractMultiple
-   */
-
-  public DataTypeVariable(String name, String valueType, List<String> spec,
-      boolean extractMultiple) {
-    super(name, spec, extractMultiple, false);
-
-    this.valueType = valueType;
-    this.resolver = SimpleDataTypeMapper.getValueResolver(this.valueType);
-  }
-
-
-
-  // resolve variable value
-  @Override
-  public EvaluationResult extractVariableValue(Map<String, EvaluationResult> contextValues,
-      InputDataExtractor dataSource) {
-    EvaluationResult result;
-    if (!this.getSpec().isEmpty()) {
-      result = getValueFromSpecs(contextValues, dataSource);
-    } else {
-      result = null;
-    }
-    EvaluationResult resolvedvalue = null;
-    if (result != null && this.resolver != null) {
-      resolvedvalue =
-          EvaluationResultFactory.getEvaluationResult(this.resolver.apply(result.getValue()));
-    } else {
-      resolvedvalue = result;
+        this.valueType = valueType;
+        this.resolver = SimpleDataTypeMapper.getValueResolver(this.valueType);
     }
 
-    return resolvedvalue;
+    // resolve variable value
+    @Override
+    public EvaluationResult extractVariableValue(Map<String, EvaluationResult> contextValues,
+            InputDataExtractor dataSource) {
+        EvaluationResult result;
+        if (!this.getSpec().isEmpty()) {
+            result = getValueFromSpecs(contextValues, dataSource);
+        } else {
+            result = null;
+        }
+        EvaluationResult resolvedvalue = null;
+        if (result != null && this.resolver != null) {
+            resolvedvalue = EvaluationResultFactory.getEvaluationResult(this.resolver.apply(result.getValue()));
+        } else {
+            resolvedvalue = result;
+        }
 
-  }
+        return resolvedvalue;
 
-  public String getValueType() {
-    return valueType;
-  }
+    }
 
+    public String getValueType() {
+        return valueType;
+    }
 
-
-  public ValueExtractor<Object, ?> getResolver() {
-    return resolver;
-  }
-
-
+    public ValueExtractor<Object, ?> getResolver() {
+        return resolver;
+    }
 
 }

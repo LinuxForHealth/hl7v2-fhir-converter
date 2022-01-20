@@ -1,5 +1,5 @@
 #
-# (C) Copyright IBM Corp. 2020, 2021
+# (C) Copyright IBM Corp. 2020, 2022
 #
 # SPDX-License-Identifier: Apache-2.0
 #
@@ -8,21 +8,51 @@ id:
    type: STRING
    valueOf: UUID.randomUUID()
    expressionType: JEXL
-identifier:
+# Used by most organizations   
+identifier_1:
+   condition: $orgIdValue NULL
    valueOf: datatype/Identifier_Gen
    generateList: true  
    expressionType: resource
    vars:
       id: CWE.1 | XON.10 | XON.3
-      system: CWE.3
+      system: CWE.3 
+# Used by IN1/Coverage (Insurance) organizations, which have a more complex identifier
+# This handles case when no $TENANT value is available        
+identifier_2a:
+   condition: $orgIdValue NOT_NULL && $TENANT NULL
+   valueOf: datatype/Identifier_var
+   generateList: true  
+   expressionType: resource
+   vars:
+      valueIn: $orgIdValue
+      systemCX: $orgIdSystem
+      start: $orgIdStart
+      end: $orgIdEnd
+      code: $orgIdTypeCode
+# Used by IN1/Coverage (Insurance) organizations, which have a more complex identifier
+# This handles case when $TENANT is passed at run time          
+identifier_2b:
+   condition: $orgIdValue NOT_NULL && $TENANT NOT_NULL
+   valueOf: datatype/Identifier_var
+   generateList: true  
+   expressionType: resource
+   vars:
+      valueIn: $TENANT + $period + $orgIdValue
+      systemCX: $orgIdSystem
+      start: $orgIdStart
+      end: $orgIdEnd
+      code: $orgIdTypeCode  
+   constants:
+      period: '.'                 
 name_v1:
    type: STRING
    condition: $idValue NULL
-   valueOf: CWE.2 | XON.1
+   valueOf: CWE.2 | XON.1 | $orgName
    required: true
    expressionType: HL7Spec
    vars:
-      idValue: CWE.1 | XON.10 | XON.3
+      idValue: CWE.1 | XON.10 | XON.3 
 name_v2:
    type: STRING
    condition: $idValue NOT_NULL
@@ -46,8 +76,10 @@ contact:
    generateList: true
    expressionType: resource
    specs: $orgContactXCN
-   constants:
-      code: 'ADMIN'
-      system_code: 'contactentity-type'
-      display: 'Administrative'
-      text: 'Organization Medical Director'
+   vars:
+      # May be provided to create a purpose in the Contact element
+      code: $orgContactPurposeCode
+      system_code: $orgContactPurposeSystemCode
+      display: $orgContactPurposeDisplay
+      text: $orgContactPurposeText
+      contactPointXTN: $orgContactPointXTN

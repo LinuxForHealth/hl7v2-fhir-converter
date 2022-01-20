@@ -103,18 +103,18 @@ resultsInterpreter:
    valueOf: resource/Practitioner
    generateList: true
    expressionType: reference
-   specs: OBR.32
+   specs: OBR.32.1
    vars:
-      interpreter: OBR.32
+      interpreter: OBR.32.1
 
 basedOn:
-   condition: $basedOnORC NOT_NULL
+   condition: $basedOnORCOBR NOT_NULL
    valueOf: resource/ServiceRequest
    generateList: true
    expressionType: reference
-   specs: ORC
+   specs: ORC | OBR
    vars:
-      basedOnORC: ORC      
+      basedOnORCOBR: ORC | OBR     
 
 specimen:
    valueOf: datatype/Reference
@@ -133,9 +133,9 @@ result:
 presentedForm:
    valueOf: datatype/Attachment
    expressionType: resource
-   # This merges all the OBX lines together when there is no id (obx3) and the message has only type 'TX' (obx2). 
+   # This merges all the OBX lines together when the message has only type 'TX' (obx2). 
    # Messages with mixed types of OBX segments will not have a presentedForm attachment created.
-   condition: $obx2 EQUALS TX && $obx3 NULL
+   condition: $obx2 EQUALS TX
    vars:
       # This concatenates all OBX-5 lines together (the asterisk) and preserves blank lines (the ampersand).  Multiple lines are concatenated with a tilde.
       data: OBX.5 *&, GeneralUtils.concatenateWithChar(data, '\n')
@@ -144,7 +144,6 @@ presentedForm:
       mime: $code
       language: $code2
       obx2: STRING, OBX.2
-      obx3: STRING, OBX.3
    constants:
       system: 'http://terminology.hl7.org/CodeSystem/v2-0834'
       code: 'text/plain'

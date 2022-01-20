@@ -8,7 +8,6 @@ package io.github.linuxforhealth.hl7.segments;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
 import org.hl7.fhir.r4.model.CodeableConcept;
@@ -24,11 +23,11 @@ import io.github.linuxforhealth.hl7.segments.util.ResourceUtils;
 
 /*** Tests the MRG segment ***/
 
-public class HL7MergeFHIRConversionTest {
+class HL7MergeFHIRConversionTest {
 
     // Test ADT_A34 with one MRG segment (the most it supports).
     @Test
-    public void validateHappyPathADT_A34WithMRG() {
+    void validateHappyPathADT_A34WithMRG() {
 
         String hl7message = "MSH|^~\\&|SENDING_APPLICATION|SENDING_FACILITY|RECEIVING_APPLICATION|RECEIVING_FACILITY|||ADT^A34||P|2.3||||\r"
                 + "EVN|A40|20110613122406637||01\r"
@@ -38,12 +37,10 @@ public class HL7MergeFHIRConversionTest {
                 + "MRG|456||||||\r";
 
         // Convert hl7 message
-        List<BundleEntryComponent> e = ResourceUtils.createHl7Segment(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
 
         // Find the patient resources in the FHIR bundle.
-        List<Resource> patientResources = e.stream()
-                .filter(v -> ResourceType.Patient == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> patientResources = ResourceUtils.getResourceList(e, ResourceType.Patient);
 
         // There should be 2 - One for the PID segment and one for the MRG segment
         assertThat(patientResources).hasSize(2);
@@ -180,7 +177,7 @@ public class HL7MergeFHIRConversionTest {
 
     // Test ADT_A40 with one MRG segment.
     @Test
-    public void validateHappyPathADT_A40WithMRG() {
+    void validateHappyPathADT_A40WithMRG() {
 
         String hl7message = "MSH|^~\\&|REGADT|MCM|RSP1P8|MCM|200301051530|SEC|ADT^A40^ADT_A39|00000003|P|2.6\r"  
                 + "EVN|A40|200301051530\r"
@@ -190,12 +187,10 @@ public class HL7MergeFHIRConversionTest {
                 + "MRG|MR2^^^XYZ\r";
 
         // Convert hl7 message
-        List<BundleEntryComponent> e = ResourceUtils.createHl7Segment(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
 
         // Find the patient resources in the FHIR bundle.
-        List<Resource> patientResources = e.stream()
-                .filter(v -> ResourceType.Patient == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> patientResources = ResourceUtils.getResourceList(e, ResourceType.Patient);
 
         // There should be 2 - One for the PID segment and one for the MRG segment
         assertThat(patientResources).hasSize(2);
@@ -274,8 +269,10 @@ public class HL7MergeFHIRConversionTest {
     }
 
     // Tests ADT_A40 message with 2 MRG segments.
+    // Suppress warnings about too many assertions in a test.  Justification: creating a FHIR message is very costly; we need to check many asserts per creation for efficiency.  
+    @java.lang.SuppressWarnings("squid:S5961")
     @Test
-    public void validateTwoMRGs() {
+    void validateTwoMRGs() {
 
         String hl7message = "MSH|^~\\&|REGADT|MCM|RSP1P8|MCM|200301051530|SEC|ADT^A40^ADT_A39|00000003|P|2.6\r"
                 + "EVN|A40|200301051530\r"
@@ -289,12 +286,10 @@ public class HL7MergeFHIRConversionTest {
                 + "MRG|MR4^^^XYZ^MR||\r";
 
         // Convert hl7 message
-        List<BundleEntryComponent> e = ResourceUtils.createHl7Segment(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
 
         // Find the patient resources in the FHIR bundle.
-        List<Resource> patientResources = e.stream()
-                .filter(v -> ResourceType.Patient == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> patientResources = ResourceUtils.getResourceList(e, ResourceType.Patient);
 
         // There should be 4 - One for each PID segment and one for each MRG segment
         assertThat(patientResources).hasSize(4);

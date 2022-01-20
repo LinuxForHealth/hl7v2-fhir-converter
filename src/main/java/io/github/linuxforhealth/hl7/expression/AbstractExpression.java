@@ -63,6 +63,8 @@ public abstract class AbstractExpression implements Expression {
 
   }
 
+
+
   @Override
   public EvaluationResult getDefaultValue() {
     return EvaluationResultFactory.getEvaluationResult(this.attr.getDefaultValue());
@@ -101,20 +103,21 @@ public abstract class AbstractExpression implements Expression {
     try {
       setLoggingContext();
 
-      LOGGER.info("Started Evaluating  with baseValue {} expression {} ", baseValue, this);
+      LOGGER.debug("Started Evaluating with baseValue {} expression {} ", baseValue, this);
 
 
       Map<String, EvaluationResult> localContextValues =
-          new HashMap<>(ImmutableMap.copyOf(contextValues));
+          new HashMap<>(contextValues);
 
       if (!baseValue.isEmpty()) {
         localContextValues.put(baseValue.getIdentifier(), baseValue);
       }
 
+
       result = evaluateValueOfExpression(dataSource, localContextValues, baseValue);
 
-      LOGGER.info("Completed Evaluating returned value  {} ----  for  expression {} ", result,
-          this);
+
+      LOGGER.debug("Completed Evaluating returned value  {} ----  for  expression {} ", result, this);
 
       if (this.conditionSatisfiedState && this.isRequired()
           && (result == null || result.isEmpty())) {
@@ -127,7 +130,7 @@ public abstract class AbstractExpression implements Expression {
         return result;
       }
     } catch (DataExtractionException | IllegalArgumentException e) {
-      LOGGER.warn("Failure encountered during evaluation of expression {} , exception {}", this,
+      LOGGER.warn("Failure encountered during evaluation of expression {}", 
           this.attr.getName());
       return null;
     } finally {
@@ -148,7 +151,7 @@ public abstract class AbstractExpression implements Expression {
 
 
   private EvaluationResult evaluateValueOfExpression(InputDataExtractor dataSource,
-      Map<String, EvaluationResult> contextValues, EvaluationResult baseinputValue) {
+      Map<String, EvaluationResult> localContextValues, EvaluationResult baseinputValue) {
     /**
      * Steps:
      * <ul>
@@ -163,21 +166,20 @@ public abstract class AbstractExpression implements Expression {
      * 
      */
 
-    Map<String, EvaluationResult> localContextValues = new HashMap<>(contextValues);
     // Add constants to the context map
     this.attr.getConstants().entrySet().forEach(e -> localContextValues.put(e.getKey(),
         EvaluationResultFactory.getEvaluationResult(e.getValue())));
 
     List<Object> result = new ArrayList<>();
     List<ResourceValue> additionalresourcesresult = new ArrayList<>();
-    List<Object> baseSpecvalues =
+    List<Object> baseSpecvalues =  
         getSpecValues(dataSource, localContextValues, baseinputValue, this.getspecs());
     LOGGER.debug("Base values evaluated {} -----  values {} ", this, baseSpecvalues);
 
 
     if (!baseSpecvalues.isEmpty()) {
       for (Object o : baseSpecvalues) {
-        EvaluationResult gen = generateValue(dataSource, localContextValues,
+        EvaluationResult gen = generateValue(dataSource, localContextValues,  
             EvaluationResultFactory.getEvaluationResult(o));
 
         if (gen != null && gen.getValue() != null && !gen.isEmpty()) {
@@ -236,7 +238,7 @@ public abstract class AbstractExpression implements Expression {
     EvaluationResult specValues;
     if (specs == null || specs.isEmpty()) {
       specValues = baseinputValue;
-    } else {
+    } else { 
       specValues = SpecificationUtil.extractMultipleValuesForSpec(specs, dataSource,
           ImmutableMap.copyOf(contextValues));
     }
@@ -293,7 +295,8 @@ public abstract class AbstractExpression implements Expression {
               new EmptyEvaluationResult());
         }
       } catch (DataExtractionException e) {
-        LOGGER.error("Cannot extract value for variable {} ", var.getVariableName(), e);
+        LOGGER.error("Cannot extract value for variable {} ", var.getVariableName());
+        LOGGER.debug("Cannot extract value for variable {} ", var.getVariableName(), e);
       }
     }
     return localVariables;

@@ -6,16 +6,19 @@
 
 plugins {
     // Apply the java-library plugin to add support for Java Library
+    id 'java'
     id 'java-library'
     id 'jacoco'
     id 'maven-publish'
     id 'signing'
-
 }
 
 group = 'io.github.linuxforhealth'
 version = (findProperty('version') == 'unspecified') ? '1.0.1-SNAPSHOT' : version
 ext.isReleaseVersion = !version.endsWith("SNAPSHOT")
+
+sourceCompatibility = 11
+targetCompatibility = 11
 
 dependencies {
 // This dependency is exported to consumers, that is to say found on their compile classpath.
@@ -44,17 +47,14 @@ implementation group: 'ca.uhn.hapi.fhir', name: 'hapi-fhir-validation', version:
 // https://mvnrepository.com/artifact/ca.uhn.hapi.fhir/hapi-fhir-validation
 implementation group: 'ca.uhn.hapi.fhir', name: 'hapi-fhir-validation-resources-r4', version: '5.1.0'
 
-
-
 implementation group: 'org.apache.commons', name: 'commons-jexl3', version: '3.1'
-
 
 // https://mvnrepository.com/artifact/org.apache.commons/commons-configuration2
 implementation group: 'org.apache.commons', name: 'commons-configuration2', version: '2.7'
 // https://mvnrepository.com/artifact/org.apache.commons/commons-collections4
 implementation group: 'org.apache.commons', name: 'commons-collections4', version: '4.4'
-implementation group:'com.ibm.fhir', name:'fhir-registry', version:'4.9.0'
-implementation group:'com.ibm.fhir', name:'fhir-term', version:'4.9.0'
+implementation group:'com.ibm.fhir', name:'fhir-registry', version:'4.10.2'
+implementation group:'com.ibm.fhir', name:'fhir-term', version:'4.10.2'
 implementation group: 'commons-beanutils', name: 'commons-beanutils', version: '1.9.4'
 
 testImplementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'
@@ -67,9 +67,19 @@ testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:5.7.2"
 
 // In this section you declare where to find the dependencies of your project
 repositories {
+    mavenCentral()  
+}
 
-    mavenCentral()
-   
+// Overriding the source directories to the target.
+// This will cause the build/compile to use target instead of src.
+if(!localDevEnv.toBoolean()) {
+    println "Overriding sourceset to the target directory"
+    sourceSets.main.java.srcDirs = ['target/main/java'];
+    sourceSets.main.resources.srcDirs = ['target/main/resources'];
+} else {
+    println "localDevEnv is true - Setting sourceset to the src directory"
+    sourceSets.main.java.srcDirs = ['src/main/java', 'src/tools'];
+    sourceSets.main.resources.srcDirs = ['src/main/resources'];
 }
 
 test {
@@ -89,14 +99,12 @@ jacocoTestReport {
 }
 
 publishing {
-
   repositories {
     maven {
       name = "OSSRH"
       def releaseRepo = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
       def snapshotRepo = "https://oss.sonatype.org/content/repositories/snapshots/"
       url = isReleaseVersion ? releaseRepo : snapshotRepo
-      
       credentials {
         username = System.getenv("MAVEN_USERNAME")
         password = System.getenv("MAVEN_PASSWORD")
@@ -114,14 +122,13 @@ javadoc.failOnError = false
 task javadocJar(type: Jar, dependsOn: javadoc) {
     classifier = 'javadoc'
     from javadoc.destinationDir
-    javadoc.options.addStringOption('Xdoclint:none', '-quiet')
+    javadoc.options.addStringOption('noindex', '-quiet')
 }
 
 artifacts {
     archives sourcesJar
     archives javadocJar
 }
-
 
 publishing {
     publications {
@@ -138,38 +145,36 @@ publishing {
             version = version
             
             pom {
-                    name = "hl7v2-fhir-converter"
-                    description = "FHIR converter is a Java based library that enables converting Hl7v2 messages to FHIR resources"
-                    url = "https://github.com/LinuxForHealth/hl7v2-fhir-converter"
-                    licenses {
-                      license {
+                name = "hl7v2-fhir-converter"
+                description = "FHIR converter is a Java based library that enables converting Hl7v2 messages to FHIR resources"
+                url = "https://github.com/LinuxForHealth/hl7v2-fhir-converter"
+                licenses {
+                    license {
                         name = "The Apache License, Version 2.0"
                         url = "http://www.apache.org/licenses/LICENSE-2.0.txt"
-                      }
                     }
-                    developers {
-                      developer {
+                }
+                developers {
+                    developer {
                         id = "pbhallam"
-                        
-                      }
                     }
-                    scm {
+                }
+                scm {
                       url = "https://github.com/LinuxForHealth/hl7v2-fhir-converter.git"
-                     
-                    }
-                  }
-           
+                }
+            }
+
         }
     }
 }
 
 
 signing {
-if (isReleaseVersion ) {
-    def signingKeyId = System.getenv("signingKeyId")
-    def signingKey = System.getenv("signingKey")
-    def signingPassword = System.getenv("signingPassword")
-    useInMemoryPgpKeys(signingKeyId, signingKey, signingPassword)
+    if (isReleaseVersion ) {
+        def signingKeyId = System.getenv("signingKeyId")
+        def signingKey = System.getenv("signingKey")
+        def signingPassword = System.getenv("signingPassword")
+        useInMemoryPgpKeys(signingKeyId, signingKey, signingPassword)
     }
     sign publishing.publications.mavenPublication
 }
@@ -177,3 +182,47 @@ if (isReleaseVersion ) {
 tasks.withType(Sign) {
     onlyIf { isReleaseVersion }
 }
+
+task deleteTarget(type: Delete) {
+    description("Deletes the target directory")
+    if(!localDevEnv.toBoolean()) {
+        println 'Deleting target directory'
+        delete "target"
+    }
+}
+
+task resourcesCopy(type: Copy) {
+    description("Copies source to the target.")
+    if(!localDevEnv.toBoolean()) {
+        println 'Copying source to target'
+        copy {
+            from 'src'
+            into 'target'
+        }
+    }
+}
+
+task deleteJavaDebugLogs {
+    description("This function will delete all DEBUG log statements from the project.")
+    if(!localDevEnv.toBoolean()) {
+        println 'Stripping DEBUG statements out of target/main'
+        FileTree  javaFiles = fileTree('target/main') {
+            include '**/*.java'
+        }
+        String regex = "(?ms)(LOGGER.debug.*?;)"
+        javaFiles.each { File javaFile ->
+            println "Start replacing regex on $javaFile.name"
+            String content = javaFile.getText()
+            content = content.replaceAll(regex, "")
+            javaFile.setText(content)
+        }
+    }
+}
+
+// Strip DEBUG log statements out
+project.tasks.build.dependsOn project.tasks.deleteJavaDebugLogs
+//BUT FIRST copy src to target
+project.tasks.deleteJavaDebugLogs.dependsOn project.tasks.resourcesCopy
+//BUT FIRST delete target directory
+project.tasks.resourcesCopy.dependsOn project.tasks.deleteTarget
+

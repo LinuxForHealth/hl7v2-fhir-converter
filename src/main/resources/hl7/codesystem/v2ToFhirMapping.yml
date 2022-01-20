@@ -57,8 +57,16 @@ DiagnosticReportStatus:
 ImmunizationStatus:
   CP: completed
   NA: not-done
-  PA: not-done
+  PA: completed
   RE: not-done
+  CM: completed
+  ER: entered-in-error
+  CA: not-done
+  DC: not-done
+  HD: not-done
+  IP: not-done
+  SC: not-done
+  RP: not-done
   
 MessageReasonEncounter:
    A01: admit
@@ -118,6 +126,43 @@ V3MaritalStatus:
   T: T
   U: U
   W: W
+
+DocumentReferenceStatus: #DocumenReference Status
+  #TXA.19
+  AV: current
+  CA: entered-in-error
+  OB: superseded
+  UN: current
+  #OBR.25
+  A: current
+  C: current
+  F: current
+  I: current
+  O: current
+  P: current
+  R: current
+  S: current
+  X: entered-in-error
+
+CompositionStatus: #DocumenReference docStatus
+  #TXA.17
+  AU: final
+  DI: preliminary
+  DO: preliminary
+  IN: preliminary
+  IP: preliminary
+  PA: preliminary
+  LA: final
+  #OBX.11
+  C: final
+  F: final
+  I: preliminary
+  P: preliminary
+  R: preliminary
+  S: preliminary
+  U: final
+  W: entered-in-error
+  # We are not mapping D,N,O,X - those values will result in this field not being set
 
 V3Race:
   # American Indian or Alaska Native	
@@ -305,9 +350,6 @@ V3ReligiousAffiliation:
   # Unknown
   # VAR:   NO REASONABLE MATCH
 
-DiagnosisRole:
-   A: AD
-
 MedicationRequestStatus:
    AF: active
    CA: cancelled
@@ -332,8 +374,76 @@ MedicationRequestStatus:
    RF: active
    RL: active
    RO: active
-   RP: active
+   RP: unknown
    RQ: active
    RR: active
    RU: active
+   A: active
+   IP: active
+   SC: active
+   CM: completed
+   ER: entered-in-error
 
+MedicationRequestCategory:
+  I: inpatient
+  O: outpatient
+
+# HL7 Table 0063 > V3 Role code (used for POLICYHOLDER_RELATIONSHIP)
+V3RoleCode:
+  BRO: BRO
+# CGV: no good match for Care giver
+  CHD: CHILD
+# DEP: no good match for Handicapped dependent
+  DOM: DOMPART
+  EXF: EXT  
+  FCH: CHLDFOST 
+  FND: FRND
+  FTH: FTH 
+  GCH: GRNDCHILD
+# GRD: no good match for Guardian
+  GRP: GRPRN
+  MTH: MTH
+  NCH: NCHILD 
+# NON: no good match for None
+  OTH: O     
+  PAR: PRN
+  SCH: STPCHLD
+  SEL: ONESELF
+  SIB: SIB
+  SIS: SIS
+  SPO: SPS
+  UNK: U
+# WRD: no good match for Ward of the court  
+
+# HL7 Table 0063 > HAPI SubscriberRelationship code 
+# This is the reverse of the relationship from V3RoleCode
+# IN1.17 is "Insured's Relationship To Patient", but Coverage.relationship is "Beneficiary relationship to the subscriber".
+# To understand the table think: If the patient is a XXXX, the the insurance subscriber is their XXXX
+# As an example, CHD does not map to child, but parent.
+# OTHER is mapped for any connection that is blood or legal (e.g. grandparent, guardian)
+# Nothing is mapped for non-legally binding connections (e.g. friend, manager)
+SubscriberRelationship:
+  BRO: other
+  CGV: other  # Caregiver
+  CHD: parent
+  DEP: other  # Handicapped dependent
+  DOM: common  # Life partner ~ common law spouse
+  EXF: other   # Extended family
+  FCH: parent 
+# FND: no good match for Friend
+  FTH: child # Father of a child
+  GCH: other
+  GRD: other # Guardian
+  GRP: other
+  MTH: child
+  NCH: parent # Natural child of a parent
+# NON: no good match for None
+  OTH: other     
+  PAR: child
+  SCH: parent # Step-child of a parent
+  SEL: self
+  SIB: other
+  SIS: other
+  SPO: spouse
+# UNK: no good match for Unknown
+# WRD: no good match for Ward of the court  

@@ -64,6 +64,7 @@ public class FHIRConverterRunFile {
                 .build();
 
         String json = ftv.convert(inputFile, options);
+        if(json == null) json = "Unable to convert the HL7 file - see logs";
         System.out.println("----------------");
         System.out.println(json);
         System.out.println("----------------");

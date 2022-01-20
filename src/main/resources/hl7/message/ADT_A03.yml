@@ -30,17 +30,20 @@ resources:
       repeats: false
       isReferenced: true
       additionalSegments:
-             - PV2
-             - EVN
-             - MSH
-             - OBX
+        - PV2
+        - EVN
+        - MSH
+        - DG1
 
     - resourceName: Condition
       segment: DG1
       resourcePath: resource/Condition
+      isReferenced: true
       repeats: true
       additionalSegments:
         - MSH
+        - PID
+        - PV1
 
     - resourceName: Observation
       segment: OBX
@@ -56,3 +59,24 @@ resources:
       repeats: true
       additionalSegments:
              - MSH
+
+    - resourceName: Procedure
+      segment: .PR1
+      group: PROCEDURE
+      resourcePath: resource/Procedure
+      repeats: true
+      additionalSegments:
+        - .ROL
+        - MSH
+        - PID
+        - PV1
+
+    - resourceName: Coverage
+      segment: .IN1
+      group: INSURANCE
+      resourcePath: resource/Coverage
+      repeats: true
+      additionalSegments:
+        - MSH
+        - PID
+        - PV1

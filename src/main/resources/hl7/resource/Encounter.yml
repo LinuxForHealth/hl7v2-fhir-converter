@@ -1,5 +1,5 @@
 #
-# (C) Copyright IBM Corp. 2020
+# (C) Copyright IBM Corp. 2020, 2021
 #
 # SPDX-License-Identifier: Apache-2.0
 #
@@ -54,7 +54,7 @@ type:
    valueOf: datatype/CodeableConcept
    generateList: true
    expressionType: resource
-   specs: PV1.4 | PV1.18
+   specs: PV1.4
 
 serviceType:
    valueOf: datatype/CodeableConcept
@@ -75,16 +75,15 @@ period:
     valueOf: datatype/Period
     expressionType: resource
     vars: 
-       start: PV1.44 | EVN.6
+       start: PV1.44 | EVN.6 | EVN.2
        end: PV1.45
 
 length:
     valueOf: datatype/Duration
     expressionType: resource
     vars: 
-      time1: DATE_TIME, PV1.44
-      time2: DATE_TIME, PV1.45
-      time3: STRING, PV2.11
+      pv2time: STRING, PV2.11
+      pv1length: PV1_DURATION_LENGTH, PV1
 
 reasonCode_1:
     valueOf: datatype/CodeableConcept
@@ -139,8 +138,6 @@ diagnosis:
         valueOf: datatype/CodeableConcept
         expressionType: resource
         specs: DG1.6
-        vars:
-          coding: DIAGNOSIS_USE, DG1.6
      rank:
         type: STRING
         valueOf: DG1.15
@@ -160,6 +157,7 @@ participant_1:
    valueOf: secondary/Participant
    generateList: true
    expressionType: resource
+   specs: PV1.7
    vars:
       practionerSpec: PV1.7
    constants:
@@ -170,6 +168,7 @@ participant_2:
    condition: $practionerSpec NOT_NULL
    valueOf: secondary/Participant
    generateList: true
+   specs: PV1.8
    expressionType: resource
    vars:
       practionerSpec: PV1.8
@@ -181,6 +180,7 @@ participant_3:
    condition: $practionerSpec NOT_NULL
    valueOf: secondary/Participant
    generateList: true
+   specs: PV1.9
    expressionType: resource
    vars:
       practionerSpec: PV1.9
@@ -192,6 +192,7 @@ participant_4:
    condition: $practionerSpec NOT_NULL
    valueOf: secondary/Participant
    generateList: true
+   specs: PV1.17
    expressionType: resource
    vars:
       practionerSpec: PV1.17
@@ -235,9 +236,9 @@ extension_1:
 
 serviceProvider:
       condition: $idValue NOT_NULL
-      valueOf: resource/Organization_Simple
+      valueOf: resource/Organization_ServiceProvider
       expressionType: reference
       vars:
-            idValue: PV2.23.8 | PV1.3.4.1 | PV1.39
+            idValue: PV2.23.8 | PV1.3.4.1
             name: PV2.23.1 | PV1.3.4.1
 

@@ -1,0 +1,37 @@
+#
+# (C) Copyright IBM Corp. 2021
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+---
+period:
+  valueOf: datatype/Period
+  expressionType: resource
+  vars:
+    start: $timestamp
+
+related_1:
+  condition: $providerCode NOT_NULL
+  valueOf: resource/Practitioner
+  expressionType: reference
+  generateList: true
+  specs: $providerCode
+  vars:
+    referenceDisplay: PERSON_DISPLAY_NAME, XCN
+
+related_2:
+  valueOf: datatype/Reference
+  expressionType: resource
+  generateList: true
+  specs: $serviceRequestRef
+
+encounter:
+  condition: $encounterRef NOT_NULL
+  valueOf: datatype/Reference
+  expressionType: resource
+  specs: $encounterRef
+
+practiceSetting:
+  valueOf: datatype/CodeableConcept
+  expressionType: resource
+  specs: $practiceSettingIn

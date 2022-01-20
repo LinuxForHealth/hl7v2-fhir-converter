@@ -32,6 +32,44 @@ identifier_2:
   constants:
     sys: "urn:id:extID"
 
+identifier_3:
+  valueOf: datatype/Identifier
+  condition: $rxo1 NULL
+  generateList: true
+  expressionType: resource
+  vars:
+    system: SYSTEM_URL, $sys
+    value: BUILD_IDENTIFIER_FROM_CWE, RXE.2
+    rxo1: RXO.1
+  constants:
+    sys: "urn:id:extID"
+
+identifier_4:
+  condition: $valueIn NOT_NULL
+  valueOf: datatype/Identifier_var
+  generateList: true
+  expressionType: resource
+  vars:
+    valueIn: ORC.3.1
+    systemCX: ORC.3.2
+  constants:
+    system: "http://terminology.hl7.org/CodeSystem/v2-0203"
+    code: "FILL"
+    display: "Filler Identifier"
+
+identifier_5:
+  condition: $valueIn NOT_NULL
+  valueOf: datatype/Identifier_var
+  generateList: true
+  expressionType: resource
+  vars:
+    valueIn: ORC.2.1
+    systemCX: ORC.2.2
+  constants:
+    system: "http://terminology.hl7.org/CodeSystem/v2-0203"
+    code: "PLAC"
+    display: "Placer Identifier"
+
 subject:
   valueOf: datatype/Reference
   expressionType: resource
@@ -39,8 +77,10 @@ subject:
   
 status:
   type: MEDREQ_STATUS
-  valueOf:  ORC.1
+  valueOf: $val
   expressionType: HL7Spec
+  vars:
+    val: ORC.5 | ORC.1
 
 intent:
   type: STRING
@@ -49,6 +89,12 @@ intent:
   constants:
     default: "order"
 
+category:
+  valueOf: datatype/CodeableConcept
+  expressionType: resource
+  vars:
+    coding: MEDREQ_CATEGORY, ORC.29
+
 medicationCodeableConcept_1:
   condition: $rxO NOT_NULL
   valueOf: datatype/CodeableConcept
@@ -56,6 +102,7 @@ medicationCodeableConcept_1:
   specs: RXO.1
   vars:
     rxO: RXO.1
+
 medicationCodeableConcept_2:
   condition: $rxE NOT_NULL 
   valueOf: datatype/CodeableConcept
@@ -63,6 +110,7 @@ medicationCodeableConcept_2:
   specs: RXE.2
   vars:
     rxE: RXE.2
+
 medicationCodeableConcept_3:
   condition: $rxC NOT_NULL
   valueOf: datatype/CodeableConcept
@@ -71,9 +119,61 @@ medicationCodeableConcept_3:
   vars:
     rxC: RXC.2
 
+medicationCodeableConcept_4:
+  condition: $rxE NOT_NULL
+  valueOf: datatype/CodeableConcept
+  expressionType: resource
+  specs: RXE.31
+  vars:
+    rxE: RXE.31
+
 authoredOn:
   type: DATE_TIME
-  valueOf: RXE.32
+  valueOf: $val
   expressionType: HL7Spec
+  vars:
+    val: RXE.32 | ORC.9
 
+reasonCode:
+  valueOf: datatype/CodeableConcept
+  generateList: true
+  expressionType: resource
+  specs: RXO.20 | RXE.27 | ORC.16
+
+requester_1:
+  condition: $rxe13 NOT_NULL
+  valueOf: resource/Practitioner
+  expressionType: reference
+  specs: RXE.13
+  vars:
+    rxe13: RXE.13
+  constants:
+    system: "http://terminology.hl7.org/CodeSystem/v2-0203"
+    code: "DEA"
+    display: "Drug Enforcement Administration registration number"
+
+requester_2:
+  condition: $orc12 NOT_NULL && $rxe13 NULL
+  valueOf: resource/Practitioner
+  expressionType: reference
+  specs: ORC.12
+  vars:
+    orc12: ORC.12
+
+dispenseRequest:
+  valueOf: secondary/DispenseRequest
+  expressionType: resource
+  vars:
+    timestamp: ORC.15
+
+note:
+  valueOf: datatype/Annotation
+  condition: $annotationText NOT_NULL
+  expressionType: resource
+  vars:
+    annotationText: NTE.3 *&, GeneralUtils.concatenateWithChar(annotationText, '  \n')  
+
+dosageInstruction:
+  valueOf: secondary/Dosage
+  expressionType: resource
 

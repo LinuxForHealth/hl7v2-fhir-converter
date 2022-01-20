@@ -18,10 +18,10 @@ import org.junit.jupiter.api.Test;
 
 import io.github.linuxforhealth.hl7.segments.util.ResourceUtils;
 
-public class Hl7AllergyFHIRConversionTest {
+class Hl7AllergyFHIRConversionTest {
 
     @Test
-    public void test_allergy_single() {
+    void test_allergy_single() {
         String hl7message = "MSH|^~\\&|SE050|050|PACS|050|20120912011230||ADT^A01|102|T|2.6|||AL|NE\r"
                 + "PID|0010||PID1234^5^M11^A^MR^HOSP~1234568965^^^USA^SS||DOE^JOHN^A^||19800202|F||W|111 TEST_STREET_NAME^^TEST_CITY^NY^111-1111^USA||(905)111-1111|||S|ZZ|12^^^124|34-13-312||||TEST_BIRTH_PLACE\r"
                 + "AL1|1|DA|^PENICILLIN|MI|PRODUCES HIVES~RASH|MI\r"
@@ -36,7 +36,7 @@ public class Hl7AllergyFHIRConversionTest {
     }
 
     @Test
-    public void test_allergy_no_severity_no_coding_system() {
+    void test_allergy_no_severity_no_coding_system() {
         String hl7message = "MSH|^~\\&|SE050|050|PACS|050|20120912011230||ADT^A01|102|T|2.6|||AL|NE\r"
                 + "PID|0010||PID1234^5^M11^A^MR^HOSP~1234568965^^^USA^SS||DOE^JOHN^A^||19800202|F||W|111 TEST_STREET_NAME^^TEST_CITY^NY^111-1111^USA||(905)111-1111|||S|ZZ|12^^^124|34-13-312||||TEST_BIRTH_PLACE\r"
                 + "AL1|1|DA|00000741^OXYCODONE||HYPOTENSION\r";
@@ -58,7 +58,7 @@ public class Hl7AllergyFHIRConversionTest {
     /**
      * Verifies AL1-6 is put into AllergyIntolerance.onsetDateTime; AllergyIntolerance.reaction.onset is not set.
      */
-    public void test_allergy_onset() {
+    void test_allergy_onset() {
         String hl7message = "MSH|^~\\&|SE050|050|PACS|050|20120912011230||ADT^A01|102|T|2.6|||AL|NE\r"
                 + "PID|0010||PID1234||DOE^JANE|||F\r"
                 + "AL1|1|DA|00000741^OXYCODONE||HYPOTENSION|20210101\r";

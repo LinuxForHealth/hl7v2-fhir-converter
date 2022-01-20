@@ -32,11 +32,37 @@ resources:
              - MSH
              - OBSERVATION.OBX
 
+    # This group name that contains the OBX matches the parser  
     - resourceName: Observation
       segment: .OBX
-      group: OBSERVATION
       resourcePath: resource/Observation
+      group: OBSERVATION
       repeats: true
       isReferenced: true
       additionalSegments:
-             - MSH
+        - MSH
+        - .NTE
+
+    - resourceName: ServiceRequest
+      segment: .ORC
+      group: COMMON_ORDER
+      resourcePath: resource/ServiceRequest
+      repeats: true
+      isReferenced: true
+      additionalSegments:
+        - .OBR
+        - .NTE
+        - MSH
+        - PV1
+        - PID   
+
+    - resourceName: DocumentReference
+      segment: TXA
+      resourcePath: resource/DocumentReference
+      repeats: true
+      additionalSegments:
+        - MSH
+        - PID
+        - COMMON_ORDER.ORC
+        - COMMON_ORDER.OBR
+        - OBX

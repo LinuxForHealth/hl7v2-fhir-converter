@@ -21,8 +21,13 @@ system_1 :
    valueOf: $system
 system_2: 
    type: STRING
-   valueOf: $resolvedSystem   
+   valueOf: $resolvedSystem
+system_3:
+   condition: $sys NOT_NULL
+   valueOf: $systemCWE
+   vars:
+      systemCWE: $urn + $sys
 code : 
-   condition: $system NOT_NULL || $resolvedSystem NOT_NULL
+   condition: $system NOT_NULL || $resolvedSystem NOT_NULL || $sys NOT_NULL
    type: String
    valueOf: $code

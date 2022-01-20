@@ -1,0 +1,73 @@
+#
+# (C) Copyright IBM Corp. 2020, 2022
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+resourceType: RelatedPerson
+#
+# Represents data that needs to be extracted for a RelatedPerson Resource in FHIR
+# reference: https://build.fhir.org/relatedperson.html
+# 
+# - NOTE- 
+# Related person gets many values from scope, so they do not need to be passed in: 
+#  IN1 and sub-fields
+#  $Patient 
+id:
+   type: STRING
+   valueOf: UUID.randomUUID()
+   expressionType: JEXL
+
+identifier:
+   condition: $valueIn NOT_NULL
+   valueOf: datatype/Identifier_var
+   generateList: true
+   expressionType: resource
+   vars:
+      # For identifier.value; required for valid identifier, 
+      # does not require and not dependent on IN1.49.4 or IN1.49.5
+      valueIn: String, IN1.49.1 
+      # For identifier.system; systemCX will process and remove spaces
+      systemCX: IN1.49.4
+      # For identifier.type, code, system, & display.
+      # Because IN1.49.5 is an ID code, this will create a correct coding
+      # because it knows the table from position and looks up the display
+      coding: CODING_SYSTEM_V2_IDENTIFIER, IN1.49.5
+
+patient: 
+   valueOf: datatype/Reference
+   expressionType: resource
+   generateList: true
+   specs: $Patient
+
+relationship:
+   valueOf: datatype/CodeableConcept
+   expressionType: resource
+   generateList: true
+   condition: $coding NOT_NULL
+   vars:
+      coding: POLICYHOLDER_RELATIONSHIP, IN1.17
+      text: String, IN1.17.2     
+
+name:
+   valueOf: datatype/HumanName
+   generateList: true
+   expressionType: resource
+   specs: IN1.16 
+
+birthDate:
+   type: DATE
+   valueOf: IN1.18 
+   expressionType: HL7Spec
+
+gender:
+   type: ADMINISTRATIVE_GENDER
+   valueOf: IN1.43 
+   expressionType: HL7Spec
+
+address:
+   valueOf: datatype/Address
+   generateList: true
+   expressionType: resource
+   specs: IN1.19 
+
+

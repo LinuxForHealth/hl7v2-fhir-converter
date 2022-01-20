@@ -1,0 +1,62 @@
+# (C) Copyright IBM Corp. 2021, 2022
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+---
+rateRatio: # Use a ratio when RXO.17 (or RXE.22) and RXO.21 (or RXE.23) is present
+  condition: $condition1 NOT_NULL && $condition2 NOT_NULL
+  valueOf: datatype/Ratio
+  expressionType: resource
+  vars:
+    condition1: RXO.21 | RXE.23
+    condition2: RXO.17 | RXE.22
+    numerator: RXO.21 | RXE.23
+    numunit: RXO.22.1 | RXE.24.1
+    denominator: $denomVal
+    denunit: RXO.17 | RXE.22
+    unitSystem: UNIT_SYSTEM, RXO.22 | RXE.24
+  constants:
+    unitSys: "http://unitsofmeasure.org"
+    denomVal: "1"
+
+rateQuantity: # gets rateQuantity from from RXO or RXE if RXO is not present
+  condition: $condition1 NOT_NULL && $condition2 NULL
+  valueOf: datatype/Quantity
+  expressionType: resource
+  vars:
+    value: RXO.21 | RXE.23
+    unit: RXO.22.1 | RXE.24.1
+    condition1: RXO.21 | RXE.23
+    condition2: RXO.17 | RXE.22
+    resolvedSystem: UNIT_SYSTEM, RXO.22 | RXE.24
+  constants:
+    unitSys: "http://unitsofmeasure.org"
+
+doseQuantity: # Use Quantity when RXO.17 (or RXE.22) is absent
+  condition: $condition1 NOT_NULL && $condition2 NULL
+  valueOf: datatype/Quantity
+  expressionType: resource
+  vars:
+    value: RXO.2 | RXE.3
+    unit: RXO.4.1 | RXE.5.1
+    condition1: RXO.2 | RXE.3
+    condition2: RXO.3 | RXE.4
+    resolvedSystem: UNIT_SYSTEM, RXO.4 | RXE.5
+  constants:
+    unitSys: "http://unitsofmeasure.org"
+
+
+doseRange: # Use a Range when low value RXO.2 (RXE.3) and high value RXO.3 (RXE.4) are both present
+  condition: $condition1 NOT_NULL && $condition2 NOT_NULL
+  valueOf: datatype/Range
+  expressionType: resource
+  vars:
+    condition1: RXO.2 | RXE.3
+    condition2: RXO.3 | RXE.4
+    highVal: RXO.3 | RXE.4
+    highUnit: RXO.4.1 | RXE.5.1
+    lowVal: RXO.2 | RXE.3
+    lowUnit: RXO.4.1 | RXE.5.1
+    unitSystem: UNIT_SYSTEM, RXO.4 | RXE.5
+  constants:
+    unitSys: "http://unitsofmeasure.org"

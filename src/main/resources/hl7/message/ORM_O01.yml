@@ -33,15 +33,6 @@ resources:
             - .PATIENT_VISIT.PV2
             - MSH
             - ORDER_DETAIL.OBSERVATION.OBX
-
-  - resourceName: Observation
-    segment: .ORDER_DETAIL.OBSERVATION.OBX
-    resourcePath: resource/Observation
-    group: ORDER
-    repeats: true
-    isReferenced: true
-    additionalSegments:
-            - MSH
     
   - resourceName: AllergyIntolerance
     segment: .AL1
@@ -59,6 +50,32 @@ resources:
     additionalSegments:
       - MSH
 
+  - resourceName: ServiceRequest
+    segment: .ORC
+    group: ORDER
+    resourcePath: resource/ServiceRequest
+    repeats: true
+    isReferenced: true
+    additionalSegments:
+      - .ORDER_DETAIL.OBR
+      - .ORDER_DETAIL.NTE
+      - PATIENT_VISIT.PV1
+      - MSH
+      - PID
+
+  # This OBX is for the Order Observation
+  - resourceName: Observation
+    segment: .ORDER_DETAIL.OBSERVATION.OBX
+    group: ORDER
+    resourcePath: resource/Observation
+    repeats: true
+    isReferenced: true
+    additionalSegments:
+      - .ORC
+      - .ORDER_DETAIL.OBR
+      - MSH
+      - .ORDER_DETAIL.OBSERVATION.NTE   
+
   - resourceName: MedicationRequest
     segment: .ORDER_DETAIL.RXO
     resourcePath: resource/MedicationRequest
@@ -69,4 +86,14 @@ resources:
       - MSH
       - .ORC
       - PATIENT.PATIENT_VISIT.PV1
+      - PATIENT.PID
+
+  - resourceName: DocumentReference
+    segment: ORDER.ORC
+    resourcePath: resource/DocumentReference
+    additionalSegments:
+      - ORDER.ORDER_DETAIL.OBR
+      - ORDER.ORDER_DETAIL.OBSERVATION.OBX
+      - PATIENT.PATIENT_VISIT.PV1
+      - MSH
       - PATIENT.PID

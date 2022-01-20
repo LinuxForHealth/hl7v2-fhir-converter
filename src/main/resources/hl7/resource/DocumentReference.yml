@@ -8,7 +8,23 @@ id:
    type: STRING
    valueOf: 'UUID.randomUUID()'
    expressionType: JEXL
-   
+
+masterIdentifier_1:
+   condition: $valueIn NOT_NULL
+   valueOf: datatype/Identifier_var
+   expressionType: resource
+   vars:
+      valueIn: TXA.12.1
+      systemCX: TXA.12.2
+
+masterIdentifier_2:
+   condition: $txa NULL && $value NOT_NULL
+   valueOf: datatype/Identifier
+   expressionType: resource
+   vars:
+      value: TXA.12.3
+      txa: TXA.12.1
+
 identifier_1:
    valueOf: datatype/Identifier
    generateList: true
@@ -19,41 +35,241 @@ identifier_1:
    constants:
       sys: "urn:id:extID"
 
-identifier_2:
+# The logic for Filler appears it should be:     
+#  valueIn: ORC.3.1 | OBR.3.1 | TXA.15.1
+#  systemCX: ORC.3.2 | OBR.3.2 | TXA.15.2 
+# But if ORC.3.1 has a value and ORC.3.2 is empty but OBR.3.2 has a value,
+# it results in mismatched code and system values.  Similarly for values in TXA.
+# The code below forces the value and the system to be of the same pair.
+# Similar settings for Placer.
+
+identifier_2a:
    condition: $valueIn NOT_NULL
    valueOf: datatype/Identifier_var
    generateList: true
+   useGroup: true
    expressionType: resource
    vars:
-      valueIn: ORC.3.1 | OBR.3.1 | TXA.15.1
-      systemCX: ORC.3.2 | OBR.3.2 | TXA.15.2
+      valueIn: ORC.3.1
+      systemCX: ORC.3.2 
    constants:
       system: "http://terminology.hl7.org/CodeSystem/v2-0203"
       code: "FILL"
       display: "Filler Identifier"
 
-identifier_3:
+identifier_2b:
+   condition: $valueInORC NULL && $valueIn NOT_NULL 
+   valueOf: datatype/Identifier_var
+   generateList: true
+   useGroup: true
+   expressionType: resource
+   vars:
+      valueIn: OBR.3.1
+      systemCX: OBR.3.2 
+      valueInORC: ORC.3.1
+   constants:
+      system: "http://terminology.hl7.org/CodeSystem/v2-0203"
+      code: "FILL"
+      display: "Filler Identifier" 
+      
+identifier_2c:
+   condition: $valueInORC NULL && $valueInOBR NULL && $valueIn NOT_NULL 
+   valueOf: datatype/Identifier_var
+   generateList: true
+   useGroup: true
+   expressionType: resource
+   vars:
+      valueIn: TXA.15.1
+      systemCX: TXA.15.2 
+      valueInORC: ORC.3.1
+      valueInOBR: OBR.3.1
+   constants:
+      system: "http://terminology.hl7.org/CodeSystem/v2-0203"
+      code: "FILL"
+      display: "Filler Identifier"
+
+identifier_3a:
+   condition: $valueIn NOT_NULL
+   valueOf: datatype/Identifier_var
+   generateList: true
+   useGroup: true
+   expressionType: resource
+   vars:
+      valueIn: ORC.2.1
+      systemCX: ORC.2.2 
+   constants:
+      system: "http://terminology.hl7.org/CodeSystem/v2-0203"
+      code: "PLAC"
+      display: "Placer Identifier"
+
+identifier_3b:
+   condition: $valueInORC NULL && $valueIn NOT_NULL 
+   valueOf: datatype/Identifier_var
+   generateList: true
+   useGroup: true
+   expressionType: resource
+   vars:
+      valueIn: OBR.2.1
+      systemCX: OBR.2.2 
+      valueInORC: ORC.2.1
+   constants:
+      system: "http://terminology.hl7.org/CodeSystem/v2-0203"
+      code: "PLAC"
+      display: "Placer Identifier"    
+      
+identifier_3c:
+   condition: $valueInORC NULL && $valueInOBR NULL && $valueIn NOT_NULL 
+   valueOf: datatype/Identifier_var
+   generateList: true
+   useGroup: true
+   expressionType: resource
+   vars:
+      valueIn: TXA.14.1
+      systemCX: TXA.14.2 
+      valueInORC: ORC.2.1
+      valueInOBR:  OBR.2.1
+   constants:
+      system: "http://terminology.hl7.org/CodeSystem/v2-0203"
+      code: "PLAC"
+      display: "Placer Identifier"
+
+identifier_4:
    condition: $valueIn NOT_NULL
    valueOf: datatype/Identifier_var
    generateList: true
    expressionType: resource
    vars:
-      valueIn: ORC.2.1 | OBR.2.1 | TXA.14.1
-      systemCX: ORC.2.2 | OBR.2.2 | TXA.14.2
+      valueIn: TXA.12.1
+      systemCX: TXA.12.2
    constants:
-      system: "http://terminology.hl7.org/CodeSystem/v2-0203"
-      code: "PLAC"
-      display: "Placer Identifier"
-   
+      code: "EntityId"
+
+identifier_5:
+   condition: $valueIn NOT_NULL
+   valueOf: datatype/Identifier_var
+   generateList: true
+   expressionType: resource
+   vars:
+      valueIn: TXA.12.3
+   constants:
+      code: "UniversalId"
+
+# Only create a DocReference when there is a TXA 
+# OR there is no TXA, but there is an ORC with OBX of type TX.
+# Do this by using required:true and getDocumentReferenceStatus which 
+# returns a value only when the conditions are satisfied.
 status:
    type: STRING
-   valueOf: $default
-   expressionType: HL7Spec
-   constants:
-      default: "current"
+   required: true
+   valueOf: 'GeneralUtils.getDocumentReferenceStatus( txa, txa19, orc, obr25, obx2)'
+   expressionType: JEXL   
+   vars:
+      txa: TXA
+      txa19: TXA.19
+      obr25: OBR.25
+      orc: ORC
+      obx2: OBX.2      
 
-content:
-   valueOf: secondary/Content
+docStatus:
+   type: DOC_REF_DOC_STATUS
+   valueOf: TXA.17 | OBX.11
+   expressionType: HL7Spec
+
+type:
+   valueOf: datatype/CodeableConcept
    expressionType: resource
-   constants:
-      value: "attachment"
+   specs: TXA.2
+
+subject:
+   valueOf: datatype/Reference
+   expressionType: resource
+   specs: $Patient
+
+date:
+   type: INSTANT
+   valueOf: TXA.6 
+   expressionType: HL7Spec
+
+author:
+   condition: $hasValue NOT_NULL
+   generateList: true
+   expressionType: reference
+   valueOf: resource/Practitioner
+   specs: TXA.9
+   vars:
+      hasValue: TXA.9
+      referenceDisplay: PERSON_DISPLAY_NAME, TXA.9
+
+authenticator:
+   condition: $hasValue NOT_NULL
+   expressionType: reference
+   valueOf: resource/Practitioner
+   specs: TXA.22 | TXA.10
+   vars:
+      hasValue: TXA.22 | TXA.10
+      referenceDisplay: PERSON_DISPLAY_NAME, TXA.22 | TXA.10
+
+# If OBX is TX type, create an attachment of the data
+content_1:
+   valueOf: secondary/Content
+   generateList: true
+   expressionType: resource
+   condition: $obx2 EQUALS TX
+   vars:
+      # TODO: in future, if other than plain text, create a mapping for content type
+      # contentType: TXA.3 | OBX.2
+      creationDate: TXA.7
+      contentData: OBX.5 *&, GeneralUtils.concatenateWithChar(contentData, '\n')
+      obx2: STRING, OBX.2
+   constants: 
+      contentType: "text/plain"   
+
+# If OBX is any other type, (not TX) the content is put in an Observation
+# DocumentReference still requires Content element, so create an empty (minimal) one.
+# Content type is sufficient minimal, include the date if present
+content_2:
+   valueOf: secondary/Content
+   generateList: true
+   expressionType: resource
+   condition: $obx2 NOT_EQUALS TX
+   vars:
+      creationDate: TXA.7
+      obx2: STRING, OBX.2
+   constants: 
+      contentType: "text/plain"      
+
+# Third case is no OBX record at all
+# DocumentReference still requires Content element, so create an empty (minimal) one.
+# Content type is sufficient for minimal, include the date if present
+content_3:
+   valueOf: secondary/Content
+   generateList: true
+   expressionType: resource
+   condition: $obx NULL
+   vars:
+      creationDate: TXA.7
+      obx: OBX 
+   constants: 
+      contentType: "text/plain"
+        
+description:
+   type: STRING
+   expressionType: HL7Spec
+   valueOf: TXA.16
+
+securityLabel:
+   condition: $txa NOT_NULL
+   valueOf: datatype/CodeableConcept
+   expressionType: resource
+   specs: TXA.18
+   vars:
+      txa: TXA.18
+
+context:
+   valueOf: secondary/Context
+   expressionType: resource
+   vars:
+      timestamp: TXA.4 
+      providerCode: TXA.5
+      serviceRequestRef: $ServiceRequest?
+      encounterRef: $Encounter

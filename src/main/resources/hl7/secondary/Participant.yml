@@ -19,5 +19,8 @@ type:
 individual:
    valueOf: resource/Practitioner
    expressionType: reference
-   specs: $practionerSpec
+   specs: XCN
    required: true
+   vars: 
+      referenceDisplay: PERSON_DISPLAY_NAME, XCN
+

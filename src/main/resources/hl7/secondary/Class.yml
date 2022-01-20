@@ -1,0 +1,28 @@
+#
+# (C) Copyright IBM Corp. 2021, 2022
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+# Class is currently only used by Coverage 
+---
+value: 
+     type: STRING
+     valueOf: XON.10 | XON.1 | $classValue
+     expressionType: HL7Spec
+     required: true
+
+type: 
+   valueOf: datatype/CodeableConcept_var
+   expressionType: resource
+   required: true
+   # Constants because Class is currently only used by Coverage 
+   constants: 
+      system: 'http://terminology.hl7.org/CodeSystem/coverage-class'
+      code: 'group'
+      display: 'Group'
+
+name:
+     type: STRING
+     valueOf: XON.1
+     expressionType: HL7Spec
+
