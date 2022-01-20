@@ -78,7 +78,7 @@ class Hl7FinancialInsuranceTest {
                 + "|LastFake^FirstFake^MiddleFake^III^Dr.^^L^^^^^20201231145045^20211231145045"
                 // IN1.7 to Organization Contact telecom  
                 //    IN1.7.1 to Organization Contact telecom .value (ONLY when 7.5-7.7 are empty.  See rules in getFormattedTelecomNumberValue.)
-                //    IN1.7.2 to Organization Contact telecom .use is "work" 
+                //    IN1.7.2 is not mapped.  Purposely contains possible valid HL7 value to show it is ignored.
                 //    IN1.7.5 (Country) to Organization Contact telecom .value (as input to getFormattedTelecomNumberValue)
                 //    IN1.7.6 (Area) to Organization Contact telecom .value (as input to getFormattedTelecomNumberValue)
                 //    IN1.7.7 (Local) to Organization Contact telecom .value (as input to getFormattedTelecomNumberValue)
@@ -86,7 +86,7 @@ class Hl7FinancialInsuranceTest {
                 //    IN1.7.13 to Organization Contact Name .period.start
                 //    IN1.7.14 to Organization Contact Name .period.end
                 //    IN1.7.18 to Organization Contact telecom .rank 
-                + "|^^^^^333^4444444^^^^^^20201231145045^20211231145045^^^^1"
+                + "|^WPN^^^^333^4444444^^^^^^20201231145045^20211231145045^^^^1"
                 // IN1.8 to list element Coverage.class.value
                 // IN1.9.1 (1) to list element Coverage.class.name
                 // IN1.9.10 (1) to list element Coverage.class.value 
@@ -156,7 +156,7 @@ class Hl7FinancialInsuranceTest {
         assertThat(org.getContact().get(0).getTelecom()).hasSize(1);
         ContactPoint contactPoint = org.getContact().get(0).getTelecomFirstRep(); // telecom is type ContactPoint
         assertThat(contactPoint.getSystemElement().getCode()).hasToString("phone"); // default type hardcoded.
-        assertThat(contactPoint.getUseElement().getCode()).hasToString("work"); // IN1.7.2
+        assertThat(contactPoint.hasUseElement()).isFalse(); // IN1.7.2 is not mapped (ignored)
         assertThat(contactPoint.getValue()).hasToString("(333) 444 4444"); // IN1.7.6, IN1.7.7 via getFormattedTelecomNumberValue
         assertThat(contactPoint.getPeriod().getStartElement().toString()).containsPattern("2020-12-31T14:50:45"); // IN1.7.13
         assertThat(contactPoint.getPeriod().getEndElement().toString()).containsPattern("2021-12-31T14:50:45"); // IN1.7.14
@@ -461,6 +461,68 @@ class Hl7FinancialInsuranceTest {
         DatatypeUtils.checkCommonCodeableConceptAssertions(coverage.getRelationship(), "self",
                 "Self",
                 "http://terminology.hl7.org/CodeSystem/subscriber-relationship", null); // IN1.17
+
+        // Confirm there are no unaccounted for resources
+        // Expected: Coverage, Organization, Patient, Encounter
+        assertThat(e).hasSize(4);
+    }
+
+    @Test
+    // Confirms that telecom values are processed in special case.
+    // Background: a testcase with IN1 was failing to create the telecom.  It didn't seem unusual because there is a phone number in IN1.7,
+    // and an organization was created, but for some reason the telecom was not created.
+    // Period and rank were not the problem cause.
+    // This was fixed by a change to Organization.yml contact: in PR #405
+    // This test is to see the problem does not return.  It fails without PR #405, and is successful with it. 
+    void testFailingOrganizationTelecom() throws IOException {
+
+        String hl7message = "MSH|^~\\&|||||20211214105741||DFT^P03|1760487765|P|2.6|||||||||\n"
+                + "EVN|P03|20211214105741\n"
+                + "PID|||MR1^^^XYZ^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
+                + "PV1||I||||||||||||||||||||||||||||||||||||||||||\n"
+                // FT1 added for completeness; required in specification, but not used (ignored) by templates
+                // FT1.4 is required transaction date (currently not used)
+                // FT1.6 is required transaction type (currently not used)
+                // FT1.7 is required transaction code (currently not used)
+                + "FT1||||20201231145045||CG|FAKE|||||||||||||||||||||||||||||||||||||\n"
+                // These fields in IN1 with these values cause the failure, leaving some of the field empty may be contribute.
+                // IN1.2 to Identifier 1
+                // IN1.3 to Organization Identifier
+                // IN1.4 to Organization Name
+                // IN1.7 to Organization Telecom
+                // IN1.8 to 15 NOT REFERENCED (Tested in testBasicInsuranceCoverageFields)
+                + "IN1|1|PLAN001|210012|GOLD CHOICE PLUS|||^^^^^800^3334444||||||||||||\n";
+
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+
+        List<Resource> encounters = ResourceUtils.getResourceList(e, ResourceType.Encounter);
+        assertThat(encounters).hasSize(1); // From PV1
+
+        List<Resource> patients = ResourceUtils.getResourceList(e, ResourceType.Patient);
+        assertThat(patients).hasSize(1); // From PID
+
+        List<Resource> organizations = ResourceUtils.getResourceList(e, ResourceType.Organization);
+        assertThat(organizations).hasSize(1); // From Payor created by IN1
+        Organization org = (Organization) organizations.get(0);
+
+        // Check organization Id's
+        assertThat(org.getName()).isEqualTo("GOLD CHOICE PLUS"); // IN1.4
+        assertThat(org.getIdentifier()).hasSize(1);
+        Identifier orgId1 = org.getIdentifierFirstRep();
+        assertThat(orgId1.getValue()).isEqualTo("210012"); // IN1.3.1
+        assertThat(orgId1.hasSystem()).isFalse(); // IN1.3.4 empty
+        assertThat(orgId1.hasPeriod()).isFalse(); // IN1.3.7 & IN1.3.7 empty
+        assertThat(orgId1.hasType()).isFalse(); // IN1.3.5 empty
+
+        // Check Organization contact telecom.  IN1.7 is standard XTN, tested exhaustively in other tests.
+        assertThat(org.getContact().get(0).getTelecom()).hasSize(1);
+        ContactPoint contactPoint = org.getContact().get(0).getTelecomFirstRep(); // telecom is type ContactPoint
+        assertThat(contactPoint.getSystemElement().getCode()).hasToString("phone"); // default type hardcoded.
+        assertThat(contactPoint.getUseElement().getCode()).hasToString("work"); // IN1.7.2
+        assertThat(contactPoint.getValue()).hasToString("(800) 333 4444"); // IN1.7.6, IN1.7.7 via getFormattedTelecomNumberValue
+
+        List<Resource> coverages = ResourceUtils.getResourceList(e, ResourceType.Coverage);
+        assertThat(coverages).hasSize(1); // From IN1 segment
 
         // Confirm there are no unaccounted for resources
         // Expected: Coverage, Organization, Patient, Encounter
