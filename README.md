@@ -26,6 +26,7 @@ The converter supports the following message segments:
 * DG1 - Diagnosis
 * EVN - Event Type
 * IN1 - Insurance
+* IN2 - Insurance Additional Information
 * MRG - Merge Patient Information
 * MSH - Message Header
 * NTE - Notes and Comments
