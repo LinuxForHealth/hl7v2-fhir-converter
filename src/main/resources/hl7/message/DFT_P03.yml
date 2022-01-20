@@ -45,6 +45,7 @@ resources:
     additionalSegments:
       - MSH
       - PID
+      - .IN2
 
   - resourceName: ServiceRequest
     segment: .ORC

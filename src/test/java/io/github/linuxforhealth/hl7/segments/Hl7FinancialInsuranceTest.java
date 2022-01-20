@@ -253,6 +253,7 @@ class Hl7FinancialInsuranceTest {
     })
     // Tests IN1.17 coverage by related person. A related person should be created and cross-referenced.
     // Also tests backup field for coverage.order
+    // Also test IN2.2 Social Security number
 
     void testInsuranceCoverageByRelatedFields(String messageType) throws IOException {
         String hl7message = "MSH|^~\\&|||||20151008111200||"+messageType+"|MSGID000001|T|2.6|||||||||\n"
@@ -295,7 +296,21 @@ class Hl7FinancialInsuranceTest {
                 //    IN1.49.5 to RelatedPerson.identifier.type.code (must be from terminology.hl7.org/3.0.0/CodeSystem-v2-0203.html)
                 //      NOTE: Purposely XX to ensure we are doing a lookup, and not getting bleed from other hard-coded XV uses
                 // IN1.50 through IN1.53 NOT REFERENCED
-                + "|MEMBER36|||||||F|||Value46|||J494949^^^Large HMO^XX||||\n";
+                + "|MEMBER36|||||||F|||Value46|||J494949^^^Large HMO^XX||||\n"
+                // IN2.2 to RelatedPerson.identifier (SSN)
+                // IN2.3 through IN1.62 not used
+                + "IN2||777-88-9999||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||"
+                // IN2.63 to RelatedPerson.telecom
+                //    IN2.63.1 to Organization Contact telecom .value (ONLY when XTN.5-XTN.7 are empty.  See rules in getFormattedTelecomNumberValue.)
+                //    IN2.63.2 is not mapped. 
+                //    IN2.63.5 (Country) to Organization Contact telecom .value (as input to getFormattedTelecomNumberValue)
+                //    IN2.63.6 (Area) to Organization Contact telecom .value (as input to getFormattedTelecomNumberValue)
+                //    IN2.63.7 (Local) to Organization Contact telecom .value (as input to getFormattedTelecomNumberValue)
+                //    IN2.63.8 (Extension) to Organization Contact telecom .value (as input to getFormattedTelecomNumberValue)
+                //    IN2.63.13 to Organization Contact Name .period.start
+                //    IN2.63.14 to Organization Contact Name .period.end
+                //    IN2.63.18 to Organization Contact telecom .rank 
+                + "|^^^^^555^7677777^^^^^^20201231145045^20211231145045^^^^1";
 
         List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
 
@@ -327,13 +342,18 @@ class Hl7FinancialInsuranceTest {
         assertThat(relatedPersons).hasSize(1); // From IN1.16 through IN1.19; IN1.43; INI.49 
         RelatedPerson related = (RelatedPerson) relatedPersons.get(0);
 
-        // Check RelatedPerson identifier
-        assertThat(related.getIdentifier()).hasSize(1);
+        // Check RelatedPerson identifiers
+        assertThat(related.getIdentifier()).hasSize(2);
         assertThat(related.getIdentifier().get(0).getValue()).isEqualTo("J494949"); // IN1.49.1
         assertThat(related.getIdentifier().get(0).getSystem()).isEqualTo("urn:id:Large_HMO"); // IN1.49.4
         DatatypeUtils.checkCommonCodeableConceptAssertions(related.getIdentifier().get(0).getType(), "XX", // IN1.49.5
                 "Organization identifier", // Display value looked up from code 'XX'
                 "http://terminology.hl7.org/CodeSystem/v2-0203", null);
+        assertThat(related.getIdentifier().get(1).getValue()).isEqualTo("777-88-9999"); // IN2.2
+        assertThat(related.getIdentifier().get(1).hasSystem()).isFalse(); // No system to assign
+        DatatypeUtils.checkCommonCodeableConceptAssertions(related.getIdentifier().get(1).getType(), "SS",
+                "Social Security number", 
+                "http://terminology.hl7.org/CodeSystem/v2-0203", null);        
 
         // Check RelatedPerson name. IN1.16 name is standard XPN, tested exhaustively in other tests.        
         assertThat(related.getName()).hasSize(1);
@@ -355,6 +375,15 @@ class Hl7FinancialInsuranceTest {
         assertThat(related.getAddress().get(0).getCity()).isEqualTo("Faketown"); // IN1.19.3
         assertThat(related.getAddress().get(0).getState()).isEqualTo("CA"); // IN1.19.4
         assertThat(related.getAddress().get(0).getPostalCode()).isEqualTo("ZIP5"); // IN1.19.5
+
+        // Check RelatedPerson telecom.  IN2.63 is standard XTN, tested exhaustively in other tests.
+        ContactPoint contactPoint = related.getTelecomFirstRep(); // telecom is type ContactPoint
+        assertThat(contactPoint.getSystemElement().getCode()).hasToString("phone"); // default type hardcoded.
+        assertThat(contactPoint.getUseElement().getCode()).isEqualTo("home");; // Hard-coded to home.  IN2.63.2 is not mapped (ignored).
+        assertThat(contactPoint.getValue()).hasToString("(555) 767 7777"); // IN2.63.6, IN2.63.7 via getFormattedTelecomNumberValue
+        assertThat(contactPoint.getPeriod().getStartElement().toString()).containsPattern("2020-12-31T14:50:45"); // IN2.63.13
+        assertThat(contactPoint.getPeriod().getEndElement().toString()).containsPattern("2021-12-31T14:50:45"); // IN2.63.14
+        assertThat(contactPoint.getRank()).isEqualTo(1); // IN2.63.18
 
         // Check coverage relationship
         DatatypeUtils.checkCommonCodeableConceptAssertions(coverage.getRelationship(), "child",
