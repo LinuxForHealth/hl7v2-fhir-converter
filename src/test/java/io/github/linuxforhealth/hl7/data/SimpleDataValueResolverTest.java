@@ -374,9 +374,9 @@ class SimpleDataValueResolverTest {
         // Check supported known input code
         SimpleCode coding = SimpleDataValueResolver.SUBSCRIBER_RELATIONSHIP.apply("CHD");
         assertThat(coding).isNotNull();
-        assertThat(coding.getCode()).isEqualTo("child");
+        assertThat(coding.getCode()).isEqualTo("parent");
         assertThat(coding.getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/subscriber-relationship");
-        assertThat(coding.getDisplay()).isEqualTo("Child");
+        assertThat(coding.getDisplay()).isEqualTo("Parent");
 
         // Check unsupported unknown input code
         // Because GOAT has no mapping, we pass it without a system.
