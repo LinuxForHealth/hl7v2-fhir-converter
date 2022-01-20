@@ -120,9 +120,9 @@ class HL7ConditionFHIRConversionTest {
         assertThat(encounter.getDiagnosis()).hasSize(1);
         assertThat(encounter.getDiagnosisFirstRep().getCondition().getReference().substring(0, 10))
                 .isEqualTo("Condition/");
-        DatatypeUtils.checkCommonCodeableConceptAssertions(encounter.getDiagnosisFirstRep().getUse(), "AD",
-                "Admission diagnosis",
-                "http://terminology.hl7.org/CodeSystem/diagnosis-role", null);
+        DatatypeUtils.checkCommonCodeableConceptAssertions(encounter.getDiagnosisFirstRep().getUse(), "A",
+                "Admitting",
+                "http://terminology.hl7.org/CodeSystem/v2-0052", null);
         assertThat(encounter.getDiagnosisFirstRep().getRank()).isEqualTo(1); // DG1.15
 
         // --- PRACTIONER TESTS ---
@@ -245,14 +245,14 @@ class HL7ConditionFHIRConversionTest {
                 + "EVN|A04||||||\r"
                 + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\r"
                 + "PV1||I|||||||||||||||||1492|||||||||||||||||||||||||\r"
-                + "DG1|1|D1|V72.83^Other specified pre-operative examination^ICD-9^^^|Other specified pre-operative examination|20151008111200|A|||||||||8|\r"
-                + "DG1|2|D2|R00.0^Tachycardia, unspecified^ICD-10^^^|Tachycardia, unspecified|20150725201300|A|||||||||8|\r"
-                + "DG1|3|D3|R06.02^Shortness of breath^ICD-10^^^|Shortness of breath||A|||||||||8|\r"
-                + "DG1|4|D4|Q99.9^Chromosomal abnormality, unspecified^ICD-10^^^|Chromosomal abnormality, unspecified||A|||||||||8|\r"
-                + "DG1|5|D5|I34.8^Arteriosclerosis^ICD-10^^^|Arteriosclerosis||A|||||||||8|\r"
-                + "DG1|6|D6|I34.0^Mitral valve regurgitation^ICD-10^^^|Mitral valve regurgitation||A|||||||||8|\r"
-                + "DG1|6|D7|I05.9^Mitral valve disorder in childbirth^ICD-10^^^|Mitral valve disorder in childbirth||A|||||||||8|\r"
-                + "DG1|7|D8|J45.909^Unspecified asthma, uncomplicated^ICD-10^^^|Unspecified asthma, uncomplicated||A|||||||||8|\r";
+                + "DG1|1|D1|V72.83^Other specified pre-operative examination^ICD-9^^^|Other specified pre-operative examination|20151008111200|F|||||||||8|\r"
+                + "DG1|2|D2|R00.0^Tachycardia, unspecified^ICD-10^^^|Tachycardia, unspecified|20150725201300|F|||||||||8|\r"
+                + "DG1|3|D3|R06.02^Shortness of breath^ICD-10^^^|Shortness of breath||F|||||||||8|\r"
+                + "DG1|4|D4|Q99.9^Chromosomal abnormality, unspecified^ICD-10^^^|Chromosomal abnormality, unspecified||F|||||||||8|\r"
+                + "DG1|5|D5|I34.8^Arteriosclerosis^ICD-10^^^|Arteriosclerosis||F|||||||||8|\r"
+                + "DG1|6|D6|I34.0^Mitral valve regurgitation^ICD-10^^^|Mitral valve regurgitation||F|||||||||8|\r"
+                + "DG1|6|D7|I05.9^Mitral valve disorder in childbirth^ICD-10^^^|Mitral valve disorder in childbirth||F|||||||||8|\r"
+                + "DG1|7|D8|J45.909^Unspecified asthma, uncomplicated^ICD-10^^^|Unspecified asthma, uncomplicated||F|||||||||8|\r";
 
         List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
 
@@ -284,9 +284,9 @@ class HL7ConditionFHIRConversionTest {
             assertThat(encounter.getDiagnosis().get(i).getCondition().getReference().substring(0, 10))
                     .isEqualTo("Condition/");
             // Verify Use coding of each diagnosis
-            DatatypeUtils.checkCommonCodeableConceptAssertions(encounter.getDiagnosis().get(i).getUse(), "AD",
-                    "Admission diagnosis",
-                    "http://terminology.hl7.org/CodeSystem/diagnosis-role", null);
+            DatatypeUtils.checkCommonCodeableConceptAssertions(encounter.getDiagnosis().get(i).getUse(), "F",
+                    "Final",
+                    "http://terminology.hl7.org/CodeSystem/v2-0052", null);
             // Verify encounter diagnosis rank is set correctly.
             assertThat(encounter.getDiagnosis().get(i).getRank()).isEqualTo(8); // DG1.15
         }
