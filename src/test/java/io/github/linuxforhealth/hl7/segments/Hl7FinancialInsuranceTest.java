@@ -357,8 +357,8 @@ class Hl7FinancialInsuranceTest {
         assertThat(related.getAddress().get(0).getPostalCode()).isEqualTo("ZIP5"); // IN1.19.5
 
         // Check coverage relationship
-        DatatypeUtils.checkCommonCodeableConceptAssertions(coverage.getRelationship(), "parent",
-                "Parent",
+        DatatypeUtils.checkCommonCodeableConceptAssertions(coverage.getRelationship(), "child",
+                "Child",
                 "http://terminology.hl7.org/CodeSystem/subscriber-relationship", null); // IN1.17
 
         // Check relatedPerson relationship

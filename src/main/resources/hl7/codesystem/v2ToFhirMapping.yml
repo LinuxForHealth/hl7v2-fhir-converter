@@ -416,27 +416,31 @@ V3RoleCode:
 # WRD: no good match for Ward of the court  
 
 # HL7 Table 0063 > HAPI SubscriberRelationship code 
+# This is the reverse of the relationship from V3RoleCode
+# IN1.17 is "Insured's Relationship To Patient", but Coverage.relationship is "Beneficiary relationship to the subscriber".
+# To understand the table think: If the patient is a XXXX, the the insurance subscriber is their XXXX
+# As an example, CHD does not map to child, but parent.
 # OTHER is mapped for any connection that is blood or legal (e.g. grandparent, guardian)
 # Nothing is mapped for non-legally binding connections (e.g. friend, manager)
 SubscriberRelationship:
   BRO: other
   CGV: other  # Caregiver
-  CHD: child
+  CHD: parent
   DEP: other  # Handicapped dependent
   DOM: common  # Life partner ~ common law spouse
   EXF: other   # Extended family
-  FCH: child 
+  FCH: parent 
 # FND: no good match for Friend
-  FTH: parent # Father
+  FTH: child # Father of a child
   GCH: other
   GRD: other # Guardian
   GRP: other
-  MTH: parent
-  NCH: child # Natural child 
+  MTH: child
+  NCH: parent # Natural child of a parent
 # NON: no good match for None
   OTH: other     
-  PAR: parent
-  SCH: child # Step-child
+  PAR: child
+  SCH: parent # Step-child of a parent
   SEL: self
   SIB: other
   SIS: other
