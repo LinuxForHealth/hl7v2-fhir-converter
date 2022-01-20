@@ -518,7 +518,7 @@ class Hl7FinancialInsuranceTest {
         assertThat(org.getContact().get(0).getTelecom()).hasSize(1);
         ContactPoint contactPoint = org.getContact().get(0).getTelecomFirstRep(); // telecom is type ContactPoint
         assertThat(contactPoint.getSystemElement().getCode()).hasToString("phone"); // default type hardcoded.
-        assertThat(contactPoint.getUseElement().getCode()).hasToString("work"); // IN1.7.2
+        assertThat(contactPoint.hasUseElement()).isFalse(); // IN1.7.2 is not mapped 
         assertThat(contactPoint.getValue()).hasToString("(800) 333 4444"); // IN1.7.6, IN1.7.7 via getFormattedTelecomNumberValue
 
         List<Resource> coverages = ResourceUtils.getResourceList(e, ResourceType.Coverage);
