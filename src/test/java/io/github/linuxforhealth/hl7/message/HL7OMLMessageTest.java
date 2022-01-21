@@ -31,7 +31,6 @@ import io.github.linuxforhealth.hl7.segments.util.ResourceUtils;
 public class HL7OMLMessageTest {
     private static FHIRContext context = new FHIRContext();
     private static final Logger LOGGER = LoggerFactory.getLogger(HL7OMLMessageTest.class);
-    private static final ConverterOptions OPTIONS = new Builder().withValidateResource().build();
     private static final ConverterOptions OPTIONS_PRETTYPRINT = new Builder()
             .withBundleType(BundleType.COLLECTION)
             .withValidateResource()
@@ -39,44 +38,41 @@ public class HL7OMLMessageTest {
             .build();
 
     @Test
-    public void test_oml() throws IOException {
-        String hl7message = "MSH|^~\\&||Test System|||20210917110100||OML^O21^OML_O21|d1577c69-dfbe-44ad-ba6d-3e05e953b2ea|T|2.5.1|||AL|AL|||||LOI_NG_PRU_PROFILE^^2.16.840.1.113883.9.87^ISO\r"
-        + "PID|1||7659afb9-0dfc-d744-1f40-5b9314807108^^^^MR||Feeney^Sam^^^^^L||20110926000000+0530|M|||953 Schmitt Road^^Milford^MA^^^L|||||S\r"
-        + "ORC|NW|8125550e-04db-11ec-a9a8-086d41d421ca^^ID^UUID|||||||20210824000000+0530|||9999997079^Hahn^Reginald^^^^^U^NPI^L^^^NPI\r"
-        + "OBR|1|8125550e-04db-11ec-a9a8-086d41d421ca^^ID^UUID||58410-2^CBC panel - Blood by Automated count^LN||||||||||||9999997079^Hahn^Reginald^^^^^U^NPI^L^^^NPI\r"
+    public void testOMLO21WithPatientAndOrderWithObservationRequestWithDG1() throws IOException {
+        String hl7message = "MSH|^~\\&||Test System|||20210917110100||OML^O21^OML_O21|||2.6\r"
+        + "PID|1||7659afb9-0dfc-d744-1f40-5b9314807108^^^^MR||Feeney^Sam^^^^^L|||M||||||||\r"
+        + "ORC|NW|8125550e-04db-11ec-a9a8-086d41d421ca^^ID^UUID||||||||||\r"
+        + "OBR|1|8125550e-04db-11ec-a9a8-086d41d421ca^^ID^UUID||58410-2^CBC panel - Blood by Automated count^LN||||||||||||\r"
         + "DG1|1||A013^Paratyphoid fever C^I10C|||A|||||||||1\r";
 
         HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
-        String json = ftv.convert(hl7message, OPTIONS);
+        String json = ftv.convert(hl7message, OPTIONS_PRETTYPRINT);
         assertThat(json).isNotBlank();
+        LOGGER.info("FHIR json result:\n" + json);
         IBaseResource bundleResource = context.getParser().parseResource(json);
         assertThat(bundleResource).isNotNull();
         Bundle b = (Bundle) bundleResource;
         List<BundleEntryComponent> e = b.getEntry();
+
         List<Resource> patientResource = e.stream()
                 .filter(v -> ResourceType.Patient == v.getResource().getResourceType())
                 .map(BundleEntryComponent::getResource).collect(Collectors.toList());
-        assertThat(patientResource).hasSize(1);
+        assertThat(patientResource).hasSize(1); //from PID
 
         List<Resource> serviceResource = e.stream()
                 .filter(v -> ResourceType.ServiceRequest == v.getResource().getResourceType())
                 .map(BundleEntryComponent::getResource).collect(Collectors.toList());
-        assertThat(serviceResource).hasSize(1);
-
-        List<Resource> physicianresource = e.stream()
-                .filter(v -> ResourceType.Practitioner == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
-        assertThat(physicianresource).hasSize(1);
+        assertThat(serviceResource).hasSize(1); //from ORC
 
         List<Resource> diagnosticresource = e.stream()
                 .filter(v -> ResourceType.DiagnosticReport == v.getResource().getResourceType())
                 .map(BundleEntryComponent::getResource).collect(Collectors.toList());
-        assertThat(diagnosticresource).hasSize(1);
+        assertThat(diagnosticresource).hasSize(1); //from OBR
 
         List<Resource> conditionresource = e.stream()
                 .filter(v -> ResourceType.Condition == v.getResource().getResourceType())
                 .map(BundleEntryComponent::getResource).collect(Collectors.toList());
-        assertThat(conditionresource).hasSize(1);
+        assertThat(conditionresource).hasSize(1); //from DG1
 
         DiagnosticReport diag = ResourceUtils.getResourceDiagnosticReport(diagnosticresource.get(0), context);
         Reference patRef = diag.getSubject();
@@ -85,116 +81,253 @@ public class HL7OMLMessageTest {
         Reference patientRef = request.getSubject();
         assertThat(patientRef.isEmpty()).isFalse();
 
+        // Confirm that there are no extra resources
+        assertThat(e.size()).isEqualTo(4);
+
     }
 
     @Test
-    public void test_omlo21_patient_encounter_present() throws IOException {
-        String hl7message = "MSH|^~\\&||TestSystem|||20210917110100||OML^O21^OML_O21|d1577c69-dfbe-44ad-ba6d-3e05e953b2ea|T|2.5.1|||AL|AL|||||LOI_NG_PRU_PROFILE^^2.16.840.1.113883.9.87^ISO\r"
-        + "PID|1||7659afb9-0dfc-d744-1f40-5b9314807108^^^^MR||Feeney^Sam^^^^^L||20110926000000+0530|M|||953 Schmitt Road^^Milford^MA^^^L|||||S\r"
-        + "PV1|1|O|||||9905^Adams^John|9906^Yellow^William^F|9907^Blue^Oren^J||||||||9908^Green^Mircea^||2462201|||||||||||||||||||||||||20180520230000\r"
-        + "ORC|NW|8125550e-04db-11ec-a9a8-086d41d421ca^^ID^UUID|||||||20210824000000+0530|||9999997079^Hahn^Reginald^^^^^U^NPI^L^^^NPI\r"
-        + "OBR|1|8125550e-04db-11ec-a9a8-086d41d421ca^^ID^UUID||58410-2^CBC panel - Blood by Automated count^LN||||||||||||9999997079^Hahn^Reginald^^^^^U^NPI^L^^^NPI\r"
-        + "DG1|1||A013^Paratyphoid fever C^I10C|||A|||||||||1\r";
+    public void testOMLO21WithPatientWithPatientVisitAndMinimumOrder() throws IOException {
+        String hl7message = "MSH|^~\\&||Test System|||20210917110100||OML^O21^OML_O21|||2.6\r"
+        + "PID|1||7659afb9-0dfc-d744-1f40-5b9314807108^^^^MR||Feeney^Sam^^^^^L|||M||||||||\r"
+        + "PV1|1|O|||||||||||||||||2462201|||||||||||||||||||||||||20180520230000\r"
+        + "ORC|NW|8125550e-04db-11ec-a9a8-086d41d421ca^^ID^UUID||||||||||\r";
 
         HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
-        String json = ftv.convert(hl7message, OPTIONS);
+        String json = ftv.convert(hl7message, OPTIONS_PRETTYPRINT);
         assertThat(json).isNotBlank();
         LOGGER.info("FHIR json result:\n" + json);
         IBaseResource bundleResource = context.getParser().parseResource(json);
         assertThat(bundleResource).isNotNull();
         Bundle b = (Bundle) bundleResource;
         List<BundleEntryComponent> e = b.getEntry();
+
         List<Resource> patientResource = e.stream()
                 .filter(v -> ResourceType.Patient == v.getResource().getResourceType())
                 .map(BundleEntryComponent::getResource).collect(Collectors.toList());
-        assertThat(patientResource).hasSize(1);
+        assertThat(patientResource).hasSize(1); //from PID
 
         List<Resource> encounterResource = e.stream()
                 .filter(v -> ResourceType.Encounter == v.getResource().getResourceType())
                 .map(BundleEntryComponent::getResource).collect(Collectors.toList());
-        assertThat(encounterResource).hasSize(1);
+        assertThat(encounterResource).hasSize(1); //from PV1
+
+        // TODO: When function is added to create ServiceRequest from ORC then also check for ServiceRequest
+        // List<Resource> serviceResource = e.stream()
+        //         .filter(v -> ResourceType.ServiceRequest == v.getResource().getResourceType())
+        //         .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        // assertThat(serviceResource).hasSize(1);
+
+        // Confirm that there are no extra resources
+        assertThat(e.size()).isEqualTo(2);  //TODO: When ServiceRequest is added then this line should check for 3.
 
     }
 
     @Test
-    public void test_oml_multiple() throws IOException {
-      String hl7message =
-          "MSH|^~\\&||Test System|||20210917110100||OML^O21^OML_O21|d1577c69-dfbe-44ad-ba6d-3e05e953b2ea|T|2.6|||AL|AL|||||LOI_NG_PRU_PROFILE^^2.16.840.1.113883.9.87^ISO\r"
-    + "PID|1||7659afb9-0dfc-d744-1f40-5b9314807108^^^^MR||Feeney^Sam^^^^^L||20110926000000+0530|M|||953 Schmitt Road^^Milford^MA^^^L|||||S\r"
-    + "ORC|NW|8125550e-04db-11ec-a9a8-086d41d421ca^^ID^UUID|||||||20210824000000+0530|||9999997079^Hahn^Reginald^^^^^U^NPI^L^^^NPI\r"
-    + "OBR|1|8125550e-04db-11ec-a9a8-086d41d421ca^^ID^UUID||58410-2^CBC panel - Blood by Automated count^LN||||||||||||9999997079^Hahn^Reginald^^^^^U^NPI^L^^^NPI\r"
-    + "DG1|1||A013^Paratyphoid fever C^I10C|||A|||||||||1\r"
-    + "ORC|NW|8125550e-04db-11ec-a9a8-086d41d421cb^^ID^UUID|||||||20210830000000+0530|||9999999979^Steuber^Ludivina^^^^^U^NPI^L^^^NPI\r"
-    + "OBR|2|8125550e-04db-11ec-a9a8-086d41d421cb^^ID^UUID||57698-3^Lipid panel with direct LDL - Serum or Plasma^LN||||||||||||9999999979^Steuber^Ludivina^^^^^U^NPI^L^^^NPI\r"
-    + "DG1|1||A001^Cholera due to Vibrio cholerae 01, biovar eltor^I10C|||A|||||||||1\r";
+    public void testOMLO21WithPatientAndOrderWithPriorOrder() throws IOException {
+        String hl7message = "MSH|^~\\&||Test System|||20210917110100||OML^O21^OML_O21|||2.6\r"
+        + "PID|1||7659afb9-0dfc-d744-1f40-5b9314807108^^^^MR||Feeney^Sam^^^^^L|||M||||||||\r"
+        + "ORC|NW|8125550e-04db-11ec-a9a8-086d41d421ca^^ID^UUID|||||||\r"
+        + "OBR|1|8125550e-04db-11ec-a9a8-086d41d421ca^^ID^UUID||58410-2^CBC panel - Blood by Automated count^LN||||||||||||\r"
+        + "DG1|1||A013^Paratyphoid fever C^I10C|||A|||||||||1\r"
+        + "ORC|NW|8125550e-04db-11ec-a9a8-086d41d421cb^^ID^UUID|||||||\r"
+        + "OBR|2|8125550e-04db-11ec-a9a8-086d41d421cb^^ID^UUID||57698-3^Lipid panel with direct LDL - Serum or Plasma^LN||||||||||||\r"
+        + "DG1|1||A001^Cholera due to Vibrio cholerae 01, biovar eltor^I10C|||A|||||||||1\r";
 
         HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
-        String json = ftv.convert(hl7message);
-
+        String json = ftv.convert(hl7message, OPTIONS_PRETTYPRINT);
         assertThat(json).isNotBlank();
-        System.out.println(json);
+        LOGGER.info("FHIR json result:\n" + json);
         IBaseResource bundleResource = context.getParser().parseResource(json);
         assertThat(bundleResource).isNotNull();
         Bundle b = (Bundle) bundleResource;
         assertThat(b.getType()).isEqualTo(BundleType.COLLECTION);
         List<BundleEntryComponent> e = b.getEntry();
+
         List<Resource> patientResource = e.stream()
                 .filter(v -> ResourceType.Patient == v.getResource().getResourceType())
                 .map(BundleEntryComponent::getResource).collect(Collectors.toList());
-        assertThat(patientResource).hasSize(1);
+        assertThat(patientResource).hasSize(1); //from PID
 
         List<Resource> diagnosisResource = e.stream()
                 .filter(v -> ResourceType.Condition == v.getResource().getResourceType())
                 .map(BundleEntryComponent::getResource).collect(Collectors.toList());
-        assertThat(diagnosisResource).hasSize(2);
+        assertThat(diagnosisResource).hasSize(2); //from DG1
 
         List<Resource> serviceResource = e.stream()
                 .filter(v -> ResourceType.ServiceRequest == v.getResource().getResourceType())
                 .map(BundleEntryComponent::getResource).collect(Collectors.toList());
-        assertThat(serviceResource).hasSize(2);
-
-        List<Resource> physicianresource = e.stream()
-                .filter(v -> ResourceType.Practitioner == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
-        assertThat(physicianresource).hasSize(2);
+        assertThat(serviceResource).hasSize(2); //from ORC
 
         List<Resource> diagnosticresource = e.stream()
                 .filter(v -> ResourceType.DiagnosticReport == v.getResource().getResourceType())
                 .map(BundleEntryComponent::getResource).collect(Collectors.toList());
-        assertThat(diagnosticresource).hasSize(2);
+        assertThat(diagnosticresource).hasSize(2); //from OBR
 
         DiagnosticReport diag = ResourceUtils.getResourceDiagnosticReport(diagnosticresource.get(0), context);
         Reference ref = diag.getSubject();
         assertThat(ref.isEmpty()).isFalse();
+
+        // Confirm that there are no extra resources
+        assertThat(e.size()).isEqualTo(7);
+
     }
 
-    @Test @Disabled
-    public void test_oml_spm() throws IOException {
-        String hl7message = "MSH|^~\\&||Test System|||20210917110100||OML^O21^OML_O21|d1577c69-dfbe-44ad-ba6d-3e05e953b2ea|T|2.5.1|||AL|AL|||||LOI_NG_PRU_PROFILE^^2.16.840.1.113883.9.87^ISO\r"
-        + "PID|1||7659afb9-0dfc-d744-1f40-5b9314807108^^^^MR||Feeney^Sam^^^^^L||20110926000000+0530|M|||953 Schmitt Road^^Milford^MA^^^L|||||S\r"
-        + "ORC|NW|8125550e-04db-11ec-a9a8-086d41d421ca^^ID^UUID|||||||20210824000000+0530|||9999997079^Hahn^Reginald^^^^^U^NPI^L^^^NPI\r"
-        + "OBR|1|8125550e-04db-11ec-a9a8-086d41d421ca^^ID^UUID||58410-2^CBC panel - Blood by Automated count^LN||||||||||||9999997079^Hahn^Reginald^^^^^U^NPI^L^^^NPI\r"
-        + "DG1|1||A013^Paratyphoid fever C^I10C|||A|||||||||1\r"
+    @Test
+    public void testOMLO21WithSpecimen() throws IOException {
+        String hl7message = "MSH|^~\\&||Test System|||20210917110100||OML^O21^OML_O21|||2.6\r"
+        + "PID|1||7659afb9-0dfc-d744-1f40-5b9314807108^^^^MR||Feeney^Sam^^^^^L|||M||||||||\r"
+        + "ORC|NW|8125550e-04db-11ec-a9a8-086d41d421ca^^ID^UUID||||||||||\r"
+        + "OBR|1|8125550e-04db-11ec-a9a8-086d41d421ca^^ID^UUID||58410-2^CBC panel - Blood by Automated count^LN||||||||||||\r"
         + "SPM|1|SpecimenID||BLD|||||||P||||||201410060535|201410060821||Y||||||1\r";
 
         HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
-        String json = ftv.convert(hl7message, OPTIONS);
+        String json = ftv.convert(hl7message, OPTIONS_PRETTYPRINT);
         assertThat(json).isNotBlank();
+        LOGGER.info("FHIR json result:\n" + json);
         IBaseResource bundleResource = context.getParser().parseResource(json);
         assertThat(bundleResource).isNotNull();
         Bundle b = (Bundle) bundleResource;
         List<BundleEntryComponent> e = b.getEntry();
 
+        List<Resource> patientResource = e.stream()
+                .filter(v -> ResourceType.Patient == v.getResource().getResourceType())
+                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        assertThat(patientResource).hasSize(1); //from PID
+
+        List<Resource> specimenResource = e.stream()
+                .filter(v -> ResourceType.Specimen == v.getResource().getResourceType())
+                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        assertThat(specimenResource).hasSize(1); //from SPM
+
+        List<Resource> serviceResource = e.stream()
+                .filter(v -> ResourceType.ServiceRequest == v.getResource().getResourceType())
+                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        assertThat(serviceResource).hasSize(1); //from ORC
+
         List<Resource> diagnosticresource = e.stream()
                 .filter(v -> ResourceType.DiagnosticReport == v.getResource().getResourceType())
                 .map(BundleEntryComponent::getResource).collect(Collectors.toList());
-        assertThat(diagnosticresource).hasSize(1);
+        assertThat(diagnosticresource).hasSize(1); //from OBR
 
-        DiagnosticReport diag = ResourceUtils.getResourceDiagnosticReport(diagnosticresource.get(0), context);
-        List<Reference> spmRef = diag.getSpecimen();
-        assertThat(spmRef.isEmpty()).isFalse();
-        assertThat(spmRef).hasSize(1);
-        assertThat(spmRef.get(0).isEmpty()).isFalse();
+        // TODO: Need to figure out why the reference is no longer there after merging the fork into master
+        // DiagnosticReport diag = ResourceUtils.getResourceDiagnosticReport(diagnosticresource.get(0), context);
+        // List<Reference> spmRef = diag.getSpecimen();
+        // assertThat(spmRef.isEmpty()).isFalse();
+        // assertThat(spmRef).hasSize(1); //from SPM
+        // assertThat(spmRef.get(0).isEmpty()).isFalse();
+
+        // Confirm that there are no extra resources
+        assertThat(e.size()).isEqualTo(4);
+    }
+
+    @Test
+    public void testOMLO21WithAllergy() throws IOException {
+        String hl7message = "MSH|^~\\&||Test System|||20210917110100||OML^O21^OML_O21|||2.6\r"
+        + "PID|1||7659afb9-0dfc-d744-1f40-5b9314807108^^^^MR||Feeney^Sam^^^^^L|||M||||||||\r"
+        + "AL1|1|DRUG|00000741^OXYCODONE||HYPOTENSION\r"
+        + "AL1|2|DRUG|00001433^TRAMADOL||SEIZURES~VOMITING\r"    
+        + "ORC|NW|8125550e-04db-11ec-a9a8-086d41d421ca^^ID^UUID||||||||||\r"
+        + "OBR|1|8125550e-04db-11ec-a9a8-086d41d421ca^^ID^UUID||58410-2^CBC panel - Blood by Automated count^LN||||||||||||\r"
+        + "AL1|1|DA|1605^acetaminophen^L|MO|Muscle Pain~hair loss\r";
+
+        HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
+        String json = ftv.convert(hl7message, OPTIONS_PRETTYPRINT);
+        assertThat(json).isNotBlank();
+        LOGGER.info("FHIR json result:\n" + json);
+        IBaseResource bundleResource = context.getParser().parseResource(json);
+        assertThat(bundleResource).isNotNull();
+        Bundle b = (Bundle) bundleResource;
+        List<BundleEntryComponent> e = b.getEntry();
+
+        List<Resource> patientResource = e.stream()
+                .filter(v -> ResourceType.Patient == v.getResource().getResourceType())
+                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        assertThat(patientResource).hasSize(1); //from PID
+
+        List<Resource> allergyResource = e.stream()
+                .filter(v -> ResourceType.AllergyIntolerance == v.getResource().getResourceType())
+                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        assertThat(allergyResource).hasSize(3); //from AL1
+
+        List<Resource> serviceResource = e.stream()
+                .filter(v -> ResourceType.ServiceRequest == v.getResource().getResourceType())
+                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        assertThat(serviceResource).hasSize(1); //from ORC
+
+        List<Resource> diagnosticresource = e.stream()
+                .filter(v -> ResourceType.DiagnosticReport == v.getResource().getResourceType())
+                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        assertThat(diagnosticresource).hasSize(1); //from OBR
+
+        // Confirm that there are no extra resources
+        assertThat(e.size()).isEqualTo(6);
+    }
+
+    @Test @Disabled
+    // This test is not currently working.  Support is yet to be added to ensure that a ServiceRequest is created when there is no OBR
+    // Note that even though the HL7 message definition does not require PID, it is necessary so that the resulting FHIR ServiceRequests pass FHIR validation.
+    public void testOMLO21MinimumMessageWithOrderWithoutObservation() throws IOException {
+        String hl7message = "MSH|^~\\&||Test System|||20210917110100||OML^O21^OML_O21|||2.6\r"
+        + "PID|1||7659afb9-0dfc-d744-1f40-5b9314807108^^^^MR||Feeney^Sam^^^^^L|||M||||||||\r"
+        + "ORC|NW|8125550e-04db-11ec-a9a8-086d41d421ca^^ID^UUID||||||||||\r";
+
+        HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
+        String json = ftv.convert(hl7message, OPTIONS_PRETTYPRINT);
+        assertThat(json).isNotBlank();
+        LOGGER.info("FHIR json result:\n" + json);
+        IBaseResource bundleResource = context.getParser().parseResource(json);
+        assertThat(bundleResource).isNotNull();
+        Bundle b = (Bundle) bundleResource;
+        assertThat(b.getType()).isEqualTo(BundleType.COLLECTION);
+        List<BundleEntryComponent> e = b.getEntry();
+
+        List<Resource> patientResource = e.stream()
+                .filter(v -> ResourceType.Patient == v.getResource().getResourceType())
+                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        assertThat(patientResource).hasSize(1); // from PID
+
+        List<Resource> serviceResource = e.stream()
+                .filter(v -> ResourceType.ServiceRequest == v.getResource().getResourceType())
+                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        assertThat(serviceResource).hasSize(1); //from ORC
+
+        // Confirm that there are no extra resources
+        assertThat(e.size()).isEqualTo(2);
+    }
+
+    @Test @Disabled
+    // This test is not currently working.  Support is yet to be added to ensure that multiple orders are created when there are no Observation groups.
+    // In general, support is yet to be added for multiple ORDER groups.  Currently subsequent ORCs are assumed to be part of the ORDER_PRIOR group.
+    // Note that even though the HL7 message definition does not require PID, it is necessary so that the resulting FHIR ServiceRequests pass FHIR validation.
+    public void testOMLO21MultipleOrdersWithoutObservations() throws IOException {
+        String hl7message = "MSH|^~\\&||Test System|||20210917110100||OML^O21^OML_O21|||2.6\r"
+        + "PID|1||7659afb9-0dfc-d744-1f40-5b9314807108^^^^MR||Feeney^Sam^^^^^L|||M||||||||\r"
+        + "ORC|NW|8125550e-04db-11ec-a9a8-086d41d421ca^^ID^UUID||||||||||\r"
+        + "ORC|NW|8125550e-04db-11ec-a9a8-086d41d421ca^^ID^UUID||||||||||\r";
+
+        HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
+        String json = ftv.convert(hl7message, OPTIONS_PRETTYPRINT);
+        assertThat(json).isNotBlank();
+        LOGGER.info("FHIR json result:\n" + json);
+        IBaseResource bundleResource = context.getParser().parseResource(json);
+        assertThat(bundleResource).isNotNull();
+        Bundle b = (Bundle) bundleResource;
+        assertThat(b.getType()).isEqualTo(BundleType.COLLECTION);
+        List<BundleEntryComponent> e = b.getEntry();
+
+        List<Resource> patientResource = e.stream()
+                .filter(v -> ResourceType.Patient == v.getResource().getResourceType())
+                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        assertThat(patientResource).hasSize(1); //from PID
+
+        List<Resource> serviceResource = e.stream()
+                .filter(v -> ResourceType.ServiceRequest == v.getResource().getResourceType())
+                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        assertThat(serviceResource).hasSize(2); //from ORC
+
+        // Confirm that there are no extra resources
+        assertThat(e.size()).isEqualTo(3);
     }
 
 

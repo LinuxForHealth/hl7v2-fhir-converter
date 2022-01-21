@@ -43,6 +43,22 @@ resources:
           - .OBR
           - MSH
 
+    - resourceName: AllergyIntolerance
+      segment: .AL1
+      resourcePath: resource/AllergyIntolerance
+      group: PATIENT
+      repeats: true
+      additionalSegments:
+          - MSH
+
+    - resourceName: AllergyIntolerance
+      segment: .PRIOR_RESULT.AL1
+      resourcePath: resource/AllergyIntolerance
+      group: ORDER.OBSERVATION_REQUEST
+      repeats: true
+      additionalSegments:
+          - MSH
+
     - resourceName: Condition
       segment: .DG1
       group: ORDER.OBSERVATION_REQUEST
@@ -53,6 +69,7 @@ resources:
           - .OBR
           - MSH
 
+# Note: According to the HL7 spec, DG1 is not allowed at this level.  However, including this here given it was a user contribution to include this Condition.
     - resourceName: Condition
       segment: .DG1
       group: ORDER.OBSERVATION_REQUEST.PRIOR_RESULT.ORDER_PRIOR
@@ -63,6 +80,13 @@ resources:
           - .OBR
           - MSH
 
+# TODO: AL1 allergy support to be added
+# TODO: IN1 insurance support to be added
+# TODO: Add support to create a ServiceRequest from ORC when there is no OBR
+#    Note that OML_O21 messages are different than ORU_R01 messages:
+#    For ORU_R01: DiagnosticReport is required.  ServiceRequest is optional.
+#    For OML_O21, this should be updated such that: DiagnosticReport is OPTIONAL.  ServiceRequest is REQUIRED.
+
     - resourceName: DiagnosticReport
       segment: .OBSERVATION_REQUEST.OBR
       group: ORDER
@@ -70,9 +94,6 @@ resources:
       repeats: true
       additionalSegments:
           - .ORC
-          - .NTE
-          - .SPECIMEN.SPM
-          - .DG1
           - MSH
 
     - resourceName: DiagnosticReport
@@ -82,7 +103,4 @@ resources:
       repeats: true
       additionalSegments:
           - .ORC
-          - .NTE
-          - .SPECIMEN.SPM
-          - .DG1
-          - MSH 
+          - MSH
