@@ -80,7 +80,6 @@ resources:
           - .OBR
           - MSH
 
-# TODO: AL1 allergy support to be added
 # TODO: IN1 insurance support to be added
 # TODO: Add support to create a ServiceRequest from ORC when there is no OBR
 #    Note that OML_O21 messages are different than ORU_R01 messages:
