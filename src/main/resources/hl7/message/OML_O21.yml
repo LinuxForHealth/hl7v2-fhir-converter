@@ -1,0 +1,88 @@
+#
+# (C) Copyright IBM Corp. 2020
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+# FHIR Resources to extract from OML_O21 message
+---
+resources:
+    - resourceName: MessageHeader
+      segment: MSH
+      resourcePath: resource/MessageHeader
+      repeats: false
+      isReferenced: false
+      additionalSegments:
+
+    - resourceName: Patient
+      segment: .PID
+      group: PATIENT
+      resourcePath: resource/Patient
+      isReferenced: true
+      repeats: false
+      additionalSegments:
+          - .PD1
+          - MSH
+
+    - resourceName: Encounter
+      segment: .PV1
+      group: PATIENT.PATIENT_VISIT
+      resourcePath: resource/Encounter
+      isReferenced: true
+      repeats: false
+      additionalSegments:
+          - .PV2
+          - MSH
+
+    - resourceName: Specimen
+      segment: .SPECIMEN.SPM
+      group: ORDER.OBSERVATION_REQUEST
+      resourcePath: resource/Specimen
+      repeats: true
+      isReferenced: true
+      additionalSegments:
+          - .OBR
+          - MSH
+
+    - resourceName: Condition
+      segment: .DG1
+      group: ORDER.OBSERVATION_REQUEST
+      resourcePath: resource/Condition
+      repeats: true
+      isReferenced: true
+      additionalSegments:
+          - .OBR
+          - MSH
+
+    - resourceName: Condition
+      segment: .DG1
+      group: ORDER.OBSERVATION_REQUEST.PRIOR_RESULT.ORDER_PRIOR
+      resourcePath: resource/Condition
+      repeats: true
+      isReferenced: true
+      additionalSegments:
+          - .OBR
+          - MSH
+
+    - resourceName: DiagnosticReport
+      segment: .OBSERVATION_REQUEST.OBR
+      group: ORDER
+      resourcePath: resource/DiagnosticReport
+      repeats: true
+      additionalSegments:
+          - .ORC
+          - .NTE
+          - .SPECIMEN.SPM
+          - .DG1
+          - MSH
+
+    - resourceName: DiagnosticReport
+      segment: .OBR
+      group: ORDER.OBSERVATION_REQUEST.PRIOR_RESULT.ORDER_PRIOR
+      resourcePath: resource/DiagnosticReport
+      repeats: true
+      additionalSegments:
+          - .ORC
+          - .NTE
+          - .SPECIMEN.SPM
+          - .DG1
+          - MSH 
