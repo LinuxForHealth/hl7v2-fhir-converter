@@ -20,8 +20,6 @@ import org.hl7.fhir.r4.model.ResourceType;
 import org.hl7.fhir.r4.model.ServiceRequest;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import io.github.linuxforhealth.fhir.FHIRContext;
 import io.github.linuxforhealth.hl7.ConverterOptions;
 import io.github.linuxforhealth.hl7.ConverterOptions.Builder;
@@ -30,7 +28,6 @@ import io.github.linuxforhealth.hl7.segments.util.ResourceUtils;
 
 public class HL7OMLMessageTest {
     private static FHIRContext context = new FHIRContext();
-    private static final Logger LOGGER = LoggerFactory.getLogger(HL7OMLMessageTest.class);
     private static final ConverterOptions OPTIONS_PRETTYPRINT = new Builder()
             .withBundleType(BundleType.COLLECTION)
             .withValidateResource()
@@ -48,30 +45,21 @@ public class HL7OMLMessageTest {
         HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
         String json = ftv.convert(hl7message, OPTIONS_PRETTYPRINT);
         assertThat(json).isNotBlank();
-        LOGGER.info("FHIR json result:\n" + json);
         IBaseResource bundleResource = context.getParser().parseResource(json);
         assertThat(bundleResource).isNotNull();
         Bundle b = (Bundle) bundleResource;
         List<BundleEntryComponent> e = b.getEntry();
 
-        List<Resource> patientResource = e.stream()
-                .filter(v -> ResourceType.Patient == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> patientResource = ResourceUtils.getResourceList(e, ResourceType.Patient);
         assertThat(patientResource).hasSize(1); //from PID
 
-        List<Resource> serviceResource = e.stream()
-                .filter(v -> ResourceType.ServiceRequest == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> serviceResource = ResourceUtils.getResourceList(e, ResourceType.ServiceRequest);
         assertThat(serviceResource).hasSize(1); //from ORC
 
-        List<Resource> diagnosticresource = e.stream()
-                .filter(v -> ResourceType.DiagnosticReport == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> diagnosticresource = ResourceUtils.getResourceList(e, ResourceType.DiagnosticReport);
         assertThat(diagnosticresource).hasSize(1); //from OBR
 
-        List<Resource> conditionresource = e.stream()
-                .filter(v -> ResourceType.Condition == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> conditionresource = ResourceUtils.getResourceList(e, ResourceType.Condition);
         assertThat(conditionresource).hasSize(1); //from DG1
 
         DiagnosticReport diag = ResourceUtils.getResourceDiagnosticReport(diagnosticresource.get(0), context);
@@ -96,20 +84,15 @@ public class HL7OMLMessageTest {
         HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
         String json = ftv.convert(hl7message, OPTIONS_PRETTYPRINT);
         assertThat(json).isNotBlank();
-        LOGGER.info("FHIR json result:\n" + json);
         IBaseResource bundleResource = context.getParser().parseResource(json);
         assertThat(bundleResource).isNotNull();
         Bundle b = (Bundle) bundleResource;
         List<BundleEntryComponent> e = b.getEntry();
 
-        List<Resource> patientResource = e.stream()
-                .filter(v -> ResourceType.Patient == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> patientResource = ResourceUtils.getResourceList(e, ResourceType.Patient);
         assertThat(patientResource).hasSize(1); //from PID
 
-        List<Resource> encounterResource = e.stream()
-                .filter(v -> ResourceType.Encounter == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> encounterResource = ResourceUtils.getResourceList(e, ResourceType.Encounter);
         assertThat(encounterResource).hasSize(1); //from PV1
 
         // TODO: When function is added to create ServiceRequest from ORC then also check for ServiceRequest
@@ -137,31 +120,22 @@ public class HL7OMLMessageTest {
         HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
         String json = ftv.convert(hl7message, OPTIONS_PRETTYPRINT);
         assertThat(json).isNotBlank();
-        LOGGER.info("FHIR json result:\n" + json);
         IBaseResource bundleResource = context.getParser().parseResource(json);
         assertThat(bundleResource).isNotNull();
         Bundle b = (Bundle) bundleResource;
         assertThat(b.getType()).isEqualTo(BundleType.COLLECTION);
         List<BundleEntryComponent> e = b.getEntry();
 
-        List<Resource> patientResource = e.stream()
-                .filter(v -> ResourceType.Patient == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> patientResource = ResourceUtils.getResourceList(e, ResourceType.Patient);
         assertThat(patientResource).hasSize(1); //from PID
 
-        List<Resource> diagnosisResource = e.stream()
-                .filter(v -> ResourceType.Condition == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> diagnosisResource = ResourceUtils.getResourceList(e, ResourceType.Condition);
         assertThat(diagnosisResource).hasSize(2); //from DG1
 
-        List<Resource> serviceResource = e.stream()
-                .filter(v -> ResourceType.ServiceRequest == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> serviceResource = ResourceUtils.getResourceList(e, ResourceType.ServiceRequest);
         assertThat(serviceResource).hasSize(2); //from ORC
 
-        List<Resource> diagnosticresource = e.stream()
-                .filter(v -> ResourceType.DiagnosticReport == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> diagnosticresource = ResourceUtils.getResourceList(e, ResourceType.DiagnosticReport);
         assertThat(diagnosticresource).hasSize(2); //from OBR
 
         DiagnosticReport diag = ResourceUtils.getResourceDiagnosticReport(diagnosticresource.get(0), context);
@@ -184,30 +158,21 @@ public class HL7OMLMessageTest {
         HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
         String json = ftv.convert(hl7message, OPTIONS_PRETTYPRINT);
         assertThat(json).isNotBlank();
-        LOGGER.info("FHIR json result:\n" + json);
         IBaseResource bundleResource = context.getParser().parseResource(json);
         assertThat(bundleResource).isNotNull();
         Bundle b = (Bundle) bundleResource;
         List<BundleEntryComponent> e = b.getEntry();
 
-        List<Resource> patientResource = e.stream()
-                .filter(v -> ResourceType.Patient == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> patientResource = ResourceUtils.getResourceList(e, ResourceType.Patient);
         assertThat(patientResource).hasSize(1); //from PID
 
-        List<Resource> specimenResource = e.stream()
-                .filter(v -> ResourceType.Specimen == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> specimenResource = ResourceUtils.getResourceList(e, ResourceType.Specimen);
         assertThat(specimenResource).hasSize(1); //from SPM
 
-        List<Resource> serviceResource = e.stream()
-                .filter(v -> ResourceType.ServiceRequest == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> serviceResource = ResourceUtils.getResourceList(e, ResourceType.ServiceRequest);
         assertThat(serviceResource).hasSize(1); //from ORC
 
-        List<Resource> diagnosticresource = e.stream()
-                .filter(v -> ResourceType.DiagnosticReport == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> diagnosticresource = ResourceUtils.getResourceList(e, ResourceType.DiagnosticReport);
         assertThat(diagnosticresource).hasSize(1); //from OBR
 
         // TODO: Need to figure out why the reference is no longer there after merging the fork into master
@@ -234,30 +199,21 @@ public class HL7OMLMessageTest {
         HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
         String json = ftv.convert(hl7message, OPTIONS_PRETTYPRINT);
         assertThat(json).isNotBlank();
-        LOGGER.info("FHIR json result:\n" + json);
         IBaseResource bundleResource = context.getParser().parseResource(json);
         assertThat(bundleResource).isNotNull();
         Bundle b = (Bundle) bundleResource;
         List<BundleEntryComponent> e = b.getEntry();
 
-        List<Resource> patientResource = e.stream()
-                .filter(v -> ResourceType.Patient == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> patientResource = ResourceUtils.getResourceList(e, ResourceType.Patient);
         assertThat(patientResource).hasSize(1); //from PID
 
-        List<Resource> allergyResource = e.stream()
-                .filter(v -> ResourceType.AllergyIntolerance == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> allergyResource = ResourceUtils.getResourceList(e, ResourceType.AllergyIntolerance);
         assertThat(allergyResource).hasSize(3); //from AL1
 
-        List<Resource> serviceResource = e.stream()
-                .filter(v -> ResourceType.ServiceRequest == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> serviceResource = ResourceUtils.getResourceList(e, ResourceType.ServiceRequest);
         assertThat(serviceResource).hasSize(1); //from ORC
 
-        List<Resource> diagnosticresource = e.stream()
-                .filter(v -> ResourceType.DiagnosticReport == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> diagnosticresource = ResourceUtils.getResourceList(e, ResourceType.DiagnosticReport);
         assertThat(diagnosticresource).hasSize(1); //from OBR
 
         // Confirm that there are no extra resources
@@ -275,21 +231,16 @@ public class HL7OMLMessageTest {
         HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
         String json = ftv.convert(hl7message, OPTIONS_PRETTYPRINT);
         assertThat(json).isNotBlank();
-        LOGGER.info("FHIR json result:\n" + json);
         IBaseResource bundleResource = context.getParser().parseResource(json);
         assertThat(bundleResource).isNotNull();
         Bundle b = (Bundle) bundleResource;
         assertThat(b.getType()).isEqualTo(BundleType.COLLECTION);
         List<BundleEntryComponent> e = b.getEntry();
 
-        List<Resource> patientResource = e.stream()
-                .filter(v -> ResourceType.Patient == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> patientResource = ResourceUtils.getResourceList(e, ResourceType.Patient);
         assertThat(patientResource).hasSize(1); // from PID
 
-        List<Resource> serviceResource = e.stream()
-                .filter(v -> ResourceType.ServiceRequest == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> serviceResource = ResourceUtils.getResourceList(e, ResourceType.ServiceRequest);
         assertThat(serviceResource).hasSize(1); //from ORC
 
         // Confirm that there are no extra resources
@@ -309,21 +260,16 @@ public class HL7OMLMessageTest {
         HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
         String json = ftv.convert(hl7message, OPTIONS_PRETTYPRINT);
         assertThat(json).isNotBlank();
-        LOGGER.info("FHIR json result:\n" + json);
         IBaseResource bundleResource = context.getParser().parseResource(json);
         assertThat(bundleResource).isNotNull();
         Bundle b = (Bundle) bundleResource;
         assertThat(b.getType()).isEqualTo(BundleType.COLLECTION);
         List<BundleEntryComponent> e = b.getEntry();
 
-        List<Resource> patientResource = e.stream()
-                .filter(v -> ResourceType.Patient == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> patientResource = ResourceUtils.getResourceList(e, ResourceType.Patient);
         assertThat(patientResource).hasSize(1); //from PID
 
-        List<Resource> serviceResource = e.stream()
-                .filter(v -> ResourceType.ServiceRequest == v.getResource().getResourceType())
-                .map(BundleEntryComponent::getResource).collect(Collectors.toList());
+        List<Resource> serviceResource = ResourceUtils.getResourceList(e, ResourceType.ServiceRequest);
         assertThat(serviceResource).hasSize(2); //from ORC
 
         // Confirm that there are no extra resources

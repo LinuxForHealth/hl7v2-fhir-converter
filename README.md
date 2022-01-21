@@ -46,7 +46,7 @@ The converter supports the following message segments:
 * SPM - Specimen
 * TXA - Transcription Document Header
 
-The converter _partially_ supports the following message types/events (To utilize the partial support, add the message to src/main/resources/config.properties):
+The converter _partially_ supports the following message types/events:
 * OML_O21 - Laboratory Order
     * Repeating ORDER groups are not supported
     * ServiceRequest resources are only created when both ORC and OBR are provided
