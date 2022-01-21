@@ -167,7 +167,7 @@ public class HL7OMLMessageTest {
         assertThat(ref.isEmpty()).isFalse();
     }
 
-    @Test
+    @Test @Disabled
     public void test_oml_spm() throws IOException {
         String hl7message = "MSH|^~\\&||Test System|||20210917110100||OML^O21^OML_O21|d1577c69-dfbe-44ad-ba6d-3e05e953b2ea|T|2.5.1|||AL|AL|||||LOI_NG_PRU_PROFILE^^2.16.840.1.113883.9.87^ISO\r"
         + "PID|1||7659afb9-0dfc-d744-1f40-5b9314807108^^^^MR||Feeney^Sam^^^^^L||20110926000000+0530|M|||953 Schmitt Road^^Milford^MA^^^L|||||S\r"
