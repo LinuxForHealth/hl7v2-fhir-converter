@@ -388,8 +388,39 @@ MedicationRequestCategory:
   I: inpatient
   O: outpatient
 
-# HL7 Table 0063 > V3 Role code (used for POLICYHOLDER_RELATIONSHIP)
+###### IMPORTANT NOTES ON RELATIONSHIP MAPPINGS #########
+# Relationships in tables V3RoleCode and SubscriberRelationship are tricky
+# Relationships in HL7 and FHIR are coded, mapped, and recoded in two different DIRECTIONS:  
+#   1.  Insured [subscriber/policyholder] is X (e.g. parent) of patient.  X is inverse Y.
+#   2.  Patient is Y (e.g. child) of insured [subscriber/policyholder]; 
+# IN1.17 is Insureds relationship to Patient (TYPE 1).  Uses HL7 V2.6 table 0063
+# IN2.72 is Patients relationship to Insured (TYPE 2).  Uses HL7 V2.6 table 0344
+# FHIR RelatedPerson.relationship is Related to Patient. (TYPE 1.) POLICYHOLDER_RELATIONSHIP  Needs coding from V3RoleCode.
+# FHIR Coverage.relationship is Beneficiary (Patient) to Insured (Subscriber) (TYPE 2.) SUBSCRIBER_RELATIONSHIP  Needs coding from SubscriberRelationship. 
+
+# Mapping to V3 Role code (used for POLICYHOLDER_RELATIONSHIP)
 V3RoleCode:
+# Input codes from IN2.72 (TYPE 2) values from table 0344, need to be REVERSED for TYPE1 POLICYHOLDER_RELATIONSHIP code from V3RoleCode.
+  01: ONESELF # Patient is insured input
+  02: SPS  # Spouse input
+  03: PRN  # Natural child financial responsibility input from Type 2, is Parent in Type 1.
+  04: PRN  # Natural child no financial responsibility input from Type 2, is Parent in Type 1.
+  05: PRN  # Step child input from Type 2, is Parent in Type 1.
+  06: PRN  # Foster child input from Type 2, is Parent in Type 1.
+# 07: no good match for Ward of the court
+# 08: no good match for Employee
+  09: U # 'Unknown' as input
+  10: O # Handicapped dependent input, Other output
+# 11: no good match for Organ donor
+# 12: no good match for Cadaver donor
+  13: GRPRN # Grandchild input from Type 2, is Grandparent Type 1 
+  14: O # Niece/Nephew input, Other output
+# 15: no good match for Injured planitiff
+# 16: no good match for Sponsored dependent
+  17: GRPRN # Minor dependent of a minor dependant input (grandchild dependent) from TYPE 2 is Grandparent Type 1 
+  18: CHILD # Parent input from TYPE 2, is Child in Type 1
+  19: GRNDCHILD # Grandparent input from TYPE 2, is Grandchild in Type 1
+# Input codes from IN1.17 (TYPE 1) values from table 0063 are standard match for TYPE 1 POLICYHOLDER_RELATIONSHIP code from V3RoleCode.  
   BRO: BRO
 # CGV: no good match for Care giver
   CHD: CHILD
@@ -415,14 +446,35 @@ V3RoleCode:
   UNK: U
 # WRD: no good match for Ward of the court  
 
-# HL7 Table 0063 > HAPI SubscriberRelationship code 
-# This is the reverse of the relationship from V3RoleCode
-# IN1.17 is "Insured's Relationship To Patient", but Coverage.relationship is "Beneficiary relationship to the subscriber".
-# To understand the table think: If the patient is a XXXX, the the insurance subscriber is their XXXX
-# As an example, CHD does not map to child, but parent.
+# SubscriberRelationship codes
+# This is the reverse of the relationships from V3RoleCode.  See IMPORTANT NOTES ON RELATIONSHIP MAPPINGS above.
 # OTHER is mapped for any connection that is blood or legal (e.g. grandparent, guardian)
 # Nothing is mapped for non-legally binding connections (e.g. friend, manager)
 SubscriberRelationship:
+# Input codes from IN2.72 (TYPE 2) values from table 0344, are standard match for TYPE 2 SUBSCRIBER_RELATIONSHIP codes from SubscriberRelationship.
+  01: self # Patient is insured input
+  02: spouse  # Spouse input
+  03: child  # Natural child financial responsibility input 
+  04: child  # Natural child no financial responsibility input 
+  05: child  # Step child input 
+  06: child  # Foster child input
+# 07: no good match for Ward of the court
+# 08: no good match for Employee
+# 09: no good match for 'Unknown' as input
+  10: other # Handicapped dependent input, Other output
+# 11: no good match for Organ donor
+# 12: no good match for Cadaver donor
+  13: other # Grandchild input 
+  14: other # Niece/Nephew input, Other output
+# 15: no good match for Injured planitiff
+# 16: no good match for Sponsored dependent
+  17: other # Minor dependent of a minor dependant input (grandchild dependent)
+  18: parent # Parent input
+  19: other # Grandparent input 
+# Input codes from IN1.17 (TYPE1) table 0063 are REVERSED for TYPE2 SUBSCRIBER_RELATIONSHIP codes from SubscriberRelationship
+# IN1.17 is "Insured's Relationship To Patient", but Coverage.relationship is "Beneficiary relationship to the subscriber".
+# To understand the table think: If the patient is a XXXX, the the insurance subscriber is their XXXX
+# As an example, CHD does not map to child, but parent.
   BRO: other
   CGV: other  # Caregiver
   CHD: parent
