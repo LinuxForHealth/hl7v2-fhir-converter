@@ -470,7 +470,7 @@ SubscriberRelationship:
   19: other # Grandparent 
 # - - - - -  
 # Codes from IN1.17 (values from table 0063) must be REVERSED for Coverage.relationship
-# Think: If the patient is a XXXX, the the insured (subscriber) is their YYYY
+# Think: If the patient is a XXXX, then the insured (subscriber) is their YYYY
   BRO: other
   CGV: other  # Caregiver
   CHD: parent
