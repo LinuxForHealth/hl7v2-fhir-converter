@@ -390,7 +390,7 @@ MedicationRequestCategory:
 
 ###### IMPORTANT NOTES ON RELATIONSHIP MAPPINGS #########
 # Relationship mappings in tables V3RoleCode and SubscriberRelationship are coded in two different DIRECTIONS:  
-#  - Insured to Patient.  Example Insured is parent of child patient. Used by IN1.17 and RelatedPerson.relationship.
+#  - Insured to Patient.  Example: Insured is parent of child patient. Used by IN1.17 and RelatedPerson.relationship.
 #  - Patient to Insured.  Example: Patient is child of insured parent. Used by IN2.72 and Coverage.relationship.
 # Insured is also referred to as Subscriber and Policyholder.  
 # Patient is also referred to as Beneficiary.
@@ -448,27 +448,6 @@ V3RoleCode:
 # Mapping to Coverage.relationship via SUBSCRIBER_RELATIONSHIP data resolver.
 # Direction: Patient to Insured
 SubscriberRelationship:
-# Codes from IN2.72 (values from table 0344)
-  01: self # Patient is insured 
-  02: spouse  # Spouse 
-  03: child  # Natural child financial responsibility
-  04: child  # Natural child no financial responsibility
-  05: child  # Step child 
-  06: child  # Foster child 
-# 07: Ward of the court: no good match
-# 08: Employee: no good match
-# 09: Unknown: no good match 
-  10: other # Handicapped dependent 
-# 11: Organ donor : no good match
-# 12: Cadaver donor : no good match
-  13: other # Grandchild 
-  14: other # Niece/Nephew 
-# 15: Injured planitiff : no good match
-# 16: Sponsored dependent : no good match
-  17: other # Minor dependent of a minor dependant input (grandchild dependent)
-  18: parent # Parent 
-  19: other # Grandparent 
-# - - - - -  
 # Codes from IN1.17 (values from table 0063) must be REVERSED for Coverage.relationship
 # Think: If the patient is a XXXX, then the insured (subscriber) is their YYYY
   BRO: other
@@ -495,3 +474,26 @@ SubscriberRelationship:
   SPO: spouse
 # UNK: Unknown : no good match
 # WRD: Ward of the court : no good match
+# - - - - -  
+# Codes from IN2.72 (values from table 0344) NOT reversed.
+  01: self # Patient is insured 
+  02: spouse  # Spouse 
+  03: child  # Natural child financial responsibility
+  04: child  # Natural child no financial responsibility
+  05: child  # Step child 
+  06: child  # Foster child 
+# 07: Ward of the court: no good match
+# 08: Employee: no good match
+# 09: Unknown: no good match 
+  10: other # Handicapped dependent 
+# 11: Organ donor : no good match
+# 12: Cadaver donor : no good match
+  13: other # Grandchild 
+  14: other # Niece/Nephew 
+# 15: Injured planitiff : no good match
+# 16: Sponsored dependent : no good match
+  17: other # Minor dependent of a minor dependant input (grandchild dependent)
+  18: parent # Parent 
+  19: other # Grandparent 
+
+

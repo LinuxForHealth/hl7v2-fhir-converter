@@ -346,12 +346,11 @@ public class SimpleDataValueResolver {
         return getFHIRCode(Hl7DataHandlerUtil.getStringValue(value), "EncounterModeOfArrivalDisplay");
     };
 
-    // Relationships are coded, mapped, and recoded in two different DIRECTIONS:  
-    //  - Insured to Patient.  Example Insured is parent of child patient. SUBSCRIBER_RELATIONSHIP maps IN1.17 to RelatedPerson.relationship.
-    //  - Patient to Insured.  Example: Patient is child of insured parent. POLICYHOLDER_RELATIONSHIP maps IN2.72 to Coverage.relationship.
-    // See detailed notes in v2ToFhirMapping maps V3RoleCode and SubscriberRelationship
+    // Relationships are coded, mapped, and recoded in two different DIRECTIONS.  
+    // See detailed notes in v2ToFhirMapping maps of V3RoleCode and SubscriberRelationship
 
-    // Maps to values in http://terminology.hl7.org/CodeSystem/v3-RoleCode; Insured is Y of patient; e.g. Parent
+    // Maps from IN1.17 and IN2.72 to http://terminology.hl7.org/CodeSystem/v3-RoleCode
+    // Used for Coverage.relationship
     public static final ValueExtractor<Object, SimpleCode> POLICYHOLDER_RELATIONSHIP = (Object value) -> {
         String val = Hl7DataHandlerUtil.getStringValue(value);
         String code = getFHIRCode(val, V3RoleCode.class);
@@ -365,7 +364,8 @@ public class SimpleDataValueResolver {
         }
     };
 
-    // Maps to values in http://terminology.hl7.org/CodeSystem/subscriber-relationship; Patient is X of insured, e.g. Child
+    // Maps from IN1.17 and IN2.72 to http://terminology.hl7.org/CodeSystem/subscriber-relationship
+    // Used for RelatedPerson.relationship.
     public static final ValueExtractor<Object, SimpleCode> SUBSCRIBER_RELATIONSHIP = (Object value) -> {
         String val = Hl7DataHandlerUtil.getStringValue(value);
         String code = getFHIRCode(val, SubscriberRelationship.class);
