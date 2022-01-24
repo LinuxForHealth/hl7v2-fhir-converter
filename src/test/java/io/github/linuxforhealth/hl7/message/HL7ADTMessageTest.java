@@ -11,6 +11,8 @@ import java.io.IOException;
 import java.util.List;
 
 import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
+import org.hl7.fhir.r4.model.Condition;
+import org.hl7.fhir.r4.model.Encounter;
 import org.hl7.fhir.r4.model.Resource;
 import org.hl7.fhir.r4.model.ResourceType;
 import org.junit.jupiter.api.Disabled;
@@ -338,6 +340,41 @@ class HL7ADTMessageTest {
         // Confirm that there are no extra resources
         assertThat(e.size()).isEqualTo(4);
 
+    }
+
+    @Test
+    void testAdtA03MultipleConditionsPresent() throws IOException {
+        String hl7message =
+                "MSH|^~\\&|PROSOLV|SENTARA|WHIA|IBM|20151008130307||ADT^A01^ADT_A01|MSGID000003|T|2.6\r" +
+                        "EVN|A01|20151008130307|||\r"
+                        + "PID|||1234^^^^MR\r"
+                        + "PV1||I||||||||SUR||||||||S|VisitNumber^^^ACME|A||||||||||||||||||||||||20150502090000|\r"
+                        + "DG1|1||B45678|||A|\r"
+                        + "DG1|2||B45678|||A|\r";
+
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+
+        // Expecting 4 total resources
+        assertThat(e.size()).isEqualTo(4);
+
+        List<Resource> patientResource = ResourceUtils.getResourceList(e, ResourceType.Patient);
+        assertThat(patientResource).hasSize(1); // from PID and PD1
+
+        List<Resource> encounterResource = ResourceUtils.getResourceList(e, ResourceType.Encounter);
+        assertThat(encounterResource).hasSize(1); // from EVN, PV1, and PV2
+
+        List<Resource> conditionResource = ResourceUtils.getResourceList(e, ResourceType.Condition);
+        assertThat(conditionResource).hasSize(2); // from DG1
+
+        Encounter encounter = (Encounter) encounterResource.get(0);
+        Condition condition1 = (Condition) conditionResource.get(0);
+        Condition condition2 = (Condition) conditionResource.get(1);
+
+        String refId1 = encounter.getDiagnosis().get(0).getCondition().getId();
+        String refId2 = encounter.getDiagnosis().get(1).getCondition().getId();
+
+        assertThat(condition1.getId()).isEqualTo(refId1);
+        assertThat(condition2.getId()).isEqualTo(refId2);
     }
 
     @Test
