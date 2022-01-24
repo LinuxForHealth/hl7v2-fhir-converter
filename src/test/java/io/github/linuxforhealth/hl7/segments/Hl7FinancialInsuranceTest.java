@@ -103,7 +103,11 @@ class Hl7FinancialInsuranceTest {
                 // IN1.46 to Identifier 3
                 // IN1.47 through IN1.53 NOT REFERENCED
                 + "|MEMBER36||||||||||Value46|||||||\n";
+        // IN2.6 is purposely empty so will not create an MC identifier
+        // IN2.8 is purposely empty so will not create an MA identifier
+        // IN2.61 is purposely empty (primary to IN1.36) so IN1.36 will be used as the MB identifier
         // IN2.72 is purposely empty (backup to IN1.17) so no RelatedPerson is created.
+
 
         List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
 
@@ -167,8 +171,8 @@ class Hl7FinancialInsuranceTest {
         assertThat(coverages).hasSize(1); // From IN1 segment
         Coverage coverage = (Coverage) coverages.get(0);
 
-        // Confirm Coverage Identifiers
-        assertThat(coverage.getIdentifier()).hasSize(4);
+        // Confirm Coverage Identifiers - Order matches order of identifier_X in Coverage.yml
+        assertThat(coverage.getIdentifier()).hasSize(4);  // XV, XV, XV, MB; but not MA (IN2.8) nor MC (IN2.6)
         assertThat(coverage.getIdentifier().get(0).getValue()).isEqualTo("Value1"); // IN1.2.1
         assertThat(coverage.getIdentifier().get(0).getSystem()).isEqualTo("urn:id:System3"); // IN1.2.3
         assertThat(coverage.getIdentifier().get(0).getUse()).isNull(); // No use, here
@@ -288,7 +292,7 @@ class Hl7FinancialInsuranceTest {
                 // IN1.22 purposely empty to show that IN1.1 is secondary for Coverage.order
                 // IN1.23 through IN1.35 NOT REFERENCED
                 + "|DoeFake^Judy^^^Rev.|PAR|19780429|19 Rose St^^Faketown^CA^ZIP5||||||||||||||||"
-                // IN1.36 to Identifier 4
+                // IN1.36 purposely present, but is ignored because IN2.61 takes priority
                 // IN1.43 to RelatedPerson.gender
                 // IN1.46 to Identifier 3
                 // IN1.49 to RelatedPerson.identifier
@@ -299,8 +303,11 @@ class Hl7FinancialInsuranceTest {
                 // IN1.50 through IN1.53 NOT REFERENCED
                 + "|MEMBER36|||||||F|||Value46|||J494949^^^Large HMO^XX||||\n"
                 // IN2.2 to RelatedPerson.identifier (SSN)
-                // IN2.3 through IN2.62 not used
-                + "IN2||777-88-9999||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||"
+                // IN2.6 to Identifier 5: MC Patient Medicare number
+                // IN2.8 to Identifier 5: MA Patient Medicaid number
+                // IN2.9 through IN2.60 not used     
+                + "IN2||777-88-9999||||MEDICARE06||MEDICAID08|| |||||||||| ||||||||||| |||||||||| |||||||||| ||||||||||"
+                // IN2.61 to MB Identifier 4; takes priority over IN1.36
                 // IN2.63 to RelatedPerson.telecom
                 //    IN2.63.1 to Organization Contact telecom .value (ONLY when XTN.5-XTN.7 are empty.  See rules in getFormattedTelecomNumberValue.)
                 //    IN2.63.2 is not mapped. 
@@ -311,7 +318,7 @@ class Hl7FinancialInsuranceTest {
                 //    IN2.63.13 to Organization Contact Name .period.start
                 //    IN2.63.14 to Organization Contact Name .period.end
                 //    IN2.63.18 to Organization Contact telecom .rank 
-                + "|^^^^^555^7677777^^^^^^20201231145045^20211231145045^^^^1";
+                + "MEMBER61||^^^^^555^7677777^^^^^^20201231145045^20211231145045^^^^1|";
 
         List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
 
@@ -330,9 +337,44 @@ class Hl7FinancialInsuranceTest {
         assertThat(coverages).hasSize(1); // From IN1 segment
         Coverage coverage = (Coverage) coverages.get(0);
 
-        // Confirm Coverage Identifiers
-        assertThat(coverage.getIdentifier()).hasSize(4);
-        // Coverage Identifiers deep check in testBasicInsuranceCoverageFields
+        // Confirm Coverage Identifiers - Order matches order of identifier_X in Coverage.yml
+        assertThat(coverage.getIdentifier()).hasSize(6); // XV, XV, XV, MB, MA, MC  
+        assertThat(coverage.getIdentifier().get(0).getValue()).isEqualTo("Value1"); // IN1.2.1
+        assertThat(coverage.getIdentifier().get(0).getSystem()).isEqualTo("urn:id:System3"); // IN1.2.3
+        assertThat(coverage.getIdentifier().get(0).getUse()).isNull(); // No use, here
+        DatatypeUtils.checkCommonCodeableConceptAssertions(coverage.getIdentifier().get(0).getType(), "XV",
+                "Health Plan Identifier",
+                "http://terminology.hl7.org/CodeSystem/v2-0203", null);
+        assertThat(coverage.getIdentifier().get(1).getValue()).isEqualTo("Value4"); // IN1.2.4
+        assertThat(coverage.getIdentifier().get(1).getSystem()).isEqualTo("urn:id:System6"); // IN1.2.6
+        assertThat(coverage.getIdentifier().get(1).getUse()).isNull(); // No use, here
+        DatatypeUtils.checkCommonCodeableConceptAssertions(coverage.getIdentifier().get(1).getType(), "XV",
+                "Health Plan Identifier",
+                "http://terminology.hl7.org/CodeSystem/v2-0203", null);
+        assertThat(coverage.getIdentifier().get(2).getValue()).isEqualTo("Value46"); // IN1.46
+        assertThat(coverage.getIdentifier().get(2).getSystem()).isNull(); // No system, here
+        assertThat(coverage.getIdentifier().get(2).getUseElement().getCode()).hasToString("old"); // Use is enumeration "old"
+        DatatypeUtils.checkCommonCodeableConceptAssertions(coverage.getIdentifier().get(2).getType(), "XV",
+                "Health Plan Identifier",
+                "http://terminology.hl7.org/CodeSystem/v2-0203", null); 
+        assertThat(coverage.getIdentifier().get(3).getValue()).isEqualTo("MEMBER61"); // IN2.61 takes priority over IN1.36
+        assertThat(coverage.getIdentifier().get(3).getSystem()).isNull(); // No system, here
+        assertThat(coverage.getIdentifier().get(3).getUse()).isNull(); // No use, here
+        DatatypeUtils.checkCommonCodeableConceptAssertions(coverage.getIdentifier().get(3).getType(), "MB",
+                "Member Number",
+                "http://terminology.hl7.org/CodeSystem/v2-0203", null);  
+        assertThat(coverage.getIdentifier().get(4).getValue()).isEqualTo("MEDICAID08"); // IN2.8
+        assertThat(coverage.getIdentifier().get(4).getSystem()).isNull(); // No system, here
+        assertThat(coverage.getIdentifier().get(4).getUse()).isNull(); // No use, here
+        DatatypeUtils.checkCommonCodeableConceptAssertions(coverage.getIdentifier().get(4).getType(), "MA",
+                "Patient Medicaid number" ,
+                "http://terminology.hl7.org/CodeSystem/v2-0203", null); 
+        assertThat(coverage.getIdentifier().get(5).getValue()).isEqualTo("MEDICARE06"); // IN2.6
+        assertThat(coverage.getIdentifier().get(5).getSystem()).isNull(); // No system, here
+        assertThat(coverage.getIdentifier().get(5).getUse()).isNull(); // No use, here
+        DatatypeUtils.checkCommonCodeableConceptAssertions(coverage.getIdentifier().get(5).getType(), "MC",
+                "Patient's Medicare number" ,
+                "http://terminology.hl7.org/CodeSystem/v2-0203", null);                
 
         // Confirm Coverage Beneficiary references to Patient, and Payor references to Organization
         assertThat(coverage.getBeneficiary().getReference()).isEqualTo(patientId);
