@@ -51,6 +51,7 @@ The converter _partially_ supports the following message types/events:
     * Repeating ORDER groups are not supported
     * ServiceRequest resources are only created when both ORC and OBR are provided
     * PID must be provided to avoid FHIR validation errors
+    * OBX and Observations are not yet supported
 
 If you need another message type/event . . .  contributions are welcome! See [CONTRIBUTING.md](CONTRIBUTING.md)!
 

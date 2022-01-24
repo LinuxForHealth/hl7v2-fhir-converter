@@ -34,13 +34,12 @@ resources:
           - MSH
 
     - resourceName: Specimen
-      segment: .SPECIMEN.SPM
-      group: ORDER.OBSERVATION_REQUEST
+      segment: OBSERVATION_REQUEST.SPECIMEN.SPM
+      group: ORDER
       resourcePath: resource/Specimen
       repeats: true
       isReferenced: true
       additionalSegments:
-          - .OBR
           - MSH
 
     - resourceName: AllergyIntolerance
@@ -93,7 +92,11 @@ resources:
       repeats: true
       additionalSegments:
           - .ORC
+          - .OBSERVATION_REQUEST.NTE
           - MSH
+          - PATIENT.PID
+          - PATIENT.PATIENT_VISIT.PV1
+          # NOTE:  PID and PV1 are passed because they are used by the created Service Request
 
     - resourceName: DiagnosticReport
       segment: .OBR
@@ -102,4 +105,5 @@ resources:
       repeats: true
       additionalSegments:
           - .ORC
+          - .NTE
           - MSH

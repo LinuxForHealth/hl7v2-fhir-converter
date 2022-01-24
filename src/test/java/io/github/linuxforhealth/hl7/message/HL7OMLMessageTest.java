@@ -175,12 +175,12 @@ public class HL7OMLMessageTest {
         List<Resource> diagnosticresource = ResourceUtils.getResourceList(e, ResourceType.DiagnosticReport);
         assertThat(diagnosticresource).hasSize(1); //from OBR
 
-        // TODO: Need to figure out why the reference is no longer there after merging the fork into master
-        // DiagnosticReport diag = ResourceUtils.getResourceDiagnosticReport(diagnosticresource.get(0), context);
-        // List<Reference> spmRef = diag.getSpecimen();
-        // assertThat(spmRef.isEmpty()).isFalse();
-        // assertThat(spmRef).hasSize(1); //from SPM
-        // assertThat(spmRef.get(0).isEmpty()).isFalse();
+        // Verify the specimen reference
+        DiagnosticReport diag = ResourceUtils.getResourceDiagnosticReport(diagnosticresource.get(0), context);
+        List<Reference> spmRef = diag.getSpecimen();
+        assertThat(spmRef.isEmpty()).isFalse();
+        assertThat(spmRef).hasSize(1); //from SPM
+        assertThat(spmRef.get(0).isEmpty()).isFalse();
 
         // Confirm that there are no extra resources
         assertThat(e.size()).isEqualTo(4);
