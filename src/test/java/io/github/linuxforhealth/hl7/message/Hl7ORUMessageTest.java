@@ -455,7 +455,7 @@ class Hl7ORUMessageTest {
         List<Resource> practitionerResource = ResourceUtils.getResourceList(e, ResourceType.Practitioner);
         assertThat(practitionerResource).hasSize(1);
 
-        List<Resource> specimenResource = ResourceUtils.getResourceList(e, ResourceType.Practitioner);
+        List<Resource> specimenResource = ResourceUtils.getResourceList(e, ResourceType.Specimen);
         assertThat(specimenResource).hasSize(1);
 
         // Expecting only the above resources, no extras! 
