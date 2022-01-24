@@ -303,7 +303,7 @@ class Hl7FinancialInsuranceTest {
                 // IN1.50 through IN1.53 NOT REFERENCED
                 + "|MEMBER36|||||||F|||Value46|||J494949^^^Large HMO^XX||||\n"
                 // IN2.2 to RelatedPerson.identifier (SSN)
-                // IN2.6 to Identifier 5: MC Patient Medicare number
+                // IN2.6 to Identifier 5: MC Patient's Medicare number
                 // IN2.8 to Identifier 5: MA Patient Medicaid number
                 // IN2.9 through IN2.60 not used     
                 + "IN2||777-88-9999||||MEDICARE06||MEDICAID08|| |||||||||| ||||||||||| |||||||||| |||||||||| ||||||||||"
