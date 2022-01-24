@@ -589,7 +589,7 @@ class Hl7FinancialInsuranceTest {
                 //    IN1.16.1 to RelatedPerson Name .family
                 //    IN1.16.2 to RelatedPerson Name .given (first)
                 //    IN1.16.5 to RelatedPerson Name .prefix
-                // IN1.17 purposely empty to validate IN2.62 works as secondary
+                // IN1.17 purposely empty to validate IN2.72 works as secondary
                 // IN1.18 through IN1.35 NOT REFERENCED
                 + "|DoeFake^Judy^^^Rev.|||||||||||||||||||"
                 // IN1.36 to Identifier 4s
@@ -598,7 +598,7 @@ class Hl7FinancialInsuranceTest {
                 // IN2.1 through IN2.71 not used
                 + "IN2||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||"
                 // IN2.72 to Coverage.relationship and RelatedPerson.relationship.  (Backup for IN1.17) Codes from table 0344
-                + "04|\n";
+                + "04|\n"; // 04 = Natural child
 
         List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
 
@@ -627,7 +627,7 @@ class Hl7FinancialInsuranceTest {
 
         // Expect one RelatedPerson
         List<Resource> relatedPersons = ResourceUtils.getResourceList(e, ResourceType.RelatedPerson);
-        assertThat(relatedPersons).hasSize(1); // From IN1.16 through IN1.19; IN1.43; INI.49 
+        assertThat(relatedPersons).hasSize(1); // From IN2.72 
         RelatedPerson related = (RelatedPerson) relatedPersons.get(0);
 
         assertThat(related.getName()).hasSize(1);
@@ -638,13 +638,13 @@ class Hl7FinancialInsuranceTest {
         // Check coverage relationship
         DatatypeUtils.checkCommonCodeableConceptAssertions(coverage.getRelationship(), "child",
                 "Child",
-                "http://terminology.hl7.org/CodeSystem/subscriber-relationship", null); // IN2.72
+                "http://terminology.hl7.org/CodeSystem/subscriber-relationship", null); // IN2.72 (04 = Natural child)
 
         // Check relatedPerson relationship
         assertThat(related.getRelationship()).hasSize(1);
         DatatypeUtils.checkCommonCodeableConceptAssertions(related.getRelationship().get(0), "PRN",
                 "parent",
-                "http://terminology.hl7.org/CodeSystem/v3-RoleCode", null); // IN2.72
+                "http://terminology.hl7.org/CodeSystem/v3-RoleCode", null); // IN2.72 (04 = Natural child)
 
         // Confirm the Coverage (subscriber) references the RelatedPerson
         assertThat(coverage.getSubscriber().getReference()).isEqualTo(related.getId());

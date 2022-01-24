@@ -389,113 +389,109 @@ MedicationRequestCategory:
   O: outpatient
 
 ###### IMPORTANT NOTES ON RELATIONSHIP MAPPINGS #########
-# Relationships in tables V3RoleCode and SubscriberRelationship are tricky
-# Relationships in HL7 and FHIR are coded, mapped, and recoded in two different DIRECTIONS:  
-#   1.  Insured [subscriber/policyholder] is X (e.g. parent) of patient.  X is inverse Y.
-#   2.  Patient is Y (e.g. child) of insured [subscriber/policyholder]; 
-# IN1.17 is Insureds relationship to Patient (TYPE 1).  Uses HL7 V2.6 table 0063
-# IN2.72 is Patients relationship to Insured (TYPE 2).  Uses HL7 V2.6 table 0344
-# FHIR RelatedPerson.relationship is Related to Patient. (TYPE 1.) POLICYHOLDER_RELATIONSHIP  Needs coding from V3RoleCode.
-# FHIR Coverage.relationship is Beneficiary (Patient) to Insured (Subscriber) (TYPE 2.) SUBSCRIBER_RELATIONSHIP  Needs coding from SubscriberRelationship. 
+# Relationship mappings in tables V3RoleCode and SubscriberRelationship are coded in two different DIRECTIONS:  
+#  - Insured to Patient.  Example Insured is parent of child patient. Used by IN1.17 and RelatedPerson.relationship.
+#  - Patient to Insured.  Example: Patient is child of insured parent. Used by IN2.72 and Coverage.relationship.
+# Insured is also referred to as Subscriber and Policyholder.  
+# Patient is also referred to as Beneficiary.
 
-# Mapping to V3 Role code (used for POLICYHOLDER_RELATIONSHIP)
+# Mapping to RelatedPerson.relationship via POLICYHOLDER_RELATIONSHIP data resolver.
+# Direction: Insured to Patient
 V3RoleCode:
-# Input codes from IN2.72 (TYPE 2) values from table 0344, need to be REVERSED for TYPE1 POLICYHOLDER_RELATIONSHIP code from V3RoleCode.
-  01: ONESELF # Patient is insured input
-  02: SPS  # Spouse input
-  03: PRN  # Natural child financial responsibility input from Type 2, is Parent in Type 1.
-  04: PRN  # Natural child no financial responsibility input from Type 2, is Parent in Type 1.
-  05: PRN  # Step child input from Type 2, is Parent in Type 1.
-  06: PRN  # Foster child input from Type 2, is Parent in Type 1.
-# 07: no good match for Ward of the court
-# 08: no good match for Employee
-  09: U # 'Unknown' as input
-  10: O # Handicapped dependent input, Other output
-# 11: no good match for Organ donor
-# 12: no good match for Cadaver donor
-  13: GRPRN # Grandchild input from Type 2, is Grandparent Type 1 
-  14: O # Niece/Nephew input, Other output
-# 15: no good match for Injured planitiff
-# 16: no good match for Sponsored dependent
-  17: GRPRN # Minor dependent of a minor dependant input (grandchild dependent) from TYPE 2 is Grandparent Type 1 
-  18: CHILD # Parent input from TYPE 2, is Child in Type 1
-  19: GRNDCHILD # Grandparent input from TYPE 2, is Grandchild in Type 1
-# Input codes from IN1.17 (TYPE 1) values from table 0063 are standard match for TYPE 1 POLICYHOLDER_RELATIONSHIP code from V3RoleCode.  
+# Codes from IN1.17 (values from table 0063) 
   BRO: BRO
-# CGV: no good match for Care giver
+# CGV: Care giver: no good match
   CHD: CHILD
-# DEP: no good match for Handicapped dependent
+# DEP: Handicapped dependent : no good match
   DOM: DOMPART
   EXF: EXT  
   FCH: CHLDFOST 
   FND: FRND
   FTH: FTH 
   GCH: GRNDCHILD
-# GRD: no good match for Guardian
-  GRP: GRPRN
+# GRD: Guardian : no good match
+  GRP: GRP
   MTH: MTH
   NCH: NCHILD 
-# NON: no good match for None
-  OTH: O     
+# NON: None: no good match
+# OTH: Other: no good match
   PAR: PRN
   SCH: STPCHLD
   SEL: ONESELF
   SIB: SIB
   SIS: SIS
   SPO: SPS
-  UNK: U
-# WRD: no good match for Ward of the court  
-
-# SubscriberRelationship codes
-# This is the reverse of the relationships from V3RoleCode.  See IMPORTANT NOTES ON RELATIONSHIP MAPPINGS above.
-# OTHER is mapped for any connection that is blood or legal (e.g. grandparent, guardian)
-# Nothing is mapped for non-legally binding connections (e.g. friend, manager)
+# UNK: Unknown : no good match
+# WRD: Ward of the court : no good match 
+# - - - - -  
+# Codes from IN2.72 (values from table 0344) must be REVERSED for RelatedPerson.relationship.
+  01: ONESELF # Patient is insured : Self
+  02: SPS  # Spouse : Spouse
+  03: PRN  # Natural child financial responsibility : Parent
+  04: PRN  # Natural child no financial responsibility : Parent
+  05: PRN  # Step child : Parent
+  06: PRNFOST  # Foster child : Foster Parent
+# 07: Ward of the court: no good match
+# 08: Employee: no good match
+# 09: Unknown: no good match 
+# 10: Handicapped dependent input: no good match 
+# 11: Organ donor : no good match
+# 12: Cadaver donor : no good match
+  13: GRPRN # Grandchild : Grandparent 
+  14: EXT # Niece/Nephew :  Extended
+# 15: Injured planitiff : no good match
+# 16: Sponsored dependent : no good match
+  17: GRPRN # Minor dependent of a minor dependant input (grandchild dependent) : Grandparent
+  18: CHILD # Parent : Child 
+  19: GRNDCHILD # Grandparent : Grandchild 
+ 
+# Mapping to Coverage.relationship via SUBSCRIBER_RELATIONSHIP data resolver.
+# Direction: Patient to Insured
 SubscriberRelationship:
-# Input codes from IN2.72 (TYPE 2) values from table 0344, are standard match for TYPE 2 SUBSCRIBER_RELATIONSHIP codes from SubscriberRelationship.
-  01: self # Patient is insured input
-  02: spouse  # Spouse input
-  03: child  # Natural child financial responsibility input 
-  04: child  # Natural child no financial responsibility input 
-  05: child  # Step child input 
-  06: child  # Foster child input
-# 07: no good match for Ward of the court
-# 08: no good match for Employee
-# 09: no good match for 'Unknown' as input
-  10: other # Handicapped dependent input, Other output
-# 11: no good match for Organ donor
-# 12: no good match for Cadaver donor
-  13: other # Grandchild input 
-  14: other # Niece/Nephew input, Other output
-# 15: no good match for Injured planitiff
-# 16: no good match for Sponsored dependent
+# Codes from IN2.72 (values from table 0344)
+  01: self # Patient is insured 
+  02: spouse  # Spouse 
+  03: child  # Natural child financial responsibility
+  04: child  # Natural child no financial responsibility
+  05: child  # Step child 
+  06: child  # Foster child 
+# 07: Ward of the court: no good match
+# 08: Employee: no good match
+# 09: Unknown: no good match 
+  10: other # Handicapped dependent 
+# 11: Organ donor : no good match
+# 12: Cadaver donor : no good match
+  13: other # Grandchild 
+  14: other # Niece/Nephew 
+# 15: Injured planitiff : no good match
+# 16: Sponsored dependent : no good match
   17: other # Minor dependent of a minor dependant input (grandchild dependent)
-  18: parent # Parent input
-  19: other # Grandparent input 
-# Input codes from IN1.17 (TYPE1) table 0063 are REVERSED for TYPE2 SUBSCRIBER_RELATIONSHIP codes from SubscriberRelationship
-# IN1.17 is "Insured's Relationship To Patient", but Coverage.relationship is "Beneficiary relationship to the subscriber".
-# To understand the table think: If the patient is a XXXX, the the insurance subscriber is their XXXX
-# As an example, CHD does not map to child, but parent.
+  18: parent # Parent 
+  19: other # Grandparent 
+# - - - - -  
+# Codes from IN1.17 (values from table 0063) must be REVERSED for Coverage.relationship
+# Think: If the patient is a XXXX, the the insured (subscriber) is their YYYY
   BRO: other
   CGV: other  # Caregiver
   CHD: parent
   DEP: other  # Handicapped dependent
-  DOM: common  # Life partner ~ common law spouse
+  DOM: common  # Life partner or common law spouse
   EXF: other   # Extended family
   FCH: parent 
-# FND: no good match for Friend
-  FTH: child # Father of a child
+# FND: Friend: no good match
+  FTH: child # Father
   GCH: other
   GRD: other # Guardian
   GRP: other
   MTH: child
-  NCH: parent # Natural child of a parent
-# NON: no good match for None
+  NCH: parent # Natural child 
+# NON: None: no good match
   OTH: other     
   PAR: child
-  SCH: parent # Step-child of a parent
+  SCH: parent # Step-child
   SEL: self
   SIB: other
   SIS: other
   SPO: spouse
-# UNK: no good match for Unknown
-# WRD: no good match for Ward of the court  
+# UNK: Unknown : no good match
+# WRD: Ward of the court : no good match

@@ -106,6 +106,7 @@ subscriber_1:
       #  $Patient  
 
 # If the subscriber is SEL (self), then reference the patient
+# NOT_NULL check is not needed because we have values here, and NOT_NULL is otherwise caught by logic of subscriber_1
 subscriber_2:
     condition: $relatedRelationshipStr EQUALS SEL || $relatedRelationshipStr EQUALS 01
     valueOf: datatype/Reference
