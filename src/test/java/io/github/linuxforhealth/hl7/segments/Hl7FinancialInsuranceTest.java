@@ -98,7 +98,7 @@ class Hl7FinancialInsuranceTest {
                 // IN1.22 to Coverage.order takes priority over IN1.1
                 // IN1.23 through IN1.35 NOT REFERENCED
                 + "|20201231145045|20211231145045|||||||||5|||||||||||||"
-                // IN1.36 to Identifier 4
+                // IN1.36 to Identifier 4 - MB
                 // IN1.36 also to subscriberId
                 // IN1.46 to Identifier 3
                 // IN1.47 through IN1.53 NOT REFERENCED
