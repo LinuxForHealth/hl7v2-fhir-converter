@@ -346,7 +346,11 @@ public class SimpleDataValueResolver {
         return getFHIRCode(Hl7DataHandlerUtil.getStringValue(value), "EncounterModeOfArrivalDisplay");
     };
 
-    // Maps 0063 to values in http://terminology.hl7.org/CodeSystem/v3-RoleCode
+    // Relationships are coded, mapped, and recoded in two different DIRECTIONS.  
+    // See detailed notes in v2ToFhirMapping maps of V3RoleCode and SubscriberRelationship
+
+    // Maps from IN1.17 and IN2.72 to http://terminology.hl7.org/CodeSystem/v3-RoleCode
+    // Used for Coverage.relationship
     public static final ValueExtractor<Object, SimpleCode> POLICYHOLDER_RELATIONSHIP = (Object value) -> {
         String val = Hl7DataHandlerUtil.getStringValue(value);
         String code = getFHIRCode(val, V3RoleCode.class);
@@ -360,7 +364,8 @@ public class SimpleDataValueResolver {
         }
     };
 
-    // Maps 0063 to values in http://terminology.hl7.org/CodeSystem/subscriber-relationship
+    // Maps from IN1.17 and IN2.72 to http://terminology.hl7.org/CodeSystem/subscriber-relationship
+    // Used for RelatedPerson.relationship.
     public static final ValueExtractor<Object, SimpleCode> SUBSCRIBER_RELATIONSHIP = (Object value) -> {
         String val = Hl7DataHandlerUtil.getStringValue(value);
         String code = getFHIRCode(val, SubscriberRelationship.class);

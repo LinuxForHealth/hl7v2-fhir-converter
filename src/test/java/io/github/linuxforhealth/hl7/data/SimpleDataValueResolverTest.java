@@ -353,12 +353,19 @@ class SimpleDataValueResolverTest {
     @Test
     void testPolicyholderRelationship() {
 
-        // Check supported known input code
+        // Check supported known input code (from table 0063)
         SimpleCode coding = SimpleDataValueResolver.POLICYHOLDER_RELATIONSHIP.apply("PAR");
         assertThat(coding).isNotNull();
         assertThat(coding.getCode()).isEqualTo("PRN");
         assertThat(coding.getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/v3-RoleCode");
         assertThat(coding.getDisplay()).isEqualTo("parent");
+
+        // Check supported known input code (from table 0344) REVERSES the relationship.  See notes in v2ToFhirMapping.
+        coding = SimpleDataValueResolver.POLICYHOLDER_RELATIONSHIP.apply("18"); // 18 is parent
+        assertThat(coding).isNotNull();
+        assertThat(coding.getCode()).isEqualTo("CHILD");
+        assertThat(coding.getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/v3-RoleCode");
+        assertThat(coding.getDisplay()).isEqualTo("child");
 
         // Check unsupported unknown input code
         // Because CGV has no mapping, we pass it without a system.
@@ -371,12 +378,19 @@ class SimpleDataValueResolverTest {
     @Test
     void testSubscriberRelationship() {
 
-        // Check supported known input code
+        // Check supported known input code (from table 0063) REVERSES the relationship.  See notes in v2ToFhirMapping.
         SimpleCode coding = SimpleDataValueResolver.SUBSCRIBER_RELATIONSHIP.apply("CHD");
         assertThat(coding).isNotNull();
         assertThat(coding.getCode()).isEqualTo("parent");
         assertThat(coding.getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/subscriber-relationship");
         assertThat(coding.getDisplay()).isEqualTo("Parent");
+
+        // Check supported known input code (from table 0344)
+        coding = SimpleDataValueResolver.SUBSCRIBER_RELATIONSHIP.apply("04"); // is child
+        assertThat(coding).isNotNull();
+        assertThat(coding.getCode()).isEqualTo("child");
+        assertThat(coding.getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/subscriber-relationship");
+        assertThat(coding.getDisplay()).isEqualTo("Child");
 
         // Check unsupported unknown input code
         // Because GOAT has no mapping, we pass it without a system.
