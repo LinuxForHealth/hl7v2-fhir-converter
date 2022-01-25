@@ -125,27 +125,24 @@ subject:
     specs: $Patient
 
 # Diagnosis is a list of References to each Condition.
-# To get the correct Condition from the Condition list in the expressionsMap spec, we use the Condition.identifier generated from DG1-3.
+# This uses a nested expression to cause an effective inner and outer loop.
+# We use the Condition.identifier generated from DG1-3 (outer loop) to get the correct Condition from the Condition list in the expressionsMap spec (inner loop).
 diagnosis:
    expressionType: nested
    evaluateLater: true
    generateList: true
    specs: DG1
    vars:
-      refDG13: BUILD_IDENTIFIER_FROM_CWE, DG1.3
+      refDG13: BUILD_IDENTIFIER_FROM_CWE, DG1.3 # Creates an identifier in $refDG13 from DG1.3 for each time we cycle through the specs: DG1
    expressionsMap:
-     # specs: Gets entire list of condition resources
-     # refconditionId: returns a reference ID, in this case we return the value of the identifier that uses "urn:id:extID"
-     # BASE_VALUE: in this case base Value will be a condition resource from the specs list of conditions
-     # refDG13: The identifier value we compare against to make sure we are dealing with the specific Diagnosis.
-     # GeneralUtils.extractAttrtibute uses utility json-path to parse through the resource in json format, and we can search for specific values. $.identifier[?(@.system==\"urn:id:extID\")].value is the json-path notation to find from root ($) identifiers that have a system with "urn:id:extID
      condition:
-        valueOf: datatype/Reference
-        expressionType: resource
-        condition: $refconditionId EQUALS_STRING $refDG13
-        specs: $Condition
-        vars:
-          refconditionId: $BASE_VALUE, GeneralUtils.extractAttribute(refconditionId,"$.identifier[?(@.system==\"urn:id:extID\")].value","String")
+       valueOf: datatype/Reference
+       expressionType: resource
+       condition: $refconditionId EQUALS_STRING $refDG13 # Inner loop (refconditionId) matches outer loop (refDG13)
+       specs: $Condition # Loops over the entire list of Condition resources
+       vars:
+         # RefconditionId is calculated by pattern matching to find identifier that contains urn:id:extID as the system
+         refconditionId: $BASE_VALUE, GeneralUtils.extractAttribute(refconditionId,"$.identifier[?(@.system==\"urn:id:extID\")].value","String")
      use:
         valueOf: datatype/CodeableConcept
         expressionType: resource

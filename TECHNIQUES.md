@@ -185,7 +185,17 @@ encounter:
   specs: $encounterRef
 ```
 #### Referencing resource values that are created from repeating segments
-In [Encounter.diagnosis](./src/main/resources/hl7/resource/Encounter.yml) we reference condition which can be created multiple times by repeating DG1 segments. In order to account for this scenario and possibly others like it, we added a function in general utils that extracts each resource value from the list of resources created from a specific segment(in our case its DG1), creates an id, and compares that ID in the yaml to make sure we are dealing with the specific resource value.
+In cases where we need to match specific resources that are in a list from a `spec`, we can use a nested structure where the outer part identifies the element to match, and the inner part uses condition(s) to find the matching element.
+A good example of this is Encounter.diagnosis in Encounter.yml.
+
+- Outer Structure  
+  - Nested expression type.
+  - Cycles through each DG1 segment via `specs: DG1`.
+  - Creates an identifier in `$refDG13` from DG1.3 for each time we cycle through the `specs: DG1`.
+- Inner Structure (`expressionsMap`)
+  - Cycles through each `specs: $Condition` resource created from each DG1 segment processed in the parent message `ADT_A03`.
+  - Matches the `$refDG13` Identifier from the outer structure to the `$refconditionId` condition identifier from the inner structure.
+  - `$refconditionId` is found in the `$Condition` by using `GeneralUtils.extractAttribute`, which uses a pattern matching utility to find the identifier.
 
 ```yaml
 diagnosis:
@@ -196,16 +206,12 @@ diagnosis:
    vars:
       refDG13: BUILD_IDENTIFIER_FROM_CWE, DG1.3
    expressionsMap:
-     #SPECS: Gets entire list of condition resources
-     #REFCONDITIONID: returns a reference ID, in this case we are return for the value of the identifier that uses "urn:id:extID"
-     #BASEVALUE: in this case base Value will be a condition resource from the specs list of conditions
-     #REFDG13: The identifier value we compare against to make sure the conditions are in the proper order
      condition:
         valueOf: datatype/Reference
         expressionType: resource
-        condition: $refconditionId EQUALS_STRING $refDG13
-        specs: $Condition
+        condition: $refconditionId EQUALS_STRING $refDG13 # Inner loop (refconditionId) matches outer loop (refDG13)
+        specs: $Condition # Loops over the entire list of Condition resources
         vars:
+          # refconditionId is calculated by pattern matching to find identifier that contains urn:id:extID as the system"
           refconditionId: $BASE_VALUE, GeneralUtils.extractAttribute(refconditionId,"$.identifier[?(@.system==\"urn:id:extID\")].value","String")
 ```
-Here we create a variable called `refconditionId` where we make the call to extractAttribute to get the correct id.value so, we can compare and ensure the resources are in order
