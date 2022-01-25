@@ -12,7 +12,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import com.google.common.base.Preconditions;
 import io.github.linuxforhealth.api.EvaluationResult;
-import io.github.linuxforhealth.api.ResourceValue;
 import io.github.linuxforhealth.core.Constants;
 import io.github.linuxforhealth.hl7.expression.specification.SimpleSpecification;
 import io.github.linuxforhealth.hl7.util.ExpressionUtility;
@@ -87,10 +86,7 @@ public class ContextValueUtils {
         }
       }
 
-      if (fetchedValue != null && fetchedValue.getValue() instanceof ResourceValue) {
-        ResourceValue rv = fetchedValue.getValue();
-        fetchedValue = EvaluationResultFactory.getEvaluationResult(rv.getResource());
-      }
+
       return fetchedValue;
     } else {
       return null;
