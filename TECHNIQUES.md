@@ -184,8 +184,8 @@ encounter:
   expressionType: resource
   specs: $encounterRef
 ```
-#### Referencing resource values that are created multiple times
-In [Encounter.diagnosis](./src/main/resources/hl7/resource/Encounter.yml) we reference condition which can be created multiple times. In order to account for this we added a function in general utils that can extract each condition that is created, creates an id, and compares that ID in the yaml to make sure the conditions have the proper IDs
+#### Referencing resource values that are created from repeating segments
+In [Encounter.diagnosis](./src/main/resources/hl7/resource/Encounter.yml) we reference condition which can be created multiple times by repeating DG1 segments. In order to account for this scenario and possibly others like it, we added a function in general utils that extracts each resource value from the list of resources created from a specific segment(in our case its DG1), creates an id, and compares that ID in the yaml to make sure we are dealing with the specific resource value.
 
 ```yaml
 diagnosis:
@@ -207,14 +207,5 @@ diagnosis:
         specs: $Condition
         vars:
           refconditionId: $BASE_VALUE, GeneralUtils.extractAttribute(refconditionId,"$.identifier[?(@.system==\"urn:id:extID\")].value","String")
-     use:
-        valueOf: datatype/CodeableConcept
-        expressionType: resource
-        specs: DG1.6
-     rank:
-        type: STRING
-        valueOf: DG1.15
-        expressionType: HL7Spec
 ```
-`$.identifier[?(@.system==\"urn:id:extID\")].value` allows us to parse through the resource in json format, and we can search for specific values
-in this case we wanted to look at the list of identifiers and get the value of the one that has `urn:id:extID` as the System.
+Here we create a variable called `refconditionId` where we make the call to extractAttribute to get the correct id.value so, we can compare and ensure the resources are in order

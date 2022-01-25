@@ -135,9 +135,10 @@ diagnosis:
       refDG13: BUILD_IDENTIFIER_FROM_CWE, DG1.3
    expressionsMap:
      # specs: Gets entire list of condition resources
-     # refconditionId: returns a reference ID, in this case we are return for the value of the identifier that uses "urn:id:extID"
+     # refconditionId: returns a reference ID, in this case we return the value of the identifier that uses "urn:id:extID"
      # BASE_VALUE: in this case base Value will be a condition resource from the specs list of conditions
-     # refDG13: The identifier value we compare against to match to the Condition being used for the reference (inner loop) matches the Condition in the outer loop
+     # refDG13: The identifier value we compare against to make sure we are dealing with the specific Diagnosis.
+     # GeneralUtils.extractAttrtibute uses utility json-path to parse through the resource in json format, and we can search for specific values. $.identifier[?(@.system==\"urn:id:extID\")].value is the json-path notation to find from root ($) identifiers that have a system with "urn:id:extID
      condition:
         valueOf: datatype/Reference
         expressionType: resource
