@@ -111,6 +111,7 @@ public abstract class AbstractExpression implements Expression {
 
       if (!baseValue.isEmpty()) {
         localContextValues.put(baseValue.getIdentifier(), baseValue);
+        localContextValues.put(Constants.BASE_VALUE_NAME, baseValue);
       }
 
 
@@ -179,7 +180,11 @@ public abstract class AbstractExpression implements Expression {
 
     if (!baseSpecvalues.isEmpty()) {
       for (Object o : baseSpecvalues) {
-        EvaluationResult gen = generateValue(dataSource, localContextValues,  
+        Map<String, EvaluationResult> localContextValuesSpec = new HashMap<>(localContextValues);
+        localContextValuesSpec.put(Constants.BASE_VALUE_NAME,
+            EvaluationResultFactory.getEvaluationResult(o));
+
+        EvaluationResult gen = generateValue(dataSource, localContextValuesSpec,
             EvaluationResultFactory.getEvaluationResult(o));
 
         if (gen != null && gen.getValue() != null && !gen.isEmpty()) {

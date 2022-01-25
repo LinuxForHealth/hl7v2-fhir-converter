@@ -113,7 +113,7 @@ reasonReference_2:
    evaluateLater: true
    generateList: true
    expressionType: resource
-   specs: $Observation    
+   specs: $Observation
 
 hospitalization:
     valueOf: secondary/Hospitalization
@@ -129,11 +129,16 @@ diagnosis:
    evaluateLater: true
    generateList: true
    specs: DG1
+   vars:
+      refDG13: BUILD_IDENTIFIER_FROM_CWE, DG1.3
    expressionsMap:
      condition:
         valueOf: datatype/Reference
         expressionType: resource
+        condition: $refconditionId EQUALS_STRING $refDG13
         specs: $Condition
+        vars:
+          refconditionId: $BASE_VALUE, GeneralUtils.extractAttribute(refconditionId,"$.identifier[?(@.system==\"urn:id:extID\")].value","String")
      use:
         valueOf: datatype/CodeableConcept
         expressionType: resource
