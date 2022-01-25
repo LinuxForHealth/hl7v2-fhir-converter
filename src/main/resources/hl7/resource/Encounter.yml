@@ -124,6 +124,8 @@ subject:
     expressionType: resource
     specs: $Patient
 
+# Diagnosis is a list of References to each Condition.
+# To get the correct Condition from the Condition list in the expressionsMap spec, we use the Condition.identifier generated from DG1-3.
 diagnosis:
    expressionType: nested
    evaluateLater: true
@@ -132,10 +134,10 @@ diagnosis:
    vars:
       refDG13: BUILD_IDENTIFIER_FROM_CWE, DG1.3
    expressionsMap:
-     #SPECS: Gets entire list of condition resources
-     #REFCONDITIONID: returns a reference ID, in this case we are return for the value of the identifier that uses "urn:id:extID"
-     #BASEVALUE: in this case base Value will be a condition resource from the specs list of conditions
-     #REFDG13: The identifier value we compare against to make sure the conditions are in the proper order
+     # specs: Gets entire list of condition resources
+     # refconditionId: returns a reference ID, in this case we are return for the value of the identifier that uses "urn:id:extID"
+     # BASE_VALUE: in this case base Value will be a condition resource from the specs list of conditions
+     # refDG13: The identifier value we compare against to match to the Condition being used for the reference (inner loop) matches the Condition in the outer loop
      condition:
         valueOf: datatype/Reference
         expressionType: resource

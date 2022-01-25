@@ -81,7 +81,7 @@ public class Hl7RelatedGeneralUtils {
             return resolver.apply(val);
 
         } catch (RuntimeException | JsonProcessingException e) {
-            LOGGER.warn(
+            LOGGER.debug(
                     "Exception encountered when trying to convert object to json for extracting values, reason: {}",
                     e.getMessage());
             return null;
