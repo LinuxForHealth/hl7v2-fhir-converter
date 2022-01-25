@@ -85,8 +85,12 @@ address:
 
 telecom:
    valueOf: datatype/ContactPoint
+   condition: $phoneNumber NOT_NULL || $localNumber NOT_NULL
    generateList: true
    expressionType: resource
    specs: IN2.63
+   vars: 
+     phoneNumber: IN2.63.1
+     localNumber: IN2.63.7
    constants:
      use: home
