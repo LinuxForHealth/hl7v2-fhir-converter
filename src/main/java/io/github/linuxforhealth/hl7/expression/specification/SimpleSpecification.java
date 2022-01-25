@@ -32,12 +32,8 @@ public class SimpleSpecification implements Specification {
 
   private InputDataExtractor primaryDataSource = new ContextMapData();
 
+
   public SimpleSpecification(String variableName, boolean isMultiple, boolean useGroup) {
-		this(variableName, isMultiple, useGroup, false);
-
-  }
-
-	public SimpleSpecification(String variableName, boolean isMultiple, boolean useGroup, boolean usePrefix) {
 		this.variableName = variableName;
 		this.isExtractMultiple = isMultiple;
 		this.useGroup = useGroup;

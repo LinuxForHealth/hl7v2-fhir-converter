@@ -7,9 +7,8 @@ package io.github.linuxforhealth.hl7.segments;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-
 import java.util.List;
-
+import java.util.stream.Collectors;
 import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
 import org.hl7.fhir.r4.model.Condition;
 import org.hl7.fhir.r4.model.Encounter;
@@ -19,7 +18,6 @@ import org.hl7.fhir.r4.model.ResourceType;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-
 import io.github.linuxforhealth.hl7.segments.util.DatatypeUtils;
 import io.github.linuxforhealth.hl7.segments.util.ResourceUtils;
 
@@ -277,7 +275,13 @@ class HL7ConditionFHIRConversionTest {
 
         // Verify there is encounter.diagnosis for every diagnosis. Therefore there should be 8.
         assertThat(encounter.getDiagnosis()).hasSize(8);
+        List<String> referencedConditions = encounter.getDiagnosis().stream()
+            .map(i -> i.getCondition().getReference()).collect(Collectors.toList());
 
+        List<String> condIdentifiers = conditionResource.stream().map(r -> (Condition) r)
+            .map(c -> c.getId()).collect(Collectors.toList());
+
+        assertThat(referencedConditions).containsExactlyInAnyOrderElementsOf(condIdentifiers);
         // Verify each diagnosis is set correctly.
         for (int i = 0; i < 8; i++) {
             // Diagnosis requires a reference to condition.

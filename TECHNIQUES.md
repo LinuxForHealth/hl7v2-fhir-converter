@@ -184,5 +184,34 @@ encounter:
   expressionType: resource
   specs: $encounterRef
 ```
+#### Referencing resource values that are created from repeating segments
+In cases where we need to match specific resources that are in a list from a `spec`, we can use a nested structure where the outer part identifies the element to match, and the inner part uses condition(s) to find the matching element.
+A good example of this is Encounter.diagnosis in Encounter.yml.
 
+- Outer Structure  
+  - Nested expression type.
+  - Cycles through each DG1 segment via `specs: DG1`.
+  - Creates an identifier in `$refDG13` from DG1.3 for each time we cycle through the `specs: DG1`.
+- Inner Structure (`expressionsMap`)
+  - Cycles through each `specs: $Condition` resource created from each DG1 segment processed in the parent message `ADT_A03`.
+  - Matches the `$refDG13` Identifier from the outer structure to the `$refconditionId` condition identifier from the inner structure.
+  - `$refconditionId` is found in the `$Condition` by using `GeneralUtils.extractAttribute`, which uses a pattern matching utility to find the identifier.
 
+```yaml
+diagnosis:
+   expressionType: nested
+   evaluateLater: true
+   generateList: true
+   specs: DG1
+   vars:
+      refDG13: BUILD_IDENTIFIER_FROM_CWE, DG1.3
+   expressionsMap:
+     condition:
+        valueOf: datatype/Reference
+        expressionType: resource
+        condition: $refconditionId EQUALS_STRING $refDG13 # Inner loop (refconditionId) matches outer loop (refDG13)
+        specs: $Condition # Loops over the entire list of Condition resources
+        vars:
+          # refconditionId is calculated by pattern matching to find identifier that contains urn:id:extID as the system"
+          refconditionId: $BASE_VALUE, GeneralUtils.extractAttribute(refconditionId,"$.identifier[?(@.system==\"urn:id:extID\")].value","String")
+```

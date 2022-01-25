@@ -113,7 +113,7 @@ reasonReference_2:
    evaluateLater: true
    generateList: true
    expressionType: resource
-   specs: $Observation    
+   specs: $Observation
 
 hospitalization:
     valueOf: secondary/Hospitalization
@@ -124,16 +124,25 @@ subject:
     expressionType: resource
     specs: $Patient
 
+# Diagnosis is a list of References to each Condition.
+# This uses a nested expression to cause an effective inner and outer loop.
+# We use the Condition.identifier generated from DG1-3 (outer loop) to get the correct Condition from the Condition list in the expressionsMap spec (inner loop).
 diagnosis:
    expressionType: nested
    evaluateLater: true
    generateList: true
    specs: DG1
+   vars:
+      refDG13: BUILD_IDENTIFIER_FROM_CWE, DG1.3 # Creates an identifier in $refDG13 from DG1.3 for each time we cycle through the specs: DG1
    expressionsMap:
      condition:
-        valueOf: datatype/Reference
-        expressionType: resource
-        specs: $Condition
+       valueOf: datatype/Reference
+       expressionType: resource
+       condition: $refconditionId EQUALS_STRING $refDG13 # Inner loop (refconditionId) matches outer loop (refDG13)
+       specs: $Condition # Loops over the entire list of Condition resources
+       vars:
+         # RefconditionId is calculated by pattern matching to find identifier that contains urn:id:extID as the system
+         refconditionId: $BASE_VALUE, GeneralUtils.extractAttribute(refconditionId,"$.identifier[?(@.system==\"urn:id:extID\")].value","String")
      use:
         valueOf: datatype/CodeableConcept
         expressionType: resource
