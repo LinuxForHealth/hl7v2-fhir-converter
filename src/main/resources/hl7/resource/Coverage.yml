@@ -92,7 +92,21 @@ identifier_6:
   constants:
     system: "http://terminology.hl7.org/CodeSystem/v2-0203"
     code: "MC"
-    display: "Patient's Medicare number"       
+    display: "Patient's Medicare number"      
+
+identifier_7:
+  condition: $valueIn NOT_NULL
+  valueOf: datatype/Identifier_var
+  generateList: true
+  expressionType: resource
+  vars:
+    valueIn: IN1.36
+    # No systemCX set for this identifier
+  constants:
+    system: "http://terminology.hl7.org/CodeSystem/v2-0203"
+    code: "SN"
+    display: "Subscriber Number"                
+
 
 # Status is required, but it comes from a non-table 2 char ST 
 # It MUST be one of: active | cancelled | draft | entered-in-error

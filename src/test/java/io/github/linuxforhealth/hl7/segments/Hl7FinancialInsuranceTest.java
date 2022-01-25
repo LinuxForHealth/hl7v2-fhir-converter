@@ -51,8 +51,8 @@ class Hl7FinancialInsuranceTest {
                 // FT1.7 is required transaction code (currently not used)
                 + "FT1||||20201231145045||CG|FAKE|||||||||||||||||||||||||||||||||||||\n"
                 // IN1 Segment is split and concatenated for easier understanding. (| precedes numbered field.)
-                // IN1.2.1, IN1.2.3 to Identifier 1
-                // IN1.2.4, IN1.2.6 to Identifier 2
+                // IN1.2.1, IN1.2.3 to Identifier XV 1
+                // IN1.2.4, IN1.2.6 to Identifier XV 2
                 + "IN1|1|Value1^^System3^Value4^^System6"
                 // Thorough organization testing.
                 // IN1.3 to Organization Identifier 
@@ -98,9 +98,9 @@ class Hl7FinancialInsuranceTest {
                 // IN1.22 to Coverage.order takes priority over IN1.1
                 // IN1.23 through IN1.35 NOT REFERENCED
                 + "|20201231145045|20211231145045|||||||||5|||||||||||||"
-                // IN1.36 to Identifier 4 - MB
+                // IN1.36 to Identifier MB and Identifier SN
                 // IN1.36 also to subscriberId
-                // IN1.46 to Identifier 3
+                // IN1.46 to Identifier XV 3
                 // IN1.47 through IN1.53 NOT REFERENCED
                 + "|MEMBER36||||||||||Value46|||||||\n";
         // IN2.6 is purposely empty so will not create an MC identifier
@@ -172,7 +172,7 @@ class Hl7FinancialInsuranceTest {
         Coverage coverage = (Coverage) coverages.get(0);
 
         // Confirm Coverage Identifiers - Order matches order of identifier_X in Coverage.yml
-        assertThat(coverage.getIdentifier()).hasSize(4);  // XV, XV, XV, MB; but not MA (IN2.8) nor MC (IN2.6)
+        assertThat(coverage.getIdentifier()).hasSize(5);  // XV, XV, XV, MB, SN; but not MA (IN2.8) nor MC (IN2.6)
         assertThat(coverage.getIdentifier().get(0).getValue()).isEqualTo("Value1"); // IN1.2.1
         assertThat(coverage.getIdentifier().get(0).getSystem()).isEqualTo("urn:id:System3"); // IN1.2.3
         assertThat(coverage.getIdentifier().get(0).getUse()).isNull(); // No use, here
@@ -197,6 +197,12 @@ class Hl7FinancialInsuranceTest {
         DatatypeUtils.checkCommonCodeableConceptAssertions(coverage.getIdentifier().get(3).getType(), "MB",
                 "Member Number",
                 "http://terminology.hl7.org/CodeSystem/v2-0203", null);
+        assertThat(coverage.getIdentifier().get(4).getValue()).isEqualTo("MEMBER36"); // IN1.36
+        assertThat(coverage.getIdentifier().get(4).getSystem()).isNull(); // No system, here
+        assertThat(coverage.getIdentifier().get(4).getUse()).isNull(); // No use, here
+        DatatypeUtils.checkCommonCodeableConceptAssertions(coverage.getIdentifier().get(4).getType(), "SN",
+                "Subscriber Number" ,
+                "http://terminology.hl7.org/CodeSystem/v2-0203", null);         
 
         // Confirm SubscriberId
         assertThat(coverage.getSubscriberId()).isEqualTo("MEMBER36"); // IN1.36
@@ -271,8 +277,8 @@ class Hl7FinancialInsuranceTest {
                 // FT1.7 is required transaction code (currently not used)
                 + "FT1||||20201231145045||CG|FAKE|||||||||||||||||||||||||||||||||||||\n"
                 // IN1 Segment is split and concatenated for easier understanding. (| precedes numbered field.)
-                // IN1.2.1, IN1.2.3 to Identifier 1
-                // IN1.2.4, IN1.2.6 to Identifier 2
+                // IN1.2.1, IN1.2.3 to Identifier XV 1
+                // IN1.2.4, IN1.2.6 to Identifier XV 2
                 + "IN1|1|Value1^^System3^Value4^^System6"
                 // Minimal Organization. Required for Payor, which is required.
                 // Organization deep test in testBasicInsuranceCoverageFields
@@ -292,9 +298,9 @@ class Hl7FinancialInsuranceTest {
                 // IN1.22 purposely empty to show that IN1.1 is secondary for Coverage.order
                 // IN1.23 through IN1.35 NOT REFERENCED
                 + "|DoeFake^Judy^^^Rev.|PAR|19780429|19 Rose St^^Faketown^CA^ZIP5||||||||||||||||"
-                // IN1.36 purposely present, but is ignored because IN2.61 takes priority
+                // IN1.36 purposely present, used by SN identifier, but is ignored by MB identifier because IN2.61 takes priority
                 // IN1.43 to RelatedPerson.gender
-                // IN1.46 to Identifier 3
+                // IN1.46 to Identifier XV 3
                 // IN1.49 to RelatedPerson.identifier
                 //    IN1.49.1 to RelatedPerson.identifier.value
                 //    IN1.49.4 to RelatedPerson.identifier.system
@@ -307,7 +313,7 @@ class Hl7FinancialInsuranceTest {
                 // IN2.8 to Identifier 5: MA Patient Medicaid number
                 // IN2.9 through IN2.60 not used     
                 + "IN2||777-88-9999||||MEDICARE06||MEDICAID08|| |||||||||| ||||||||||| |||||||||| |||||||||| ||||||||||"
-                // IN2.61 to MB Identifier 4; takes priority over IN1.36
+                // IN2.61 to Identifier MB; takes priority over IN1.36
                 // IN2.63 to RelatedPerson.telecom
                 //    IN2.63.1 to Organization Contact telecom .value (ONLY when XTN.5-XTN.7 are empty.  See rules in getFormattedTelecomNumberValue.)
                 //    IN2.63.2 is not mapped. 
@@ -338,7 +344,7 @@ class Hl7FinancialInsuranceTest {
         Coverage coverage = (Coverage) coverages.get(0);
 
         // Confirm Coverage Identifiers - Order matches order of identifier_X in Coverage.yml
-        assertThat(coverage.getIdentifier()).hasSize(6); // XV, XV, XV, MB, MA, MC  
+        assertThat(coverage.getIdentifier()).hasSize(7); // XV, XV, XV, MB, MA, MC, SN
         assertThat(coverage.getIdentifier().get(0).getValue()).isEqualTo("Value1"); // IN1.2.1
         assertThat(coverage.getIdentifier().get(0).getSystem()).isEqualTo("urn:id:System3"); // IN1.2.3
         assertThat(coverage.getIdentifier().get(0).getUse()).isNull(); // No use, here
@@ -374,7 +380,13 @@ class Hl7FinancialInsuranceTest {
         assertThat(coverage.getIdentifier().get(5).getUse()).isNull(); // No use, here
         DatatypeUtils.checkCommonCodeableConceptAssertions(coverage.getIdentifier().get(5).getType(), "MC",
                 "Patient's Medicare number" ,
-                "http://terminology.hl7.org/CodeSystem/v2-0203", null);                
+                "http://terminology.hl7.org/CodeSystem/v2-0203", null);  
+        assertThat(coverage.getIdentifier().get(6).getValue()).isEqualTo("MEMBER36"); // IN1.36
+        assertThat(coverage.getIdentifier().get(6).getSystem()).isNull(); // No system, here
+        assertThat(coverage.getIdentifier().get(6).getUse()).isNull(); // No use, here
+        DatatypeUtils.checkCommonCodeableConceptAssertions(coverage.getIdentifier().get(6).getType(), "SN",
+                "Subscriber Number" ,
+                "http://terminology.hl7.org/CodeSystem/v2-0203", null);                       
 
         // Confirm Coverage Beneficiary references to Patient, and Payor references to Organization
         assertThat(coverage.getBeneficiary().getReference()).isEqualTo(patientId);
@@ -467,8 +479,8 @@ class Hl7FinancialInsuranceTest {
                 // FT1.7 is required transaction code (currently not used)
                 + "FT1||||20201231145045||CG|FAKE|||||||||||||||||||||||||||||||||||||\n"
                 // IN1 Segment is split and concatenated for easier understanding. (| precedes numbered field.)
-                // IN1.2.1, IN1.2.3 to Identifier 1
-                // IN1.2.4, IN1.2.6 to Identifier 2
+                // IN1.2.1, IN1.2.3 to Identifier XV 1
+                // IN1.2.4, IN1.2.6 to Identifier XV 2
                 + "IN1|1|Value1^^System3^Value4^^System6"
                 // Minimal Organization to test TENANT prepend. 
                 // IN1.3 to Organization Identifier 
@@ -481,8 +493,8 @@ class Hl7FinancialInsuranceTest {
                 // IN1.17 to Coverage.relationship.  SEL (self) should create relationship of ONESELF, and reference to patient. 
                 // IN1.18 through IN1.35 NOT REFERENCED
                 + "||SEL||||||||||||||||||"
-                // IN1.36 to Identifier 4
-                // IN1.46 to Identifier 3
+                // IN1.36 to Identifier MB and Identifier SN
+                // IN1.46 to Identifier XV 3
                 // IN1.47 through IN1.53 NOT REFERENCED
                 + "|MEMBER36||||||||||Value46|||||||\n";
 
@@ -518,7 +530,7 @@ class Hl7FinancialInsuranceTest {
         Coverage coverage = (Coverage) coverages.get(0);
 
         // Confirm Coverage Identifiers
-        assertThat(coverage.getIdentifier()).hasSize(4);
+        assertThat(coverage.getIdentifier()).hasSize(5); // XV, XV, XV, MB, SN
         // Coverage Identifiers deep check in testBasicInsuranceCoverageFields
 
         // Confirm Coverage Subscriber references to Patient
@@ -560,7 +572,7 @@ class Hl7FinancialInsuranceTest {
                 // FT1.7 is required transaction code (currently not used)
                 + "FT1||||20201231145045||CG|FAKE|||||||||||||||||||||||||||||||||||||\n"
                 // These fields in IN1 with these values cause the failure, leaving some of the field empty may be contribute.
-                // IN1.2 to Identifier 1
+                // IN1.2 to Identifier XV 1
                 // IN1.3 to Organization Identifier
                 // IN1.4 to Organization Name
                 // IN1.7 to Organization Telecom
@@ -604,7 +616,8 @@ class Hl7FinancialInsuranceTest {
     }
 
     @Test
-    // Tests IN2.72 as backup IN1.17 coverage. Code '04' is child. A related person should be created.  
+    // Tests IN2.72 as backup IN1.17 coverage. Code '04' is child. A related person should be created.
+    // Tests empty IN2.63 missing telecom.  
     void testInsuranceCoverageFromIN2() throws IOException {
         String hl7message = "MSH|^~\\&|||||20151008111200||ADT^A01^ADT_A01|MSGID000001|T|2.6|||||||||\n"
                 + "EVN||20210407191342||||||\n"
@@ -616,8 +629,8 @@ class Hl7FinancialInsuranceTest {
                 // FT1.7 is required transaction code (currently not used)
                 + "FT1||||20201231145045||CG|FAKE|||||||||||||||||||||||||||||||||||||\n"
                 // IN1 Segment is split and concatenated for easier understanding. (| precedes numbered field.)
-                // IN1.2.1, IN1.2.3 to Identifier 1
-                // IN1.2.4, IN1.2.6 to Identifier 2
+                // IN1.2.1, IN1.2.3 to Identifier XV 1
+                // IN1.2.4, IN1.2.6 to Identifier XV 2
                 + "IN1|1|Value1^^System3^Value4^^System6"
                 // Minimal Organization. Required for Payor, which is required.
                 // Organization deep test in testBasicInsuranceCoverageFields
@@ -634,10 +647,11 @@ class Hl7FinancialInsuranceTest {
                 // IN1.17 purposely empty to validate IN2.72 works as secondary
                 // IN1.18 through IN1.35 NOT REFERENCED
                 + "|DoeFake^Judy^^^Rev.|||||||||||||||||||"
-                // IN1.36 to Identifier 4s
+                // IN1.36 to Identifier MB and Identifier SN
                 // IN1.37 through IN1.53 NOT REFERENCED
                 + "|MEMBER36|||||||||||||||||\n"
                 // IN2.1 through IN2.71 not used
+                // IN2.63 purposely empty to ensure an empty telecom is not created.
                 + "IN2||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||"
                 // IN2.72 to Coverage.relationship and RelatedPerson.relationship.  (Backup for IN1.17) Codes from table 0344
                 + "04|\n"; // 04 = Natural child
@@ -660,7 +674,7 @@ class Hl7FinancialInsuranceTest {
         Coverage coverage = (Coverage) coverages.get(0);
 
         // Confirm Coverage Identifiers
-        assertThat(coverage.getIdentifier()).hasSize(3);
+        assertThat(coverage.getIdentifier()).hasSize(4);  // XV, XV, MB, SN
         // Coverage Identifiers deep check in testBasicInsuranceCoverageFields
 
         // Confirm Coverage Beneficiary references to Patient, and Payor references to Organization
@@ -671,6 +685,7 @@ class Hl7FinancialInsuranceTest {
         List<Resource> relatedPersons = ResourceUtils.getResourceList(e, ResourceType.RelatedPerson);
         assertThat(relatedPersons).hasSize(1); // From IN2.72 
         RelatedPerson related = (RelatedPerson) relatedPersons.get(0);
+        assertThat(related.hasTelecom()).isFalse(); // Because IN2.63 is empty
 
         assertThat(related.getName()).hasSize(1);
         HumanName relatedName = related.getName().get(0);
@@ -712,8 +727,8 @@ class Hl7FinancialInsuranceTest {
                 // FT1.7 is required transaction code (currently not used)
                 + "FT1||||20201231145045||CG|FAKE|||||||||||||||||||||||||||||||||||||\n"
                 // IN1 Segment is split and concatenated for easier understanding. (| precedes numbered field.)
-                // IN1.2.1, IN1.2.3 to Identifier 1
-                // IN1.2.4, IN1.2.6 to Identifier 2
+                // IN1.2.1, IN1.2.3 to Identifier XV 1
+                // IN1.2.4, IN1.2.6 to Identifier XV 2
                 + "IN1|1|Value1^^System3^Value4^^System6"
                 // Minimal Organization
                 // IN1.3 to Organization Identifier 
@@ -724,7 +739,7 @@ class Hl7FinancialInsuranceTest {
                 // IN1.17 empty to verify that IN2.72 works as backup for IN1.17
                 // IN1.18 through IN1.35 NOT REFERENCED
                 + "||||||||||||||||||||"
-                // IN1.36 to Identifier 4s
+                // IN1.36 to Identifier 4 (MB) and Identifier 7 (SN)
                 // IN1.37 through IN1.53 NOT REFERENCED
                 + "|MEMBER36|||||||||||||||||\n"
                 // IN2.1 through IN2.71 NOT REFERENCED
@@ -756,7 +771,7 @@ class Hl7FinancialInsuranceTest {
         Coverage coverage = (Coverage) coverages.get(0);
 
         // Confirm Coverage Identifiers
-        assertThat(coverage.getIdentifier()).hasSize(3);
+        assertThat(coverage.getIdentifier()).hasSize(4);  // XV, XV, MB, SN
         // Coverage Identifiers deep check in testBasicInsuranceCoverageFields
 
         // Confirm Coverage Subscriber references to Patient
