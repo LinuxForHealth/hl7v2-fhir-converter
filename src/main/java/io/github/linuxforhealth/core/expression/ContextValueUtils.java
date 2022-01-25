@@ -85,8 +85,6 @@ public class ContextValueUtils {
           fetchedValue = contextValues.get(VariableUtils.getVarName(varName));
         }
       }
-
-
       return fetchedValue;
     } else {
       return null;

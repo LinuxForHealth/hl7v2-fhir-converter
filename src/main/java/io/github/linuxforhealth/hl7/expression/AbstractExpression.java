@@ -32,316 +32,285 @@ import io.github.linuxforhealth.core.expression.VariableUtils;
 import io.github.linuxforhealth.hl7.expression.specification.SpecificationUtil;
 
 public abstract class AbstractExpression implements Expression {
-  private static final String RESOURCE = "Resource";
+    private static final String RESOURCE = "Resource";
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractExpression.class);
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(AbstractExpression.class);
+    private ExpressionAttributes attr;
+    private String originalContext;
+    private boolean conditionSatisfiedState;
 
-
-  private ExpressionAttributes attr;
-  private String originalContext;
-  private boolean conditionSatisfiedState;
-  public AbstractExpression(ExpressionAttributes attr) {
-    this.attr = attr;
-  }
-
-
-
-  @Override
-  public String getType() {
-    return this.attr.getType();
-  }
-
-
-  public ExpressionAttributes getExpressionAttr() {
-    return this.attr;
-  }
-
-  @Override
-  public boolean isEvaluateLater() {
-    return this.attr.isEvaluateLater();
-
-  }
-
-
-
-  @Override
-  public EvaluationResult getDefaultValue() {
-    return EvaluationResultFactory.getEvaluationResult(this.attr.getDefaultValue());
-  }
-
-  public boolean isRequired() {
-    return this.attr.isRequired();
-  }
-
-  @Override
-  public List<Specification> getspecs() {
-    return this.attr.getSpecs();
-  }
-
-  @Override
-  public List<Variable> getVariables() {
-    return this.attr.getVariables();
-  }
-
-
-  /**
-   * Evaluates the expression and generated single or multiple resources based on the expression
-   * values. If expression (reference and resource) ends with * then for that expression the Generic
-   * result includes list of values.
-   * 
-   * @see io.github.linuxforhealth.api.Expression#evaluate(io.github.linuxforhealth.api.InputDataExtractor,
-   *      java.util.Map, EvaluationResult)
-   */
-  @Override
-  public EvaluationResult evaluate(InputDataExtractor dataSource,
-      Map<String, EvaluationResult> contextValues, EvaluationResult baseValue) {
-    Preconditions.checkArgument(dataSource != null, "dataSource cannot be null");
-    Preconditions.checkArgument(contextValues != null, "contextValues cannot be null");
-    Preconditions.checkArgument(baseValue != null, "baseValue cannot be null");
-    EvaluationResult result;
-    try {
-      setLoggingContext();
-
-      LOGGER.debug("Started Evaluating with baseValue {} expression {} ", baseValue, this);
-
-
-      Map<String, EvaluationResult> localContextValues =
-          new HashMap<>(contextValues);
-
-      if (!baseValue.isEmpty()) {
-        localContextValues.put(baseValue.getIdentifier(), baseValue);
-        localContextValues.put(Constants.BASE_VALUE_NAME, baseValue);
-      }
-
-
-      result = evaluateValueOfExpression(dataSource, localContextValues, baseValue);
-
-
-      LOGGER.debug("Completed Evaluating returned value  {} ----  for  expression {} ", result, this);
-
-      if (this.conditionSatisfiedState && this.isRequired()
-          && (result == null || result.isEmpty())) {
-
-        String stringRep = this.toString();
-        throw new RequiredConstraintFailureException(
-            "Resource Constraint condition not satisfied for expression   :" + stringRep);
-
-      } else {
-        return result;
-      }
-    } catch (DataExtractionException | IllegalArgumentException e) {
-      LOGGER.warn("Failure encountered during evaluation of expression {}", 
-          this.attr.getName());
-      return null;
-    } finally {
-      resetLoggingContext();
+    public AbstractExpression(ExpressionAttributes attr) {
+        this.attr = attr;
     }
-  }
 
+    @Override
+    public String getType() {
+        return this.attr.getType();
+    }
 
+    public ExpressionAttributes getExpressionAttr() {
+        return this.attr;
+    }
 
-  private void setLoggingContext() {
-    originalContext = MDC.get(RESOURCE);
-    MDC.put(RESOURCE, originalContext + "-> Field:" + this.getExpressionAttr().getName());
-  }
+    @Override
+    public boolean isEvaluateLater() {
+        return this.attr.isEvaluateLater();
 
-  private void resetLoggingContext() {
-    MDC.put(RESOURCE, originalContext);
-  }
+    }
 
+    @Override
+    public EvaluationResult getDefaultValue() {
+        return EvaluationResultFactory.getEvaluationResult(this.attr.getDefaultValue());
+    }
 
-  private EvaluationResult evaluateValueOfExpression(InputDataExtractor dataSource,
-      Map<String, EvaluationResult> localContextValues, EvaluationResult baseinputValue) {
+    public boolean isRequired() {
+        return this.attr.isRequired();
+    }
+
+    @Override
+    public List<Specification> getspecs() {
+        return this.attr.getSpecs();
+    }
+
+    @Override
+    public List<Variable> getVariables() {
+        return this.attr.getVariables();
+    }
+
     /**
-     * Steps:
-     * <ul>
-     * <li>Add all constants to the context map</li>
-     * <li>Evaluate the specs</li>
-     * <li>Evaluate the variables</li>
-     * <li>Apply the condition</li>
-     * <li>If condition is satisfies then evaluate the valueOf/value attribute.</li>
-     * </ul>
-     * Note: If generateMultiple is set that all the spec values are used for generating list value
-     * from the expression.
+     * Evaluates the expression and generated single or multiple resources based on the expression
+     * values. If expression (reference and resource) ends with * then for that expression the Generic
+     * result includes list of values.
      * 
+     * @see io.github.linuxforhealth.api.Expression#evaluate(io.github.linuxforhealth.api.InputDataExtractor,
+     *      java.util.Map, EvaluationResult)
      */
+    @Override
+    public EvaluationResult evaluate(InputDataExtractor dataSource,
+            Map<String, EvaluationResult> contextValues, EvaluationResult baseValue) {
+        Preconditions.checkArgument(dataSource != null, "dataSource cannot be null");
+        Preconditions.checkArgument(contextValues != null, "contextValues cannot be null");
+        Preconditions.checkArgument(baseValue != null, "baseValue cannot be null");
+        EvaluationResult result;
+        try {
+            setLoggingContext();
 
-    // Add constants to the context map
-    this.attr.getConstants().entrySet().forEach(e -> localContextValues.put(e.getKey(),
-        EvaluationResultFactory.getEvaluationResult(e.getValue())));
+            LOGGER.debug("Started Evaluating with baseValue {} expression {} ", baseValue, this);
 
-    List<Object> result = new ArrayList<>();
-    List<ResourceValue> additionalresourcesresult = new ArrayList<>();
-    List<Object> baseSpecvalues =  
-        getSpecValues(dataSource, localContextValues, baseinputValue, this.getspecs());
-    LOGGER.debug("Base values evaluated {} -----  values {} ", this, baseSpecvalues);
+            Map<String, EvaluationResult> localContextValues = new HashMap<>(contextValues);
 
+            if (!baseValue.isEmpty()) {
+                localContextValues.put(baseValue.getIdentifier(), baseValue);
+                localContextValues.put(Constants.BASE_VALUE_NAME, baseValue);
+            }
 
-    if (!baseSpecvalues.isEmpty()) {
-      for (Object o : baseSpecvalues) {
-        Map<String, EvaluationResult> localContextValuesSpec = new HashMap<>(localContextValues);
-        localContextValuesSpec.put(Constants.BASE_VALUE_NAME,
-            EvaluationResultFactory.getEvaluationResult(o));
+            result = evaluateValueOfExpression(dataSource, localContextValues, baseValue);
 
-        EvaluationResult gen = generateValue(dataSource, localContextValuesSpec,
-            EvaluationResultFactory.getEvaluationResult(o));
+            LOGGER.debug("Completed Evaluating returned value  {} ----  for  expression {} ", result, this);
 
-        if (gen != null && gen.getValue() != null && !gen.isEmpty()) {
-          if (gen.getValue() instanceof List) {
-            result.addAll(gen.getValue());
-          } else {
-            result.add(gen.getValue());
-          }
-          additionalresourcesresult.addAll(gen.getAdditionalResources());
+            if (this.conditionSatisfiedState && this.isRequired()
+                    && (result == null || result.isEmpty())) {
+
+                String stringRep = this.toString();
+                throw new RequiredConstraintFailureException(
+                        "Resource Constraint condition not satisfied for expression   :" + stringRep);
+
+            } else {
+                return result;
+            }
+        } catch (DataExtractionException | IllegalArgumentException e) {
+            LOGGER.warn("Failure encountered during evaluation of expression {}",
+                    this.attr.getName());
+            return null;
+        } finally {
+            resetLoggingContext();
         }
+    }
 
-        if (!this.attr.isGenerateMultiple() && !result.isEmpty()) {
-          break;
-        }
+    private void setLoggingContext() {
+        originalContext = MDC.get(RESOURCE);
+        MDC.put(RESOURCE, originalContext + "-> Field:" + this.getExpressionAttr().getName());
+    }
 
-      }
-    } else {
-      EvaluationResult gen = generateValue(dataSource, localContextValues, baseinputValue);
-      if (gen != null && gen.getValue() != null && !gen.isEmpty()) {
-        if (gen.getValue() instanceof List) {
-          result.addAll(gen.getValue());
+    private void resetLoggingContext() {
+        MDC.put(RESOURCE, originalContext);
+    }
+
+    private EvaluationResult evaluateValueOfExpression(InputDataExtractor dataSource,
+            Map<String, EvaluationResult> localContextValues, EvaluationResult baseinputValue) {
+        /**
+         * Steps:
+         * <ul>
+         * <li>Add all constants to the context map</li>
+         * <li>Evaluate the specs</li>
+         * <li>Evaluate the variables</li>
+         * <li>Apply the condition</li>
+         * <li>If condition is satisfies then evaluate the valueOf/value attribute.</li>
+         * </ul>
+         * Note: If generateMultiple is set that all the spec values are used for generating list value
+         * from the expression.
+         * 
+         */
+
+        // Add constants to the context map
+        this.attr.getConstants().entrySet().forEach(e -> localContextValues.put(e.getKey(),
+                EvaluationResultFactory.getEvaluationResult(e.getValue())));
+
+        List<Object> result = new ArrayList<>();
+        List<ResourceValue> additionalresourcesresult = new ArrayList<>();
+        List<Object> baseSpecvalues = getSpecValues(dataSource, localContextValues, baseinputValue, this.getspecs());
+        LOGGER.debug("Base values evaluated {} -----  values {} ", this, baseSpecvalues);
+
+        if (!baseSpecvalues.isEmpty()) {
+            for (Object o : baseSpecvalues) {
+                Map<String, EvaluationResult> localContextValuesSpec = new HashMap<>(localContextValues);
+                localContextValuesSpec.put(Constants.BASE_VALUE_NAME,
+                        EvaluationResultFactory.getEvaluationResult(o));
+
+                EvaluationResult gen = generateValue(dataSource, localContextValuesSpec,
+                        EvaluationResultFactory.getEvaluationResult(o));
+
+                if (gen != null && gen.getValue() != null && !gen.isEmpty()) {
+                    if (gen.getValue() instanceof List) {
+                        result.addAll(gen.getValue());
+                    } else {
+                        result.add(gen.getValue());
+                    }
+                    additionalresourcesresult.addAll(gen.getAdditionalResources());
+                }
+
+                if (!this.attr.isGenerateMultiple() && !result.isEmpty()) {
+                    break;
+                }
+
+            }
         } else {
-          result.add(gen.getValue());
+            EvaluationResult gen = generateValue(dataSource, localContextValues, baseinputValue);
+            if (gen != null && gen.getValue() != null && !gen.isEmpty()) {
+                if (gen.getValue() instanceof List) {
+                    result.addAll(gen.getValue());
+                } else {
+                    result.add(gen.getValue());
+                }
+                additionalresourcesresult.addAll(gen.getAdditionalResources());
+
+            }
+
         }
-        additionalresourcesresult.addAll(gen.getAdditionalResources());
 
-      }
-
-    }
-
-
-    return getResult(result, additionalresourcesresult);
-
-
-  }
-
-  private EvaluationResult getResult(List<Object> result,
-      List<ResourceValue> additionalresourcesresult) {
-    if (!result.isEmpty() && !this.attr.isGenerateMultiple()) {
-      return EvaluationResultFactory.getEvaluationResult(result.get(0), additionalresourcesresult);
-    } else if (!result.isEmpty()) {
-      return EvaluationResultFactory.getEvaluationResult(result, additionalresourcesresult);
-    } else if (!this.getDefaultValue().isEmpty()) {
-      return this.getDefaultValue();
-    } else {
-      return null;
-    }
-
-  }
-
-
-  protected static List<Object> getSpecValues(InputDataExtractor dataSource,
-      Map<String, EvaluationResult> contextValues, EvaluationResult baseinputValue,
-      List<Specification> specs) {
-    List<Object> baseHl7Specvalues = new ArrayList<>();
-    EvaluationResult specValues;
-    if (specs == null || specs.isEmpty()) {
-      specValues = baseinputValue;
-    } else { 
-      specValues = SpecificationUtil.extractMultipleValuesForSpec(specs, dataSource,
-          ImmutableMap.copyOf(contextValues));
-    }
-
-
-    if (specValues != null && specValues.getValue() instanceof List) {
-      baseHl7Specvalues.addAll((List<Object>) specValues.getValue());
-    } else if (specValues != null) {
-      baseHl7Specvalues.add(specValues.getValue());
-    }
-
-    return baseHl7Specvalues;
-  }
-
-
-
-  private EvaluationResult generateValue(InputDataExtractor dataSource,
-      Map<String, EvaluationResult> contextValues, EvaluationResult baseValue) {
-
-    // resolve variables
-    Map<String, EvaluationResult> localContextValues = new HashMap<>(contextValues);
-    if (baseValue != null && baseValue.getValue() != null) {
-      localContextValues.put(DataTypeUtil.getDataType(baseValue.getValue()), baseValue);
-    }
-    localContextValues.putAll(
-        resolveVariables(this.getVariables(), ImmutableMap.copyOf(localContextValues), dataSource));
-
-    if (this.isConditionSatisfied(localContextValues)) {
-      conditionSatisfiedState = true;
-      return evaluateExpression(dataSource, ImmutableMap.copyOf(localContextValues), baseValue);
+        return getResult(result, additionalresourcesresult);
 
     }
-    return null;
-  }
 
-
-
-  private static Map<String, EvaluationResult> resolveVariables(List<Variable> variables,
-      Map<String, EvaluationResult> contextValues, InputDataExtractor dataSource) {
-
-    Map<String, EvaluationResult> localVariables = new HashMap<>();
-
-    for (Variable var : variables) {
-      try {
-        EvaluationResult value =
-            var.extractVariableValue(ImmutableMap.copyOf(contextValues), dataSource);
-        if (value != null) {
-
-          localVariables.put(VariableUtils.getVarName(var.getVariableName()),
-              EvaluationResultFactory.getEvaluationResult(value.getValue()));
+    private EvaluationResult getResult(List<Object> result,
+            List<ResourceValue> additionalresourcesresult) {
+        if (!result.isEmpty() && !this.attr.isGenerateMultiple()) {
+            return EvaluationResultFactory.getEvaluationResult(result.get(0), additionalresourcesresult);
+        } else if (!result.isEmpty()) {
+            return EvaluationResultFactory.getEvaluationResult(result, additionalresourcesresult);
+        } else if (!this.getDefaultValue().isEmpty()) {
+            return this.getDefaultValue();
         } else {
-          // enclose null in GenericParsingResult
-          localVariables.put(VariableUtils.getVarName(var.getVariableName()),
-              new EmptyEvaluationResult());
+            return null;
         }
-      } catch (DataExtractionException e) {
-        LOGGER.error("Cannot extract value for variable {} ", var.getVariableName());
-        LOGGER.debug("Cannot extract value for variable {} ", var.getVariableName(), e);
-      }
+
     }
-    return localVariables;
-  }
 
+    protected static List<Object> getSpecValues(InputDataExtractor dataSource,
+            Map<String, EvaluationResult> contextValues, EvaluationResult baseinputValue,
+            List<Specification> specs) {
+        List<Object> baseHl7Specvalues = new ArrayList<>();
+        EvaluationResult specValues;
+        if (specs == null || specs.isEmpty()) {
+            specValues = baseinputValue;
+        } else {
+            specValues = SpecificationUtil.extractMultipleValuesForSpec(specs, dataSource,
+                    ImmutableMap.copyOf(contextValues));
+        }
 
-  protected abstract EvaluationResult evaluateExpression(InputDataExtractor dataSource,
-      Map<String, EvaluationResult> resolvedVariables, EvaluationResult baseValue);
+        if (specValues != null && specValues.getValue() instanceof List) {
+            baseHl7Specvalues.addAll((List<Object>) specValues.getValue());
+        } else if (specValues != null) {
+            baseHl7Specvalues.add(specValues.getValue());
+        }
 
-
-
-  @Override
-  public boolean isConditionSatisfied(Map<String, EvaluationResult> contextValues) {
-    if (this.attr.getFilter() != null) {
-      return this.attr.getFilter().test(contextValues);
-    } else {
-      return true;
+        return baseHl7Specvalues;
     }
-  }
 
+    private EvaluationResult generateValue(InputDataExtractor dataSource,
+            Map<String, EvaluationResult> contextValues, EvaluationResult baseValue) {
 
-  @Override
-  public Map<String, String> getConstants() {
-    return this.attr.getConstants();
-  }
+        // resolve variables
+        Map<String, EvaluationResult> localContextValues = new HashMap<>(contextValues);
+        if (baseValue != null && baseValue.getValue() != null) {
+            localContextValues.put(DataTypeUtil.getDataType(baseValue.getValue()), baseValue);
+        }
+        localContextValues.putAll(
+                resolveVariables(this.getVariables(), ImmutableMap.copyOf(localContextValues), dataSource));
 
+        if (this.isConditionSatisfied(localContextValues)) {
+            conditionSatisfiedState = true;
+            return evaluateExpression(dataSource, ImmutableMap.copyOf(localContextValues), baseValue);
 
-
-  protected static String getGroupId(Map<String, EvaluationResult> localContext) {
-    EvaluationResult result = localContext.get(Constants.GROUP_ID);
-    if (result != null) {
-      return (String) result.getValue();
+        }
+        return null;
     }
-    return null;
-  }
 
-  @Override
-  public String toString() {
-    ToStringBuilder.setDefaultStyle(ToStringStyle.SIMPLE_STYLE);
-    return new ToStringBuilder(this).append("Expression Attributes", this.attr).build();
-  }
+    private static Map<String, EvaluationResult> resolveVariables(List<Variable> variables,
+            Map<String, EvaluationResult> contextValues, InputDataExtractor dataSource) {
+
+        Map<String, EvaluationResult> localVariables = new HashMap<>();
+
+        for (Variable var : variables) {
+            try {
+                EvaluationResult value = var.extractVariableValue(ImmutableMap.copyOf(contextValues), dataSource);
+                if (value != null) {
+
+                    localVariables.put(VariableUtils.getVarName(var.getVariableName()),
+                            EvaluationResultFactory.getEvaluationResult(value.getValue()));
+                } else {
+                    // enclose null in GenericParsingResult
+                    localVariables.put(VariableUtils.getVarName(var.getVariableName()),
+                            new EmptyEvaluationResult());
+                }
+            } catch (DataExtractionException e) {
+                LOGGER.error("Cannot extract value for variable {} ", var.getVariableName());
+                LOGGER.debug("Cannot extract value for variable {} ", var.getVariableName(), e);
+            }
+        }
+        return localVariables;
+    }
+
+    protected abstract EvaluationResult evaluateExpression(InputDataExtractor dataSource,
+            Map<String, EvaluationResult> resolvedVariables, EvaluationResult baseValue);
+
+    @Override
+    public boolean isConditionSatisfied(Map<String, EvaluationResult> contextValues) {
+        if (this.attr.getFilter() != null) {
+            return this.attr.getFilter().test(contextValues);
+        } else {
+            return true;
+        }
+    }
+
+    @Override
+    public Map<String, String> getConstants() {
+        return this.attr.getConstants();
+    }
+
+    protected static String getGroupId(Map<String, EvaluationResult> localContext) {
+        EvaluationResult result = localContext.get(Constants.GROUP_ID);
+        if (result != null) {
+            return (String) result.getValue();
+        }
+        return null;
+    }
+
+    @Override
+    public String toString() {
+        ToStringBuilder.setDefaultStyle(ToStringStyle.SIMPLE_STYLE);
+        return new ToStringBuilder(this).append("Expression Attributes", this.attr).build();
+    }
 
 }

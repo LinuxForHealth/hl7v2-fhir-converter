@@ -43,7 +43,7 @@ public class ResourceUtils {
     public static FHIRContext context = new FHIRContext();
     private static final Logger LOGGER = LoggerFactory.getLogger(ResourceUtils.class);
     private static final ConverterOptions STANDARD_OPTIONS =
-        new Builder().withPrettyPrint().build();
+        new Builder().withValidateResource().withPrettyPrint().build();
 
     public static List<BundleEntryComponent> createFHIRBundleFromHL7MessageReturnEntryList(String inputSegment) {
         return createFHIRBundleFromHL7MessageReturnEntryList(inputSegment, STANDARD_OPTIONS);
@@ -53,7 +53,7 @@ public class ResourceUtils {
         HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
         String json = ftv.convert(inputSegment, options);
         assertThat(json).isNotBlank();
-        LOGGER.info("FHIR json result:\n" + json);
+        LOGGER.debug("FHIR json result:\n" + json);
         FHIRContext context = new FHIRContext();
         IBaseResource bundleResource = context.getParser().parseResource(json);
         assertThat(bundleResource).isNotNull();

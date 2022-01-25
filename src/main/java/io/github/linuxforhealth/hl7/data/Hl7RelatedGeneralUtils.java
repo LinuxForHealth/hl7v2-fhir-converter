@@ -64,34 +64,30 @@ public class Hl7RelatedGeneralUtils {
 
     // Uses JsonPath to extract the value from an object.
     public static Object extractAttribute(Object resource, String path, String klass) {
-      if (resource == null) {
-        return null;
-      }
-      Object data = resource;
-      if (resource instanceof ResourceValue) {
-        ResourceValue rv = (ResourceValue) resource;
-        data = rv.getResource();
-      }
-      try {
-        String json = ObjectMapperUtil.getJSONInstance().writeValueAsString(data);
-        
-        List<?> val = JsonPath.parse(json).read(path, List.class);
-        ValueExtractor<Object, ?> resolver = SimpleDataTypeMapper.getValueResolver(klass);
-        LOGGER.debug("extracted value after json evaluation: {}", val);
-        return resolver.apply(val);
+        if (resource == null) {
+            return null;
+        }
+        Object data = resource;
+        if (resource instanceof ResourceValue) {
+            ResourceValue rv = (ResourceValue) resource;
+            data = rv.getResource();
+        }
+        try {
+            String json = ObjectMapperUtil.getJSONInstance().writeValueAsString(data);
 
-      
-      } catch (RuntimeException | JsonProcessingException e) {
-        LOGGER.warn(
-            "Exception encountered when trying to convert object to json for extracting values, reason: {}",
-            e.getMessage());
-        return null;
-      }
-     
-     
+            List<?> val = JsonPath.parse(json).read(path, List.class);
+            ValueExtractor<Object, ?> resolver = SimpleDataTypeMapper.getValueResolver(klass);
+            LOGGER.debug("extracted value after json evaluation: {}", val);
+            return resolver.apply(val);
+
+        } catch (RuntimeException | JsonProcessingException e) {
+            LOGGER.warn(
+                    "Exception encountered when trying to convert object to json for extracting values, reason: {}",
+                    e.getMessage());
+            return null;
+        }
+
     }
-
-
 
     // ExtractLow - see comments above
     public static String extractLow(Object input) {

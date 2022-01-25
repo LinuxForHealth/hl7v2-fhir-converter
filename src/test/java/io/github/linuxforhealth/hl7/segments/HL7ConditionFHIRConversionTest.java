@@ -275,13 +275,13 @@ class HL7ConditionFHIRConversionTest {
 
         // Verify there is encounter.diagnosis for every diagnosis. Therefore there should be 8.
         assertThat(encounter.getDiagnosis()).hasSize(8);
-        List<String> rferencedconditions = encounter.getDiagnosis().stream()
+        List<String> referencedConditions = encounter.getDiagnosis().stream()
             .map(i -> i.getCondition().getReference()).collect(Collectors.toList());
 
-        List<String> condidentifiers = conditionResource.stream().map(r -> (Condition) r)
+        List<String> condIdentifiers = conditionResource.stream().map(r -> (Condition) r)
             .map(c -> c.getId()).collect(Collectors.toList());
 
-        assertThat(rferencedconditions).containsExactlyInAnyOrderElementsOf(condidentifiers);
+        assertThat(referencedConditions).containsExactlyInAnyOrderElementsOf(condIdentifiers);
         // Verify each diagnosis is set correctly.
         for (int i = 0; i < 8; i++) {
             // Diagnosis requires a reference to condition.

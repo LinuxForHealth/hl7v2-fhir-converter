@@ -132,6 +132,10 @@ diagnosis:
    vars:
       refDG13: BUILD_IDENTIFIER_FROM_CWE, DG1.3
    expressionsMap:
+     #SPECS: Gets entire list of condition resources
+     #REFCONDITIONID: returns a reference ID, in this case we are return for the value of the identifier that uses "urn:id:extID"
+     #BASEVALUE: in this case base Value will be a condition resource from the specs list of conditions
+     #REFDG13: The identifier value we compare against to make sure the conditions are in the proper order
      condition:
         valueOf: datatype/Reference
         expressionType: resource

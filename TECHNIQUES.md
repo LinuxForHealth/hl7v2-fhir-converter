@@ -184,5 +184,37 @@ encounter:
   expressionType: resource
   specs: $encounterRef
 ```
+#### Referencing resource values that are created multiple times
+In [Encounter.diagnosis](./src/main/resources/hl7/resource/Encounter.yml) we reference condition which can be created multiple times. In order to account for this we added a function in general utils that can extract each condition that is created, creates an id, and compares that ID in the yaml to make sure the conditions have the proper IDs
 
-
+```yaml
+diagnosis:
+   expressionType: nested
+   evaluateLater: true
+   generateList: true
+   specs: DG1
+   vars:
+      refDG13: BUILD_IDENTIFIER_FROM_CWE, DG1.3
+   expressionsMap:
+     #SPECS: Gets entire list of condition resources
+     #REFCONDITIONID: returns a reference ID, in this case we are return for the value of the identifier that uses "urn:id:extID"
+     #BASEVALUE: in this case base Value will be a condition resource from the specs list of conditions
+     #REFDG13: The identifier value we compare against to make sure the conditions are in the proper order
+     condition:
+        valueOf: datatype/Reference
+        expressionType: resource
+        condition: $refconditionId EQUALS_STRING $refDG13
+        specs: $Condition
+        vars:
+          refconditionId: $BASE_VALUE, GeneralUtils.extractAttribute(refconditionId,"$.identifier[?(@.system==\"urn:id:extID\")].value","String")
+     use:
+        valueOf: datatype/CodeableConcept
+        expressionType: resource
+        specs: DG1.6
+     rank:
+        type: STRING
+        valueOf: DG1.15
+        expressionType: HL7Spec
+```
+`$.identifier[?(@.system==\"urn:id:extID\")].value` allows us to parse through the resource in json format, and we can search for specific values
+in this case we wanted to look at the list of identifiers and get the value of the one that has `urn:id:extID` as the System.
