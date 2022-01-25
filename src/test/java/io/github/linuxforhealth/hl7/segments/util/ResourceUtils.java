@@ -6,11 +6,9 @@
 package io.github.linuxforhealth.hl7.segments.util;
 
 import static org.assertj.core.api.Assertions.assertThat;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r4.model.AllergyIntolerance;
 import org.hl7.fhir.r4.model.Base;
@@ -35,7 +33,6 @@ import org.hl7.fhir.r4.model.ResourceType;
 import org.hl7.fhir.r4.model.ServiceRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import io.github.linuxforhealth.fhir.FHIRContext;
 import io.github.linuxforhealth.hl7.ConverterOptions;
 import io.github.linuxforhealth.hl7.ConverterOptions.Builder;
@@ -45,7 +42,8 @@ public class ResourceUtils {
 
     public static FHIRContext context = new FHIRContext();
     private static final Logger LOGGER = LoggerFactory.getLogger(ResourceUtils.class);
-    private static final ConverterOptions STANDARD_OPTIONS = new Builder().withValidateResource().withPrettyPrint().build(); 
+    private static final ConverterOptions STANDARD_OPTIONS =
+        new Builder().withPrettyPrint().build();
 
     public static List<BundleEntryComponent> createFHIRBundleFromHL7MessageReturnEntryList(String inputSegment) {
         return createFHIRBundleFromHL7MessageReturnEntryList(inputSegment, STANDARD_OPTIONS);
@@ -55,7 +53,7 @@ public class ResourceUtils {
         HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
         String json = ftv.convert(inputSegment, options);
         assertThat(json).isNotBlank();
-        LOGGER.debug("FHIR json result:\n" + json);
+        LOGGER.info("FHIR json result:\n" + json);
         FHIRContext context = new FHIRContext();
         IBaseResource bundleResource = context.getParser().parseResource(json);
         assertThat(bundleResource).isNotNull();
