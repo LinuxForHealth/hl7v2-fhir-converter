@@ -5,81 +5,99 @@
 #
 resourceType: Organization
 id:
-   type: STRING
-   valueOf: UUID.randomUUID()
-   expressionType: JEXL
-# Used by most organizations   
+  type: STRING
+  valueOf: UUID.randomUUID()
+  expressionType: JEXL
+
+# Used by most organizations
 identifier_1:
-   condition: $orgIdValue NULL
-   valueOf: datatype/Identifier_Gen
-   generateList: true  
-   expressionType: resource
-   vars:
-      id: CWE.1 | XON.10 | XON.3
-      system: CWE.3 
+  condition: $orgIdValue NULL
+  valueOf: datatype/Identifier_Gen
+  generateList: true
+  expressionType: resource
+  vars:
+    id: CWE.1 | XON.10 | XON.3
+    system: CWE.3
+
 # Used by IN1/Coverage (Insurance) organizations, which have a more complex identifier
-# This handles case when no $TENANT value is available        
+# This handles case when no $TENANT value is available
 identifier_2a:
-   condition: $orgIdValue NOT_NULL && $TENANT NULL
-   valueOf: datatype/Identifier_var
-   generateList: true  
-   expressionType: resource
-   vars:
-      valueIn: $orgIdValue
-      systemCX: $orgIdSystem
-      start: $orgIdStart
-      end: $orgIdEnd
-      code: $orgIdTypeCode
+  condition: $orgIdValue NOT_NULL && $TENANT NULL
+  valueOf: datatype/Identifier_var
+  generateList: true
+  expressionType: resource
+  vars:
+    valueIn: $orgIdValue
+    systemCX: $orgIdSystem
+    start: $orgIdStart
+    end: $orgIdEnd
+    code: $orgIdTypeCode
+
 # Used by IN1/Coverage (Insurance) organizations, which have a more complex identifier
-# This handles case when $TENANT is passed at run time          
+# This handles case when $TENANT is passed at run time
 identifier_2b:
-   condition: $orgIdValue NOT_NULL && $TENANT NOT_NULL
-   valueOf: datatype/Identifier_var
-   generateList: true  
-   expressionType: resource
-   vars:
-      valueIn: $TENANT + $period + $orgIdValue
-      systemCX: $orgIdSystem
-      start: $orgIdStart
-      end: $orgIdEnd
-      code: $orgIdTypeCode  
-   constants:
-      period: '.'                 
+  condition: $orgIdValue NOT_NULL && $TENANT NOT_NULL
+  valueOf: datatype/Identifier_var
+  generateList: true
+  expressionType: resource
+  vars:
+    valueIn: $TENANT + $period + $orgIdValue
+    systemCX: $orgIdSystem
+    start: $orgIdStart
+    end: $orgIdEnd
+    code: $orgIdTypeCode
+  constants:
+    period: "." # period is constant used between concatention in $valueIn
+
+identifier_3:
+  valueOf: datatype/Identifier_var
+  generateList: true
+  expressionType: resource
+  vars:
+    valueIn: $orgCompanyPlanCode   # IN1.35 passed in from Coverage
+    # No CXsystem
+    # No code
+
 name_v1:
-   type: STRING
-   condition: $idValue NULL
-   valueOf: CWE.2 | XON.1 | $orgName
-   required: true
-   expressionType: HL7Spec
-   vars:
-      idValue: CWE.1 | XON.10 | XON.3 
+  type: STRING
+  condition: $idValue NULL
+  valueOf: CWE.2 | XON.1 | $orgName
+  # NOTE FHIR does not require Organization.name, but we do
+  # for an unkown reason. This is documented in Issue #422
+  # When this is fixed, remove payor_2: orgName: String, IN2.25.1
+  required: true
+  expressionType: HL7Spec
+  vars:
+    idValue: CWE.1 | XON.10 | XON.3
+
 name_v2:
-   type: STRING
-   condition: $idValue NOT_NULL
-   valueOf: CWE.2 | XON.1
-   expressionType: HL7Spec
-   vars:
-      idValue: CWE.1 | XON.10 | XON.3
+  type: STRING
+  condition: $idValue NOT_NULL
+  valueOf: CWE.2 | XON.1
+  expressionType: HL7Spec
+  vars:
+    idValue: CWE.1 | XON.10 | XON.3
+
 alias:
-   type: STRING
-   valueOf: CWE.5
-   expressionType: HL7Spec
+  type: STRING
+  valueOf: CWE.5
+  expressionType: HL7Spec
 
 address:
-   valueOf: datatype/Address
-   generateList: true
-   expressionType: resource
-   specs: $orgAddressXAD  
+  valueOf: datatype/Address
+  generateList: true
+  expressionType: resource
+  specs: $orgAddressXAD
 
-contact: 
-   valueOf: secondary/Contact
-   generateList: true
-   expressionType: resource
-   specs: $orgContactXCN
-   vars:
-      # May be provided to create a purpose in the Contact element
-      code: $orgContactPurposeCode
-      system_code: $orgContactPurposeSystemCode
-      display: $orgContactPurposeDisplay
-      text: $orgContactPurposeText
-      contactPointXTN: $orgContactPointXTN
+contact:
+  valueOf: secondary/Contact
+  generateList: true
+  expressionType: resource
+  specs: $orgContactXCN
+  vars:
+    # May be provided to create a purpose in the Contact element
+    code: $orgContactPurposeCode
+    system_code: $orgContactPurposeSystemCode
+    display: $orgContactPurposeDisplay
+    text: $orgContactPurposeText
+    contactPointXTN: $orgContactPointXTN

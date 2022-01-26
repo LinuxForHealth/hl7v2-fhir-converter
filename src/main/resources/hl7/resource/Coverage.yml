@@ -12,7 +12,7 @@
 resourceType: Coverage
 id:
   type: STRING
-  valueOf: 'UUID.randomUUID()'
+  valueOf: "UUID.randomUUID()"
   expressionType: JEXL
 
 identifier_1:
@@ -39,7 +39,7 @@ identifier_2:
   constants:
     system: "http://terminology.hl7.org/CodeSystem/v2-0203"
     code: "XV"
-    display: "Health Plan Identifier" 
+    display: "Health Plan Identifier"
 
 identifier_3:
   condition: $valueIn NOT_NULL
@@ -52,8 +52,8 @@ identifier_3:
   constants:
     system: "http://terminology.hl7.org/CodeSystem/v2-0203"
     code: "XV"
-    display: "Health Plan Identifier" 
-    use: "old"    
+    display: "Health Plan Identifier"
+    use: "old"
 
 identifier_4:
   condition: $valueIn NOT_NULL
@@ -66,7 +66,7 @@ identifier_4:
   constants:
     system: "http://terminology.hl7.org/CodeSystem/v2-0203"
     code: "MB"
-    display: "Member Number"      
+    display: "Member Number"
 
 identifier_5:
   condition: $valueIn NOT_NULL
@@ -74,12 +74,12 @@ identifier_5:
   generateList: true
   expressionType: resource
   vars:
-    valueIn: IN2.8 
+    valueIn: IN2.8
     # No systemCX set for this identifier
   constants:
     system: "http://terminology.hl7.org/CodeSystem/v2-0203"
     code: "MA"
-    display: "Patient Medicaid number"       
+    display: "Patient Medicaid number"
 
 identifier_6:
   condition: $valueIn NOT_NULL
@@ -92,7 +92,7 @@ identifier_6:
   constants:
     system: "http://terminology.hl7.org/CodeSystem/v2-0203"
     code: "MC"
-    display: "Patient's Medicare number"      
+    display: "Patient's Medicare number"
 
 identifier_7:
   condition: $valueIn NOT_NULL
@@ -105,97 +105,121 @@ identifier_7:
   constants:
     system: "http://terminology.hl7.org/CodeSystem/v2-0203"
     code: "SN"
-    display: "Subscriber Number"                
+    display: "Subscriber Number"
 
-
-# Status is required, but it comes from a non-table 2 char ST 
+# Status is required, but it comes from a non-table 2 char ST
 # It MUST be one of: active | cancelled | draft | entered-in-error
 # For now, until we get a good mapping, assume all records are active
 status:
-   type: STRING
-   default: active
-   valueOf: $active
-   #   valueOf: IN1.45 value will come from IN1.45, but we don't yet have a mapping.
-   expressionType: HL7Spec
-   constants:
-     active: 'active'
+  type: STRING
+  default: active
+  valueOf: $active
+  #   valueOf: IN1.45 value will come from IN1.45, but we don't yet have a mapping.
+  expressionType: HL7Spec
+  constants:
+    active: "active"
 
-payor:
-   valueOf: resource/Organization
-   expressionType: reference
-   vars: 
-       orgName: String, IN1.4.1
-       orgIdValue: String, IN1.3.1
-       orgIdSystem: String, IN1.3.4
-       orgIdTypeCode: String, IN1.3.5
-       orgIdStart: IN1.3.7
-       orgIdEnd: IN1.3.8
-       orgAddressXAD: IN1.5
-       orgContactXCN: IN1.6
-       orgContactPointXTN: IN1.7
+payor_1:
+  valueOf: resource/Organization
+  expressionType: reference
+  generateList: true
+  vars:
+    orgName: String, IN1.4.1
+    orgIdValue: String, IN1.3.1
+    orgIdSystem: String, IN1.3.4
+    orgIdTypeCode: String, IN1.3.5
+    orgIdStart: IN1.3.7
+    orgIdEnd: IN1.3.8
+    orgAddressXAD: IN1.5
+    orgContactXCN: IN1.6
+    orgContactPointXTN: IN1.7
+    orgCompanyPlanCode: IN1.35
+
+payor_2:
+  valueOf: resource/Organization
+  expressionType: reference
+  generateList: true
+  vars:
+    # NOTE FHIR does not require Organization.name, but we do
+    # for an unknown reason. This is documented in Issue #422
+    orgName: String, IN2.25.1
+    orgIdValue: String, IN2.25.1
+    orgIdSystem: String, IN2.25.4
+    orgIdTypeCode: String, IN2.25.5
+    orgIdStart: IN2.25.7
+    orgIdEnd: IN2.25.8
+
+policyHolder:
+  valueOf: resource/Organization
+  expressionType: reference
+  vars:
+    orgName: String, IN2.69.1
+    orgIdValue: String, IN2.69.10
+    orgIdSystem: String, IN2.69.6
+    orgIdTypeCode: String, IN2.69.7
 
 # If the subscriber is not SEL (self), then create the related person
 subscriber_1:
-   condition: $relatedRelationshipStr NOT_NULL && $relatedRelationshipStr NOT_EQUALS SEL && $relatedRelationshipStr NOT_EQUALS 01
-   valueOf: resource/RelatedPerson
-   expressionType: reference
-   vars: 
-      relatedRelationshipStr: String, IN1.17 | IN2.72  
-      # Related person gets many values from scope, so they do not need to be passed in
-      #  IN1 and sub-fields
-      #  $Patient  
+  condition: $relatedRelationshipStr NOT_NULL && $relatedRelationshipStr NOT_EQUALS SEL && $relatedRelationshipStr NOT_EQUALS 01
+  valueOf: resource/RelatedPerson
+  expressionType: reference
+  vars:
+    relatedRelationshipStr: String, IN1.17 | IN2.72
+    # Related person gets many values from scope, so they do not need to be passed in
+    #  IN1 and sub-fields
+    #  $Patient
 
 # If the subscriber is SEL (self), then reference the patient
 # NOT_NULL check is not needed because we have values here, and NOT_NULL is otherwise caught by logic of subscriber_1
 subscriber_2:
-    condition: $relatedRelationshipStr EQUALS SEL || $relatedRelationshipStr EQUALS 01
-    valueOf: datatype/Reference
-    expressionType: resource
-    specs: $Patient
-    vars: 
-      relatedRelationshipStr: String, IN1.17 | IN2.72    
+  condition: $relatedRelationshipStr EQUALS SEL || $relatedRelationshipStr EQUALS 01
+  valueOf: datatype/Reference
+  expressionType: resource
+  specs: $Patient
+  vars:
+    relatedRelationshipStr: String, IN1.17 | IN2.72
 
-subscriberId:  
-   type: STRING
-   valueOf: IN1.36
-   expressionType: HL7Spec
+subscriberId:
+  type: STRING
+  valueOf: IN1.36
+  expressionType: HL7Spec
 
 # Relationship may be SEL (self)
 relationship:
-   valueOf: datatype/CodeableConcept
-   expressionType: resource
-   generateList: true
-   condition: $coding NOT_NULL
-   vars:
-      coding: SUBSCRIBER_RELATIONSHIP, IN1.17 | IN2.72
-      text: String, IN1.17.2 | IN2.72.2
+  valueOf: datatype/CodeableConcept
+  expressionType: resource
+  generateList: true
+  condition: $coding NOT_NULL
+  vars:
+    coding: SUBSCRIBER_RELATIONSHIP, IN1.17 | IN2.72
+    text: String, IN1.17.2 | IN2.72.2
 
 beneficiary:
-    valueOf: datatype/Reference
-    expressionType: resource
-    specs: $Patient
+  valueOf: datatype/Reference
+  expressionType: resource
+  specs: $Patient
 
 class_1:
-   valueOf: secondary/Class
-   generateList: true
-   expressionType: resource
-   vars: 
-      classValue: String, IN1.8
+  valueOf: secondary/Class
+  generateList: true
+  expressionType: resource
+  vars:
+    classValue: String, IN1.8
 
 class_2:
-   valueOf: secondary/Class
-   generateList: true
-   expressionType: resource
-   specs: IN1.9
+  valueOf: secondary/Class
+  generateList: true
+  expressionType: resource
+  specs: IN1.9
 
 period:
-    valueOf: datatype/Period
-    expressionType: resource
-    vars:
-       start: IN1.12
-       end: IN1.13
+  valueOf: datatype/Period
+  expressionType: resource
+  vars:
+    start: IN1.12
+    end: IN1.13
 
 order:
-   type: INTEGER
-   valueOf: IN1.22 | IN1.1
-   expressionType: HL7Spec
+  type: INTEGER
+  valueOf: IN1.22 | IN1.1
+  expressionType: HL7Spec
