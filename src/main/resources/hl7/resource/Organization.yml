@@ -54,7 +54,7 @@ identifier_3:
   generateList: true
   expressionType: resource
   vars:
-    valueIn: $orgCompanyPlanCode
+    valueIn: $orgCompanyPlanCode   # IN1.35 passed in from Coverage
     # No CXsystem
     # No code
 
