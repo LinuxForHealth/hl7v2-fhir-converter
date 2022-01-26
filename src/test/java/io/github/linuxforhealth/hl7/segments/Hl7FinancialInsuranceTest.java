@@ -96,17 +96,22 @@ class Hl7FinancialInsuranceTest {
                 // IN1.13 to Coverage.period.end
                 // IN1.17 is purposely empty - no Related Person should be created.
                 // IN1.22 to Coverage.order takes priority over IN1.1
-                // IN1.23 through IN1.35 NOT REFERENCED
-                + "|20201231145045|20211231145045|||||||||5|||||||||||||"
-                // IN1.36 to Identifier MB and Identifier SN
+                // IN1.23 through IN1.34 NOT REFERENCED                
+                // IN1.35 to Organization.identifier
+                + "|20201231145045|20211231145045|||||||||5|||||||||||||COMPANYPLANCODE35"
+                // IN1.36 to Identifier 4 - MB
                 // IN1.36 also to subscriberId
                 // IN1.46 to Identifier XV 3
                 // IN1.47 through IN1.53 NOT REFERENCED
-                + "|MEMBER36||||||||||Value46|||||||\n";
-        // IN2.6 is purposely empty so will not create an MC identifier
-        // IN2.8 is purposely empty so will not create an MA identifier
-        // IN2.61 is purposely empty (primary to IN1.36) so IN1.36 will be used as the MB identifier
-        // IN2.72 is purposely empty (backup to IN1.17) so no RelatedPerson is created.
+                + "|MEMBER36||||||||||Value46|||||||\n"
+                // IN2.6 is purposely empty so will not create an MC identifier
+                // IN2.8 is purposely empty so will not create an MA identifier
+                // IN2.25 to new PayorId Organization
+                // IN2.61 is purposely empty (primary to IN1.36) so IN1.36 will be used as the MB identifier
+                + "IN2|||||||||||||||||||||||||IdValue25.1^^^IdSystem25.4^IdType25.5^^20201231145045^20211231145045|||||||||||||||||||||||||||||||||||||||||||"
+                // IN2.69 to new Insured Organization Name and ID
+                // IN2.72 is purposely empty (backup to IN1.17) so no RelatedPerson is created.
+                + "|Name69.1^^^^^IdSystem69.6^XX^^^IdValue69.10||\n";
 
 
         List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
@@ -120,14 +125,16 @@ class Hl7FinancialInsuranceTest {
         String patientId = patient.getId();
 
         List<Resource> organizations = ResourceUtils.getResourceList(e, ResourceType.Organization);
-        assertThat(organizations).hasSize(1); // From Payor created by IN1
+        assertThat(organizations).hasSize(3); // From IN1.3 creates Payor, IN2.25 to new PayorId Organization, IN2.69 creates new Insured Organization Name
         Organization org = (Organization) organizations.get(0);
 
-        // Check organization Id's
+        // Check Payor Organization Id's
         String organizationId = org.getId();
         assertThat(org.getName()).isEqualTo("Large Blue Organization"); // IN1.4
-        assertThat(org.getIdentifier()).hasSize(1);
-        Identifier orgId1 = org.getIdentifierFirstRep();
+        assertThat(org.getIdentifier()).hasSize(2);
+        Identifier orgId0 = org.getIdentifier().get(0);
+        assertThat(orgId0.getValue()).isEqualTo("COMPANYPLANCODE35"); // IN1.35
+        Identifier orgId1 = org.getIdentifier().get(1);
         // Note: in the next assert, no TENANT value set; confirm default (nothing) was used.  See testInsuranceCoverageOfSelfAndTenant for test of setting TENANT.
         assertThat(orgId1.getValue()).isEqualTo("IdValue1"); // IN1.3.1 
         assertThat(orgId1.getSystem()).isEqualTo("urn:id:IdSystem4"); // IN1.3.4
@@ -135,7 +142,7 @@ class Hl7FinancialInsuranceTest {
         assertThat(orgId1.getPeriod().getEndElement().toString()).containsPattern("2021-12-31T14:50:45"); // IN1.3.8
         DatatypeUtils.checkCommonCodeableConceptAssertions(orgId1.getType(), "IdType5", null, null, null); // IN1.3.5
 
-        // Check the Organization address. IN1.4 is a standard XAD address, which is tested exhaustively in other tests.  
+        // Check Payor Organization address. IN1.4 is a standard XAD address, which is tested exhaustively in other tests.  
         assertThat(org.getAddress()).hasSize(1);
         assertThat(org.getAddress().get(0).getLine().get(0).getValueAsString())
                 .isEqualTo("456 Ultramarine Lane"); // IN1.4.1
@@ -143,7 +150,7 @@ class Hl7FinancialInsuranceTest {
         assertThat(org.getAddress().get(0).getState()).isEqualTo("CA"); // IN1.4.4
         assertThat(org.getAddress().get(0).getPostalCode()).isEqualTo("ZIP5"); // IN1.4.5
 
-        // Check Organization contact name.  IN1.6 name is standard XPN, tested exhaustively in other tests.
+        // Check Payor Organization contact name.  IN1.6 name is standard XPN, tested exhaustively in other tests.
         HumanName contactName = org.getContact().get(0).getName();
         assertThat(org.getContact()).hasSize(1);
         assertThat(contactName.getFamily()).isEqualTo("LastFake"); // IN1.6.1
@@ -157,7 +164,7 @@ class Hl7FinancialInsuranceTest {
         assertThat(contactName.getPeriod().getEndElement().toString()).containsPattern("2021-12-31T14:50:45"); // IN1.6.13
         assertThat(org.getContact().get(0).hasPurpose()).isFalse(); // Check there is no purpose. Don't need one, here.
 
-        // Check Organization contact telecom.  IN1.7 is standard XTN, tested exhaustively in other tests.
+        // Check Payor Organization contact telecom.  IN1.7 is standard XTN, tested exhaustively in other tests.
         assertThat(org.getContact().get(0).getTelecom()).hasSize(1);
         ContactPoint contactPoint = org.getContact().get(0).getTelecomFirstRep(); // telecom is type ContactPoint
         assertThat(contactPoint.getSystemElement().getCode()).hasToString("phone"); // default type hardcoded.
@@ -166,6 +173,26 @@ class Hl7FinancialInsuranceTest {
         assertThat(contactPoint.getPeriod().getStartElement().toString()).containsPattern("2020-12-31T14:50:45"); // IN1.7.13
         assertThat(contactPoint.getPeriod().getEndElement().toString()).containsPattern("2021-12-31T14:50:45"); // IN1.7.14
         assertThat(contactPoint.getRank()).isEqualTo(1); // IN1.7.18
+
+        // Check Insured Organization Name and ID Organization from IN2.69
+        org = (Organization) organizations.get(1);
+        assertThat(org.getName()).isEqualTo("Name69.1"); // IN2.69.1
+        assertThat(org.getIdentifier()).hasSize(1);
+        orgId0 = org.getIdentifier().get(0);
+        assertThat(orgId0.getValue()).isEqualTo("IdValue69.10"); // IN2.69.10
+        assertThat(orgId0.getSystem()).isEqualTo("urn:id:IdSystem69.6"); // IN2.69.6
+        DatatypeUtils.checkCommonCodeableConceptAssertions(orgId0.getType(), "XX", null, null, null); // IN2.69.7
+
+        // Check PayorId Organization from IN2.25 
+        org = (Organization) organizations.get(2);
+        assertThat(org.getName()).isEqualTo("IdValue25.1"); // IN2.25.1
+        assertThat(org.getIdentifier()).hasSize(1);
+        orgId0 = org.getIdentifier().get(0);
+        assertThat(orgId0.getValue()).isEqualTo("IdValue25.1"); // IN2.25.1
+        assertThat(orgId0.getSystem()).isEqualTo("urn:id:IdSystem25.4"); // IN2.25.4
+        assertThat(orgId0.getPeriod().getStartElement().toString()).containsPattern("2020-12-31T14:50:45"); // IN2.25.7
+        assertThat(orgId0.getPeriod().getEndElement().toString()).containsPattern("2021-12-31T14:50:45"); // IN2.25.8
+        DatatypeUtils.checkCommonCodeableConceptAssertions(orgId0.getType(), "IdType25.5", null, null, null); // IN2.25.5
 
         List<Resource> coverages = ResourceUtils.getResourceList(e, ResourceType.Coverage);
         assertThat(coverages).hasSize(1); // From IN1 segment
@@ -228,8 +255,8 @@ class Hl7FinancialInsuranceTest {
         assertThat(relatedPersons).isEmpty(); // IN1.17 empty
 
         // Confirm there are no unaccounted for resources
-        // Expected: Coverage, Organization, Patient, Encounter
-        assertThat(e).hasSize(4);
+        // Expected: Coverage, Organization (3x), Patient, Encounter
+        assertThat(e).hasSize(6);
     }
 
     // Checks that a Coverage.Class with the right Value and Name and Type exist in the list
@@ -464,9 +491,11 @@ class Hl7FinancialInsuranceTest {
         assertThat(e).hasSize(5);
     }
 
+    // Suppress warnings about too many assertions in a test.  Justification: creating a FHIR message is very costly; we need to check many asserts per creation for efficiency.  
+    @java.lang.SuppressWarnings("squid:S5961")
     @Test
     // Tests IN1.17 coverage by one's self. A related person should not be created.  But the patient should be referenced.
-    // Tests Organization ID created with a TENANT prepend.
+    // Tests multiple Organization ID's created with a TENANT prepend.
     void testInsuranceCoverageOfSelfAndTenant() throws IOException {
 
         String hl7message = "MSH|^~\\&|||||20151008111200||DFT^P03^DFT_P03|MSGID000001|T|2.6|||||||||\n"
@@ -496,7 +525,16 @@ class Hl7FinancialInsuranceTest {
                 // IN1.36 to Identifier MB and Identifier SN
                 // IN1.46 to Identifier XV 3
                 // IN1.47 through IN1.53 NOT REFERENCED
-                + "|MEMBER36||||||||||Value46|||||||\n";
+                + "|MEMBER36||||||||||Value46|||||||\n"
+                // IN2.6 is purposely empty so will not create an MC identifier
+                // IN2.8 is purposely empty so will not create an MA identifier
+                // IN2.25 to new PayorId Organization
+                // IN2.61 is purposely empty (primary to IN1.36) so IN1.36 will be used as the MB identifier
+                + "IN2|||||||||||||||||||||||||IdValue25.1^^^IdSystem25.4^IdType25.5^^20201231145045^20211231145045|||||||||||||||||||||||||||||||||||||||||||"
+                // IN2.69 to new Insured Organization Name and ID
+                // IN2.72 is purposely empty (backup to IN1.17) so no RelatedPerson is created.
+                + "|Name69.1^^^^^IdSystem69.6^XX^^^IdValue69.10||\n";
+
 
         // TENANT prepend is passed through the options.  
         ConverterOptions customOptionsWithTenant = new Builder().withValidateResource().withPrettyPrint()
@@ -513,17 +551,37 @@ class Hl7FinancialInsuranceTest {
         String patientId = patient.getId();
 
         List<Resource> organizations = ResourceUtils.getResourceList(e, ResourceType.Organization);
-        assertThat(organizations).hasSize(1); // From Payor created by IN1
+        assertThat(organizations).hasSize(3); // From Payor created by IN1, PayorId Organization (IN2.25), and Insured Organization Name (IN2.69)
         Organization org = (Organization) organizations.get(0);
 
         // Check organization Id's
         assertThat(org.getName()).isEqualTo("Large Blue Organization"); // IN1.4
         assertThat(org.getIdentifier()).hasSize(1);
-        Identifier orgId1 = org.getIdentifierFirstRep();
-        assertThat(orgId1.getValue()).isEqualTo("TenantId.IdValue1"); // Options TENANT + IN1.3.1
-        assertThat(orgId1.getSystem()).isEqualTo("urn:id:IdSystem4"); // IN1.3.4
-        assertThat(orgId1.hasPeriod()).isFalse(); // IN1.3.7 & IN1.3.7 empty
-        assertThat(orgId1.hasType()).isFalse(); // IN1.3.5 empty
+        Identifier orgId0 = org.getIdentifierFirstRep();
+        assertThat(orgId0.getValue()).isEqualTo("TenantId.IdValue1"); // Options TENANT + IN1.3.1
+        assertThat(orgId0.getSystem()).isEqualTo("urn:id:IdSystem4"); // IN1.3.4
+        assertThat(orgId0.hasPeriod()).isFalse(); // IN1.3.7 & IN1.3.7 empty
+        assertThat(orgId0.hasType()).isFalse(); // IN1.3.5 empty
+
+        // Check Insured Organization Name and ID Organization from IN2.69
+        org = (Organization) organizations.get(1);
+        assertThat(org.getName()).isEqualTo("Name69.1"); // IN2.69.1
+        assertThat(org.getIdentifier()).hasSize(1);
+        orgId0 = org.getIdentifier().get(0);
+        assertThat(orgId0.getValue()).isEqualTo("TenantId.IdValue69.10"); // IN2.69.10
+        assertThat(orgId0.getSystem()).isEqualTo("urn:id:IdSystem69.6"); // IN2.69.6
+        DatatypeUtils.checkCommonCodeableConceptAssertions(orgId0.getType(), "XX", null, null, null); // IN2.69.7
+
+        // Check PayorId Organization from IN2.25 
+        org = (Organization) organizations.get(2);
+        assertThat(org.getName()).isEqualTo("IdValue25.1"); // IN2.25.1
+        assertThat(org.getIdentifier()).hasSize(1);
+        orgId0 = org.getIdentifier().get(0);
+        assertThat(orgId0.getValue()).isEqualTo("TenantId.IdValue25.1"); // IN2.25.1
+        assertThat(orgId0.getSystem()).isEqualTo("urn:id:IdSystem25.4"); // IN2.25.4
+        assertThat(orgId0.getPeriod().getStartElement().toString()).containsPattern("2020-12-31T14:50:45"); // IN2.25.7
+        assertThat(orgId0.getPeriod().getEndElement().toString()).containsPattern("2021-12-31T14:50:45"); // IN2.25.8
+        DatatypeUtils.checkCommonCodeableConceptAssertions(orgId0.getType(), "IdType25.5", null, null, null); // // IN2.25.5
 
         List<Resource> coverages = ResourceUtils.getResourceList(e, ResourceType.Coverage);
         assertThat(coverages).hasSize(1); // From IN1 segment
@@ -549,8 +607,8 @@ class Hl7FinancialInsuranceTest {
                 "http://terminology.hl7.org/CodeSystem/subscriber-relationship", null); // IN1.17
 
         // Confirm there are no unaccounted for resources
-        // Expected: Coverage, Organization, Patient, Encounter
-        assertThat(e).hasSize(4);
+        // Expected: Coverage, Organization (3x), Patient, Encounter
+        assertThat(e).hasSize(6);
     }
 
     @Test

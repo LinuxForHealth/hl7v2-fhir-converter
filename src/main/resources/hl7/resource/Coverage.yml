@@ -120,9 +120,10 @@ status:
    constants:
      active: 'active'
 
-payor:
+payor_1:
    valueOf: resource/Organization
    expressionType: reference
+   generateList: true
    vars: 
        orgName: String, IN1.4.1
        orgIdValue: String, IN1.3.1
@@ -133,6 +134,32 @@ payor:
        orgAddressXAD: IN1.5
        orgContactXCN: IN1.6
        orgContactPointXTN: IN1.7
+       orgCompanyPlanCode: IN1.35
+
+payor_2:
+   valueOf: resource/Organization
+   expressionType: reference
+   generateList: true
+   vars: 
+       # NOTE FHIR does not require Organization.name, but we do
+       # for an unknown reason. This is documented in Issue #422
+       orgName: String, IN2.25.1
+       orgIdValue: String, IN2.25.1
+       orgIdSystem: String, IN2.25.4
+       orgIdTypeCode: String, IN2.25.5
+       orgIdStart: IN2.25.7
+       orgIdEnd: IN2.25.8
+
+payor_3:
+   valueOf: resource/Organization
+   expressionType: reference
+   generateList: true
+   vars: 
+       orgName: String, IN2.69.1
+       orgIdValue: String, IN2.69.10
+       orgIdSystem: String, IN2.69.6
+       orgIdTypeCode: String, IN2.69.7
+   
 
 # If the subscriber is not SEL (self), then create the related person
 subscriber_1:

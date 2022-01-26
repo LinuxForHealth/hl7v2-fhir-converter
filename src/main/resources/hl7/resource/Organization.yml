@@ -45,14 +45,28 @@ identifier_2b:
       code: $orgIdTypeCode  
    constants:
       period: '.'                 
+
+identifier_3:
+   valueOf: datatype/Identifier_var
+   generateList: true  
+   expressionType: resource
+   vars:
+      valueIn: $orgCompanyPlanCode
+      # No CXsystem
+      # No code
+
 name_v1:
    type: STRING
    condition: $idValue NULL
    valueOf: CWE.2 | XON.1 | $orgName
+   # NOTE FHIR does not require Organization.name, but we do
+   # for an unkown reason. This is documented in Issue #422
+   # When this is fixed, remove payor_2: orgName: String, IN2.25.1
    required: true
    expressionType: HL7Spec
    vars:
       idValue: CWE.1 | XON.10 | XON.3 
+
 name_v2:
    type: STRING
    condition: $idValue NOT_NULL
@@ -60,6 +74,7 @@ name_v2:
    expressionType: HL7Spec
    vars:
       idValue: CWE.1 | XON.10 | XON.3
+      
 alias:
    type: STRING
    valueOf: CWE.5
