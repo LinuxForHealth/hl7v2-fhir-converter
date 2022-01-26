@@ -150,10 +150,9 @@ payor_2:
        orgIdStart: IN2.25.7
        orgIdEnd: IN2.25.8
 
-payor_3:
+policyHolder:
    valueOf: resource/Organization
    expressionType: reference
-   generateList: true
    vars: 
        orgName: String, IN2.69.1
        orgIdValue: String, IN2.69.10
