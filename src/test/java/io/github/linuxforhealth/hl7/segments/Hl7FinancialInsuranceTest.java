@@ -353,8 +353,8 @@ class Hl7FinancialInsuranceTest {
                 // IN1.50 through IN1.53 NOT REFERENCED
                 + "|MEMBER36|||||||F|||Value46|||J494949^^^Large HMO^XX||||\n"
                 // IN2.2 to RelatedPerson.identifier (SSN)
-                // IN2.6 to Coverage.identifier MC Patient's Medicare number
-                // IN2.8 to Coverage.identifier MA Patient Medicaid number
+                // IN2.6 to Coverage.identifier MC Patient's Medicare number and Patient.identifier MC Medicare number 
+                // IN2.8 to Coverage.identifier MA Patient Medicaid number and Patient.identifier MA Medicare number
                 // IN2.9 through IN2.60 not used     
                 + "IN2||777-88-9999||||MEDICARE06||MEDICAID08|| |||||||||| ||||||||||| |||||||||| |||||||||| ||||||||||"
                 // IN2.61 to Coverage.identifier MB; takes priority over IN1.36
@@ -379,6 +379,28 @@ class Hl7FinancialInsuranceTest {
         assertThat(patients).hasSize(1); // From PID
         Patient patient = (Patient) patients.get(0);
         String patientId = patient.getId();
+        assertThat(patient.getIdentifier()).hasSize(4); // From PID.3, IN1.49, IN2.6, IN2.8
+        Identifier patientIdentifier = patient.getIdentifier().get(0);
+        assertThat(patientIdentifier.getValue()).isEqualTo("MR1"); // PID.3.1 
+        assertThat(patientIdentifier.getSystem()).isEqualTo("urn:id:XYZ"); // PID.3.4
+        DatatypeUtils.checkCommonCodeableConceptAssertions(patientIdentifier.getType(), "MR", "Medical record number",
+                "http://terminology.hl7.org/CodeSystem/v2-0203", null); // PID.3.5
+        patientIdentifier = patient.getIdentifier().get(1);
+        assertThat(patientIdentifier.getValue()).isEqualTo("J494949"); // IN1.49.1 
+        assertThat(patientIdentifier.getSystem()).isEqualTo("urn:id:Large_HMO"); // IN1.49.4
+        DatatypeUtils.checkCommonCodeableConceptAssertions(patientIdentifier.getType(), "XX", null,
+                "http://terminology.hl7.org/CodeSystem/v2-0203", null); // IN1.49.5  
+        patientIdentifier = patient.getIdentifier().get(2);
+        assertThat(patientIdentifier.getValue()).isEqualTo("MEDICAID08"); // IN2.8
+        assertThat(patientIdentifier.hasSystem()).isFalse(); // No system for IN2.8
+        DatatypeUtils.checkCommonCodeableConceptAssertions(patientIdentifier.getType(), "MA", "Patient Medicaid number",
+                "http://terminology.hl7.org/CodeSystem/v2-0203", null);
+        patientIdentifier = patient.getIdentifier().get(3);
+        assertThat(patientIdentifier.getValue()).isEqualTo("MEDICARE06"); // IN2.6
+        assertThat(patientIdentifier.hasSystem()).isFalse(); // No system for IN2.6
+        DatatypeUtils.checkCommonCodeableConceptAssertions(patientIdentifier.getType(), "MC",
+                "Patient's Medicare number",
+                "http://terminology.hl7.org/CodeSystem/v2-0203", null);
 
         List<Resource> organizations = ResourceUtils.getResourceList(e, ResourceType.Organization);
         assertThat(organizations).hasSize(1); // From Payor created by IN1
@@ -517,6 +539,7 @@ class Hl7FinancialInsuranceTest {
 
         String hl7message = "MSH|^~\\&|||||20151008111200||DFT^P03^DFT_P03|MSGID000001|T|2.6|||||||||\n"
                 + "EVN||20210407191342||||||\n"
+                // PID.19 purposely empty so IN2.2 used as SSN PatientIdentifier
                 + "PID|||MR1^^^XYZ^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
                 + "PV1||I||||||||||||||||||||||||||||||||||||||||||\n"
                 // FT1 added for completeness; required in specification, but not used (ignored) by templates
@@ -543,11 +566,13 @@ class Hl7FinancialInsuranceTest {
                 // IN1.46 to third XV Coverage.identifier
                 // IN1.47 through IN1.53 NOT REFERENCED
                 + "|MEMBER36||||||||||Value46|||||||\n"
+                // IN2.2 to SSN Patient.identifier because relationship = self and PID.19 is empty
                 // IN2.6 is purposely empty so will not create an MC Coverage.identifier
                 // IN2.8 is purposely empty so will not create an MA Coverage.identifier
                 // IN2.25 to new PayorId Organization
-                // IN2.61 is purposely empty (primary to IN1.36) so IN1.36 will be used as the MB Coverage.identifier
-                + "IN2|||||||||||||||||||||||||IdValue25.1^^^IdSystem25.4^IdType25.5^^20201231145045^20211231145045|||||||||||||||||||||||||||||||||||||||||||"
+                // IN2.61 is purposely empty (primary to IN1.36) so IN1.36 will be used as the MB Coverage.identifier and MB Patient.Identifier
+                // Only used for MB Patient.Identifier because subscriber is SELF
+                + "IN2||SSN123456|||||||||||||||||||||||IdValue25.1^^^IdSystem25.4^IdType25.5^^20201231145045^20211231145045|||||||||||||||||||||||||||||||||||||||||||"
                 // IN2.69 to new PolicyHolder Organization Name and ID
                 // IN2.72 is purposely empty (backup to IN1.17) so no RelatedPerson is created.
                 + "|Name69.1^^^^^IdSystem69.6^XX^^^IdValue69.10||\n";
@@ -565,6 +590,23 @@ class Hl7FinancialInsuranceTest {
         assertThat(patients).hasSize(1); // From PID
         Patient patient = (Patient) patients.get(0);
         String patientId = patient.getId();
+        // Check Patient.identifiers
+        assertThat(patient.getIdentifier()).hasSize(3); // From PID.3, IN2.2 and IN1.36
+        Identifier patientIdentifier = patient.getIdentifier().get(0);
+        assertThat(patientIdentifier.getValue()).isEqualTo("MR1"); // PID.3.1 
+        assertThat(patientIdentifier.getSystem()).isEqualTo("urn:id:XYZ"); // PID.3.4
+        DatatypeUtils.checkCommonCodeableConceptAssertions(patientIdentifier.getType(), "MR", "Medical record number",
+                "http://terminology.hl7.org/CodeSystem/v2-0203", null); // PID.3.5
+        patientIdentifier = patient.getIdentifier().get(1);
+        assertThat(patientIdentifier.getValue()).isEqualTo("SSN123456"); // IN2.2
+        assertThat(patientIdentifier.hasSystem()).isFalse(); // No system for SSN
+        DatatypeUtils.checkCommonCodeableConceptAssertions(patientIdentifier.getType(), "SS", "Social Security number",
+                "http://terminology.hl7.org/CodeSystem/v2-0203", null);
+        patientIdentifier = patient.getIdentifier().get(2);
+        assertThat(patientIdentifier.getValue()).isEqualTo("MEMBER36"); // IN1.36 backup to IN2.61, active because subscriber is SELF
+        assertThat(patientIdentifier.hasSystem()).isFalse(); // No system for MB
+        DatatypeUtils.checkCommonCodeableConceptAssertions(patientIdentifier.getType(), "MB", "Member Number",
+                "http://terminology.hl7.org/CodeSystem/v2-0203", null);
 
         List<Resource> organizations = ResourceUtils.getResourceList(e, ResourceType.Organization);
         assertThat(organizations).hasSize(3); // From Payor created by IN1, PayorId Organization (IN2.25), and PolcyHolder Organization Name (IN2.69)

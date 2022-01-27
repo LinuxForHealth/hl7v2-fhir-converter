@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2020, 2021
+ * (C) Copyright IBM Corp. 2020, 2022
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -69,6 +69,7 @@ public enum SimpleDataTypeMapper {
   POLICYHOLDER_RELATIONSHIP(SimpleDataValueResolver.POLICYHOLDER_RELATIONSHIP),
   SUBSCRIBER_RELATIONSHIP(SimpleDataValueResolver.SUBSCRIBER_RELATIONSHIP),
   RELATED_PERSON_NEEDED(SimpleDataValueResolver.RELATED_PERSON_NEEDED),
+  SUBSCRIBER_IS_SELF(SimpleDataValueResolver.SUBSCRIBER_IS_SELF),
   UNIT_SYSTEM(SimpleDataValueResolver.UNIT_SYSTEM),
   ENCOUNTER_MODE_ARRIVAL_DISPLAY(SimpleDataValueResolver.ENCOUNTER_MODE_ARRIVAL_DISPLAY);
 

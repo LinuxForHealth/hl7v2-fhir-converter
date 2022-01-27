@@ -1,5 +1,5 @@
 #
-# (C) Copyright IBM Corp. 2020, 2021
+# (C) Copyright IBM Corp. 2020, 2022
 #
 # SPDX-License-Identifier: Apache-2.0
 #
@@ -19,14 +19,30 @@ identifier_1:
    vars:
       assignerSystem: String, PID.3.4
 
-# Gets the SSN from PID.19, formats and adds it as an ID
-identifier_2:
-   condition: $valueIn NOT_NULL
+# When the Coverage.subscriber is not self (or is empty) use PID.19 for SSN identifier
+identifier_2a:
+   condition: $valueIn NOT_NULL && $subscriberIsSelf NOT_EQUALS TRUE
    valueOf: datatype/Identifier_var
    generateList: true
    expressionType: resource
    vars:
-      valueIn: String, PID.19
+      valueIn: String, PID.19 # subscriber SSN
+      subscriberIsSelf: SUBSCRIBER_IS_SELF, IN1.17 | IN2.72 # subscriber relationship
+   constants:
+      system: http://terminology.hl7.org/CodeSystem/v2-0203
+      code: SS
+      display: Social Security number
+# There is no text for PID.19
+
+# When the Coverage.subscriber is self use PID.19 / IN2.2 for SSN identifier
+identifier_2b:
+   condition: $valueIn NOT_NULL && $subscriberIsSelf EQUALS TRUE
+   valueOf: datatype/Identifier_var
+   generateList: true
+   expressionType: resource
+   vars:
+      valueIn: String, PID.19 | IN2.2 # subscriber SSN
+      subscriberIsSelf: SUBSCRIBER_IS_SELF, IN1.17 | IN2.72  # subscriber relationship
    constants:
       system: http://terminology.hl7.org/CodeSystem/v2-0203
       code: SS
@@ -71,6 +87,47 @@ identifier_5:
       code: IN1.49.5
    constants:
       system: http://terminology.hl7.org/CodeSystem/v2-0203
+
+# only include when the subscriber is self
+identifier_6:
+  condition: $valueIn NOT_NULL && $subscriberIsSelf EQUALS TRUE
+  valueOf: datatype/Identifier_var
+  generateList: true
+  expressionType: resource
+  vars:
+    valueIn: IN2.61 | IN1.36
+    subscriberIsSelf: SUBSCRIBER_IS_SELF, IN1.17 | IN2.72  # subscriber relationship
+    # No systemCX set for this identifier
+  constants:
+    system: "http://terminology.hl7.org/CodeSystem/v2-0203"
+    code: "MB"
+    display: "Member Number"
+
+identifier_7:
+  condition: $valueIn NOT_NULL
+  valueOf: datatype/Identifier_var
+  generateList: true
+  expressionType: resource
+  vars:
+    valueIn: IN2.8
+    # No systemCX set for this identifier
+  constants:
+    system: "http://terminology.hl7.org/CodeSystem/v2-0203"
+    code: "MA"
+    display: "Patient Medicaid number"
+
+identifier_8:
+  condition: $valueIn NOT_NULL
+  valueOf: datatype/Identifier_var
+  generateList: true
+  expressionType: resource
+  vars:
+    valueIn: IN2.6
+    # No systemCX set for this identifier
+  constants:
+    system: "http://terminology.hl7.org/CodeSystem/v2-0203"
+    code: "MC"
+    display: "Patient's Medicare number"
 
 name:
    valueOf: datatype/HumanName
@@ -187,7 +244,7 @@ generalPractitioner:
    specs: PD1.4
    vars:
       practitionerVal: PD1.4
-      
+
 extension:
    generateList: true
    expressionType: nested
