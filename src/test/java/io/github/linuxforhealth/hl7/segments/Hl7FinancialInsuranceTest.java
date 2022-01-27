@@ -51,8 +51,8 @@ class Hl7FinancialInsuranceTest {
                 // FT1.7 is required transaction code (currently not used)
                 + "FT1||||20201231145045||CG|FAKE|||||||||||||||||||||||||||||||||||||\n"
                 // IN1 Segment is split and concatenated for easier understanding. (| precedes numbered field.)
-                // IN1.2.1, IN1.2.3 to Coverage.identifier XV 1
-                // IN1.2.4, IN1.2.6 to Coverage.identifier XV 2
+                // IN1.2.1, IN1.2.3 to first XV Coverage.identifier
+                // IN1.2.4, IN1.2.6 to second XV Coverage.identifier
                 + "IN1|1|Value1^^System3^Value4^^System6"
                 // Thorough organization testing.
                 // IN1.3 to Organization Identifier 
@@ -101,10 +101,9 @@ class Hl7FinancialInsuranceTest {
                 + "|20201231145045|20211231145045|||||||||5|||||||||||||COMPANYPLANCODE35"
                 // IN1.36 to Coverage.identifier MB and Coverage.identifier SN
                 // IN1.36 also to subscriberId
-                // IN1.46 to Coverage.identifier XV 3
+                // IN1.46 to third XV Coverage.identifier
                 // IN1.49 to PatientCoverage.identifier
-                // IN1.53 through IN1.53 NOT REFERENCED
-                + "|MEMBER36||||||||||Value46||PatientId48|PatientId49.1^^^System49.4^TypeCode49.5|PatientId50|||\n"
+                + "|MEMBER36||||||||||Value46|||PatientId49.1^^^System49.4^TypeCode49.5||||\n"
                 // IN2.6 is purposely empty so will not create an MC Coverage.identifier
                 // IN2.8 is purposely empty so will not create an MA Coverage.identifier
                 // IN2.25 to new PayorId Organization
@@ -322,8 +321,8 @@ class Hl7FinancialInsuranceTest {
                 // FT1.7 is required transaction code (currently not used)
                 + "FT1||||20201231145045||CG|FAKE|||||||||||||||||||||||||||||||||||||\n"
                 // IN1 Segment is split and concatenated for easier understanding. (| precedes numbered field.)
-                // IN1.2.1, IN1.2.3 to Coverage.identifier XV 1
-                // IN1.2.4, IN1.2.6 to Coverage.identifier XV 2
+                // IN1.2.1, IN1.2.3 to first XV Coverage.identifier
+                // IN1.2.4, IN1.2.6 to second XV Coverage.identifier
                 + "IN1|1|Value1^^System3^Value4^^System6"
                 // Minimal Organization. Required for Payor, which is required.
                 // Organization deep test in testBasicInsuranceCoverageFields
@@ -345,7 +344,7 @@ class Hl7FinancialInsuranceTest {
                 + "|DoeFake^Judy^^^Rev.|PAR|19780429|19 Rose St^^Faketown^CA^ZIP5||||||||||||||||"
                 // IN1.36 purposely present, used by SN Coverage.identifier, but is ignored by MB Coverage.identifier because IN2.61 takes priority
                 // IN1.43 to RelatedPerson.gender
-                // IN1.46 to Coverage.identifier XV 3
+                // IN1.46 to third XV Coverage.identifier
                 // IN1.49 to RelatedPerson.identifier
                 //    IN1.49.1 to RelatedPerson.identifier.value
                 //    IN1.49.4 to RelatedPerson.identifier.system
@@ -526,8 +525,8 @@ class Hl7FinancialInsuranceTest {
                 // FT1.7 is required transaction code (currently not used)
                 + "FT1||||20201231145045||CG|FAKE|||||||||||||||||||||||||||||||||||||\n"
                 // IN1 Segment is split and concatenated for easier understanding. (| precedes numbered field.)
-                // IN1.2.1, IN1.2.3 to Coverage.identifier XV 1
-                // IN1.2.4, IN1.2.6 to Coverage.identifier XV 2
+                // IN1.2.1, IN1.2.3 to first XV Coverage.identifier
+                // IN1.2.4, IN1.2.6 to second XV Coverage.identifier
                 + "IN1|1|Value1^^System3^Value4^^System6"
                 // Minimal Organization to test TENANT prepend. 
                 // IN1.3 to Organization identifier 
@@ -541,7 +540,7 @@ class Hl7FinancialInsuranceTest {
                 // IN1.18 through IN1.35 NOT REFERENCED
                 + "||SEL||||||||||||||||||"
                 // IN1.36 to Coverage.identifier MB and Coverage.identifier SN
-                // IN1.46 to Coverage.identifier XV 3
+                // IN1.46 to third XV Coverage.identifier
                 // IN1.47 through IN1.53 NOT REFERENCED
                 + "|MEMBER36||||||||||Value46|||||||\n"
                 // IN2.6 is purposely empty so will not create an MC Coverage.identifier
@@ -654,7 +653,7 @@ class Hl7FinancialInsuranceTest {
                 // FT1.7 is required transaction code (currently not used)
                 + "FT1||||20201231145045||CG|FAKE|||||||||||||||||||||||||||||||||||||\n"
                 // These fields in IN1 with these values cause the failure, leaving some of the field empty may be contribute.
-                // IN1.2 to Coverage.identifier XV 1
+                // IN1.2 to first XV Coverage.identifier
                 // IN1.3 to Organization Identifier
                 // IN1.4 to Organization Name
                 // IN1.7 to Organization Telecom
@@ -711,8 +710,8 @@ class Hl7FinancialInsuranceTest {
                 // FT1.7 is required transaction code (currently not used)
                 + "FT1||||20201231145045||CG|FAKE|||||||||||||||||||||||||||||||||||||\n"
                 // IN1 Segment is split and concatenated for easier understanding. (| precedes numbered field.)
-                // IN1.2.1, IN1.2.3 to Coverage.identifier XV 1
-                // IN1.2.4, IN1.2.6 to Coverage.identifier XV 2
+                // IN1.2.1, IN1.2.3 to first XV Coverage.identifier
+                // IN1.2.4, IN1.2.6 to second XV Coverage.identifier
                 + "IN1|1|Value1^^System3^Value4^^System6"
                 // Minimal Organization. Required for Payor, which is required.
                 // Organization deep test in testBasicInsuranceCoverageFields
@@ -809,8 +808,8 @@ class Hl7FinancialInsuranceTest {
                 // FT1.7 is required transaction code (currently not used)
                 + "FT1||||20201231145045||CG|FAKE|||||||||||||||||||||||||||||||||||||\n"
                 // IN1 Segment is split and concatenated for easier understanding. (| precedes numbered field.)
-                // IN1.2.1, IN1.2.3 to Coverage.identifier XV 1
-                // IN1.2.4, IN1.2.6 to Coverage.identifier XV 2
+                // IN1.2.1, IN1.2.3 to first XV Coverage.identifier
+                // IN1.2.4, IN1.2.6 to second XV Coverage.identifier
                 + "IN1|1|Value1^^System3^Value4^^System6"
                 // Minimal Organization
                 // IN1.3 to Organization Identifier 
@@ -890,8 +889,8 @@ class Hl7FinancialInsuranceTest {
                 // FT1.7 is required transaction code (currently not used)
                 + "FT1||||20201231145045||CG|FAKE|||||||||||||||||||||||||||||||||||||\n"
                 // IN1 Segment is split and concatenated for easier understanding. (| precedes numbered field.)
-                // IN1.2.1, IN1.2.3 to Coverage.identifier XV 1
-                // IN1.2.4, IN1.2.6 to Coverage.identifier XV 2
+                // IN1.2.1, IN1.2.3 to first XV Coverage.identifier
+                // IN1.2.4, IN1.2.6 to second XV Coverage.identifier
                 + "IN1|1|Value1^^System3^Value4^^System6"
                 // Minimal Organization
                 // IN1.3 to Organization Identifier 
