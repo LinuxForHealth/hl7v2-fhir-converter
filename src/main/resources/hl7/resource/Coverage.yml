@@ -158,19 +158,19 @@ policyHolder:
     orgIdSystem: String, IN2.69.6
     orgIdTypeCode: String, IN2.69.7
 
-# If the subscriber is not SEL (self), then create the related person
+# If the subscriber is in the list of relationship codes needing a relatedPerson, create one
 subscriber_1:
-  condition: $relatedRelationshipStr NOT_NULL && $relatedRelationshipStr NOT_EQUALS SEL && $relatedRelationshipStr NOT_EQUALS 01
+  condition: $createRelatedPerson NOT_NULL && $createRelatedPerson EQUALS TRUE
   valueOf: resource/RelatedPerson
   expressionType: reference
   vars:
-    relatedRelationshipStr: String, IN1.17 | IN2.72
+    createRelatedPerson: RELATED_PERSON_NEEDED, IN1.17 | IN2.72
     # Related person gets many values from scope, so they do not need to be passed in
     #  IN1 and sub-fields
     #  $Patient
 
-# If the subscriber is SEL (self), then reference the patient
-# NOT_NULL check is not needed because we have values here, and NOT_NULL is otherwise caught by logic of subscriber_1
+# If the subscriber is SEL (self), do not create a relatedPerson, but reference the patient
+# NOT_NULL check is not needed because we have positive values and condition will not fire without them
 subscriber_2:
   condition: $relatedRelationshipStr EQUALS SEL || $relatedRelationshipStr EQUALS 01
   valueOf: datatype/Reference

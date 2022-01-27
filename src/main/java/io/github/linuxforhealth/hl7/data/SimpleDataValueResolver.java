@@ -379,6 +379,12 @@ public class SimpleDataValueResolver {
         }
     };
 
+    // Maps from IN1.17 or IN2.72 to a boolean string TRUE if RelatedPerson should be created
+    public static final ValueExtractor<Object, String> RELATED_PERSON_NEEDED = (Object value) -> {
+        String val = Hl7DataHandlerUtil.getStringValue(value);
+        return getFHIRCode(val, "RelatedPersonNeeded");
+    };
+
     public static final ValueExtractor<Object, SimpleCode> MARITAL_STATUS = (Object value) -> {
         String val = Hl7DataHandlerUtil.getStringValue(value);
         String text = Hl7DataHandlerUtil.getOriginalDisplayText(value);

@@ -10,6 +10,7 @@ id:
    type: STRING
    valueOf: UUID.randomUUID()
    expressionType: JEXL
+
 identifier_1:
    valueOf: datatype/Identifier_SystemID
    generateList: true
@@ -17,6 +18,7 @@ identifier_1:
    specs: PID.3
    vars:
       assignerSystem: String, PID.3.4
+
 # Gets the SSN from PID.19, formats and adds it as an ID
 identifier_2:
    condition: $valueIn NOT_NULL
@@ -30,6 +32,7 @@ identifier_2:
       code: SS
       display: Social Security number
 # There is no text for PID.19
+
 identifier_3:
    condition: $valueIn NOT_NULL
    valueOf: datatype/Identifier_var
@@ -44,6 +47,7 @@ identifier_3:
       code: DL
       display: Driver's license number
 # There is no text for PID.20
+
 identifier_4:
    condition: $mrgIdentifier NOT_NULL
    valueOf: datatype/Identifier_SystemID
@@ -55,21 +59,36 @@ identifier_4:
       mrgIdentifier: MRG.1
 # Add the old MR # from the MRG segment
 
+identifier_5:
+   condition: $valueIn NOT_NULL
+   valueOf: datatype/Identifier_var
+   generateList: true
+   expressionType: resource
+   specs: IN1.49
+   vars:
+      valueIn: String, IN1.49.1
+      systemCX: IN1.49.4
+      code: IN1.49.5
+   constants:
+      system: http://terminology.hl7.org/CodeSystem/v2-0203
+
 name:
    valueOf: datatype/HumanName
    generateList: true
    expressionType: resource
    specs: PID.5
-# There is no authority for PID.20
+
 gender:
    type: ADMINISTRATIVE_GENDER
    valueOf: PID.8
    expressionType: HL7Spec
+
 address:
    valueOf: datatype/Address
    generateList: true
    expressionType: resource
    specs: PID.11
+
 telecom_1:
    condition: $pid14 NOT_NULL
    valueOf: datatype/ContactPoint
@@ -80,7 +99,7 @@ telecom_1:
       pid14: PID.14
    constants:
       use: work
-# The yaml is processed in reverse order, therefore
+
 telecom_2:
    condition: $pid13 NOT_NULL
    valueOf: datatype/ContactPoint
@@ -91,11 +110,14 @@ telecom_2:
       pid13: PID.13
    constants:
       use: home
+
+# The yaml is processed in reverse order, therefore
 # Put the PID.13 last in yaml so it is first to be processed
 birthDate:
    type: DATE
    valueOf: PID.7
    expressionType: HL7Spec
+
 multipleBirthBoolean_1:
    condition: $multBool NOT_NULL && $multInt NULL
    type: BOOLEAN
@@ -104,6 +126,7 @@ multipleBirthBoolean_1:
    vars:
       multBool: PID.24
       multInt: PID.25
+
 multipleBirthBoolean_2:
    condition: $multBool EQUALS N
    type: BOOLEAN
@@ -112,6 +135,7 @@ multipleBirthBoolean_2:
    vars:
       multBool: String, PID.24
       multInt: PID.25
+
 multipleBirthInteger_1:
    condition: $multBool NULL && $multInt NOT_NULL
    type: INTEGER
@@ -120,6 +144,7 @@ multipleBirthInteger_1:
    vars:
       multBool: String, PID.24
       multInt: PID.25
+
 multipleBirthInteger_2:
    condition: $multBool EQUALS Y && $multInt NOT_NULL
    type: INTEGER
@@ -128,6 +153,7 @@ multipleBirthInteger_2:
    vars:
       multBool: String, PID.24
       multInt: PID.25
+
 deceasedBoolean:
    condition: $deceasedBool NOT_NULL && $deceasedDateTime NULL
    type: BOOLEAN
@@ -136,6 +162,7 @@ deceasedBoolean:
    vars:
       deceasedBool: PID.30
       deceasedDateTime: PID.29
+
 deceasedDateTime:
    condition: $deceasedDateTime NOT_NULL
    type: DATE_TIME
@@ -143,6 +170,7 @@ deceasedDateTime:
    expressionType: HL7Spec
    vars:
       deceasedDateTime: PID.29
+
 maritalStatus:
    valueOf: datatype/CodeableConcept
    expressionType: resource
@@ -150,6 +178,7 @@ maritalStatus:
    vars:
       coding: MARITAL_STATUS, PID.16
       text: String, PID.16.2
+
 generalPractitioner:
    condition: $practitionerVal NOT_NULL
    valueOf: resource/Practitioner
@@ -158,6 +187,7 @@ generalPractitioner:
    specs: PD1.4
    vars:
       practitionerVal: PD1.4
+      
 extension:
    generateList: true
    expressionType: nested
