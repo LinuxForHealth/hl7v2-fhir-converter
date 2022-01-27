@@ -496,4 +496,53 @@ SubscriberRelationship:
   18: parent # Parent 
   19: other # Grandparent 
 
-
+# Indicates whether a relatedPerson should be created for Coverage
+# Only a TRUE will cause relatedPerson to be created. At this time FALSE and no match are equivalent
+RelatedPersonNeeded:
+# Direction: Insured to Patient
+# Codes from IN1.17 (values from table 0063) 
+  BRO: TRUE
+# CGV: Care giver: no relatedPerson
+  CHD: TRUE
+# DEP: Handicapped dependent : no relatedPerson
+  DOM: TRUE
+  EXF: TRUE  
+  FCH: TRUE 
+# FND: Friend: no relatedPerson
+  FTH: TRUE 
+  GCH: TRUE
+# GRD: Guardian : no relatedPerson
+  GRP: TRUE
+  MTH: TRUE
+  NCH: TRUE 
+# NON: None: no relatedPerson
+# OTH: Other: no relatedPerson
+  PAR: TRUE
+  SCH: TRUE
+# SEL: Self: no relatedPerson
+  SIB: TRUE
+  SIS: TRUE
+  SPO: TRUE
+# UNK: Unknown : no relatedPerson
+# WRD: Ward of the court : no relatedPerson 
+# - - - - -  
+# Codes from IN2.72 (values from table 0344) must be REVERSED for RelatedPerson.relationship.
+  01: # Patient is insured : no relatedPerson
+  02: TRUE  # Spouse : Spouse
+  03: TRUE  # Natural child financial responsibility : Parent
+  04: TRUE  # Natural child no financial responsibility : Parent
+  05: TRUE  # Step child : Parent
+  06: TRUE  # Foster child : Foster Parent
+# 07: Ward of the court: no relatedPerson
+# 08: Employee: no relatedPerson
+# 09: Unknown: no relatedPerson 
+# 10: Handicapped dependent input: no relatedPerson 
+# 11: Organ donor : no relatedPerson
+# 12: Cadaver donor : no relatedPerson
+  13: TRUE # Grandchild : Grandparent 
+  14: TRUE # Niece/Nephew :  Extended
+# 15: Injured planitiff : no relatedPerson
+# 16: Sponsored dependent : no relatedPerson
+  17: TRUE # Minor dependent of a minor dependant input (grandchild dependent) : Grandparent
+  18: TRUE # Parent : Child 
+  19: TRUE # Grandparent : Grandchild 

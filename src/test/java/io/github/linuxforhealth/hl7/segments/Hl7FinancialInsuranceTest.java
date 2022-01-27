@@ -51,8 +51,8 @@ class Hl7FinancialInsuranceTest {
                 // FT1.7 is required transaction code (currently not used)
                 + "FT1||||20201231145045||CG|FAKE|||||||||||||||||||||||||||||||||||||\n"
                 // IN1 Segment is split and concatenated for easier understanding. (| precedes numbered field.)
-                // IN1.2.1, IN1.2.3 to Identifier XV 1
-                // IN1.2.4, IN1.2.6 to Identifier XV 2
+                // IN1.2.1, IN1.2.3 to Coverage.identifier XV 1
+                // IN1.2.4, IN1.2.6 to Coverage.identifier XV 2
                 + "IN1|1|Value1^^System3^Value4^^System6"
                 // Thorough organization testing.
                 // IN1.3 to Organization Identifier 
@@ -99,15 +99,16 @@ class Hl7FinancialInsuranceTest {
                 // IN1.23 through IN1.34 NOT REFERENCED                
                 // IN1.35 to Organization.identifier
                 + "|20201231145045|20211231145045|||||||||5|||||||||||||COMPANYPLANCODE35"
-                // IN1.36 to Identifier MB and Identifier SN
+                // IN1.36 to Coverage.identifier MB and Coverage.identifier SN
                 // IN1.36 also to subscriberId
-                // IN1.46 to Identifier XV 3
-                // IN1.47 through IN1.53 NOT REFERENCED
-                + "|MEMBER36||||||||||Value46|||||||\n"
-                // IN2.6 is purposely empty so will not create an MC identifier
-                // IN2.8 is purposely empty so will not create an MA identifier
+                // IN1.46 to Coverage.identifier XV 3
+                // IN1.49 to PatientCoverage.identifier
+                // IN1.53 through IN1.53 NOT REFERENCED
+                + "|MEMBER36||||||||||Value46||PatientId48|PatientId49.1^^^System49.4^TypeCode49.5|PatientId50|||\n"
+                // IN2.6 is purposely empty so will not create an MC Coverage.identifier
+                // IN2.8 is purposely empty so will not create an MA Coverage.identifier
                 // IN2.25 to new PayorId Organization
-                // IN2.61 is purposely empty (primary to IN1.36) so IN1.36 will be used as the MB identifier
+                // IN2.61 is purposely empty (primary to IN1.36) so IN1.36 will be used as the MB Coverage.identifier
                 + "IN2|||||||||||||||||||||||||IdValue25.1^^^IdSystem25.4^IdType25.5^^20201231145045^20211231145045|||||||||||||||||||||||||||||||||||||||||||"
                 // IN2.69 to new PolicyHolder Organization Name and ID
                 // IN2.72 is purposely empty (backup to IN1.17) so no RelatedPerson is created.
@@ -122,6 +123,17 @@ class Hl7FinancialInsuranceTest {
         assertThat(patients).hasSize(1); // From PID
         Patient patient = (Patient) patients.get(0);
         String patientId = patient.getId();
+        assertThat(patient.getIdentifier()).hasSize(2); // From PID.3 and IN1.49
+        Identifier patientIdentifier = patient.getIdentifier().get(0);
+        assertThat(patientIdentifier.getValue()).isEqualTo("MR1"); // PID.3.1 
+        assertThat(patientIdentifier.getSystem()).isEqualTo("urn:id:XYZ"); // PID.3.4
+        DatatypeUtils.checkCommonCodeableConceptAssertions(patientIdentifier.getType(), "MR", "Medical record number",
+                "http://terminology.hl7.org/CodeSystem/v2-0203", null); // PID.3.5
+        patientIdentifier = patient.getIdentifier().get(1);
+        assertThat(patientIdentifier.getValue()).isEqualTo("PatientId49.1"); // IN1.49.1 
+        assertThat(patientIdentifier.getSystem()).isEqualTo("urn:id:System49.4"); // IN1.49.4
+        DatatypeUtils.checkCommonCodeableConceptAssertions(patientIdentifier.getType(), "TypeCode49.5", null,
+                "http://terminology.hl7.org/CodeSystem/v2-0203", null); // IN1.49.5        
 
         List<Resource> organizations = ResourceUtils.getResourceList(e, ResourceType.Organization);
         assertThat(organizations).hasSize(3); // From IN1.3 creates Payor, IN2.25 to new PayorId Organization, IN2.69 creates new PolicyHolder Organization Name
@@ -310,8 +322,8 @@ class Hl7FinancialInsuranceTest {
                 // FT1.7 is required transaction code (currently not used)
                 + "FT1||||20201231145045||CG|FAKE|||||||||||||||||||||||||||||||||||||\n"
                 // IN1 Segment is split and concatenated for easier understanding. (| precedes numbered field.)
-                // IN1.2.1, IN1.2.3 to Identifier XV 1
-                // IN1.2.4, IN1.2.6 to Identifier XV 2
+                // IN1.2.1, IN1.2.3 to Coverage.identifier XV 1
+                // IN1.2.4, IN1.2.6 to Coverage.identifier XV 2
                 + "IN1|1|Value1^^System3^Value4^^System6"
                 // Minimal Organization. Required for Payor, which is required.
                 // Organization deep test in testBasicInsuranceCoverageFields
@@ -331,9 +343,9 @@ class Hl7FinancialInsuranceTest {
                 // IN1.22 purposely empty to show that IN1.1 is secondary for Coverage.order
                 // IN1.23 through IN1.35 NOT REFERENCED
                 + "|DoeFake^Judy^^^Rev.|PAR|19780429|19 Rose St^^Faketown^CA^ZIP5||||||||||||||||"
-                // IN1.36 purposely present, used by SN identifier, but is ignored by MB identifier because IN2.61 takes priority
+                // IN1.36 purposely present, used by SN Coverage.identifier, but is ignored by MB Coverage.identifier because IN2.61 takes priority
                 // IN1.43 to RelatedPerson.gender
-                // IN1.46 to Identifier XV 3
+                // IN1.46 to Coverage.identifier XV 3
                 // IN1.49 to RelatedPerson.identifier
                 //    IN1.49.1 to RelatedPerson.identifier.value
                 //    IN1.49.4 to RelatedPerson.identifier.system
@@ -342,11 +354,11 @@ class Hl7FinancialInsuranceTest {
                 // IN1.50 through IN1.53 NOT REFERENCED
                 + "|MEMBER36|||||||F|||Value46|||J494949^^^Large HMO^XX||||\n"
                 // IN2.2 to RelatedPerson.identifier (SSN)
-                // IN2.6 to Identifier 5: MC Patient's Medicare number
-                // IN2.8 to Identifier 5: MA Patient Medicaid number
+                // IN2.6 to Coverage.identifier MC Patient's Medicare number
+                // IN2.8 to Coverage.identifier MA Patient Medicaid number
                 // IN2.9 through IN2.60 not used     
                 + "IN2||777-88-9999||||MEDICARE06||MEDICAID08|| |||||||||| ||||||||||| |||||||||| |||||||||| ||||||||||"
-                // IN2.61 to Identifier MB; takes priority over IN1.36
+                // IN2.61 to Coverage.identifier MB; takes priority over IN1.36
                 // IN2.63 to RelatedPerson.telecom
                 //    IN2.63.1 to Organization Contact telecom .value (ONLY when XTN.5-XTN.7 are empty.  See rules in getFormattedTelecomNumberValue.)
                 //    IN2.63.2 is not mapped. 
@@ -514,11 +526,11 @@ class Hl7FinancialInsuranceTest {
                 // FT1.7 is required transaction code (currently not used)
                 + "FT1||||20201231145045||CG|FAKE|||||||||||||||||||||||||||||||||||||\n"
                 // IN1 Segment is split and concatenated for easier understanding. (| precedes numbered field.)
-                // IN1.2.1, IN1.2.3 to Identifier XV 1
-                // IN1.2.4, IN1.2.6 to Identifier XV 2
+                // IN1.2.1, IN1.2.3 to Coverage.identifier XV 1
+                // IN1.2.4, IN1.2.6 to Coverage.identifier XV 2
                 + "IN1|1|Value1^^System3^Value4^^System6"
                 // Minimal Organization to test TENANT prepend. 
-                // IN1.3 to Organization Identifier 
+                // IN1.3 to Organization identifier 
                 //    IN1.3.1 to Organization Identifier.value
                 //    IN1.3.4 to Organization Identifier.system, will be prepended by TENANT from options
                 // IN1.4 to Organization Name
@@ -528,14 +540,14 @@ class Hl7FinancialInsuranceTest {
                 // IN1.17 to Coverage.relationship.  SEL (self) should create relationship of ONESELF, and reference to patient. 
                 // IN1.18 through IN1.35 NOT REFERENCED
                 + "||SEL||||||||||||||||||"
-                // IN1.36 to Identifier MB and Identifier SN
-                // IN1.46 to Identifier XV 3
+                // IN1.36 to Coverage.identifier MB and Coverage.identifier SN
+                // IN1.46 to Coverage.identifier XV 3
                 // IN1.47 through IN1.53 NOT REFERENCED
                 + "|MEMBER36||||||||||Value46|||||||\n"
-                // IN2.6 is purposely empty so will not create an MC identifier
-                // IN2.8 is purposely empty so will not create an MA identifier
+                // IN2.6 is purposely empty so will not create an MC Coverage.identifier
+                // IN2.8 is purposely empty so will not create an MA Coverage.identifier
                 // IN2.25 to new PayorId Organization
-                // IN2.61 is purposely empty (primary to IN1.36) so IN1.36 will be used as the MB identifier
+                // IN2.61 is purposely empty (primary to IN1.36) so IN1.36 will be used as the MB Coverage.identifier
                 + "IN2|||||||||||||||||||||||||IdValue25.1^^^IdSystem25.4^IdType25.5^^20201231145045^20211231145045|||||||||||||||||||||||||||||||||||||||||||"
                 // IN2.69 to new PolicyHolder Organization Name and ID
                 // IN2.72 is purposely empty (backup to IN1.17) so no RelatedPerson is created.
@@ -642,7 +654,7 @@ class Hl7FinancialInsuranceTest {
                 // FT1.7 is required transaction code (currently not used)
                 + "FT1||||20201231145045||CG|FAKE|||||||||||||||||||||||||||||||||||||\n"
                 // These fields in IN1 with these values cause the failure, leaving some of the field empty may be contribute.
-                // IN1.2 to Identifier XV 1
+                // IN1.2 to Coverage.identifier XV 1
                 // IN1.3 to Organization Identifier
                 // IN1.4 to Organization Name
                 // IN1.7 to Organization Telecom
@@ -699,8 +711,8 @@ class Hl7FinancialInsuranceTest {
                 // FT1.7 is required transaction code (currently not used)
                 + "FT1||||20201231145045||CG|FAKE|||||||||||||||||||||||||||||||||||||\n"
                 // IN1 Segment is split and concatenated for easier understanding. (| precedes numbered field.)
-                // IN1.2.1, IN1.2.3 to Identifier XV 1
-                // IN1.2.4, IN1.2.6 to Identifier XV 2
+                // IN1.2.1, IN1.2.3 to Coverage.identifier XV 1
+                // IN1.2.4, IN1.2.6 to Coverage.identifier XV 2
                 + "IN1|1|Value1^^System3^Value4^^System6"
                 // Minimal Organization. Required for Payor, which is required.
                 // Organization deep test in testBasicInsuranceCoverageFields
@@ -717,7 +729,7 @@ class Hl7FinancialInsuranceTest {
                 // IN1.17 purposely empty to validate IN2.72 works as secondary
                 // IN1.18 through IN1.35 NOT REFERENCED
                 + "|DoeFake^Judy^^^Rev.|||||||||||||||||||"
-                // IN1.36 to Identifier MB and Identifier SN
+                // IN1.36 to Coverage.identifier MB and Coverage.identifier SN
                 // IN1.37 through IN1.53 NOT REFERENCED
                 + "|MEMBER36|||||||||||||||||\n"
                 // IN2.1 through IN2.71 not used
@@ -797,8 +809,8 @@ class Hl7FinancialInsuranceTest {
                 // FT1.7 is required transaction code (currently not used)
                 + "FT1||||20201231145045||CG|FAKE|||||||||||||||||||||||||||||||||||||\n"
                 // IN1 Segment is split and concatenated for easier understanding. (| precedes numbered field.)
-                // IN1.2.1, IN1.2.3 to Identifier XV 1
-                // IN1.2.4, IN1.2.6 to Identifier XV 2
+                // IN1.2.1, IN1.2.3 to Coverage.identifier XV 1
+                // IN1.2.4, IN1.2.6 to Coverage.identifier XV 2
                 + "IN1|1|Value1^^System3^Value4^^System6"
                 // Minimal Organization
                 // IN1.3 to Organization Identifier 
@@ -809,7 +821,7 @@ class Hl7FinancialInsuranceTest {
                 // IN1.17 empty to verify that IN2.72 works as backup for IN1.17
                 // IN1.18 through IN1.35 NOT REFERENCED
                 + "||||||||||||||||||||"
-                // IN1.36 to Identifier MB and Identifier SN
+                // IN1.36 to Coverage.identifier MB and Coverage.identifier SN
                 // IN1.37 through IN1.53 NOT REFERENCED
                 + "|MEMBER36|||||||||||||||||\n"
                 // IN2.1 through IN2.71 NOT REFERENCED
@@ -817,6 +829,82 @@ class Hl7FinancialInsuranceTest {
                 // IN2.72 to Coverage.relationship and RelatedPerson.relationship.  (Backup for IN1.17) Codes from table 0344
                 // Code 01 (self) should create relationship of ONESELF, and reference to patient
                 + "01|\n";
+
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+
+        List<Resource> encounters = ResourceUtils.getResourceList(e, ResourceType.Encounter);
+        assertThat(encounters).hasSize(1); // From PV1
+
+        List<Resource> patients = ResourceUtils.getResourceList(e, ResourceType.Patient);
+        assertThat(patients).hasSize(1); // From PID
+        Patient patient = (Patient) patients.get(0);
+        String patientId = patient.getId();
+
+        List<Resource> organizations = ResourceUtils.getResourceList(e, ResourceType.Organization);
+        assertThat(organizations).hasSize(1); // From Payor created by IN1
+        Organization org = (Organization) organizations.get(0);
+
+        // Check organization Id's
+        assertThat(org.getIdentifier()).hasSize(1);
+        // Organization identifiers checked deeply in other tests
+
+        List<Resource> coverages = ResourceUtils.getResourceList(e, ResourceType.Coverage);
+        assertThat(coverages).hasSize(1); // From IN1 segment
+        Coverage coverage = (Coverage) coverages.get(0);
+
+        // Confirm Coverage Identifiers
+        assertThat(coverage.getIdentifier()).hasSize(4); // XV, XV, MB, SN
+        // Coverage Identifiers deep check in testBasicInsuranceCoverageFields
+
+        // Confirm Coverage Subscriber references to Patient
+        assertThat(coverage.getSubscriber().getReference()).isEqualTo(patientId);
+        // Confirm Coverage Beneficiary references to Patient, and Payor references to Organization
+        assertThat(coverage.getBeneficiary().getReference()).isEqualTo(patientId);
+        assertThat(coverage.getPayorFirstRep().getReference()).isEqualTo(organizations.get(0).getId());
+
+        // Expect no RelatedPerson because IN2.72 was 01 (self)
+        List<Resource> relatedPersons = ResourceUtils.getResourceList(e, ResourceType.RelatedPerson);
+        assertThat(relatedPersons).isEmpty(); // No related person should be created because IN2.72 was 01 (self)
+
+        // Check coverage.relationship (from SubscriberRelationship mapping)
+        DatatypeUtils.checkCommonCodeableConceptAssertions(coverage.getRelationship(), "self",
+                "Self",
+                "http://terminology.hl7.org/CodeSystem/subscriber-relationship", null); // IN2.72
+
+        // Confirm there are no unaccounted for resources
+        // Expected: Coverage, Organization, Patient, Encounter
+        assertThat(e).hasSize(4);
+    }
+
+    @Test
+    // Tests non-related subscriber, employer.
+    void testInsuranceCoverageOfWorkersComp() throws IOException {
+
+        String hl7message = "MSH|^~\\&|TEST|TEST|||20220101120000||DFT^P03|1234|P|2.6\n"
+                // + "EVN||20210407191342||||||\n"
+                + "PID|||workers_comp^^^XYZ^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
+                + "PV1||I||||||||||||||||||||||||||||||||||||||||||\n"
+                // FT1 added for completeness; required in specification, but not used (ignored) by templates
+                // FT1.4 is required transaction date (currently not used)
+                // FT1.6 is required transaction type (currently not used)
+                // FT1.7 is required transaction code (currently not used)
+                + "FT1||||20201231145045||CG|FAKE|||||||||||||||||||||||||||||||||||||\n"
+                // IN1 Segment is split and concatenated for easier understanding. (| precedes numbered field.)
+                // IN1.2.1, IN1.2.3 to Coverage.identifier XV 1
+                // IN1.2.4, IN1.2.6 to Coverage.identifier XV 2
+                + "IN1|1|Value1^^System3^Value4^^System6"
+                // Minimal Organization
+                // IN1.3 to Organization Identifier 
+                // INI.4 to Organization Name (required to inflate organization)
+                // IN1.5 through 15 NOT REFERENCED (Tested in testBasicInsuranceCoverageFields)
+                + "|IdValue1^^^IdSystem4^^^^|Large Blue Organization|||||||||||"
+                // IN1.16 empty because there is no related person (IN2.72 is self)
+                // IN1.17 is non-related value means "Employer"
+                // IN1.18 through IN1.35 NOT REFERENCED
+                + "||EMR||||||||||||||||||"
+                // IN1.36 to Coverage.identifier MB and Coverage.identifier SN
+                // IN1.37 through IN1.53 NOT REFERENCED
+                + "|MEMBER36|||||||||||||||||\n";
 
         List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
 
@@ -844,20 +932,19 @@ class Hl7FinancialInsuranceTest {
         assertThat(coverage.getIdentifier()).hasSize(4); // XV, XV, MB, SN
         // Coverage Identifiers deep check in testBasicInsuranceCoverageFields
 
-        // Confirm Coverage Subscriber references to Patient
-        assertThat(coverage.getSubscriber().getReference()).isEqualTo(patientId);
+        // Because the relationship is EMR (Employer), no subscriber is created (subscriber can't be an Organization)
+        assertThat(coverage.hasSubscriber()).isFalse();
         // Confirm Coverage Beneficiary references to Patient, and Payor references to Organization
         assertThat(coverage.getBeneficiary().getReference()).isEqualTo(patientId);
         assertThat(coverage.getPayorFirstRep().getReference()).isEqualTo(organizations.get(0).getId());
 
-        // Expect no RelatedPerson because IN2.72 was 01 (self)
+        // Expect no RelatedPerson because IN1.17 was EMR
         List<Resource> relatedPersons = ResourceUtils.getResourceList(e, ResourceType.RelatedPerson);
         assertThat(relatedPersons).isEmpty(); // No related person should be created because IN2.72 was 01 (self)
 
         // Check coverage.relationship (from SubscriberRelationship mapping)
-        DatatypeUtils.checkCommonCodeableConceptAssertions(coverage.getRelationship(), "self",
-                "Self",
-                "http://terminology.hl7.org/CodeSystem/subscriber-relationship", null); // IN2.72
+        DatatypeUtils.checkCommonCodeableConceptAssertions(coverage.getRelationship(), "EMR",
+                null, null, null); // IN1.17, because it is not mapped there is no system or display.
 
         // Confirm there are no unaccounted for resources
         // Expected: Coverage, Organization, Patient, Encounter
