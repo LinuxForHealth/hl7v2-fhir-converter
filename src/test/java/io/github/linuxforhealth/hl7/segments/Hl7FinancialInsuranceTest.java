@@ -103,7 +103,7 @@ class Hl7FinancialInsuranceTest {
                 // IN1.36 also to subscriberId
                 // IN1.46 to third XV Coverage.identifier
                 // IN1.49 to PatientCoverage.identifier
-                + "|MEMBER36||||||||||Value46|||PatientId49.1^^^System49.4^TypeCode49.5||||\n"
+                + "|MEMBER36||||||||||Value46|||PatientId49.1^^^System49.4^XX||||\n"
                 // IN2.6 is purposely empty so will not create an MC Coverage.identifier
                 // IN2.8 is purposely empty so will not create an MA Coverage.identifier
                 // IN2.25 to new PayorId Organization
@@ -131,7 +131,7 @@ class Hl7FinancialInsuranceTest {
         patientIdentifier = patient.getIdentifier().get(1);
         assertThat(patientIdentifier.getValue()).isEqualTo("PatientId49.1"); // IN1.49.1 
         assertThat(patientIdentifier.getSystem()).isEqualTo("urn:id:System49.4"); // IN1.49.4
-        DatatypeUtils.checkCommonCodeableConceptAssertions(patientIdentifier.getType(), "TypeCode49.5", null,
+        DatatypeUtils.checkCommonCodeableConceptAssertions(patientIdentifier.getType(), "XX", null,
                 "http://terminology.hl7.org/CodeSystem/v2-0203", null); // IN1.49.5        
 
         List<Resource> organizations = ResourceUtils.getResourceList(e, ResourceType.Organization);
