@@ -598,14 +598,14 @@ class Hl7FinancialInsuranceTest {
         DatatypeUtils.checkCommonCodeableConceptAssertions(patientIdentifier.getType(), "MR", "Medical record number",
                 "http://terminology.hl7.org/CodeSystem/v2-0203", null); // PID.3.5
         patientIdentifier = patient.getIdentifier().get(1);
-        assertThat(patientIdentifier.getValue()).isEqualTo("SSN123456"); // IN2.2
-        assertThat(patientIdentifier.hasSystem()).isFalse(); // No system for SSN
-        DatatypeUtils.checkCommonCodeableConceptAssertions(patientIdentifier.getType(), "SS", "Social Security number",
-                "http://terminology.hl7.org/CodeSystem/v2-0203", null);
-        patientIdentifier = patient.getIdentifier().get(2);
         assertThat(patientIdentifier.getValue()).isEqualTo("MEMBER36"); // IN1.36 backup to IN2.61, active because subscriber is SELF
         assertThat(patientIdentifier.hasSystem()).isFalse(); // No system for MB
         DatatypeUtils.checkCommonCodeableConceptAssertions(patientIdentifier.getType(), "MB", "Member Number",
+                "http://terminology.hl7.org/CodeSystem/v2-0203", null);
+        patientIdentifier = patient.getIdentifier().get(2);
+        assertThat(patientIdentifier.getValue()).isEqualTo("SSN123456"); // IN2.2
+        assertThat(patientIdentifier.hasSystem()).isFalse(); // No system for SSN
+        DatatypeUtils.checkCommonCodeableConceptAssertions(patientIdentifier.getType(), "SS", "Social Security number",
                 "http://terminology.hl7.org/CodeSystem/v2-0203", null);
 
         List<Resource> organizations = ResourceUtils.getResourceList(e, ResourceType.Organization);
