@@ -385,6 +385,12 @@ public class SimpleDataValueResolver {
         return getFHIRCode(val, "RelatedPersonNeeded");
     };
 
+    // Maps from IN1.17 or IN2.72 to a boolean string TRUE if the subscriber is equivalent to SELF
+    public static final ValueExtractor<Object, String> SUBSCRIBER_IS_SELF = (Object value) -> {
+        String val = Hl7DataHandlerUtil.getStringValue(value);
+        return getFHIRCode(val, "SubscriberIsSelf");
+    };
+
     public static final ValueExtractor<Object, SimpleCode> MARITAL_STATUS = (Object value) -> {
         String val = Hl7DataHandlerUtil.getStringValue(value);
         String text = Hl7DataHandlerUtil.getOriginalDisplayText(value);

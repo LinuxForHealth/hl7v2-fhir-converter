@@ -172,12 +172,12 @@ subscriber_1:
 # If the subscriber is SEL (self), do not create a relatedPerson, but reference the patient
 # NOT_NULL check is not needed because we have positive values and condition will not fire without them
 subscriber_2:
-  condition: $relatedRelationshipStr EQUALS SEL || $relatedRelationshipStr EQUALS 01
+  condition: $subscriberIsSelf EQUALS TRUE
   valueOf: datatype/Reference
   expressionType: resource
   specs: $Patient
   vars:
-    relatedRelationshipStr: String, IN1.17 | IN2.72
+    subscriberIsSelf: SUBSCRIBER_IS_SELF, IN1.17 | IN2.72 # subscriber relationship
 
 subscriberId:
   type: STRING

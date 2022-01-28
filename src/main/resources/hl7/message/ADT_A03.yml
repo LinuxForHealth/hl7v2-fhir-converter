@@ -22,6 +22,8 @@ resources:
       additionalSegments:
              - PD1
              - MSH
+             - INSURANCE.IN1
+             - INSURANCE.IN2
 
 
     - resourceName: Encounter
