@@ -389,15 +389,15 @@ MedicationRequestCategory:
   O: outpatient
 
 ###### IMPORTANT NOTES ON RELATIONSHIP MAPPINGS #########
-# Relationship mappings in tables V3RoleCode and SubscriberRelationship are coded in two different DIRECTIONS:  
+# Relationship mappings in tables PolicyholderRelationshipINxxx (V3RoleCode) and SubscriberRelationshipINxxx are coded in two different DIRECTIONS:  
 #  - Insured to Patient.  Example: Insured is parent of child patient. Used by IN1.17 and RelatedPerson.relationship.
 #  - Patient to Insured.  Example: Patient is child of insured parent. Used by IN2.72 and Coverage.relationship.
 # Insured is also referred to as Subscriber and Policyholder.  
 # Patient is also referred to as Beneficiary.
 
-# Mapping to RelatedPerson.relationship via POLICYHOLDER_RELATIONSHIP data resolver.
+# Mapping to RelatedPerson.relationship via POLICYHOLDER_RELATIONSHIP_IN117 data resolver.
 # Direction: Insured to Patient
-V3RoleCode:
+PolicyholderRelationshipIN117:
 # Codes from IN1.17 (values from table 0063) 
   BRO: BRO
 # CGV: Care giver: no good match
@@ -423,7 +423,10 @@ V3RoleCode:
   SPO: SPS
 # UNK: Unknown : no good match
 # WRD: Ward of the court : no good match 
-# - - - - -  
+
+# Mapping to RelatedPerson.relationship via POLICYHOLDER_RELATIONSHIP_IN272 data resolver.
+# Direction: Insured to Patient
+PolicyholderRelationshipIN272:
 # Codes from IN2.72 (values from table 0344) must be REVERSED for RelatedPerson.relationship.
   01: ONESELF # Patient is insured : Self
   02: SPS  # Spouse : Spouse
@@ -445,9 +448,9 @@ V3RoleCode:
   18: CHILD # Parent : Child 
   19: GRNDCHILD # Grandparent : Grandchild 
  
-# Mapping to Coverage.relationship via SUBSCRIBER_RELATIONSHIP data resolver.
+# Mapping to Coverage.relationship via SUBSCRIBER_RELATIONSHIP_IN117 data resolver.
 # Direction: Patient to Insured
-SubscriberRelationship:
+SubscriberRelationshipIN117:
 # Codes from IN1.17 (values from table 0063) must be REVERSED for Coverage.relationship
 # Think: If the patient is a XXXX, then the insured (subscriber) is their YYYY
   BRO: other
@@ -474,7 +477,10 @@ SubscriberRelationship:
   SPO: spouse
 # UNK: Unknown : no good match
 # WRD: Ward of the court : no good match
-# - - - - -  
+
+# Mapping to Coverage.relationship via SUBSCRIBER_RELATIONSHIP_IN272 data resolver.
+# Direction: Patient to Insured
+SubscriberRelationshipIN272:
 # Codes from IN2.72 (values from table 0344) NOT reversed.
   01: self # Patient is insured 
   02: spouse  # Spouse 
@@ -498,7 +504,7 @@ SubscriberRelationship:
 
 # Indicates whether a relatedPerson should be created for Coverage
 # Only a TRUE will cause relatedPerson to be created. At this time FALSE and no match are equivalent
-RelatedPersonNeeded:
+RelatedPersonNeededIN117:
 # Direction: Insured to Patient
 # Codes from IN1.17 (values from table 0063) 
   BRO: TRUE
@@ -525,7 +531,8 @@ RelatedPersonNeeded:
   SPO: TRUE
 # UNK: Unknown : no relatedPerson
 # WRD: Ward of the court : no relatedPerson 
-# - - - - -  
+
+RelatedPersonNeededIN272:
 # Codes from IN2.72 (values from table 0344) must be REVERSED for RelatedPerson.relationship.
   01: # Patient is insured : no relatedPerson
   02: TRUE  # Spouse : Spouse
@@ -546,12 +553,3 @@ RelatedPersonNeeded:
   17: TRUE # Minor dependent of a minor dependant input (grandchild dependent) : Grandparent
   18: TRUE # Parent : Child 
   19: TRUE # Grandparent : Grandchild 
-
-# Indicates whether the input code maps to SELF by returning TRUE.
-# FALSE and no match are equivalent.
-# Only matching codes listed because all other codes fail.
-SubscriberIsSelf:
-# Codes from IN1.17 (values from table 0063) 
-  SEL: TRUE
-# Codes from IN2.72 (values from table 0344)
-  01: TRUE  # Patient is insured : no relatedPerson

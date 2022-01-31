@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2020, 2021
+ * (C) Copyright IBM Corp. 2020, 2022
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -354,22 +354,28 @@ class SimpleDataValueResolverTest {
     void testPolicyholderRelationship() {
 
         // Check supported known input code (from table 0063)
-        SimpleCode coding = SimpleDataValueResolver.POLICYHOLDER_RELATIONSHIP.apply("PAR");
+        SimpleCode coding = SimpleDataValueResolver.POLICYHOLDER_RELATIONSHIP_IN117.apply("PAR");
         assertThat(coding).isNotNull();
         assertThat(coding.getCode()).isEqualTo("PRN");
         assertThat(coding.getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/v3-RoleCode");
         assertThat(coding.getDisplay()).isEqualTo("parent");
 
         // Check supported known input code (from table 0344) REVERSES the relationship.  See notes in v2ToFhirMapping.
-        coding = SimpleDataValueResolver.POLICYHOLDER_RELATIONSHIP.apply("18"); // 18 is parent
+        coding = SimpleDataValueResolver.POLICYHOLDER_RELATIONSHIP_IN272.apply("18"); // 18 is parent
         assertThat(coding).isNotNull();
         assertThat(coding.getCode()).isEqualTo("CHILD");
         assertThat(coding.getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/v3-RoleCode");
         assertThat(coding.getDisplay()).isEqualTo("child");
 
-        // Check unsupported unknown input code
-        // Because CGV has no mapping, we pass it without a system.
-        coding = SimpleDataValueResolver.POLICYHOLDER_RELATIONSHIP.apply("PET");
+        // Check unsupported unknown input codes
+        // Because PET has no mapping, we pass it without a system.
+        coding = SimpleDataValueResolver.POLICYHOLDER_RELATIONSHIP_IN117.apply("PET");
+        assertThat(coding.getCode()).isEqualTo("PET");
+        assertThat(coding.getSystem()).isNull();
+        assertThat(coding.getDisplay()).isNull();
+
+        // Because PET has no mapping, we pass it without a system.
+        coding = SimpleDataValueResolver.POLICYHOLDER_RELATIONSHIP_IN272.apply("PET");
         assertThat(coding.getCode()).isEqualTo("PET");
         assertThat(coding.getSystem()).isNull();
         assertThat(coding.getDisplay()).isNull();
@@ -379,22 +385,28 @@ class SimpleDataValueResolverTest {
     void testSubscriberRelationship() {
 
         // Check supported known input code (from table 0063) REVERSES the relationship.  See notes in v2ToFhirMapping.
-        SimpleCode coding = SimpleDataValueResolver.SUBSCRIBER_RELATIONSHIP.apply("CHD");
+        SimpleCode coding = SimpleDataValueResolver.SUBSCRIBER_RELATIONSHIP_IN117.apply("CHD");
         assertThat(coding).isNotNull();
         assertThat(coding.getCode()).isEqualTo("parent");
         assertThat(coding.getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/subscriber-relationship");
         assertThat(coding.getDisplay()).isEqualTo("Parent");
 
         // Check supported known input code (from table 0344)
-        coding = SimpleDataValueResolver.SUBSCRIBER_RELATIONSHIP.apply("04"); // is child
+        coding = SimpleDataValueResolver.SUBSCRIBER_RELATIONSHIP_IN272.apply("04"); // is child
         assertThat(coding).isNotNull();
         assertThat(coding.getCode()).isEqualTo("child");
         assertThat(coding.getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/subscriber-relationship");
         assertThat(coding.getDisplay()).isEqualTo("Child");
 
-        // Check unsupported unknown input code
+        // Check unsupported unknown input codes
         // Because GOAT has no mapping, we pass it without a system.
-        coding = SimpleDataValueResolver.POLICYHOLDER_RELATIONSHIP.apply("GOAT");
+        coding = SimpleDataValueResolver.POLICYHOLDER_RELATIONSHIP_IN117.apply("GOAT");
+        assertThat(coding.getCode()).isEqualTo("GOAT");
+        assertThat(coding.getSystem()).isNull();
+        assertThat(coding.getDisplay()).isNull();
+
+        // Because GOAT has no mapping, we pass it without a system.
+        coding = SimpleDataValueResolver.POLICYHOLDER_RELATIONSHIP_IN272.apply("GOAT");
         assertThat(coding.getCode()).isEqualTo("GOAT");
         assertThat(coding.getSystem()).isNull();
         assertThat(coding.getDisplay()).isNull();

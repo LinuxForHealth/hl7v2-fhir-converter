@@ -349,11 +349,11 @@ public class SimpleDataValueResolver {
     // Relationships are coded, mapped, and recoded in two different DIRECTIONS.  
     // See detailed notes in v2ToFhirMapping maps of V3RoleCode and SubscriberRelationship
 
-    // Maps from IN1.17 and IN2.72 to http://terminology.hl7.org/CodeSystem/v3-RoleCode
+    // Maps from IN1.17 to http://terminology.hl7.org/CodeSystem/v3-RoleCode
     // Used for Coverage.relationship
-    public static final ValueExtractor<Object, SimpleCode> POLICYHOLDER_RELATIONSHIP = (Object value) -> {
+    public static final ValueExtractor<Object, SimpleCode> POLICYHOLDER_RELATIONSHIP_IN117 = (Object value) -> {
         String val = Hl7DataHandlerUtil.getStringValue(value);
-        String code = getFHIRCode(val, V3RoleCode.class);
+        String code = getFHIRCode(val, "PolicyholderRelationshipIN117");
         String version = Hl7DataHandlerUtil.getVersion(value);
         if (code != null) {
             V3RoleCode relationship = V3RoleCode.fromCode(code);
@@ -364,11 +364,41 @@ public class SimpleDataValueResolver {
         }
     };
 
-    // Maps from IN1.17 and IN2.72 to http://terminology.hl7.org/CodeSystem/subscriber-relationship
-    // Used for RelatedPerson.relationship.
-    public static final ValueExtractor<Object, SimpleCode> SUBSCRIBER_RELATIONSHIP = (Object value) -> {
+    // Maps from IN2.72 to http://terminology.hl7.org/CodeSystem/v3-RoleCode
+    // Used for Coverage.relationship
+    public static final ValueExtractor<Object, SimpleCode> POLICYHOLDER_RELATIONSHIP_IN272 = (Object value) -> {
         String val = Hl7DataHandlerUtil.getStringValue(value);
-        String code = getFHIRCode(val, SubscriberRelationship.class);
+        String code = getFHIRCode(val, "PolicyholderRelationshipIN272");
+        String version = Hl7DataHandlerUtil.getVersion(value);
+        if (code != null) {
+            V3RoleCode relationship = V3RoleCode.fromCode(code);
+            return new SimpleCode(code, relationship.getSystem(), relationship.getDisplay(), version);
+        } else {
+            // If code is not found in our mapping, return the code itself with no system or display. 
+            return new SimpleCode(val, null, null, null);
+        }
+    };
+
+    // Maps from IN1.17 to http://terminology.hl7.org/CodeSystem/subscriber-relationship
+    // Used for RelatedPerson.relationship.
+    public static final ValueExtractor<Object, SimpleCode> SUBSCRIBER_RELATIONSHIP_IN117 = (Object value) -> {
+        String val = Hl7DataHandlerUtil.getStringValue(value);
+        String code = getFHIRCode(val, "SubscriberRelationshipIN117");
+        String version = Hl7DataHandlerUtil.getVersion(value);
+        if (code != null) {
+            SubscriberRelationship relationship = SubscriberRelationship.fromCode(code);
+            return new SimpleCode(code, relationship.getSystem(), relationship.getDisplay(), version);
+        } else {
+            // If code is not found in our mapping, return the code itself with no system or display. 
+            return new SimpleCode(val, null, null, null);
+        }
+    };
+
+    // Maps from IN2.72 to http://terminology.hl7.org/CodeSystem/subscriber-relationship
+    // Used for RelatedPerson.relationship.
+    public static final ValueExtractor<Object, SimpleCode> SUBSCRIBER_RELATIONSHIP_IN272 = (Object value) -> {
+        String val = Hl7DataHandlerUtil.getStringValue(value);
+        String code = getFHIRCode(val, "SubscriberRelationshipIN272");
         String version = Hl7DataHandlerUtil.getVersion(value);
         if (code != null) {
             SubscriberRelationship relationship = SubscriberRelationship.fromCode(code);
@@ -380,15 +410,15 @@ public class SimpleDataValueResolver {
     };
 
     // Maps from IN1.17 or IN2.72 to a boolean string TRUE if RelatedPerson should be created
-    public static final ValueExtractor<Object, String> RELATED_PERSON_NEEDED = (Object value) -> {
+    public static final ValueExtractor<Object, String> RELATED_PERSON_NEEDED_IN117 = (Object value) -> {
         String val = Hl7DataHandlerUtil.getStringValue(value);
-        return getFHIRCode(val, "RelatedPersonNeeded");
+        return getFHIRCode(val, "RelatedPersonNeededIN117");
     };
 
-    // Maps from IN1.17 or IN2.72 to a boolean string TRUE if the subscriber is equivalent to SELF
-    public static final ValueExtractor<Object, String> SUBSCRIBER_IS_SELF = (Object value) -> {
+    // Maps from IN1.17 or IN2.72 to a boolean string TRUE if RelatedPerson should be created
+    public static final ValueExtractor<Object, String> RELATED_PERSON_NEEDED_IN272 = (Object value) -> {
         String val = Hl7DataHandlerUtil.getStringValue(value);
-        return getFHIRCode(val, "SubscriberIsSelf");
+        return getFHIRCode(val, "RelatedPersonNeededIN272");
     };
 
     public static final ValueExtractor<Object, SimpleCode> MARITAL_STATUS = (Object value) -> {
