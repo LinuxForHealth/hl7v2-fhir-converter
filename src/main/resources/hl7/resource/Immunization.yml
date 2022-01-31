@@ -199,3 +199,83 @@ reaction:
    specs: OBX
    vars:
       obx31: String, OBX.3.1
+
+
+# See comments for Hl7ImmunizationFHIRConverstionTest.testMultipleNestedEducation
+# which explains the input and expected output.
+
+# The following loops over the OBX, but does not create the education element.
+# Even if it did loop correctly, it doesn't group the related elements.
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+education:
+   expressionType: nested
+   evaluateLater: true
+   generateList: true
+   specs: OBX
+   vars:
+      refRecId: BUILD_IDENTIFIER, OBX.4 # Creates an identifier in $refRecId from OBX.4 for each time we cycle through the specs: DG1
+   expressionsMap:
+     education:
+       valueOf: secondary/Education
+       generateList: true
+       expressionType: resource
+       condition: $refconditionId EQUALS_STRING $refRecId # Inner loop (refconditionId) matches outer loop (refRecId)
+       specs: OBX # Loops over the entire list of OBX records
+       vars:
+         # RefconditionId is calculated by getting the refRecId from the OBX
+         refconditionId: String, OBX.4 
+         presDate:  OBX.5
+       constants:
+         documentType: 'Vaccine Information Sheet'   
+
+# The following creates the Education array, but does not group the results
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# It yeilds:
+#   "education": [ {
+#     "documentType": "DTaP, UF Information Sheet"
+#   }, {
+#     "documentType": "Hep B, UF Information Sheet"
+#   }, {
+#     "publicationDate": "2007-05-17"
+#   }, {
+#     "publicationDate": "2012-02-02"
+#   }, {
+#     "presentationDate": "2014-12-03"
+#   }, {
+#     "presentationDate": "2014-12-03"
+#   } ]
+# }
+# education_1:
+#    valueOf: secondary/Education
+#    condition: $edCode EQUALS 30956-7
+#    expressionType: resource
+#    generateList: true
+#    specs: OBX
+#    vars:
+#       documentType:  OBX.5.2 + $documentAppend
+#       edCode: String, OBX.3.1
+#    constants:
+#       documentAppend: ' Information Sheet'          
+
+# education_2:
+#    valueOf: secondary/Education
+#    condition: $edCode EQUALS 29768-9
+#    expressionType: resource
+#    generateList: true
+#    specs: OBX
+#    vars:
+#       pubDate:  OBX.5
+#       edCode: String, OBX.3.1
+
+# education_3:
+#    valueOf: secondary/Education
+#    condition: $edCode EQUALS 29769-7
+#    expressionType: resource
+#    generateList: true
+#    specs: OBX
+#    vars:
+#       presDate:  OBX.5
+#       edCode: String, OBX.3.1  
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+

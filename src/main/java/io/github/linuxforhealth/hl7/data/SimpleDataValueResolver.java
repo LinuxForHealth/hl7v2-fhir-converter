@@ -607,6 +607,33 @@ public class SimpleDataValueResolver {
         return null;
     };
 
+    public static final ValueExtractor<Object, String> BUILD_IDENTIFIER = (Object value) -> {
+        if (value instanceof Varies) {
+            Varies variesValue = ((Varies) value);
+            if (variesValue.getData() instanceof CWE) {
+                value = (CWE) variesValue.getData();
+            }
+        }
+        if (value instanceof CWE) {
+            CWE newValue = ((CWE) value);
+            String identifier = newValue.getCwe1_Identifier().toString();
+            String text = newValue.getCwe2_Text().toString();
+            String codingSystem = newValue.getCwe3_NameOfCodingSystem().toString();
+            if (identifier != null) {
+                if (codingSystem != null) {
+                    String join = identifier + "-" + codingSystem;
+                    return join;
+                } else {
+                    return identifier;
+                }
+            } else
+                return text;
+        }
+
+        String myValue = value.toString();
+        return myValue;
+    };
+
     public static final ValueExtractor<Object, String> ALLERGY_INTOLERANCE_CRITICALITY_CODE_FHIR = (Object value) -> {
         String val = Hl7DataHandlerUtil.getStringValue(value);
         String code = getFHIRCode(val, AllergyIntoleranceCriticality.class);

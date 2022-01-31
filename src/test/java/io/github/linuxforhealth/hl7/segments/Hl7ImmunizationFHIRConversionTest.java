@@ -359,4 +359,61 @@ class Hl7ImmunizationFHIRConversionTest {
         }
 
     }
+
+    // The following creates education records which combine information from related OBX's, indicated by matching OBX.4 value
+    // For the records below, Immunization.education should be:
+    //
+    // "education": [
+    //     {
+    //         "documentType": "DTaP, UF Information Sheet",
+    //         "publicationDate": "2007-05-17",
+    //         "presentationDate": "2014-12-03"
+    //     },
+    //     {
+    //         "documentType": "Hep B, UF Information Sheet",
+    //         "publicationDate": "2012-02-02",
+    //         "presentationDate": "2014-12-03"                
+    //     }
+    // ],
+    @Test
+    void testMultipleNestedEducation() throws IOException {
+
+        String hl7VUXmessageRep =  "MSH|^~\\&||NH9999|NHIIS|NHIIS|20160106165800070+0000||VXU^V04^VXU_V04|20210205NH0000 01|P|2.5.1|||||||||Z22^CDCPHPHINVS|||\n" 
+                + "PID|1||12345^^^^MR||TestPatient^Jane^^^^^L||||||\n"
+                + "NK1|1|LASTNAME^FIRST^^^^^L|SPO^SPOUSE^HL70063||^PRN^PH^^^603^7772222\n"
+                + "ORC|RE||2623980^EHR|||||||||^ORDERINGLASTNAME^FIRST^^^^^^^L^^^MD|\n" 
+                + "RXA|0|1|20160105||33^PNEUMOCOCCAL POLYSACCHARIDE PPV23^CVX|0.5|ML^^UCUM| |00^NEW IMMUNIZATION RECORD^NIP001|^ADMINISTERINGLASTNAME^FIRST^^^^^^^L^^^RN|^^^NH9999||||L024129|201701 21|MSD^MERCK AND CO., INC.^MVX|||CP|A|\n"
+                + "RXR|C28161^Intramuscular^NCIT|LD^Left Deltoid^HL70163|\n"
+                + "OBX|1|CE|30956-7^Vaccine Type^LN|47|107^DTaP, UF^CVX||||||F\n"
+                + "OBX|2|DT|29768-9^Date Vaccine Information Statement Published^LN|47|20070517||||||F\n"
+                + "OBX|3|DT|29769-7^Date Vaccine Information Statement Presented^LN|47|20141203||||||F\n"
+                + "OBX|4|CE|30956-7^Vaccine Type^LN|48|45^Hep B, UF^CVX||||||F\n"
+                + "OBX|5|DT|29768-9^Date Vaccine Information Statement Published^LN|48|20120202||||||F\n"
+                + "OBX|6|DT|29769-7^Date Vaccine Information Statement Presented^LN|48|20141203||||||F\n"
+                + "ORC|RE||9999^EHR|||||||\n";
+
+        List<Bundle.BundleEntryComponent> e = ResourceUtils
+                .createFHIRBundleFromHL7MessageReturnEntryList(hl7VUXmessageRep);
+        List<Resource> immunizations = ResourceUtils.getResourceList(e, ResourceType.Immunization);
+        assertThat(immunizations).hasSize(1); // Exactly 3
+        Immunization immunization = (Immunization)immunizations.get(0);
+
+        assertThat(immunization.getEducation()).hasSize(4); // Exactly 4
+        assertThat(immunization.getEducation().get(0).getDocumentTypeElement()).hasToString("DTaP, UF Information Sheet");
+        assertThat(immunization.getEducation().get(0).getPublicationDateElement().toString()).containsPattern("2007-05-17");
+        assertThat(immunization.getEducation().get(0).getPresentationDateElement().toString()).containsPattern("2014-12-03");
+        assertThat(immunization.getEducation().get(1).getDocumentTypeElement()).hasToString("Hep B, UF Information Sheet");
+        assertThat(immunization.getEducation().get(1).getPublicationDateElement().toString()).containsPattern("2012-02-02");
+        assertThat(immunization.getEducation().get(1).getPresentationDateElement().toString()).containsPattern("2014-12-03");
+
+        List<Resource> organizations = ResourceUtils.getResourceList(e, ResourceType.Organization);
+        assertThat(organizations).hasSize(1); // Exactly 1
+
+        List<Resource> practitioners = ResourceUtils.getResourceList(e, ResourceType.Practitioner);
+        assertThat(practitioners).hasSize(2); // Exactly 2
+
+        // Expect Immunization, Organization, Practitioner (x2), Patient
+        assertThat(e).hasSize(5); // Exactly 5
+
+    }
 }

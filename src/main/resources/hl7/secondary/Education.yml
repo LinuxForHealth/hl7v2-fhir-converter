@@ -1,0 +1,35 @@
+#
+# (C) Copyright IBM Corp. 2022
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+# RULE: One of documentType or reference SHALL be present
+# Educational material document identifier : String
+documentType: 
+     type: STRING
+     valueOf: $documentType
+     expressionType: HL7Spec
+
+# Educational material reference pointer : uri
+reference_1 : 
+   type: URI
+   valueOf: $reference
+
+reference_2: 
+   type: STRING
+   valueOf: $resolvedReference
+
+# Educational material publication date : dateTime
+publicationDate: 
+     type: DATE_TIME
+     valueOf: $pubDate
+     expressionType: HL7Spec
+
+# Educational material presentation date : dateTime
+presentationDate:
+     type: DATE_TIME
+     valueOf: $presDate
+     expressionType: HL7Spec
+
+
