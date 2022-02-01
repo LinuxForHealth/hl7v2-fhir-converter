@@ -112,10 +112,10 @@ class Hl7FinancialInsuranceTest {
                 // IN2.69 to new PolicyHolder Organization Name and ID
                 //    IN2.69.1 to PolicyHolder Organization Name
                 //    IN2.69.6 to PolicyHolder Organization Identifier.system
-                //    IN2.69.7 to PolicyHolder Organization Identifier.type.code
+                //    IN2.69.7 to PolicyHolder Organization Identifier.type.code, purposely unknown code to validate code-only type
                 //    IN2.69.10 to PolicyHolder Organization Id and Identifier
                 // IN2.72 is purposely empty (backup to IN1.17) so no RelatedPerson is created.
-                + "|Name69.1^^^^^IdSystem69.6^XX^^^IdValue69.10||\n";
+                + "|Name69.1^^^^^IdSystem69.6^UNK^^^IdValue69.10||\n";
 
         List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
 
@@ -211,7 +211,8 @@ class Hl7FinancialInsuranceTest {
         orgIdentifer = org.getIdentifier().get(0);
         assertThat(orgIdentifer.getValue()).isEqualTo("IdValue69.10"); // IN2.69.10
         assertThat(orgIdentifer.getSystem()).isEqualTo("urn:id:IdSystem69.6"); // IN2.69.6
-        DatatypeUtils.checkCommonCodeableConceptAssertions(orgIdentifer.getType(), "XX", null, null, null); // IN2.69.7
+        // Becuase the code is unknown, the 0203 table lookup fails, and the coding has just the code, no system
+        DatatypeUtils.checkCommonCodeableConceptAssertions(orgIdentifer.getType(), "UNK", null, null, null); // IN2.69.7
 
         List<Resource> coverages = ResourceUtils.getResourceList(e, ResourceType.Coverage);
         assertThat(coverages).hasSize(1); // From IN1 segment
@@ -583,7 +584,7 @@ class Hl7FinancialInsuranceTest {
                 // IN2.69 to new PolicyHolder Organization 
                 //    IN2.69.1 to PolicyHolder Organization Name
                 //    IN2.69.6 to PolicyHolder Organization Identifier.system
-                //    IN2.69.7 to PolicyHolder Organization Identifier.type.code
+                //    IN2.69.7 to PolicyHolder Organization Identifier.type.code and will process as 203 table coding
                 //    IN2.69.10 to PolicyHolder Organization Id and Identifier
                 // IN2.72 is purposely empty (backup to IN1.17) so no RelatedPerson is created.
                 + "|Name69.1^^^^^IdSystem69.6^XX^^^IdValue69.10||\n";
@@ -623,7 +624,7 @@ class Hl7FinancialInsuranceTest {
         assertThat(organizations).hasSize(3); // From Payor created by IN1, PayorId Organization (IN2.25), and PolcyHolder Organization Name (IN2.69)
         Organization org = (Organization) organizations.get(0);
         String payorOrgId = org.getId();
-        assertThat(payorOrgId).isEqualTo("Organization/TenantId.IdValue1"); // IN1.17.1
+        assertThat(payorOrgId).isEqualTo("Organization/TenantId.IdValue1"); // IN1.17.1 w/TENANT prepend
 
         // Check organization Identifier's
         assertThat(org.getName()).isEqualTo("Large Blue Organization"); // IN1.4
@@ -637,7 +638,7 @@ class Hl7FinancialInsuranceTest {
         // Check PayorId Organization from IN2.25 
         org = (Organization) organizations.get(1);
         String payorOrgIdIn25 = org.getId();
-        assertThat(payorOrgIdIn25).isEqualTo("Organization/TenantId.IdValue25.1"); // IN1.25.1
+        assertThat(payorOrgIdIn25).isEqualTo("Organization/TenantId.IdValue25.1"); // IN1.25.1 w/TENANT prepend
         assertThat(org.getName()).isEqualTo("IdValue25.1"); // IN2.25.1
         assertThat(org.getIdentifier()).hasSize(1);
         orgIdentifer = org.getIdentifier().get(0);
@@ -650,13 +651,14 @@ class Hl7FinancialInsuranceTest {
         // Check PolicyHolder Organization Name and ID Organization from IN2.69
         org = (Organization) organizations.get(2);
         String policyHolderOrgId = org.getId();
-        assertThat(policyHolderOrgId).isEqualTo("Organization/TenantId.IdValue69.10"); // IN2.69.1
+        assertThat(policyHolderOrgId).isEqualTo("Organization/TenantId.IdValue69.10"); // IN2.69.1 w/TENANT prepend
         assertThat(org.getName()).isEqualTo("Name69.1"); // IN2.69.1
         assertThat(org.getIdentifier()).hasSize(1);
         orgIdentifer = org.getIdentifier().get(0);
         assertThat(orgIdentifer.getValue()).isEqualTo("TenantId.IdValue69.10"); // IN2.69.10 w/TENANT. prepend
         assertThat(orgIdentifer.getSystem()).isEqualTo("urn:id:IdSystem69.6"); // IN2.69.6
-        DatatypeUtils.checkCommonCodeableConceptAssertions(orgIdentifer.getType(), "XX", null, null, null); // IN2.69.7
+        // Becuase the code is known, the 0203 table lookup is successful and returns code, display, and system
+        DatatypeUtils.checkCommonCodeableConceptAssertions(orgIdentifer.getType(), "XX", "Organization identifier", "http://terminology.hl7.org/CodeSystem/v2-0203", null); // IN2.69.7 with lookup
 
         List<Resource> coverages = ResourceUtils.getResourceList(e, ResourceType.Coverage);
         assertThat(coverages).hasSize(1); // From IN1 segment
