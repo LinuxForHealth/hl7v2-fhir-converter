@@ -137,15 +137,16 @@ identifier_5:
    constants:
       system: http://terminology.hl7.org/CodeSystem/v2-0203
 
-# Only include when the subscriber is self
-identifier_6:
-  condition: $valueIn NOT_NULL && $subscriberValue EQUALS SEL
+# identifier_6a and _6b are two parts to complex logic
+# Only include when the subscriber is self, uses IN1.17
+identifier_6a:
+  condition: $valueIn NOT_NULL && $valueIN117 EQUALS SEL
   valueOf: datatype/Identifier_var
   generateList: true
   expressionType: resource
   vars:
     valueIn: IN2.61 | IN1.36
-    subscriberValue: String, IN1.17.1  # subscriber relationship
+    valueIN117: String, IN1.17.1  # subscriber relationship
     # No systemCX set for this identifier
   constants:
     system: "http://terminology.hl7.org/CodeSystem/v2-0203"
@@ -153,16 +154,16 @@ identifier_6:
     display: "Member Number"
 
 # Only include when the subscriber is self
-# Give IN1.17 priority (even urecognized value) over IN2.72
+# IN2.72 only gets used if IN1.17 priority is empty (see identifier_6a) 
 identifier_6b:
-  condition: $valueIn NOT_NULL && $valueIn117 NULL && $subscriberValue EQUALS 01
+  condition: $valueIn NOT_NULL && $valueIN117 NULL && $valueIN272 EQUALS 01
   valueOf: datatype/Identifier_var
   generateList: true
   expressionType: resource
   vars:
     valueIn: IN2.61 | IN1.36
-    valueIn117: IN1.17.1
-    subscriberValue: String, IN2.72  # subscriber relationship
+    valueIN117: IN1.17.1
+    valueIN272: String, IN2.72  # subscriber relationship
     # No systemCX set for this identifier
   constants:
     system: "http://terminology.hl7.org/CodeSystem/v2-0203"

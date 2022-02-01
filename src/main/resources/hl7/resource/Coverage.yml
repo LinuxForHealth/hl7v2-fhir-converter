@@ -171,7 +171,7 @@ subscriber_1a:
 
 # If IN1.17 is empty and the subscriber from IN2.72 is in the list of relationship codes needing a relatedPerson, create one
 subscriber_1b:
-  condition: $createRelatedPerson NOT_NULL && $valueIn117 NULL && $createRelatedPerson EQUALS TRUE
+  condition: $valueIn117 NULL && $createRelatedPerson NOT_NULL && $createRelatedPerson EQUALS TRUE
   valueOf: resource/RelatedPerson
   expressionType: reference
   vars:

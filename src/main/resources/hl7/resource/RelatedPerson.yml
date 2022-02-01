@@ -52,6 +52,7 @@ patient:
    generateList: true
    specs: $Patient
 
+# When IN1.17 has a value
 relationship_1a:
    valueOf: datatype/CodeableConcept
    expressionType: resource
