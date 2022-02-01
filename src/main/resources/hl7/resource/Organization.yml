@@ -3,11 +3,32 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 #
+# Used by most organizations
+# $orgIdValue would be missing because not passed in such as for IN1 / IN2 
 resourceType: Organization
-id:
+id_1:
+  condition: $orgIdValue NULL
   type: STRING
   valueOf: UUID.randomUUID()
   expressionType: JEXL
+
+# When there is IN1 / IN2 record but there is NO TENANT
+# $orgIdValue must be passed in to control which IN1 / IN2 is used, and prevent bleed
+id_2:
+  condition: $orgIdValue NOT_NULL && $TENANT NULL
+  type: STRING
+  valueOf: $orgIdValue
+
+# When there is IN1 / IN2 record and there IS a TENANT
+# $orgIdValue must be passed in to control which IN1 / IN2 is used, and prevent bleed
+id_3:
+  condition: $orgIdValue NOT_NULL && $TENANT NOT_NULL
+  type: STRING
+  valueOf: $orgIdWithTenantPrefix
+  vars: 
+    orgIdWithTenantPrefix: $TENANT + $period + $orgIdValue
+  constants:
+    period: "." # period is constant used between concatention in $orgIdWithTenantPrefix    
 
 # Used by most organizations
 identifier_1:
