@@ -992,4 +992,83 @@ class Hl7FinancialInsuranceTest {
         assertThat(e).hasSize(4);
     }
 
+    @Test
+    // Here, we try to trick the system by using a valid IN2.72 code in IN1.17, where it is not valid
+    // The system should accept the unknown code, but NOT create a related person.
+    // As part of the test, there is a valid code in IN2.72 that would create a related person, but it should be ignored.
+    void testInsuranceCoverageUnknownRelationship() throws IOException {
+
+        String hl7message = "MSH|^~\\&|TEST|TEST|||20220101120000||DFT^P03|1234|P|2.6\n"
+                // + "EVN||20210407191342||||||\n"
+                + "PID|||workers_comp^^^XYZ^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
+                + "PV1||I||||||||||||||||||||||||||||||||||||||||||\n"
+                // FT1 added for completeness; required in specification, but not used (ignored) by templates
+                // FT1.4 is required transaction date (currently not used)
+                // FT1.6 is required transaction type (currently not used)
+                // FT1.7 is required transaction code (currently not used)
+                + "FT1||||20201231145045||CG|FAKE|||||||||||||||||||||||||||||||||||||\n"
+                // IN1 Segment is split and concatenated for easier understanding. (| precedes numbered field.)
+                // IN1.2.1, IN1.2.3 to first XV Coverage.identifier
+                // IN1.2.4, IN1.2.6 to second XV Coverage.identifier
+                + "IN1|1|Value1^^System3^Value4^^System6"
+                // Minimal Organization
+                // IN1.3 to Organization Identifier 
+                // INI.4 to Organization Name (required to inflate organization)
+                // IN1.5 through 15 NOT REFERENCED (Tested in testBasicInsuranceCoverageFields)
+                + "|IdValue1^^^IdSystem4^^^^|Large Blue Organization|||||||||||"
+                // IN1.16 purposely empty because there is no related person
+                // IN1.17 is purposely an unknown code to be placed in Coverage.relationship but NOT RelatedPerson.relationship, which will not be created
+                // IN1.18 through IN1.53 NOT REFERENCED
+                + "||05||||||||||||||||||||||||||||||||||||\n"
+                // IN2.1 through IN2.71 NOT REFERENCED
+                + "IN2||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||"
+                // IN2.72 is valid and would create a RelatedPerson, but it is ignored because IN1.17 has a value (even though it is an unknown code)
+                // A valid code in IN2.72 does not take priority over an invalid code in IN1.17.
+                + "04|\n";
+
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+
+        List<Resource> encounters = ResourceUtils.getResourceList(e, ResourceType.Encounter);
+        assertThat(encounters).hasSize(1); // From PV1
+
+        List<Resource> patients = ResourceUtils.getResourceList(e, ResourceType.Patient);
+        assertThat(patients).hasSize(1); // From PID
+        Patient patient = (Patient) patients.get(0);
+        String patientId = patient.getId();
+
+        List<Resource> organizations = ResourceUtils.getResourceList(e, ResourceType.Organization);
+        assertThat(organizations).hasSize(1); // From Payor created by IN1
+        Organization org = (Organization) organizations.get(0);
+
+        // Check organization Id's
+        assertThat(org.getIdentifier()).hasSize(1);
+        // Org identifiers checked deeply in other tests
+
+        List<Resource> coverages = ResourceUtils.getResourceList(e, ResourceType.Coverage);
+        assertThat(coverages).hasSize(1); // From IN1 segment
+        Coverage coverage = (Coverage) coverages.get(0);
+
+        // Confirm Coverage Identifiers
+        assertThat(coverage.getIdentifier()).hasSize(2); // XV, XV
+        // Coverage Identifiers deep check in testBasicInsuranceCoverageFields
+
+        // Because the relationship is 05, an unknown code, no subscriber is created
+        assertThat(coverage.hasSubscriber()).isFalse();
+        // Confirm Coverage Beneficiary references to Patient, and Payor references to Organization
+        assertThat(coverage.getBeneficiary().getReference()).isEqualTo(patientId);
+        assertThat(coverage.getPayorFirstRep().getReference()).isEqualTo(organizations.get(0).getId());
+
+        // Expect no RelatedPerson because IN1.17 was an unknown code
+        List<Resource> relatedPersons = ResourceUtils.getResourceList(e, ResourceType.RelatedPerson);
+        assertThat(relatedPersons).isEmpty(); // No related person should be created because IN1.17 was an unknown code
+
+        // Check coverage.relationship (from SubscriberRelationship mapping)
+        DatatypeUtils.checkCommonCodeableConceptAssertions(coverage.getRelationship(), "05",
+                null, null, null); // IN1.17, because it is unkown there is no system or display.
+
+        // Confirm there are no unaccounted for resources
+        // Expected: Coverage, Organization, Patient, Encounter
+        assertThat(e).hasSize(4);
+    }
+
 }

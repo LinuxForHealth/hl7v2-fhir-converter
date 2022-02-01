@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2021
+ * (C) Copyright IBM Corp. 2021, 2022
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -45,12 +45,12 @@ class HL7MergeFHIRConversionTest {
         // There should be 2 - One for the PID segment and one for the MRG segment
         assertThat(patientResources).hasSize(2);
 
-        // Get first patient and associated indentifiers and id.
+        // Get first patient and associated identifiers and id.
         Patient patientOne = PatientUtils.getPatientFromResource(patientResources.get(0));
         String patientOneId = patientOne.getId();
         List<Identifier> patientOneIdentifierList = patientOne.getIdentifier();
 
-        // Get second patient and associated indentifiers and id.
+        // Get second patient and associated identifiers and id.
         Patient patientTwo = PatientUtils.getPatientFromResource(patientResources.get(1));
         String patientTwoId = patientTwo.getId();
         List<Identifier> patientTwoIdentifierList = patientTwo.getIdentifier();
@@ -195,12 +195,12 @@ class HL7MergeFHIRConversionTest {
         // There should be 2 - One for the PID segment and one for the MRG segment
         assertThat(patientResources).hasSize(2);
 
-        // Get first patient and associated indentifiers and id.
+        // Get first patient and associated identifiers and id.
         Patient patientOne = PatientUtils.getPatientFromResource(patientResources.get(0));
         String patientOneId = patientOne.getId();
         List<Identifier> patientOneIdentifierList = patientOne.getIdentifier();
 
-        // Get second patient and associated indentifiers and id.
+        // Get second patient and associated identifiers and id.
         Patient patientTwo = PatientUtils.getPatientFromResource(patientResources.get(1));
         String patientTwoId = patientTwo.getId();
         List<Identifier> patientTwoIdentifierList = patientTwo.getIdentifier();
@@ -294,22 +294,22 @@ class HL7MergeFHIRConversionTest {
         // There should be 4 - One for each PID segment and one for each MRG segment
         assertThat(patientResources).hasSize(4);
 
-        // Get first patient and associated indentifiers and id.
+        // Get first patient and associated identifiers and id.
         Patient patientOne = PatientUtils.getPatientFromResource(patientResources.get(0));
         String patientOneId = patientOne.getId();
         List<Identifier> patientOneIdentifierList = patientOne.getIdentifier();
 
-        // Get second patient and associated indentifiers and id.
+        // Get second patient and associated identifiers and id.
         Patient patientTwo = PatientUtils.getPatientFromResource(patientResources.get(1));
         String patientTwoId = patientTwo.getId();
         List<Identifier> patientTwoIdentifierList = patientTwo.getIdentifier();
 
-        // Get third patient and associated indentifiers and id.
+        // Get third patient and associated identifiers and id.
         Patient patientThree = PatientUtils.getPatientFromResource(patientResources.get(2));
         String patientThreeId = patientThree.getId();
         List<Identifier> patientThreeIdentifierList = patientThree.getIdentifier();
 
-        // Get fourth patient and associated indentifiers and id.
+        // Get fourth patient and associated identifiers and id.
         Patient patientFour = PatientUtils.getPatientFromResource(patientResources.get(3));
         String patientFourId = patientFour.getId();
         List<Identifier> patientFourIdentifierList = patientFour.getIdentifier();
@@ -389,7 +389,7 @@ class HL7MergeFHIRConversionTest {
         // Verify the second identifier is marked as old
         assertThat(patientThreeIdentifierList.get(1).getUse()).isEqualTo(Identifier.IdentifierUse.OLD);
 
-        // Verify identifier type is not present for the first indentifier
+        // Verify identifier type is not present for the first identifier
         assertThat(patientThreeIdentifierList.get(0).getType().getCoding()).isEmpty();
 
         // Verify identifier type is set correctly for the second identifier

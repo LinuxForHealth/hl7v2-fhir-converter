@@ -52,14 +52,26 @@ patient:
    generateList: true
    specs: $Patient
 
-relationship:
+# When IN1.17 has a value
+relationship_1a:
    valueOf: datatype/CodeableConcept
    expressionType: resource
    generateList: true
    condition: $coding NOT_NULL
    vars:
-      coding: POLICYHOLDER_RELATIONSHIP, IN1.17 | IN2.72
-      text: String, IN1.17.2 | IN2.72.2
+      coding: POLICYHOLDER_RELATIONSHIP_IN117, IN1.17
+      text: String, IN1.17.2
+
+# When IN1.17 is empty, use IN2.72 as the relationship
+relationship_1b:
+   valueOf: datatype/CodeableConcept
+   expressionType: resource
+   generateList: true
+   condition: $valueIn117 NULL && $coding NOT_NULL
+   vars:
+      coding: POLICYHOLDER_RELATIONSHIP_IN272, IN2.72
+      valueIn117: IN1.17.1
+      text: String, IN2.72.2      
 
 name:
    valueOf: datatype/HumanName
