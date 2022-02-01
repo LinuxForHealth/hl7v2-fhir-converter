@@ -156,7 +156,8 @@ policyHolder:
     orgName: String, IN2.69.1
     orgIdValue: String, IN2.69.10 # used for Id and Identifier
     orgIdSystem: String, IN2.69.6
-    orgIdTypeCode: String, IN2.69.7
+    # Using coding does intelligent system lookup, field knows its table is 0203
+    orgIdTypeCoding: CODING_SYSTEM_V2_IS_USER_DEFINED_TABLE, IN2.69.7 
 
 # If the subscriber from IN1.17 is in the list of relationship codes needing a relatedPerson, create one
 subscriber_1a:

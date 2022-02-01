@@ -53,6 +53,7 @@ identifier_2a:
     start: $orgIdStart
     end: $orgIdEnd
     code: $orgIdTypeCode
+    coding: $orgIdTypeCoding # $coding takes priority over $code
 
 # Used by IN1/Coverage (Insurance) organizations, which have a more complex identifier
 # This handles case when $TENANT is passed at run time
@@ -67,10 +68,13 @@ identifier_2b:
     start: $orgIdStart
     end: $orgIdEnd
     code: $orgIdTypeCode
+    coding: $orgIdTypeCoding  # $coding takes priority over $code
   constants:
     period: "." # period is constant used between concatention in $valueIn
 
+# Must check for empty valueIn because coding could be set
 identifier_3:
+  condition: $valueIn NOT_NULL
   valueOf: datatype/Identifier_var
   generateList: true
   expressionType: resource
