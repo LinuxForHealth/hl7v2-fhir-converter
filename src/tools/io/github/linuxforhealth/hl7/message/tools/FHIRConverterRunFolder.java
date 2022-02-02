@@ -57,7 +57,7 @@ public class FHIRConverterRunFolder {
             //get the list of Files in the Folder
             File inputFolder = new File(inputFolderName);
             if (!inputFolder.exists()) {
-                System.out.println("Intput folder " + inputFolderName + " not found");
+                System.out.println("Input folder " + inputFolderName + " not found");
                 return;
             }
             File outputFolder = new File(outputFolderName);
