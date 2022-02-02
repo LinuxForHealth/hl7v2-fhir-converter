@@ -144,7 +144,7 @@ class Hl7FinancialInsuranceTest {
 
         // Check Payor Organization Id's
         String payorOrgId = org.getId();
-        assertThat(payorOrgId).isEqualTo("Organization/IdValue1"); // IN1.17.1 (no TENANT)
+        assertThat(payorOrgId).isEqualTo("Organization/idvalue1"); // IN1.17.1 (no TENANT)  (Id's lowercased)
         assertThat(org.getName()).isEqualTo("Large Blue Organization"); // IN1.4
         assertThat(org.getIdentifier()).hasSize(2);
         Identifier orgIdentifer = org.getIdentifier().get(0);
@@ -192,7 +192,7 @@ class Hl7FinancialInsuranceTest {
         // Check PayorId Organization from IN2.25 
         org = (Organization) organizations.get(1);
         String payorOrgIdIn25 = org.getId();
-        assertThat(payorOrgIdIn25).isEqualTo("Organization/IdValue25.1"); // IN1.25.1 (no TENANT)
+        assertThat(payorOrgIdIn25).isEqualTo("Organization/idvalue25.1"); // IN1.25.1 (no TENANT) (Id's lowercased)
         assertThat(org.getName()).isEqualTo("IdValue25.1"); // IN2.25.1
         assertThat(org.getIdentifier()).hasSize(1);
         orgIdentifer = org.getIdentifier().get(0);
@@ -205,7 +205,7 @@ class Hl7FinancialInsuranceTest {
         // Check PolicyHolder Organization Name and ID Organization from IN2.69
         org = (Organization) organizations.get(2);
         String policyHolderOrgId = org.getId();
-        assertThat(policyHolderOrgId).isEqualTo("Organization/IdValue69.10"); // IN2.69.1 (no TENANT)
+        assertThat(policyHolderOrgId).isEqualTo("Organization/idvalue69.10"); // IN2.69.1 (no TENANT) (Id's lowercased)
         assertThat(org.getName()).isEqualTo("Name69.1"); // IN2.69.1
         assertThat(org.getIdentifier()).hasSize(1);
         orgIdentifer = org.getIdentifier().get(0);
@@ -624,7 +624,7 @@ class Hl7FinancialInsuranceTest {
         assertThat(organizations).hasSize(3); // From Payor created by IN1, PayorId Organization (IN2.25), and PolcyHolder Organization Name (IN2.69)
         Organization org = (Organization) organizations.get(0);
         String payorOrgId = org.getId();
-        assertThat(payorOrgId).isEqualTo("Organization/TenantId.IdValue1"); // IN1.17.1 w/TENANT prepend
+        assertThat(payorOrgId).isEqualTo("Organization/tenantid.idvalue1"); // IN1.17.1 w/TENANT prepend (Id's lowercased)
 
         // Check organization Identifier's
         assertThat(org.getName()).isEqualTo("Large Blue Organization"); // IN1.4
@@ -638,7 +638,7 @@ class Hl7FinancialInsuranceTest {
         // Check PayorId Organization from IN2.25 
         org = (Organization) organizations.get(1);
         String payorOrgIdIn25 = org.getId();
-        assertThat(payorOrgIdIn25).isEqualTo("Organization/TenantId.IdValue25.1"); // IN1.25.1 w/TENANT prepend
+        assertThat(payorOrgIdIn25).isEqualTo("Organization/tenantid.idvalue25.1"); // IN1.25.1 w/TENANT prepend (Id's lowercased)
         assertThat(org.getName()).isEqualTo("IdValue25.1"); // IN2.25.1
         assertThat(org.getIdentifier()).hasSize(1);
         orgIdentifer = org.getIdentifier().get(0);
@@ -651,7 +651,7 @@ class Hl7FinancialInsuranceTest {
         // Check PolicyHolder Organization Name and ID Organization from IN2.69
         org = (Organization) organizations.get(2);
         String policyHolderOrgId = org.getId();
-        assertThat(policyHolderOrgId).isEqualTo("Organization/TenantId.IdValue69.10"); // IN2.69.1 w/TENANT prepend
+        assertThat(policyHolderOrgId).isEqualTo("Organization/tenantid.idvalue69.10"); // IN2.69.1 w/TENANT prepend (Id's lowercased)
         assertThat(org.getName()).isEqualTo("Name69.1"); // IN2.69.1
         assertThat(org.getIdentifier()).hasSize(1);
         orgIdentifer = org.getIdentifier().get(0);

@@ -90,6 +90,14 @@ public class SimpleDataValueResolver {
         return Hl7DataHandlerUtil.getStringValue(value, true);
     };
 
+    public static final ValueExtractor<Object, String> LOWER_CASE_STRING = (Object value) -> {
+        String strValue = Hl7DataHandlerUtil.getStringValue(value);
+        if (strValue != null) {
+            return strValue.toLowerCase();
+        } 
+        return null;
+    };
+
     public static final ValueExtractor<Object, String> INSTANT = (Object value) -> {
         String val = Hl7DataHandlerUtil.getStringValue(value);
         if (val != null) {
