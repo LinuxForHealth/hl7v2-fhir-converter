@@ -211,7 +211,6 @@ class SimpleDataValueResolverTest {
         assertThat(SimpleDataValueResolver.VALID_ID.apply("A B C")).isEqualTo("a-b-c");
         assertThat(SimpleDataValueResolver.VALID_ID.apply("A-B-C")).isEqualTo("a-b-c");
         assertThat(SimpleDataValueResolver.VALID_ID.apply("A/B/C")).isEqualTo("a-b-c");
-        assertThat(SimpleDataValueResolver.VALID_ID.apply("Å-B-C")).isEqualTo("--b-c");
         assertThat(SimpleDataValueResolver.VALID_ID.apply("A_B,C")).isEqualTo("a-b-c");
         assertThat(SimpleDataValueResolver.VALID_ID.apply("A.B.C")).isEqualTo("a.b.c");
     }
