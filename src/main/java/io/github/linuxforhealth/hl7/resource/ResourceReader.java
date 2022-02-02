@@ -80,17 +80,26 @@ public class ResourceReader {
    * @return The resource as a String
    */
   public String getResource(String resourcePath) {
-    Path resourceFolderFilePath = Paths.get(converterConfig.getResourceFolder(), resourcePath);
-    Path alternateResourceFolderFilePath = Paths.get(converterConfig.getAdditionalResourcesLocation(), resourcePath);
+    String resourceFolderName = converterConfig.getResourceFolder();
+    String additionalResourcesFolderName = converterConfig.getAdditionalResourcesLocation();
     String resource = null;
 
     try {
-      if (resourceFolderFilePath != null && resourceFolderFilePath.toFile().exists()) {
-        resource = loadFileResource(resourceFolderFilePath.toFile());
-      } 
-      if (resource == null && alternateResourceFolderFilePath != null && alternateResourceFolderFilePath.toFile().exists()) {
-        resource = loadFileResource(alternateResourceFolderFilePath.toFile());
-      } 
+      if (resourceFolderName != null) {
+        Path resourceFolderFilePath = Paths.get(resourceFolderName, resourcePath);
+        if (resourceFolderFilePath.toFile().exists()) {
+          resource = loadFileResource(resourceFolderFilePath.toFile());
+        }
+      }
+
+      if (resource == null && additionalResourcesFolderName != null) {
+        Path alternateResourceFolderFilePath = Paths.get(additionalResourcesFolderName, resourcePath);
+
+        if (alternateResourceFolderFilePath.toFile().exists()) {
+          resource = loadFileResource(alternateResourceFolderFilePath.toFile());
+        }
+      }
+
       if (resource == null) {
         resource = loadClassPathResource(resourcePath);
       }
