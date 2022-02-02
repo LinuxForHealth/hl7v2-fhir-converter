@@ -19,6 +19,8 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
+import io.github.linuxforhealth.hl7.ConverterOptions;
+import io.github.linuxforhealth.hl7.ConverterOptions.Builder;
 import io.github.linuxforhealth.hl7.HL7ToFHIRConverter;
 
 /**
@@ -55,7 +57,7 @@ public class FHIRConverterRunFolder {
             //get the list of Files in the Folder
             File inputFolder = new File(inputFolderName);
             if (!inputFolder.exists()) {
-                System.out.println("Intput folder " + inputFolderName + " not found");
+                System.out.println("Input folder " + inputFolderName + " not found");
                 return;
             }
             File outputFolder = new File(outputFolderName);
@@ -87,7 +89,10 @@ public class FHIRConverterRunFolder {
 
                     // Convert from HL7 to JSON
                     HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
-                    String json = ftv.convert(hl7MessageString);
+                    ConverterOptions options = new Builder().withValidateResource().withPrettyPrint()
+                            .withProperty("TENANT", "tenantid").build();
+
+                    String json = ftv.convert(hl7MessageString, options);
 
                     // Create a JSON object to be able to pretty print 
                     JsonParser parser = new JsonParser();
