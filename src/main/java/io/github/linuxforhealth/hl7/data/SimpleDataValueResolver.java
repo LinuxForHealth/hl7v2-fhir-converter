@@ -90,10 +90,11 @@ public class SimpleDataValueResolver {
         return Hl7DataHandlerUtil.getStringValue(value, true);
     };
 
-    public static final ValueExtractor<Object, String> LOWER_CASE_STRING = (Object value) -> {
+    public static final ValueExtractor<Object, String> VALID_ID = (Object value) -> {
         String strValue = Hl7DataHandlerUtil.getStringValue(value);
         if (strValue != null) {
-            return strValue.toLowerCase();
+            strValue = strValue.toLowerCase();
+            return strValue.replaceAll("[^a-zA-Z0-9.]", "-");
         } 
         return null;
     };
