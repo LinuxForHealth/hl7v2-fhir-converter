@@ -16,14 +16,14 @@ id_1:
 # $orgIdValue must be passed in to control which IN1 / IN2 is used, and prevent bleed
 id_2:
   condition: $orgIdValue NOT_NULL && $TENANT NULL
-  type: STRING
+  type: LOWER_CASE_STRING
   valueOf: $orgIdValue
 
 # When there is IN1 / IN2 record and there IS a TENANT
 # $orgIdValue must be passed in to control which IN1 / IN2 is used, and prevent bleed
 id_3:
   condition: $orgIdValue NOT_NULL && $TENANT NOT_NULL
-  type: STRING
+  type: LOWER_CASE_STRING
   valueOf: $orgIdWithTenantPrefix
   vars: 
     orgIdWithTenantPrefix: $TENANT + $period + $orgIdValue
