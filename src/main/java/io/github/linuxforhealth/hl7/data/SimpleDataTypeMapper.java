@@ -14,7 +14,7 @@ public enum SimpleDataTypeMapper {
   INTEGER(SimpleDataValueResolver.INTEGER),
   STRING(SimpleDataValueResolver.STRING),
   STRING_ALL(SimpleDataValueResolver.STRING_ALL),
-  LOWER_CASE_STRING(SimpleDataValueResolver.LOWER_CASE_STRING),
+  VALID_ID(SimpleDataValueResolver.VALID_ID),
   FLOAT(SimpleDataValueResolver.FLOAT),
   BASE64_BINARY(SimpleDataValueResolver.BASE64_BINARY),
 

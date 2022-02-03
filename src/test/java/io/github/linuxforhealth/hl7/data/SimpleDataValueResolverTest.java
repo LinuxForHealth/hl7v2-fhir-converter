@@ -206,6 +206,16 @@ class SimpleDataValueResolverTest {
     }
 
     @Test
+    // Tests VALID_ID
+    void testConvertToValidId() {
+        assertThat(SimpleDataValueResolver.VALID_ID.apply("A B C")).isEqualTo("a-b-c");
+        assertThat(SimpleDataValueResolver.VALID_ID.apply("A-B-C")).isEqualTo("a-b-c");
+        assertThat(SimpleDataValueResolver.VALID_ID.apply("A/B/C")).isEqualTo("a-b-c");
+        assertThat(SimpleDataValueResolver.VALID_ID.apply("A_B,C")).isEqualTo("a-b-c");
+        assertThat(SimpleDataValueResolver.VALID_ID.apply("A.B.C")).isEqualTo("a.b.c");
+    }
+
+    @Test
     void get_race_value_valid() throws DataTypeException {
         CWE cwe = new CWE(null);
         cwe.getCwe3_NameOfCodingSystem().setValue("HL70005");
