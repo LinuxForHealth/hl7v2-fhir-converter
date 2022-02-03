@@ -227,7 +227,7 @@ education:
          presDate:  OBX.5
        constants:
          documentType: 'Vaccine Information Sheet'   
-
+ 
 # The following creates the Education array, but does not group the results
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # It yeilds:
