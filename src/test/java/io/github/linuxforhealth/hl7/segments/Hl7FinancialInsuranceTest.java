@@ -147,14 +147,14 @@ class Hl7FinancialInsuranceTest {
         assertThat(payorOrgId).isEqualTo("Organization/idvalue1"); // IN1.17.1 (no TENANT)  (Id's lowercased)
         assertThat(org.getName()).isEqualTo("Large Blue Organization"); // IN1.4
         assertThat(org.getIdentifier()).hasSize(2);
-        Identifier orgIdentifer = org.getIdentifier().get(0);
-        assertThat(orgIdentifer.getValue()).isEqualTo("COMPANYPLANCODE35"); // IN1.35
+        Identifier orgIdentifier = org.getIdentifier().get(0);
+        assertThat(orgIdentifier.getValue()).isEqualTo("IdValue1"); // IN1.3.1 
+        assertThat(orgIdentifier.getSystem()).isEqualTo("urn:id:IdSystem4"); // IN1.3.4
+        assertThat(orgIdentifier.getPeriod().getStartElement().toString()).containsPattern("2020-12-31T14:50:45"); // IN1.3.7
+        assertThat(orgIdentifier.getPeriod().getEndElement().toString()).containsPattern("2021-12-31T14:50:45"); // IN1.3.8
+        DatatypeUtils.checkCommonCodeableConceptAssertions(orgIdentifier.getType(), "IdType5", null, null, null); // IN1.3.5
         Identifier orgIdentifier1 = org.getIdentifier().get(1);
-        assertThat(orgIdentifier1.getValue()).isEqualTo("IdValue1"); // IN1.3.1 
-        assertThat(orgIdentifier1.getSystem()).isEqualTo("urn:id:IdSystem4"); // IN1.3.4
-        assertThat(orgIdentifier1.getPeriod().getStartElement().toString()).containsPattern("2020-12-31T14:50:45"); // IN1.3.7
-        assertThat(orgIdentifier1.getPeriod().getEndElement().toString()).containsPattern("2021-12-31T14:50:45"); // IN1.3.8
-        DatatypeUtils.checkCommonCodeableConceptAssertions(orgIdentifier1.getType(), "IdType5", null, null, null); // IN1.3.5
+        assertThat(orgIdentifier1.getValue()).isEqualTo("COMPANYPLANCODE35"); // IN1.35
 
         // Check Payor Organization address. IN1.4 is a standard XAD address, which is tested exhaustively in other tests.  
         assertThat(org.getAddress()).hasSize(1);
@@ -194,12 +194,12 @@ class Hl7FinancialInsuranceTest {
         assertThat(payorOrgIdIn25).isEqualTo("Organization/idvalue25.1"); // IN1.25.1 (no TENANT) (Id's lowercased)
         assertThat(org.getName()).isEqualTo("IdValue25.1"); // IN2.25.1
         assertThat(org.getIdentifier()).hasSize(1);
-        orgIdentifer = org.getIdentifier().get(0);
-        assertThat(orgIdentifer.getValue()).isEqualTo("IdValue25.1"); // IN2.25.1
-        assertThat(orgIdentifer.getSystem()).isEqualTo("urn:id:IdSystem25.4"); // IN2.25.4
-        assertThat(orgIdentifer.getPeriod().getStartElement().toString()).containsPattern("2020-12-31T14:50:45"); // IN2.25.7
-        assertThat(orgIdentifer.getPeriod().getEndElement().toString()).containsPattern("2021-12-31T14:50:45"); // IN2.25.8
-        DatatypeUtils.checkCommonCodeableConceptAssertions(orgIdentifer.getType(), "IdType25.5", null, null, null); // IN2.25.5
+        orgIdentifier = org.getIdentifier().get(0);
+        assertThat(orgIdentifier.getValue()).isEqualTo("IdValue25.1"); // IN2.25.1
+        assertThat(orgIdentifier.getSystem()).isEqualTo("urn:id:IdSystem25.4"); // IN2.25.4
+        assertThat(orgIdentifier.getPeriod().getStartElement().toString()).containsPattern("2020-12-31T14:50:45"); // IN2.25.7
+        assertThat(orgIdentifier.getPeriod().getEndElement().toString()).containsPattern("2021-12-31T14:50:45"); // IN2.25.8
+        DatatypeUtils.checkCommonCodeableConceptAssertions(orgIdentifier.getType(), "IdType25.5", null, null, null); // IN2.25.5
 
         // Check PolicyHolder Organization Name and ID Organization from IN2.69
         org = (Organization) organizations.get(2);
@@ -207,11 +207,11 @@ class Hl7FinancialInsuranceTest {
         assertThat(policyHolderOrgId).isEqualTo("Organization/idvalue69.10"); // IN2.69.1 (no TENANT) (Id's lowercased)
         assertThat(org.getName()).isEqualTo("Name69.1"); // IN2.69.1
         assertThat(org.getIdentifier()).hasSize(1);
-        orgIdentifer = org.getIdentifier().get(0);
-        assertThat(orgIdentifer.getValue()).isEqualTo("IdValue69.10"); // IN2.69.10
-        assertThat(orgIdentifer.getSystem()).isEqualTo("urn:id:IdSystem69.6"); // IN2.69.6
+        orgIdentifier = org.getIdentifier().get(0);
+        assertThat(orgIdentifier.getValue()).isEqualTo("IdValue69.10"); // IN2.69.10
+        assertThat(orgIdentifier.getSystem()).isEqualTo("urn:id:IdSystem69.6"); // IN2.69.6
         // Becuase the code is unknown, the 0203 table lookup fails, and the coding has just the code, no system
-        DatatypeUtils.checkCommonCodeableConceptAssertions(orgIdentifer.getType(), "UNK", null, null, null); // IN2.69.7
+        DatatypeUtils.checkCommonCodeableConceptAssertions(orgIdentifier.getType(), "UNK", null, null, null); // IN2.69.7
 
         List<Resource> coverages = ResourceUtils.getResourceList(e, ResourceType.Coverage);
         assertThat(coverages).hasSize(1); // From IN1 segment
@@ -628,11 +628,11 @@ class Hl7FinancialInsuranceTest {
         // Check organization Identifier's
         assertThat(org.getName()).isEqualTo("Large Blue Organization"); // IN1.4
         assertThat(org.getIdentifier()).hasSize(1);
-        Identifier orgIdentifer = org.getIdentifierFirstRep();
-        assertThat(orgIdentifer.getValue()).isEqualTo("IdValue1"); // IN1.3.1
-        assertThat(orgIdentifer.getSystem()).isEqualTo("urn:id:IdSystem4"); // IN1.3.4
-        assertThat(orgIdentifer.hasPeriod()).isFalse(); // IN1.3.7 & IN1.3.7 empty
-        assertThat(orgIdentifer.hasType()).isFalse(); // IN1.3.5 empty
+        Identifier orgIdentifier = org.getIdentifierFirstRep();
+        assertThat(orgIdentifier.getValue()).isEqualTo("IdValue1"); // IN1.3.1
+        assertThat(orgIdentifier.getSystem()).isEqualTo("urn:id:IdSystem4"); // IN1.3.4
+        assertThat(orgIdentifier.hasPeriod()).isFalse(); // IN1.3.7 & IN1.3.7 empty
+        assertThat(orgIdentifier.hasType()).isFalse(); // IN1.3.5 empty
 
         // Check PayorId Organization from IN2.25 
         org = (Organization) organizations.get(1);
@@ -640,12 +640,12 @@ class Hl7FinancialInsuranceTest {
         assertThat(payorOrgIdIn25).isEqualTo("Organization/tenantid.idvalue25.1"); // IN1.25.1 w/TENANT prepend (Id's lowercased)
         assertThat(org.getName()).isEqualTo("IdValue25.1"); // IN2.25.1
         assertThat(org.getIdentifier()).hasSize(1);
-        orgIdentifer = org.getIdentifier().get(0);
-        assertThat(orgIdentifer.getValue()).isEqualTo("IdValue25.1"); // IN2.25.1 
-        assertThat(orgIdentifer.getSystem()).isEqualTo("urn:id:IdSystem25.4"); // IN2.25.4
-        assertThat(orgIdentifer.getPeriod().getStartElement().toString()).containsPattern("2020-12-31T14:50:45"); // IN2.25.7
-        assertThat(orgIdentifer.getPeriod().getEndElement().toString()).containsPattern("2021-12-31T14:50:45"); // IN2.25.8
-        DatatypeUtils.checkCommonCodeableConceptAssertions(orgIdentifer.getType(), "IdType25.5", null, null, null); // IN2.25.5
+        orgIdentifier = org.getIdentifier().get(0);
+        assertThat(orgIdentifier.getValue()).isEqualTo("IdValue25.1"); // IN2.25.1 
+        assertThat(orgIdentifier.getSystem()).isEqualTo("urn:id:IdSystem25.4"); // IN2.25.4
+        assertThat(orgIdentifier.getPeriod().getStartElement().toString()).containsPattern("2020-12-31T14:50:45"); // IN2.25.7
+        assertThat(orgIdentifier.getPeriod().getEndElement().toString()).containsPattern("2021-12-31T14:50:45"); // IN2.25.8
+        DatatypeUtils.checkCommonCodeableConceptAssertions(orgIdentifier.getType(), "IdType25.5", null, null, null); // IN2.25.5
 
         // Check PolicyHolder Organization Name and ID Organization from IN2.69
         org = (Organization) organizations.get(2);
@@ -653,11 +653,11 @@ class Hl7FinancialInsuranceTest {
         assertThat(policyHolderOrgId).isEqualTo("Organization/tenantid.idvalue69.10"); // IN2.69.1 w/TENANT prepend (Id's lowercased)
         assertThat(org.getName()).isEqualTo("Name69.1"); // IN2.69.1
         assertThat(org.getIdentifier()).hasSize(1);
-        orgIdentifer = org.getIdentifier().get(0);
-        assertThat(orgIdentifer.getValue()).isEqualTo("IdValue69.10"); // IN2.69.10
-        assertThat(orgIdentifer.getSystem()).isEqualTo("urn:id:IdSystem69.6"); // IN2.69.6
+        orgIdentifier = org.getIdentifier().get(0);
+        assertThat(orgIdentifier.getValue()).isEqualTo("IdValue69.10"); // IN2.69.10
+        assertThat(orgIdentifier.getSystem()).isEqualTo("urn:id:IdSystem69.6"); // IN2.69.6
         // Becuase the code is known, the 0203 table lookup is successful and returns code, display, and system
-        DatatypeUtils.checkCommonCodeableConceptAssertions(orgIdentifer.getType(), "XX", "Organization identifier", "http://terminology.hl7.org/CodeSystem/v2-0203", null); // IN2.69.7 with lookup
+        DatatypeUtils.checkCommonCodeableConceptAssertions(orgIdentifier.getType(), "XX", "Organization identifier", "http://terminology.hl7.org/CodeSystem/v2-0203", null); // IN2.69.7 with lookup
 
         List<Resource> coverages = ResourceUtils.getResourceList(e, ResourceType.Coverage);
         assertThat(coverages).hasSize(1); // From IN1 segment

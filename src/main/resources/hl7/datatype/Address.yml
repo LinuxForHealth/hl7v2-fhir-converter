@@ -42,7 +42,7 @@ district:
      vars:
      # from Patient, if provided.
       patientCounty: $distPatientCounty
-      addressCountyParish: $distCountyParish
+      addressCountyParish: String, XAD.9 | $distCountyParish 
       patient: $distPatient
 
 country: 

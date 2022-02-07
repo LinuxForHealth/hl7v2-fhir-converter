@@ -213,10 +213,10 @@ address:
    expressionType: resource
    specs: PID.11
    vars:
-        # Used in Address to create district for Patient address.
+        # Used in Address to create district for patient address
         # In future, they could be processed in a DataValueResolver. 
         distPatientCounty: String, PID.12
-        distAddressCountyParish: String, XAD.9
+        distAddressCountyParish: String, PID.11.9
         distPatient: PID
 
 telecom_1:
