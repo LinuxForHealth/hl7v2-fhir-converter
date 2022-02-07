@@ -31,14 +31,19 @@ postalCode:
      valueOf: XAD.5
      expressionType: HL7Spec
 
+# District should only be added for a patient address, and never for Organization.
+# NOTE: in future, this could be made a data value resolver and put in Patient.yml
 district:
+    #  Only process for patients.
+     condition: patient NOT_NULL
      type: STRING
      valueOf: 'GeneralUtils.getAddressDistrict( patientCounty, addressCountyParish, patient)'
      expressionType: JEXL
      vars:
-          patientCounty: String, PID.12
-          addressCountyParish: String, XAD.9
-          patient: PID
+     # from Patient, if provided.
+      patientCounty: $distPatientCounty
+      addressCountyParish: String, XAD.9 | $distCountyParish 
+      patient: $distPatient
 
 country: 
      type: STRING

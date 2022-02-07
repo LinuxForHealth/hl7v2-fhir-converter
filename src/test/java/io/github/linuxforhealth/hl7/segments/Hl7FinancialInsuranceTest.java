@@ -147,15 +147,14 @@ class Hl7FinancialInsuranceTest {
         assertThat(payorOrgId).isEqualTo("Organization/idvalue1"); // IN1.17.1 (no TENANT)  (Id's lowercased)
         assertThat(org.getName()).isEqualTo("Large Blue Organization"); // IN1.4
         assertThat(org.getIdentifier()).hasSize(2);
-        Identifier orgIdentifer = org.getIdentifier().get(0);
-        assertThat(orgIdentifer.getValue()).isEqualTo("COMPANYPLANCODE35"); // IN1.35
+        Identifier orgIdentifier = org.getIdentifier().get(0);
+        assertThat(orgIdentifier.getValue()).isEqualTo("IdValue1"); // IN1.3.1 
+        assertThat(orgIdentifier.getSystem()).isEqualTo("urn:id:IdSystem4"); // IN1.3.4
+        assertThat(orgIdentifier.getPeriod().getStartElement().toString()).containsPattern("2020-12-31T14:50:45"); // IN1.3.7
+        assertThat(orgIdentifier.getPeriod().getEndElement().toString()).containsPattern("2021-12-31T14:50:45"); // IN1.3.8
+        DatatypeUtils.checkCommonCodeableConceptAssertions(orgIdentifier.getType(), "IdType5", null, null, null); // IN1.3.5
         Identifier orgIdentifier1 = org.getIdentifier().get(1);
-        // Note: in the next assert, no TENANT value set; confirm default (nothing) was used.  See testInsuranceCoverageOfSelfAndTenant for test of setting TENANT.
-        assertThat(orgIdentifier1.getValue()).isEqualTo("IdValue1"); // IN1.3.1 
-        assertThat(orgIdentifier1.getSystem()).isEqualTo("urn:id:IdSystem4"); // IN1.3.4
-        assertThat(orgIdentifier1.getPeriod().getStartElement().toString()).containsPattern("2020-12-31T14:50:45"); // IN1.3.7
-        assertThat(orgIdentifier1.getPeriod().getEndElement().toString()).containsPattern("2021-12-31T14:50:45"); // IN1.3.8
-        DatatypeUtils.checkCommonCodeableConceptAssertions(orgIdentifier1.getType(), "IdType5", null, null, null); // IN1.3.5
+        assertThat(orgIdentifier1.getValue()).isEqualTo("COMPANYPLANCODE35"); // IN1.35
 
         // Check Payor Organization address. IN1.4 is a standard XAD address, which is tested exhaustively in other tests.  
         assertThat(org.getAddress()).hasSize(1);
@@ -195,12 +194,12 @@ class Hl7FinancialInsuranceTest {
         assertThat(payorOrgIdIn25).isEqualTo("Organization/idvalue25.1"); // IN1.25.1 (no TENANT) (Id's lowercased)
         assertThat(org.getName()).isEqualTo("IdValue25.1"); // IN2.25.1
         assertThat(org.getIdentifier()).hasSize(1);
-        orgIdentifer = org.getIdentifier().get(0);
-        assertThat(orgIdentifer.getValue()).isEqualTo("IdValue25.1"); // IN2.25.1
-        assertThat(orgIdentifer.getSystem()).isEqualTo("urn:id:IdSystem25.4"); // IN2.25.4
-        assertThat(orgIdentifer.getPeriod().getStartElement().toString()).containsPattern("2020-12-31T14:50:45"); // IN2.25.7
-        assertThat(orgIdentifer.getPeriod().getEndElement().toString()).containsPattern("2021-12-31T14:50:45"); // IN2.25.8
-        DatatypeUtils.checkCommonCodeableConceptAssertions(orgIdentifer.getType(), "IdType25.5", null, null, null); // IN2.25.5
+        orgIdentifier = org.getIdentifier().get(0);
+        assertThat(orgIdentifier.getValue()).isEqualTo("IdValue25.1"); // IN2.25.1
+        assertThat(orgIdentifier.getSystem()).isEqualTo("urn:id:IdSystem25.4"); // IN2.25.4
+        assertThat(orgIdentifier.getPeriod().getStartElement().toString()).containsPattern("2020-12-31T14:50:45"); // IN2.25.7
+        assertThat(orgIdentifier.getPeriod().getEndElement().toString()).containsPattern("2021-12-31T14:50:45"); // IN2.25.8
+        DatatypeUtils.checkCommonCodeableConceptAssertions(orgIdentifier.getType(), "IdType25.5", null, null, null); // IN2.25.5
 
         // Check PolicyHolder Organization Name and ID Organization from IN2.69
         org = (Organization) organizations.get(2);
@@ -208,11 +207,11 @@ class Hl7FinancialInsuranceTest {
         assertThat(policyHolderOrgId).isEqualTo("Organization/idvalue69.10"); // IN2.69.1 (no TENANT) (Id's lowercased)
         assertThat(org.getName()).isEqualTo("Name69.1"); // IN2.69.1
         assertThat(org.getIdentifier()).hasSize(1);
-        orgIdentifer = org.getIdentifier().get(0);
-        assertThat(orgIdentifer.getValue()).isEqualTo("IdValue69.10"); // IN2.69.10
-        assertThat(orgIdentifer.getSystem()).isEqualTo("urn:id:IdSystem69.6"); // IN2.69.6
+        orgIdentifier = org.getIdentifier().get(0);
+        assertThat(orgIdentifier.getValue()).isEqualTo("IdValue69.10"); // IN2.69.10
+        assertThat(orgIdentifier.getSystem()).isEqualTo("urn:id:IdSystem69.6"); // IN2.69.6
         // Becuase the code is unknown, the 0203 table lookup fails, and the coding has just the code, no system
-        DatatypeUtils.checkCommonCodeableConceptAssertions(orgIdentifer.getType(), "UNK", null, null, null); // IN2.69.7
+        DatatypeUtils.checkCommonCodeableConceptAssertions(orgIdentifier.getType(), "UNK", null, null, null); // IN2.69.7
 
         List<Resource> coverages = ResourceUtils.getResourceList(e, ResourceType.Coverage);
         assertThat(coverages).hasSize(1); // From IN1 segment
@@ -335,7 +334,7 @@ class Hl7FinancialInsuranceTest {
                 // Minimal Organization. Required for Payor, which is required.
                 // Organization deep test in testBasicInsuranceCoverageFields
                 // IN1.3 to Organization Identifier 
-                //    IN1.3.1 to Organization Identifier.value  (No TENANT set; uses default (nothing).)
+                //    IN1.3.1 to Organization Identifier.value 
                 //    IN1.3.4 to Organization Identifier.system
                 // INI.4 to Organization Name (required to inflate organization)
                 // IN1.5 to 15 NOT REFERENCED (See test testBasicInsuranceCoverageFields)
@@ -542,7 +541,7 @@ class Hl7FinancialInsuranceTest {
     @java.lang.SuppressWarnings("squid:S5961")
     @Test
     // Tests IN1.17 coverage by one's self. A related person should not be created.  But the patient should be referenced.
-    // Tests multiple Organization ID's created with a TENANT prepend.
+    // Tests multiple Organization Id's created with a TENANT prepend.
     void testInsuranceCoverageOfSelfAndTenant() throws IOException {
 
         String hl7message = "MSH|^~\\&|||||20151008111200||DFT^P03^DFT_P03|MSGID000001|T|2.6|||||||||\n"
@@ -559,10 +558,10 @@ class Hl7FinancialInsuranceTest {
                 // IN1.2.1, IN1.2.3 to first XV Coverage.identifier
                 // IN1.2.4, IN1.2.6 to second XV Coverage.identifier
                 + "IN1|1|Value1^^System3^Value4^^System6"
-                // Minimal Organization to test TENANT prepend. 
+                // Minimal Organization 
                 // IN1.3 to Organization identifier 
                 //    IN1.3.1 to Organization Identifier.value
-                //    IN1.3.4 to Organization Identifier.system, will be prepended by TENANT from options
+                //    IN1.3.4 to Organization Identifier.system
                 // IN1.4 to Organization Name
                 // IN1.5 to 15 NOT REFERENCED (Tested in testBasicInsuranceCoverageFields)
                 + "|IdValue1^^^IdSystem4^^^^|Large Blue Organization|||||||||||"
@@ -629,11 +628,11 @@ class Hl7FinancialInsuranceTest {
         // Check organization Identifier's
         assertThat(org.getName()).isEqualTo("Large Blue Organization"); // IN1.4
         assertThat(org.getIdentifier()).hasSize(1);
-        Identifier orgIdentifer = org.getIdentifierFirstRep();
-        assertThat(orgIdentifer.getValue()).isEqualTo("TenantId.IdValue1"); // Options TENANT + IN1.3.1
-        assertThat(orgIdentifer.getSystem()).isEqualTo("urn:id:IdSystem4"); // IN1.3.4
-        assertThat(orgIdentifer.hasPeriod()).isFalse(); // IN1.3.7 & IN1.3.7 empty
-        assertThat(orgIdentifer.hasType()).isFalse(); // IN1.3.5 empty
+        Identifier orgIdentifier = org.getIdentifierFirstRep();
+        assertThat(orgIdentifier.getValue()).isEqualTo("IdValue1"); // IN1.3.1
+        assertThat(orgIdentifier.getSystem()).isEqualTo("urn:id:IdSystem4"); // IN1.3.4
+        assertThat(orgIdentifier.hasPeriod()).isFalse(); // IN1.3.7 & IN1.3.7 empty
+        assertThat(orgIdentifier.hasType()).isFalse(); // IN1.3.5 empty
 
         // Check PayorId Organization from IN2.25 
         org = (Organization) organizations.get(1);
@@ -641,12 +640,12 @@ class Hl7FinancialInsuranceTest {
         assertThat(payorOrgIdIn25).isEqualTo("Organization/tenantid.idvalue25.1"); // IN1.25.1 w/TENANT prepend (Id's lowercased)
         assertThat(org.getName()).isEqualTo("IdValue25.1"); // IN2.25.1
         assertThat(org.getIdentifier()).hasSize(1);
-        orgIdentifer = org.getIdentifier().get(0);
-        assertThat(orgIdentifer.getValue()).isEqualTo("TenantId.IdValue25.1"); // IN2.25.1 w/TENANT. prepend
-        assertThat(orgIdentifer.getSystem()).isEqualTo("urn:id:IdSystem25.4"); // IN2.25.4
-        assertThat(orgIdentifer.getPeriod().getStartElement().toString()).containsPattern("2020-12-31T14:50:45"); // IN2.25.7
-        assertThat(orgIdentifer.getPeriod().getEndElement().toString()).containsPattern("2021-12-31T14:50:45"); // IN2.25.8
-        DatatypeUtils.checkCommonCodeableConceptAssertions(orgIdentifer.getType(), "IdType25.5", null, null, null); // IN2.25.5
+        orgIdentifier = org.getIdentifier().get(0);
+        assertThat(orgIdentifier.getValue()).isEqualTo("IdValue25.1"); // IN2.25.1 
+        assertThat(orgIdentifier.getSystem()).isEqualTo("urn:id:IdSystem25.4"); // IN2.25.4
+        assertThat(orgIdentifier.getPeriod().getStartElement().toString()).containsPattern("2020-12-31T14:50:45"); // IN2.25.7
+        assertThat(orgIdentifier.getPeriod().getEndElement().toString()).containsPattern("2021-12-31T14:50:45"); // IN2.25.8
+        DatatypeUtils.checkCommonCodeableConceptAssertions(orgIdentifier.getType(), "IdType25.5", null, null, null); // IN2.25.5
 
         // Check PolicyHolder Organization Name and ID Organization from IN2.69
         org = (Organization) organizations.get(2);
@@ -654,11 +653,11 @@ class Hl7FinancialInsuranceTest {
         assertThat(policyHolderOrgId).isEqualTo("Organization/tenantid.idvalue69.10"); // IN2.69.1 w/TENANT prepend (Id's lowercased)
         assertThat(org.getName()).isEqualTo("Name69.1"); // IN2.69.1
         assertThat(org.getIdentifier()).hasSize(1);
-        orgIdentifer = org.getIdentifier().get(0);
-        assertThat(orgIdentifer.getValue()).isEqualTo("TenantId.IdValue69.10"); // IN2.69.10 w/TENANT. prepend
-        assertThat(orgIdentifer.getSystem()).isEqualTo("urn:id:IdSystem69.6"); // IN2.69.6
+        orgIdentifier = org.getIdentifier().get(0);
+        assertThat(orgIdentifier.getValue()).isEqualTo("IdValue69.10"); // IN2.69.10
+        assertThat(orgIdentifier.getSystem()).isEqualTo("urn:id:IdSystem69.6"); // IN2.69.6
         // Becuase the code is known, the 0203 table lookup is successful and returns code, display, and system
-        DatatypeUtils.checkCommonCodeableConceptAssertions(orgIdentifer.getType(), "XX", "Organization identifier", "http://terminology.hl7.org/CodeSystem/v2-0203", null); // IN2.69.7 with lookup
+        DatatypeUtils.checkCommonCodeableConceptAssertions(orgIdentifier.getType(), "XX", "Organization identifier", "http://terminology.hl7.org/CodeSystem/v2-0203", null); // IN2.69.7 with lookup
 
         List<Resource> coverages = ResourceUtils.getResourceList(e, ResourceType.Coverage);
         assertThat(coverages).hasSize(1); // From IN1 segment
@@ -1085,6 +1084,63 @@ class Hl7FinancialInsuranceTest {
         // Confirm there are no unaccounted for resources
         // Expected: Coverage, Organization, Patient, Encounter
         assertThat(e).hasSize(4);
+    }
+
+    @Test
+    // Ensure that Patient data does not bleed into Organizations created for the Patient's insurance
+    void testForDataBleedFromPatientToOrganization() throws IOException {
+
+        String hl7message = 
+                "MSH|^~\\&|TEST|TEST|||20220101120000||ADT^A01^ADT_A01|1234|P|2.6\n"
+                // "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|ADT^A01^ADT_A01|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6|56789^NID^UID|MCM|CDP|^4086::132:2A57:3C28^IPV6|^4086::132:2A57:3C25^IPV6|\n"
+                // PID.11 Used for address
+                // PID.11.9 Used for district calculation
+                // PID.12 Used for district calculation
+                + "PID|1|103456|MR12345678^^^^MR||DOE^JANE^|||F|||19 Raymond St^Route3^Albany^NY^56321^USA^P|12||||||||||||||||||||||||||\n"
+                // PD1.3 Used for org creation
+                // PD1.4 Used for org creation to check for bleed of districts
+                + "PD1|||Mayo|123456^Walt^^^^Dr||||||||||||||||||\n"
+                // IN1 Broadly populated to create organization
+                + "IN1|1|GLOBAL|7776664|Blue Cross Blue Shield|456 Blue Cross Lane||||Blue|987123|IBM||||||NON||||||||||||20210322145350|Dr Disney|S|GOOD|200|12|B6543|H789456|||17|||1|M|123 IBM way|True|NONE|B|NO|J321456|M|20210322145605|London|YES\n"
+                // IN2 Broadly populated to create organizations
+                + "IN2|A23456|222001111|IBM 1345|EMPLOYEED|E|N23497234|R3294809|S234234|Army|U439823|SGT SCHULTZ|Army|Fort Wayne|USA|E1... E9|ACT|20300402145954|N|N|N|Yes|Grey Duck|Goose|T34941341232|D123123123|C435435345|2|SPR|2ANC|1234.00|O|A0|USA|EN|F|F|Y|N|COG|Stanley|DUTCH|N|M|20170322150208||Software Engineer|8|P|Mr Blue|1-555-333-4444|SURGERY|Jim Stanley|1-555-222-3333|FIRST|20170202150409|20210322150400|3|1-222-333-4444|GLOBAL|GROUP|B14456789|OTH|1-444-777-8888|1-444-555-3333|NONE|N|Y|N|GVH 123456|CDP 98765|2106-3|9\n" ;
+
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+
+        List<Resource> patients = ResourceUtils.getResourceList(e, ResourceType.Patient);
+        assertThat(patients).hasSize(1); // From PID
+        Patient patient = (Patient) patients.get(0);
+        assertThat(patient.getAddressFirstRep().getDistrict()).hasToString("12");
+
+        List<Resource> organizations = ResourceUtils.getResourceList(e, ResourceType.Organization);
+        assertThat(organizations).hasSize(3); // From Payor created by IN1
+        Organization org = (Organization) organizations.get(0);
+        assertThat(org.getAddressFirstRep().hasDistrict()).isFalse();
+       
+        org = (Organization) organizations.get(1);
+        assertThat(org.hasAddress()).isFalse();
+
+        org = (Organization) organizations.get(2);
+        assertThat(org.hasAddress()).isFalse();
+
+        List<Resource> coverages = ResourceUtils.getResourceList(e, ResourceType.Coverage);
+        assertThat(coverages).hasSize(1); // From IN1 segment
+        Coverage coverage = (Coverage) coverages.get(0);
+
+        // Confirm Coverage Identifiers
+        assertThat(coverage.getIdentifier()).hasSize(6);
+        // Coverage Identifiers deep check in testBasicInsuranceCoverageFields
+
+        // Because the relationship is NON, no subscriber is created
+        assertThat(coverage.hasSubscriber()).isFalse();
+
+        // Expect no RelatedPerson because IN1.17 is NON
+        List<Resource> relatedPersons = ResourceUtils.getResourceList(e, ResourceType.RelatedPerson);
+        assertThat(relatedPersons).isEmpty(); // No related person should be created because IN1.17 was an unknown code
+
+        // Confirm there are no unaccounted for resources
+        // Expected: Coverage, Organization (3), Patient, Practitioner
+        assertThat(e).hasSize(6);
     }
 
 }
