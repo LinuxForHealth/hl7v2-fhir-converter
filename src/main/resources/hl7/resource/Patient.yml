@@ -212,6 +212,12 @@ address:
    generateList: true
    expressionType: resource
    specs: PID.11
+   vars:
+        # Used in Address to create district for Patient address.
+        # In future, they could be processed in a DataValueResolver. 
+        distPatientCounty: String, PID.12
+        distAddressCountyParish: String, XAD.9
+        distPatient: PID
 
 telecom_1:
    condition: $pid14 NOT_NULL
