@@ -350,6 +350,9 @@ V3ReligiousAffiliation:
   # Unknown
   # VAR:   NO REASONABLE MATCH
 
+DiagnosisRole: # maps DG1.6 to Encounter.diagnosis.use
+    A: AD
+
 MedicationRequestStatus:
    AF: active
    CA: cancelled
