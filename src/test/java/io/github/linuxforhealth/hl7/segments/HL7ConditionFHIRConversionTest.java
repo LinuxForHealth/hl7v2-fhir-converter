@@ -45,7 +45,7 @@ class HL7ConditionFHIRConversionTest {
                 + "PV1||I|||||||||||||||||1400|||||||||||||||||||||||||\r"
                 // DG1.3 to Code
                 // DG1.5 to Onset (DateTime)
-                // DG1.6 type required 
+                // DG1.6 to encounter.diagnosis.use (A > AD)
                 // DG1.15 to Rank
                 // DG1.16 to Practitioner  
                 // DG1.19 to RecordedDate
@@ -118,9 +118,9 @@ class HL7ConditionFHIRConversionTest {
         assertThat(encounter.getDiagnosis()).hasSize(1);
         assertThat(encounter.getDiagnosisFirstRep().getCondition().getReference().substring(0, 10))
                 .isEqualTo("Condition/");
-        DatatypeUtils.checkCommonCodeableConceptAssertions(encounter.getDiagnosisFirstRep().getUse(), "A",
-                "Admitting",
-                "http://terminology.hl7.org/CodeSystem/v2-0052", null);
+        DatatypeUtils.checkCommonCodeableConceptAssertions(encounter.getDiagnosisFirstRep().getUse(), "AD",
+                "Admission diagnosis",
+                "http://terminology.hl7.org/CodeSystem/diagnosis-role", null);  // DG1.6
         assertThat(encounter.getDiagnosisFirstRep().getRank()).isEqualTo(1); // DG1.15
 
         // --- PRACTIONER TESTS ---
@@ -234,7 +234,7 @@ class HL7ConditionFHIRConversionTest {
 
     }
 
-    // Tests that the Encounter has the full aray of condition references in both
+    // Tests that the Encounter has the full array of condition references in both
     // diagnosis and reasonReference.
     @Test
     void validateEncounterMultipleDiagnosesTestingMultipleDiagnosisAndReasonReferences() {

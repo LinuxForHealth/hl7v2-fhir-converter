@@ -286,6 +286,35 @@ public class SimpleDataValueResolver {
         }
     };
 
+    // Diagnosis Use needs special handling because the three input codes, A, F, and W
+    // need different systems because FHIR has a system for A, but not F and W.
+    // We check the value and based on the value, do the lookup in the right system.
+    // Note: values that come in know the table based on the field position.
+    public static final ValueExtractor<Object, SimpleCode> DIAGNOSIS_USE = (Object value) -> {
+        String val = Hl7DataHandlerUtil.getStringValue(value);
+        if (val != null && (val.equals("F") || val.equals("W"))){
+            // Process as table v2-0052
+            String table = Hl7DataHandlerUtil.getTableNumber(value);
+            if (table != null && val != null) {
+                // Found table and a code. Try looking it up.
+                SimpleCode coding = TerminologyLookup.lookup(table, val);
+                // A non-null, non-empty value in display means a good code from lookup.
+                if (coding != null && coding.getDisplay() != null && !coding.getDisplay().isEmpty()) {
+                    return coding;
+                }
+                // Without a good table lookup, falls through to simple code handling below
+            }
+        } 
+        // Otherwise process as a DiagnosisRole mapping (handles unknown codes)
+        String code = getFHIRCode(val, DiagnosisRole.class);
+        if (code != null) {
+            DiagnosisRole use = DiagnosisRole.fromCode(code);
+            return new SimpleCode(code, use.getSystem(), use.getDisplay());
+        } else {
+            return new SimpleCode(val, null, null);
+        }
+    };
+
     public static final ValueExtractor<Object, SimpleCode> CONDITION_CLINICAL_STATUS_FHIR = (Object value) -> {
         String val = Hl7DataHandlerUtil.getStringValue(value);
 
