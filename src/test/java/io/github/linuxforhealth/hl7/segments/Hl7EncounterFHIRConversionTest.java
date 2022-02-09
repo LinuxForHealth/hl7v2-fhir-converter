@@ -170,6 +170,9 @@ class Hl7EncounterFHIRConversionTest {
         Organization orgResource = ResourceUtils.getResourceOrganization(organizations.get(0), context);
         assertThat(orgResource.getId()).isEqualTo(providerString);
         assertThat(orgResource.getName()).isEqualTo("South Shore Hosptial Weymouth");
+        assertThat(orgResource.getIdentifier()).hasSize(1);
+        assertThat(orgResource.getIdentifierFirstRep().getValue()).hasToString("SSH_WEYMOUTH"); // PV2.23.1
+        assertThat(orgResource.getIdentifierFirstRep().getSystem()).hasToString("urn:id:extId"); // Because ID is name based
     }
 
     // Test for serviceProvider reference in messages with both PV1 and PV2 segments
@@ -216,6 +219,9 @@ class Hl7EncounterFHIRConversionTest {
         Organization orgResource = ResourceUtils.getResourceOrganization(organizations.get(0), context);
         assertThat(orgResource.getId()).isEqualTo(providerString);
         assertThat(orgResource.getName()).isEqualTo("South Shore Hosptial Weymouth");
+        assertThat(orgResource.getIdentifier()).hasSize(1);
+        assertThat(orgResource.getIdentifierFirstRep().getValue()).hasToString("Toronto"); // PV1.3.4.1
+        assertThat(orgResource.getIdentifierFirstRep().getSystem()).hasToString("urn:id:extId"); // Because ID is name based
     }
 
     // Test for serviceProvider reference in messages with PV1 segment and no PV2 segment
@@ -261,7 +267,10 @@ class Hl7EncounterFHIRConversionTest {
 
         Organization orgResource = ResourceUtils.getResourceOrganization(organizations.get(0), context);
         assertThat(orgResource.getId()).isEqualTo(providerString);
-        assertThat(orgResource.getName()).isEqualTo("Toronto East");
+        assertThat(orgResource.getName()).isEqualTo("Toronto East"); // PV1.3.4.1
+        assertThat(orgResource.getIdentifier()).hasSize(1);
+        assertThat(orgResource.getIdentifierFirstRep().getValue()).hasToString("Toronto East"); // PV1.3.4.1
+        assertThat(orgResource.getIdentifierFirstRep().getSystem()).hasToString("urn:id:extId"); // Because ID is name based
     }
 
     @Test
@@ -296,6 +305,9 @@ class Hl7EncounterFHIRConversionTest {
         Organization orgResource = ResourceUtils.getResourceOrganization(organizations.get(0), context);
         assertThat(orgResource.getId()).isEqualTo(providerString);
         assertThat(orgResource.getName()).isEqualTo("South Shore Hosptial Weymouth");
+        assertThat(orgResource.getIdentifier()).hasSize(1);
+        assertThat(orgResource.getIdentifierFirstRep().getValue()).hasToString("SSH*WEYMOUTH WEST_BUILD-7.F"); // PV2.23.1
+        assertThat(orgResource.getIdentifierFirstRep().getSystem()).hasToString("urn:id:extId"); // Because ID is name based
     }
 
     @Test
