@@ -124,8 +124,8 @@ identifier_4:
       mrgIdentifier: MRG.1
 # Add the old MR # from the MRG segment
 
-# identifier_5a and _5b and _5c are three parts to complex logic
-# Only include IN1.49 as an identifier when the subscriber is not self AND a relatedPerson is created uses IN1.17
+# identifier_5a and _5b are two parts to complex logic
+# Only include IN1.49 as an identifier when the subscriber is not self AND a relatedPerson is created
 identifier_5a:
    condition: $valueIn NOT_NULL && $subscriberValue NOT_EQUALS SEL && $createRelatedPerson EQUALS TRUE
    valueOf: datatype/Identifier_var
