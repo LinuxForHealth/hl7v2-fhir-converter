@@ -361,9 +361,9 @@ class Hl7RelatedGeneralUtilsTest {
     void testGetFormatAsId() {
 
         // Inputs are any string
-        assertThat(Hl7RelatedGeneralUtils.formatAsId("Mayo Clinic")).isEqualTo("mayo.clinic");
+        assertThat(Hl7RelatedGeneralUtils.formatAsId("Mayo Clinic")).isEqualTo("mayo-clinic");
         assertThat(Hl7RelatedGeneralUtils.formatAsId("OMC")).isEqualTo("omc");
-        assertThat(Hl7RelatedGeneralUtils.formatAsId("   4 5 6  ")).isEqualTo("4.5.6");
+        assertThat(Hl7RelatedGeneralUtils.formatAsId("   4 5 6  ")).isEqualTo("4-5-6");
 
         // Edge cases (if these occur we might have name space collisions)
         // The input is trimmed so totally blank input becomes empty
