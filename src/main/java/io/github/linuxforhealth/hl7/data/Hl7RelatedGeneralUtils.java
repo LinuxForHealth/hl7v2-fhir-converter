@@ -279,17 +279,6 @@ public class Hl7RelatedGeneralUtils {
         return result;
     }
 
-    public static String formatAsId(Object input) {
-        if (input != null) {
-            // This replaces any special character (other than letters, numbers, dashes, or periods) with a period
-            // Then lower-cases, and truncates to 64 characters.
-            String stringValue = Hl7DataHandlerUtil.getStringValue(input).trim();
-            stringValue = stringValue.replaceAll("[^a-zA-Z0-9\\-\\.]", "-").toLowerCase();
-            return StringUtils.left(stringValue, 64);
-        }
-        return null;
-    }
-
     public static String getAddressUse(String xad7Type, String xad16Temp, String xad17Bad) {
         LOGGER.info("Calculating Address Use");
         LOGGER.debug("Calculating address Use from XAD.7 {}, XAD.16 {}, XAD.17 {}", xad7Type, xad16Temp, xad17Bad);
