@@ -284,7 +284,7 @@ public class Hl7RelatedGeneralUtils {
             // This replaces any special character (other than letters, numbers, dashes, or periods) with a period
             // Then lower-cases, and truncates to 64 characters.
             String stringValue = Hl7DataHandlerUtil.getStringValue(input).trim();
-            stringValue = stringValue.replaceAll("[^a-zA-Z0-9\\-\\.]", ".").toLowerCase();
+            stringValue = stringValue.replaceAll("[^a-zA-Z0-9\\-\\.]", "-").toLowerCase();
             return StringUtils.left(stringValue, 64);
         }
         return null;
