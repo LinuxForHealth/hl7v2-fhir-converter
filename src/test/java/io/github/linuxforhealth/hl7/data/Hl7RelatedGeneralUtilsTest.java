@@ -356,22 +356,4 @@ class Hl7RelatedGeneralUtilsTest {
         assertThat(Hl7RelatedGeneralUtils.getFormattedTelecomNumberValue("111", "", "", "4444444", "", "112"))
                 .isEqualTo("444 4444"); // Same rule without extension
     }
-
-    @Test
-    void testGetFormatAsId() {
-
-        // Inputs are any string
-        assertThat(Hl7RelatedGeneralUtils.formatAsId("Mayo Clinic")).isEqualTo("mayo-clinic");
-        assertThat(Hl7RelatedGeneralUtils.formatAsId("OMC")).isEqualTo("omc");
-        assertThat(Hl7RelatedGeneralUtils.formatAsId("   4 5 6  ")).isEqualTo("4-5-6");
-
-        // Edge cases (if these occur we might have name space collisions)
-        // The input is trimmed so totally blank input becomes empty
-        assertThat(Hl7RelatedGeneralUtils.formatAsId(" ")).isEmpty();
-        assertThat(Hl7RelatedGeneralUtils.formatAsId("")).isEmpty();
-        // Null in becomes null out
-        assertThat(Hl7RelatedGeneralUtils.formatAsId(null)).isNull();
-
-    }
-
 }

@@ -254,7 +254,7 @@ class Hl7EncounterFHIRConversionTest {
         Reference serviceProvider = encounter.getServiceProvider();
         assertThat(serviceProvider).isNotNull();
         String providerString = serviceProvider.getReference();
-        assertThat(providerString).isEqualTo("Organization/toronto-east"); // Also verify underscore replacement for Utility.formatAsId
+        assertThat(providerString).isEqualTo("Organization/toronto-east"); // Also verify underscore replacement for VALID_ID
 
         List<Resource> organizations = ResourceUtils.getResourceList(e, ResourceType.Organization);
         assertThat(organizations).hasSize(1);
