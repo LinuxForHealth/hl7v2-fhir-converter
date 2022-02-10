@@ -254,4 +254,4 @@ serviceProvider:
     orgName: String, PV2.23.1 | PV1.3.4.1
     orgIdValue: String, PV2.23.8 | PV1.3.4.1  # used for Id and Identifier
   constants:   
-    orgIdSystem: 'extId'  # 'urn:id:' added by SystemCX processing
+    orgIdSystem: 'extID'  # 'urn:id:' added by SystemCX processing
