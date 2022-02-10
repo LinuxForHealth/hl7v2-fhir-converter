@@ -124,8 +124,10 @@ identifier_4:
       mrgIdentifier: MRG.1
 # Add the old MR # from the MRG segment
 
-identifier_5:
-   condition: $valueIn NOT_NULL
+# identifier_5a and _5b are two parts to complex logic
+# Only include IN1.49 as an identifier when the subscriber is not self AND a relatedPerson is created
+identifier_5a:
+   condition: $valueIn NOT_NULL && $subscriberValue NOT_EQUALS SEL && $createRelatedPerson EQUALS TRUE
    valueOf: datatype/Identifier_var
    generateList: true
    expressionType: resource
@@ -134,8 +136,26 @@ identifier_5:
       valueIn: String, IN1.49.1
       systemCX: IN1.49.4
       code: IN1.49.5
+      subscriberValue: String, IN1.17.1 # subscriber relationship
+      createRelatedPerson: RELATED_PERSON_NEEDED_IN117, IN1.17 
    constants:
       system: http://terminology.hl7.org/CodeSystem/v2-0203
+
+identifier_5b:
+   condition: $valueIn NOT_NULL && $valueIN117 NULL && $subscriberValue NOT_EQUALS 01 && $createRelatedPerson EQUALS TRUE
+   valueOf: datatype/Identifier_var
+   generateList: true
+   expressionType: resource
+   specs: IN1.49
+   vars:
+      valueIn: String, IN1.49.1
+      systemCX: IN1.49.4
+      code: IN1.49.5
+      subscriberValue: String, IN2.72 # subscriber relationship
+      createRelatedPerson: RELATED_PERSON_NEEDED_IN272, IN2.72
+      valueIN117: IN1.17.1
+   constants:
+      system: http://terminology.hl7.org/CodeSystem/v2-0203          
 
 # identifier_6a and _6b are two parts to complex logic
 # Only include when the subscriber is self, uses IN1.17

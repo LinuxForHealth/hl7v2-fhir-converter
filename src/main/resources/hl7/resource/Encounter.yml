@@ -1,5 +1,5 @@
 #
-# (C) Copyright IBM Corp. 2020, 2021
+# (C) Copyright IBM Corp. 2020, 2022
 #
 # SPDX-License-Identifier: Apache-2.0
 #
@@ -253,3 +253,5 @@ serviceProvider:
   vars:
     orgName: String, PV2.23.1 | PV1.3.4.1
     orgIdValue: String, PV2.23.8 | PV1.3.4.1  # used for Id and Identifier
+  constants:   
+    orgIdSystem: 'extId'  # 'urn:id:' added by SystemCX processing

@@ -102,8 +102,8 @@ class Hl7FinancialInsuranceTest {
                 // IN1.36 to Coverage.identifier MB and Coverage.identifier SN
                 // IN1.36 also to subscriberId
                 // IN1.46 to third XV Coverage.identifier
-                // IN1.49 to PatientCoverage.identifier
-                + "|MEMBER36||||||||||Value46|||PatientId49.1^^^System49.4^XX||||\n"
+                // IN1.49 has value to show that it is not used for Patient.identifier because NO relationship (IN1.17/IN2.72 empty)
+                + "|MEMBER36||||||||||Value46|||PatientId49.1||||\n"
                 // IN2.6 is purposely empty so will not create an MC Coverage.identifier
                 // IN2.8 is purposely empty so will not create an MA Coverage.identifier
                 // IN2.25 to new PayorId Organization
@@ -126,18 +126,15 @@ class Hl7FinancialInsuranceTest {
         assertThat(patients).hasSize(1); // From PID
         Patient patient = (Patient) patients.get(0);
         String patientId = patient.getId();
-        assertThat(patient.getIdentifier()).hasSize(2); // From PID.3 and IN1.49
+        assertThat(patient.getIdentifier()).hasSize(1); // From PID.3 
+        
         Identifier patientIdentifier = patient.getIdentifier().get(0);
         assertThat(patientIdentifier.getValue()).isEqualTo("MR1"); // PID.3.1 
         assertThat(patientIdentifier.getSystem()).isEqualTo("urn:id:XYZ"); // PID.3.4
         DatatypeUtils.checkCommonCodeableConceptAssertions(patientIdentifier.getType(), "MR", "Medical record number",
                 "http://terminology.hl7.org/CodeSystem/v2-0203", null); // PID.3.5
-        patientIdentifier = patient.getIdentifier().get(1);
-        assertThat(patientIdentifier.getValue()).isEqualTo("PatientId49.1"); // IN1.49.1 
-        assertThat(patientIdentifier.getSystem()).isEqualTo("urn:id:System49.4"); // IN1.49.4
-        DatatypeUtils.checkCommonCodeableConceptAssertions(patientIdentifier.getType(), "XX", null,
-                "http://terminology.hl7.org/CodeSystem/v2-0203", null); // IN1.49.5        
-
+        // IN1.49 not used        
+  
         List<Resource> organizations = ResourceUtils.getResourceList(e, ResourceType.Organization);
         assertThat(organizations).hasSize(3); // From IN1.3 creates Payor, IN2.25 to new PayorId Organization, IN2.69 creates new PolicyHolder Organization Name
         Organization org = (Organization) organizations.get(0);
@@ -954,13 +951,14 @@ class Hl7FinancialInsuranceTest {
                 // INI.4 to Organization Name (required to inflate organization)
                 // IN1.5 through 15 NOT REFERENCED (Tested in testBasicInsuranceCoverageFields)
                 + "|IdValue1^^^IdSystem4^^^^|Large Blue Organization|||||||||||"
-                // IN1.16 empty because there is no related person (IN2.72 is self)
+                // IN1.16 empty because there is no related person
                 // IN1.17 is non-related value means "Employer"
                 // IN1.18 through IN1.35 NOT REFERENCED
                 + "||EMR||||||||||||||||||"
                 // IN1.36 to Coverage.identifier MB and Coverage.identifier SN
+                // IN1.49 purposely added to prove it is ignored as id for both Patient and RelatedPerson
                 // IN1.37 through IN1.53 NOT REFERENCED
-                + "|MEMBER36|||||||||||||||||\n";
+                + "|MEMBER36|||||||||||||J321456||||\n";
 
         List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
 
@@ -971,6 +969,10 @@ class Hl7FinancialInsuranceTest {
         assertThat(patients).hasSize(1); // From PID
         Patient patient = (Patient) patients.get(0);
         String patientId = patient.getId();
+        // No patient identifier should have value IN1.49 "J321456" because relationship is not SEL (self) 
+        // Finding exactly 1 expected identifier "workers_comp" proves not "J321456"
+        assertThat(patient.getIdentifier()).hasSize(1);
+        assertThat(patient.getIdentifierFirstRep().getValueElement()).hasToString("workers_comp");  
 
         List<Resource> organizations = ResourceUtils.getResourceList(e, ResourceType.Organization);
         assertThat(organizations).hasSize(1); // From Payor created by IN1
