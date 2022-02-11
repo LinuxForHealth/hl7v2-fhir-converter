@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2021
+ * (C) Copyright IBM Corp. 2021, 2022
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -21,6 +21,7 @@ import org.hl7.fhir.r4.model.Resource;
 import org.hl7.fhir.r4.model.ResourceType;
 import org.junit.jupiter.api.Test;
 
+import io.github.linuxforhealth.hl7.segments.util.DatatypeUtils;
 import io.github.linuxforhealth.hl7.segments.util.ResourceUtils;
 
 class Hl7ImmunizationFHIRConversionTest {
@@ -167,13 +168,8 @@ class Hl7ImmunizationFHIRConversionTest {
         assertThat(immunization.getDoseQuantity().getSystem()).isNull();
         assertThat(immunization.getDoseQuantity().getCode()).isNull();
 
-        assertThat(immunization.getProgramEligibilityFirstRep().getCodingFirstRep().getCode()).isEqualTo("V02");
-        assertThat(immunization.getProgramEligibilityFirstRep().getCodingFirstRep().getSystem())
-                .isEqualTo("urn:id:v2-0064");
-        assertThat(immunization.getProgramEligibilityFirstRep().getCodingFirstRep().getDisplay())
-                .isEqualTo("VFC eligible Medicaid/MedicaidManaged Care");
-        assertThat(immunization.getProgramEligibilityFirstRep().getText())
-                .isEqualTo("VFC eligible Medicaid/MedicaidManaged Care");
+        DatatypeUtils.checkCommonCodeableConceptAssertions(immunization.getProgramEligibilityFirstRep(), "V02", "VFC eligible Medicaid/MedicaidManaged Care",
+        "https://phinvads.cdc.gov/vads/ViewCodeSystem.action?id=2.16.840.1.113883.12.64#", "VFC eligible Medicaid/MedicaidManaged Care");
 
         assertThat(immunization.hasFundingSource()).isFalse();
         assertThat(immunization.hasReaction()).isFalse();
@@ -213,12 +209,8 @@ class Hl7ImmunizationFHIRConversionTest {
         assertThat(immunization.getDoseQuantity().getSystem()).isEqualTo("http://unitsofmeasure.org");
 
         // If OBX.3 is 30963-3 the OBX.5 is for funding source
-        assertThat(immunization.getFundingSource().getCodingFirstRep().getCode()).isEqualTo("V02");
-        assertThat(immunization.getFundingSource().getCodingFirstRep().getSystem()).isEqualTo("urn:id:v2-0064");
-        assertThat(immunization.getFundingSource().getCodingFirstRep().getDisplay())
-                .isEqualTo("VFC eligible Medicaid/MedicaidManaged Care");
-        assertThat(immunization.getFundingSource().getText()).isEqualTo("VFC eligible Medicaid/MedicaidManaged Care");
-
+        DatatypeUtils.checkCommonCodeableConceptAssertions(immunization.getFundingSource(), "V02", "VFC eligible Medicaid/MedicaidManaged Care",
+        "https://phinvads.cdc.gov/vads/ViewCodeSystem.action?id=2.16.840.1.113883.12.64#", "VFC eligible Medicaid/MedicaidManaged Care");
         assertThat(immunization.hasProgramEligibility()).isFalse();
         assertThat(immunization.hasReaction()).isFalse();
 
