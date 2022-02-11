@@ -4490,8 +4490,6 @@
   url: "http://hl7.org/fhir/sid/us-medicare"
   oid: "urn:oid:2.16.840.1.113883.4.572"
 
-
-
 - id: "MBI"
   description: "Medicare Beneficiary Identifier"
   url: "http://hl7.org/fhir/sid/us-mbi"
@@ -4504,10 +4502,16 @@
   description: "languages"
   url: "http://hl7.org/fhir/ValueSet/all-languages"
   oid: "urn:oid:2.16.840.1.113883.4.642.3.21"
+
+  # next two are different id notations for the same table.
 - id: "HL70064"
   description: "Financial Class (HL7)"
   url: "https://phinvads.cdc.gov/vads/ViewCodeSystem.action?id=2.16.840.1.113883.12.64#"
   oid: "urn:oid:2.16.840.1.113883.12.64"
+- id: "V2-0064"
+  description: "Financial Class (HL7)"
+  url: "https://phinvads.cdc.gov/vads/ViewCodeSystem.action?id=2.16.840.1.113883.12.64#"
+  oid: "urn:oid:2.16.840.1.113883.12.64"  
 
   # source-record-type-system
 - id: "source-record-type-system"
