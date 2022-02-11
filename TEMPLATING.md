@@ -174,9 +174,11 @@ subject:
     specs: $Patient
 
 onsetDateTime:
-     type: DATE_TIME
-     valueOf: PRB.16
-     expressionType: HL7Spec
+    type: STRING
+    valueOf: 'GeneralUtils.dateTimeWithZoneId(dateTimeIn,ZONEID)'
+    expressionType: JEXL
+    vars: 
+        dateTimeIn: PRB.16
 
 stage:
    valueOf: secondary/Stage

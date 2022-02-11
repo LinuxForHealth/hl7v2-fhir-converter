@@ -324,7 +324,7 @@ class Hl7IdentifierFHIRConversionTest {
 
     @Test
     void conditionDg1IdentifierTest2() {
-        // Test PV1-19 for visit number; extId with DG1-3.1.
+        // Test PV1-19 for visit number; extID with DG1-3.1.
         // Also test DG1-20 creates additional identifiers.
         String withDG120 = "MSH|^~\\&|||||||ADT^A01^ADT_A01|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6||||||\r"
                 + "PID|||10290^^^WEST^MR||||20040530|M||||||||||||||||||||||N\n"
@@ -523,7 +523,7 @@ class Hl7IdentifierFHIRConversionTest {
         int posPLACER = getIdentifierPositionByValue("PON001", identifiers);
         assertThat(posPLACER).isNotSameAs(-1);
 
-        // Identifier 1: extId with MSH-7
+        // Identifier 1: extID with MSH-7
         Identifier identifier = report.getIdentifier().get(posExtId);
         String value = identifier.getValue();
         String system = identifier.getSystem();
@@ -573,7 +573,7 @@ class Hl7IdentifierFHIRConversionTest {
         assertThat(posFILLER).isNotSameAs(-1);
         int posPLACER = getIdentifierPositionByValue("CC_000000", identifiers);
         assertThat(posPLACER).isNotSameAs(-1);
-        // Identifier 1: extId with MSH-7
+        // Identifier 1: extID with MSH-7
         Identifier identifier = report.getIdentifier().get(posExtId);
         String value = identifier.getValue();
         String system = identifier.getSystem();
@@ -836,7 +836,7 @@ class Hl7IdentifierFHIRConversionTest {
 
     @Test
     void documentReferenceIdentifierTest() {
-        // Filler and placer from ORC, extId from MSH-7
+        // Filler and placer from ORC, extID from MSH-7
         String documentReference = "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|MDM^T02|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6|56789^NID^UID|MCM||||\n"
                 +
                 "PID|1||000054321^^^MRN|||||||||||||M|CAT|||||N\n" +

@@ -98,6 +98,24 @@ public static String getAddressDistrict(String patientCountyPid12, String addres
         return returnDistrict;
     }
 ```
+
+## Time
+
+Time conversion and formatting utilities are available, but they must be called in a thread-safe way.  The time ZoneId may be specified as a default in `config.properties` value `default.zoneid=+08:00` or passed in via runtime context using `.withZoneIdText("-05:00")`.  The value of the input `ZoneIdText` is available as the system variable `$ZONEID` and should be used in all time conversions where a time zone is needed. `GeneralUtils.dateTimeWithZoneId` takes an input HL7 time value field and converts it using the ZoneIdText of the current context.  The timezone should not be stored by any static method, accessing the ZoneIdText via the system variable makes the time processing threadsafe.
+```yaml
+time:
+  type: STRING
+  valueOf: "GeneralUtils.dateTimeWithZoneId(dateTimeIn,ZONEID)"
+  expressionType: JEXL
+  vars:
+    dateTimeIn: NTE.6 | NTE.7
+```
+The rules for determining a time zone for a date time value are:
+1. If a DateTime from HL7 contains it's own ZoneId in the DateTime, use it.
+1. If it has no ZoneId, and the context ZoneIdText is set, use that.
+1. If it has no ZoneId, and no context ZoneIdText, but there is a config ZoneId, use that.
+1. If it has no ZoneId, and no context ZoneIdText, and no config ZoneId, use the local timezone (whichis the ZoneId of the server where the process is running).
+
 ## YAML Hints
 
 Hints about the ways syntax and references work in the YAML files

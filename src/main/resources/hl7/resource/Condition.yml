@@ -1,5 +1,5 @@
 #
-# (C) Copyright IBM Corp. 2020, 2021
+# (C) Copyright IBM Corp. 2020, 2022
 #
 # SPDX-License-Identifier: Apache-2.0
 #
@@ -126,27 +126,25 @@ asserter:
      asserterVal: DG1.16
 
 recordedDate:
-   type: DATE_TIME
-   valueOf: DG1.19 | PRB.2
-   expressionType: HL7Spec
+  type: STRING
+  valueOf: 'GeneralUtils.dateTimeWithZoneId(dateTimeIn,ZONEID)'
+  expressionType: JEXL
+  vars: 
+    dateTimeIn: DG1.19 | PRB.2      
 
 abatementDateTime:
-  type: DATE_TIME
-  valueOf: PRB.9
-  expressionType: HL7Spec
-
-verificationStatus:
-  valueOf: datatype/CodeableConcept
-  generateList: true
-  expressionType: resource
-  specs: PRB.13
-  vars:
-    code: PRB.13
+  type: STRING
+  valueOf: 'GeneralUtils.dateTimeWithZoneId(dateTimeIn,ZONEID)'
+  expressionType: JEXL
+  vars: 
+    dateTimeIn: PRB.9 
 
 onsetDateTime:
-  type: DATE_TIME
-  valueOf: PRB.16 | DG1.5
-  expressionType: HL7Spec
+  type: STRING
+  valueOf: 'GeneralUtils.dateTimeWithZoneId(dateTimeIn,ZONEID)'
+  expressionType: JEXL
+  vars: 
+    dateTimeIn: PRB.16 | DG1.5    
 
 onsetString:
   condition: $onsetDateTime NULL
@@ -156,12 +154,12 @@ onsetString:
   vars:
     onsetDateTime: PRB.16  #DG1.5 not referenced for onsetDateTime as there is currently not a fallback DG1 segment to use for a onset string
 
-extension_1:
+extension:
    generateList: true
    valueOf: extension/Extension
    expressionType: resource
    vars:
-      value: DATE_TIME, PRB.7
+      value: PRB.7, GeneralUtils.dateTimeWithZoneId(value,ZONEID)  
    constants:
       KEY_NAME_SUFFIX: DateTime
       urlValue: condition-assertedDate

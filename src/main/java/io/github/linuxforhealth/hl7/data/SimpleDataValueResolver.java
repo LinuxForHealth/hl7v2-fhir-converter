@@ -14,15 +14,9 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.Temporal;
-import java.time.temporal.UnsupportedTemporalTypeException;
-
 import ca.uhn.hl7v2.model.v26.datatype.CWE;
 import ca.uhn.hl7v2.model.v26.datatype.PPN;
 import ca.uhn.hl7v2.model.v26.datatype.XCN;
-import ca.uhn.hl7v2.model.v26.segment.PV1;
-import ca.uhn.hl7v2.model.v26.datatype.DTM;
 
 import ca.uhn.hl7v2.model.Varies;
 import org.apache.commons.lang3.BooleanUtils;
@@ -74,13 +68,6 @@ public class SimpleDataValueResolver {
         return null;
     };
 
-    public static final ValueExtractor<Object, String> DATE_TIME = (Object value) -> {
-        String val = Hl7DataHandlerUtil.getStringValue(value);
-        if (val != null) {
-            return DateUtil.formatToDateTimeWithZone(val);
-        }
-        return null;
-    };
 
     public static final ValueExtractor<Object, String> STRING = (Object value) -> {
         return Hl7DataHandlerUtil.getStringValue(value);
@@ -96,46 +83,6 @@ public class SimpleDataValueResolver {
             strValue = strValue.toLowerCase();
             return strValue.replaceAll("[^a-zA-Z0-9.]", "-");
         } 
-        return null;
-    };
-
-    public static final ValueExtractor<Object, String> INSTANT = (Object value) -> {
-        String val = Hl7DataHandlerUtil.getStringValue(value);
-        if (val != null) {
-            return DateUtil.formatToZonedDateTime(val);
-        }
-        return null;
-    };
-
-    // Special extractor only for use with PV1 records.
-    // Extract the admit and discharge time and calculate duration length.
-    // Returns null if for any reason the data is not usable, which
-    // allows use of secondary values or to stop display.
-    public static final ValueExtractor<Object, String> PV1_DURATION_LENGTH = (Object value) -> {
-        if (value instanceof PV1) {
-            PV1 pv1 = (PV1) value;
-            DTM start = pv1.getAdmitDateTime();
-            DTM end = pv1.getDischargeDateTime();
-
-            try {
-                String sdate1 = Hl7DataHandlerUtil.getStringValue(start);
-                String sdate2 = Hl7DataHandlerUtil.getStringValue(end);
-                if (sdate1 != null && sdate2 != null) {
-                    Temporal date1 = DateUtil.getTemporal(DateUtil.formatToDateTimeWithZone(sdate1));
-                    Temporal date2 = DateUtil.getTemporal(DateUtil.formatToDateTimeWithZone(sdate2));
-                    LOGGER.info("computing temporal dates");
-                    LOGGER.debug("temporal dates start: {} , end: {} ", date1, date2);
-                    if (date1 != null && date2 != null) {
-                        return String.valueOf(ChronoUnit.MINUTES.between(date1, date2));
-                    }
-                }
-            } catch (UnsupportedTemporalTypeException e) {
-                LOGGER.warn("Cannot evaluate time difference.");
-                LOGGER.debug("Cannot evaluate time difference for start: {} , end: {} reason {} ", start, end,
-                        e.getMessage());
-                return null;
-            }
-        }
         return null;
     };
 

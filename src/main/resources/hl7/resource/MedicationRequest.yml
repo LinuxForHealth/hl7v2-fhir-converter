@@ -1,5 +1,5 @@
 #
-# (C) Copyright IBM Corp. 2021
+# (C) Copyright IBM Corp. 2021, 2022
 #
 # SPDX-License-Identifier: Apache-2.0
 #
@@ -128,11 +128,11 @@ medicationCodeableConcept_4:
     rxE: RXE.31
 
 authoredOn:
-  type: DATE_TIME
-  valueOf: $val
-  expressionType: HL7Spec
-  vars:
-    val: RXE.32 | ORC.9
+  type: STRING
+  valueOf: 'GeneralUtils.dateTimeWithZoneId(dateTimeIn,ZONEID)'
+  expressionType: JEXL
+  vars: 
+    dateTimeIn: RXE.32 | ORC.9  
 
 reasonCode:
   valueOf: datatype/CodeableConcept

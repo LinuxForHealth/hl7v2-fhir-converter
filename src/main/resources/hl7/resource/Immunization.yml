@@ -1,201 +1,234 @@
 #
-# (C) Copyright IBM Corp. 2020
+# (C) Copyright IBM Corp. 2020, 2022
 #
 # SPDX-License-Identifier: Apache-2.0
 #
 resourceType: Immunization
 id:
-   type: STRING
-   valueOf: UUID.randomUUID()
-   expressionType: JEXL
+  type: STRING
+  valueOf: UUID.randomUUID()
+  expressionType: JEXL
 
 identifier:
-   valueOf: datatype/Identifier
-   generateList: true
-   expressionType: resource
-   vars:
-      system: SYSTEM_URL, $sys
-      value: BUILD_IDENTIFIER_FROM_CWE, RXA.5
-   constants:
-      sys: "urn:id:extID"
+  valueOf: datatype/Identifier
+  generateList: true
+  expressionType: resource
+  vars:
+    system: SYSTEM_URL, $sys
+    value: BUILD_IDENTIFIER_FROM_CWE, RXA.5
+  constants:
+    sys: "urn:id:extID"
+
 status:
-   valueOf: "GeneralUtils.getImmunizationStatus(rxa18,rxa20,orc5)"
-   expressionType: JEXL
-   vars:
-      rxa18: RXA.18
-      rxa20: RXA.20
-      orc5: ORC.5
+  valueOf: "GeneralUtils.getImmunizationStatus(rxa18,rxa20,orc5)"
+  expressionType: JEXL
+  vars:
+    rxa18: RXA.18
+    rxa20: RXA.20
+    orc5: ORC.5
+
 statusReason_1:
-   condition: $rxa18 NOT_NULL
-   valueOf: datatype/CodeableConcept
-   expressionType: resource
-   specs: RXA.18
-   vars:
-      rxa18: RXA.18
+  condition: $rxa18 NOT_NULL
+  valueOf: datatype/CodeableConcept
+  expressionType: resource
+  specs: RXA.18
+  vars:
+    rxa18: RXA.18
+
 statusReason_2:
-   valueOf: datatype/CodeableConcept_var
-   expressionType: resource
-   condition: $rxa18 NULL && $statCode EQUALS RE
-   vars:
-      rxa18: RXA.18
-      statCode: STRING, RXA.20
-   constants:
-      code: "PATOBJ"
-      display: "Patient Refusal"
-      system: "http://terminology.hl7.org/CodeSystem/v3-ActReason"
+  valueOf: datatype/CodeableConcept_var
+  expressionType: resource
+  condition: $rxa18 NULL && $statCode EQUALS RE
+  vars:
+    rxa18: RXA.18
+    statCode: STRING, RXA.20
+  constants:
+    code: "PATOBJ"
+    display: "Patient Refusal"
+    system: "http://terminology.hl7.org/CodeSystem/v3-ActReason"
+
 statusReason_3:
-   valueOf: datatype/CodeableConcept_var
-   expressionType: resource
-   condition: $rxa18 NULL && $rxa20 NULL && $obx31 EQUALS 30945-0
-   vars:
-      rxa18: RXA.18
-      rxa20: RXA.20
-      obx31: String, OBX.3.1
-   constants:
-      code: "MEDPREC"
-      display: "medical precaution"
-      system: "http://terminology.hl7.org/CodeSystem/v3-ActReason"
+  valueOf: datatype/CodeableConcept_var
+  expressionType: resource
+  condition: $rxa18 NULL && $rxa20 NULL && $obx31 EQUALS 30945-0
+  vars:
+    rxa18: RXA.18
+    rxa20: RXA.20
+    obx31: String, OBX.3.1
+  constants:
+    code: "MEDPREC"
+    display: "medical precaution"
+    system: "http://terminology.hl7.org/CodeSystem/v3-ActReason"
+
 statusReason_4:
-   valueOf: datatype/CodeableConcept_var
-   expressionType: resource
-   condition: $rxa18 NULL && $rxa20 NULL && $obx31 EQUALS 59784-9
-   vars:
-      rxa18: RXA.18
-      rxa20: RXA.20
-      obx31: String, OBX.3.1
-   constants:
-      code: "IMMUNE"
-      display: "immunity"
-      system: "http://terminology.hl7.org/CodeSystem/v3-ActReason"
+  valueOf: datatype/CodeableConcept_var
+  expressionType: resource
+  condition: $rxa18 NULL && $rxa20 NULL && $obx31 EQUALS 59784-9
+  vars:
+    rxa18: RXA.18
+    rxa20: RXA.20
+    obx31: String, OBX.3.1
+  constants:
+    code: "IMMUNE"
+    display: "immunity"
+    system: "http://terminology.hl7.org/CodeSystem/v3-ActReason"
+
 vaccineCode_1:
-   valueOf: datatype/CodeableConcept
-   expressionType: resource
-   specs: RXA.5
-   vars:
-      code: RXA.5
+  valueOf: datatype/CodeableConcept
+  expressionType: resource
+  specs: RXA.5
+  vars:
+    code: RXA.5
+
 vaccineCode_2:
-   condition: $obx31 EQUALS 30956-7 && $rxa5 NULL
-   valueOf: datatype/CodeableConcept
-   expressionType: resource
-   specs: OBX.5
-   vars:
-      rxa5: RXA.5
-      obx31: String, OBX.3.1
+  condition: $obx31 EQUALS 30956-7 && $rxa5 NULL
+  valueOf: datatype/CodeableConcept
+  expressionType: resource
+  specs: OBX.5
+  vars:
+    rxa5: RXA.5
+    obx31: String, OBX.3.1
+
 patient:
-   valueOf: datatype/Reference
-   required: true
-   expressionType: resource
-   specs: $Patient
+  valueOf: datatype/Reference
+  required: true
+  expressionType: resource
+  specs: $Patient
+
 encounter:
-   valueOf: datatype/Reference
-   expressionType: resource
-   specs: $Encounter
+  valueOf: datatype/Reference
+  expressionType: resource
+  specs: $Encounter
+
 occurrenceDateTime:
-   required: true
-   type: DATE_TIME
-   valueOf: RXA.3
-   expressionType: HL7Spec
+  required: true
+  type: STRING
+  valueOf: "GeneralUtils.dateTimeWithZoneId(dateTimeIn,ZONEID)"
+  expressionType: JEXL
+  vars:
+    dateTimeIn: RXA.3
+
 primarySource:
-   value: true
-   condition: $rxa9 NOT_NULL
-   vars:
-      rxa9: RXA.9
+  value: true
+  condition: $rxa9 NOT_NULL
+  vars:
+    rxa9: RXA.9
+
 reportOrigin:
-   valueOf: datatype/CodeableConcept
-   expressionType: resource
-   specs: RXA.9
+  valueOf: datatype/CodeableConcept
+  expressionType: resource
+  specs: RXA.9
+
 manufacturer:
-   condition: $rxa17 NOT_NULL
-   valueOf: resource/Organization
-   expressionType: reference
-   specs: RXA.17
-   vars: 
-      rxa17: RXA.17
+  condition: $rxa17 NOT_NULL
+  valueOf: resource/Organization
+  expressionType: reference
+  specs: RXA.17
+  vars:
+    rxa17: RXA.17
+
 lotNumber:
-   type: STRING
-   valueOf: RXA.15
-   expressionType: HL7Spec
+  type: STRING
+  valueOf: RXA.15
+  expressionType: HL7Spec
+
 expirationDate:
-   type: DATE_TIME
-   valueOf: RXA.16
-   expressionType: HL7Spec
+  type: STRING
+  valueOf: "GeneralUtils.dateTimeWithZoneId(dateTimeIn,ZONEID)"
+  expressionType: JEXL
+  vars:
+    dateTimeIn: RXA.16
+
 site:
-   valueOf: datatype/CodeableConcept
-   expressionType: resource
-   specs: RXR.2
+  valueOf: datatype/CodeableConcept
+  expressionType: resource
+  specs: RXR.2
+
 route:
-   valueOf: datatype/CodeableConcept
-   expressionType: resource
-   specs: RXR.1
+  valueOf: datatype/CodeableConcept
+  expressionType: resource
+  specs: RXR.1
+
 doseQuantity:
-   condition: $value NOT_NULL
-   valueOf: datatype/Quantity
-   expressionType: resource
-   specs: RXA.6 | RXA.7
-   vars:
-      value: DOSE_VALUE, RXA.6
-      unit: RXA.7.1
-      code: RXA.7.1
-      sys: DOSE_SYSTEM, RXA.7.3
+  condition: $value NOT_NULL
+  valueOf: datatype/Quantity
+  expressionType: resource
+  specs: RXA.6 | RXA.7
+  vars:
+    value: DOSE_VALUE, RXA.6
+    unit: RXA.7.1
+    code: RXA.7.1
+    sys: DOSE_SYSTEM, RXA.7.3
+
 performer_1:
-   valueOf: secondary/Performer
-   generateList: true
-   expressionType: resource
-   vars:
-      orderingProvider: ORC.12
+  valueOf: secondary/Performer
+  generateList: true
+  expressionType: resource
+  vars:
+    orderingProvider: ORC.12
+
 performer_2:
-   valueOf: secondary/Performer
-   generateList: true
-   expressionType: resource
-   vars:
-      administeringProvider: RXA.10
+  valueOf: secondary/Performer
+  generateList: true
+  expressionType: resource
+  vars:
+    administeringProvider: RXA.10
+
 note:
-   valueOf: datatype/Annotation
-   expressionType: resource
-   condition: $obx3 EQUALS 48767-8
-   specs: OBX
-   vars:
-      obx3: STRING, OBX.3.1
-      annotationText: STRING, OBX.5
+  valueOf: datatype/Annotation
+  expressionType: resource
+  condition: $obx3 EQUALS 48767-8
+  specs: OBX
+  vars:
+    obx3: STRING, OBX.3.1
+    annotationText: STRING, OBX.5
+
 reasonReference:
-   valueOf: datatype/Reference
-   expressionType: resource
-   generateList: true
-   specs: $Observation
-   useGroup: true
+  valueOf: datatype/Reference
+  expressionType: resource
+  generateList: true
+  specs: $Observation
+  useGroup: true
+
 isSubpotent:
-   value: true
-   condition: $rxa20 EQUALS PA
-   vars:
-      rxa20: String, RXA.20
+  value: true
+  condition: $rxa20 EQUALS PA
+  vars:
+    rxa20: String, RXA.20
+
 programEligibility:
-   valueOf: datatype/CodeableConcept
-   expressionType: resource
-   condition: $obx3 EQUALS 64994-7
-   specs: OBX.5
-   vars:
-      obx3: String, OBX.3.1
+  valueOf: datatype/CodeableConcept
+  expressionType: resource
+  condition: $obx3 EQUALS 64994-7
+  specs: OBX.5
+  vars:
+    obx3: String, OBX.3.1
+    
 fundingSource:
-   valueOf: datatype/CodeableConcept
-   expressionType: resource
-   condition: $obx3 EQUALS 30963-3
-   specs: OBX.5
-   vars:
-      obx3: String, OBX.3.1
+  valueOf: datatype/CodeableConcept
+  expressionType: resource
+  condition: $obx3 EQUALS 30963-3
+  specs: OBX.5
+  vars:
+    obx3: String, OBX.3.1
 
 reasonCode:
-   valueOf: datatype/CodeableConcept
-   expressionType: resource
-   specs: RXA.19
+  valueOf: datatype/CodeableConcept
+  expressionType: resource
+  specs: RXA.19
+
 recorded:
-   type: DATE_TIME
-   valueOf: RXA.22 | ORC.9
-   expressionType: HL7Spec
+  type: STRING
+  valueOf: "GeneralUtils.dateTimeWithZoneId(dateTimeIn,ZONEID)"
+  expressionType: JEXL
+  vars:
+    dateTimeIn: RXA.22 | ORC.9
+
 reaction:
-   condition: $obx31 EQUALS 31044-1
-   valueOf: secondary/ImmunizationReaction
-   generateList: true
-   expressionType: resource
-   specs: OBX
-   vars:
-      obx31: String, OBX.3.1
+  condition: $obx31 EQUALS 31044-1
+  valueOf: secondary/ImmunizationReaction
+  generateList: true
+  expressionType: resource
+  specs: OBX
+  vars:
+    obx31: String, OBX.3.1

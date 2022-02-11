@@ -1,153 +1,156 @@
 #
-# (C) Copyright IBM Corp. 2020, 2021
+# (C) Copyright IBM Corp. 2020, 2022
 #
 # SPDX-License-Identifier: Apache-2.0
 #
 resourceType: DiagnosticReport
 id:
-   type: STRING
-   valueOf: 'UUID.randomUUID()'
-   expressionType: JEXL
+  type: STRING
+  valueOf: "UUID.randomUUID()"
+  expressionType: JEXL
 
 identifier_1:
-   valueOf: datatype/Identifier
-   generateList: true
-   expressionType: resource
-   vars:
-      value: MSH.7
-      system: SYSTEM_URL, $sys
-   constants:
-      sys: "urn:id:extID"
+  valueOf: datatype/Identifier
+  generateList: true
+  expressionType: resource
+  vars:
+    value: MSH.7
+    system: SYSTEM_URL, $sys
+  constants:
+    sys: "urn:id:extID"
 
 identifier_2:
-   condition: $valueIn NOT_NULL
-   valueOf: datatype/Identifier_var
-   generateList: true
-   expressionType: resource
-   vars:
-      valueIn: ORC.3.1 | OBR.3.1
-      systemCX: ORC.3.2 | OBR.3.2
-   constants:
-      system: "http://terminology.hl7.org/CodeSystem/v2-0203"
-      code: "FILL"
-      display: "Filler Identifier"
+  condition: $valueIn NOT_NULL
+  valueOf: datatype/Identifier_var
+  generateList: true
+  expressionType: resource
+  vars:
+    valueIn: ORC.3.1 | OBR.3.1
+    systemCX: ORC.3.2 | OBR.3.2
+  constants:
+    system: "http://terminology.hl7.org/CodeSystem/v2-0203"
+    code: "FILL"
+    display: "Filler Identifier"
 
 identifier_3:
-   condition: $valueIn NOT_NULL
-   valueOf: datatype/Identifier_var
-   generateList: true
-   expressionType: resource
-   vars:
-      valueIn: ORC.2.1 | OBR.2.1
-      systemCX: ORC.2.2 | OBR.2.2
-   constants:
-      system: "http://terminology.hl7.org/CodeSystem/v2-0203"
-      code: "PLAC"
-      display: "Placer Identifier"
-   
+  condition: $valueIn NOT_NULL
+  valueOf: datatype/Identifier_var
+  generateList: true
+  expressionType: resource
+  vars:
+    valueIn: ORC.2.1 | OBR.2.1
+    systemCX: ORC.2.2 | OBR.2.2
+  constants:
+    system: "http://terminology.hl7.org/CodeSystem/v2-0203"
+    code: "PLAC"
+    display: "Placer Identifier"
+
 status:
-   type: DIAGNOSTIC_REPORT_STATUS
-   valueOf: OBR.25
-   expressionType: HL7Spec
+  type: DIAGNOSTIC_REPORT_STATUS
+  valueOf: OBR.25
+  expressionType: HL7Spec
 
 category:
-   valueOf: datatype/CodeableConcept
-   generateList: true
-   expressionType: resource
-   specs: OBR.24
-   vars:
-      code: OBR.24
-      
+  valueOf: datatype/CodeableConcept
+  generateList: true
+  expressionType: resource
+  specs: OBR.24
+  vars:
+    code: OBR.24
+
 code:
-   valueOf: datatype/CodeableConcept
-   expressionType: resource
-   specs: OBR.4
-   required: true
-   vars:
-      code: OBR.4
+  valueOf: datatype/CodeableConcept
+  expressionType: resource
+  specs: OBR.4
+  required: true
+  vars:
+    code: OBR.4
 
 encounter:
-   valueOf: datatype/Reference
-   expressionType: resource
-   specs: $Encounter
-   
+  valueOf: datatype/Reference
+  expressionType: resource
+  specs: $Encounter
+
 subject:
-   valueOf: datatype/Reference
-   expressionType: resource
-   specs: $Patient
-   
+  valueOf: datatype/Reference
+  expressionType: resource
+  specs: $Patient
+
 effectiveDateTime:
-   condition: $start NOT_NULL && $end NULL
-   type: DATE_TIME
-   valueOf: OBR.7
-   expressionType: HL7Spec
-   vars:
-      start: OBR.7
-      end: OBR.8
+  condition: $start NOT_NULL && $end NULL
+  type: STRING
+  valueOf: "GeneralUtils.dateTimeWithZoneId(dateTimeIn,ZONEID)"
+  expressionType: JEXL
+  vars:
+    dateTimeIn: OBR.7
+    start: OBR.7
+    end: OBR.8
 
 effectivePeriod:
-   valueOf: datatype/Period
-   condition: $start NOT_NULL && $end NOT_NULL
-   expressionType: resource
-   vars:
-      start: OBR.7
-      end: OBR.8
+  valueOf: datatype/Period
+  condition: $start NOT_NULL && $end NOT_NULL
+  expressionType: resource
+  vars:
+    start: OBR.7
+    end: OBR.8
 
 issued:
-   type: INSTANT
-   valueOf: OBR.22
-   expressionType: HL7Spec
-   
+  type: STRING
+  valueOf: 'GeneralUtils.dateTimeWithZoneId(dateTimeIn,ZONEID)'
+  expressionType: JEXL
+  vars: 
+    dateTimeIn: OBR.22  
+
 resultsInterpreter:
-   condition: $interpreter NOT_NULL
-   valueOf: resource/Practitioner
-   generateList: true
-   expressionType: reference
-   specs: OBR.32.1
-   vars:
-      interpreter: OBR.32.1
+  condition: $interpreter NOT_NULL
+  valueOf: resource/Practitioner
+  generateList: true
+  expressionType: reference
+  specs: OBR.32.1
+  vars:
+    interpreter: OBR.32.1
 
 basedOn:
-   condition: $basedOnORCOBR NOT_NULL
-   valueOf: resource/ServiceRequest
-   generateList: true
-   expressionType: reference
-   specs: ORC | OBR
-   vars:
-      basedOnORCOBR: ORC | OBR     
+  condition: $basedOnORCOBR NOT_NULL
+  valueOf: resource/ServiceRequest
+  generateList: true
+  expressionType: reference
+  specs: ORC | OBR
+  vars:
+    basedOnORCOBR: ORC | OBR
 
 specimen:
-   valueOf: datatype/Reference
-   generateList: true
-   expressionType: resource
-   specs: $Specimen
-   useGroup: true
+  valueOf: datatype/Reference
+  generateList: true
+  expressionType: resource
+  specs: $Specimen
+  useGroup: true
 
 result:
-   valueOf: datatype/Reference
-   generateList: true
-   expressionType: resource
-   specs: $Observation
-   useGroup: true
+  valueOf: datatype/Reference
+  generateList: true
+  expressionType: resource
+  specs: $Observation
+  useGroup: true
 
 presentedForm:
-   valueOf: datatype/Attachment
-   expressionType: resource
-   # This merges all the OBX lines together when the message has only type 'TX' (obx2). 
-   # Messages with mixed types of OBX segments will not have a presentedForm attachment created.
-   condition: $obx2 EQUALS TX
-   vars:
-      # This concatenates all OBX-5 lines together (the asterisk) and preserves blank lines (the ampersand).  Multiple lines are concatenated with a tilde.
-      data: OBX.5 *&, GeneralUtils.concatenateWithChar(data, '\n')
-      title: OBR.4.2
-      date: OBX.14
-      mime: $code
-      language: $code2
-      obx2: STRING, OBX.2
-   constants:
-      system: 'http://terminology.hl7.org/CodeSystem/v2-0834'
-      code: 'text/plain'
-      display: 'Text data'
-      system2: 'http://hl7.org/fhir/ValueSet/all-languages'
-      code2: 'en'
-      display2: 'English'
+  valueOf: datatype/Attachment
+  expressionType: resource
+  # This merges all the OBX lines together when the message has only type 'TX' (obx2).
+  # Messages with mixed types of OBX segments will not have a presentedForm attachment created.
+  condition: $obx2 EQUALS TX
+  vars:
+    # This concatenates all OBX-5 lines together (the asterisk) and preserves blank lines (the ampersand).  Multiple lines are concatenated with a tilde.
+    data: OBX.5 *&, GeneralUtils.concatenateWithChar(data, '\n')
+    title: OBR.4.2
+    date: OBX.14
+    mime: $code
+    language: $code2
+    obx2: STRING, OBX.2
+  constants:
+    system: "http://terminology.hl7.org/CodeSystem/v2-0834"
+    code: "text/plain"
+    display: "Text data"
+    system2: "http://hl7.org/fhir/ValueSet/all-languages"
+    code2: "en"
+    display2: "English"

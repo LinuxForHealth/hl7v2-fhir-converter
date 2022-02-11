@@ -103,6 +103,10 @@ public class HL7MessageEngine implements MessageEngine {
         for (Map.Entry<String,String> entry : getFHIRContext().getProperties().entrySet()){
             localContextValues.put(entry.getKey(), new SimpleEvaluationResult<String>(entry.getValue()));
         }
+        // Add the ZoneId runtime property to localContextVariables
+        // If it is not passed in (null), use "" (empty) to satisfy parser null checks in .yml parsing
+        String zoneIdText =  getFHIRContext().getZoneIdText() != null ? getFHIRContext().getZoneIdText() : "";
+        localContextValues.put("ZONEID", new SimpleEvaluationResult<String>(zoneIdText));
  
         List<ResourceResult> resourceResultsWithEvalLater = new ArrayList<>();
         for (FHIRResourceTemplate genericTemplate : resources) {

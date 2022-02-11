@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2020, 2021
+ * (C) Copyright IBM Corp. 2020, 2022
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -26,6 +26,8 @@ import com.jayway.jsonpath.JsonPath;
 import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Segment;
 import ca.uhn.hl7v2.model.Type;
+import ca.uhn.hl7v2.model.v26.segment.PV1;
+import ca.uhn.hl7v2.model.v26.datatype.DTM;
 import io.github.linuxforhealth.api.ResourceValue;
 import io.github.linuxforhealth.core.ObjectMapperUtil;
 import io.github.linuxforhealth.hl7.data.date.DateUtil;
@@ -119,6 +121,48 @@ public class Hl7RelatedGeneralUtils {
                 }
             }
             return null;
+        }
+        return null;
+    }
+
+    public static String dateTimeWithZoneId(Object dateTime, Object zoneId) {
+        String val = Hl7DataHandlerUtil.getStringValue(dateTime);
+        String zoneIdText = Hl7DataHandlerUtil.getStringValue(zoneId);
+        if (val != null) {
+            return DateUtil.formatToDateTimeWithZone(val, zoneIdText);
+        }
+        return null;
+    }
+
+    // Special extractor only for use with PV1 records.
+    // Extract the admit and discharge time and calculate duration length.
+    // Returns null if for any reason the data is not usable, which
+    // allows use of secondary values or to stop display.
+    public static String pv1DurationLength(Object pv1Value, Object zoneId) {
+        if (pv1Value instanceof PV1) {
+            String zoneIdText = Hl7DataHandlerUtil.getStringValue(zoneId);
+            PV1 pv1 = (PV1) pv1Value;
+            DTM start = pv1.getAdmitDateTime();
+            DTM end = pv1.getDischargeDateTime();
+
+            try {
+                String sdate1 = Hl7DataHandlerUtil.getStringValue(start);
+                String sdate2 = Hl7DataHandlerUtil.getStringValue(end);
+                if (sdate1 != null && sdate2 != null) {
+                    Temporal date1 = DateUtil.getTemporal(DateUtil.formatToDateTimeWithZone(sdate1, zoneIdText));
+                    Temporal date2 = DateUtil.getTemporal(DateUtil.formatToDateTimeWithZone(sdate2, zoneIdText));
+                    LOGGER.info("computing temporal dates");
+                    LOGGER.debug("temporal dates start: {} , end: {} ", date1, date2);
+                    if (date1 != null && date2 != null) {
+                        return String.valueOf(ChronoUnit.MINUTES.between(date1, date2));
+                    }
+                }
+            } catch (UnsupportedTemporalTypeException e) {
+                LOGGER.warn("Cannot evaluate time difference.");
+                LOGGER.debug("Cannot evaluate time difference for start: {} , end: {} reason {} ", start, end,
+                        e.getMessage());
+                return null;
+            }
         }
         return null;
     }

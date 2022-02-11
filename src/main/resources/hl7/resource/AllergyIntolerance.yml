@@ -1,5 +1,5 @@
 #
-# (C) Copyright IBM Corp. 2020
+# (C) Copyright IBM Corp. 2020, 2022
 #
 # SPDX-License-Identifier: Apache-2.0
 #
@@ -7,7 +7,7 @@
 resourceType: AllergyIntolerance
 id:
   type: STRING
-  valueOf: 'UUID.randomUUID()'
+  valueOf: "UUID.randomUUID()"
   expressionType: JEXL
 
 identifier:
@@ -21,51 +21,53 @@ identifier:
     sys: "urn:id:extID"
 
 clinicalStatus:
-   valueOf: datatype/CodeableConcept_var
-   generateList: true
-   expressionType: resource
-   constants:
-      system: 'http://terminology.hl7.org/CodeSystem/allergyintolerance-clinical'
-      code: 'active'
-      display: 'Active'
-    
-verificationStatus: 
-   valueOf: datatype/CodeableConcept_var
-   generateList: true
-   expressionType: resource
-   constants:
-      system: 'http://terminology.hl7.org/CodeSystem/allergyintolerance-verification'
-      code: 'confirmed'
-      display: 'Confirmed'
+  valueOf: datatype/CodeableConcept_var
+  generateList: true
+  expressionType: resource
+  constants:
+    system: "http://terminology.hl7.org/CodeSystem/allergyintolerance-clinical"
+    code: "active"
+    display: "Active"
+
+verificationStatus:
+  valueOf: datatype/CodeableConcept_var
+  generateList: true
+  expressionType: resource
+  constants:
+    system: "http://terminology.hl7.org/CodeSystem/allergyintolerance-verification"
+    code: "confirmed"
+    display: "Confirmed"
 
 category:
-    type: ALLERGY_INTOLERANCE_CATEGORY
-    generateList: true
-    valueOf: AL1.2
-    expressionType: HL7Spec
-    
+  type: ALLERGY_INTOLERANCE_CATEGORY
+  generateList: true
+  valueOf: AL1.2
+  expressionType: HL7Spec
+
 criticality:
-    type: ALLERGY_INTOLERANCE_CRITICALITY 
-    valueOf: AL1.4
-    expressionType: HL7Spec
-    
+  type: ALLERGY_INTOLERANCE_CRITICALITY
+  valueOf: AL1.4
+  expressionType: HL7Spec
+
 code:
-   valueOf: datatype/CodeableConcept
-   generateList: true
-   expressionType: resource
-   specs: AL1.3
+  valueOf: datatype/CodeableConcept
+  generateList: true
+  expressionType: resource
+  specs: AL1.3
 
 onsetDateTime:
-   type: DATE_TIME
-   valueOf: AL1.6
-   expressionType: HL7Spec
+  type: STRING
+  valueOf: "GeneralUtils.dateTimeWithZoneId(dateTimeIn,ZONEID)"
+  expressionType: JEXL
+  vars:
+    dateTimeIn: AL1.6
 
 patient:
-    valueOf: datatype/Reference
-    expressionType: resource
-    specs: $Patient
+  valueOf: datatype/Reference
+  expressionType: resource
+  specs: $Patient
 
 reaction:
-    valueOf: secondary/Reaction
-    expressionType: resource
-    specs: AL1.5
+  valueOf: secondary/Reaction
+  expressionType: resource
+  specs: AL1.5

@@ -138,17 +138,6 @@ public class ConverterConfiguration {
     return zoneId;
   }
 
-  // Allow override of the ZoneId used for TimeZone operations
-  public void setZoneId(String zoneText) {
-    try {
-      zoneId = ZoneId.of(zoneText);
-    } catch (DateTimeException e) {
-      LOGGER.warn("Cannot create ZoneId");
-      LOGGER.debug("Cannot create ZoneId from :" + zoneText, e);
-      // Leave zoneId as it was.
-    }
-  }
-
   public String getAdditionalConceptmapFile() {
     return additionalConceptmapFile;
   }
