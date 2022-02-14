@@ -51,7 +51,7 @@ class DateUtilTest {
 
     @Test
     void simple_datetime() {
-        String ld = DateUtil.formatToDateTimeWithZone("2008","");
+        String ld = DateUtil.formatToDateTimeWithDefaultZone("2008");
         assertThat(ld).isEqualTo("2008");
         ld = DateUtil.formatToDateTimeWithZone("2008","America/Chicago");
         assertThat(ld).isEqualTo("2008");
@@ -59,7 +59,7 @@ class DateUtilTest {
 
     @Test
     void simple_datetime_month() {
-        String ld = DateUtil.formatToDateTimeWithZone("200809","");
+        String ld = DateUtil.formatToDateTimeWithDefaultZone("200809");
         assertThat(ld).isEqualTo("2008-09");
         ld = DateUtil.formatToDateTimeWithZone("200809","America/Chicago");
         assertThat(ld).isEqualTo("2008-09");
@@ -67,7 +67,7 @@ class DateUtilTest {
 
     @Test
     void simple_datetime_month_day() {
-        String ld = DateUtil.formatToDateTimeWithZone("20080926","");
+        String ld = DateUtil.formatToDateTimeWithDefaultZone("20080926");
         assertThat(ld).isEqualTo("2008-09-26");
         ld = DateUtil.formatToDateTimeWithZone("20080926","America/Chicago");
         assertThat(ld).isEqualTo("2008-09-26");
@@ -75,7 +75,7 @@ class DateUtilTest {
 
     @Test
     void simple_datetime_month_day_hour() {
-        String ld = DateUtil.formatToDateTimeWithZone("2008092609","");
+        String ld = DateUtil.formatToDateTimeWithDefaultZone("2008092609");
         assertThat(ld).isEqualTo("2008-09-26T09:00:00+08:00");
         ld = DateUtil.formatToDateTimeWithZone("2008092609","-07:00");
         assertThat(ld).isEqualTo("2008-09-26T09:00:00-07:00");
@@ -86,7 +86,7 @@ class DateUtilTest {
     @Test
     void simple_datetime_month_day_zone() {
         // When ZoneId is part of dateTime input, no ZoneId adjustment
-        String ld = DateUtil.formatToDateTimeWithZone("200711040132-0400","");
+        String ld = DateUtil.formatToDateTimeWithDefaultZone("200711040132-0400");
         assertThat(ld).isEqualTo("2007-11-04T01:32:00-04:00");
         ld = DateUtil.formatToDateTimeWithZone("200711040132-0400","America/Chicago");
         assertThat(ld).isEqualTo("2007-11-04T01:32:00-04:00"); 
@@ -95,31 +95,31 @@ class DateUtilTest {
     @Test
     void simple_datetime_month_day_milliseconds_zone() {
         // When ZoneId is part of dateTime input, no ZoneId adjustment
-        String ld = DateUtil.formatToDateTimeWithZone("20071104013206.3+0900","");
+        String ld = DateUtil.formatToDateTimeWithDefaultZone("20071104013206.3+0900");
         assertThat(ld).isEqualTo("2007-11-04T01:32:06.3+09:00");
 
-        ld = DateUtil.formatToDateTimeWithZone("20071104013206.34+0900","");
+        ld = DateUtil.formatToDateTimeWithDefaultZone("20071104013206.34+0900");
         assertThat(ld).isEqualTo("2007-11-04T01:32:06.34+09:00");
 
-        ld = DateUtil.formatToDateTimeWithZone("20071104013206.345+0900","");
+        ld = DateUtil.formatToDateTimeWithDefaultZone("20071104013206.345+0900");
         assertThat(ld).isEqualTo("2007-11-04T01:32:06.345+09:00");
 
-        ld = DateUtil.formatToDateTimeWithZone("20071104013206.3456+0900","");
+        ld = DateUtil.formatToDateTimeWithDefaultZone("20071104013206.3456+0900");
         assertThat(ld).isEqualTo("2007-11-04T01:32:06.3456+09:00");
     }
 
     @Test
     void simple_datetime_month_day_milliseconds_no_zone() {
-        String ld = DateUtil.formatToDateTimeWithZone("20071104013206.3","");
+        String ld = DateUtil.formatToDateTimeWithDefaultZone("20071104013206.3");
         assertThat(ld).isEqualTo("2007-11-04T01:32:06.3+08:00");
 
-        ld = DateUtil.formatToDateTimeWithZone("20071104013206.34","");
+        ld = DateUtil.formatToDateTimeWithDefaultZone("20071104013206.34");
         assertThat(ld).isEqualTo("2007-11-04T01:32:06.34+08:00");
 
-        ld = DateUtil.formatToDateTimeWithZone("20071104013206.345","");
+        ld = DateUtil.formatToDateTimeWithDefaultZone("20071104013206.345");
         assertThat(ld).isEqualTo("2007-11-04T01:32:06.345+08:00");
 
-        ld = DateUtil.formatToDateTimeWithZone("20071104013206.3456","");
+        ld = DateUtil.formatToDateTimeWithDefaultZone("20071104013206.3456");
         assertThat(ld).isEqualTo("2007-11-04T01:32:06.3456+08:00");
 
         ld = DateUtil.formatToDateTimeWithZone("20071104013206.3","+03:00");

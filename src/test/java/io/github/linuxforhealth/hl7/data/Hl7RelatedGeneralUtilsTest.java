@@ -368,25 +368,22 @@ class Hl7RelatedGeneralUtilsTest {
 
     @Test
     void getPV1DurationLength() throws DataTypeException {
-        // Get a PV1
-        ORU_R01 message = new ORU_R01();
-        ORU_R01_PATIENT_RESULT patientResult = message.getPATIENT_RESULT();
-        ORU_R01_PATIENT patient = patientResult.getPATIENT();
-        ORU_R01_VISIT visit = patient.getVISIT();
-        PV1 pv1 = visit.getPV1();
 
         ArrayList<String> timeZoneIds = Lists.newArrayList("", "+03:00", "Europe/Paris");
-        // String timeZoneId = "+03:00";
 
         for (String timeZoneId : timeZoneIds) {
+            // Get a PV1
+            ORU_R01 message = new ORU_R01();
+            ORU_R01_PATIENT_RESULT patientResult = message.getPATIENT_RESULT();
+            ORU_R01_PATIENT patient = patientResult.getPATIENT();
+            ORU_R01_VISIT visit = patient.getVISIT();
+            PV1 pv1 = visit.getPV1();
+
             // Admit and Discharge are not yet set; they are still empty
-            pv1.getAdmitDateTime().setValue("");
-            pv1.getDischargeDateTime().setValue("");
             assertThat(Hl7RelatedGeneralUtils.pv1DurationLength(pv1, timeZoneId)).isNull();
 
             // Admit set, but Discharge not yet set
             pv1.getAdmitDateTime().setValue("20161013154626");
-            pv1.getDischargeDateTime().setValue("");
             assertThat(Hl7RelatedGeneralUtils.pv1DurationLength(pv1, timeZoneId)).isNull();
 
             // Admit and Discharge set to valid values

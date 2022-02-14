@@ -249,6 +249,7 @@ serviceProvider:
   condition: $orgIdValue NOT_NULL
   valueOf: resource/Organization
   expressionType: reference
+  generateList: true
   vars:
     orgName: String, PV2.23.1 | PV1.3.4.1
     orgIdValue: String, PV2.23.8 | PV1.3.4.1  # used for Id and Identifier
