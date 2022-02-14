@@ -23,11 +23,9 @@ import ca.uhn.hl7v2.model.DataTypeException;
 import ca.uhn.hl7v2.model.v26.datatype.CWE;
 import ca.uhn.hl7v2.model.v26.datatype.TX;
 import ca.uhn.hl7v2.model.v26.datatype.XCN;
-import ca.uhn.hl7v2.model.v26.group.ORU_R01_PATIENT;
-import ca.uhn.hl7v2.model.v26.group.ORU_R01_PATIENT_RESULT;
-import ca.uhn.hl7v2.model.v26.group.ORU_R01_VISIT;
+
 import ca.uhn.hl7v2.model.v26.message.ORU_R01;
-import ca.uhn.hl7v2.model.v26.segment.PV1;
+
 import io.github.linuxforhealth.core.terminology.SimpleCode;
 import io.github.linuxforhealth.hl7.data.date.DateUtil;
 
@@ -78,35 +76,6 @@ class SimpleDataValueResolverTest {
     void get_date_value_null() {
 
         assertThat(SimpleDataValueResolver.DATE.apply(null)).isNull();
-    }
-
-    @Test
-    void get_datetime_value_valid() {
-        String gen = "20110613122406";
-        assertThat(SimpleDataValueResolver.DATE_TIME.apply(gen)).isNotNull();
-        assertThat(SimpleDataValueResolver.DATE_TIME.apply(gen)).isEqualTo(DateUtil.formatToDateTimeWithZone(gen));
-
-        // Test DateTime adjusts for milliseconds
-        gen = "20110613122406.637";
-        assertThat(SimpleDataValueResolver.DATE_TIME.apply(gen)).isNotNull();
-        assertThat(SimpleDataValueResolver.DATE_TIME.apply(gen)).isEqualTo(DateUtil.formatToDateTimeWithZone(gen));
-    }
-
-    @Test
-    void get_instant_value_null() {
-        assertThat(SimpleDataValueResolver.INSTANT.apply(null)).isNull();
-    }
-
-    @Test
-    void get_instant_value_valid() {
-        String gen = "20091130112038";
-        assertThat(SimpleDataValueResolver.INSTANT.apply(gen)).isNotNull();
-        assertThat(SimpleDataValueResolver.INSTANT.apply(gen)).isEqualTo(DateUtil.formatToZonedDateTime(gen));
-    }
-
-    @Test
-    void get_datetime_value_null() {
-        assertThat(SimpleDataValueResolver.DATE_TIME.apply(null)).isNull();
     }
 
     @Test
@@ -323,41 +292,6 @@ class SimpleDataValueResolverTest {
         assertThat(SimpleDataValueResolver.PERSON_DISPLAY_NAME.apply(cwe)).isNull();
         // String is not a valid input and should return null
         assertThat(SimpleDataValueResolver.PERSON_DISPLAY_NAME.apply("Bogus String")).isNull();
-    }
-
-    @Test
-    void getPV1DurationLength() throws DataTypeException {
-        // Get a PV1
-        ORU_R01 message = new ORU_R01();
-        ORU_R01_PATIENT_RESULT patientResult = message.getPATIENT_RESULT();
-        ORU_R01_PATIENT patient = patientResult.getPATIENT();
-        ORU_R01_VISIT visit = patient.getVISIT();
-        PV1 pv1 = visit.getPV1();
-
-        // Admit and Discharge are not yet set; they are still empty
-        assertThat(SimpleDataValueResolver.PV1_DURATION_LENGTH.apply(pv1)).isNull();
-
-        // Admit set, but Discharge not yet set
-        pv1.getAdmitDateTime().setValue("20161013154626");
-        assertThat(SimpleDataValueResolver.PV1_DURATION_LENGTH.apply(pv1)).isNull();
-
-        // Admit and Discharge set to valid values
-        pv1.getAdmitDateTime().setValue("20161013154626");
-        pv1.getDischargeDateTime().setValue("20161013164626");
-        assertThat(SimpleDataValueResolver.PV1_DURATION_LENGTH.apply(pv1)).isEqualTo("60");
-
-        // Admit and Discharge set to valid values less that one minute apart
-        pv1.getAdmitDateTime().setValue("20161013154626");
-        pv1.getDischargeDateTime().setValue("20161013154628");
-        assertThat(SimpleDataValueResolver.PV1_DURATION_LENGTH.apply(pv1)).isEqualTo("0");
-
-        // Admit and Discharge set to insufficient detail values (have no minutes) return null
-        pv1.getAdmitDateTime().setValue("20161013");
-        pv1.getDischargeDateTime().setValue("20161013");
-        assertThat(SimpleDataValueResolver.PV1_DURATION_LENGTH.apply(pv1)).isNull();
-
-        // Other input types, such as a string, are not valid and null is returned
-        assertThat(SimpleDataValueResolver.PV1_DURATION_LENGTH.apply("A string")).isNull();
     }
 
     @Test

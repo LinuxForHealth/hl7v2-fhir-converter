@@ -83,7 +83,7 @@ length:
     expressionType: resource
     vars: 
       pv2time: STRING, PV2.11
-      pv1length: PV1_DURATION_LENGTH, PV1
+      pv1length: PV1, GeneralUtils.pv1DurationLength(pv1length,ZONEID)
 
 reasonCode_1:
     valueOf: datatype/CodeableConcept

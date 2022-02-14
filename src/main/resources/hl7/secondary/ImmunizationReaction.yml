@@ -1,16 +1,17 @@
 #
-# (C) Copyright IBM Corp. 2021
+# (C) Copyright IBM Corp. 2021, 2022
 #
 # SPDX-License-Identifier: Apache-2.0
 #
 ---
 detail:
-   valueOf: resource/Observation_ImmunizationReaction
-   expressionType: reference
-   specs: OBX.5
+  valueOf: resource/Observation_ImmunizationReaction
+  expressionType: reference
+  specs: OBX.5
 
 date:
-   type: DATE_TIME
-   valueOf: OBX.14
-   expressionType: HL7Spec
-
+  type: STRING
+  valueOf: "GeneralUtils.dateTimeWithZoneId(dateTimeIn,ZONEID)"
+  expressionType: JEXL
+  vars:
+    dateTimeIn: OBX.14

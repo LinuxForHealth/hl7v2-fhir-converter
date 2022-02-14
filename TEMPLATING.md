@@ -174,9 +174,11 @@ subject:
     specs: $Patient
 
 onsetDateTime:
-     type: DATE_TIME
-     valueOf: PRB.16
-     expressionType: HL7Spec
+    type: STRING
+    valueOf: 'GeneralUtils.dateTimeWithZoneId(dateTimeIn,ZONEID)'
+    expressionType: JEXL
+    vars: 
+        dateTimeIn: PRB.16
 
 stage:
    valueOf: secondary/Stage
@@ -242,6 +244,12 @@ The extraction logic for each field can be defined by using expressions. This co
 Specification represents the base value for a expression. There are two types of Specifications -
 * SimpleSpecification  -- Represents simple specification that can be extracted from context values. Example: specs: $Patient. Note BASE_VALUE is reserved for base value provided to an expression during evaluation. Do not use or name variable as BASE_VALUE.
 * HL7Specification -- Represents specification for extracting values from HL7 message.
+
+#### Reserved Variable Names
+You may name your variables anything, with the exception of the following, which are reserved for system use.
+* **BASE_VALUE** - base value provided to an expression during evaluation.
+* **TENANT** - convention for id of the tenant, when passed in at run-time.
+* **ZONEID** - zoneId if passed in at run-time; usually set to the tenant zoneId.  
 
 ##### HL7Specification
 

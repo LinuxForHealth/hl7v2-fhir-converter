@@ -138,7 +138,7 @@ The converter allows passing of certain parameters at run time through the optio
  
 | Parameter Name           | Description                                                                                                                                                                       | Example Call on Options Creation                    |
 | ----------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------- |
-| ZoneIdText     | ZoneId override for the ISO 8601 timezone offset. Overrides default.zoneid in config.properties. Requires a valid ZoneId text value, which is converted to a java.time.ZoneId.            | options.withZoneIdText("+07:00")      |
+| ZoneIdText     | ZoneId override for the ISO 8601 timezone offset. Overrides default.zoneid in config.properties. Requires a valid ZoneId text value, which is converted to a java.time.ZoneId.            | options.withZoneIdText("+07:00")   options.withZoneIdText("America/Chicago")   |
 | Property (Key/Value)  | A string property expressed as a key / value pair.  Properties become available as variables to the templates.  A property `TENANT` with value `myTenantId` is utilized in templates as `$TENANT`.             | options.withProperty("TENANT","myTenantId")      |
 
 

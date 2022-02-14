@@ -1,5 +1,5 @@
 #
-# (C) Copyright IBM Corp. 2021
+# (C) Copyright IBM Corp. 2021, 2022
 #
 # SPDX-License-Identifier: Apache-2.0
 #
@@ -186,9 +186,11 @@ subject:
    specs: $Patient
 
 date:
-   type: INSTANT
-   valueOf: TXA.6 
-   expressionType: HL7Spec
+  type: STRING
+  valueOf: 'GeneralUtils.dateTimeWithZoneId(dateTimeIn,ZONEID)'
+  expressionType: JEXL
+  vars: 
+    dateTimeIn: TXA.6
 
 author:
    condition: $hasValue NOT_NULL

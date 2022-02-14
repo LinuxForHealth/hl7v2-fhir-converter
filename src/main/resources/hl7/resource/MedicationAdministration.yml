@@ -1,5 +1,5 @@
 #
-# (C) Copyright IBM Corp. 2021
+# (C) Copyright IBM Corp. 2021, 2022
 #
 # SPDX-License-Identifier: Apache-2.0
 #
@@ -34,7 +34,7 @@ identifier_2:
 
 status:
   type: MEDREQ_STATUS
-  valueOf:  RXA.20
+  valueOf: RXA.20
   expressionType: HL7Spec
 
 medicationCodeableConcept:
@@ -48,9 +48,11 @@ medicationReference:
   specs: $Medication
 
 effectiveDateTime:
-  type: DATE_TIME
-  valueOf: RXA.3 | RXA.4
-  expressionType: HL7Spec
+  type: STRING
+  valueOf: "GeneralUtils.dateTimeWithZoneId(dateTimeIn,ZONEID)"
+  expressionType: JEXL
+  vars:
+    dateTimeIn: RXA.3 | RXA.4
 
 effectivePeriod:
   valueOf: datatype/Period

@@ -1,13 +1,19 @@
 #
-# (C) Copyright IBM Corp. 2020
+# (C) Copyright IBM Corp. 2020, 2022
 #
 # SPDX-License-Identifier: Apache-2.0
 #
 ---
-start: 
-     type: DATE_TIME
-     valueOf: $start
-      
+start:
+  type: STRING
+  valueOf: "GeneralUtils.dateTimeWithZoneId(dateTimeIn,ZONEID)"
+  expressionType: JEXL
+  vars:
+    dateTimeIn: $start
+
 end:
-   type: DATE_TIME
-   valueOf: $end
+  type: STRING
+  valueOf: "GeneralUtils.dateTimeWithZoneId(dateTimeIn,ZONEID)"
+  expressionType: JEXL
+  vars:
+    dateTimeIn: $end

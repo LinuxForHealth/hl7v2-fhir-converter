@@ -1,10 +1,11 @@
 /*
- * (C) Copyright IBM Corp. 2020
+ * (C) Copyright IBM Corp. 2020, 2022
  *
  * SPDX-License-Identifier: Apache-2.0
  */
 package io.github.linuxforhealth.hl7.data.date;
 
+import java.time.DateTimeException;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -15,6 +16,7 @@ import java.time.format.DateTimeParseException;
 import java.time.temporal.Temporal;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TimeZone;
 import java.util.Map.Entry;
 import java.util.regex.Pattern;
 
@@ -48,26 +50,52 @@ public class DateUtil {
         }
     }
 
-    public static String formatToDateTimeWithZone(String input) {
+    // Convenience method
+    // Input with no zoneId, processes with the default zoneId
+    // No run-time zoneId can be passed with this method,
+    // So this should be used only when there is no run-time zoneId.
+    public static String formatToDateTimeWithDefaultZone(String input) {
+        return formatToDateTimeWithZone(input, null);
+    }
+
+    // If a DateTime from HL7 has a ZoneId in the DateTime, use it.
+    // If it has no ZoneId, and the Run Time Override (RTO) is set, use that.
+    // If it has no ZoneId, and not RTO, but there is a config ZoneId, use that.
+    // If it has no ZoneId, and not RTO, and no config ZoneId, use the local timezone (of the server).
+    // This method is often called with zoneId of null or empty ""
+    public static String formatToDateTimeWithZone(String input, String zoneId) {
         String returnValue = getLocalDate(input);
         if (returnValue == null) {
             returnValue = getZonedDate(input);
         }
         if (returnValue == null) {
-            returnValue = getLocalDateTimeWithDefaultZone(input);
+            returnValue = getLocalDateTimeWithZone(input, zoneId);
         }
         return returnValue;
     }
 
-    private static String getLocalDateTimeWithDefaultZone(String input) {
-        String returnValue;
-
+    // This method is called with zoneId of null or empty "" when the zoneIdText is not set at runtime.
+    private static String getLocalDateTimeWithZone(String input, String zoneIdText) {
         try {
             LocalDateTime ldt = LocalDateTime.parse(input, DateFormats.getFormatterInstance());
-            ZoneId zone = ConverterConfiguration.getInstance().getZoneId();
+            // Attempt to recognize the input zoneIdText, if it is not null
+            ZoneId zone = zoneIdText != null ? getZoneIdFromText(zoneIdText) : null;
+            // Warn if we've got a non-null non-empty string that we can't convert
+            if (zoneIdText != null && (!zoneIdText.isEmpty() && zone == null)){
+                LOGGER.warn("Input zoneId not recognized.  Using default Zone.");
+                LOGGER.debug("Input zoneId '{}' not recognized.  Using default Zone.", zoneIdText);
+            }
+            // If there is no valid input zoneId, use the config.properties zoneId
+            if (zone == null) {
+                zone = ConverterConfiguration.getInstance().getZoneId();
+            }
+            // If there is no Configured ZoneId, use the default of the server.
+            if (zone == null) {
+                zone = getZoneIdFromText(TimeZone.getDefault().getID());
+            }
+            // One of the above should have provided a zone.
             if (zone != null) {
-                returnValue = ldt.atZone(zone).format(DateFormats.FHIR_ZONE_DATE_TIME_FORMAT);
-                return returnValue;
+                return ldt.atZone(zone).format(DateFormats.FHIR_ZONE_DATE_TIME_FORMAT);
             } else {
                 LOGGER.warn("No default zone set, cannot convert LocalDateTime to ZonedDateTime");
                 LOGGER.debug("No default zone set, cannot convert LocalDateTime to ZonedDateTime, input {} ", input);
@@ -80,6 +108,18 @@ public class DateUtil {
         }
     }
 
+    private static ZoneId getZoneIdFromText(String zoneIdText){
+        try {
+            return ZoneId.of(zoneIdText);
+          } catch (DateTimeException e) {
+            LOGGER.warn("Cannot create ZoneId");
+            LOGGER.debug("Cannot create ZoneId from :" + zoneIdText, e);
+            // Leave zoneId as it was.
+          }
+        return null;
+    }
+
+    // Matches an input string to a local date using the known patterns
     private static String getLocalDate(String input) {
         DateTimeFormatter format = null;
         for (Entry<Pattern, DateTimeFormatter> pattern : DateFormats
@@ -168,13 +208,5 @@ public class DateUtil {
             }
         }
         return temporal;
-    }
-
-    public static String formatToZonedDateTime(String input) {
-        String zoned = getZonedDate(input);
-        if (zoned == null) {
-            zoned = formatToDateTimeWithZone(input);
-        }
-        return zoned;
     }
 }

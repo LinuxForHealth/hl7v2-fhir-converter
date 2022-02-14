@@ -20,14 +20,10 @@ public enum SimpleDataTypeMapper {
 
   URI(SimpleDataValueResolver.URI_VAL),
   URL(SimpleDataValueResolver.STRING),
-  INSTANT(SimpleDataValueResolver.INSTANT),
 
   DATE(SimpleDataValueResolver.DATE),
 
-  DATE_TIME(SimpleDataValueResolver.DATE_TIME),
-  //TIME(SimpleDataValueResolver.TIME_TYPE),
   ID(SimpleDataValueResolver.STRING),
-  //MARKDOWN(SimpleDataValueResolver.STRING),
   UNSIGNEDINT(SimpleDataValueResolver.INTEGER),
   POSITIVEINT(SimpleDataValueResolver.INTEGER),
   UUID(SimpleDataValueResolver.UUID_VAL),
@@ -41,7 +37,6 @@ public enum SimpleDataTypeMapper {
   SYSTEM_ID(SimpleDataValueResolver.SYSTEM_ID),
   DOSE_SYSTEM(SimpleDataValueResolver.DOSE_SYSTEM),
   DOSE_VALUE(SimpleDataValueResolver.DOSE_VALUE),
-  PV1_DURATION_LENGTH(SimpleDataValueResolver.PV1_DURATION_LENGTH),
 
   ALLERGY_INTOLERANCE_CATEGORY(SimpleDataValueResolver.ALLERGY_INTOLERANCE_CATEGORY_CODE_FHIR),
   ALLERGY_INTOLERANCE_CRITICALITY(

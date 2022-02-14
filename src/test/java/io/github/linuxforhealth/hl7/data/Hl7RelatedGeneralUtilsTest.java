@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2020, 2021
+ * (C) Copyright IBM Corp. 2020, 2022
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -9,11 +9,20 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.ArrayList;
 import java.util.List;
+import com.google.common.collect.Lists;
 
 import org.hl7.fhir.r4.model.codesystems.EncounterStatus;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import ca.uhn.hl7v2.model.DataTypeException;
+import ca.uhn.hl7v2.model.v26.group.ORU_R01_PATIENT;
+import ca.uhn.hl7v2.model.v26.group.ORU_R01_PATIENT_RESULT;
+import ca.uhn.hl7v2.model.v26.group.ORU_R01_VISIT;
+import ca.uhn.hl7v2.model.v26.message.ORU_R01;
+import ca.uhn.hl7v2.model.v26.segment.PV1;
+import io.github.linuxforhealth.hl7.data.date.DateUtil;
 
 class Hl7RelatedGeneralUtilsTest {
 
@@ -356,4 +365,63 @@ class Hl7RelatedGeneralUtilsTest {
         assertThat(Hl7RelatedGeneralUtils.getFormattedTelecomNumberValue("111", "", "", "4444444", "", "112"))
                 .isEqualTo("444 4444"); // Same rule without extension
     }
+
+    @Test
+    void getPV1DurationLength() throws DataTypeException {
+
+        ArrayList<String> timeZoneIds = Lists.newArrayList("", "+03:00", "Europe/Paris");
+
+        for (String timeZoneId : timeZoneIds) {
+            // Get a PV1
+            ORU_R01 message = new ORU_R01();
+            ORU_R01_PATIENT_RESULT patientResult = message.getPATIENT_RESULT();
+            ORU_R01_PATIENT patient = patientResult.getPATIENT();
+            ORU_R01_VISIT visit = patient.getVISIT();
+            PV1 pv1 = visit.getPV1();
+
+            // Admit and Discharge are not yet set; they are still empty
+            assertThat(Hl7RelatedGeneralUtils.pv1DurationLength(pv1, timeZoneId)).isNull();
+
+            // Admit set, but Discharge not yet set
+            pv1.getAdmitDateTime().setValue("20161013154626");
+            assertThat(Hl7RelatedGeneralUtils.pv1DurationLength(pv1, timeZoneId)).isNull();
+
+            // Admit and Discharge set to valid values
+            pv1.getAdmitDateTime().setValue("20161013154626");
+            pv1.getDischargeDateTime().setValue("20161013164626");
+            assertThat(Hl7RelatedGeneralUtils.pv1DurationLength(pv1, timeZoneId)).isEqualTo("60");
+
+            // Admit and Discharge set to valid values less that one minute apart
+            pv1.getAdmitDateTime().setValue("20161013154626");
+            pv1.getDischargeDateTime().setValue("20161013154628");
+            assertThat(Hl7RelatedGeneralUtils.pv1DurationLength(pv1, timeZoneId)).isEqualTo("0");
+
+            // Admit and Discharge set to insufficient detail values (have no minutes) return null
+            pv1.getAdmitDateTime().setValue("20161013");
+            pv1.getDischargeDateTime().setValue("20161013");
+            assertThat(Hl7RelatedGeneralUtils.pv1DurationLength(pv1, timeZoneId)).isNull();
+
+            // Other input types, such as a string, are not valid and null is returned
+            assertThat(Hl7RelatedGeneralUtils.pv1DurationLength("A string", timeZoneId)).isNull();
+        }
+
+    }
+
+    @Test
+    void get_datetime_value_valid() {
+        String gen = "20110613122406";
+        assertThat(Hl7RelatedGeneralUtils.dateTimeWithZoneId(gen,"")).isNotNull();
+        assertThat(Hl7RelatedGeneralUtils.dateTimeWithZoneId(gen,"")).isEqualTo(DateUtil.formatToDateTimeWithZone(gen,""));
+
+        // Test DateTime adjusts for milliseconds
+        gen = "20110613122406.637";
+        assertThat(Hl7RelatedGeneralUtils.dateTimeWithZoneId(gen,"")).isNotNull();
+        assertThat(Hl7RelatedGeneralUtils.dateTimeWithZoneId(gen,"")).isEqualTo(DateUtil.formatToDateTimeWithZone(gen,""));
+    }
+
+    @Test
+    void get_datetime_value_null() {
+        assertThat(Hl7RelatedGeneralUtils.dateTimeWithZoneId(null,null)).isNull();
+    }
+
 }

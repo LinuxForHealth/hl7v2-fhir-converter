@@ -1,54 +1,55 @@
 #
-# (C) Copyright IBM Corp. 2021
+# (C) Copyright IBM Corp. 2021, 2022
 #
 # SPDX-License-Identifier: Apache-2.0
 #
 resourceType: Specimen
 id:
-   type: STRING
-   valueOf: 'UUID.randomUUID()'
-   expressionType: JEXL
-   
+  type: STRING
+  valueOf: "UUID.randomUUID()"
+  expressionType: JEXL
+
 identifier:
-   valueOf: datatype/Identifier
-   generateList: true
-   expressionType: resource
-   specs: SPM.2.1 | SPM.2.2
-   
+  valueOf: datatype/Identifier
+  generateList: true
+  expressionType: resource
+  specs: SPM.2.1 | SPM.2.2
+
 status:
-   type: SPECIMEN_STATUS
-   valueOf: SPM.20
-   expressionType: HL7Spec
+  type: SPECIMEN_STATUS
+  valueOf: SPM.20
+  expressionType: HL7Spec
 
 type:
-   valueOf: datatype/CodeableConcept
-   expressionType: resource
-   specs: SPM.4 | SPM.5
+  valueOf: datatype/CodeableConcept
+  expressionType: resource
+  specs: SPM.4 | SPM.5
 
 receivedTime:
-   type: DATE_TIME
-   valueOf: SPM.18
-   expressionType: HL7Spec
+  type: STRING
+  valueOf: "GeneralUtils.dateTimeWithZoneId(dateTimeIn,ZONEID)"
+  expressionType: JEXL
+  vars:
+    dateTimeIn: SPM.18
 
 collection:
-   valueOf: secondary/collection
-   expressionType: resource
+  valueOf: secondary/collection
+  expressionType: resource
 
 processing:
-   valueOf: secondary/processing
-   expressionType: resource
+  valueOf: secondary/processing
+  expressionType: resource
 
 condition:
-   valueOf: datatype/CodeableConcept
-   expressionType: resource
-   specs: SPM.24
+  valueOf: datatype/CodeableConcept
+  expressionType: resource
+  specs: SPM.24
 
 note:
-   valueOf: datatype/Annotation
-   expressionType: resource
-   condition: $obx3 EQUALS 48767-8
-   specs: OBX
-   vars:
-      obx3: STRING, OBX.3.1
-      annotationText: STRING, OBX.5
-
+  valueOf: datatype/Annotation
+  expressionType: resource
+  condition: $obx3 EQUALS 48767-8
+  specs: OBX
+  vars:
+    obx3: STRING, OBX.3.1
+    annotationText: STRING, OBX.5

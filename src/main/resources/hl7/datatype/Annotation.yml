@@ -1,23 +1,27 @@
 #
-# (C) Copyright IBM Corp. 2020, 2021
+# (C) Copyright IBM Corp. 2020, 2022
 #
 # SPDX-License-Identifier: Apache-2.0
 #
 # When annotationText is a concatenation of multiple NTE records, the first NTE.5 is used
 # to create the practitioner reference.  Other NTE.5's are ignored.
 authorReference:
-   condition: $performer NOT_NULL
-   valueOf: resource/Practitioner
-   expressionType: reference
-   specs: NTE.5
-   vars:
-      performer: NTE.5
+  condition: $performer NOT_NULL
+  valueOf: resource/Practitioner
+  expressionType: reference
+  specs: NTE.5
+  vars:
+    performer: NTE.5
+ 
 time:
-   type: DATE_TIME
-   valueOf: NTE.6 | NTE.7
-   expressionType: HL7Spec
+  type: STRING
+  valueOf: "GeneralUtils.dateTimeWithZoneId(dateTimeIn,ZONEID)"
+  expressionType: JEXL
+  vars:
+    dateTimeIn: NTE.6 | NTE.7
+
 text:
-   type: STRING
-   valueOf: $annotationText | NTE.3
-   required: true
-   expressionType: HL7Spec
+  type: STRING
+  valueOf: $annotationText | NTE.3
+  required: true
+  expressionType: HL7Spec

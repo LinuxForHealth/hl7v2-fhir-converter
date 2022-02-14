@@ -33,6 +33,7 @@ public class FHIRContext {
     private static FhirValidator validator;
     private boolean validateResource;
     private HashMap<String, String> properties;
+    private String zoneIdText;
 
     /**
      * Constructor for FHIRContext
@@ -42,11 +43,12 @@ public class FHIRContext {
      * @param properties Run-time properties in a Map of Key / Value String pairs
      * 
      */
-    public FHIRContext(boolean isPrettyPrint, boolean validateResource, Map<String,String> properties) {
+    public FHIRContext(boolean isPrettyPrint, boolean validateResource, Map<String,String> properties, String zoneIdText) {
         parser = CTX.newJsonParser();
         parser.setPrettyPrint(isPrettyPrint);
         this.validateResource = validateResource;
         this.properties = (HashMap<String, String>) properties;
+        this.zoneIdText = zoneIdText;
 
     }
 
@@ -58,11 +60,11 @@ public class FHIRContext {
      * 
      */
     public FHIRContext(boolean isPrettyPrint, boolean validateResource) {
-        this(isPrettyPrint, validateResource, new HashMap<>());
+        this(isPrettyPrint, validateResource, new HashMap<>(),null);
     }
 
     public FHIRContext() {
-        this(Constants.DEFAULT_PRETTY_PRINT, false, new HashMap<>());
+        this(Constants.DEFAULT_PRETTY_PRINT, false, new HashMap<>(),null);
     }
 
     public IParser getParser() {
@@ -80,6 +82,10 @@ public class FHIRContext {
 
     public Map<String, String> getProperties() {
         return properties;
+    }
+
+    public String getZoneIdText() {
+        return zoneIdText;
     }
 
     public String encodeResourceToString(Bundle bundle){
