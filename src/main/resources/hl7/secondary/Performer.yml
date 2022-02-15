@@ -1,5 +1,5 @@
 #
-# (C) Copyright IBM Corp. 2020
+# (C) Copyright IBM Corp. 2020, 2022
 #
 # SPDX-License-Identifier: Apache-2.0
 #
@@ -20,10 +20,32 @@ function_v2:
     system: 'http://terminology.hl7.org/CodeSystem/v2-0443'
     code: AP
     text: Administering Provider
-actor:
+
+function_v3:
+   condition: $administeringProviderOrganization NOT_NULL
+   valueOf: datatype/CodeableConcept_var
+   expressionType: resource
+   constants:
+    system: 'http://terminology.hl7.org/CodeSystem/v2-0443'
+    code: AP
+    text: Administering Provider    
+
+actor_1:
    condition: $orderingProvider NOT_NULL || $administeringProvider NOT_NULL
    valueOf: resource/Practitioner
    expressionType: reference
-   generateList: true
    specs: $orderingProvider | $administeringProvider
    required: true
+
+actor_2:
+   condition: $administeringProviderOrganization NOT_NULL
+   valueOf: resource/Organization
+   expressionType: reference
+   specs: $administeringProviderOrganization
+   required: true   
+   vars:
+     idValue: $administeringProviderOrganization 
+     orgName: String, $administeringProviderOrganization
+     orgIdValue: String, $administeringProviderOrganization # used for Id and Identifier
+   constants:   
+     orgIdSystem: 'extID'  # 'urn:id:' added by SystemCX processing

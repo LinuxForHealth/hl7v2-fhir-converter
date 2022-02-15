@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2020
+ * (C) Copyright IBM Corp. 2020, 2022
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -8,10 +8,13 @@ package io.github.linuxforhealth.hl7.message;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.r4.model.Bundle;
+import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Preconditions;
@@ -34,7 +37,7 @@ public class HL7MessageModel implements MessageTemplate<Message> {
 
     @JsonCreator
     public HL7MessageModel(@JsonProperty("messageName") String messageName,
-                           @JsonProperty("resources") List<HL7FHIRResourceTemplate> resources) {
+            @JsonProperty("resources") List<HL7FHIRResourceTemplate> resources) {
         this.messageName = messageName;
         this.resources = new ArrayList<>();
         if (resources != null && !resources.isEmpty()) {
@@ -52,7 +55,6 @@ public class HL7MessageModel implements MessageTemplate<Message> {
         }
         LOGGER.error("Error transforming HL7 message. {}", classAndStack);
     }
-
 
     public String convert(String message, MessageEngine engine) throws IOException {
         Preconditions.checkArgument(StringUtils.isNotBlank(message),
@@ -75,7 +77,6 @@ public class HL7MessageModel implements MessageTemplate<Message> {
 
     }
 
-
     @Override
     public Bundle convert(Message message, MessageEngine engine) {
         Preconditions.checkArgument(message != null, "Input Hl7 message cannot be null");
@@ -90,6 +91,7 @@ public class HL7MessageModel implements MessageTemplate<Message> {
         // NOTE: We have seen PHI in these exception messages.
         try {
             bundle = engine.transform(dataSource, this.getResources(), new HashMap<>());
+            deduplicate(bundle);  // Bundle is passed by reference and may be modified
             engine.getFHIRContext().validate(bundle);
 
         } catch (Exception e) {
@@ -98,9 +100,7 @@ public class HL7MessageModel implements MessageTemplate<Message> {
         }
 
         return bundle;
-
     }
-
 
     @Override
     public String getMessageName() {
@@ -116,5 +116,31 @@ public class HL7MessageModel implements MessageTemplate<Message> {
         return new ArrayList<>(resources);
     }
 
+    // General deduplication utility. Currently only Organizations.
+    // Bundle is passed by reference and may be modified
+    private void deduplicate(Bundle bundle) {
+        List<BundleEntryComponent> entries = bundle.getEntry();
+        Iterator<BundleEntryComponent> i = entries.iterator();
+        while (i.hasNext()) {
+            BundleEntryComponent entry = i.next(); // Safe traversal for removal
+            // Currently only looking for duplicate Organizations, because their Urls and Id's are created from org data.
+            if (entry.getFullUrl().startsWith("Organization/") && duplicateFound(entry, entries)) {
+                i.remove();  // Safe removal
+            }
+        }
+    }
+
+    // Determine if an entry has duplicates by counting all the entries which have the same Url.
+    // If count > 1 then it has duplicates.  (It will be counted, too, as 1.)
+    private boolean duplicateFound(BundleEntryComponent entry, List<BundleEntryComponent> entries) {
+        String targetUrl = entry.getFullUrl();
+        Integer foundCount = 0;
+        for (BundleEntryComponent component : entries) {
+            if (component.getFullUrl().equals(targetUrl)) {
+                foundCount++;
+            }
+        }
+        return foundCount > 1;
+    }
 
 }
