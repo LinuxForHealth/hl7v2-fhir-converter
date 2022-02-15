@@ -20,8 +20,11 @@ import org.hl7.fhir.r4.model.Observation;
 import org.hl7.fhir.r4.model.Practitioner;
 import org.hl7.fhir.r4.model.Resource;
 import org.hl7.fhir.r4.model.ResourceType;
+import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
 import org.junit.jupiter.api.Test;
 
+import io.github.linuxforhealth.hl7.ConverterOptions;
+import io.github.linuxforhealth.hl7.ConverterOptions.Builder;
 import io.github.linuxforhealth.hl7.segments.util.DatatypeUtils;
 import io.github.linuxforhealth.hl7.segments.util.ResourceUtils;
 
@@ -378,14 +381,14 @@ class Hl7ImmunizationFHIRConversionTest {
     void testImmunizationAdministrationPlaceOrg1() throws IOException {
         String hl7VUXmessageRep = "MSH|^~\\&|||||20140701041038||VXU^V04^VXU_V04|MSG.Valid_01|P|2.6|||\n"
                 + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\r"
-                // PV1.3.4 to Organization place; used by Encounter, but bypassed for Immunization Performer because RXA.27 has priority
+                // PV1.3.4 to Organization referenced by Encounter.serviceProvider; but bypassed for Immunization.performer because RXA.27.4 has priority
                 + "PV1||O|^^^PlacePV1.3.4\r"
                 + "ORC|||197027|||||||^Clerk^Myron|||||||RI2050\r"
-                // RXA.11 present, but should be ignored because RXA.27 has priority
+                // RXA.11.4 present, but should be ignored because RXA.27.4 has priority
                 // RXA.12 - RXA.26 not used
                 + "RXA|0|1|20130531||48^HIB PRP-T^CVX||||||^^^PlaceRXA11|||||||||||||||"
                 // RXA.27 to Immunization Performer
-                + "|^^^PlaceRXA27\r"
+                + "|^^^PlaceRXA274\r"
                 + "OBX|1|CE|59784-9^Disease with presumed immunity^LN||\r";
 
         List<Bundle.BundleEntryComponent> e = ResourceUtils
@@ -396,13 +399,15 @@ class Hl7ImmunizationFHIRConversionTest {
         assertThat(organizations).hasSize(2);
         Organization org1 = (Organization) organizations.get(0);
         Organization org2 = (Organization) organizations.get(1);
-        String orgId1 = org1.getId(); // RXA.27
+        String orgId1 = org1.getId(); // RXA.27.4
+        assertThat(orgId1).isEqualTo("Organization/placerxa274"); // RXA.27.4
         String orgId2 = org2.getId(); // PV1.3.4
+        assertThat(orgId2).isEqualTo("Organization/placepv1.3.4"); // PV1.3.4
 
         List<Resource> immunizations = ResourceUtils.getResourceList(e, ResourceType.Immunization);
         assertThat(immunizations).hasSize(1);
         Immunization imm = (Immunization) immunizations.get(0);
-        assertThat(imm.getPerformer()).hasSize(1); // RXA.27
+        assertThat(imm.getPerformer()).hasSize(1); // RXA.27.4
         assertThat(imm.getPerformerFirstRep().getActor().getReference()).isEqualTo(orgId1); // RXA.27
 
         List<Resource> encounters = ResourceUtils.getResourceList(e, ResourceType.Encounter);
@@ -436,6 +441,7 @@ class Hl7ImmunizationFHIRConversionTest {
         assertThat(organizations).hasSize(1); // Proves that deduplication worked
         Organization org = (Organization) organizations.get(0);
         String orgId = org.getId(); // PV1.3.4
+        assertThat(orgId).isEqualTo("Organization/placepv1.3.4"); // PV1.3.4
 
         List<Resource> immunizations = ResourceUtils.getResourceList(e, ResourceType.Immunization);
         assertThat(immunizations).hasSize(1);
@@ -460,29 +466,33 @@ class Hl7ImmunizationFHIRConversionTest {
                 // PV1 purposely missing
                 + "ORC|||197027|||||||^Clerk^Myron|||||||RI2050\r"
                 // RXA.6 - RXA6.26 not used
-                // RXA.11 present and takes priority because there is no RXA.27 nor PV1.3.4
+                // RXA.11.4 present and takes priority because there is no RXA.27 nor PV1.3.4
                 + "RXA|0|1|20130531||48^HIB PRP-T^CVX||||||^^^PlaceRXA11|||||||||||||||"
                 + "OBX|1|CE|59784-9^Disease with presumed immunity^LN||\r";
 
-        List<Bundle.BundleEntryComponent> e = ResourceUtils
-                .createFHIRBundleFromHL7MessageReturnEntryList(hl7VUXmessageRep);
+        // TENANT prepend is passed through the options.  
+        ConverterOptions customOptionsWithTenant = new Builder().withValidateResource().withPrettyPrint()
+        .withProperty("TENANT", "TenantId").build();
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7VUXmessageRep,
+                customOptionsWithTenant);        
 
         // We expect two different organizations, one for Encounter.serviceProvider, one for Immunization.performer   
         List<Resource> organizations = ResourceUtils.getResourceList(e, ResourceType.Organization);
         assertThat(organizations).hasSize(1);
         Organization org = (Organization) organizations.get(0);
-        String orgId = org.getId(); // RXA.11
+        String orgId = org.getId(); 
+        assertThat(orgId).isEqualTo("Organization/tenantid.placerxa11"); // RXA.11.4 + tenantid
 
         List<Resource> immunizations = ResourceUtils.getResourceList(e, ResourceType.Immunization);
         assertThat(immunizations).hasSize(1);
         Immunization imm = (Immunization) immunizations.get(0);
-        assertThat(imm.getPerformer()).hasSize(1); // RXA.11
-        assertThat(imm.getPerformerFirstRep().getActor().getReference()).isEqualTo(orgId); // RXA.11
+        assertThat(imm.getPerformer()).hasSize(1); // RXA.11.4
+        assertThat(imm.getPerformerFirstRep().getActor().getReference()).isEqualTo(orgId); // RXA.11.4 + tenantid
 
         List<Resource> encounters = ResourceUtils.getResourceList(e, ResourceType.Encounter);
         assertThat(encounters).isEmpty();
 
-        // Check for expected resources: Organizations, Immunization,  Patient
+        // Check for expected resources: Organization, Immunization,  Patient
         assertThat(e).hasSize(3);
     }
 }

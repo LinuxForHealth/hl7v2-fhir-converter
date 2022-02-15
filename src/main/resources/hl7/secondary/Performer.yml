@@ -34,7 +34,6 @@ actor_1:
    condition: $orderingProvider NOT_NULL || $administeringProvider NOT_NULL
    valueOf: resource/Practitioner
    expressionType: reference
-   generateList: true
    specs: $orderingProvider | $administeringProvider
    required: true
 
@@ -42,7 +41,6 @@ actor_2:
    condition: $administeringProviderOrganization NOT_NULL
    valueOf: resource/Organization
    expressionType: reference
-   generateList: true
    specs: $administeringProviderOrganization
    required: true   
    vars:
