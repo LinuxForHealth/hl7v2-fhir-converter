@@ -91,7 +91,7 @@ public class HL7MessageModel implements MessageTemplate<Message> {
         // NOTE: We have seen PHI in these exception messages.
         try {
             bundle = engine.transform(dataSource, this.getResources(), new HashMap<>());
-            bundle = deduplicate(bundle);
+            deduplicate(bundle);  // Bundle is passed by reference and may be modified
             engine.getFHIRContext().validate(bundle);
 
         } catch (Exception e) {
@@ -117,8 +117,8 @@ public class HL7MessageModel implements MessageTemplate<Message> {
     }
 
     // General deduplication utility. Currently only Organizations.
-    // Potentially modifies bundle!
-    private Bundle deduplicate(Bundle bundle) {
+    // Bundle is passed by reference and may be modified
+    private void deduplicate(Bundle bundle) {
         List<BundleEntryComponent> entries = bundle.getEntry();
         Iterator<BundleEntryComponent> i = entries.iterator();
         while (i.hasNext()) {
@@ -128,7 +128,6 @@ public class HL7MessageModel implements MessageTemplate<Message> {
                 i.remove();  // Safe removal
             }
         }
-        return bundle;
     }
 
     // Determine if an entry has duplicates by counting all the entries which have the same Url.
