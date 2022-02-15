@@ -1,5 +1,5 @@
 #
-# (C) Copyright IBM Corp. 2020
+# (C) Copyright IBM Corp. 2020, 2022
 #
 # SPDX-License-Identifier: Apache-2.0
 #
@@ -21,7 +21,7 @@ resources:
       additionalSegments:
              - PD1
              - MSH
-      
+
     - resourceName: Encounter
       segment: .PV1
       resourcePath: resource/Encounter
@@ -45,3 +45,4 @@ resources:
               - .RXR
               - .OBSERVATION.OBX
               - MSH
+              - PATIENT.PV1
