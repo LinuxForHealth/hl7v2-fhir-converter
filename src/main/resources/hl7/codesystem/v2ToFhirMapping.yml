@@ -144,7 +144,7 @@ DocumentReferenceStatus: #DocumenReference Status
   S: current
   X: entered-in-error
 
-CompositionStatus: #DocumenReference docStatus
+CompositionStatus: #DocumentReference docStatus
   #TXA.17
   AU: final
   DI: preliminary

@@ -81,13 +81,16 @@ vaccineCode_1:
     code: RXA.5
 
 vaccineCode_2:
+  expressionType: nested
   condition: $obx31 EQUALS 30956-7 && $rxa5 NULL
-  valueOf: datatype/CodeableConcept
-  expressionType: resource
-  specs: OBX.5
+  specs: OBX # Repeat for all OBX records
   vars:
     rxa5: RXA.5
     obx31: String, OBX.3.1
+  expressions:
+    - valueOf: datatype/CodeableConcept
+      expressionType: resource
+      specs: OBX.5
 
 patient:
   valueOf: datatype/Reference
@@ -204,21 +207,27 @@ isSubpotent:
   vars:
     rxa20: String, RXA.20
 
-programEligibility:
-  valueOf: datatype/CodeableConcept
-  expressionType: resource
-  condition: $obx3 EQUALS 64994-7
-  specs: OBX.5
-  vars:
-    obx3: String, OBX.3.1
-    
+programEligibility: 
+    expressionType: nested
+    condition: $obx3b EQUALS 64994-7
+    specs: OBX # Repeat for all OBX records
+    vars:
+      obx3b: String, OBX.3.1
+    expressions:
+      - valueOf: datatype/CodeableConcept
+        expressionType: resource
+        specs: OBX.5
+
 fundingSource:
-  valueOf: datatype/CodeableConcept
-  expressionType: resource
-  condition: $obx3 EQUALS 30963-3
-  specs: OBX.5
+  expressionType: nested
+  condition: $obx3b EQUALS 30963-3
+  specs: OBX # Repeat for all OBX records
   vars:
-    obx3: String, OBX.3.1
+    obx3b: String, OBX.3.1
+  expressions:
+    - valueOf: datatype/CodeableConcept
+      expressionType: resource
+      specs: OBX.5
 
 reasonCode:
   valueOf: datatype/CodeableConcept

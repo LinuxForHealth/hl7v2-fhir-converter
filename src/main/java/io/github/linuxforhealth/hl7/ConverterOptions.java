@@ -102,7 +102,7 @@ public class ConverterOptions {
     /**
      * getProperty looks up the value for a property of key
      * 
-     * @key isPrettyPrint Should PrettyPrint be applied to output formatting
+     * @param key Property key to look up
      * 
      * @return the value associated with the key or NULL if the key is not found
      * 
