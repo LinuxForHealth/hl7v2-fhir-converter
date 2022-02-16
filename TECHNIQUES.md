@@ -233,3 +233,31 @@ diagnosis:
           # refconditionId is calculated by pattern matching to find identifier that contains urn:id:extID as the system"
           refconditionId: $BASE_VALUE, GeneralUtils.extractAttribute(refconditionId,"$.identifier[?(@.system==\"urn:id:extID\")].value","String")
 ```
+
+#### Referencing fields of repeating segments
+
+As another example, in Immunization, each of the OBX segments needed processing of OBX.5 fields based on the value of OBX.3.  The following looks like it would work, but it doesn't. On the surface, it appears that `specs: OBX.5` will take each OBX record and process OBX5.  However this only works for the _first_ OBX.5, because `specs: OBX.5` is really specifying to repeat the sub-fields of OBX.5.  
+```yml
+# Wrong way to repeat for all OBX records
+fundingSource:
+  valueOf: datatype/CodeableConcept
+  expressionType: resource
+  condition: $obx3b EQUALS 30963-3
+  specs: OBX.5
+  vars:
+    obx3b: String, OBX.3.1
+```
+The solution is to repeat on OBX using `spec: OBX`, and nest the OBX.5 processing within the repeat from `spec: OBX` 
+```yml
+# Right way to repeat for all OBX records
+fundingSource:
+   expressionType: nested
+   condition: $obx3b EQUALS 30963-3
+   specs: OBX
+   vars:
+      obx3b: String, OBX.3.1 
+   expressions:
+      - valueOf: datatype/CodeableConcept
+        expressionType: resource
+        specs: OBX.5
+```

@@ -36,7 +36,7 @@ class Hl7ImmunizationFHIRConversionTest {
     void testImmunizationRXA20Priority() throws IOException {
 
         // RXA.20 is "completed" this takes precedence over rxa.18 having a value and orc.5
-        //ORC.5 is here to prove RXA.20 is taking precedence
+        // ORC.5 is here to prove RXA.20 is taking precedence
         // ORC.9 is here to prove RXA.22 is taking precedence
         String hl7VUXmessageRep = "MSH|^~\\&|EHR|12345^SiteName|MIIS|99990|20140701041038||VXU^V04^VXU_V04|MSG.Valid_01|P|2.6|||\n"
                 + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\r"
@@ -238,6 +238,78 @@ class Hl7ImmunizationFHIRConversionTest {
         assertThat(immunization.hasProgramEligibility()).isFalse();
         assertThat(immunization.hasReaction()).isFalse();
 
+    }
+
+    // Suppress warnings about too many assertions in a test.  Justification: creating a FHIR message is very costly; we need to check many asserts per creation for efficiency.  
+    @java.lang.SuppressWarnings("squid:S5961")
+    @Test
+    void testImmunizationFailingFundingSource() throws IOException {
+
+        // Tests that multiple OBX records are processed.
+        // Checks that values which are created from all of the associated OBX records are found.
+        // Checks that a bug where only the first of the OBX records were processed does not return.
+        String hl7VUXmessageRep = "MSH|^~\\&|EHR|12345^SiteName|MIIS|99990|20140701041038||VXU^V04^VXU_V04|MSG.Valid_01|P|2.6|||\n"
+                + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\r"
+                + "ORC|RE||197027||PA|||||^Clerk^Myron|||||||RI2050\r"
+                // RXA 5 purposely empty so OBX.3 30956-7 triggers
+                + "RXA|||20130531|||0.5|ML^^UCUM||||||||||||00^refusal|RE\r"
+                // Four different specialized OBX records.  See comments in tests.
+                + "OBX|1|CWE|30963-3^ VACCINE FUNDING SOURCE^LN|1|V02^VFC eligible Medicaid/MedicaidManaged Care^HL70064\r"
+                + "OBX|2|CE|64994-7^Vaccine funding program eligibility category^LN|1|V05^VFC eligible - Federally Qualified Health Center Patient (under-insured)^HL70064||||||F|||20161107\r"
+                + "OBX|3|CWE|30956-7^vaccine type^LN|1|107^DTAP^CVX||||||F|||20161108\r"
+                + "OBX|4|CWE|31044-1^Reaction^LN|1|VXC9^Persistent, inconsolable crying lasting > 3 hours within 48 hours of dose^CDCPHINVS||||||F|||20170201\r";
+
+        List<Bundle.BundleEntryComponent> e = ResourceUtils
+                .createFHIRBundleFromHL7MessageReturnEntryList(hl7VUXmessageRep);
+        List<Resource> immunizations = ResourceUtils.getResourceList(e, ResourceType.Immunization);
+        assertThat(immunizations).hasSize(1);
+        Immunization immunization = ResourceUtils.getResourceImmunization(immunizations.get(0), ResourceUtils.context);
+
+        // For OBX record 1, OBX.3 is 30963-3, use OBX.5 as funding source
+        assertThat(immunization.hasFundingSource()).isTrue();
+        DatatypeUtils.checkCommonCodeableConceptAssertions(immunization.getFundingSource(), "V02",
+                "VFC eligible Medicaid/MedicaidManaged Care",
+                "https://phinvads.cdc.gov/vads/ViewCodeSystem.action?id=2.16.840.1.113883.12.64#",
+                "VFC eligible Medicaid/MedicaidManaged Care");
+
+        // For OBX record 2, OBX.3 is 64994-7, use OBX.5 as programEligibility
+        assertThat(immunization.hasProgramEligibility()).isTrue();
+        assertThat(immunization.getProgramEligibility()).hasSize(1);
+        DatatypeUtils.checkCommonCodeableConceptAssertions(immunization.getProgramEligibilityFirstRep(), "V05",
+                null,
+                "https://phinvads.cdc.gov/vads/ViewCodeSystem.action?id=2.16.840.1.113883.12.64#",
+                "VFC eligible - Federally Qualified Health Center Patient (under-insured)");
+
+        // For OBX record 3, OBX.3 is 30956-7 and RXA.5 is empty, use OBX.5 as vaccineCode
+        assertThat(immunization.hasVaccineCode()).isTrue();
+        assertThat(immunization.getVaccineCode().getCodingFirstRep().getCode()).isEqualTo("107");
+        assertThat(immunization.getVaccineCode().getCodingFirstRep().getDisplay()).isEqualTo("DTAP");
+        assertThat(immunization.getVaccineCode().getCodingFirstRep().getSystem())
+                .isEqualTo("http://hl7.org/fhir/sid/cvx");
+        assertThat(immunization.getVaccineCode().getText()).isEqualTo("DTAP");
+
+        // For OBX record 4 OBX.3 is 31044-1, use OBX.5 as reaction and create a detail reference; 
+        assertThat(immunization.getReactionFirstRep().getDateElement().toString()).contains("2017-02-01"); //OBX.14
+        assertThat(immunization.getReactionFirstRep().getDetail().hasReference()).isTrue(); //OBX.5
+        // Looking for one Observation that matches the Reaction.Detail reference
+        String reactionDetailReference = immunization.getReactionFirstRep().getDetail().getReference();
+
+        // There is only one observation, and it should be the one for reaction
+        List<Resource> observations = ResourceUtils.getResourceList(e, ResourceType.Observation);
+        assertThat(observations).hasSize(1);
+        Observation obs = ResourceUtils.getResourceObservation(observations.get(0), ResourceUtils.context);
+        assertThat(obs.getId()).isEqualTo(reactionDetailReference);
+        assertThat(obs.getCode().getCodingFirstRep().getDisplay())
+                .isEqualTo("Persistent, inconsolable crying lasting > 3 hours within 48 hours of dose");
+        assertThat(obs.getCode().getCodingFirstRep().getCode()).isEqualTo("VXC9");
+        assertThat(obs.getCode().getCodingFirstRep().getSystem()).isEqualTo("urn:id:CDCPHINVS");
+        assertThat(obs.getCode().getText())
+                .isEqualTo("Persistent, inconsolable crying lasting > 3 hours within 48 hours of dose");
+        assertThat(obs.getIdentifierFirstRep().getValue()).isEqualTo("197027-VXC9-CDCPHINVS");
+        assertThat(obs.getIdentifierFirstRep().getSystem()).isEqualTo("urn:id:extID");
+
+        // Check for expected resources: Immunization, Observation, Patient
+        assertThat(e).hasSize(3);
     }
 
     @Test
@@ -472,15 +544,15 @@ class Hl7ImmunizationFHIRConversionTest {
 
         // TENANT prepend is passed through the options.  
         ConverterOptions customOptionsWithTenant = new Builder().withValidateResource().withPrettyPrint()
-        .withProperty("TENANT", "TenantId").build();
+                .withProperty("TENANT", "TenantId").build();
         List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7VUXmessageRep,
-                customOptionsWithTenant);        
+                customOptionsWithTenant);
 
         // We expect two different organizations, one for Encounter.serviceProvider, one for Immunization.performer   
         List<Resource> organizations = ResourceUtils.getResourceList(e, ResourceType.Organization);
         assertThat(organizations).hasSize(1);
         Organization org = (Organization) organizations.get(0);
-        String orgId = org.getId(); 
+        String orgId = org.getId();
         assertThat(orgId).isEqualTo("Organization/tenantid.placerxa11"); // RXA.11.4 + tenantid
 
         List<Resource> immunizations = ResourceUtils.getResourceList(e, ResourceType.Immunization);

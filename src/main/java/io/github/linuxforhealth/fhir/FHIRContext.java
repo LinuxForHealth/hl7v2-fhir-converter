@@ -41,6 +41,7 @@ public class FHIRContext {
      * @param isPrettyPrint Should PrettyPrint be applied to output formatting
      * @param validateResource Should the output be FHIR validated
      * @param properties Run-time properties in a Map of Key / Value String pairs
+     * @param zoneIdText Country/city zoneId text or offset
      * 
      */
     public FHIRContext(boolean isPrettyPrint, boolean validateResource, Map<String,String> properties, String zoneIdText) {
