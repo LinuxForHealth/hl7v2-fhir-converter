@@ -201,7 +201,7 @@ The extraction logic for each field can be defined by using expressions. This co
 * type: DEFAULT - Object <br>
   Represents the class type for the final return value extracted for the field.
 * specs: DEFAULT - NONE<br>
-  Represents the base value for a resource, if no spec is provided then parents base value would be used as base value for child resource.
+  Represents the base value for a resource, if no spec is provided then parents base value would be used as base value for child resource.  Spec causes a repeating field or segment to be processed once for each field. 
   Refer to the section on supported formats for [Specification](#specification).<br>
 
 * default: DEFAULT - NULL<br>

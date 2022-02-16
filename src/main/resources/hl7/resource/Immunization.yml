@@ -209,10 +209,10 @@ isSubpotent:
 
 programEligibility: 
     expressionType: nested
-    condition: $obx3b EQUALS 64994-7
+    condition: $obx3 EQUALS 64994-7
     specs: OBX # Repeat for all OBX records
     vars:
-      obx3b: String, OBX.3.1
+      obx3: String, OBX.3.1
     expressions:
       - valueOf: datatype/CodeableConcept
         expressionType: resource
@@ -220,10 +220,10 @@ programEligibility:
 
 fundingSource:
   expressionType: nested
-  condition: $obx3b EQUALS 30963-3
+  condition: $obx3 EQUALS 30963-3
   specs: OBX # Repeat for all OBX records
   vars:
-    obx3b: String, OBX.3.1
+    obx3: String, OBX.3.1
   expressions:
     - valueOf: datatype/CodeableConcept
       expressionType: resource
