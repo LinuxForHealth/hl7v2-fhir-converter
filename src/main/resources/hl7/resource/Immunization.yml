@@ -249,3 +249,23 @@ reaction:
   specs: OBX
   vars:
     obx31: String, OBX.3.1
+
+education:
+  expressionType: nested
+  condition: $obx31 EQUALS 30956-7
+  generateList: true
+  specs: OBX
+  vars:
+    obx31: String, OBX.3.1
+  expressions:
+    - valueOf: secondary/Education
+      expressionType: resource
+      vars:
+        documentType: String, OBX.5.2
+        # Within nesting, evaluates only when outer condition is true.
+        # This avoids unnecessary evaluation.
+        pubDateString: FIND_EDUCATION_PUBLICATION_DATE, OBX
+        presDateString: FIND_EDUCATION_PRESENTATION_DATE, OBX
+      constants:
+        informationSheet: " Information Sheet"    
+    
