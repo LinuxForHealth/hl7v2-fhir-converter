@@ -10,7 +10,7 @@ function_v1:
    constants:
     system: 'http://terminology.hl7.org/CodeSystem/v2-0443'
     code: 'OP'
-    text: 'Ordering Provider'
+    display: 'Ordering Provider'
 
 function_v2:
    condition: $administeringProvider NOT_NULL
@@ -19,7 +19,7 @@ function_v2:
    constants:
     system: 'http://terminology.hl7.org/CodeSystem/v2-0443'
     code: AP
-    text: Administering Provider
+    display: Administering Provider
 
 function_v3:
    condition: $administeringProviderOrganization NOT_NULL
@@ -28,7 +28,7 @@ function_v3:
    constants:
     system: 'http://terminology.hl7.org/CodeSystem/v2-0443'
     code: AP
-    text: Administering Provider    
+    display: Administering Provider    
 
 actor_1:
    condition: $orderingProvider NOT_NULL || $administeringProvider NOT_NULL
