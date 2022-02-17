@@ -112,7 +112,7 @@ class Hl7ImmunizationFHIRConversionTest {
         assertThat(practBundle2.getNameFirstRep().getGiven().get(0)).hasToString("Nurse");
 
         String requesterRef3 = resource.getPerformer().get(2).getActor().getReference();
-        DatatypeUtils.checkCommonCodingAssertions(resource.getPerformer().get(1).getFunction().getCoding().get(0), "AP",
+        DatatypeUtils.checkCommonCodingAssertions(resource.getPerformer().get(2).getFunction().getCoding().get(0), "AP",
                 "Administering Provider",
                 "http://terminology.hl7.org/CodeSystem/v2-0443", null); // RXA.11
         assertThat(resource.getPerformer().get(1).getFunction().hasText()).isFalse();
@@ -172,8 +172,11 @@ class Hl7ImmunizationFHIRConversionTest {
         Immunization immunization = ResourceUtils.getImmunization(hl7VUXmessageRep);
 
         assertThat(immunization.getPerformer()).hasSize(1);
-        assertThat(immunization.getPerformer().get(0).getFunction().getCodingFirstRep().getCode()).isEqualTo("AP");// RXA.10
-        assertThat(immunization.getPerformer().get(0).getFunction().getText()).isEqualTo("Administering Provider"); // RXA.10
+        DatatypeUtils.checkCommonCodingAssertions(immunization.getPerformer().get(0).getFunction().getCodingFirstRep(),
+                "AP",
+                "Administering Provider",
+                "http://terminology.hl7.org/CodeSystem/v2-0443", null); // RXA.10
+        assertThat(immunization.getPerformer().get(0).getFunction().hasText()).isFalse();
         assertThat(immunization.getStatus().getDisplay()).isEqualTo("not-done"); // RXA.18 is not empty which signals that the status is not-done. ORC.5 is here to show precedence
         assertThat(immunization.hasStatusReason()).isTrue(); // if status is "not-done" we show the Status reason
         assertThat(immunization.getStatusReason().getCodingFirstRep().getCode()).isEqualTo("00");
