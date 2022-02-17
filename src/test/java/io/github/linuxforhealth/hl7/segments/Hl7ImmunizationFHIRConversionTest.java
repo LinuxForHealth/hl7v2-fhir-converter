@@ -571,4 +571,96 @@ class Hl7ImmunizationFHIRConversionTest {
         // Check for expected resources: Organization, Immunization,  Patient
         assertThat(e).hasSize(3);
     }
+
+    // The following creates education records which combine information from related OBX's, indicated by matching OBX.4 value
+    // There are two ORC/RXA/RXR/OBX* sections that differ only by dates and other small differences; enough to ensure we
+    // are finding the correct matching publication and presentation dates for the correct siblings and there is no data bleed.
+    // For each of RXA sections below, Immunization.education should be (dates & xx vary):
+    //
+    // "education": [
+    //     {
+    //         "documentType": "DTaP, xx UF Information Sheet",
+    //         "publicationDate": "2007-05-17",
+    //         "presentationDate": "2014-12-03"
+    //     },
+    //     {
+    //         "documentType": "Hep B, xx UF Information Sheet",
+    //         "publicationDate": "2012-02-02",
+    //         "presentationDate": "2014-12-03"                
+    //     }
+    // ],
+    @Test
+    void testDoubleMultipleNestedEducation() throws IOException {
+
+        String hl7VUXmessageRep = "MSH|^~\\&|||||20160106165800070+0000||VXU^V04^VXU_V04|20210205NH0000 01|P|2.5.1|||||||||Z22^CDCPHPHINVS|||\n"
+                + "PID|1||12345^^^^MR||TestPatient^Jane^^^^^L||||||\n"
+                + "NK1|1|LASTNAME^FIRST^^^^^L|SPO^SPOUSE^HL70063||^PRN^PH^^^603^7772222\n"
+                // First immunization set. Descriptions have AA, and dates 2007.
+                + "ORC|RE||2623980^EHR|||||||||^ORDERINGLASTNAME^FIRST^^^^^^^L^^^MD|\n"
+                + "RXA|0|1|20160105||33^PNEUMOCOCCAL POLYSACCHARIDE PPV23^CVX|0.5|ML^^UCUM|||||||||||||||\n"
+                + "RXR|C28161^Intramuscular^NCIT|LD^Left Deltoid^HL70163|\n"
+                + "OBX|1|CE|30956-7^Vaccine Type^LN|2|107^DTaP, AA UF^CVX||||||F\n"
+                + "OBX|2|DT|29768-9^Date Vaccine Information Statement Published^LN|2|20070517||||||F\n"
+                + "OBX|3|DT|29769-7^Date Vaccine Information Statement Presented^LN|2|20071203||||||F\n"
+                + "OBX|4|CWE|64994-7^funding pgm eligibility^LN||V01^Insured^HL70064||||||F||||||VXC40^per immunization^CDCPHINVS\n" // Extra record
+                + "OBX|5|CE|30956-7^Vaccine Type^LN|3|45^Hep B, AA UF^CVX||||||F\n"
+                + "OBX|6|DT|29768-9^Date Vaccine Information Statement Published^LN|3|20070202||||||F\n"
+                + "OBX|7|DT|29769-7^Date Vaccine Information Statement Presented^LN|3|20071203||||||F\n"
+                // Second immunization set. Descriptions have BB, and dates 2014.
+                + "ORC|RE||2623980^EHR|||||||||^ORDERINGLASTNAME^FIRST^^^^^^^L^^^MD|\n"
+                + "RXA|0|1|20160105||33^PNEUMOCOCCAL POLYSACCHARIDE PPV23^CVX|0.5|ML^^UCUM||||||||||||||||\n"
+                + "RXR|C28161^Intramuscular^NCIT|LD^Left Deltoid^HL70163|\n"
+                + "OBX|1|CWE|64994-7^funding pgm eligibility^LN||V01^Insured^HL70064||||||F||||||VXC40^per immunization^CDCPHINVS\n" // Extra record
+                + "OBX|2|CE|30956-7^Vaccine Type^LN|2|107^DTaP, BB UF^CVX||||||F\n"
+                + "OBX|3|DT|29768-9^Date Vaccine Information Statement Published^LN|2|20140517||||||F\n"
+                + "OBX|4|DT|29769-7^Date Vaccine Information Statement Presented^LN|2|20141203||||||F\n"
+                + "OBX|5|CE|30956-7^Vaccine Type^LN|3|45^Hep B, BB UF^CVX||||||F\n"
+                + "OBX|6|DT|29768-9^Date Vaccine Information Statement Published^LN|3|20140202||||||F\n"
+                + "OBX|7|DT|29769-7^Date Vaccine Information Statement Presented^LN|3|20141203||||||F\n"
+                + "ORC|RE||9999^EHR|||||||\n";
+
+        List<Bundle.BundleEntryComponent> e = ResourceUtils
+                .createFHIRBundleFromHL7MessageReturnEntryList(hl7VUXmessageRep);
+        List<Resource> immunizations = ResourceUtils.getResourceList(e, ResourceType.Immunization);
+        assertThat(immunizations).hasSize(2); 
+
+        // First immunization set. Descriptions have AA, and dates 2007.
+        Immunization immunization = (Immunization) immunizations.get(0);
+        assertThat(immunization.getEducation()).hasSize(2);
+        assertThat(immunization.getEducation().get(0).getDocumentTypeElement())
+                .hasToString("DTaP, AA UF Information Sheet");
+        assertThat(immunization.getEducation().get(0).getPublicationDateElement().getValueAsString())
+                .hasToString("2007-05-17");
+        assertThat(immunization.getEducation().get(0).getPresentationDateElement().getValueAsString())
+                .hasToString("2007-12-03");
+        assertThat(immunization.getEducation().get(1).getDocumentTypeElement())
+                .hasToString("Hep B, AA UF Information Sheet");
+        assertThat(immunization.getEducation().get(1).getPublicationDateElement().getValueAsString())
+                .hasToString("2007-02-02");
+        assertThat(immunization.getEducation().get(1).getPresentationDateElement().getValueAsString())
+                .hasToString("2007-12-03");
+
+        // Second immunization set. Descriptions have BB, and dates 2014.
+        immunization = (Immunization) immunizations.get(1);
+        assertThat(immunization.getEducation()).hasSize(2);
+        assertThat(immunization.getEducation().get(0).getDocumentTypeElement())
+                .hasToString("DTaP, BB UF Information Sheet");
+        assertThat(immunization.getEducation().get(0).getPublicationDateElement().getValueAsString())
+                .hasToString("2014-05-17");
+        assertThat(immunization.getEducation().get(0).getPresentationDateElement().getValueAsString())
+                .hasToString("2014-12-03");
+        assertThat(immunization.getEducation().get(1).getDocumentTypeElement())
+                .hasToString("Hep B, BB UF Information Sheet");
+        assertThat(immunization.getEducation().get(1).getPublicationDateElement().getValueAsString())
+                .hasToString("2014-02-02");
+        assertThat(immunization.getEducation().get(1).getPresentationDateElement().getValueAsString())
+                .hasToString("2014-12-03");       
+
+        List<Resource> practitioners = ResourceUtils.getResourceList(e, ResourceType.Practitioner);
+        assertThat(practitioners).hasSize(2); // Exactly 2
+
+        // Expect Immunization (x2), Practitioner (x2), Patient
+        assertThat(e).hasSize(5); // Exactly 5
+
+    }
 }

@@ -15,13 +15,21 @@ import java.util.Map;
 import java.util.UUID;
 
 import ca.uhn.hl7v2.model.v26.datatype.CWE;
+import ca.uhn.hl7v2.model.v26.datatype.DT;
 import ca.uhn.hl7v2.model.v26.datatype.PPN;
 import ca.uhn.hl7v2.model.v26.datatype.XCN;
-
+import ca.uhn.hl7v2.model.v26.group.VXU_V04_OBSERVATION;
+import ca.uhn.hl7v2.model.v26.group.VXU_V04_ORDER;
+import ca.uhn.hl7v2.model.v26.segment.OBX;
+import ca.uhn.hl7v2.HL7Exception;
+import ca.uhn.hl7v2.Location;
+import ca.uhn.hl7v2.model.Group;
 import ca.uhn.hl7v2.model.Varies;
+
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.hl7.fhir.dstu2.model.Order;
 import org.hl7.fhir.dstu3.model.codesystems.MedicationRequestCategory;
 import org.hl7.fhir.exceptions.FHIRException;
 import org.hl7.fhir.r4.model.AllergyIntolerance.AllergyIntoleranceCategory;
@@ -68,7 +76,6 @@ public class SimpleDataValueResolver {
         return null;
     };
 
-
     public static final ValueExtractor<Object, String> STRING = (Object value) -> {
         return Hl7DataHandlerUtil.getStringValue(value);
     };
@@ -82,7 +89,7 @@ public class SimpleDataValueResolver {
         if (strValue != null) {
             strValue = strValue.toLowerCase();
             return strValue.replaceAll("[^a-zA-Z0-9.]", "-");
-        } 
+        }
         return null;
     };
 
@@ -186,6 +193,53 @@ public class SimpleDataValueResolver {
         return getFHIRCode(val, ObservationStatus.class);
     };
 
+    public static final ValueExtractor<Object, String> FIND_EDUCATION_PUBLICATION_DATE = (Object value) -> {
+        return getSelectedDateFromObxGroup (value, "29768-9");
+    };
+
+    public static final ValueExtractor<Object, String> FIND_EDUCATION_PRESENTATION_DATE = (Object value) -> {
+        return getSelectedDateFromObxGroup (value, "29769-7");
+    };
+
+    // Finding a selected date is used when the information is in a sibling OBX.
+    // This is used for immunization records where the immunization, the publication, and presentation are
+    // in different sibling OBX's grouped together by OBX.4.
+    // This special purpose routine finds the grandparent object, so we can search the correct sibling objects,
+    // which prevents search overreach and datableed.
+    private static final String getSelectedDateFromObxGroup(Object valueObx, String codeToMatch) {
+        if (valueObx instanceof OBX) {  
+            try {
+                OBX obx = (OBX) valueObx;
+                // Get the group number from OBX.3
+                String obx4GroupNum = obx.getObx4_ObservationSubID().getValueOrEmpty();
+                // The parent of the OBX
+                Group parentGroup = obx.getParent();
+                // The grandparent of the OBX will always be a VXU_V04_ORDER
+                VXU_V04_ORDER vvOrder = (VXU_V04_ORDER) parentGroup.getParent();
+                // Get the repeating 'sibling' OBSERVATION objects
+                List<VXU_V04_OBSERVATION> observations = vvOrder.getOBSERVATIONAll();
+                for (VXU_V04_OBSERVATION obsIter : observations) {
+                    // For each OBSERVATION, get the OBX
+                    OBX obsIterObx = obsIter.getOBX();
+                    // If the group numbers (OBX.4) match AND OBX.3.1 matches the codeToMatch
+                    if (obx4GroupNum.equals(obsIterObx.getObx4_ObservationSubID().getValueOrEmpty()) &&
+                            obsIterObx.getObx3_ObservationIdentifier().getCwe1_Identifier().getValueOrEmpty()
+                                    .equals(codeToMatch)) {
+                        // Dig out the date (DT)                
+                        Varies[] v = obsIterObx.getObx5_ObservationValue();
+                        DT dt = (DT) v[0].getData();
+                        // Convert to formatted date string (no time, so we don't need zoneId)
+                        return DateUtil.formatToDate(dt.getValue());
+                    }
+                }
+            } catch (HL7Exception e) {
+                e.printStackTrace();
+                return null;  // If something fails
+            }
+        } 
+        return null;
+    }
+
     public static final ValueExtractor<Object, SimpleCode> OBSERVATION_STATUS_FHIR = (Object value) -> {
         String val = Hl7DataHandlerUtil.getStringValue(value);
         String code = getFHIRCode(val, ObservationStatus.class);
@@ -239,7 +293,7 @@ public class SimpleDataValueResolver {
     // Note: values that come in know the table based on the field position.
     public static final ValueExtractor<Object, SimpleCode> DIAGNOSIS_USE = (Object value) -> {
         String val = Hl7DataHandlerUtil.getStringValue(value);
-        if (val != null && (val.equals("F") || val.equals("W"))){
+        if (val != null && (val.equals("F") || val.equals("W"))) {
             // Process as table v2-0052
             String table = Hl7DataHandlerUtil.getTableNumber(value);
             if (table != null && val != null) {
@@ -251,7 +305,7 @@ public class SimpleDataValueResolver {
                 }
                 // Without a good table lookup, falls through to simple code handling below
             }
-        } 
+        }
         // Otherwise process as a DiagnosisRole mapping (handles unknown codes)
         String code = getFHIRCode(val, DiagnosisRole.class);
         if (code != null) {
@@ -550,8 +604,9 @@ public class SimpleDataValueResolver {
         SimpleCode codingSystem = commonCodingSystemV2(table, code, text, version);
         if (codingSystem.getSystem() != null) {
             return codingSystem.getSystem();
-        }return "http://unitsofmeasure.org";
-        
+        }
+        return "http://unitsofmeasure.org";
+
     };
 
     // For OBX.5 and other dynamic encoded fields, the real class is wrapped in the Varies class, and must be extracted from data
