@@ -225,11 +225,11 @@ public class SimpleDataValueResolver {
                     if (obx4GroupNum.equals(obsIterObx.getObx4_ObservationSubID().getValueOrEmpty()) &&
                             obsIterObx.getObx3_ObservationIdentifier().getCwe1_Identifier().getValueOrEmpty()
                                     .equals(codeToMatch)) {
-                        // Dig out the date (DT)                
+                        // Dig out the date string              
                         Varies[] v = obsIterObx.getObx5_ObservationValue();
-                        DT dt = (DT) v[0].getData();
+                        String unformattedDateString = Hl7DataHandlerUtil.getStringValue(v[0].getData());
                         // Convert to formatted date string (no time, so we don't need zoneId)
-                        return DateUtil.formatToDate(dt.getValue());
+                        return DateUtil.formatToDate(unformattedDateString);
                     }
                 }
             } catch (HL7Exception e) {

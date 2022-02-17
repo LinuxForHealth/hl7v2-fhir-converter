@@ -27,7 +27,8 @@
       valueOf: $pubDate
       expressionType: HL7Spec
 
- publicationDate_2:  
+ publicationDate_2:
+      condition: $pubDateString NOT_NULL  
       type: STRING
       valueOf: $pubDateString
       expressionType: HL7Spec     
@@ -39,6 +40,7 @@
       expressionType: HL7Spec
 
  presentationDate_2:
+      condition: $presDateString NOT_NULL
       type: STRING
       valueOf: $presDateString
       expressionType: HL7Spec      
