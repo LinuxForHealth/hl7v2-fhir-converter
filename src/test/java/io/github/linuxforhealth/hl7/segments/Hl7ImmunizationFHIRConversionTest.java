@@ -89,10 +89,11 @@ class Hl7ImmunizationFHIRConversionTest {
         String requesterRef1 = resource.getPerformer().get(0).getActor().getReference();
         Practitioner practBundle1 = ResourceUtils.getSpecificPractitionerFromBundleEntriesList(e, requesterRef1);
         assertThat(resource.getPerformer()).hasSize(3);
-        assertThat(resource.getPerformer().get(0).getFunction().getCoding().get(0).getCode())
-                .isEqualTo("OP"); // ORC.12
-        assertThat(resource.getPerformer().get(0).getFunction().getText())
-                .isEqualTo("Ordering Provider"); // ORC.12
+        DatatypeUtils.checkCommonCodingAssertions(resource.getPerformer().get(0).getFunction().getCoding().get(0), "OP",
+                "Ordering Provider",
+                "http://terminology.hl7.org/CodeSystem/v2-0443", null); // ORC.12
+        assertThat(resource.getPerformer().get(0).getFunction().hasText()).isFalse();
+
         assertThat(resource.getPerformer().get(0).getActor().getReference()).isNotEmpty(); // ORC.12
         assertThat(practBundle1.getNameFirstRep().getText()).isEqualTo("MARY Pediatric");
         assertThat(practBundle1.getNameFirstRep().getFamily()).isEqualTo("Pediatric");
@@ -101,20 +102,20 @@ class Hl7ImmunizationFHIRConversionTest {
 
         String requesterRef2 = resource.getPerformer().get(1).getActor().getReference();
         Practitioner practBundle2 = ResourceUtils.getSpecificPractitionerFromBundleEntriesList(e, requesterRef2);
-        assertThat(resource.getPerformer().get(1).getFunction().getCoding().get(0).getCode())
-                .isEqualTo("AP"); // RXA.10
-        assertThat(resource.getPerformer().get(1).getFunction().getText())
-                .isEqualTo("Administering Provider"); // RXA.10
+        DatatypeUtils.checkCommonCodingAssertions(resource.getPerformer().get(1).getFunction().getCoding().get(0), "AP",
+                "Administering Provider",
+                "http://terminology.hl7.org/CodeSystem/v2-0443", null); // RXA.10
+        assertThat(resource.getPerformer().get(1).getFunction().hasText()).isFalse();
         assertThat(resource.getPerformer().get(1).getActor().isEmpty()).isFalse(); // RXA.10
         assertThat(practBundle2.getNameFirstRep().getText()).isEqualTo("Nurse Sticker");
         assertThat(practBundle2.getNameFirstRep().getFamily()).isEqualTo("Sticker");
         assertThat(practBundle2.getNameFirstRep().getGiven().get(0)).hasToString("Nurse");
 
         String requesterRef3 = resource.getPerformer().get(2).getActor().getReference();
-        assertThat(resource.getPerformer().get(2).getFunction().getCoding().get(0).getCode())
-                .isEqualTo("AP"); // RXA.10
-        assertThat(resource.getPerformer().get(2).getFunction().getText())
-                .isEqualTo("Administering Provider"); // RXA.10
+        DatatypeUtils.checkCommonCodingAssertions(resource.getPerformer().get(2).getFunction().getCoding().get(0), "AP",
+                "Administering Provider",
+                "http://terminology.hl7.org/CodeSystem/v2-0443", null); // RXA.11
+        assertThat(resource.getPerformer().get(1).getFunction().hasText()).isFalse();
 
         // Immunization.Reaction Date (OBX.14) and Detail (OBX.5 if OBX 3 is 31044-1)
         assertThat(resource.getReactionFirstRep().getDateElement().toString()).contains("2013-05-31"); //OBX.14
@@ -171,8 +172,11 @@ class Hl7ImmunizationFHIRConversionTest {
         Immunization immunization = ResourceUtils.getImmunization(hl7VUXmessageRep);
 
         assertThat(immunization.getPerformer()).hasSize(1);
-        assertThat(immunization.getPerformer().get(0).getFunction().getCodingFirstRep().getCode()).isEqualTo("AP");// RXA.10
-        assertThat(immunization.getPerformer().get(0).getFunction().getText()).isEqualTo("Administering Provider"); // RXA.10
+        DatatypeUtils.checkCommonCodingAssertions(immunization.getPerformer().get(0).getFunction().getCodingFirstRep(),
+                "AP",
+                "Administering Provider",
+                "http://terminology.hl7.org/CodeSystem/v2-0443", null); // RXA.10
+        assertThat(immunization.getPerformer().get(0).getFunction().hasText()).isFalse();
         assertThat(immunization.getStatus().getDisplay()).isEqualTo("not-done"); // RXA.18 is not empty which signals that the status is not-done. ORC.5 is here to show precedence
         assertThat(immunization.hasStatusReason()).isTrue(); // if status is "not-done" we show the Status reason
         assertThat(immunization.getStatusReason().getCodingFirstRep().getCode()).isEqualTo("00");
