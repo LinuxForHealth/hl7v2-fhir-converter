@@ -210,14 +210,14 @@ public class SimpleDataValueResolver {
         if (valueObx instanceof OBX) {  
             try {
                 OBX obx = (OBX) valueObx;
-                // Get the group number from OBX.3
+                // Get the group number from OBX.4
                 String obx4GroupNum = obx.getObx4_ObservationSubID().getValueOrEmpty();
-                // The parent of the OBX
-                Group parentGroup = obx.getParent();
-                // The grandparent of the OBX will always be a VXU_V04_ORDER
-                VXU_V04_ORDER vvOrder = (VXU_V04_ORDER) parentGroup.getParent();
+                // OBX is contained in an OBSERVATION. Get the OBSERVATION by requesting the parent.  
+                VXU_V04_OBSERVATION containingObservation = (VXU_V04_OBSERVATION)obx.getParent();
+                // The parent of the OBSERVATION is a VXU_V04_ORDER
+                VXU_V04_ORDER containingOrder = (VXU_V04_ORDER) containingObservation.getParent();
                 // Get the repeating 'sibling' OBSERVATION objects
-                List<VXU_V04_OBSERVATION> observations = vvOrder.getOBSERVATIONAll();
+                List<VXU_V04_OBSERVATION> observations = containingOrder.getOBSERVATIONAll();
                 for (VXU_V04_OBSERVATION obsIter : observations) {
                     // For each OBSERVATION, get the OBX
                     OBX obsIterObx = obsIter.getOBX();
@@ -225,15 +225,15 @@ public class SimpleDataValueResolver {
                     if (obx4GroupNum.equals(obsIterObx.getObx4_ObservationSubID().getValueOrEmpty()) &&
                             obsIterObx.getObx3_ObservationIdentifier().getCwe1_Identifier().getValueOrEmpty()
                                     .equals(codeToMatch)) {
-                        // Dig out the date (DT)                
+                        // Dig out the date string              
                         Varies[] v = obsIterObx.getObx5_ObservationValue();
-                        DT dt = (DT) v[0].getData();
+                        String unformattedDateString = Hl7DataHandlerUtil.getStringValue(v[0].getData());
                         // Convert to formatted date string (no time, so we don't need zoneId)
-                        return DateUtil.formatToDate(dt.getValue());
+                        return DateUtil.formatToDate(unformattedDateString);
                     }
                 }
             } catch (HL7Exception e) {
-                e.printStackTrace();
+                LOGGER.debug("Cannot create ZoneId from :" + codeToMatch, e);
                 return null;  // If something fails
             }
         } 

@@ -4,6 +4,7 @@
  #
 
  # RULE: One of documentType or reference SHALL be present
+ # We don't use reference at this time.
  # Educational material document identifier : String
  documentType: 
       type: STRING
@@ -12,33 +13,16 @@
       vars:
         documentDescription: $documentType + $informationSheet
       
- # Educational material reference pointer : uri
- reference_1 : 
-    type: URI
-    valueOf: $reference
-
- reference_2: 
-    type: STRING
-    valueOf: $resolvedReference
-
- # Educational material publication date : dateTime
- publicationDate_1: 
-      type: DATE_TIME
-      valueOf: $pubDate
-      expressionType: HL7Spec
-
- publicationDate_2:  
+ # Educational material publication date : date formatted string
+ publicationDate:
+      condition: $pubDateString NOT_NULL  
       type: STRING
       valueOf: $pubDateString
       expressionType: HL7Spec     
 
- # Educational material presentation date : dateTime
- presentationDate_1:
-      type: DATE_TIME
-      valueOf: $presDate
-      expressionType: HL7Spec
-
- presentationDate_2:
+ # Educational material presentation date : date formatted string
+ presentationDate:
+      condition: $presDateString NOT_NULL
       type: STRING
       valueOf: $presDateString
       expressionType: HL7Spec      
