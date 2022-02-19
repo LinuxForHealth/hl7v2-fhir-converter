@@ -47,7 +47,8 @@ statusReason_2:
     display: "Patient Refusal"
     system: "http://terminology.hl7.org/CodeSystem/v3-ActReason"
 
-statusReason_3:
+# 3a & 3b together make complex $rxa20 NULL || $rxa20 NOT_EQUALS RE
+statusReason_3a:
   valueOf: datatype/CodeableConcept_var
   expressionType: resource
   condition: $rxa18 NULL && $rxa20 NULL && $obx31 EQUALS 30945-0
@@ -60,7 +61,21 @@ statusReason_3:
     display: "medical precaution"
     system: "http://terminology.hl7.org/CodeSystem/v3-ActReason"
 
-statusReason_4:
+statusReason_3b:
+  valueOf: datatype/CodeableConcept_var
+  expressionType: resource
+  condition: $rxa18 NULL && $rxa20 NOT_EQUALS RE && $obx31 EQUALS 30945-0
+  vars:
+    rxa18: RXA.18
+    rxa20: String, RXA.20
+    obx31: String, OBX.3.1
+  constants:
+    code: "MEDPREC"
+    display: "medical precaution"
+    system: "http://terminology.hl7.org/CodeSystem/v3-ActReason"    
+
+# 4a & 4b together make complex $rxa20 NULL || $rxa20 NOT_EQUALS RE
+statusReason_4a:
   valueOf: datatype/CodeableConcept_var
   expressionType: resource
   condition: $rxa18 NULL && $rxa20 NULL && $obx31 EQUALS 59784-9
@@ -72,6 +87,19 @@ statusReason_4:
     code: "IMMUNE"
     display: "immunity"
     system: "http://terminology.hl7.org/CodeSystem/v3-ActReason"
+
+statusReason_4b:
+  valueOf: datatype/CodeableConcept_var
+  expressionType: resource
+  condition: $rxa18 NULL && $rxa20 NOT_EQUALS RE && $obx31 EQUALS 59784-9
+  vars:
+    rxa18: RXA.18
+    rxa20: String, RXA.20
+    obx31: String, OBX.3.1
+  constants:
+    code: "IMMUNE"
+    display: "immunity"
+    system: "http://terminology.hl7.org/CodeSystem/v3-ActReason"    
 
 vaccineCode_1:
   valueOf: datatype/CodeableConcept
