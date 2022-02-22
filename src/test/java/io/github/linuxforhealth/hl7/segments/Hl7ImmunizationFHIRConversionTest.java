@@ -615,12 +615,12 @@ class Hl7ImmunizationFHIRConversionTest {
     //
     // "education": [
     //     {
-    //         "documentType": "DTaP, xx UF Information Sheet",
+    //         "documentType": "DTaP, xx UF",
     //         "publicationDate": "2007-05-17",
     //         "presentationDate": "2014-12-03"
     //     },
     //     {
-    //         "documentType": "Hep B, xx UF Information Sheet",
+    //         "documentType": "Hep B, xx UF",
     //         "publicationDate": "2012-02-02",
     //         "presentationDate": "2014-12-03"                
     //     }
