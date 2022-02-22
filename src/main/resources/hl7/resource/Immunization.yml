@@ -335,7 +335,7 @@ education_2:
 # Case 3: If publicationDate (29768-9), look at siblings of same group.
 # Process only if documentType (69764-9) and reference (30956-7) do not exist,
 # because if either exists, already handled by Case 1 or 2.
-# Also find presentationDate (29769-7). Set documentType as 'undefined'.
+# Also find presentationDate (29769-7). Set documentType as 'unspecified'.
 education_3:
   expressionType: nested
   condition: $obx31 EQUALS 29768-9 # publicationDate
@@ -353,12 +353,12 @@ education_3:
         pubDateString: FIND_EDUCATION_PUBLICATION_DATE, OBX
         presDateString: FIND_EDUCATION_PRESENTATION_DATE, OBX
       constants:
-        documentType: "undefined" # no document type or reference found, so use undefined as default
+        documentType: "unspecified" # no document type or reference found, so use unspecified as default
 
 # Case 4: If presentationDate (29769-7) look at siblings of same group.
 # Process only if documentType (69764-9), reference (30956-7) and publicationDate (29768-9) do not exist,
 # because if any exists, already handled by Case 1, 2, or 3.
-# Set documentType as 'undefined'.
+# Set documentType as 'unspecified'.
 education_4:
   expressionType: nested
   condition: $obx31 EQUALS 29769-7 # presentationDate
@@ -376,4 +376,4 @@ education_4:
         pubDateString: FIND_EDUCATION_PUBLICATION_DATE, OBX # Used to check if this case is applicable
         presDateString: FIND_EDUCATION_PRESENTATION_DATE, OBX
       constants:
-        documentType: "undefined" # no document type or reference found, so use undefined as default
+        documentType: "unspecified" # no document type or reference found, so use unspecified as default

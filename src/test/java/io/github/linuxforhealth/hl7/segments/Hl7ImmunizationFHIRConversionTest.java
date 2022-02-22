@@ -689,7 +689,7 @@ class Hl7ImmunizationFHIRConversionTest {
                 + "OBX|6|DT|29768-9^Date Vaccine Information Statement Published^LN|3|20140202||||||F\n"
                 + "OBX|7|DT|29769-7^Date Vaccine Information Statement Presented^LN|3|20141203||||||F\n"
                 // Immunization 2: education group 3. Has no DocumentType nor Reference record. 
-                // 'undefined' is used as DocumentType.       
+                // 'unspecified' is used as DocumentType.       
                 + "OBX|32|DT|29768-9^Date Vaccine Information Statement Published^LN|6|20140503||||||F\n"
                 + "OBX|33|DT|29769-7^Date Vaccine Information Statement Presented^LN|6|20140505||||||F\n"
                 // -----  THIRD IMMUNIZATION SET. ----- Descriptions have CC, and dates 2017.
@@ -708,7 +708,7 @@ class Hl7ImmunizationFHIRConversionTest {
                 + "OBX|22|DT|29768-9^Date Vaccine Information Statement Published^LN|5|20170403||||||F\n"
                 + "OBX|23|DT|29769-7^Date Vaccine Information Statement Presented^LN|5|20170405||||||F\n"
                 // Immunization 3: education group 3. Has no DocumentType nor Reference record. 
-                // 'undefined' is used as DocumentType.       
+                // 'unspecified' is used as DocumentType.       
                 + "OBX|43|DT|29769-7^Date Vaccine Information Statement Presented^LN|7|20170605||||||F\n"
                 + "ORC|RE||9999^EHR|||||||\n";
 
@@ -730,8 +730,8 @@ class Hl7ImmunizationFHIRConversionTest {
         checkImmunizationEducation(immunization.getEducation().get(0), "DTaP, BB1 UF", "2014-05-17", "2014-12-03");
         // Reference used as DocumentType
         checkImmunizationEducation(immunization.getEducation().get(1), "Hep B, BB2 UF", "2014-02-02", "2014-12-03");
-        // Has no DocumentType nor Reference record. 'undefined' is used as DocumentType.
-        checkImmunizationEducation(immunization.getEducation().get(2), "undefined", "2014-05-03", "2014-05-05");
+        // Has no DocumentType nor Reference record. 'unspecified' is used as DocumentType.
+        checkImmunizationEducation(immunization.getEducation().get(2), "unspecified", "2014-05-03", "2014-05-05");
 
         // Second immunization set. Descriptions have CC, and dates 2017.
         immunization = (Immunization) immunizations.get(2);
@@ -740,8 +740,8 @@ class Hl7ImmunizationFHIRConversionTest {
         checkImmunizationEducation(immunization.getEducation().get(0), "Hep B, CC3a UF", "2017-03-03", "2017-03-05");
         // Has only DocumentType record.  DocumentType will be used.     
         checkImmunizationEducation(immunization.getEducation().get(1), "Hep B, CC4 UF", "2017-04-03", "2017-04-05");
-        // Has no DocumentType nor Reference record nor PublicationDate. 'undefined' is used as DocumentType.        
-        checkImmunizationEducation(immunization.getEducation().get(2), "undefined", null, "2017-06-05");
+        // Has no DocumentType nor Reference record nor PublicationDate. 'unspecified' is used as DocumentType.        
+        checkImmunizationEducation(immunization.getEducation().get(2), "unspecified", null, "2017-06-05");
 
     }
 
