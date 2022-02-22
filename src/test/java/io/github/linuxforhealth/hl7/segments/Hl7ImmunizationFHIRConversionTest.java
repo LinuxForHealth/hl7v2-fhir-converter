@@ -720,7 +720,7 @@ class Hl7ImmunizationFHIRConversionTest {
 
     }
 
-    // Helper routine for common Immunization.education checkes.
+    // Helper routine for common Immunization.education checks.
     private static void checkImmunizationEducation(ImmunizationEducationComponent eduComp, String documentType,
             String publicationDate,
             String presentationDate) {
