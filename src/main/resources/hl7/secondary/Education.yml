@@ -1,28 +1,33 @@
 # (C) Copyright IBM Corp. 2022
- #
- # SPDX-License-Identifier: Apache-2.0
- #
+#
+# SPDX-License-Identifier: Apache-2.0
+#
 
- # RULE: One of documentType or reference SHALL be present
- # We don't use reference at this time.
- # Educational material document identifier : String
- documentType: 
-      type: STRING
-      valueOf: $documentDescription
-      expressionType: HL7Spec
-      vars:
-        documentDescription: $documentType + $informationSheet
-      
- # Educational material publication date : date formatted string
- publicationDate:
-      condition: $pubDateString NOT_NULL  
-      type: STRING
-      valueOf: $pubDateString
-      expressionType: HL7Spec     
+# RULE: One of documentType or reference SHALL be present.
+# Only documentType is used at this time because reference MUST be valid URN.
+# But we have not yet seen HL7 reference (30956-7) records with URNs to handle.
+# Therefore, any data in reference (30956-7) records is only used for
+# documentType and only if there is no actual documentType (69764-9) OBX record
 
- # Educational material presentation date : date formatted string
- presentationDate:
-      condition: $presDateString NOT_NULL
-      type: STRING
-      valueOf: $presDateString
-      expressionType: HL7Spec      
+# Educational material document identifier : String
+documentType:
+  type: STRING
+  valueOf: $documentType
+  expressionType: HL7Spec
+
+# If reference is used in the future, it would be added here
+# Reference must be a valid URN to validate.
+
+# Educational material publication date : date formatted string
+publicationDate:
+  condition: $pubDateString NOT_NULL
+  type: STRING
+  valueOf: $pubDateString
+  expressionType: HL7Spec
+
+# Educational material presentation date : date formatted string
+presentationDate:
+  condition: $presDateString NOT_NULL
+  type: STRING
+  valueOf: $presDateString
+  expressionType: HL7Spec

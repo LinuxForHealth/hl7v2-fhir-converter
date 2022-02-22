@@ -21,6 +21,7 @@ import org.hl7.fhir.r4.model.Practitioner;
 import org.hl7.fhir.r4.model.Resource;
 import org.hl7.fhir.r4.model.ResourceType;
 import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
+import org.hl7.fhir.r4.model.Immunization.ImmunizationEducationComponent;
 import org.junit.jupiter.api.Test;
 
 import io.github.linuxforhealth.hl7.ConverterOptions;
@@ -317,14 +318,14 @@ class Hl7ImmunizationFHIRConversionTest {
     @Test
     void testImmunizationTestORC5BackupForRXA20() throws IOException {
 
-        //ORC.5 backs up RXA.20 and RXA.18
+        // ORC.5 backs up RXA.20 and RXA.18
         String hl7VUXmessageRep = "MSH|^~\\&|EHR|12345^SiteName|MIIS|99990|20140701041038||VXU^V04^VXU_V04|MSG.Valid_01|P|2.6|||\n"
                 + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\r"
                 + "ORC|||197027||PA|||||^Clerk^Myron|||||||RI2050\r"
                 + "RXA|0|1|20130531||48^HIB PRP-T^CVX|999|ML^^UCUM||||||||||||||A\r";
 
         Immunization immunization = ResourceUtils.getImmunization(hl7VUXmessageRep);
-        //dose Quantity with 999 as the value which should return null;
+        // doseQuantity with 999 as the value which should return null;
         assertThat(immunization.hasDoseQuantity()).isFalse();
         assertThat(immunization.getStatus().getDisplay()).isEqualTo("completed"); //ORC.5 backs up RXA.20 and RXA.18
         assertThat(immunization.hasStatusReason()).isFalse();
@@ -336,9 +337,9 @@ class Hl7ImmunizationFHIRConversionTest {
     }
 
     @Test
-    void testImmunizationDefaultCompleted() throws IOException {
-        //Status defaults to completed RXA.20,RXA.18 and ORC.5 are empty
-        //Status reason is MEDPREC when OBX.3 is 30945-0 RXA.18 and RXA.20 not provided
+    void testImmunizationDefaultCompletedMEDPRECStatusReason() throws IOException {
+        // Status defaults to completed RXA.20, RXA.18 and ORC.5 are empty
+        // Status reason is MEDPREC when OBX.3 is 30945-0 RXA.18 and RXA.20 not provided
         String hl7VUXmessageRep = "MSH|^~\\&|MYEHR2.5|RI88140101|KIDSNET_IFL|RIHEALTH|20130531||VXU^V04^VXU_V04|20130531RI881401010105|P|2.5.1|||NE|AL||||||RI543763\r"
                 + "PID|1||12345^^^^MR||TestPatient^Jane^^^^^L||||||\r"
                 + "ORC|||197027|||||||^Clerk^Myron|||||||RI2050\r"
@@ -356,8 +357,28 @@ class Hl7ImmunizationFHIRConversionTest {
     }
 
     @Test
+    void testImmunizationStatusReasonMEDPREC2() throws IOException {
+        // Status reason is MEDPREC when OBX.3 is 30945-0, RXA.18 empty, and RXA.20 not RE
+        String hl7VUXmessageRep = "MSH|^~\\&|MYEHR2.5|RI88140101|KIDSNET_IFL|RIHEALTH|20130531||VXU^V04^VXU_V04|20130531RI881401010105|P|2.5.1|||NE|AL||||||RI543763\r"
+                + "PID|1||12345^^^^MR||TestPatient^Jane^^^^^L||||||\r"
+                + "ORC|||197027|||||||^Clerk^Myron|||||||RI2050\r"
+                // RXA.20 is not RE, so OBX.3==30945-0 is activated; yeilds status not-done and MEDPREC statusReason
+                + "RXA|0|1|20130531||48^HIB PRP-T^CVX|||||||||||||||NA\r"
+                + "OBX|1|CE|30945-0^contraindication^LN|1|V02^VFC eligible Medicaid/MedicaidManaged Care^HL70064||||||F||||||\r";
+
+        Immunization immunization = ResourceUtils.getImmunization(hl7VUXmessageRep);
+
+        assertThat(immunization.getStatus().getDisplay()).isEqualTo("not-done"); // RXA-20
+        assertThat(immunization.hasStatusReason()).isTrue();
+        assertThat(immunization.getStatusReason().getCodingFirstRep().getCode()).isEqualTo("MEDPREC");
+        assertThat(immunization.getStatusReason().getCodingFirstRep().getSystem())
+                .isEqualTo("http://terminology.hl7.org/CodeSystem/v3-ActReason");
+        assertThat(immunization.getStatusReason().getCodingFirstRep().getDisplay()).isEqualTo("medical precaution");
+    }
+
+    @Test
     void testImmunizationReasonImmune() throws IOException {
-        //Status reason is IMMUNE when OBX.3 is 59784-9 and RXA.18 and RXA.20 not provided
+        // Status reason is IMMUNE when OBX.3 is 59784-9, and RXA.18 and RXA.20 not provided
         String hl7VUXmessageRep = "MSH|^~\\&|EHR|12345^SiteName|MIIS|99990|20140701041038||VXU^V04^VXU_V04|MSG.Valid_01|P|2.6|||\n"
                 + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\r"
                 + "ORC|||197027|||||||^Clerk^Myron|||||||RI2050\r"
@@ -377,7 +398,7 @@ class Hl7ImmunizationFHIRConversionTest {
 
     @Test
     void testImmunizationReasonImmune2() throws IOException {
-        //Status reason is IMMUNE when OBX.3 is 59784-9 and RXA.18 not provided and RXA.20 is not RE
+        // Status reason is IMMUNE when OBX.3 is 59784-9, RXA.18 not provided, and RXA.20 is not RE
         String hl7VUXmessageRep = "MSH|^~\\&|EHR|12345^SiteName|MIIS|99990|20140701041038||VXU^V04^VXU_V04|MSG.Valid_01|P|2.6|||\n"
                 + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\r"
                 + "ORC|||197027|||||||^Clerk^Myron|||||||RI2050\r"
@@ -392,7 +413,6 @@ class Hl7ImmunizationFHIRConversionTest {
         assertThat(immunization.getStatusReason().getCodingFirstRep().getCode()).isEqualTo("IMMUNE"); // From OBX.3==59784-9
         assertThat(immunization.getStatusReason().getCodingFirstRep().getSystem())
                 .isEqualTo("http://terminology.hl7.org/CodeSystem/v3-ActReason");
-        assertThat(immunization.getStatusReason().getCodingFirstRep().getDisplay()).isEqualTo("immunity");
     }
 
     @Test
@@ -406,7 +426,7 @@ class Hl7ImmunizationFHIRConversionTest {
 
         Immunization immunization = ResourceUtils.getImmunization(hl7VUXmessageRep);
 
-        assertThat(immunization.getStatus().getDisplay()).isEqualTo("completed"); //Status defaults to completed
+        assertThat(immunization.getStatus().getDisplay()).isEqualTo("completed"); // Status defaults to completed
         assertThat(immunization.hasStatusReason()).isFalse();
         assertThat(immunization.hasReaction()).isFalse();
         assertThat(immunization.hasProgramEligibility()).isFalse();
@@ -588,18 +608,19 @@ class Hl7ImmunizationFHIRConversionTest {
     }
 
     // The following creates education records which combine information from related OBX's, indicated by matching OBX.4 value
-    // There are two ORC/RXA/RXR/OBX* sections that differ only by dates and other small differences; enough to ensure we
+    // There are three ORC/RXA/RXR/OBX* sections, two differ only by dates and other small differences; enough to ensure we
     // are finding the correct matching publication and presentation dates for the correct siblings and there is no data bleed.
+    // Others have handle various cases of completeness of data, according to rules outlined in Immunization.yml.
     // For each of RXA sections below, Immunization.education should be (dates & xx vary):
     //
     // "education": [
     //     {
-    //         "documentType": "DTaP, xx UF Information Sheet",
+    //         "documentType": "DTaP, xx UF",
     //         "publicationDate": "2007-05-17",
     //         "presentationDate": "2014-12-03"
     //     },
     //     {
-    //         "documentType": "Hep B, xx UF Information Sheet",
+    //         "documentType": "Hep B, xx UF",
     //         "publicationDate": "2012-02-02",
     //         "presentationDate": "2014-12-03"                
     //     }
@@ -610,71 +631,115 @@ class Hl7ImmunizationFHIRConversionTest {
         String hl7VUXmessageRep = "MSH|^~\\&|||||20160106165800070+0000||VXU^V04^VXU_V04|20210205NH0000 01|P|2.5.1|||||||||Z22^CDCPHPHINVS|||\n"
                 + "PID|1||12345^^^^MR||TestPatient^Jane^^^^^L||||||\n"
                 + "NK1|1|LASTNAME^FIRST^^^^^L|SPO^SPOUSE^HL70063||^PRN^PH^^^603^7772222\n"
-                // First immunization set. Descriptions have AA, and dates 2007.
+                // ----- FIRST IMMUNIZATION SET. ----- Descriptions have AA, and dates 2007.
                 + "ORC|RE||2623980^EHR|||||||||^ORDERINGLASTNAME^FIRST^^^^^^^L^^^MD|\n"
                 + "RXA|0|1|20160105||33^PNEUMOCOCCAL POLYSACCHARIDE PPV23^CVX|0.5|ML^^UCUM|||||||||||||||\n"
                 + "RXR|C28161^Intramuscular^NCIT|LD^Left Deltoid^HL70163|\n"
-                + "OBX|1|CE|30956-7^Vaccine Type^LN|2|107^DTaP, AA UF^CVX||||||F\n"
+                // Immunization 1: education group 1. Same as Immunization 2: group 1 to test for distinction and no bleed.
+                // Reference will be used as DocumentType
+                + "OBX|1|CE|30956-7^Vaccine Type^LN|2|107^DTaP, AA1 UF^CVX||||||F\n"
                 + "OBX|2|DT|29768-9^Date Vaccine Information Statement Published^LN|2|20070517||||||F\n"
                 + "OBX|3|DT|29769-7^Date Vaccine Information Statement Presented^LN|2|20071203||||||F\n"
+                // Random OBX to prove it doesn't confuse searching or group association.
                 + "OBX|4|CWE|64994-7^funding pgm eligibility^LN||V01^Insured^HL70064||||||F||||||VXC40^per immunization^CDCPHINVS\n" // Extra record
-                + "OBX|5|CE|30956-7^Vaccine Type^LN|3|45^Hep B, AA UF^CVX||||||F\n"
+                // Immunization 1: education group 2. Same as Immunization 2: group 2 to test for distinction and no bleed.
+                // Reference will be used as DocumentType
+                + "OBX|5|CE|30956-7^Vaccine Type^LN|3|45^Hep B, AA2 UF^CVX||||||F\n"
                 + "OBX|6|DT|29768-9^Date Vaccine Information Statement Published^LN|3|20070202||||||F\n"
                 + "OBX|7|DT|29769-7^Date Vaccine Information Statement Presented^LN|3|20071203||||||F\n"
-                // Second immunization set. Descriptions have BB, and dates 2014.
+                // -----  SECOND IMMUNIZATION SET. ----- Descriptions have BB, and dates 2014.
                 + "ORC|RE||2623980^EHR|||||||||^ORDERINGLASTNAME^FIRST^^^^^^^L^^^MD|\n"
                 + "RXA|0|1|20160105||33^PNEUMOCOCCAL POLYSACCHARIDE PPV23^CVX|0.5|ML^^UCUM||||||||||||||||\n"
                 + "RXR|C28161^Intramuscular^NCIT|LD^Left Deltoid^HL70163|\n"
+                // Random OBX to prove it doesn't confuse searching or group association.
                 + "OBX|1|CWE|64994-7^funding pgm eligibility^LN||V01^Insured^HL70064||||||F||||||VXC40^per immunization^CDCPHINVS\n" // Extra record
-                + "OBX|2|CE|30956-7^Vaccine Type^LN|2|107^DTaP, BB UF^CVX||||||F\n"
+                // Immunization 2: education group 1. Same as Immunization 1: group 1 to test for distinction and no bleed.
+                // Reference will be used as DocumentType
+                + "OBX|2|CE|30956-7^Vaccine Type^LN|2|107^DTaP, BB1 UF^CVX||||||F\n"
                 + "OBX|3|DT|29768-9^Date Vaccine Information Statement Published^LN|2|20140517||||||F\n"
                 + "OBX|4|DT|29769-7^Date Vaccine Information Statement Presented^LN|2|20141203||||||F\n"
-                + "OBX|5|CE|30956-7^Vaccine Type^LN|3|45^Hep B, BB UF^CVX||||||F\n"
+                // Immunization 2: education group 2. Same as Immunization 1: group 2 to test for distinction and no bleed.
+                // Reference will be used as DocumentType
+                + "OBX|5|CE|30956-7^Vaccine Type^LN|3|45^Hep B, BB2 UF^CVX||||||F\n"
                 + "OBX|6|DT|29768-9^Date Vaccine Information Statement Published^LN|3|20140202||||||F\n"
                 + "OBX|7|DT|29769-7^Date Vaccine Information Statement Presented^LN|3|20141203||||||F\n"
+                // Immunization 2: education group 3. Has no DocumentType nor Reference record. 
+                // 'undefined' is used as DocumentType.       
+                + "OBX|32|DT|29768-9^Date Vaccine Information Statement Published^LN|6|20140503||||||F\n"
+                + "OBX|33|DT|29769-7^Date Vaccine Information Statement Presented^LN|6|20140505||||||F\n"
+                // -----  THIRD IMMUNIZATION SET. ----- Descriptions have CC, and dates 2017.
+                + "ORC|RE||2623980^EHR|||||||||^ORDERINGLASTNAME^FIRST^^^^^^^L^^^MD|\n"
+                + "RXA|0|1|20160105||33^PNEUMOCOCCAL POLYSACCHARIDE PPV23^CVX|0.5|ML^^UCUM||||||||||||||||\n"
+                + "RXR|C28161^Intramuscular^NCIT|LD^Left Deltoid^HL70163|\n"
+                // Immunization 3: education group 1. Has both DocumentType and Reference records.  
+                // DocumentType will be used as DocumentType.
+                + "OBX|8|CE|69764-9^Vaccine Type^LN|4|45^Hep B, CC3a UF^CVX||||||F\n"
+                + "OBX|9|CE|30956-7^Vaccine Type^LN|4|45^Hep B, CC3b UF^CVX||||||F\n"
+                + "OBX|10|DT|29768-9^Date Vaccine Information Statement Published^LN|4|20170303||||||F\n"
+                + "OBX|11|DT|29769-7^Date Vaccine Information Statement Presented^LN|4|20170305||||||F\n"
+                // Immunization 3: education group 2. Has both DocumentType but no Reference record. 
+                // DocumentType will be used as DocumentType.
+                + "OBX|21|CE|69764-9^Vaccine Type^LN|5|45^Hep B, CC4 UF^CVX||||||F\n"
+                + "OBX|22|DT|29768-9^Date Vaccine Information Statement Published^LN|5|20170403||||||F\n"
+                + "OBX|23|DT|29769-7^Date Vaccine Information Statement Presented^LN|5|20170405||||||F\n"
+                // Immunization 3: education group 3. Has no DocumentType nor Reference record. 
+                // 'undefined' is used as DocumentType.       
+                + "OBX|43|DT|29769-7^Date Vaccine Information Statement Presented^LN|7|20170605||||||F\n"
                 + "ORC|RE||9999^EHR|||||||\n";
 
         List<Bundle.BundleEntryComponent> e = ResourceUtils
                 .createFHIRBundleFromHL7MessageReturnEntryList(hl7VUXmessageRep);
         List<Resource> immunizations = ResourceUtils.getResourceList(e, ResourceType.Immunization);
-        assertThat(immunizations).hasSize(2);
+        assertThat(immunizations).hasSize(3);
 
         // First immunization set. Descriptions have AA, and dates 2007.
         Immunization immunization = (Immunization) immunizations.get(0);
         assertThat(immunization.getEducation()).hasSize(2);
-        assertThat(immunization.getEducation().get(0).getDocumentTypeElement())
-                .hasToString("DTaP, AA UF Information Sheet");
-        assertThat(immunization.getEducation().get(0).getPublicationDateElement().getValueAsString())
-                .hasToString("2007-05-17");
-        assertThat(immunization.getEducation().get(0).getPresentationDateElement().getValueAsString())
-                .hasToString("2007-12-03");
-        assertThat(immunization.getEducation().get(1).getDocumentTypeElement())
-                .hasToString("Hep B, AA UF Information Sheet");
-        assertThat(immunization.getEducation().get(1).getPublicationDateElement().getValueAsString())
-                .hasToString("2007-02-02");
-        assertThat(immunization.getEducation().get(1).getPresentationDateElement().getValueAsString())
-                .hasToString("2007-12-03");
+        checkImmunizationEducation(immunization.getEducation().get(0), "DTaP, AA1 UF", "2007-05-17", "2007-12-03");
+        checkImmunizationEducation(immunization.getEducation().get(1), "Hep B, AA2 UF", "2007-02-02", "2007-12-03");
 
         // Second immunization set. Descriptions have BB, and dates 2014.
         immunization = (Immunization) immunizations.get(1);
-        assertThat(immunization.getEducation()).hasSize(2);
-        assertThat(immunization.getEducation().get(0).getDocumentTypeElement())
-                .hasToString("DTaP, BB UF Information Sheet");
-        assertThat(immunization.getEducation().get(0).getPublicationDateElement().getValueAsString())
-                .hasToString("2014-05-17");
-        assertThat(immunization.getEducation().get(0).getPresentationDateElement().getValueAsString())
-                .hasToString("2014-12-03");
-        assertThat(immunization.getEducation().get(1).getDocumentTypeElement())
-                .hasToString("Hep B, BB UF Information Sheet");
-        assertThat(immunization.getEducation().get(1).getPublicationDateElement().getValueAsString())
-                .hasToString("2014-02-02");
-        assertThat(immunization.getEducation().get(1).getPresentationDateElement().getValueAsString())
-                .hasToString("2014-12-03");
+        assertThat(immunization.getEducation()).hasSize(3);
+        // Reference used as DocumentType
+        checkImmunizationEducation(immunization.getEducation().get(0), "DTaP, BB1 UF", "2014-05-17", "2014-12-03");
+        // Reference used as DocumentType
+        checkImmunizationEducation(immunization.getEducation().get(1), "Hep B, BB2 UF", "2014-02-02", "2014-12-03");
+        // Has no DocumentType nor Reference record. 'undefined' is used as DocumentType.
+        checkImmunizationEducation(immunization.getEducation().get(2), "undefined", "2014-05-03", "2014-05-05");
 
-        List<Resource> practitioners = ResourceUtils.getResourceList(e, ResourceType.Practitioner);
-        assertThat(practitioners).hasSize(2); // Exactly 2
+        // Second immunization set. Descriptions have CC, and dates 2017.
+        immunization = (Immunization) immunizations.get(2);
+        assertThat(immunization.getEducation()).hasSize(3);
+        // Has both DocumentType and Reference records.  DocumentType will be used.
+        checkImmunizationEducation(immunization.getEducation().get(0), "Hep B, CC3a UF", "2017-03-03", "2017-03-05");
+        // Has only DocumentType record.  DocumentType will be used.     
+        checkImmunizationEducation(immunization.getEducation().get(1), "Hep B, CC4 UF", "2017-04-03", "2017-04-05");
+        // Has no DocumentType nor Reference record nor PublicationDate. 'undefined' is used as DocumentType.        
+        checkImmunizationEducation(immunization.getEducation().get(2), "undefined", null, "2017-06-05");
 
-        // Expect Immunization (x2), Practitioner (x2), Patient
-        assertThat(e).hasSize(5); // Exactly 5
     }
+
+    // Helper routine for common Immunization.education checks.
+    private static void checkImmunizationEducation(ImmunizationEducationComponent eduComp, String documentType,
+            String publicationDate,
+            String presentationDate) {
+
+        // DocumentType is required, unless we support Reference in the future  
+        assertThat(eduComp.getDocumentTypeElement()).hasToString(documentType);
+
+        if (publicationDate == null) {
+            assertThat(eduComp.hasPublicationDateElement()).isFalse();
+        } else {
+            assertThat(eduComp.getPublicationDateElement().getValueAsString()).hasToString(publicationDate);
+        }
+
+        if (presentationDate == null) {
+            assertThat(eduComp.hasPresentationDateElement()).isFalse();
+        } else {
+            assertThat(eduComp.getPresentationDateElement().getValueAsString()).hasToString(presentationDate);
+        }
+
+    }
+
 }
