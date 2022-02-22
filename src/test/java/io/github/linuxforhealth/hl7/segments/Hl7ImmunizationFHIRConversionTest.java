@@ -350,10 +350,16 @@ class Hl7ImmunizationFHIRConversionTest {
 
         assertThat(immunization.getStatus().getDisplay()).isEqualTo("completed"); //Status defaults to completed
         assertThat(immunization.hasStatusReason()).isTrue();
-        assertThat(immunization.getStatusReason().getCodingFirstRep().getCode()).isEqualTo("MEDPREC");
-        assertThat(immunization.getStatusReason().getCodingFirstRep().getSystem())
+        assertThat(immunization.getStatusReason().getCoding()).hasSize(2);
+        assertThat(immunization.getStatusReason().getCoding().get(0).getCode()).isEqualTo("MEDPREC");
+        assertThat(immunization.getStatusReason().getCoding().get(0).getSystem())
                 .isEqualTo("http://terminology.hl7.org/CodeSystem/v3-ActReason");
-        assertThat(immunization.getStatusReason().getCodingFirstRep().getDisplay()).isEqualTo("medical precaution");
+        assertThat(immunization.getStatusReason().getCoding().get(0).getDisplay()).isEqualTo("medical precaution");
+        assertThat(immunization.getStatusReason().getCoding().get(1).getCode()).isEqualTo("30945-0");
+        assertThat(immunization.getStatusReason().getCoding().get(1).getSystem())
+                .isEqualTo("http://loinc.org");
+        assertThat(immunization.getStatusReason().getCoding().get(1).getDisplay()).isEqualTo("contraindication");
+        assertThat(immunization.getStatusReason().getText()).isEqualTo("contraindication");
     }
 
     @Test
@@ -370,10 +376,16 @@ class Hl7ImmunizationFHIRConversionTest {
 
         assertThat(immunization.getStatus().getDisplay()).isEqualTo("not-done"); // RXA-20
         assertThat(immunization.hasStatusReason()).isTrue();
-        assertThat(immunization.getStatusReason().getCodingFirstRep().getCode()).isEqualTo("MEDPREC");
-        assertThat(immunization.getStatusReason().getCodingFirstRep().getSystem())
+        assertThat(immunization.getStatusReason().getCoding()).hasSize(2);
+        assertThat(immunization.getStatusReason().getCoding().get(0).getCode()).isEqualTo("MEDPREC");
+        assertThat(immunization.getStatusReason().getCoding().get(0).getSystem())
                 .isEqualTo("http://terminology.hl7.org/CodeSystem/v3-ActReason");
-        assertThat(immunization.getStatusReason().getCodingFirstRep().getDisplay()).isEqualTo("medical precaution");
+        assertThat(immunization.getStatusReason().getCoding().get(0).getDisplay()).isEqualTo("medical precaution");
+        assertThat(immunization.getStatusReason().getCoding().get(1).getCode()).isEqualTo("30945-0");
+        assertThat(immunization.getStatusReason().getCoding().get(1).getSystem())
+                .isEqualTo("http://loinc.org");
+        assertThat(immunization.getStatusReason().getCoding().get(1).getDisplay()).isEqualTo("contraindication");
+        assertThat(immunization.getStatusReason().getText()).isEqualTo("contraindication");
     }
 
     @Test
@@ -389,10 +401,16 @@ class Hl7ImmunizationFHIRConversionTest {
 
         assertThat(immunization.getStatus().getDisplay()).isEqualTo("completed"); //Status defaults to completed
         assertThat(immunization.hasStatusReason()).isTrue();
-        assertThat(immunization.getStatusReason().getCodingFirstRep().getCode()).isEqualTo("IMMUNE");
-        assertThat(immunization.getStatusReason().getCodingFirstRep().getSystem())
+        assertThat(immunization.getStatusReason().getCoding()).hasSize(2);
+        assertThat(immunization.getStatusReason().getCoding().get(0).getCode()).isEqualTo("IMMUNE"); // From OBX.3==59784-9
+        assertThat(immunization.getStatusReason().getCoding().get(0).getSystem())
                 .isEqualTo("http://terminology.hl7.org/CodeSystem/v3-ActReason");
-        assertThat(immunization.getStatusReason().getCodingFirstRep().getDisplay()).isEqualTo("immunity");
+        assertThat(immunization.getStatusReason().getCoding().get(0).getDisplay()).isEqualTo("immunity");
+        assertThat(immunization.getStatusReason().getCoding().get(1).getCode()).isEqualTo("59784-9");
+        assertThat(immunization.getStatusReason().getCoding().get(1).getSystem())
+                .isEqualTo("http://loinc.org");
+        assertThat(immunization.getStatusReason().getCoding().get(1).getDisplay()).isEqualTo("Disease with presumed immunity");
+        assertThat(immunization.getStatusReason().getText()).isEqualTo("Disease with presumed immunity");        
 
     }
 
@@ -410,9 +428,16 @@ class Hl7ImmunizationFHIRConversionTest {
 
         assertThat(immunization.getStatus().getDisplay()).isEqualTo("not-done"); // RXA.20
         assertThat(immunization.hasStatusReason()).isTrue();
-        assertThat(immunization.getStatusReason().getCodingFirstRep().getCode()).isEqualTo("IMMUNE"); // From OBX.3==59784-9
-        assertThat(immunization.getStatusReason().getCodingFirstRep().getSystem())
+        assertThat(immunization.getStatusReason().getCoding()).hasSize(2);
+        assertThat(immunization.getStatusReason().getCoding().get(0).getCode()).isEqualTo("IMMUNE"); // From OBX.3==59784-9
+        assertThat(immunization.getStatusReason().getCoding().get(0).getSystem())
                 .isEqualTo("http://terminology.hl7.org/CodeSystem/v3-ActReason");
+        assertThat(immunization.getStatusReason().getCoding().get(0).getDisplay()).isEqualTo("immunity");
+        assertThat(immunization.getStatusReason().getCoding().get(1).getCode()).isEqualTo("59784-9");
+        assertThat(immunization.getStatusReason().getCoding().get(1).getSystem())
+                .isEqualTo("http://loinc.org");
+        assertThat(immunization.getStatusReason().getCoding().get(1).getDisplay()).isEqualTo("Disease with presumed immunity");
+        assertThat(immunization.getStatusReason().getText()).isEqualTo("Disease with presumed immunity");
     }
 
     @Test
