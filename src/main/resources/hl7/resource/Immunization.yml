@@ -72,7 +72,7 @@ statusReason_3b:
   constants:
     code: "MEDPREC"
     display: "medical precaution"
-    system: "http://terminology.hl7.org/CodeSystem/v3-ActReason"    
+    system: "http://terminology.hl7.org/CodeSystem/v3-ActReason"
 
 # 4a & 4b together make complex $rxa20 NULL || $rxa20 NOT_EQUALS RE
 statusReason_4a:
@@ -99,7 +99,7 @@ statusReason_4b:
   constants:
     code: "IMMUNE"
     display: "immunity"
-    system: "http://terminology.hl7.org/CodeSystem/v3-ActReason"    
+    system: "http://terminology.hl7.org/CodeSystem/v3-ActReason"
 
 vaccineCode_1:
   valueOf: datatype/CodeableConcept
@@ -235,16 +235,16 @@ isSubpotent:
   vars:
     rxa20: String, RXA.20
 
-programEligibility: 
-    expressionType: nested
-    condition: $obx3 EQUALS 64994-7
-    specs: OBX # Repeat for all OBX records
-    vars:
-      obx3: String, OBX.3.1
-    expressions:
-      - valueOf: datatype/CodeableConcept
-        expressionType: resource
-        specs: OBX.5
+programEligibility:
+  expressionType: nested
+  condition: $obx3 EQUALS 64994-7
+  specs: OBX # Repeat for all OBX records
+  vars:
+    obx3: String, OBX.3.1
+  expressions:
+    - valueOf: datatype/CodeableConcept
+      expressionType: resource
+      specs: OBX.5
 
 fundingSource:
   expressionType: nested
@@ -278,22 +278,97 @@ reaction:
   vars:
     obx31: String, OBX.3.1
 
-education:
+# NOTES on Immunization.education rules.  Immunization.education information is contained in
+# multiple OBX records connected by a group indicator in OBX.4.  The converter only processes
+# one record at time, therefore special data handlers are used to search sibling records
+# for the related group information. There isn't a way to keep track of which records in a related
+# group have been processed, therefore the conditions below create four handling Cases,
+# to ensure all group records are handled, but no dupilate education objects are created.
+
+# Case 1: If documentType (69764-9), look at siblings of same group.
+# Find publicationDate (29768-9), presentationDate(29769-7), and reference (30956-7) if it exists.
+# We don't have a good way to use reference if it's not a URN, so at this time it is discarded.
+education_1:
   expressionType: nested
-  condition: $obx31 EQUALS 30956-7
+  condition: $obx31 EQUALS 69764-9 # DocType
+  generateList: true
+  specs: OBX
+  vars:
+    obx31: String, OBX.3.1
+  expressions:
+    # Putting evaluations in nesting, evaluates only when outer condition is true.
+    # This avoids unnecessary evaluation.
+    - valueOf: secondary/Education
+      expressionType: resource
+      vars:
+        documentType: FIND_EDUCATION_DOCUMENT_TYPE_TEXT, OBX
+        # referenceString: FIND_EDUCATION_REFERENCE_TEXT, OBX  # Reference not used when there is a documentType but may be in future
+        pubDateString: FIND_EDUCATION_PUBLICATION_DATE, OBX
+        presDateString: FIND_EDUCATION_PRESENTATION_DATE, OBX
+
+# Case 2: If reference (30956-7), look at siblings of same group.
+# Process only if documentType (69764-9) does not exist, because if it exists, already handled by Case 1.
+# Find publicationDate (29768-9), presentationDate(29769-7).
+# Use the reference content as DocumentType, and leave Education.reference empty.
+education_2:
+  expressionType: nested
+  condition: $obx31 EQUALS 30956-7 # Reference
   generateList: true
   specs: OBX
   vars:
     obx31: String, OBX.3.1
   expressions:
     - valueOf: secondary/Education
+      condition: $docTypeString NULL # Process only if documentType (69764-9) does not exist, see notes above.
       expressionType: resource
       vars:
-        documentType: String, OBX.5.2
-        # Within nesting, evaluates only when outer condition is true.
-        # This avoids unnecessary evaluation.
+        documentType: FIND_EDUCATION_REFERENCE_TEXT, OBX # Use reference text as document type, there is no document OBX
+        docTypeString: FIND_EDUCATION_DOCUMENT_TYPE_TEXT, OBX # Look for absense of document type, see logic notes above.
+        pubDateString: FIND_EDUCATION_PUBLICATION_DATE, OBX
+        presDateString: FIND_EDUCATION_PRESENTATION_DATE, OBX
+
+# Case 3: If publicationDate (29768-9), look at siblings of same group.
+# Process only if documentType (69764-9) and reference (30956-7) do not exist,
+# because if either exists, already handled by Case 1 or 2.
+# Also find presentationDate (29769-7). Set documentType as 'undefined'.
+education_3:
+  expressionType: nested
+  condition: $obx31 EQUALS 29768-9 # Reference
+  generateList: true
+  specs: OBX
+  vars:
+    obx31: String, OBX.3.1
+  expressions:
+    - valueOf: secondary/Education
+      condition: $docTypeString NULL && referenceString NULL
+      expressionType: resource
+      vars:
+        referenceString: FIND_EDUCATION_REFERENCE_TEXT, OBX # Used to check if applicable
+        docTypeString: FIND_EDUCATION_DOCUMENT_TYPE_TEXT, OBX # Used to check if applicable
         pubDateString: FIND_EDUCATION_PUBLICATION_DATE, OBX
         presDateString: FIND_EDUCATION_PRESENTATION_DATE, OBX
       constants:
-        informationSheet: " Information Sheet"    
-    
+        documentType: undefined # no document type or reference found, so use undefined as default
+
+# Case 4: If presentationDate (29769-7) look at siblings of same group.
+# Process only if documentType (69764-9), reference (30956-7) and publicationDate (29768-9) do not exist,
+# because if any exists, already handled by Case 1, 2, or 3.
+# Set documentType as 'undefined'.
+education_4:
+  expressionType: nested
+  condition: $obx31 EQUALS 29769-7 # Reference
+  generateList: true
+  specs: OBX
+  vars:
+    obx31: String, OBX.3.1
+  expressions:
+    - valueOf: secondary/Education
+      condition: $docTypeString NULL && referenceString NULL && pubDateString NULL
+      expressionType: resource
+      vars:
+        referenceString: FIND_EDUCATION_REFERENCE_TEXT, OBX # Used to check if this case is applicable
+        docTypeString: FIND_EDUCATION_DOCUMENT_TYPE_TEXT, OBX # Used to check if this case is applicable
+        pubDateString: FIND_EDUCATION_PUBLICATION_DATE, OBX # Used to check if this case is applicable
+        presDateString: FIND_EDUCATION_PRESENTATION_DATE, OBX
+      constants:
+        documentType: undefined # no document type or reference found, so use undefined as default

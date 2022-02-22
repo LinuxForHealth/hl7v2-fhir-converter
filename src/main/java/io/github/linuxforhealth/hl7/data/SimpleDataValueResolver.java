@@ -14,6 +14,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 
+import ca.uhn.hl7v2.model.v26.datatype.CE;
 import ca.uhn.hl7v2.model.v26.datatype.CWE;
 import ca.uhn.hl7v2.model.v26.datatype.DT;
 import ca.uhn.hl7v2.model.v26.datatype.PPN;
@@ -192,27 +193,54 @@ public class SimpleDataValueResolver {
         return getFHIRCode(val, ObservationStatus.class);
     };
 
+    // Handlers for searching Immunization.education siblings.
+    public static final ValueExtractor<Object, String> FIND_EDUCATION_REFERENCE_TEXT = (Object value) -> {
+        return getSelectedSiblingObservationTEXTfromObxGroup(value, "30956-7");
+    };
+
+    public static final ValueExtractor<Object, String> FIND_EDUCATION_DOCUMENT_TYPE_TEXT = (Object value) -> {
+        return getSelectedSiblingObservationTEXTfromObxGroup(value, "69764-9");
+    };
+
     public static final ValueExtractor<Object, String> FIND_EDUCATION_PUBLICATION_DATE = (Object value) -> {
-        return getSelectedDateFromObxGroup (value, "29768-9");
+        return getSelectedSiblingObservationDATEfromObxGroup(value, "29768-9");
     };
 
     public static final ValueExtractor<Object, String> FIND_EDUCATION_PRESENTATION_DATE = (Object value) -> {
-        return getSelectedDateFromObxGroup (value, "29769-7");
+        return getSelectedSiblingObservationDATEfromObxGroup(value, "29769-7");
     };
 
-    // Finding a selected date is used when the information is in a sibling OBX.
-    // This is used for immunization records where the immunization, the publication, and presentation are
-    // in different sibling OBX's grouped together by OBX.4.
+    // Typed handler for CE & CWE return values from Immunization.education siblings
+    private static final String getSelectedSiblingObservationTEXTfromObxGroup(Object valueObx, String siblingCode) {
+        Object obj = getSelectedSiblingObservationVALUEfromObxGroup(valueObx, siblingCode);
+        if (obj instanceof CE) {
+            return Hl7DataHandlerUtil.getStringValue(((CE) obj).getText());
+        }
+        if (obj instanceof CWE) {
+            return Hl7DataHandlerUtil.getStringValue(((CWE) obj).getText());
+        }
+        return null;
+    }
+
+    // Typed handler for DT return values from Immunization.education siblings
+    private static final String getSelectedSiblingObservationDATEfromObxGroup(Object valueObx, String siblingCode) {
+        DT date = (DT) getSelectedSiblingObservationVALUEfromObxGroup(valueObx, siblingCode);
+        return date != null ? DateUtil.formatToDate(date.getValue()) : null;
+    }
+
+    // Common handler for searching Immunization.education siblings.  Used for immunization records where the 
+    // immunization, the publication, and presentation are in different sibling OBX's grouped together by OBX.4.
     // This special purpose routine finds the grandparent object, so we can search the correct sibling objects,
     // which prevents search overreach and datableed.
-    private static final String getSelectedDateFromObxGroup(Object valueObx, String codeToMatch) {
-        if (valueObx instanceof OBX) {  
+    // The return value is an unformatted object. It is up to the caller to check type and extract content to string.
+    private static final Object getSelectedSiblingObservationVALUEfromObxGroup(Object valueObx, String siblingCode) {
+        if (valueObx instanceof OBX) {
             try {
                 OBX obx = (OBX) valueObx;
                 // Get the group number from OBX.4
                 String obx4GroupNum = obx.getObx4_ObservationSubID().getValueOrEmpty();
                 // OBX is contained in an OBSERVATION. Get the OBSERVATION by requesting the parent.  
-                VXU_V04_OBSERVATION containingObservation = (VXU_V04_OBSERVATION)obx.getParent();
+                VXU_V04_OBSERVATION containingObservation = (VXU_V04_OBSERVATION) obx.getParent();
                 // The parent of the OBSERVATION is a VXU_V04_ORDER
                 VXU_V04_ORDER containingOrder = (VXU_V04_ORDER) containingObservation.getParent();
                 // Get the repeating 'sibling' OBSERVATION objects
@@ -220,22 +248,21 @@ public class SimpleDataValueResolver {
                 for (VXU_V04_OBSERVATION obsIter : observations) {
                     // For each OBSERVATION, get the OBX
                     OBX obsIterObx = obsIter.getOBX();
-                    // If the group numbers (OBX.4) match AND OBX.3.1 matches the codeToMatch
+                    // If OBX.4 is the same group AND OBX.3.1 matches the siblingCode we want 
                     if (obx4GroupNum.equals(obsIterObx.getObx4_ObservationSubID().getValueOrEmpty()) &&
                             obsIterObx.getObx3_ObservationIdentifier().getCwe1_Identifier().getValueOrEmpty()
-                                    .equals(codeToMatch)) {
-                        // Dig out the date string              
-                        Varies[] v = obsIterObx.getObx5_ObservationValue();
-                        String unformattedDateString = Hl7DataHandlerUtil.getStringValue(v[0].getData());
-                        // Convert to formatted date string (no time, so we don't need zoneId)
-                        return DateUtil.formatToDate(unformattedDateString);
+                                    .equals(siblingCode)) {
+                        if (obsIterObx.getObservationValueReps() > 0) {
+                            return obsIterObx.getObservationValue(0).getData();
+                        }
+                        return null;
                     }
                 }
             } catch (HL7Exception e) {
-                LOGGER.debug("Cannot create ZoneId from :" + codeToMatch, e);
-                return null;  // If something fails
+                LOGGER.debug("Cannot retrieve field for:" + siblingCode, e);
+                return null; // If something fails
             }
-        } 
+        }
         return null;
     }
 
