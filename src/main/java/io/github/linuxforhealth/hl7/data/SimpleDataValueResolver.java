@@ -18,6 +18,7 @@ import ca.uhn.hl7v2.model.v26.datatype.CE;
 import ca.uhn.hl7v2.model.v26.datatype.CWE;
 import ca.uhn.hl7v2.model.v26.datatype.DT;
 import ca.uhn.hl7v2.model.v26.datatype.PPN;
+import ca.uhn.hl7v2.model.v26.datatype.TS;
 import ca.uhn.hl7v2.model.v26.datatype.XCN;
 import ca.uhn.hl7v2.model.v26.group.VXU_V04_OBSERVATION;
 import ca.uhn.hl7v2.model.v26.group.VXU_V04_ORDER;
@@ -222,10 +223,16 @@ public class SimpleDataValueResolver {
         return null;
     }
 
-    // Typed handler for DT return values from Immunization.education siblings
+    // Typed handler for DT & TS return values from Immunization.education siblings
     private static final String getSelectedSiblingObservationDATEfromObxGroup(Object valueObx, String siblingCode) {
-        DT date = (DT) getSelectedSiblingObservationVALUEfromObxGroup(valueObx, siblingCode);
-        return date != null ? DateUtil.formatToDate(date.getValue()) : null;
+        Object obj = getSelectedSiblingObservationVALUEfromObxGroup(valueObx, siblingCode);
+        if (obj instanceof DT) {
+            return DateUtil.formatToDate(((DT)obj).getValue());
+        }
+        if (obj instanceof TS) {
+            return DateUtil.formatToDate(((TS)obj).toString());
+        }
+        return null;
     }
 
     // Common handler for searching Immunization.education siblings.  Used for immunization records where the 
