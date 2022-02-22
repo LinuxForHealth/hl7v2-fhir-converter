@@ -1,5 +1,5 @@
 #
-# (C) Copyright IBM Corp. 2020, 2021
+# (C) Copyright IBM Corp. 2020, 2022
 #
 # SPDX-License-Identifier: Apache-2.0
 #
@@ -58,7 +58,18 @@ coding_6:
    valueOf: $coding
    condition: $coding NOT_NULL
    generateList: true
-   
+
+# Allows alternate coding to be added from hardcoded values
+coding_7:
+    generateList: true
+    valueOf: datatype/Coding  # uses values from vars
+    expressionType: resource
+    condition: $code NOT_NULL
+    vars: 
+      code: $alternateCode
+      display: $alternateDisplay
+      system: $alternateSystem
+  
 # Require available text, and the absense of an identifierCoding
 text:
    condition: $displayText NOT_NULL && $identifierCoding NULL
