@@ -318,14 +318,14 @@ class Hl7ImmunizationFHIRConversionTest {
     @Test
     void testImmunizationTestORC5BackupForRXA20() throws IOException {
 
-        //ORC.5 backs up RXA.20 and RXA.18
+        // ORC.5 backs up RXA.20 and RXA.18
         String hl7VUXmessageRep = "MSH|^~\\&|EHR|12345^SiteName|MIIS|99990|20140701041038||VXU^V04^VXU_V04|MSG.Valid_01|P|2.6|||\n"
                 + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\r"
                 + "ORC|||197027||PA|||||^Clerk^Myron|||||||RI2050\r"
                 + "RXA|0|1|20130531||48^HIB PRP-T^CVX|999|ML^^UCUM||||||||||||||A\r";
 
         Immunization immunization = ResourceUtils.getImmunization(hl7VUXmessageRep);
-        //dose Quantity with 999 as the value which should return null;
+        // doseQuantity with 999 as the value which should return null;
         assertThat(immunization.hasDoseQuantity()).isFalse();
         assertThat(immunization.getStatus().getDisplay()).isEqualTo("completed"); //ORC.5 backs up RXA.20 and RXA.18
         assertThat(immunization.hasStatusReason()).isFalse();
@@ -338,8 +338,8 @@ class Hl7ImmunizationFHIRConversionTest {
 
     @Test
     void testImmunizationDefaultCompletedMEDPRECStatusReason() throws IOException {
-        //Status defaults to completed RXA.20,RXA.18 and ORC.5 are empty
-        //Status reason is MEDPREC when OBX.3 is 30945-0 RXA.18 and RXA.20 not provided
+        // Status defaults to completed RXA.20, RXA.18 and ORC.5 are empty
+        // Status reason is MEDPREC when OBX.3 is 30945-0 RXA.18 and RXA.20 not provided
         String hl7VUXmessageRep = "MSH|^~\\&|MYEHR2.5|RI88140101|KIDSNET_IFL|RIHEALTH|20130531||VXU^V04^VXU_V04|20130531RI881401010105|P|2.5.1|||NE|AL||||||RI543763\r"
                 + "PID|1||12345^^^^MR||TestPatient^Jane^^^^^L||||||\r"
                 + "ORC|||197027|||||||^Clerk^Myron|||||||RI2050\r"
@@ -358,7 +358,7 @@ class Hl7ImmunizationFHIRConversionTest {
 
     @Test
     void testImmunizationStatusReasonMEDPREC2() throws IOException {
-        //Status reason is MEDPREC when OBX.3 is 30945-0 RXA.18 and RXA.20 not RE
+        // Status reason is MEDPREC when OBX.3 is 30945-0, RXA.18 empty, and RXA.20 not RE
         String hl7VUXmessageRep = "MSH|^~\\&|MYEHR2.5|RI88140101|KIDSNET_IFL|RIHEALTH|20130531||VXU^V04^VXU_V04|20130531RI881401010105|P|2.5.1|||NE|AL||||||RI543763\r"
                 + "PID|1||12345^^^^MR||TestPatient^Jane^^^^^L||||||\r"
                 + "ORC|||197027|||||||^Clerk^Myron|||||||RI2050\r"
@@ -378,7 +378,7 @@ class Hl7ImmunizationFHIRConversionTest {
 
     @Test
     void testImmunizationReasonImmune() throws IOException {
-        //Status reason is IMMUNE when OBX.3 is 59784-9 and RXA.18 and RXA.20 not provided
+        // Status reason is IMMUNE when OBX.3 is 59784-9, and RXA.18 and RXA.20 not provided
         String hl7VUXmessageRep = "MSH|^~\\&|EHR|12345^SiteName|MIIS|99990|20140701041038||VXU^V04^VXU_V04|MSG.Valid_01|P|2.6|||\n"
                 + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\r"
                 + "ORC|||197027|||||||^Clerk^Myron|||||||RI2050\r"
@@ -398,7 +398,7 @@ class Hl7ImmunizationFHIRConversionTest {
 
     @Test
     void testImmunizationReasonImmune2() throws IOException {
-        //Status reason is IMMUNE when OBX.3 is 59784-9 and RXA.18 not provided and RXA.20 is not RE
+        // Status reason is IMMUNE when OBX.3 is 59784-9, RXA.18 not provided, and RXA.20 is not RE
         String hl7VUXmessageRep = "MSH|^~\\&|EHR|12345^SiteName|MIIS|99990|20140701041038||VXU^V04^VXU_V04|MSG.Valid_01|P|2.6|||\n"
                 + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\r"
                 + "ORC|||197027|||||||^Clerk^Myron|||||||RI2050\r"
@@ -426,7 +426,7 @@ class Hl7ImmunizationFHIRConversionTest {
 
         Immunization immunization = ResourceUtils.getImmunization(hl7VUXmessageRep);
 
-        assertThat(immunization.getStatus().getDisplay()).isEqualTo("completed"); //Status defaults to completed
+        assertThat(immunization.getStatus().getDisplay()).isEqualTo("completed"); // Status defaults to completed
         assertThat(immunization.hasStatusReason()).isFalse();
         assertThat(immunization.hasReaction()).isFalse();
         assertThat(immunization.hasProgramEligibility()).isFalse();

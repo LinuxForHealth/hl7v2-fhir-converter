@@ -283,11 +283,12 @@ reaction:
 # one record at time, therefore special data handlers are used to search sibling records
 # for the related group information. There isn't a way to keep track of which records in a related
 # group have been processed, therefore the conditions below create four handling Cases,
-# to ensure all group records are handled, but no dupilate education objects are created.
+# to ensure all group records are handled, but no duplicate education objects are created.
 
 # Case 1: If documentType (69764-9), look at siblings of same group.
-# Find publicationDate (29768-9), presentationDate(29769-7), and reference (30956-7) if it exists.
-# We don't have a good way to use reference if it's not a URN, so at this time it is discarded.
+# Find publicationDate (29768-9) and presentationDate(29769-7).
+# We don't have a good way to use reference if it's not a URN, so at this time it is ignored.
+# (Placement in code noted for possible future changes.)
 education_1:
   expressionType: nested
   condition: $obx31 EQUALS 69764-9 # DocType
@@ -333,7 +334,7 @@ education_2:
 # Also find presentationDate (29769-7). Set documentType as 'undefined'.
 education_3:
   expressionType: nested
-  condition: $obx31 EQUALS 29768-9 # Reference
+  condition: $obx31 EQUALS 29768-9 # publicationDate
   generateList: true
   specs: OBX
   vars:
@@ -348,7 +349,7 @@ education_3:
         pubDateString: FIND_EDUCATION_PUBLICATION_DATE, OBX
         presDateString: FIND_EDUCATION_PRESENTATION_DATE, OBX
       constants:
-        documentType: undefined # no document type or reference found, so use undefined as default
+        documentType: "undefined" # no document type or reference found, so use undefined as default
 
 # Case 4: If presentationDate (29769-7) look at siblings of same group.
 # Process only if documentType (69764-9), reference (30956-7) and publicationDate (29768-9) do not exist,
@@ -356,7 +357,7 @@ education_3:
 # Set documentType as 'undefined'.
 education_4:
   expressionType: nested
-  condition: $obx31 EQUALS 29769-7 # Reference
+  condition: $obx31 EQUALS 29769-7 # presentationDate
   generateList: true
   specs: OBX
   vars:
@@ -371,4 +372,4 @@ education_4:
         pubDateString: FIND_EDUCATION_PUBLICATION_DATE, OBX # Used to check if this case is applicable
         presDateString: FIND_EDUCATION_PRESENTATION_DATE, OBX
       constants:
-        documentType: undefined # no document type or reference found, so use undefined as default
+        documentType: "undefined" # no document type or reference found, so use undefined as default
