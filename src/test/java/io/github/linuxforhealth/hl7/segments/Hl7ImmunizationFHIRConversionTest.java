@@ -672,6 +672,14 @@ class Hl7ImmunizationFHIRConversionTest {
                 + "OBX|5|CE|30956-7^Vaccine Type^LN|3|45^Hep B, AA2 UF^CVX||||||F\n"
                 + "OBX|6|DT|29768-9^Date Vaccine Information Statement Published^LN|3|20070202||||||F\n"
                 + "OBX|7|DT|29769-7^Date Vaccine Information Statement Presented^LN|3|20071203||||||F\n"
+                // Immunization 1: education group 3. Degenerate 69764-9 without CE/CWE data.
+                // DocumentType will default to "unspecified"
+                // 48767-8 record in group will be ignore.
+                + "OBX|2|DT|69764-9^HIB Info Sheet^LN|8|20070505||||||F|||20130531\n"
+                + "OBX|3|DT|29768-9^VIS Publication Date^LN|8|20070606||||||F|||20130531\n"
+                + "OBX|4|DT|29769-7^VIS Presentation Date^LN|8|20070707||||||F|||20130531\n"
+                + "OBX|5|ST|48767-8^Annotation^LN|8|Some text from doctor||||||F|||20130531\n"
+
                 // -----  SECOND IMMUNIZATION SET. ----- Descriptions have BB, and dates 2014.
                 + "ORC|RE||2623980^EHR|||||||||^ORDERINGLASTNAME^FIRST^^^^^^^L^^^MD|\n"
                 + "RXA|0|1|20160105||33^PNEUMOCOCCAL POLYSACCHARIDE PPV23^CVX|0.5|ML^^UCUM||||||||||||||||\n"
@@ -692,6 +700,7 @@ class Hl7ImmunizationFHIRConversionTest {
                 // 'unspecified' is used as DocumentType.       
                 + "OBX|32|DT|29768-9^Date Vaccine Information Statement Published^LN|6|20140503||||||F\n"
                 + "OBX|33|DT|29769-7^Date Vaccine Information Statement Presented^LN|6|20140505||||||F\n"
+
                 // -----  THIRD IMMUNIZATION SET. ----- Descriptions have CC, and dates 2017.
                 + "ORC|RE||2623980^EHR|||||||||^ORDERINGLASTNAME^FIRST^^^^^^^L^^^MD|\n"
                 + "RXA|0|1|20160105||33^PNEUMOCOCCAL POLYSACCHARIDE PPV23^CVX|0.5|ML^^UCUM||||||||||||||||\n"
@@ -719,9 +728,11 @@ class Hl7ImmunizationFHIRConversionTest {
 
         // First immunization set. Descriptions have AA, and dates 2007.
         Immunization immunization = (Immunization) immunizations.get(0);
-        assertThat(immunization.getEducation()).hasSize(2);
-        checkImmunizationEducation(immunization.getEducation().get(0), "DTaP, AA1 UF", "2007-05-17", "2007-12-03");
-        checkImmunizationEducation(immunization.getEducation().get(1), "Hep B, AA2 UF", "2007-02-02", "2007-12-03");
+        assertThat(immunization.getEducation()).hasSize(3);
+        checkImmunizationEducation(immunization.getEducation().get(1), "DTaP, AA1 UF", "2007-05-17", "2007-12-03");
+        checkImmunizationEducation(immunization.getEducation().get(2), "Hep B, AA2 UF", "2007-02-02", "2007-12-03");
+        // Degenerate 69764-9 without CE/CWE data. DocumentType will default to "unspecified"
+        checkImmunizationEducation(immunization.getEducation().get(0), "unspecified", "2007-06-06", "2007-07-07");
 
         // Second immunization set. Descriptions have BB, and dates 2014.
         immunization = (Immunization) immunizations.get(1);

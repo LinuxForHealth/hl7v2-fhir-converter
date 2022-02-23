@@ -214,12 +214,19 @@ public class SimpleDataValueResolver {
     // Typed handler for CE & CWE return values from Immunization.education siblings
     private static final String getSelectedSiblingObservationTEXTfromObxGroup(Object valueObx, String siblingCode) {
         Object obj = getSelectedSiblingObservationVALUEfromObxGroup(valueObx, siblingCode);
-        if (obj instanceof CE) {
-            return Hl7DataHandlerUtil.getStringValue(((CE) obj).getText());
+        // If we got an object, tease out the text value
+        if (obj != null) {
+            String returnVal = null;
+            if (obj instanceof CE) {
+                returnVal = Hl7DataHandlerUtil.getStringValue(((CE) obj).getText());
+            }
+            if (obj instanceof CWE) {
+                returnVal = Hl7DataHandlerUtil.getStringValue(((CWE) obj).getText());
+            }
+            // If there was no text value in the object, or the object was not an expected type default to "unspecified"
+            return returnVal != null ? returnVal : "unspecified";
         }
-        if (obj instanceof CWE) {
-            return Hl7DataHandlerUtil.getStringValue(((CWE) obj).getText());
-        }
+        // If no object was found, return null 
         return null;
     }
 
