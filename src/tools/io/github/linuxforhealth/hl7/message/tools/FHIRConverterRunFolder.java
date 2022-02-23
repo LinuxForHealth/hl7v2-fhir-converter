@@ -25,13 +25,15 @@ import io.github.linuxforhealth.hl7.HL7ToFHIRConverter;
 
 /**
  * Converts all HL7 messages found in a folder, writes the resulting JSONs to a specified location.
+ * 
  * Uses the following Java system properties:
  * - hl7.input.folder : directory containing the HL7 files to convert
  * - hl7.output.folder : directory to write output to; directory must exist, files will be overwritten if they exist
- * - hl7.tools.debug : Set to "true" to output input HL7 and output JSON to the console as well as to files. Defaults to
- * false.
+ * - hl7.tools.debug : Set to "true" to output input HL7 and output JSON to the console. When "false" output JSONs
+ * will only be written to files. Defaults to false.
  * - hl7.tools.recurse.subfolders : When "true" will recurse input folder sub-directories. Output will also be placed in
  * sub-directories. Defaults to "true".
+ * 
  * This class uses a main() method; run as a Java application.
  */
 public class FHIRConverterRunFolder {
