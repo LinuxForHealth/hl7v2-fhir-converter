@@ -21,6 +21,8 @@ resources:
       additionalSegments:
              - PD1
              - MSH
+             - INSURANCE.IN1
+             - INSURANCE.IN2
 
     - resourceName: Encounter
       segment: .PV1
@@ -46,3 +48,13 @@ resources:
               - .OBSERVATION.OBX
               - MSH
               - PATIENT.PV1
+
+    - resourceName: Coverage
+      segment: .IN1
+      group: INSURANCE
+      resourcePath: resource/Coverage
+      repeats: true
+      additionalSegments:
+        - MSH
+        - PID
+        - .IN2

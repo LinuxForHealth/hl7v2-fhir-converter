@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2020, 2021
+ * (C) Copyright IBM Corp. 2020, 2022
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -48,7 +48,7 @@ class Hl7VXUMessageTest {
                 .createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
         // Validate that the correct resources are created
         List<Resource> patient = ResourceUtils.getResourceList(e, ResourceType.Patient);
-        assertThat(patient).hasSize(1);;
+        assertThat(patient).hasSize(1);
 
         // Expecting only the above resources, no extras!
         assertThat(e.size()).isEqualTo(1);
@@ -74,24 +74,34 @@ class Hl7VXUMessageTest {
     }
 
     @Test
-    void test_VXU_with_patient_group_that_has_all_segments() throws IOException {
+    void test_VXU_with_patient_group_that_has_all_segments_and_insurance() throws IOException {
   	    String hl7message = 
             "MSH|^~\\&|EHR|12345^SiteName|MIIS|99990|20140701041038||VXU^V04^VXU_V04|MSG.Valid_01|P|2.6|||\r"
   		    + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\r"
             + "PD1|||||||||||01|N||||A\r"
   		    + "PV1|1|R||||||||||||||||||V01^20120901041038\r"
-            + "PV2|||||||||||||||||||||||||AI|||||||||||||C|\r";
+            + "PV2|||||||||||||||||||||||||AI|||||||||||||C|\r"
+            // Minimal Insurance. Minimal Organization for Payor, which is required.
+            + "IN1|1|Value1^^System3^Value4^^System6|IdValue1^^^IdSystem4^^^^|Large Blue Organization|||||||||||\n"
+            // IN2.72 creates a RelatedPerson,
+            + "IN2||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||04|\n";
 
         List<Bundle.BundleEntryComponent> e = ResourceUtils
                 .createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
         // Validate that the correct resources are created
         List<Resource> patient = ResourceUtils.getResourceList(e, ResourceType.Patient);
         assertThat(patient).hasSize(1);
-        List<Resource> enc = ResourceUtils.getResourceList(e, ResourceType.Encounter);
-        assertThat(enc).hasSize(1);
+        List<Resource> encounters = ResourceUtils.getResourceList(e, ResourceType.Encounter);
+        assertThat(encounters).hasSize(1);
+        List<Resource> coverages = ResourceUtils.getResourceList(e, ResourceType.Coverage);
+        assertThat(coverages).hasSize(1);
+        List<Resource> organizations = ResourceUtils.getResourceList(e, ResourceType.Organization);
+        assertThat(organizations).hasSize(1);
+        List<Resource> related = ResourceUtils.getResourceList(e, ResourceType.RelatedPerson);
+        assertThat(related).hasSize(1);
 
-        // Expecting only the above resources, no extras!
-        assertThat(e.size()).isEqualTo(2);
+        // Expecting only Patient, Encounter, Coverage, Organization, no extras!
+        assertThat(e.size()).isEqualTo(5);
     }
 
     @Test
@@ -172,11 +182,15 @@ class Hl7VXUMessageTest {
 }
 
     @Test
-    void test_VXU_with_minimum_patient_group_plus_order_group_with_OBX_with_observations() throws IOException {
+    void test_VXU_with_minimum_patient_group_plus_coverage_plus_order_group_with_OBX_with_observations() throws IOException {
         String hl7message = 
             "MSH|^~\\&|EHR|12345^SiteName|MIIS|99990|20140701041038||VXU^V04^VXU_V04|MSG.Valid_01|P|2.6|||\r"
             + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\r"
             + "PV1|1|R||||||||||||||||||V01^20120901041038\r"
+            // Minimal insurance Coverage. Minimal Organization for Payor, which is required.
+            + "IN1|1|Value1^^System3^Value4^^System6|IdValue1^^^IdSystem4^^^^|Large Blue Organization|||||||||||\n"
+            // IN2.72 creates a RelatedPerson.
+            + "IN2||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||04|\n"
             + "ORC|RE||4242546^NameSpaceID||||||||||||||\r"
             + "RXA|0|1|20140701041038|20140701041038|48^HPV, quadrivalent^CVX|0.5|ml^MilliLiter [SI Volume Units]^UCUM||||14509|||||||||CP||\r"
             + "RXR|C28161^Intramuscular^NCIT||||\r"
@@ -195,9 +209,15 @@ class Hl7VXUMessageTest {
         List<Resource> obs = ResourceUtils.getResourceList(e, ResourceType.Observation);
         assertThat(obs).hasSize(2);
         // verify that the correct Observations are associated with the correct Immunizations.
+        List<Resource> coverages = ResourceUtils.getResourceList(e, ResourceType.Coverage);
+        assertThat(coverages).hasSize(1);
+        List<Resource> organizations = ResourceUtils.getResourceList(e, ResourceType.Organization);
+        assertThat(organizations).hasSize(1);
+        List<Resource> related = ResourceUtils.getResourceList(e, ResourceType.RelatedPerson);
+        assertThat(related).hasSize(1);
 
         // Expecting only the above resources, no extras!
-        assertThat(e.size()).isEqualTo(5);
+        assertThat(e.size()).isEqualTo(8);
     }
 
     // Suppress warnings about too many assertions in a test.  Justification: creating a FHIR message is very costly; we need to check many asserts per creation for efficiency.  

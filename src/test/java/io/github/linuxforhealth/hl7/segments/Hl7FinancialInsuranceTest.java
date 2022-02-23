@@ -305,10 +305,10 @@ class Hl7FinancialInsuranceTest {
     // Suppress warnings about too many assertions in a test.  Justification: creating a FHIR message is very costly; we need to check many asserts per creation for efficiency.  
     @java.lang.SuppressWarnings("squid:S5961")
     @ParameterizedTest
-    // Tests IN1 for different message types. 
+    // Tests IN1 & IN2 for all supported message types. 
     // The breadth of this test is sufficent for multiple message type coverage, so other tests are not parameterized.
     @ValueSource(strings = {
-            "DFT^P03^DFT_P03", "ADT^A01^ADT_A01"
+        "DFT^P03^DFT_P03", "VXU^V04^VXU_V04", "ADT^A01^ADT_A01"
     })
     // Tests IN1.17 coverage by related person. A related person should be created and cross-referenced.
     // Also tests backup field for coverage.order
@@ -697,7 +697,7 @@ class Hl7FinancialInsuranceTest {
     // This test is to see the problem does not return.  It fails without PR #405, and is successful with it. 
     void testFailingOrganizationTelecom() throws IOException {
 
-        String hl7message = "MSH|^~\\&|||||20211214105741||DFT^P03|1760487765|P|2.6|||||||||\n"
+        String hl7message = "MSH|^~\\&|||||20211214105741||DFT^P03^DFT_P03|1760487765|P|2.6|||||||||\n"
                 + "EVN|P03|20211214105741\n"
                 + "PID|||MR1^^^XYZ^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
                 + "PV1||I||||||||||||||||||||||||||||||||||||||||||\n"
@@ -933,7 +933,7 @@ class Hl7FinancialInsuranceTest {
     // Tests non-related subscriber, employer.
     void testInsuranceCoverageOfWorkersComp() throws IOException {
 
-        String hl7message = "MSH|^~\\&|TEST|TEST|||20220101120000||DFT^P03|1234|P|2.6\n"
+        String hl7message = "MSH|^~\\&|TEST|TEST|||20220101120000||DFT^P03^DFT_P03|1234|P|2.6\n"
                 // + "EVN||20210407191342||||||\n"
                 + "PID|||workers_comp^^^XYZ^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
                 + "PV1||I||||||||||||||||||||||||||||||||||||||||||\n"
@@ -1015,7 +1015,7 @@ class Hl7FinancialInsuranceTest {
     // As part of the test, there is a valid code in IN2.72 that would create a related person, but it should be ignored.
     void testInsuranceCoverageUnknownRelationship() throws IOException {
 
-        String hl7message = "MSH|^~\\&|TEST|TEST|||20220101120000||DFT^P03|1234|P|2.6\n"
+        String hl7message = "MSH|^~\\&|TEST|TEST|||20220101120000||DFT^P03^DFT_P03|1234|P|2.6\n"
                 // + "EVN||20210407191342||||||\n"
                 + "PID|||workers_comp^^^XYZ^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
                 + "PV1||I||||||||||||||||||||||||||||||||||||||||||\n"
