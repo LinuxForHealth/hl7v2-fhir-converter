@@ -933,7 +933,7 @@ class Hl7FinancialInsuranceTest {
     // Tests non-related subscriber, employer.
     void testInsuranceCoverageOfWorkersComp() throws IOException {
 
-        String hl7message = "MSH|^~\\&|TEST|TEST|||20220101120000||DFT^P03^DFT_P03|1234|P|2.6\n"
+        String hl7message = "MSH|^~\\&|TEST|TEST|||20220101120000||DFT^P03|1234|P|2.6\n"
                 // + "EVN||20210407191342||||||\n"
                 + "PID|||workers_comp^^^XYZ^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
                 + "PV1||I||||||||||||||||||||||||||||||||||||||||||\n"
@@ -1015,7 +1015,7 @@ class Hl7FinancialInsuranceTest {
     // As part of the test, there is a valid code in IN2.72 that would create a related person, but it should be ignored.
     void testInsuranceCoverageUnknownRelationship() throws IOException {
 
-        String hl7message = "MSH|^~\\&|TEST|TEST|||20220101120000||DFT^P03^DFT_P03|1234|P|2.6\n"
+        String hl7message = "MSH|^~\\&|TEST|TEST|||20220101120000||DFT^P03|1234|P|2.6\n"
                 // + "EVN||20210407191342||||||\n"
                 + "PID|||workers_comp^^^XYZ^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
                 + "PV1||I||||||||||||||||||||||||||||||||||||||||||\n"
