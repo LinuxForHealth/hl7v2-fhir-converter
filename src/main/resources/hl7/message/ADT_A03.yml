@@ -80,6 +80,5 @@ resources:
       repeats: true
       additionalSegments:
         - MSH
-        - PID
         - PV1
         - .IN2
