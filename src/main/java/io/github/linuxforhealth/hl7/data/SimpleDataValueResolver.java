@@ -25,6 +25,7 @@ import ca.uhn.hl7v2.model.v26.group.VXU_V04_OBSERVATION;
 import ca.uhn.hl7v2.model.v26.group.VXU_V04_ORDER;
 import ca.uhn.hl7v2.model.v26.segment.OBX;
 import ca.uhn.hl7v2.HL7Exception;
+import ca.uhn.hl7v2.model.DataTypeException;
 import ca.uhn.hl7v2.model.Varies;
 
 import org.apache.commons.lang3.BooleanUtils;
@@ -239,7 +240,9 @@ public class SimpleDataValueResolver {
             return DateUtil.formatToDate(((TS)obj).getTime().toString());
         }
         if (obj instanceof DTM) {
-            return DateUtil.formatToDate(((DTM)obj).getValue());
+            String dateString = ((DTM)obj).getValue();
+            // DTMs potentially have more information than we need.  Truncate after day, or return null.
+            return dateString.length() > 7 ? DateUtil.formatToDate(dateString.substring(0,8)) : null;
         }
         return null;
     }

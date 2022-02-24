@@ -716,8 +716,8 @@ class Hl7ImmunizationFHIRConversionTest {
                 // DocumentType will be used as DocumentType.
                 // OBX times have type DTM to prove that works
                 + "OBX|21|CE|69764-9^Vaccine Type^LN|5|45^Hep B, CC4 UF^CVX||||||F\n"
-                + "OBX|22|DTM|29768-9^Date Vaccine Information Statement Published^LN|5|20170403||||||F\n"
-                + "OBX|23|DTM|29769-7^Date Vaccine Information Statement Presented^LN|5|20170405||||||F\n"
+                + "OBX|22|DTM|29768-9^Date Vaccine Information Statement Published^LN|5|20170403011212000+0000||||||F\n"
+                + "OBX|23|DTM|29769-7^Date Vaccine Information Statement Presented^LN|5|20170405011212000+0000||||||F\n"
                 // Immunization 3: education group 3. Has no DocumentType nor Reference record. 
                 // 'unspecified' is used as DocumentType.       
                 + "OBX|43|DT|29769-7^Date Vaccine Information Statement Presented^LN|7|20170605||||||F\n"
