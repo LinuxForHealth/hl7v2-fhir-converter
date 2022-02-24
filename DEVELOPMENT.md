@@ -114,7 +114,7 @@ If a new FHIR datatype is required, add a yaml file to [src/main/resources/datat
 
 ### Implement Test Cases for the Message, Segments and Fields
 
-Implement test cases to validate the HL7 Message to FHIR Resource mapping. Create a new message testin
+Implement test cases to validate the HL7 Message to FHIR Resource mapping. Create a new message test class
 in [src/test/java/io/github/linuxforhealth/hl7/message](src/test/java/io/github/linuxforhealth/hl7/message) to test the structure of the message (see [Hl7DFTMessageTest.java](src/test/java/io/github/linuxforhealth/hl7/message/Hl7DFTMessageTest.java).  
 Create a new tests in [src/test/java/io/github/linuxforhealth/hl7/segments](src/test/java/io/github/linuxforhealth/hl7/segments) to test details of fields. See [Hl7FinancialInsuranceTest.java](src/test/java/io/github/linuxforhealth/hl7/message/Hl7FinancialInsuranceTest.java). 
 
