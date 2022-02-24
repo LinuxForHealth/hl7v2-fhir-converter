@@ -707,15 +707,17 @@ class Hl7ImmunizationFHIRConversionTest {
                 + "RXR|C28161^Intramuscular^NCIT|LD^Left Deltoid^HL70163|\n"
                 // Immunization 3: education group 1. Has both DocumentType and Reference records.  
                 // DocumentType will be used as DocumentType.
+                // OBX times have type TS to prove that works
                 + "OBX|8|CE|69764-9^Vaccine Type^LN|4|45^Hep B, CC3a UF^CVX||||||F\n"
                 + "OBX|9|CE|30956-7^Vaccine Type^LN|4|45^Hep B, CC3b UF^CVX||||||F\n"
-                + "OBX|10|DT|29768-9^Date Vaccine Information Statement Published^LN|4|20170303||||||F\n"
-                + "OBX|11|DT|29769-7^Date Vaccine Information Statement Presented^LN|4|20170305||||||F\n"
+                + "OBX|10|TS|29768-9^Date Vaccine Information Statement Published^LN|4|20170303||||||F\n"
+                + "OBX|11|TS|29769-7^Date Vaccine Information Statement Presented^LN|4|20170305||||||F\n"
                 // Immunization 3: education group 2. Has both DocumentType but no Reference record. 
                 // DocumentType will be used as DocumentType.
+                // OBX times have type DTM to prove that works
                 + "OBX|21|CE|69764-9^Vaccine Type^LN|5|45^Hep B, CC4 UF^CVX||||||F\n"
-                + "OBX|22|DT|29768-9^Date Vaccine Information Statement Published^LN|5|20170403||||||F\n"
-                + "OBX|23|DT|29769-7^Date Vaccine Information Statement Presented^LN|5|20170405||||||F\n"
+                + "OBX|22|DTM|29768-9^Date Vaccine Information Statement Published^LN|5|20170403011212000+0000||||||F\n"
+                + "OBX|23|DTM|29769-7^Date Vaccine Information Statement Presented^LN|5|20170405011212000+0000||||||F\n"
                 // Immunization 3: education group 3. Has no DocumentType nor Reference record. 
                 // 'unspecified' is used as DocumentType.       
                 + "OBX|43|DT|29769-7^Date Vaccine Information Statement Presented^LN|7|20170605||||||F\n"
