@@ -17,6 +17,7 @@ import java.util.UUID;
 import ca.uhn.hl7v2.model.v26.datatype.CE;
 import ca.uhn.hl7v2.model.v26.datatype.CWE;
 import ca.uhn.hl7v2.model.v26.datatype.DT;
+import ca.uhn.hl7v2.model.v26.datatype.DTM;
 import ca.uhn.hl7v2.model.v26.datatype.PPN;
 import ca.uhn.hl7v2.model.v26.datatype.TS;
 import ca.uhn.hl7v2.model.v26.datatype.XCN;
@@ -24,8 +25,6 @@ import ca.uhn.hl7v2.model.v26.group.VXU_V04_OBSERVATION;
 import ca.uhn.hl7v2.model.v26.group.VXU_V04_ORDER;
 import ca.uhn.hl7v2.model.v26.segment.OBX;
 import ca.uhn.hl7v2.HL7Exception;
-import ca.uhn.hl7v2.Location;
-import ca.uhn.hl7v2.model.Group;
 import ca.uhn.hl7v2.model.Varies;
 
 import org.apache.commons.lang3.BooleanUtils;
@@ -237,7 +236,10 @@ public class SimpleDataValueResolver {
             return DateUtil.formatToDate(((DT)obj).getValue());
         }
         if (obj instanceof TS) {
-            return DateUtil.formatToDate(((TS)obj).toString());
+            return DateUtil.formatToDate(((TS)obj).getTime().toString());
+        }
+        if (obj instanceof DTM) {
+            return DateUtil.formatToDate(((DTM)obj).getValue());
         }
         return null;
     }
