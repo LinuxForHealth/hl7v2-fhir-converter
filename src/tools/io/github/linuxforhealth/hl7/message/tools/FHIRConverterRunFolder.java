@@ -29,6 +29,8 @@ import io.github.linuxforhealth.hl7.HL7ToFHIRConverter;
  * Uses the following Java system properties:
  * - hl7.input.folder : directory containing the HL7 files to convert
  * - hl7.output.folder : directory to write output to; directory must exist, files will be overwritten if they exist
+ * - hl7.output.folder.flat : Indicates whether to create subdirectories to match input directory structure when
+ * hl7.tools.recurse.subfolders=true. Defaults to false.
  * - hl7.tools.debug : Set to "true" to output input HL7 and output JSON to the console. When "false" output JSONs
  * will only be written to files. Defaults to false.
  * - hl7.tools.recurse.subfolders : When "true" will recurse input folder sub-directories. Output will also be placed in
@@ -40,6 +42,7 @@ public class FHIRConverterRunFolder {
 
     String inputFolderName;
     String outputFolderName;
+    boolean flattenOutputFolders;
     boolean traverseSubFolders;
     boolean debug;
     int numConvertedFiles = 0;
@@ -50,10 +53,11 @@ public class FHIRConverterRunFolder {
     Gson gson;
 
     public FHIRConverterRunFolder(String inputFolderName, String outputFolderName, boolean traverseSubFolders,
-            boolean debug) {
+            boolean flattenOutputFolders, boolean debug) {
         this.inputFolderName = inputFolderName;
         this.outputFolderName = outputFolderName;
         this.traverseSubFolders = traverseSubFolders;
+        this.flattenOutputFolders = flattenOutputFolders;
         this.debug = debug;
         hl7Converter = new HL7ToFHIRConverter();
         hl7ConverterOptions = new Builder().withValidateResource().withPrettyPrint()
@@ -85,6 +89,12 @@ public class FHIRConverterRunFolder {
             return;
         }
 
+        String flattenOutput = System.getProperty("hl7.output.folder.flat");
+        boolean flattenOutputFolders = false;
+        if (flattenOutput != null && flattenOutput.equalsIgnoreCase("true")) {
+            flattenOutputFolders = true;
+        }
+
         String debugStr = System.getProperty("hl7.tools.debug");
         boolean debug = false;
         if (debugStr != null && debugStr.equalsIgnoreCase("true")) {
@@ -98,7 +108,7 @@ public class FHIRConverterRunFolder {
         }
 
         FHIRConverterRunFolder converter = new FHIRConverterRunFolder(inputFolderName, outputFolderName,
-                traverseSubdirectories, debug);
+                traverseSubdirectories, flattenOutputFolders, debug);
 
         converter.processFolder(inputFolder, outputFolderName);
 
@@ -187,7 +197,10 @@ public class FHIRConverterRunFolder {
             // Recurse through the folders in the directory
             File[] folderList = inputFolder.listFiles(File::isDirectory);
             for (File folder : folderList) {
-                String outputSubfolderName = outputFolderName + File.separator + folder.getName();
+                String outputSubfolderName = outputFolderName;
+                if (!flattenOutputFolders) {
+                    outputSubfolderName = outputFolderName + File.separator + folder.getName();
+                }
                 processFolder(folder, outputSubfolderName);
             }
         } catch (IOException | IllegalArgumentException e) {
