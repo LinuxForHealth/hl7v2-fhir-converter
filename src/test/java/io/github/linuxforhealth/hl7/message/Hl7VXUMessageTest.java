@@ -51,7 +51,7 @@ class Hl7VXUMessageTest {
         assertThat(patient).hasSize(1);
 
         // Expecting only the above resources, no extras!
-        assertThat(e.size()).isEqualTo(1);
+        assertThat(e).hasSize(1);
     }
 
     @Test
@@ -70,11 +70,11 @@ class Hl7VXUMessageTest {
         assertThat(enc).hasSize(1);
 
         // Expecting only the above resources, no extras!
-        assertThat(e.size()).isEqualTo(2);
+        assertThat(e).hasSize(2);
     }
 
     @Test
-    void test_VXU_with_patient_group_that_has_all_segments_and_insurance() throws IOException {
+    void test_VXU_with_full_patient_group_and_insurance() throws IOException {
   	    String hl7message = 
             "MSH|^~\\&|EHR|12345^SiteName|MIIS|99990|20140701041038||VXU^V04^VXU_V04|MSG.Valid_01|P|2.6|||\r"
   		    + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\r"
@@ -101,7 +101,7 @@ class Hl7VXUMessageTest {
         assertThat(related).hasSize(1);
 
         // Expecting only Patient, Encounter, Coverage, Organization, no extras!
-        assertThat(e.size()).isEqualTo(5);
+        assertThat(e).hasSize(5);
     }
 
     @Test
@@ -126,7 +126,7 @@ class Hl7VXUMessageTest {
         assertThat(immu).hasSize(1);
 
         // Expecting only the above resources, no extras!
-        assertThat(e.size()).isEqualTo(3);
+        assertThat(e).hasSize(3);
     }
 
     @Test
@@ -150,7 +150,7 @@ class Hl7VXUMessageTest {
         assertThat(immu).hasSize(1);
 
         // Expecting only the above resources, no extras!
-        assertThat(e.size()).isEqualTo(3);
+        assertThat(e).hasSize(3);
   }
 
     @Test
@@ -178,7 +178,7 @@ class Hl7VXUMessageTest {
         // No Observations should be created because OBX3.1 is not 31044-1
 
         // Expecting only the above resources, no extras!
-        assertThat(e.size()).isEqualTo(3);
+        assertThat(e).hasSize(3);
 }
 
     @Test
@@ -217,7 +217,7 @@ class Hl7VXUMessageTest {
         assertThat(related).hasSize(1);
 
         // Expecting only the above resources, no extras!
-        assertThat(e.size()).isEqualTo(8);
+        assertThat(e).hasSize(8);
     }
 
     // Suppress warnings about too many assertions in a test.  Justification: creating a FHIR message is very costly; we need to check many asserts per creation for efficiency.  
@@ -278,7 +278,7 @@ class Hl7VXUMessageTest {
         assertThat(obsResource.getCode().getText()).isEqualTo("Rash within 14 days of dose");
         assertThat(obsResource.getIdentifierFirstRep().getValue()).isEqualTo("4242546-VXC14-CDCPHINVS");
         assertThat(obsResource.getIdentifierFirstRep().getSystem()).isEqualTo("urn:id:extID");
-        assertThat(e.size()).isEqualTo(7);
+        assertThat(e).hasSize(7);
 
         // The second set of assertions are from the second RXA segment
         resource = ResourceUtils.getResourceImmunization(immu.get(1), ResourceUtils.context);

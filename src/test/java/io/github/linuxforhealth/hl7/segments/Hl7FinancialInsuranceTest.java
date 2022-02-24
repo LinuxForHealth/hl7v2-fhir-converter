@@ -697,7 +697,7 @@ class Hl7FinancialInsuranceTest {
     // This test is to see the problem does not return.  It fails without PR #405, and is successful with it. 
     void testFailingOrganizationTelecom() throws IOException {
 
-        String hl7message = "MSH|^~\\&|||||20211214105741||DFT^P03^DFT_P03|1760487765|P|2.6|||||||||\n"
+        String hl7message = "MSH|^~\\&|||||20211214105741||DFT^P03|1760487765|P|2.6|||||||||\n"
                 + "EVN|P03|20211214105741\n"
                 + "PID|||MR1^^^XYZ^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
                 + "PV1||I||||||||||||||||||||||||||||||||||||||||||\n"
