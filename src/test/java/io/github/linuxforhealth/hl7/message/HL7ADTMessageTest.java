@@ -117,7 +117,7 @@ class HL7ADTMessageTest {
     @ParameterizedTest
     // ADT_A01, ADT_A04, ADT_A08, ADT_A13 all use the same message structure so we can reuse adt_a01 tests for them.
     @ValueSource(strings = { "ADT^A01", "ADT^A04", "ADT^A08"/* , "ADT^A13" */ })
-    void testAdtA01FullPlusMultipleProcedureGroup(String message) throws IOException {
+    void testAdtA01FullPlusMultipleProcedureGroupAndSingleInsurance(String message) throws IOException {
         String hl7message = "MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||" + message
                 + "|controlID|P|2.6\r"
                 + "EVN|A01|20150502090000|\r"
@@ -138,7 +138,6 @@ class HL7ADTMessageTest {
                 + "IN1|1|Value1^^System3^Value4^^System6|IdValue1^^^IdSystem4^^^^|Large Blue Organization|||||||||||\n"
                 // IN2.72 creates a RelatedPerson,
                 + "IN2||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||04|\n";
-
 
         List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
 
@@ -333,7 +332,10 @@ class HL7ADTMessageTest {
                 + "EVN|A01|20150502090000|\r"
                 + "PID|||1234^^^^MR\r"
                 + "PV1||I||||||||SUR||||||||S|VisitNumber^^^ACME|A||||||||||||||||||||||||20150502090000|\r"
-                + "IN1||||Large Blue Organization|456 Ultramarine Lane^^Faketown^CA^ZIP5\n";
+                // Minimal Insurance. Minimal Organization for Payor, which is required.
+                + "IN1|1|Value1^^System3^Value4^^System6|IdValue1^^^IdSystem4^^^^|Large Blue Organization|||||||||||\n"
+                // IN2.72 creates a RelatedPerson,
+                + "IN2||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||04|\n";
 
         List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
 
@@ -343,23 +345,27 @@ class HL7ADTMessageTest {
         List<Resource> encounterResource = ResourceUtils.getResourceList(e, ResourceType.Encounter);
         assertThat(encounterResource).hasSize(1); // from EVN, PV1
 
-        List<Resource> coverageResource = ResourceUtils.getResourceList(e, ResourceType.Coverage);
-        assertThat(coverageResource).hasSize(1); // from IN1
+        List<Resource> coverages = ResourceUtils.getResourceList(e, ResourceType.Coverage);
+        assertThat(coverages).hasSize(1); //from INSURANCE.IN1
 
         List<Resource> organizationResource = ResourceUtils.getResourceList(e, ResourceType.Organization);
-        assertThat(organizationResource).hasSize(1); // Reference from IN1
+        assertThat(organizationResource).hasSize(1); //from INSURANCE.IN1
+
+        List<Resource> relatedResource = ResourceUtils.getResourceList(e, ResourceType.RelatedPerson);
+        assertThat(relatedResource).hasSize(1); //from INSURANCE.IN1
 
         // Confirm that there are no extra resources
-        assertThat(e).hasSize(4);
+        assertThat(e).hasSize(5);
 
     }
 
     @ParameterizedTest
     @ValueSource(strings = { "ADT^A28", "ADT^A31" })
     // @Test
-    // Test ADT_A28 & ADT_A31 with all currently supported segments.  These use the ADT_A05 structure.
-    void testAdtA28A31AllSegments(String message) throws IOException {
-        String hl7message = "MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||"+message+"|controlID|P|2.6\n"
+    // Test ADT_A28 & ADT_A31 (structure ADT_A05) with all currently supported segments.  These use the ADT_A05 structure.
+    void testAdtA05WithAllergiesMultipleProceduresAndSingleInsurance(String message) throws IOException {
+        String hl7message = "MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||" + message
+                + "|controlID|P|2.6\n"
                 + "EVN|A01|20150502090000|\n"
                 + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
                 + "PD1|||||||||||01|N||||A\r"
@@ -411,6 +417,48 @@ class HL7ADTMessageTest {
         List<Resource> relatedResource = ResourceUtils.getResourceList(e, ResourceType.RelatedPerson);
         assertThat(relatedResource).hasSize(1); //from INSURANCE.IN1
 
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = { "ADT^A28", "ADT^A31" })
+    // @Test
+    // Test ADT_A28 & ADT_A31 (structure ADT_A05) with all currently supported segments.  These use the ADT_A05 structure.
+    void testAdtA05MinimumWithNoProceduresAndMultipleInsurance(String message) throws IOException {
+        String hl7message = "MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||" + message
+                + "|controlID|P|2.6\n"
+                + "EVN|A01|20150502090000|\n"
+                + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
+                + "PV1||I||||||||SUR||||||||S|VisitNumber^^^ACME|A||||||||||||||||||||||||20150502090000|\n"
+                + "PV2|||||||||||||||||||||||||AI|||||||||||||C|\n"
+                // Minimal Insurance. Minimal Organization for Payor, which is required.
+                + "IN1|1|Value1a^^System3a^Value4a^^System6a|IdValue1a^^^IdSystem4a^^^^|Large Blue Organization|||||||||||\n"
+                // IN2.72 creates a RelatedPerson,
+                + "IN2|1|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||04|\n"
+                // Minimal Insurance. Minimal Organization for Payor, which is required.
+                + "IN1|2|Value1b^^System3b^Value4b^^System6b|IdValue1b^^^IdSystem4b^^^^|Large Green Organization|||||||||||\n"
+                // IN2.72 creates a RelatedPerson,
+                + "IN2|2|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||04|\n";
+
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+
+        List<Resource> patientResource = ResourceUtils.getResourceList(e, ResourceType.Patient);
+        assertThat(patientResource).hasSize(1); // from PID and PD1
+
+        List<Resource> encounterResource = ResourceUtils.getResourceList(e, ResourceType.Encounter);
+        assertThat(encounterResource).hasSize(1); // from EVN, PV1, and PV2
+
+        List<Resource> coverages = ResourceUtils.getResourceList(e, ResourceType.Coverage);
+        assertThat(coverages).hasSize(2); //from INSURANCE.IN1 x2
+
+        List<Resource> organizationResource = ResourceUtils.getResourceList(e, ResourceType.Organization);
+        assertThat(organizationResource).hasSize(2); //from INSURANCE.IN1 x2
+
+        List<Resource> relatedResource = ResourceUtils.getResourceList(e, ResourceType.RelatedPerson);
+        assertThat(relatedResource).hasSize(2); //from INSURANCE.IN1 x2
+
+        // Expecting 8 total resources
+        // Patient, Encounter, Coverage (2), RelatedPerson (2), Organization (2)
+        assertThat(e).hasSize(8);
     }
 
     @ParameterizedTest
