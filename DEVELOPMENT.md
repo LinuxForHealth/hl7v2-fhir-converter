@@ -32,6 +32,10 @@ The Official FHIR documentation, provided by the HL7 organization, provides comp
 Each resource page contains field definitions [(Example: Medication Resource)](https://www.hl7.org/fhir/medication.html), and HL7 v2 mappings [(Example: Medication Resource)](https://www.hl7.org/fhir/medication-mappings.html).
 Review the documentation determine which FHIR resource fields to include. The FHIR specification supports numerous resources with a variety of fields. It is likely that a subset of fields are required for a given use-case.
 
+Also, keep in mind the messages, structures, groups, and segments from the HL7 V2.6 messages being parsed.  A good resources is [Health Level Seven® Standard Version 2.6 -
+An Application Protocol for Electronic Data Exchange
+in Healthcare Environments](https://www.vico.org/HL7_V2_6/HL7%20Messaging%20Version%202.6/V2_6_Index.html) at vico.org. Messages have specific structures they are supported by.  For example `ADT^A08` and `ADT^A04` use the `ADT_A01` structure to map groups and segments within groups.
+
 ### Modifying an HL7 Segment Template
 
 Find the associated FHIR resource that maps from the fields in the HL7 Segment. A good example is [src/main/resources/hl7/resource/Patient.yml](src/main/resources/hl7/resource/Patient.yml) which maps for the `PID` segment.  (TEMPLATING)[TEMPLATING.md] explains how the templates work for mappings.

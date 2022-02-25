@@ -308,12 +308,18 @@ class Hl7FinancialInsuranceTest {
     // Tests IN1 & IN2 for all supported message types. 
     // The breadth of this test is sufficent for multiple message type coverage, so other tests are not parameterized.
     @ValueSource(strings = {
-        "DFT^P03^DFT_P03", "VXU^V04^VXU_V04", "ADT^A01^ADT_A01"
+        "DFT^P03^DFT_P03", 
+        "VXU^V04^VXU_V04", 
+        "ADT^A01^ADT_A01",
+        "ADT^A03^ADT_A03", 
+        "ADT^A04^ADT_A01", // ADT^A04 uses structure ADT_A01
+        "ADT^A08^ADT_A01", // ADT^A08 uses structure ADT_A01 
+        "ADT^A28^ADT_A05", // ADT^A28 uses structure ADT_A05 
+        "ADT^A31^ADT_A05"  // ADT^A31 uses structure ADT_A05 
     })
     // Tests IN1.17 coverage by related person. A related person should be created and cross-referenced.
     // Also tests backup field for coverage.order
     // Also test IN2.2 Social Security number
-
     void testInsuranceCoverageByRelatedFields(String messageType) throws IOException {
         String hl7message = "MSH|^~\\&|||||20151008111200||" + messageType + "|MSGID000001|T|2.6|||||||||\n"
                 + "EVN||20210407191342||||||\n"
