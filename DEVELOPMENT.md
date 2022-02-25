@@ -34,7 +34,7 @@ Review the documentation determine which FHIR resource fields to include. The FH
 
 ### Modifying an HL7 Segment Template
 
-Find the associated FHIR resource that maps from the fields in the HL7 Segment. A good example is [src/main/resources/hl7/resource/Patient.yml](src/main/resources/hl7/resource/Patient.yml) which maps for the `PID` segment.  (TEMPLATING)[TEMPLATING.md] explains how the templates work for mappings.
+Find the associated FHIR resource that maps from the fields in the HL7 Segment. A good example is [src/main/resources/hl7/resource/Patient.yml](src/main/resources/hl7/resource/Patient.yml) which maps for the `PID` segment.  [TEMPLATING[(TEMPLATING.md) explains how the templates work for mappings.
 
 Reuse existing resources other resources from from [src/main/resources/hl7/resource](src/main/resources/hl7/resource), [src/main/resources/hl7/secondary](src/main/resources/hl7/secondary), and data types from [src/main/resources/hl7/datatype](src/main/resources/hl7/datatype) when possible.  Only create new templates if needed. 
 
@@ -46,7 +46,7 @@ Reuse existing resources other resources from from [src/main/resources/hl7/resou
 (See explanation above)
 ### Modifying an HL7 Message Template
 
-To add new segments to an existing message, find the associated message template.  These are all in [src/main/resources/hl7/message](src/main/resources/hl7/message). A good example is [src/main/resources/hl7/message/DFT_P03.yml](src/main/resources/hl7/message/DFT_P03.yml) which processes the DFT_P03 message. (TEMPLATING)[TEMPLATING.md] explains how segments map to FHIR resources. 
+To add new segments to an existing message, find the associated message template.  These are all in [src/main/resources/hl7/message](src/main/resources/hl7/message). A good example is [src/main/resources/hl7/message/DFT_P03.yml](src/main/resources/hl7/message/DFT_P03.yml) which processes the DFT_P03 message. [TEMPLATING](TEMPLATING.md) explains how segments map to FHIR resources. 
 
 Reuse existing resources other resources from from [src/main/resources/hl7/resource](src/main/resources/hl7/resource), [src/main/resources/hl7/secondary](src/main/resources/hl7/secondary), and data types from [src/main/resources/hl7/datatype](src/main/resources/hl7/datatype) when possible.  Only create new templates if needed. 
 
