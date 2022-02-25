@@ -34,7 +34,7 @@ Review the documentation determine which FHIR resource fields to include. The FH
 
 ### Modifying an HL7 Segment Template
 
-Find the associated FHIR resource that maps from the fields in the HL7 Segment. A good example is [src/main/resources/hl7/resource/Patient.yml](src/main/resources/hl7/resource/Patient.yml) which maps for the `PID` segment.  [TEMPLATING[(TEMPLATING.md) explains how the templates work for mappings.
+Find the associated FHIR resource that maps from the fields in the HL7 Segment. A good example is [src/main/resources/hl7/resource/Patient.yml](src/main/resources/hl7/resource/Patient.yml) which maps for the `PID` segment.  [TEMPLATING](TEMPLATING.md) explains how the templates work for mappings.
 
 Reuse existing resources other resources from from [src/main/resources/hl7/resource](src/main/resources/hl7/resource), [src/main/resources/hl7/secondary](src/main/resources/hl7/secondary), and data types from [src/main/resources/hl7/datatype](src/main/resources/hl7/datatype) when possible.  Only create new templates if needed. 
 
