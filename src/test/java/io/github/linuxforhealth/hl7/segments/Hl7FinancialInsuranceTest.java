@@ -305,7 +305,7 @@ class Hl7FinancialInsuranceTest {
     // Suppress warnings about too many assertions in a test.  Justification: creating a FHIR message is very costly; we need to check many asserts per creation for efficiency.  
     @java.lang.SuppressWarnings("squid:S5961")
     @ParameterizedTest
-    // Tests IN1 & IN2 for all supported message types. 
+    // Tests IN1 & IN2 for all supported message types that have EVN segments.
     // The breadth of this test is sufficent for multiple message type coverage, so other tests are not parameterized.
     @ValueSource(strings = {
         "DFT^P03^DFT_P03", 

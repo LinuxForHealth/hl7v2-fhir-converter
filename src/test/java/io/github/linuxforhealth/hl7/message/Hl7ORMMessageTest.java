@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2021
+ * (C) Copyright IBM Corp. 2021, 2022
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -17,11 +17,15 @@ import org.junit.jupiter.api.Test;
 class Hl7ORMMessageTest {
 
     @Test
-    void test_ORMO01_patient_encounter_present() throws IOException {
+    void test_ORMO01_patient_encounter_and_insurance_present() throws IOException {
         String hl7message = "MSH|^~\\&|WHI_LOAD_GENERATOR|IBM_TORONTO_LAB|IBMWATSON_LAB|IBM|20210407191758||ORM^O01|MSGID_e30a3471-7afd-4aa2-a3d5-e93fd89d24b3|T|2.3\n"
                 + "PID|1||0a1f7838-4230-4752-b8f6-948b07c38b25^^^MRN||Patient^Load^Generator||19690720|M|Patient^Alias^Generator||9999^^CITY^STATE^ZIP^CAN|COUNTY|(866)845-0900|||||Account_0a1f7838-4230-4752-b8f6-948b07c38b25|123-456-7890||||BIRTH PLACE\n"
                 + "PV1||IP|^^^Toronto^^5642 Hilly Av||||2905^Doctor^Attending^M^IV^^M.D|5755^Doctor^Referring^^Sr|770542^Doctor^Consulting^Jr||||||||59367^Doctor^Admitting|IP^I|Visit_0a1f7838-4230-4752-b8f6-948b07c38b25|||||||||||||||||||||||||20210407191758\n"
                 + "PV2|||^|||X-5546||20210407191758|||||||||||||||\n"
+                // Minimal Insurance. Minimal Organization for Payor, which is required.
+                + "IN1|1|Value1^^System3^Value4^^System6|IdValue1^^^IdSystem4^^^^|Large Blue Organization|||||||||||\n"
+                // IN2.72 creates a RelatedPerson,
+                + "IN2||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||04|\n"
                 + "ORC|SN|ACCESSION_a42990b7-4155-4404-81ef-e85158caed72|ACCESSION_a42990b7-4155-4404-81ef-e85158caed72|2950|||||20210407191758|2739^BY^ENTERED|2799^BY^VERIFIED|3122^PROVIDER^ORDERING||(696)901-1300|20210407191758||||||ORDERING FAC NAME|ADDR^^CITY^STATE^ZIP^USA|(515)-290-8888|9999^^CITY^STATE^ZIP^CAN\n"
                 + "OBR|1|ACCESSION_a42990b7-4155-4404-81ef-e85158caed72|ACCESSION_a42990b7-4155-4404-81ef-e85158caed72|4916^Diffusion-weighted imaging||20210331214400|20210407191758|20210407191758||||||20210331214600||1234^SOURCE^SPECIMEN^LNAME^FNAME^^^^^^^^^LABNAME||||W18562||||P|||^^^^^POCPR|660600^Doctor^FYI||||Result Interpreter\n";
 
@@ -40,7 +44,16 @@ class Hl7ORMMessageTest {
         assertThat(practitioners).hasSize(5);
 
         List<Resource> organizations = ResourceUtils.getResourceList(e, ResourceType.Organization);
-        assertThat(organizations).hasSize(1);
+        assertThat(organizations).hasSize(2); // from Practitioner and INSURANCE.IN1
+
+        List<Resource> coverages = ResourceUtils.getResourceList(e, ResourceType.Coverage);
+        assertThat(coverages).hasSize(1); //from INSURANCE.IN1
+
+        List<Resource> relatedResource = ResourceUtils.getResourceList(e, ResourceType.RelatedPerson);
+        assertThat(relatedResource).hasSize(1); //from INSURANCE.IN1
+
+        // Confirm that there are no extra resources created
+        assertThat(e).hasSize(12);
     }
 
 }

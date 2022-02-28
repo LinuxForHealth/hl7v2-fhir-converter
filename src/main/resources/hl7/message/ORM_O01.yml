@@ -33,6 +33,16 @@ resources:
             - .PATIENT_VISIT.PV2
             - MSH
             - ORDER_DETAIL.OBSERVATION.OBX
+
+  - resourceName: Coverage
+    segment: .IN1
+    group: PATIENT.INSURANCE
+    resourcePath: resource/Coverage
+    repeats: true
+    additionalSegments:
+      - MSH
+      - PATIENT.PATIENT_VISIT.PV1
+      - .IN2                  
     
   - resourceName: AllergyIntolerance
     segment: .AL1
@@ -97,3 +107,13 @@ resources:
       - PATIENT.PATIENT_VISIT.PV1
       - MSH
       - PATIENT.PID
+
+  # - resourceName: Coverage
+  #   segment: PATIENT.INSURANCE.IN1
+  #   # group: PATIENT
+  #   resourcePath: resource/Coverage
+  #   repeats: true
+  #   additionalSegments:
+  #     - MSH
+  #     - PATIENT.PATIENT_VISIT.PV1
+  #     - PATIENT.INSURANCE.IN2

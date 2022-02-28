@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2020, 2021
+ * (C) Copyright IBM Corp. 2020, 2022
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -73,19 +73,19 @@ class Hl7ORUMessageTest {
         assertThat(servReqResource).hasSize(1);
 
         // Expecting only the above resources, no extras!
-        assertThat(e.size()).isEqualTo(3);
+        assertThat(e).hasSize(3);
 
         ///////////////////////////////////////////
         // Now confirm content of the diagnosticReport because we don't have separate tests for DiagnosticReport
         ///////////////////////////////////////////
         DiagnosticReport diag = ResourceUtils.getResourceDiagnosticReport(diagnosticReport.get(0), context);
         assertThat(diag.getStatus().toCode()).isEqualTo("final"); // Verify status from OBR.25
-        assertThat(diag.getCategory().size()).isZero(); // Verify category from OBR.24
+        assertThat(diag.getCategory()).isEmpty(); // Verify category from OBR.24
 
         // Verify code from OBR.4
         assertThat(diag.hasCode()).isTrue();
         List<Coding> codings = diag.getCode().getCoding();
-        assertThat(codings.size()).isEqualTo(1);
+        assertThat(codings).hasSize(1);
         Coding coding = codings.get(0);
         assertThat(coding.hasDisplay()).isTrue();
         assertThat(coding.getDisplay()).hasToString("New Born Screening");
@@ -146,21 +146,21 @@ class Hl7ORUMessageTest {
         assertThat(servReqResource).hasSize(1);
 
         // Expecting only the above resources, no extras!
-        assertThat(e.size()).isEqualTo(6);
+        assertThat(e).hasSize(6);
 
         ///////////////////////////////////////////
         // Now confirm content of the diagnosticReport because we don't have separate tests for DiagnosticReport
         ///////////////////////////////////////////
         DiagnosticReport diag = ResourceUtils.getResourceDiagnosticReport(diagnosticReport.get(0), context);
         assertThat(diag.getStatus().toCode()).isEqualTo("final"); // Verify status from OBR.25
-        assertThat(diag.getCategory().size()).isEqualTo(1); // Verify category from OBR.24
+        assertThat(diag.getCategory()).hasSize(1); // Verify category from OBR.24
         DatatypeUtils.checkCommonCodeableConceptAssertions(diag.getCategoryFirstRep(), "CUS", "Cardiac Ultrasound",
                 "http://terminology.hl7.org/CodeSystem/v2-0074", "CUS");
 
         // Verify code from OBR.4
         assertThat(diag.hasCode()).isTrue();
         List<Coding> codings = diag.getCode().getCoding();
-        assertThat(codings.size()).isEqualTo(1);
+        assertThat(codings).hasSize(1);
         Coding coding = codings.get(0);
         assertThat(coding.hasDisplay()).isTrue();
         assertThat(coding.getDisplay()).hasToString("New Born Screening");
@@ -184,7 +184,6 @@ class Hl7ORUMessageTest {
 
         // Verify result reference
         List<Reference> obsRef = diag.getResult();
-        assertThat(obsRef.isEmpty()).isFalse();
         assertThat(obsRef).hasSize(2);
         assertThat(obsRef.get(0).isEmpty()).isFalse();
         assertThat(obsRef.get(1).isEmpty()).isFalse();
@@ -240,19 +239,19 @@ class Hl7ORUMessageTest {
         assertThat(practitionerResource).hasSize(5);
 
         // Expecting only the above resources, no extras!
-        assertThat(e.size()).isEqualTo(10);
+        assertThat(e).hasSize(10);
 
         ///////////////////////////////////////////
         // Now confirm content of the diagnosticReport because we don't have separate tests for DiagnosticReport
         ///////////////////////////////////////////
         DiagnosticReport diag = ResourceUtils.getResourceDiagnosticReport(diagnosticReport.get(0), context);
         assertThat(diag.getStatus().toCode()).isEqualTo("final"); // Verify status from OBR.25
-        assertThat(diag.getCategory().size()).isZero(); // Verify category from OBR.24
+        assertThat(diag.getCategory()).isEmpty(); // Verify category from OBR.24
 
         // Verify code from OBR.4
         assertThat(diag.hasCode()).isTrue();
         List<Coding> codings = diag.getCode().getCoding();
-        assertThat(codings.size()).isEqualTo(1);
+        assertThat(codings).hasSize(1);
         Coding coding = codings.get(0);
         assertThat(coding.hasDisplay()).isTrue();
         assertThat(coding.getDisplay()).hasToString("Final Echocardiogram Report");
@@ -275,7 +274,6 @@ class Hl7ORUMessageTest {
 
         // Verify result reference
         List<Reference> obsRef = diag.getResult();
-        assertThat(obsRef.isEmpty()).isFalse();
         assertThat(obsRef).hasSize(1);
         assertThat(obsRef.get(0).isEmpty()).isFalse();
 
@@ -331,19 +329,19 @@ class Hl7ORUMessageTest {
         assertThat(servReqResource).hasSize(2);
 
         // Expecting only the above resources, no extras!
-        assertThat(e.size()).isEqualTo(11);
+        assertThat(e).hasSize(11);
 
         ///////////////////////////////////////////
         // Now confirm content of the FIRST diagnosticReport because we don't have separate tests for DiagnosticReport
         ///////////////////////////////////////////
         DiagnosticReport diag = ResourceUtils.getResourceDiagnosticReport(diagnosticReport.get(0), context);
         assertThat(diag.getStatus().toCode()).isEqualTo("final"); // Verify status from OBR.25
-        assertThat(diag.getCategory().size()).isZero(); // Verify category from OBR.24
+        assertThat(diag.getCategory()).isEmpty(); // Verify category from OBR.24
 
         // Verify code from OBR.4
         assertThat(diag.hasCode()).isTrue();
         List<Coding> codings = diag.getCode().getCoding();
-        assertThat(codings.size()).isEqualTo(1);
+        assertThat(codings).hasSize(1);
         Coding coding = codings.get(0);
         assertThat(coding.hasDisplay()).isTrue();
         assertThat(coding.getDisplay()).hasToString("Final Echocardiogram Report");
@@ -365,7 +363,6 @@ class Hl7ORUMessageTest {
 
         // Verify result reference
         List<Reference> obsRef = diag.getResult();
-        assertThat(obsRef.isEmpty()).isFalse();
         assertThat(obsRef).hasSize(2);
         assertThat(obsRef.get(0).isEmpty()).isFalse();
 
@@ -378,12 +375,12 @@ class Hl7ORUMessageTest {
         ///////////////////////////////////////////
         DiagnosticReport diag2 = ResourceUtils.getResourceDiagnosticReport(diagnosticReport.get(0), context);
         assertThat(diag2.getStatus().toCode()).isEqualTo("final"); // Verify status from OBR.25
-        assertThat(diag2.getCategory().size()).isZero(); // Verify category from OBR.24
+        assertThat(diag2.getCategory()).isEmpty(); // Verify category from OBR.24
 
         // Verify code from OBR.4
         assertThat(diag2.hasCode()).isTrue();
         List<Coding> codings2 = diag2.getCode().getCoding();
-        assertThat(codings2.size()).isEqualTo(1);
+        assertThat(codings2).hasSize(1);
         Coding coding2 = codings.get(0);
         assertThat(coding2.hasDisplay()).isTrue();
         assertThat(coding2.getDisplay()).hasToString("Final Echocardiogram Report");
@@ -405,7 +402,6 @@ class Hl7ORUMessageTest {
 
         // Verify result reference
         List<Reference> obsRef2 = diag2.getResult();
-        assertThat(obsRef2.isEmpty()).isFalse();
         assertThat(obsRef2).hasSize(2);
         assertThat(obsRef2.get(0).isEmpty()).isFalse();
 
@@ -459,19 +455,19 @@ class Hl7ORUMessageTest {
         assertThat(specimenResource).hasSize(1);
 
         // Expecting only the above resources, no extras! 
-        assertThat(e.size()).isEqualTo(6);
+        assertThat(e).hasSize(6);
 
         ///////////////////////////////////////////
         // Now confirm content of the diagnosticReport because we don't have separate tests for DiagnosticReport
         ///////////////////////////////////////////
         DiagnosticReport diag = ResourceUtils.getResourceDiagnosticReport(diagnosticReport.get(0), context);
         assertThat(diag.getStatus().toCode()).isEqualTo("final"); // Verify status from OBR.25
-        assertThat(diag.getCategory().size()).isZero(); // Verify category from OBR.24
+        assertThat(diag.getCategory()).isEmpty(); // Verify category from OBR.24
 
         // Verify code from OBR.4
         assertThat(diag.hasCode()).isTrue();
         List<Coding> codings = diag.getCode().getCoding();
-        assertThat(codings.size()).isEqualTo(1);
+        assertThat(codings).hasSize(1);
         Coding coding = codings.get(0);
         assertThat(coding.hasDisplay()).isTrue();
         assertThat(coding.getDisplay()).hasToString("New Born Screening");
@@ -492,13 +488,11 @@ class Hl7ORUMessageTest {
 
         // Verify specimen reference
         List<Reference> spmRef = diag.getSpecimen();
-        assertThat(spmRef.isEmpty()).isFalse();
         assertThat(spmRef).hasSize(1);
         assertThat(spmRef.get(0).isEmpty()).isFalse();
 
         // Verify result reference
         List<Reference> obsRef = diag.getResult();
-        assertThat(obsRef.isEmpty()).isFalse();
         assertThat(obsRef).hasSize(1);
         assertThat(obsRef.get(0).isEmpty()).isFalse();
         // Verify presentedForm from OBX of type ST - No attachments expected because OBX of type not TX creates an Observation.
@@ -567,7 +561,7 @@ class Hl7ORUMessageTest {
         assertThat(servReqResource).hasSize(1);
 
         // Verify there are no extra resources created
-        assertThat(e.size()).isEqualTo(10);
+        assertThat(e).hasSize(10);
 
         //Verify no observations are created
         List<Resource> obsResource = ResourceUtils.getResourceList(e, ResourceType.Observation);
@@ -578,14 +572,14 @@ class Hl7ORUMessageTest {
         ///////////////////////////////////////////
         DiagnosticReport diag = ResourceUtils.getResourceDiagnosticReport(reportResource.get(0), context);
         assertThat(diag.getStatus().toCode()).isEqualTo("final"); // Verify status from OBR.25
-        assertThat(diag.getCategory().size()).isEqualTo(1); // Verify category from OBR.24
+        assertThat(diag.getCategory()).hasSize(1); // Verify category from OBR.24
         DatatypeUtils.checkCommonCodeableConceptAssertions(diag.getCategoryFirstRep(), "CT", "CAT Scan",
                 "http://terminology.hl7.org/CodeSystem/v2-0074", "CT");
 
         // Verify code from OBR.4; This tests scenario of the code not being in the default loinc system.
         assertThat(diag.hasCode()).isTrue();
         List<Coding> codings = diag.getCode().getCoding();
-        assertThat(codings.size()).isEqualTo(1);
+        assertThat(codings).hasSize(1);
         Coding coding = codings.get(0);
         assertThat(coding.hasDisplay()).isTrue();
         assertThat(coding.getDisplay()).hasToString("ECHO CARDIOGRAM COMPLETE");
@@ -698,15 +692,15 @@ class Hl7ORUMessageTest {
         assertThat(servReqResource).hasSize(1);
 
         // Verify there are no extra resources created
-        assertThat(e.size()).isEqualTo(11);
+        assertThat(e).hasSize(11);
 
         ///////////////////////////////////////////
         // Now confirm content of the diagnosticReport because we don't have separate tests for DiagnosticReport
         ///////////////////////////////////////////
         DiagnosticReport diag = ResourceUtils.getResourceDiagnosticReport(reportResource.get(0), context);
         assertThat(diag.getStatus().toCode()).isEqualTo("final"); // Verify status from OBR.25
-        assertThat(diag.getCategory().size()).isEqualTo(1); // Verify category from OBR.24
-        assertThat(diag.getCategory().get(0).getCoding().size()).isEqualTo(1);
+        assertThat(diag.getCategory()).hasSize(1); // Verify category from OBR.24
+        assertThat(diag.getCategory().get(0).getCoding()).hasSize(1);
         assertThat(diag.getCategory().get(0).getCoding().get(0).getSystem())
                 .isEqualTo("http://terminology.hl7.org/CodeSystem/v2-0074");
         assertThat(diag.getCategory().get(0).getCoding().get(0).getCode()).isEqualTo("CT");
@@ -716,7 +710,7 @@ class Hl7ORUMessageTest {
         // Verify code from OBR.4; This tests scenario of the code not being in the default loinc system.
         assertThat(diag.hasCode()).isTrue();
         List<Coding> codings = diag.getCode().getCoding();
-        assertThat(codings.size()).isEqualTo(1);
+        assertThat(codings).hasSize(1);
         Coding coding = codings.get(0);
         assertThat(coding.hasDisplay()).isTrue();
         assertThat(coding.getDisplay()).hasToString("ECHO CARDIOGRAM COMPLETE");
