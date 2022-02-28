@@ -1,34 +1,34 @@
 #
-# (C) Copyright IBM Corp. 2021
+# (C) Copyright IBM Corp. 2021, 2022
 #
 # SPDX-License-Identifier: Apache-2.0
 #
 # FHIR Resources to extract from ADT_A02 message
 ---
 resources:
-    - resourceName: MessageHeader
-      segment: MSH
-      resourcePath: resource/MessageHeader
-      repeats: false
-      isReferenced: false
-      additionalSegments: 
-             - EVN
-   
-    - resourceName: Patient
-      segment: PID
-      resourcePath: resource/Patient
-      repeats: false
-      isReferenced: true
-      additionalSegments:
-             - PD1
-             - MSH
+  - resourceName: MessageHeader
+    segment: MSH
+    resourcePath: resource/MessageHeader
+    repeats: false
+    isReferenced: false
+    additionalSegments:
+      - EVN
 
-    - resourceName: Encounter
-      segment: PV1
-      resourcePath: resource/Encounter
-      repeats: false
-      isReferenced: true
-      additionalSegments:
-             - PV2
-             - EVN
-             - MSH
+  - resourceName: Patient
+    segment: PID
+    resourcePath: resource/Patient
+    repeats: false
+    isReferenced: true
+    additionalSegments:
+      - PD1
+      - MSH
+
+  - resourceName: Encounter
+    segment: PV1
+    resourcePath: resource/Encounter
+    repeats: false
+    isReferenced: true
+    additionalSegments:
+      - PV2
+      - EVN
+      - MSH

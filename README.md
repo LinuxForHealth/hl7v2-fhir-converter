@@ -7,7 +7,10 @@ Message parsing and modeling is supported using the "HAPI" libraries for [HL7](h
 The converter supports the following message types/events:
 * ADT_A01 - Patient Administration: Admit/Visit Notification
 * ADT_A03 - Patient Administration: Discharge/End Visit  
+* ADT_A04 - Patient Administration: Register a Patient  
 * ADT_A08 - Patient Administration: Update Patient Information
+* ADT_A28 - Patient Administration: Add Person or Patient Information 
+* ADT_A31 - Patient Administration: Update Person Information
 * ADT_A34 - Patient Administration: Merge Patient Information - Patient ID Only
 * ADT_A40 - Patient Administration: Merge Patient - Patient Identifier List
 * DFT_P03 - Post Detail Financial Transaction (does not convert FT1)
