@@ -17,7 +17,7 @@ import org.junit.jupiter.api.Test;
 class Hl7ORMMessageTest {
 
     @Test
-    void testORMO01NoPatientOrderOnly() throws IOException {
+    void testORMO01MinimumOrderOnly() throws IOException {
         String hl7message = "MSH|^~\\&|||||20210407191342||ORM^O01|MSGID_bae9ce6a-e35d-4ff5-8d50-c5dde19cc1aa|T|2.5.1\r"
                 + "ORC|OP|1000|9999999||||^3 times daily^^20210401\r";
 
@@ -32,7 +32,7 @@ class Hl7ORMMessageTest {
     }
 
     @Test
-    void testORMO01NoPatientOrderPlusDetail() throws IOException {
+    void testORMO01OrderWithDetail() throws IOException {
         String hl7message = "MSH|^~\\&|||||20210407191342||ORM^O01|MSGID_bae9ce6a-e35d-4ff5-8d50-c5dde19cc1aa|T|2.5.1\r"
                 + "ORC|OP|1000|9999999||||^3 times daily^^20210401\r"
                 + "RXO|50111032701^hydrALAZINE HCl 25 MG Oral Tablet^NDC^^^^^^hydrALAZINE (APRESOLINE) 25 MG TABS|||||||||||||||||||||||\r";
@@ -51,7 +51,7 @@ class Hl7ORMMessageTest {
     }
 
     @Test
-    void testORMO01PatientOrderPlusDetail() throws IOException {
+    void testORMO01MinimumPatientAndOrderWithDetail() throws IOException {
         String hl7message = "MSH|^~\\&|||||20210407191342||ORM^O01|MSGID_bae9ce6a-e35d-4ff5-8d50-c5dde19cc1aa|T|2.5.1\r"
                 + "PID|||1234^^^^MR||DOE^JANE^|||F|||||||||||||||||||||\r"
                 + "ORC|OP|1000|9999999||||^3 times daily^^20210401\r"
@@ -74,7 +74,7 @@ class Hl7ORMMessageTest {
     }
 
     @Test
-    void testORMO01PatientEncounterInsuranceOrder() throws IOException {
+    void testORMO01PatientWithVisitWithInsuranceAndOrder() throws IOException {
         String hl7message = "MSH|^~\\&|WHI_LOAD_GENERATOR|IBM_TORONTO_LAB|IBMWATSON_LAB|IBM|20210407191758||ORM^O01|MSGID_e30a3471-7afd-4aa2-a3d5-e93fd89d24b3|T|2.3\n"
                 + "PID|1||0a1f7838-4230-4752-b8f6-948b07c38b25^^^MRN||Patient^Load^Generator||19690720|M|Patient^Alias^Generator||9999^^CITY^STATE^ZIP^CAN|COUNTY|(866)845-0900|||||Account_0a1f7838-4230-4752-b8f6-948b07c38b25|123-456-7890||||BIRTH PLACE\n"
                 + "PV1||IP|^^^Toronto^^5642 Hilly Av||||2905^Doctor^Attending^M^IV^^M.D|5755^Doctor^Referring^^Sr|770542^Doctor^Consulting^Jr||||||||59367^Doctor^Admitting|IP^I|Visit_0a1f7838-4230-4752-b8f6-948b07c38b25|||||||||||||||||||||||||20210407191758\n"
@@ -114,7 +114,7 @@ class Hl7ORMMessageTest {
     }
 
     @Test
-    void testORMO01PatientWithPatientVisitMultipleInsuranceOrder() throws IOException {
+    void testORMO01PatientWithVisitWithMultipleInsuranceAndOrder() throws IOException {
         String hl7message = "MSH|^~\\&|||||20210407191342||ORM^O01|MSGID_bae9ce6a-e35d-4ff5-8d50-c5dde19cc1aa|T|2.5.1\r"
                 + "PID|||1234^^^^MR||DOE^JANE^|||F|||||||||||||||||||||\r"
                 + "PV1||I|||||||||||||||||1400|||||||||||||||||||||||||199501102300\r"
@@ -158,7 +158,7 @@ class Hl7ORMMessageTest {
     }
 
     @Test
-    void testORMO01PatientWithPatientVisitSingleInsuranceMultipleAllergyOrder() throws IOException {
+    void testORMO01PatientWithVisitWithSingleInsuranceWithMultipleAllergyAndOrder() throws IOException {
         String hl7message = "MSH|^~\\&|||||20210407191342||ORM^O01|MSGID_bae9ce6a-e35d-4ff5-8d50-c5dde19cc1aa|T|2.5.1\r"
                 + "PID|||1234^^^^MR||DOE^JANE^|||F|||||||||||||||||||||\r"
                 + "PD1|||||||||||01|N||||A\r"
@@ -205,7 +205,7 @@ class Hl7ORMMessageTest {
     }
 
     @Test
-    void testORMO01NoPatientOrderWithMultipleObservationsWithOBXnonTX() throws IOException {
+    void testORMO01OrderWithMultipleObservationsWithOBXnonTX() throws IOException {
         String hl7message = "MSH|^~\\&|||||20210407191342||ORM^O01|MSGID_bae9ce6a-e35d-4ff5-8d50-c5dde19cc1aa|T|2.5.1\r"
                 //1st order
                 + "ORC|OP|1000|9999999||||^3 times daily^^20210401\r"
@@ -235,7 +235,7 @@ class Hl7ORMMessageTest {
     }
 
     @Test
-    void testORMO01PatientOrderWithMultipleObservationsWithOBXnonTX() throws IOException {
+    void testORMO01PatientAndOrderWithMultipleObservationsWithOBXnonTX() throws IOException {
         String hl7message = "MSH|^~\\&|||||20210407191342||ORM^O01|MSGID_bae9ce6a-e35d-4ff5-8d50-c5dde19cc1aa|T|2.5.1\r"
                 + "PID|||1234^^^^MR||DOE^JANE^|||F|||||||||||||||||||||\r" //Even though PID is optional, I had to provide it in order to get results from the converter
                 //1st order
@@ -269,7 +269,7 @@ class Hl7ORMMessageTest {
     }
 
     @Test
-    void testORMO01NoPatientOrderWithMultipleObservationsWithOBXtypeTX() throws IOException {
+    void testORMO01OrderWithMultipleObservationsWithOBXtypeTX() throws IOException {
         String hl7message = "MSH|^~\\&|||||20210407191342||ORM^O01|MSGID_bae9ce6a-e35d-4ff5-8d50-c5dde19cc1aa|T|2.5.1\r"
                 // first order group
                 + "ORC|OP|1000|9999999||||^3 times daily^^20210401\r"
@@ -299,7 +299,7 @@ class Hl7ORMMessageTest {
     }
 
     @Test
-    void testORMO01PatientOrderWithMultipleObservationsWithOBXtypeTX() throws IOException {
+    void testORMO01PatientAndOrderWithMultipleObservationsWithOBXtypeTX() throws IOException {
         String hl7message = "MSH|^~\\&|||||20210407191342||ORM^O01|MSGID_bae9ce6a-e35d-4ff5-8d50-c5dde19cc1aa|T|2.5.1\r"
                 + "PID|||1234^^^^MR||DOE^JANE^|||F|||||||||||||||||||||\r" //Even though PID is optional, I had to provide it in order to get results from the converter
                 // first order group
@@ -333,7 +333,7 @@ class Hl7ORMMessageTest {
     }
 
     @Test
-    void testORMO01PatientMultipleInsuranceMultipleOrdersWithAndWithoutOBXtypeTX() throws IOException {
+    void testORMO01PatientWithMultipleInsuranceAndMultipleOrdersWithAndWithoutOBXtypeTX() throws IOException {
         String hl7message = "MSH|^~\\&|||||20210407191342||ORM^O01|MSGID_bae9ce6a-e35d-4ff5-8d50-c5dde19cc1aa|T|2.5.1\r"
                 + "PID|||1234^^^^MR||DOE^JANE^|||F|||||||||||||||||||||\r"
                 // Minimal Insurance 1. Minimal Organization for Payor, which is required. IN2.72 creates a RelatedPerson.
