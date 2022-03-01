@@ -35,6 +35,16 @@ resources:
       - MSH
       - ORDER_DETAIL.OBSERVATION.OBX
 
+  - resourceName: Coverage
+    segment: .IN1
+    group: PATIENT.INSURANCE
+    resourcePath: resource/Coverage
+    repeats: true
+    additionalSegments:
+      - MSH
+      - PATIENT.PATIENT_VISIT.PV1
+      - .IN2            
+
   - resourceName: MedicationRequest
     segment: .RXO
     resourcePath: resource/MedicationRequest
@@ -66,4 +76,3 @@ resources:
       - .ORC
       - MSH
       - .OBSERVATION.NTE 
- 

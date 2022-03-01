@@ -33,6 +33,16 @@ resources:
       - .PID
       - .PATIENT_VISIT.PV2
       - MSH
+
+  - resourceName: Coverage
+    segment: .IN1
+    group: PATIENT.INSURANCE
+    resourcePath: resource/Coverage
+    repeats: true
+    additionalSegments:
+      - MSH
+      - PATIENT.PATIENT_VISIT.PV1
+      - .IN2            
       
   - resourceName: AllergyIntolerance
     segment: PATIENT.AL1
