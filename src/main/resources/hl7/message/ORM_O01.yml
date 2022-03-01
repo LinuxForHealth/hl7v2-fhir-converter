@@ -1,5 +1,5 @@
 #
-# (C) Copyright IBM Corp. 2021
+# (C) Copyright IBM Corp. 2021, 2022
 #
 # SPDX-License-Identifier: Apache-2.0
 #
@@ -108,12 +108,3 @@ resources:
       - MSH
       - PATIENT.PID
 
-  # - resourceName: Coverage
-  #   segment: PATIENT.INSURANCE.IN1
-  #   # group: PATIENT
-  #   resourcePath: resource/Coverage
-  #   repeats: true
-  #   additionalSegments:
-  #     - MSH
-  #     - PATIENT.PATIENT_VISIT.PV1
-  #     - PATIENT.INSURANCE.IN2

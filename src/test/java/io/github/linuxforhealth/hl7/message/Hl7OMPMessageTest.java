@@ -20,7 +20,7 @@ import io.github.linuxforhealth.hl7.segments.util.ResourceUtils;
 class Hl7OMPMessageTest {
 
     @Test
-    void test_OMPO09_min_PATIENT_and_min_ORDER_groups() throws IOException {
+    void testOMPO09MinimumPatientAndMinimumOrderGroups() throws IOException {
         String hl7message = "MSH|^~\\&|WHI_LOAD_GENERATOR|IBM_TORONTO_LAB|MEDORDER|IBM|20210407191342|9022934|OMP^O09|MSGID_bae9ce6a-e35d-4ff5-8d50-c5dde19cc1aa|T|2.5.1\r"
                 + "PID|||1234^^^^MR||DOE^JANE^|||F|||||||||||||||||||||\r"
                 + "ORC|OP|1000|9999999||||^3 times daily^^20210401\r"
@@ -40,10 +40,18 @@ class Hl7OMPMessageTest {
     }
 
     @Test
-    void test_OMPO09_PATIENT_with_PATIENT_VISIT_and_min_ORDER_groups() throws IOException {
+    void testOMPO09PatientWithPatientVisitAndMultipleInsuranceAndMinimumOrderGroups() throws IOException {
         String hl7message = "MSH|^~\\&|WHI_LOAD_GENERATOR|IBM_TORONTO_LAB|MEDORDER|IBM|20210407191342|9022934|OMP^O09|MSGID_bae9ce6a-e35d-4ff5-8d50-c5dde19cc1aa|T|2.5.1\r"
                 + "PID|||1234^^^^MR||DOE^JANE^|||F|||||||||||||||||||||\r"
                 + "PV1||I|||||||||||||||||1400|||||||||||||||||||||||||199501102300\r"
+                // Minimal Insurance 1. Minimal Organization for Payor, which is required.
+                + "IN1|1|Value1^^System3^Value4^^System6|IdValue1^^^IdSystem4^^^^|Large Blue Organization|||||||||||\n"
+                // IN2.72 creates a RelatedPerson,
+                + "IN2||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||04|\n"
+                // Minimal Insurance 2.  Minimal Organization for Payor, which is required.
+                + "IN1|1|Value1b^^System3b^Value4b^^System6b|IdValue1b^^^IdSystem4b^^^^|Large Green Organization|||||||||||\n"
+                // IN2.72 creates a RelatedPerson,
+                + "IN2||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||04|\n"
                 + "ORC|OP|1000|9999999||||^3 times daily^^20210401\r"
                 + "RXO|50111032701^hydrALAZINE HCl 25 MG Oral Tablet^NDC^^^^^^hydrALAZINE (APRESOLINE) 25 MG TABS|||||||||||||||||||||||\r";
 
@@ -58,13 +66,22 @@ class Hl7OMPMessageTest {
         List<Resource> medicationRequestResource = ResourceUtils.getResourceList(e, ResourceType.MedicationRequest);
         assertThat(medicationRequestResource).hasSize(1);
 
+        List<Resource> coverages = ResourceUtils.getResourceList(e, ResourceType.Coverage);
+        assertThat(coverages).hasSize(2); //from INSURANCE.IN1 2x
+
+        List<Resource> organizationResource = ResourceUtils.getResourceList(e, ResourceType.Organization);
+        assertThat(organizationResource).hasSize(2); //from INSURANCE.IN1 2x
+
+        List<Resource> relatedResource = ResourceUtils.getResourceList(e, ResourceType.RelatedPerson);
+        assertThat(relatedResource).hasSize(2); //from INSURANCE.IN1 2x
+
         // Confirm that there are no extra resources created
-        assertThat(e).hasSize(3);
+        assertThat(e).hasSize(9);
 
     }
 
     @Test
-    void test_OMPO09_full_PATIENT_with_PATIENT_VISIT_and_INSURANCE_and_min_ORDER_groups() throws IOException {
+    void testOMPO09FullPatientWithPatientVisitAndInsuranceAndMinimumOrderGroups() throws IOException {
         String hl7message = "MSH|^~\\&|WHI_LOAD_GENERATOR|IBM_TORONTO_LAB|MEDORDER|IBM|20210407191342|9022934|OMP^O09|MSGID_bae9ce6a-e35d-4ff5-8d50-c5dde19cc1aa|T|2.5.1\r"
                 + "PID|||1234^^^^MR||DOE^JANE^|||F|||||||||||||||||||||\r"
                 + "PD1|||||||||||01|N||||A\r"
@@ -108,7 +125,7 @@ class Hl7OMPMessageTest {
     }
 
     @Test
-    void test_OMPO09_ORDER_with_multiple_OBSERVATIONS_with_OBXnonTX() throws IOException {
+    void testOMPO09OrderWithMultipleObservationsWithOBXnonTX() throws IOException {
         String hl7message = "MSH|^~\\&|WHI_LOAD_GENERATOR|IBM_TORONTO_LAB|MEDORDER|IBM|20210407191342|9022934|OMP^O09|MSGID_bae9ce6a-e35d-4ff5-8d50-c5dde19cc1aa|T|2.5.1\r"
                 + "PID|||1234^^^^MR||DOE^JANE^|||F|||||||||||||||||||||\r" //Even though PID is optional, I had to provide it in order to get results from the converter
                 //1st order
@@ -139,7 +156,7 @@ class Hl7OMPMessageTest {
     }
 
     @Test
-    void test_OMPO09_ORDER_with_multiple_OBSERVATIONS_with_OBXtypeTX() throws IOException {
+    void testOMPO09OrderWithMultipleObservationsWithOBXtypeTX() throws IOException {
         String hl7message = "MSH|^~\\&|WHI_LOAD_GENERATOR|IBM_TORONTO_LAB|MEDORDER|IBM|20210407191342|9022934|OMP^O09|MSGID_bae9ce6a-e35d-4ff5-8d50-c5dde19cc1aa|T|2.5.1\r"
                 + "PID|||1234^^^^MR||DOE^JANE^|||F|||||||||||||||||||||\r" //Even though PID is optional, I had to provide it in order to get results from the converter
                 + "ORC|OP|1000|9999999||||^3 times daily^^20210401\r"
@@ -169,7 +186,7 @@ class Hl7OMPMessageTest {
     }
 
     @Test
-    void test_OMPO09_with_multiple_ORDERs_with_and_without_OBXtypeTX() throws IOException {
+    void testOMPO09withMultipleOrdersWithAndWithoutOBXtypeTX() throws IOException {
         String hl7message = "MSH|^~\\&|WHI_LOAD_GENERATOR|IBM_TORONTO_LAB|MEDORDER|IBM|20210407191342|9022934|OMP^O09|MSGID_bae9ce6a-e35d-4ff5-8d50-c5dde19cc1aa|T|2.5.1\r"
                 + "PID|||1234^^^^MR||DOE^JANE^|||F|||||||||||||||||||||\r" //Even though PID is optional, I had to provide it in order to get results from the converter
                 // first order group
