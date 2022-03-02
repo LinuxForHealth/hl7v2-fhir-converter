@@ -6,225 +6,209 @@
 package io.github.linuxforhealth.hl7.segments;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import java.util.List;
-
-import org.hl7.fhir.r4.model.StringType;
-import org.hl7.fhir.r4.model.Patient;
-import org.hl7.fhir.r4.model.Address;
-import org.hl7.fhir.r4.model.Period;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
+import org.hl7.fhir.r4.model.Address;
+import org.hl7.fhir.r4.model.Patient;
+import org.hl7.fhir.r4.model.Period;
+import org.hl7.fhir.r4.model.StringType;
 import org.junit.jupiter.api.Test;
 
+import io.github.linuxforhealth.hl7.HL7ToFHIRConverter;
 import io.github.linuxforhealth.hl7.segments.util.PatientUtils;
 
 class Hl7AddressFHIRConversionTest {
+    private HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
 
-  @Test
-  void patient_address_extended_test() {
+    @Test
+    void patient_address_extended_test() {
 
-    String patientAddress =
-    "MSH|^~\\&|MIICEHRApplication|MIIC|MIIC|MIIC|201705130822||VXU^V04^VXU_V04|test1100|P|2.5.1|||AL|AL|||||Z22^CDCPHINVS|^^^^^MIIC^SR^^^MIIC|MIIC\n"
-    + "PID|1||12345678^^^^MR|ALTID|Moose^Mickey^J^III^^^|Mother^Micky|20060504|M|Alias^Alias|2106-3^White^ HL70005|111 1st Street^Suite #1^Minneapolis^MN^11111^USA^H^^AdrC^^^20010101&20081231^^^^Y^Z^V^c/o Pluto19|PatC|^PRN^^^PH^555^5555555|^PRN^^^PH^555^666666|english|married|bhuddist|1234567_account|111-22-3333|||2186-5^not Hispanic or Latino^CDCREC|Born in USA|||USA||||\n"
-    ;
+        String patientAddress = "MSH|^~\\&|MIICEHRApplication|MIIC|MIIC|MIIC|201705130822||VXU^V04^VXU_V04|test1100|P|2.5.1|||AL|AL|||||Z22^CDCPHINVS|^^^^^MIIC^SR^^^MIIC|MIIC\n"
+                + "PID|1||12345678^^^^MR|ALTID|Moose^Mickey^J^III^^^|Mother^Micky|20060504|M|Alias^Alias|2106-3^White^ HL70005|111 1st Street^Suite #1^Minneapolis^MN^11111^USA^H^^AdrC^^^20010101&20081231^^^^Y^Z^V^c/o Pluto19|PatC|^PRN^^^PH^555^5555555|^PRN^^^PH^555^666666|english|married|bhuddist|1234567_account|111-22-3333|||2186-5^not Hispanic or Latino^CDCREC|Born in USA|||USA||||\n";
 
-    Patient patient = PatientUtils.createPatientFromHl7Segment(patientAddress);
-    assertThat(patient.hasAddress()).isTrue();
-    List<Address> addresses = patient.getAddress(); 
-    assertThat(addresses.size()).isEqualTo(1);
-    Address address = addresses.get(0); 
+        Patient patient = PatientUtils.createPatientFromHl7Segment(ftv, patientAddress);
+        assertThat(patient.hasAddress()).isTrue();
+        List<Address> addresses = patient.getAddress();
+        assertThat(addresses.size()).isEqualTo(1);
+        Address address = addresses.get(0);
 
-    assertThat(address.getDistrict()).isEqualTo("AdrC");
-    assertThat(address.getCity()).isEqualTo("Minneapolis"); 
-    assertThat(address.getState()).isEqualTo("MN"); 
-    assertThat(address.getCountry()).isEqualTo("USA"); 
-    assertThat(address.getPostalCode()).isEqualTo("11111"); 
-    
-    List<StringType> lines = address.getLine();
-    assertThat(lines.size()).isEqualTo(3);
-    assertThat(lines.get(0).toString()).hasToString("111 1st Street");
-    assertThat(lines.get(1).toString()).hasToString("Suite #1");
-    assertThat(lines.get(2).toString()).hasToString("c/o Pluto19");
+        assertThat(address.getDistrict()).isEqualTo("AdrC");
+        assertThat(address.getCity()).isEqualTo("Minneapolis");
+        assertThat(address.getState()).isEqualTo("MN");
+        assertThat(address.getCountry()).isEqualTo("USA");
+        assertThat(address.getPostalCode()).isEqualTo("11111");
 
-    assertThat(address.hasUse()).isTrue(); 
-    assertThat(address.getUse()).isEqualTo(Address.AddressUse.TEMP);
-    assertThat(address.getType()).isEqualTo(Address.AddressType.PHYSICAL);
+        List<StringType> lines = address.getLine();
+        assertThat(lines.size()).isEqualTo(3);
+        assertThat(lines.get(0).toString()).hasToString("111 1st Street");
+        assertThat(lines.get(1).toString()).hasToString("Suite #1");
+        assertThat(lines.get(2).toString()).hasToString("c/o Pluto19");
 
-  }
+        assertThat(address.hasUse()).isTrue();
+        assertThat(address.getUse()).isEqualTo(Address.AddressUse.TEMP);
+        assertThat(address.getType()).isEqualTo(Address.AddressType.PHYSICAL);
 
-  @Test
-  void patient_address_date_ranges_test() {
+    }
 
-    String patientAddress =
-    "MSH|^~\\&|MIICEHRApplication|MIIC|MIIC|MIIC|201705130822||VXU^V04^VXU_V04|test1100|P|2.5.1|||AL|AL|||||Z22^CDCPHINVS|^^^^^MIIC^SR^^^MIIC|MIIC\n"
-    + "PID|1||12345678^^^^MR|ALTID|Moose^Mickey^J^III^^^|Mother^Micky|20060504|M|Alias^Alias|2106-3^White^ HL70005|111 1st Street^Suite #1^Minneapolis^MN^11111^USA^H^^AdrC^^^20010101&20081231^^^^Y^Z^V^c/o Pluto19|PatC|^PRN^^^PH^555^5555555|^PRN^^^PH^555^666666|english|married|bhuddist|1234567_account|111-22-3333|||2186-5^not Hispanic or Latino^CDCREC|Born in USA|||USA||||\n"
-    ;
+    @Test
+    void patient_address_date_ranges_test() {
 
-    String patientAddressExplicitEffectiveExpirationDates =
-    "MSH|^~\\&|MIICEHRApplication|MIIC|MIIC|MIIC|201705130822||VXU^V04^VXU_V04|test1100|P|2.5.1|||AL|AL|||||Z22^CDCPHINVS|^^^^^MIIC^SR^^^MIIC|MIIC\n"
-    + "PID|1||12345678^^^^MR|ALTID|Moose^Mickey^J^III^^^|Mother^Micky|20060504|M|Alias^Alias|2106-3^White^ HL70005|111 1st Street^Suite #1^Minneapolis^MN^11111^USA^H^^AdrC^^^20010101&20081231^19920101^19981231^^Y^Z^V^c/o Pluto19|PatC|^PRN^^^PH^555^5555555|^PRN^^^PH^555^666666|english|married|bhuddist|1234567_account|111-22-3333|||2186-5^not Hispanic or Latino^CDCREC|Born in USA|||USA||||\n"
-    ;
+        String patientAddress = "MSH|^~\\&|MIICEHRApplication|MIIC|MIIC|MIIC|201705130822||VXU^V04^VXU_V04|test1100|P|2.5.1|||AL|AL|||||Z22^CDCPHINVS|^^^^^MIIC^SR^^^MIIC|MIIC\n"
+                + "PID|1||12345678^^^^MR|ALTID|Moose^Mickey^J^III^^^|Mother^Micky|20060504|M|Alias^Alias|2106-3^White^ HL70005|111 1st Street^Suite #1^Minneapolis^MN^11111^USA^H^^AdrC^^^20010101&20081231^^^^Y^Z^V^c/o Pluto19|PatC|^PRN^^^PH^555^5555555|^PRN^^^PH^555^666666|english|married|bhuddist|1234567_account|111-22-3333|||2186-5^not Hispanic or Latino^CDCREC|Born in USA|||USA||||\n";
 
-    // If address county, ignore patient county
-    Patient patient = PatientUtils.createPatientFromHl7Segment(patientAddress);
-    assertThat(patient.hasAddress()).isTrue();
-    List<Address> addresses = patient.getAddress(); 
-    assertThat(addresses.size()).isEqualTo(1);
-    Address address = addresses.get(0); 
+        String patientAddressExplicitEffectiveExpirationDates = "MSH|^~\\&|MIICEHRApplication|MIIC|MIIC|MIIC|201705130822||VXU^V04^VXU_V04|test1100|P|2.5.1|||AL|AL|||||Z22^CDCPHINVS|^^^^^MIIC^SR^^^MIIC|MIIC\n"
+                + "PID|1||12345678^^^^MR|ALTID|Moose^Mickey^J^III^^^|Mother^Micky|20060504|M|Alias^Alias|2106-3^White^ HL70005|111 1st Street^Suite #1^Minneapolis^MN^11111^USA^H^^AdrC^^^20010101&20081231^19920101^19981231^^Y^Z^V^c/o Pluto19|PatC|^PRN^^^PH^555^5555555|^PRN^^^PH^555^666666|english|married|bhuddist|1234567_account|111-22-3333|||2186-5^not Hispanic or Latino^CDCREC|Born in USA|||USA||||\n";
 
-      // Test date range
-    Period period = address.getPeriod();
-    assertThat(period.hasStart()).isTrue();
-    assertThat(period.hasEnd()).isTrue(); 
+        // If address county, ignore patient county
+        Patient patient = PatientUtils.createPatientFromHl7Segment(ftv, patientAddress);
+        assertThat(patient.hasAddress()).isTrue();
+        List<Address> addresses = patient.getAddress();
+        assertThat(addresses.size()).isEqualTo(1);
+        Address address = addresses.get(0);
 
-    Date startDate = period.getStart();
-    Calendar startCalendar = Calendar.getInstance();
-    startCalendar.setTime(startDate);
-    assertThat(startCalendar.get(Calendar.YEAR)).isEqualTo(2001);
-    assertThat(startCalendar.get(Calendar.MONTH)).isZero(); // Zero based; January is 0
-    assertThat(startCalendar.get(Calendar.DAY_OF_MONTH)).isEqualTo(1);
+        // Test date range
+        Period period = address.getPeriod();
+        assertThat(period.hasStart()).isTrue();
+        assertThat(period.hasEnd()).isTrue();
 
-    Date endDate = period.getEnd();
-    Calendar endCalendar = Calendar.getInstance();
-    endCalendar.setTime(endDate);
-    assertThat(endCalendar.get(Calendar.YEAR)).isEqualTo(2008);
-    assertThat(endCalendar.get(Calendar.MONTH)).isEqualTo(11); // Zero based; December is 11
-    assertThat(endCalendar.get(Calendar.DAY_OF_MONTH)).isEqualTo(31);
+        Date startDate = period.getStart();
+        Calendar startCalendar = Calendar.getInstance();
+        startCalendar.setTime(startDate);
+        assertThat(startCalendar.get(Calendar.YEAR)).isEqualTo(2001);
+        assertThat(startCalendar.get(Calendar.MONTH)).isZero(); // Zero based; January is 0
+        assertThat(startCalendar.get(Calendar.DAY_OF_MONTH)).isEqualTo(1);
 
-    // Test explicit date start (effective) and end (expiration)
-    patient = PatientUtils.createPatientFromHl7Segment(patientAddressExplicitEffectiveExpirationDates);
-    assertThat(patient.hasAddress()).isTrue();
-    addresses = patient.getAddress(); 
-    assertThat(addresses.size()).isEqualTo(1);
-    address = addresses.get(0); 
+        Date endDate = period.getEnd();
+        Calendar endCalendar = Calendar.getInstance();
+        endCalendar.setTime(endDate);
+        assertThat(endCalendar.get(Calendar.YEAR)).isEqualTo(2008);
+        assertThat(endCalendar.get(Calendar.MONTH)).isEqualTo(11); // Zero based; December is 11
+        assertThat(endCalendar.get(Calendar.DAY_OF_MONTH)).isEqualTo(31);
 
-    period = address.getPeriod();
-    assertThat(period.hasStart()).isTrue();
-    assertThat(period.hasEnd()).isTrue(); 
+        // Test explicit date start (effective) and end (expiration)
+        patient = PatientUtils.createPatientFromHl7Segment(ftv, patientAddressExplicitEffectiveExpirationDates);
+        assertThat(patient.hasAddress()).isTrue();
+        addresses = patient.getAddress();
+        assertThat(addresses.size()).isEqualTo(1);
+        address = addresses.get(0);
 
-    startDate = period.getStart();
-    startCalendar = Calendar.getInstance();
-    startCalendar.setTime(startDate);
-    assertThat(startCalendar.get(Calendar.YEAR)).isEqualTo(1992);
-    assertThat(startCalendar.get(Calendar.MONTH)).isZero(); // Zero based; January is 0
-    assertThat(startCalendar.get(Calendar.DAY_OF_MONTH)).isEqualTo(1);
+        period = address.getPeriod();
+        assertThat(period.hasStart()).isTrue();
+        assertThat(period.hasEnd()).isTrue();
 
-    endDate = period.getEnd();
-    endCalendar = Calendar.getInstance();
-    endCalendar.setTime(endDate);
-    assertThat(endCalendar.get(Calendar.YEAR)).isEqualTo(1998);
-    assertThat(endCalendar.get(Calendar.MONTH)).isEqualTo(11); // Zero based; December is 11
-    assertThat(endCalendar.get(Calendar.DAY_OF_MONTH)).isEqualTo(31);
-   
-  }
+        startDate = period.getStart();
+        startCalendar = Calendar.getInstance();
+        startCalendar.setTime(startDate);
+        assertThat(startCalendar.get(Calendar.YEAR)).isEqualTo(1992);
+        assertThat(startCalendar.get(Calendar.MONTH)).isZero(); // Zero based; January is 0
+        assertThat(startCalendar.get(Calendar.DAY_OF_MONTH)).isEqualTo(1);
 
-  @Test
-  // District / County conversion testing is unique because it behaves differently when there are multiple addresses
-  // Use these tests to also test multiple addresses 
-  // See Hl7RelatedGeneralUtils.getAddressDistrict for details on when district and county apply.
-  void patient_address_district_and_multiple_address_conversion_test() {
+        endDate = period.getEnd();
+        endCalendar = Calendar.getInstance();
+        endCalendar.setTime(endDate);
+        assertThat(endCalendar.get(Calendar.YEAR)).isEqualTo(1998);
+        assertThat(endCalendar.get(Calendar.MONTH)).isEqualTo(11); // Zero based; December is 11
+        assertThat(endCalendar.get(Calendar.DAY_OF_MONTH)).isEqualTo(31);
 
-    // When there is no county XAD.9 in the address, and there is only one address, use the PID county.
-    String patientSingleAddressYesAddressCountyNoPatientCounty =
-    "MSH|^~\\&|MIICEHRApplication|MIIC|MIIC|MIIC|201705130822||VXU^V04^VXU_V04|test1100|P|2.5.1|||AL|AL|||||Z22^CDCPHINVS|^^^^^MIIC^SR^^^MIIC|MIIC\n"
-    + "PID|1||12345678^^^^MR|ALTID|Moose^Mickey^J^III^^^|Mother^Micky|20060504|M|Alias^Alias|2106-3^White^ HL70005|111 1st Street^Suite #1^Minneapolis^MN^11111^USA^H^^AdrC^^^20011120&20081120^^^^Y^Z^V^c/o Pluto19||^PRN^^^PH^555^5555555|^PRN^^^PH^555^666666|english|married|bhuddist|1234567_account|111-22-3333|||2186-5^not Hispanic or Latino^CDCREC|Born in USA|||USA||||\n"
-    ;
+    }
 
-    String patientSingleAddressNoAddressCountyNoPatientCounty =
-    "MSH|^~\\&|MIICEHRApplication|MIIC|MIIC|MIIC|201705130822||VXU^V04^VXU_V04|test1100|P|2.5.1|||AL|AL|||||Z22^CDCPHINVS|^^^^^MIIC^SR^^^MIIC|MIIC\n"
-    + "PID|1||12345678^^^^MR|ALTID|Moose^Mickey^J^III^^^|Mother^Micky|20060504|M|Alias^Alias|2106-3^White^ HL70005|111 1st Street^Suite #1^Minneapolis^MN^11111^USA^H^^^^^20011120&20081120^^^^Y^Z^V^c/o Pluto19||^PRN^^^PH^555^5555555|^PRN^^^PH^555^666666|english|married|bhuddist|1234567_account|111-22-3333|||2186-5^not Hispanic or Latino^CDCREC|Born in USA|||USA||||\n"
-    ;
+    @Test
+    // District / County conversion testing is unique because it behaves differently when there are multiple addresses
+    // Use these tests to also test multiple addresses 
+    // See Hl7RelatedGeneralUtils.getAddressDistrict for details on when district and county apply.
+    void patient_address_district_and_multiple_address_conversion_test() {
 
-    String patientSingleAddressYesAddressCountyYesPatientCounty =
-    "MSH|^~\\&|MIICEHRApplication|MIIC|MIIC|MIIC|201705130822||VXU^V04^VXU_V04|test1100|P|2.5.1|||AL|AL|||||Z22^CDCPHINVS|^^^^^MIIC^SR^^^MIIC|MIIC\n"
-    + "PID|1||12345678^^^^MR|ALTID|Moose^Mickey^J^III^^^|Mother^Micky|20060504|M|Alias^Alias|2106-3^White^ HL70005|111 1st Street^Suite #1^Minneapolis^MN^11111^USA^H^^AdrC^^^20011120&20081120^^^^Y^Z^V^c/o Pluto19|PatC|^PRN^^^PH^555^5555555|^PRN^^^PH^555^666666|english|married|bhuddist|1234567_account|111-22-3333|||2186-5^not Hispanic or Latino^CDCREC|Born in USA|||USA||||\n"
-    ;
+        // When there is no county XAD.9 in the address, and there is only one address, use the PID county.
+        String patientSingleAddressYesAddressCountyNoPatientCounty = "MSH|^~\\&|MIICEHRApplication|MIIC|MIIC|MIIC|201705130822||VXU^V04^VXU_V04|test1100|P|2.5.1|||AL|AL|||||Z22^CDCPHINVS|^^^^^MIIC^SR^^^MIIC|MIIC\n"
+                + "PID|1||12345678^^^^MR|ALTID|Moose^Mickey^J^III^^^|Mother^Micky|20060504|M|Alias^Alias|2106-3^White^ HL70005|111 1st Street^Suite #1^Minneapolis^MN^11111^USA^H^^AdrC^^^20011120&20081120^^^^Y^Z^V^c/o Pluto19||^PRN^^^PH^555^5555555|^PRN^^^PH^555^666666|english|married|bhuddist|1234567_account|111-22-3333|||2186-5^not Hispanic or Latino^CDCREC|Born in USA|||USA||||\n";
 
-    String patientSingleAddressNoAddressCountyYesPatientCounty =
-    "MSH|^~\\&|MIICEHRApplication|MIIC|MIIC|MIIC|201705130822||VXU^V04^VXU_V04|test1100|P|2.5.1|||AL|AL|||||Z22^CDCPHINVS|^^^^^MIIC^SR^^^MIIC|MIIC\n"
-    + "PID|1||12345678^^^^MR|ALTID|Moose^Mickey^J^III^^^|Mother^Micky|20060504|M|Alias^Alias|2106-3^White^ HL70005|111 1st Street^Suite #1^Minneapolis^MN^11111^USA^H^^^^^20011120&20081120^^^^Y^Z^V^c/o Pluto19|PatC|^PRN^^^PH^555^5555555|^PRN^^^PH^555^666666|english|married|bhuddist|1234567_account|111-22-3333|||2186-5^not Hispanic or Latino^CDCREC|Born in USA|||USA||||\n"
-    ;
+        String patientSingleAddressNoAddressCountyNoPatientCounty = "MSH|^~\\&|MIICEHRApplication|MIIC|MIIC|MIIC|201705130822||VXU^V04^VXU_V04|test1100|P|2.5.1|||AL|AL|||||Z22^CDCPHINVS|^^^^^MIIC^SR^^^MIIC|MIIC\n"
+                + "PID|1||12345678^^^^MR|ALTID|Moose^Mickey^J^III^^^|Mother^Micky|20060504|M|Alias^Alias|2106-3^White^ HL70005|111 1st Street^Suite #1^Minneapolis^MN^11111^USA^H^^^^^20011120&20081120^^^^Y^Z^V^c/o Pluto19||^PRN^^^PH^555^5555555|^PRN^^^PH^555^666666|english|married|bhuddist|1234567_account|111-22-3333|||2186-5^not Hispanic or Latino^CDCREC|Born in USA|||USA||||\n";
 
-    String patientMultipleAddressOneAddressCountyYesPatientCounty =
-    "MSH|^~\\&|MIICEHRApplication|MIIC|MIIC|MIIC|201705130822||VXU^V04^VXU_V04|test1100|P|2.5.1|||AL|AL|||||Z22^CDCPHINVS|^^^^^MIIC^SR^^^MIIC|MIIC\n"
-    + "PID|1||12345678^^^^MR|ALTID|Moose^Mickey^J^III^^^|Mother^Micky|20060504|M|Alias^Alias|2106-3^White^ HL70005|111 1st Street^Suite #1^Minneapolis^MN^11111^USA^H^^AdrC^^^20011120&20081120^^^^Y^Z^V^c/o Pluto19~222 2nd Ave^Suite #2^Salt Lake City^Utah^22222|PatC|^PRN^^^PH^555^5555555|^PRN^^^PH^555^666666|english|married|bhuddist|1234567_account|111-22-3333|||2186-5^not Hispanic or Latino^CDCREC|Born in USA|||USA||||\n"
-    ;
+        String patientSingleAddressYesAddressCountyYesPatientCounty = "MSH|^~\\&|MIICEHRApplication|MIIC|MIIC|MIIC|201705130822||VXU^V04^VXU_V04|test1100|P|2.5.1|||AL|AL|||||Z22^CDCPHINVS|^^^^^MIIC^SR^^^MIIC|MIIC\n"
+                + "PID|1||12345678^^^^MR|ALTID|Moose^Mickey^J^III^^^|Mother^Micky|20060504|M|Alias^Alias|2106-3^White^ HL70005|111 1st Street^Suite #1^Minneapolis^MN^11111^USA^H^^AdrC^^^20011120&20081120^^^^Y^Z^V^c/o Pluto19|PatC|^PRN^^^PH^555^5555555|^PRN^^^PH^555^666666|english|married|bhuddist|1234567_account|111-22-3333|||2186-5^not Hispanic or Latino^CDCREC|Born in USA|||USA||||\n";
 
-    // If address county, ignore patient county
-    Patient patient = PatientUtils.createPatientFromHl7Segment(patientSingleAddressYesAddressCountyNoPatientCounty);
-    assertThat(patient.hasAddress()).isTrue();
-    List<Address> addresses = patient.getAddress(); 
-    assertThat(addresses.size()).isEqualTo(1);
-    Address address = addresses.get(0); 
-    assertThat(address.getDistrict()).isEqualTo("AdrC"); 
-    
-    // If no address county, and no patient county, = no county
-    patient = PatientUtils.createPatientFromHl7Segment(patientSingleAddressNoAddressCountyNoPatientCounty);
-    assertThat(patient.hasAddress()).isTrue();
-    addresses = patient.getAddress(); 
-    assertThat(addresses.size()).isEqualTo(1);
-    address = addresses.get(0); 
-    assertThat(address.getDistrict()).isNull(); 
+        String patientSingleAddressNoAddressCountyYesPatientCounty = "MSH|^~\\&|MIICEHRApplication|MIIC|MIIC|MIIC|201705130822||VXU^V04^VXU_V04|test1100|P|2.5.1|||AL|AL|||||Z22^CDCPHINVS|^^^^^MIIC^SR^^^MIIC|MIIC\n"
+                + "PID|1||12345678^^^^MR|ALTID|Moose^Mickey^J^III^^^|Mother^Micky|20060504|M|Alias^Alias|2106-3^White^ HL70005|111 1st Street^Suite #1^Minneapolis^MN^11111^USA^H^^^^^20011120&20081120^^^^Y^Z^V^c/o Pluto19|PatC|^PRN^^^PH^555^5555555|^PRN^^^PH^555^666666|english|married|bhuddist|1234567_account|111-22-3333|||2186-5^not Hispanic or Latino^CDCREC|Born in USA|||USA||||\n";
 
-    // If address county, ignore patient county
-    patient = PatientUtils.createPatientFromHl7Segment(patientSingleAddressYesAddressCountyYesPatientCounty);
-    assertThat(patient.hasAddress()).isTrue();
-    addresses = patient.getAddress(); 
-    assertThat(addresses.size()).isEqualTo(1);
-    address = addresses.get(0); 
-    assertThat(address.getDistrict()).isEqualTo("AdrC"); 
+        String patientMultipleAddressOneAddressCountyYesPatientCounty = "MSH|^~\\&|MIICEHRApplication|MIIC|MIIC|MIIC|201705130822||VXU^V04^VXU_V04|test1100|P|2.5.1|||AL|AL|||||Z22^CDCPHINVS|^^^^^MIIC^SR^^^MIIC|MIIC\n"
+                + "PID|1||12345678^^^^MR|ALTID|Moose^Mickey^J^III^^^|Mother^Micky|20060504|M|Alias^Alias|2106-3^White^ HL70005|111 1st Street^Suite #1^Minneapolis^MN^11111^USA^H^^AdrC^^^20011120&20081120^^^^Y^Z^V^c/o Pluto19~222 2nd Ave^Suite #2^Salt Lake City^Utah^22222|PatC|^PRN^^^PH^555^5555555|^PRN^^^PH^555^666666|english|married|bhuddist|1234567_account|111-22-3333|||2186-5^not Hispanic or Latino^CDCREC|Born in USA|||USA||||\n";
 
-    // If no address county, a patient county is present, and EXACTLY one (repeatable) address then Patient County
-    patient = PatientUtils.createPatientFromHl7Segment(patientSingleAddressNoAddressCountyYesPatientCounty);
-    assertThat(patient.hasAddress()).isTrue();
-    addresses = patient.getAddress(); 
-    assertThat(addresses.size()).isEqualTo(1);
-    address = addresses.get(0); 
-    assertThat(address.getDistrict()).isEqualTo("PatC"); 
+        // If address county, ignore patient county
+        Patient patient = PatientUtils.createPatientFromHl7Segment(ftv,
+                patientSingleAddressYesAddressCountyNoPatientCounty);
+        assertThat(patient.hasAddress()).isTrue();
+        List<Address> addresses = patient.getAddress();
+        assertThat(addresses.size()).isEqualTo(1);
+        Address address = addresses.get(0);
+        assertThat(address.getDistrict()).isEqualTo("AdrC");
 
-    // If more than one address, ignore the patient county and use only the address county, if it is present
-    patient = PatientUtils.createPatientFromHl7Segment(patientMultipleAddressOneAddressCountyYesPatientCounty);
-    assertThat(patient.hasAddress()).isTrue();
-    addresses = patient.getAddress(); 
-    assertThat(addresses.size()).isEqualTo(2);
-    address = addresses.get(0); 
-    assertThat(address.getDistrict()).isEqualTo("AdrC"); // Address 1 has a county
-    address = addresses.get(1); 
-    assertThat(address.getDistrict()).isNull(); // Address 2 has no county; result is correctly NOT "PatC"
+        // If no address county, and no patient county, = no county
+        patient = PatientUtils.createPatientFromHl7Segment(ftv, patientSingleAddressNoAddressCountyNoPatientCounty);
+        assertThat(patient.hasAddress()).isTrue();
+        addresses = patient.getAddress();
+        assertThat(addresses.size()).isEqualTo(1);
+        address = addresses.get(0);
+        assertThat(address.getDistrict()).isNull();
 
-    // Check a few other things about the addresses to confirm they are different and correct
-    address = addresses.get(0); 
-    assertThat(address.getCity()).isEqualTo("Minneapolis"); 
-    assertThat(address.getState()).isEqualTo("MN"); 
-    assertThat(address.getCountry()).isEqualTo("USA"); 
-    assertThat(address.getPostalCode()).isEqualTo("11111"); 
-    address = addresses.get(1); 
-    assertThat(address.getCity()).isEqualTo("Salt Lake City"); 
-    assertThat(address.getState()).isEqualTo("Utah"); 
-    assertThat(address.getCountry()).isNull(); 
-    assertThat(address.getPostalCode()).isEqualTo("22222");
-  }
+        // If address county, ignore patient county
+        patient = PatientUtils.createPatientFromHl7Segment(ftv, patientSingleAddressYesAddressCountyYesPatientCounty);
+        assertThat(patient.hasAddress()).isTrue();
+        addresses = patient.getAddress();
+        assertThat(addresses.size()).isEqualTo(1);
+        address = addresses.get(0);
+        assertThat(address.getDistrict()).isEqualTo("AdrC");
 
-  @Test
-  void patient_postal_mail_test() {
+        // If no address county, a patient county is present, and EXACTLY one (repeatable) address then Patient County
+        patient = PatientUtils.createPatientFromHl7Segment(ftv, patientSingleAddressNoAddressCountyYesPatientCounty);
+        assertThat(patient.hasAddress()).isTrue();
+        addresses = patient.getAddress();
+        assertThat(addresses.size()).isEqualTo(1);
+        address = addresses.get(0);
+        assertThat(address.getDistrict()).isEqualTo("PatC");
 
-    String patientAddressWithPostalMail =
-    "MSH|^~\\&|MYEHR2.5|RI88140101|KIDSNET_IFL|RIHEALTH|20130531||VXU^V04^VXU_V04|20130531RI881401010105|P|2.6|||NE|AL||||||RI543763\n"
-    // "M" is postal mail
-    + "PID|1||432155^^^^MR||Patient^Johnny^New^^^^L|Smith^Sally|20130414|M||2106-3^White^HL70005|123 Any St^^Somewhere^WI^54000^^M"
-    ;
-    
-    // If address county, ignore patient county
-    Patient patient = PatientUtils.createPatientFromHl7Segment(patientAddressWithPostalMail);
-    assertThat(patient.hasAddress()).isTrue();
-    List<Address> addresses = patient.getAddress(); 
-    assertThat(addresses.size()).isEqualTo(1);
+        // If more than one address, ignore the patient county and use only the address county, if it is present
+        patient = PatientUtils.createPatientFromHl7Segment(ftv, patientMultipleAddressOneAddressCountyYesPatientCounty);
+        assertThat(patient.hasAddress()).isTrue();
+        addresses = patient.getAddress();
+        assertThat(addresses.size()).isEqualTo(2);
+        address = addresses.get(0);
+        assertThat(address.getDistrict()).isEqualTo("AdrC"); // Address 1 has a county
+        address = addresses.get(1);
+        assertThat(address.getDistrict()).isNull(); // Address 2 has no county; result is correctly NOT "PatC"
 
-    Address address = addresses.get(0); 
-    assertThat(address.getType()).isEqualTo(Address.AddressType.POSTAL); 
+        // Check a few other things about the addresses to confirm they are different and correct
+        address = addresses.get(0);
+        assertThat(address.getCity()).isEqualTo("Minneapolis");
+        assertThat(address.getState()).isEqualTo("MN");
+        assertThat(address.getCountry()).isEqualTo("USA");
+        assertThat(address.getPostalCode()).isEqualTo("11111");
+        address = addresses.get(1);
+        assertThat(address.getCity()).isEqualTo("Salt Lake City");
+        assertThat(address.getState()).isEqualTo("Utah");
+        assertThat(address.getCountry()).isNull();
+        assertThat(address.getPostalCode()).isEqualTo("22222");
+    }
 
-  }
-  
+    @Test
+    void patient_postal_mail_test() {
+
+        String patientAddressWithPostalMail = "MSH|^~\\&|MYEHR2.5|RI88140101|KIDSNET_IFL|RIHEALTH|20130531||VXU^V04^VXU_V04|20130531RI881401010105|P|2.6|||NE|AL||||||RI543763\n"
+                // "M" is postal mail
+                + "PID|1||432155^^^^MR||Patient^Johnny^New^^^^L|Smith^Sally|20130414|M||2106-3^White^HL70005|123 Any St^^Somewhere^WI^54000^^M";
+
+        // If address county, ignore patient county
+        Patient patient = PatientUtils.createPatientFromHl7Segment(ftv, patientAddressWithPostalMail);
+        assertThat(patient.hasAddress()).isTrue();
+        List<Address> addresses = patient.getAddress();
+        assertThat(addresses.size()).isEqualTo(1);
+
+        Address address = addresses.get(0);
+        assertThat(address.getType()).isEqualTo(Address.AddressType.POSTAL);
+
+    }
+
 }

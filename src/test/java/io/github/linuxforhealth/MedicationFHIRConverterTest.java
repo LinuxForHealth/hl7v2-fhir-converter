@@ -16,9 +16,12 @@ import org.hl7.fhir.r4.model.Resource;
 import org.hl7.fhir.r4.model.ResourceType;
 import org.junit.jupiter.api.Test;
 
+import io.github.linuxforhealth.hl7.HL7ToFHIRConverter;
 import io.github.linuxforhealth.hl7.segments.util.ResourceUtils;
 
 class MedicationFHIRConverterTest {
+
+    private HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
 
     // Tests that we create a practitioner from the RXA segment in hl7 message.
     // This uses the Performer resource (specifically actor)
@@ -38,7 +41,7 @@ class MedicationFHIRConverterTest {
                 + "OBX|3|TS|29768-9^DATE VACCINE INFORMATION STATEMENT PUBLISHED^LN|1|20010711||||||F|||20120720101321\r"
                 + "OBX|4|TS|29769-7^DATE VACCINE INFORMATION STATEMENT PRESENTED^LN|1|19901207||||||F|||20140701041038\r";
 
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         // Find the practitioner from the FHIR bundle.
         List<Resource> practitionerResource = e.stream()

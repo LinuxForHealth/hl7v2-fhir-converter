@@ -15,9 +15,12 @@ import org.hl7.fhir.r4.model.Resource;
 import org.hl7.fhir.r4.model.ResourceType;
 import org.junit.jupiter.api.Test;
 
+import io.github.linuxforhealth.hl7.HL7ToFHIRConverter;
 import io.github.linuxforhealth.hl7.segments.util.ResourceUtils;
 
 class IssueFixTest {
+
+    private HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
 
     // Note: test oru_issue_81 has been removed. It is superceded by testBroadORCPlusOBRFields which specifically tests that 
     // DiagnosticReport.issued instant comes from OBR.22    
@@ -38,7 +41,7 @@ class IssueFixTest {
                 + "AL1|1|DRUG|00000741^OXYCODONE||HYPOTENSION\r"
                 + "PRB|AD|200603150625|aortic stenosis|53692||2||200603150625";
 
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
         List<Resource> messageHeaders = ResourceUtils.getResourceList(e, ResourceType.MessageHeader);
         assertThat(messageHeaders).isEmpty();
     }
@@ -56,7 +59,7 @@ class IssueFixTest {
                 + "RXA|0|1|20170512||998^No vaccine given^CVX|999||||||||||||||CP|\n"
                 + "OBX|1|CE|30945-0^contraindication^LN|1|M4^Medical exemption: Influenza^NIP||||||F|||20120916  \n";
 
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7vxu);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7vxu);
         List<Resource> immunizations = ResourceUtils.getResourceList(e, ResourceType.Immunization);
         // Since "RXA|0|1|201501011| " RXA.3 has incorrect date, no immunization resource is generated
         // as occurrenceDateTime is required field and is extracted from RXA.3

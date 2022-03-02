@@ -49,6 +49,7 @@ class Hl7ORUMessageTest {
             .withValidateResource()
             .withPrettyPrint()
             .build();
+    private HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
 
     // DiagnosticReports are only created from ORU messages so the test of DiagnosticReport content is included in this test module.
     // Suppress warnings about too many assertions in a test.  Justification: creating a FHIR message is very costly; we need to check many asserts per creation for efficiency.  
@@ -60,7 +61,7 @@ class Hl7ORUMessageTest {
                 + "PID||45483|45483||SMITH^SUZIE^||20160813|M|||123 MAIN STREET^^SCHENECTADY^NY^12345||(123)456-7890|||||^^^T||||||||||||\r"
                 + "OBR|1||986^IA PHIMS Stage^2.16.840.1.114222.4.3.3.5.1.2^ISO|1051-2^New Born Screening^LN|||20151009173644|||||||||||||002|||||F|||2740^Tsadok^Janetary~2913^Merrit^Darren^F~3065^Mahoney^Paul^J~4723^Loh^Robert^L~9052^Winter^Oscar^|||||\r";
 
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         // Verify correct resources created
         List<Resource> patientResource = ResourceUtils.getResourceList(e, ResourceType.Patient);
@@ -127,7 +128,7 @@ class Hl7ORUMessageTest {
                 + "OBX|1|ST|TS-F-01-002^Endocrine Disorders^L||obs report||||||F\r"
                 + "OBX|2|ST|GA-F-01-024^Galactosemia^L||ECHOCARDIOGRAPHIC REPORT||||||F\r";
 
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         // Verify correct resources created
         List<Resource> patientResource = ResourceUtils.getResourceList(e, ResourceType.Patient);
@@ -217,7 +218,7 @@ class Hl7ORUMessageTest {
                 + "OBR|1||bbf1993ab|1122^Final Echocardiogram Report|||20180520230000|||||||||||||002|||||F|||550469^Tsadok550469^Janetary~660469^Merrit660469^Darren^F~770469^Das770469^Surjya^P~880469^Winter880469^Oscar^||||770469&Das770469&Surjya&P^^^6N^1234^A|\r"
                 + "OBX|1|NM|2552^HRTRTMON|1|115||||||F|||20180520230000|||\r";
 
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         // Verify that the right resources are created
         List<Resource> patientResource = ResourceUtils.getResourceList(e, ResourceType.Patient);
@@ -310,7 +311,7 @@ class Hl7ORUMessageTest {
                 + "OBX|1|CWE|625-4^Bacteria identified in Stool by Culture^LN^^^^2.33^^result1|1|27268008^Salmonella^SCT^^^^20090731^^Salmonella species|||A^A^HL70078^^^^2.5|||P|||20120301|||^^^^^^^^Bacterial Culture||201203140957||||||\r"
                 + "OBX|2|ST|TS-F-01-002^Endocrine Disorders^L||ECHOCARDIOGRAPHIC REPORT Group 2||||||F\r";
 
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         // Verify that the right resources are being created
         List<Resource> patientResource = ResourceUtils.getResourceList(e, ResourceType.Patient);
@@ -433,7 +434,7 @@ class Hl7ORUMessageTest {
                 + "OBX|1|ST|TS-F-01-002^Endocrine Disorders^L||obs report||||||F\r"
                 + "SPM|1|SpecimenID||BLD|||||||P||||||201410060535|201410060821||Y||||||1\r";
 
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         // Verify that the right resources are created
         List<Resource> patientResource = ResourceUtils.getResourceList(e, ResourceType.Patient);
@@ -523,7 +524,6 @@ class Hl7ORUMessageTest {
     @java.lang.SuppressWarnings("squid:S5961")
     @Test
     void test_oru_multipleOBXofDifferentTypes() throws IOException {
-        HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
         String json = ftv.convert(new File("src/test/resources/ORU-multiline-short.hl7"), OPTIONS_PRETTYPRINT);
         assertThat(json).isNotBlank();
         LOGGER.debug("FHIR json result:\n" + json);
@@ -650,8 +650,6 @@ class Hl7ORUMessageTest {
     // Suppress warnings about too many assertions in a test.  Justification: creating a FHIR message is very costly; we need to check many asserts per creation for efficiency.  
     @java.lang.SuppressWarnings("squid:S5961")
     void test_oru_multipleOBXWithMixedType() throws IOException {
-
-        HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
         String json = ftv.convert(new File("src/test/resources/ORU-multiline-short-mixed.hl7"), OPTIONS_PRETTYPRINT);
         assertThat(json).isNotBlank();
         LOGGER.debug("FHIR json result:\n" + json);
@@ -765,7 +763,6 @@ class Hl7ORUMessageTest {
                 + "OBX|2|CWE|20575-7^Hepatitis A virus Ab [Presence] in Serum^LN^HAVAB^Hepatitis A antibodies (anti-HAV)^L^2.52||260385009^Negative (qualifier value)^SCT^NEG^NEGATIVE^L^201509USEd^^Negative (qualifier value)||Negative|N|||F|||20150925|||||201509261400\r"
                 + "OBX|3|NM|22316-4^Hepatitis B virus core Ab [Units/volume] in Serum^LN^HBcAbQ^Hepatitis B core antibodies (anti-HBVc) Quant^L^2.52||0.70|[IU]/mL^international unit per milliliter^UCUM^IU/ml^^L^1.9|<0.50 IU/mL|H|||F|||20150925|||||201509261400";
 
-        HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
         String json = ftv.convert(ORU_r01, OPTIONS);
 
         FHIRContext context = new FHIRContext();
@@ -783,5 +780,45 @@ class Hl7ORUMessageTest {
 
         assertThat(expectStatusUnknown.hasStatus()).isTrue();
         assertThat(status).isEqualTo(DiagnosticReport.DiagnosticReportStatus.UNKNOWN);
+    }
+
+    @Test
+    void test_convert_2_in_row() throws IOException {
+        String ORU_r01 = "MSH|^~\\&|Epic|ATRIUS|||20180924152907|34001|ORU^R01^ORU_R01|213|T|2.6|||||||||PHLabReport-Ack^^2.16.840.1.114222.4.10.3^ISO||\r\n"
+                +
+                "PID|||PID-oru-r01-sample06^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\r\n" +
+                //   "PV1|1|R||||||||||||||||||||||||||||||||||||||||||20180924152707|\r\n" +
+                "ORC|RE|248648498^|248648498^|ML18267-C00001^Beaker||||||||1457352338^TEITLEMAN^CHRISTOPHER^A^MD^^^^^^^^^NPISER||(781)849-2400^^^^^781^8492400|||||||ATRIUS HEALTH, INC^D^^^^POCFULL^XX^^^1020|P.O. BOX 415432^^BOSTON^MA^02241-5432^^B|898-7980^^8^^^800^8987980|111 GROSSMAN DRIVE^^BRAINTREE^MA^02184^USA^C^^NORFOLK|||||||\r\n"
+                +
+                "OBR|1|248648498^|248648498^|83036E^HEMOGLOBIN A1C^PACSEAP^^^^^^HEMOGLOBIN A1C|||20180924152700||||L||E11.9^Type 2 diabetes mellitus without complications^ICD-10-CM^^^^^^Type 2 diabetes mellitus without complications|||1457352338^TEITLEMAN^CHRISTOPHER^A^MD^^^^^^^^^NPISER|(781)849-2400^^^^^781^8492400|||||20180924152900|||F|||||||&Roache&Gerard&&||||||||||||||||||\r\n"
+                +
+                "TQ1|1||||||20180924152721|20180924235959|R\r\n" +
+                "OBX|1|NM|17985^GLYCOHEMOGLOBIN HGB A1C^LRR^^^^^^GLYCOHEMOGLOBIN HGB A1C||5.6|%|<6.0||||F|||20180924152700||9548^ROACHE^GERARD^^|||20180924152903||||HVMA DEPARTMENT OF PATHOLOGY AND LAB MEDICINE^D|152 SECOND AVE^^NEEDHAM^MA^02494-2809^^B|\r\n"
+                +
+                "OBX|2|NM|17853^MEAN BLOOD GLUCOSE^LRR^^^^^^MEAN BLOOD GLUCOSE||114.02|mg/dL|||||F|||20180924152700||9548^ROACHE^GERARD^^|||20180924152903||||HVMA DEPARTMENT OF PATHOLOGY AND LAB MEDICINE^D|152 SECOND AVE^^NEEDHAM^MA^02494-2809^^B|\r\n";
+
+        String json = ftv.convert(ORU_r01, OPTIONS);
+
+        String ORU_r01_2 = "MSH|^~\\&|PHIMS^2.16.840.1.114222.4.3.3.5.1.2^ISO|IA_Public_Health_Lab^2.16.840.1.114222.4.1.10411^ISO|IA.DOH.IDSS^2.16.840.1.114222.4.3.3.19^ISO|IA DOH^2.16.840.1.114222.4.1.3650^ISO|201203142359||ORU^R01^ORU_R01|2.16.840.1.114222.4.3.3.5.1.2-20120314235954.325|T|2.6|||AL|NE|USA||||PHLabReport-Ack^^2.16.840.1.113883.9.10^ISO\r\n"
+                +
+                "PID|||PID-oru-r01-sample09^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\r\n" +
+                "ORC|RE||986^PHIMS^2.16.840.1.114222.4.3.3.5.1.2^ISO||A|||||||^SAWYER^TOM^^^^MD^^^^^^^^L|||||||||MISSOURI DEPARTMENT OF HEALTH LABORATORY -MISSOURI DEPARTMENT OF HEALTH LABORATORY^L|307 W MCCARTY ST^^JEFFERSON CITY^MO^65101^USA^B|^WPN^PH^^1^^5555555\r\n"
+                +
+                "OBR|1||986^PHIMS^2.16.840.1.114222.4.3.3.5.1.2^ISO|625-4^Bacteria identified in Stool by Culture^LN^^^^2.33^^Enteric Culture|||20120301|||||||||^SAWYER TOM MD^^^^^^^^L||||||201203140957|||P\r\n"
+                +
+                "OBX|1|CWE|625-4^Bacteria identified in Stool by Culture^LN^^^^2.33^^result1|1|27268008^Salmonella^SCT^^^^20090731^^Salmonella species|||A^A^HL70078^^^^2.5|||P|||20120301|||^^^^^^^^Bacterial Culture||201203140957||||State Hygienic Laboratory^L^^^^IA Public Health Lab&2.16.840.1.114222.4.1.10411&ISO^FI^^^16D0648109|State Hygienic Laboratory^UIResearch Park -Coralville^Iowa City^IA^52242-5002^USA^B^^19103|^Atchison^Christopher^^^^^^^L\r\n";
+
+        String json2 = ftv.convert(ORU_r01_2, OPTIONS_PRETTYPRINT);
+
+        System.out.println(json2);
+
+        FHIRContext context2 = new FHIRContext();
+        IBaseResource bundleResource2 = context2.getParser().parseResource(json2);
+        assertThat(bundleResource2).isNotNull();
+        Bundle b2 = (Bundle) bundleResource2;
+        List<BundleEntryComponent> e2 = b2.getEntry();
+        List<Resource> Organization = ResourceUtils.getResourceList(e2, ResourceType.Organization);
+        assertThat(Organization).hasSize(1);
+
     }
 }

@@ -6,7 +6,6 @@
 package io.github.linuxforhealth.hl7.segments;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import org.junit.jupiter.api.Assertions;
 
 import java.util.Date;
 import java.util.List;
@@ -14,11 +13,14 @@ import java.util.List;
 import org.hl7.fhir.r4.model.AllergyIntolerance;
 import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.DateTimeType;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import io.github.linuxforhealth.hl7.HL7ToFHIRConverter;
 import io.github.linuxforhealth.hl7.segments.util.ResourceUtils;
 
 class Hl7AllergyFHIRConversionTest {
+    private HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
 
     @Test
     void test_allergy_single() {
@@ -27,7 +29,7 @@ class Hl7AllergyFHIRConversionTest {
                 + "AL1|1|DA|^PENICILLIN|MI|PRODUCES HIVES~RASH|MI\r"
                 + "AL1|2|AA|^CAT DANDER|SV";
 
-        AllergyIntolerance allergy = ResourceUtils.getAllergyResource(hl7message);
+        AllergyIntolerance allergy = ResourceUtils.getAllergyResource(ftv, hl7message);
         assertThat(allergy.getCriticality().toCode()).isEqualTo("low");
         assertThat(allergy.getCategory().get(0).getCode()).isEqualTo("medication");
         assertThat(allergy.getCode().getText()).isEqualTo("PENICILLIN");
@@ -41,7 +43,7 @@ class Hl7AllergyFHIRConversionTest {
                 + "PID|0010||PID1234^5^M11^A^MR^HOSP~1234568965^^^USA^SS||DOE^JOHN^A^||19800202|F||W|111 TEST_STREET_NAME^^TEST_CITY^NY^111-1111^USA||(905)111-1111|||S|ZZ|12^^^124|34-13-312||||TEST_BIRTH_PLACE\r"
                 + "AL1|1|DA|00000741^OXYCODONE||HYPOTENSION\r";
 
-        AllergyIntolerance allergy = ResourceUtils.getAllergyResource(hl7message);
+        AllergyIntolerance allergy = ResourceUtils.getAllergyResource(ftv, hl7message);
         assertThat(allergy.hasCriticality()).isFalse();
         assertThat(allergy.getCategory().get(0).getCode()).isEqualTo("medication");
         assertThat(allergy.getCode().getText()).isEqualTo("OXYCODONE");
@@ -49,7 +51,7 @@ class Hl7AllergyFHIRConversionTest {
         Assertions.assertEquals(1, codings.size());
         Coding coding = codings.get(0);
         Assertions.assertEquals("00000741", coding.getCode());
-        Assertions.assertEquals("OXYCODONE",coding.getDisplay());
+        Assertions.assertEquals("OXYCODONE", coding.getDisplay());
         assertThat(allergy.getReaction().get(0).getManifestation()).extracting(m -> m.getText())
                 .containsExactly("HYPOTENSION");
     }
@@ -63,7 +65,7 @@ class Hl7AllergyFHIRConversionTest {
                 + "PID|0010||PID1234||DOE^JANE|||F\r"
                 + "AL1|1|DA|00000741^OXYCODONE||HYPOTENSION|20210101\r";
 
-        AllergyIntolerance allergy = ResourceUtils.getAllergyResource(hl7message);
+        AllergyIntolerance allergy = ResourceUtils.getAllergyResource(ftv, hl7message);
         assertThat(allergy.getCategory().get(0).getCode()).isEqualTo("medication");
         assertThat(allergy.getReaction().get(0).getManifestation()).extracting(m -> m.getText())
                 .containsExactly("HYPOTENSION");

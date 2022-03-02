@@ -37,6 +37,7 @@ import io.github.linuxforhealth.hl7.segments.util.PatientUtils;
 import io.github.linuxforhealth.hl7.segments.util.ResourceUtils;
 
 class Hl7PatientFHIRConversionTest {
+    private HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
 
     private static FHIRContext context = new FHIRContext(true, false);
     private static final Logger LOGGER = LoggerFactory.getLogger(Hl7PatientFHIRConversionTest.class);
@@ -65,7 +66,7 @@ class Hl7PatientFHIRConversionTest {
                 + "PID|1||1234^^^AssigningAuthority^MR||TEST^PATIENT|\r"
                 + "PD1|||Sample Family Practice^^2222|1111^LastName^ClinicianFirstName^^^^Title||||||||||||A|\r";
 
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         List<Resource> patientResource = ResourceUtils.getResourceList(e, ResourceType.Patient);
         assertThat(patientResource).hasSize(1);
@@ -99,25 +100,25 @@ class Hl7PatientFHIRConversionTest {
         String patientMsgDeceasedDateOnlyYYYYMM = "MSH|^~\\&|MIICEHRApplication|MIIC|MIIC|MIIC|201705130822||VXU^V04^VXU_V04|test1100|P|2.5.1|||AL|AL|||||Z22^CDCPHINVS|^^^^^MIIC^SR^^^MIIC|MIIC\n"
                 + "PID|1||12345678^^^^MR|ALTID|Mouse^Mickey^J^III^^^|Mother^Micky|20060504|M|Alias^Alias|2106-3^White^ HL70005|12345 testing ave^^Minneapolis^MN^55407^^^^MN053|USAA|^PRN^^^PH^555^5555555|^PRN^^^PH^555^666666|english|married|bhuddist|1234567_account|111-22-3333|||2186-5^not Hispanic or Latino^CDCREC|Born in USA|Y|2|USA|||200611|\n";
 
-        Patient patientObjDeceasedEmpty = PatientUtils.createPatientFromHl7Segment(patientMsgDeceasedEmpty);
+        Patient patientObjDeceasedEmpty = PatientUtils.createPatientFromHl7Segment(ftv, patientMsgDeceasedEmpty);
         assertThat(patientObjDeceasedEmpty.hasDeceased()).isFalse();
         assertThat(patientObjDeceasedEmpty.hasDeceasedBooleanType()).isFalse();
         assertThat(patientObjDeceasedEmpty.hasDeceasedDateTimeType()).isFalse();
 
-        Patient patientObjNotDeadBooleanN = PatientUtils.createPatientFromHl7Segment(patientMsgNotDeadBooleanN);
+        Patient patientObjNotDeadBooleanN = PatientUtils.createPatientFromHl7Segment(ftv, patientMsgNotDeadBooleanN);
         assertThat(patientObjNotDeadBooleanN.hasDeceased()).isTrue();
         assertThat(patientObjNotDeadBooleanN.hasDeceasedBooleanType()).isTrue();
         assertThat(patientObjNotDeadBooleanN.getDeceasedBooleanType().booleanValue()).isFalse();
 
         Patient patientObjDeceasedDateOnlyYYYY = PatientUtils
-                .createPatientFromHl7Segment(patientMsgDeceasedDateOnlyYYYY);
+                .createPatientFromHl7Segment(ftv, patientMsgDeceasedDateOnlyYYYY);
         assertThat(patientObjDeceasedDateOnlyYYYY.hasDeceased()).isTrue();
         assertThat(patientObjDeceasedDateOnlyYYYY.hasDeceasedDateTimeType()).isTrue();
         assertThat(patientObjDeceasedDateOnlyYYYY.hasDeceasedBooleanType()).isFalse();
         assertThat(patientObjDeceasedDateOnlyYYYY.getDeceasedDateTimeType().asStringValue()).isEqualTo("2006");
 
         Patient patientObjDeceasedDateOnlyYYYYMM = PatientUtils
-                .createPatientFromHl7Segment(patientMsgDeceasedDateOnlyYYYYMM);
+                .createPatientFromHl7Segment(ftv, patientMsgDeceasedDateOnlyYYYYMM);
         assertThat(patientObjDeceasedDateOnlyYYYYMM.hasDeceased()).isTrue();
         assertThat(patientObjDeceasedDateOnlyYYYYMM.hasDeceasedDateTimeType()).isTrue();
         assertThat(patientObjDeceasedDateOnlyYYYYMM.hasDeceasedBooleanType()).isFalse();
@@ -138,14 +139,14 @@ class Hl7PatientFHIRConversionTest {
                 + "PID|1||12345678^^^^MR|ALTID|Mouse^Mickey^J^III^^^|Mother^Micky|20060504|M|Alias^Alias|2106-3^White^ HL70005|12345 testing ave^^Minneapolis^MN^55407^^^^MN053|USAA|^PRN^^^PH^555^5555555|^PRN^^^PH^555^666666|english|married|bhuddist|1234567_account|111-22-3333|||2186-5^not Hispanic or Latino^CDCREC|Born in USA|Y|2|USA|||20061120|Y\n";
 
         Patient patientObjDeceasedBooleanYOnly = PatientUtils
-                .createPatientFromHl7Segment(patientMsgDeceasedBooleanYOnly);
+                .createPatientFromHl7Segment(ftv, patientMsgDeceasedBooleanYOnly);
         assertThat(patientObjDeceasedBooleanYOnly.hasDeceased()).isTrue();
         assertThat(patientObjDeceasedBooleanYOnly.hasDeceasedDateTimeType()).isFalse();
         assertThat(patientObjDeceasedBooleanYOnly.hasDeceasedBooleanType()).isTrue();
         assertThat(patientObjDeceasedBooleanYOnly.getDeceasedBooleanType().booleanValue()).isTrue();
 
         Patient patientObjDeceasedDateOnlyYYYYMMDDHHMMSSZZZZ = PatientUtils
-                .createPatientFromHl7Segment(patientMsgDeceasedDateOnlyYYYYMMDDHHMMSSZZZZ);
+                .createPatientFromHl7Segment(ftv, patientMsgDeceasedDateOnlyYYYYMMDDHHMMSSZZZZ);
         assertThat(patientObjDeceasedDateOnlyYYYYMMDDHHMMSSZZZZ.hasDeceased()).isTrue();
         assertThat(patientObjDeceasedDateOnlyYYYYMMDDHHMMSSZZZZ.hasDeceasedDateTimeType()).isTrue();
         assertThat(patientObjDeceasedDateOnlyYYYYMMDDHHMMSSZZZZ.hasDeceasedBooleanType()).isFalse();
@@ -153,7 +154,7 @@ class Hl7PatientFHIRConversionTest {
                 .isEqualTo("2006-11-20T11:59:30+01:00");
 
         Patient patientObjDeceasedDateAndBooleanY = PatientUtils
-                .createPatientFromHl7Segment(patientMsgDeceasedDateAndBooleanY);
+                .createPatientFromHl7Segment(ftv, patientMsgDeceasedDateAndBooleanY);
         assertThat(patientObjDeceasedDateAndBooleanY.hasDeceased()).isTrue();
         assertThat(patientObjDeceasedDateAndBooleanY.hasDeceasedDateTimeType()).isTrue();
         assertThat(patientObjDeceasedDateAndBooleanY.hasDeceasedBooleanType()).isFalse();
@@ -177,14 +178,14 @@ class Hl7PatientFHIRConversionTest {
 
         String patientMsgEmptyMultiple = "MSH|^~\\&|MIICEHRApplication|MIIC|MIIC|MIIC|201705130822||VXU^V04^VXU_V04|test1100|P|2.5.1|||AL|AL|||||Z22^CDCPHINVS|^^^^^MIIC^SR^^^MIIC|MIIC\n"
                 + "PID|1||12345678^^^^MR|ALTID|Mouse^Mickey^J^III^^^||||||||||||||||||Born in USA|||USA||||\n";
-        Patient patientObjEmptyMultiple = PatientUtils.createPatientFromHl7Segment(patientMsgEmptyMultiple);
+        Patient patientObjEmptyMultiple = PatientUtils.createPatientFromHl7Segment(ftv, patientMsgEmptyMultiple);
         assertThat(patientObjEmptyMultiple.hasMultipleBirth()).isFalse();
         assertThat(patientObjEmptyMultiple.hasMultipleBirthIntegerType()).isFalse();
         assertThat(patientObjEmptyMultiple.hasMultipleBirthBooleanType()).isFalse();
 
         String patientMsgMultipleN = "MSH|^~\\&|MIICEHRApplication|MIIC|MIIC|MIIC|201705130822||VXU^V04^VXU_V04|test1100|P|2.5.1|||AL|AL|||||Z22^CDCPHINVS|^^^^^MIIC^SR^^^MIIC|MIIC\n"
                 + "PID|1||12345678^^^^MR|ALTID|Mouse^Mickey^J^III^^^||||||||||||||||||Born in USA|N||USA||||\n";
-        Patient patientObjMultipleN = PatientUtils.createPatientFromHl7Segment(patientMsgMultipleN);
+        Patient patientObjMultipleN = PatientUtils.createPatientFromHl7Segment(ftv, patientMsgMultipleN);
         assertThat(patientObjMultipleN.hasMultipleBirth()).isTrue();
         assertThat(patientObjMultipleN.hasMultipleBirthIntegerType()).isFalse();
         assertThat(patientObjMultipleN.hasMultipleBirthBooleanType()).isTrue();
@@ -193,7 +194,8 @@ class Hl7PatientFHIRConversionTest {
         String patientMsgMultipleNumberOnly = "MSH|^~\\&|MIICEHRApplication|MIIC|MIIC|MIIC|201705130822||VXU^V04^VXU_V04|test1100|P|2.5.1|||AL|AL|||||Z22^CDCPHINVS|^^^^^MIIC^SR^^^MIIC|MIIC\n"
                 + "PID|1||12345678^^^^MR|ALTID|Mouse^Mickey^J^III^^^||||||||||||||||||Born in USA||2|USA||||\n";
         // A number when the boolean is missing presumes the number has meaning.  An integer is created.
-        Patient patientObjMultipleNumberOnly = PatientUtils.createPatientFromHl7Segment(patientMsgMultipleNumberOnly);
+        Patient patientObjMultipleNumberOnly = PatientUtils.createPatientFromHl7Segment(ftv,
+                patientMsgMultipleNumberOnly);
         assertThat(patientObjMultipleNumberOnly.hasMultipleBirth()).isTrue();
         assertThat(patientObjMultipleNumberOnly.hasMultipleBirthIntegerType()).isTrue();
         assertThat(patientObjMultipleNumberOnly.hasMultipleBirthBooleanType()).isFalse();
@@ -202,7 +204,7 @@ class Hl7PatientFHIRConversionTest {
         String patientMsgMultipleBooleanYOnly = "MSH|^~\\&|MIICEHRApplication|MIIC|MIIC|MIIC|201705130822||VXU^V04^VXU_V04|test1100|P|2.5.1|||AL|AL|||||Z22^CDCPHINVS|^^^^^MIIC^SR^^^MIIC|MIIC\n"
                 + "PID|1||12345678^^^^MR|ALTID|Mouse^Mickey^J^III^^^||||||||||||||||||Born in USA|Y||USA||||\n";
         Patient patientObjMultipleBooleanYOnly = PatientUtils
-                .createPatientFromHl7Segment(patientMsgMultipleBooleanYOnly);
+                .createPatientFromHl7Segment(ftv, patientMsgMultipleBooleanYOnly);
         assertThat(patientObjMultipleBooleanYOnly.hasMultipleBirth()).isTrue();
         assertThat(patientObjMultipleBooleanYOnly.hasMultipleBirthIntegerType()).isFalse();
         assertThat(patientObjMultipleBooleanYOnly.hasMultipleBirthBooleanType()).isTrue();
@@ -211,7 +213,7 @@ class Hl7PatientFHIRConversionTest {
         String patientMsgMultipleNumberAndBooleanY = "MSH|^~\\&|MIICEHRApplication|MIIC|MIIC|MIIC|201705130822||VXU^V04^VXU_V04|test1100|P|2.5.1|||AL|AL|||||Z22^CDCPHINVS|^^^^^MIIC^SR^^^MIIC|MIIC\n"
                 + "PID|1||12345678^^^^MR|ALTID|Mouse^Mickey^J^III^^^||||||||||||||||||Born in USA|Y|3|USA||||\n";
         Patient patientObjMultipleNumberAndBooleanY = PatientUtils
-                .createPatientFromHl7Segment(patientMsgMultipleNumberAndBooleanY);
+                .createPatientFromHl7Segment(ftv, patientMsgMultipleNumberAndBooleanY);
         assertThat(patientObjMultipleNumberAndBooleanY.hasMultipleBirth()).isTrue();
         assertThat(patientObjMultipleNumberAndBooleanY.hasMultipleBirthIntegerType()).isTrue();
         assertThat(patientObjMultipleNumberAndBooleanY.hasMultipleBirthBooleanType()).isFalse();
@@ -219,7 +221,7 @@ class Hl7PatientFHIRConversionTest {
 
         String patientMsgMultipleN16 = "MSH|^~\\&|MIICEHRApplication|MIIC|MIIC|MIIC|201705130822||VXU^V04^VXU_V04|test1100|P|2.5.1|||AL|AL|||||Z22^CDCPHINVS|^^^^^MIIC^SR^^^MIIC|MIIC\n"
                 + "PID|1||12345678^^^^MR|ALTID|Mouse^Mickey^J^III^^^||||||||||||||||||Born in USA|N|16|USA||||\n";
-        Patient patientObjMultipleN16 = PatientUtils.createPatientFromHl7Segment(patientMsgMultipleN16);
+        Patient patientObjMultipleN16 = PatientUtils.createPatientFromHl7Segment(ftv, patientMsgMultipleN16);
         assertThat(patientObjMultipleN16.hasMultipleBirth()).isTrue();
         assertThat(patientObjMultipleN16.hasMultipleBirthIntegerType()).isFalse();
         assertThat(patientObjMultipleN16.hasMultipleBirthBooleanType()).isTrue();
@@ -232,7 +234,7 @@ class Hl7PatientFHIRConversionTest {
                 +
                 "PID|1||PA123456^^^MYEMR^MR||TestPatient^John^M^^^^B|MILLER^MARTHA^G^^^^M|20140227|M||2106-3^WHITE^CDCREC|1234 W FIRST ST^^BEVERLY HILLS^CA^90210^^H||^PRN^PH^^^555^5555555||ENG^English^HL70296|||||||2186-5^ not Hispanic or Latino^CDCREC||Y|2\r";
 
-        Patient patientObjUsualName = PatientUtils.createPatientFromHl7Segment(patientUseName);
+        Patient patientObjUsualName = PatientUtils.createPatientFromHl7Segment(ftv, patientUseName);
 
         java.util.List<org.hl7.fhir.r4.model.HumanName> name = patientObjUsualName.getName();
         HumanName.NameUse useName = name.get(0).getUse();
@@ -246,7 +248,7 @@ class Hl7PatientFHIRConversionTest {
                 // PID 5 fields (name) are extracted and tested
                 + "PID|1||PA123456^^^MYEMR^MR||JONES^GEORGE^Q^III^MR^^B||||||||||||||||||||\r";
 
-        Patient patientObjUsualName = PatientUtils.createPatientFromHl7Segment(patientHasMiddleName);
+        Patient patientObjUsualName = PatientUtils.createPatientFromHl7Segment(ftv, patientHasMiddleName);
 
         java.util.List<org.hl7.fhir.r4.model.HumanName> name = patientObjUsualName.getName();
         List<StringType> givenName = name.get(0).getGiven();
@@ -273,11 +275,11 @@ class Hl7PatientFHIRConversionTest {
                 +
                 "PID|0010||||DOE^JOHN^A^|||M|||||||\r";
 
-        Patient patientObjNoGender = PatientUtils.createPatientFromHl7Segment(patientEmptyGenderField);
+        Patient patientObjNoGender = PatientUtils.createPatientFromHl7Segment(ftv, patientEmptyGenderField);
         Enumerations.AdministrativeGender gender = patientObjNoGender.getGender();
         assertThat(gender).isNull();
 
-        Patient patientObjGender = PatientUtils.createPatientFromHl7Segment(patientWithGenderField);
+        Patient patientObjGender = PatientUtils.createPatientFromHl7Segment(ftv, patientWithGenderField);
         Enumerations.AdministrativeGender gen = patientObjGender.getGender();
         assertThat(gen).isNotNull().isEqualTo(Enumerations.AdministrativeGender.MALE);
     }
@@ -292,7 +294,7 @@ class Hl7PatientFHIRConversionTest {
                 +
                 "PID|1||12345678^^^MRN||TestPatient^Jane|||||||||||S^unmarried^^^^^1.1||||||\r";
 
-        Patient patientObjMarried = PatientUtils.createPatientFromHl7Segment(marriedPatientWithVersion);
+        Patient patientObjMarried = PatientUtils.createPatientFromHl7Segment(ftv, marriedPatientWithVersion);
         assertThat(patientObjMarried.hasMaritalStatus()).isTrue();
         assertThat(patientObjMarried.getMaritalStatus().hasText()).isFalse();
         assertThat(patientObjMarried.getMaritalStatus().getCoding()).hasSize(1);
@@ -302,7 +304,7 @@ class Hl7PatientFHIRConversionTest {
         assertThat(coding.getVersion()).isEqualTo("47");
 
         Patient patientObjMarriedAltText = PatientUtils
-                .createPatientFromHl7Segment(singlePatientWithVersionAndOriginalText);
+                .createPatientFromHl7Segment(ftv, singlePatientWithVersionAndOriginalText);
         assertThat(patientObjMarriedAltText.hasMaritalStatus()).isTrue();
         assertThat(patientObjMarriedAltText.getMaritalStatus().getText()).isEqualTo("unmarried");
         assertThat(patientObjMarriedAltText.getMaritalStatus().getCoding()).hasSize(1);
@@ -330,7 +332,7 @@ class Hl7PatientFHIRConversionTest {
                         +
                         "PID|1||PA123456^^^MYEMR^MR||DOE^JANE|||M|||||||ENG|||||||||Y|2\r";
 
-        Patient patientObjEnglish = PatientUtils.createPatientFromHl7Segment(patientSpeaksEnglishWithSystem);
+        Patient patientObjEnglish = PatientUtils.createPatientFromHl7Segment(ftv, patientSpeaksEnglishWithSystem);
         assertThat(patientObjEnglish.hasCommunication()).isTrue();
         assertThat(patientObjEnglish.getCommunication().get(0).getPreferred()).isTrue();
         assertThat(patientObjEnglish.getCommunication()).hasSize(1);
@@ -342,7 +344,7 @@ class Hl7PatientFHIRConversionTest {
         assertThat(code.getSystem()).isEqualTo("urn:id:v2-0296");
         assertThat(code.getDisplay()).isEqualTo("English");
 
-        Patient patientObjNoSystem = PatientUtils.createPatientFromHl7Segment(patientEnglishNoSystem);
+        Patient patientObjNoSystem = PatientUtils.createPatientFromHl7Segment(ftv, patientEnglishNoSystem);
         assertThat(patientObjNoSystem.hasCommunication()).isTrue();
         assertThat(patientObjNoSystem.getCommunication().get(0).getPreferred()).isTrue();
         assertThat(patientObjNoSystem.getCommunication()).hasSize(1);
@@ -354,7 +356,7 @@ class Hl7PatientFHIRConversionTest {
         assertThat(code.getDisplay()).isEqualTo("English");
         assertThat(codeNo.hasDisplay()).isTrue();
 
-        Patient patientObjCodeOnly = PatientUtils.createPatientFromHl7Segment(patientEnglishCodeOnly);
+        Patient patientObjCodeOnly = PatientUtils.createPatientFromHl7Segment(ftv, patientEnglishCodeOnly);
         assertThat(patientObjCodeOnly.hasCommunication()).isTrue();
         assertThat(patientObjCodeOnly.getCommunication().get(0).getPreferred()).isTrue();
         assertThat(patientObjCodeOnly.getCommunication()).hasSize(1);
@@ -443,7 +445,6 @@ class Hl7PatientFHIRConversionTest {
     }
 
     private void validate_data_lineage(String hl7message, String messageType, boolean millis) {
-        HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
         String json = ftv.convert(hl7message, PatientUtils.OPTIONS);
         assertThat(json).isNotBlank();
         LOGGER.debug(json);

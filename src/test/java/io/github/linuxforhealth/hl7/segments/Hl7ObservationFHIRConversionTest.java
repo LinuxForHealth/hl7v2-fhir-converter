@@ -37,6 +37,7 @@ import com.google.common.collect.Lists;
 
 import io.github.linuxforhealth.api.ResourceModel;
 import io.github.linuxforhealth.fhir.FHIRContext;
+import io.github.linuxforhealth.hl7.HL7ToFHIRConverter;
 import io.github.linuxforhealth.hl7.message.HL7FHIRResourceTemplate;
 import io.github.linuxforhealth.hl7.message.HL7FHIRResourceTemplateAttributes;
 import io.github.linuxforhealth.hl7.message.HL7MessageEngine;
@@ -64,11 +65,13 @@ class Hl7ObservationFHIRConversionTest {
     HL7FHIRResourceTemplate observation = new HL7FHIRResourceTemplate(attributes);
     private HL7MessageModel message = new HL7MessageModel("ADT", Lists.newArrayList(observation));
 
+    private HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
+
     @Test
     void testObservationNmResult() throws IOException {
         String hl7message = baseMessage + "OBX|1|NM|0135-4^TotalProtein||7.3|gm/dl|5.9-8.4|||R|F";
 
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
         List<Resource> obsResource = ResourceUtils.getResourceList(e, ResourceType.Observation);
         assertThat(obsResource).hasSize(1);
         Observation obs = (Observation) obsResource.get(0);
@@ -99,7 +102,7 @@ class Hl7ObservationFHIRConversionTest {
     void testObservationSN_valueQuantity_result() throws IOException {
         String hl7message = baseMessage + "OBX|1|SN|28-1^Ampicillin Islt MIC^LN||<^0.06|ug/mL^^UCUM|||";
 
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         List<Resource> obsResource = ResourceUtils.getResourceList(e, ResourceType.Observation);
         assertThat(obsResource).hasSize(1);
@@ -126,7 +129,7 @@ class Hl7ObservationFHIRConversionTest {
         String hl7message = baseMessage
                 + "OBX|1|SN|24467-3^CD3+CD4+ (T4 helper) cells [#/volume] in Blood^LN||=^440|{Cells}/uL^cells per microliter^UCUM|649-1346 cells/mcL|L|||F";
 
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         List<Resource> obsResource = ResourceUtils.getResourceList(e, ResourceType.Observation);
         assertThat(obsResource).hasSize(1);
@@ -170,7 +173,7 @@ class Hl7ObservationFHIRConversionTest {
         String hl7message = baseMessage
                 + "OBX|1|SN|24467-3^CD3+CD4+ (T4 helper) cells [#/volume] in Blood^LN||=^440^.|{Cells}/uL^cells per microliter^UCUM|||||F";
 
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         List<Resource> obsResource = ResourceUtils.getResourceList(e, ResourceType.Observation);
         assertThat(obsResource).hasSize(1);
@@ -189,7 +192,7 @@ class Hl7ObservationFHIRConversionTest {
     void testObservationSN_valueQuantity_missing_comparator_result() throws IOException {
         String hl7message = baseMessage + "OBX|1|SN|1554-5^GLUCOSE||^182|mg/dl|70_105||||F";
 
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         List<Resource> obsResource = ResourceUtils.getResourceList(e, ResourceType.Observation);
         assertThat(obsResource).hasSize(1);
@@ -222,7 +225,7 @@ class Hl7ObservationFHIRConversionTest {
     void testObservationSN_valueRatio_colon_result() throws IOException {
         String hl7message = baseMessage + "OBX|1|SN|111^LabWithRatio||^2^:^3|";
 
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         List<Resource> obsResource = ResourceUtils.getResourceList(e, ResourceType.Observation);
         assertThat(obsResource).hasSize(1);
@@ -237,7 +240,7 @@ class Hl7ObservationFHIRConversionTest {
     void testObservationSN_valueRatio_slash_result() throws IOException {
         String hl7message = baseMessage + "OBX|1|SN|111^LabWithRatio||^2^/^3|";
 
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         List<Resource> obsResource = ResourceUtils.getResourceList(e, ResourceType.Observation);
         assertThat(obsResource).hasSize(1);
@@ -253,7 +256,7 @@ class Hl7ObservationFHIRConversionTest {
         String hl7message = baseMessage
                 + "OBX|1|ST|^Type of protein feed^L||Fourth Line: HYPERDYNAMIC LV SYSTOLIC FUNCTION, VISUAL EF 80%||||||F||||Alex||";
 
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         List<Resource> obsResource = ResourceUtils.getResourceList(e, ResourceType.Observation);
         assertThat(obsResource).hasSize(1);
@@ -269,7 +272,7 @@ class Hl7ObservationFHIRConversionTest {
         String hl7message = baseMessage
                 + "OBX|1|ST|^Type of protein feed^L||HYPERDYNAMIC LV SYSTOLIC FUNCTION, VISUAL EF 80%~Fifth line, as part of a repeated field||||||F||";
 
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         List<Resource> obsResource = ResourceUtils.getResourceList(e, ResourceType.Observation);
         assertThat(obsResource).hasSize(1);
@@ -286,7 +289,7 @@ class Hl7ObservationFHIRConversionTest {
         String hl7message = baseMessage
                 + "OBX|1|CE|93000&CMP^LIN^CPT4|11|1305^No significant change was found^MEIECG";
 
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         List<Resource> obsResource = ResourceUtils.getResourceList(e, ResourceType.Observation);
         assertThat(obsResource).hasSize(1);
@@ -306,7 +309,7 @@ class Hl7ObservationFHIRConversionTest {
         String hl7message = baseMessage
                 + "OBX|1|CE|93000&CMP^LIN^CPT4|11|1305^No significant change was found^LN";
 
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         List<Resource> obsResource = ResourceUtils.getResourceList(e, ResourceType.Observation);
         assertThat(obsResource).hasSize(1);
@@ -326,7 +329,7 @@ class Hl7ObservationFHIRConversionTest {
         String hl7message = baseMessage
                 + "OBX|1|ST|14151-5^HCO3 BldCo-sCnc^LN|TEST|||||||F|||20210311122016|||||20210311122153||||";
 
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         List<Resource> obsResource = ResourceUtils.getResourceList(e, ResourceType.Observation);
         assertThat(obsResource).hasSize(1);
@@ -496,7 +499,7 @@ class Hl7ObservationFHIRConversionTest {
                 + "OBX|2|NM|22316-4^Hepatitis B virus core Ab [Units/volume] in Serum^LN^HBcAbQ^Hepatitis B core antibodies (anti-HBVc) Quant^L^2.52||0.70|[IU]/mL^international unit per milliliter^UCUM^IU/ml^^L^1.9|<0.50 IU/mL|H|||F|||20150925|||||201509261400\r"
                 + "SPM|1|SpecimenID||BLOOD^Blood^^87612001^BLOOD^SCT^^||||Cord Art^Blood, Cord Arterial^^^^^^^|||P||||||201110060535|201110060821||Y||||||1\r";
 
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ORU_r01);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, ORU_r01);
 
         List<Resource> obsResource = ResourceUtils.getResourceList(e, ResourceType.Observation);
         assertThat(obsResource).hasSize(2);
@@ -555,7 +558,7 @@ class Hl7ObservationFHIRConversionTest {
                 + "RXE|^Q24H&0600^^20210407191342^^ROU|DEFAULTMED^cefTRIAXone (ROCEPHIN) 2 g in sodium chloride 0.9 % 50 mL IVPB|2||g||||||||\n"
                 + "OBX|1|NM|Most Current Weight^Most current measured weight (actual)||90|kg||IND||||||20210320153850||1111^ClinicianLastName^ClinicianFirstName^^^^Title|Manual^Text the 4th^SNM3|Device_1234567^mySystem|20210322153925|Observation Site^Text 5^SNM3|INST^Instance Identifier System||Radiology^Radiological Services|467 Albany Hospital^^Albany^NY|Cardiology^ContactLastName^Jane^Q^^Dr.^MD\r";
 
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         List<Resource> obsResource = ResourceUtils.getResourceList(e, ResourceType.Observation);
         assertThat(obsResource).hasSize(1);

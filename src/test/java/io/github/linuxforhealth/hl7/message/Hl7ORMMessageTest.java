@@ -6,22 +6,27 @@
 package io.github.linuxforhealth.hl7.message;
 
 import static org.assertj.core.api.Assertions.assertThat;
+
 import java.io.IOException;
 import java.util.List;
-import io.github.linuxforhealth.hl7.segments.util.ResourceUtils;
+
 import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
 import org.hl7.fhir.r4.model.Resource;
 import org.hl7.fhir.r4.model.ResourceType;
 import org.junit.jupiter.api.Test;
 
+import io.github.linuxforhealth.hl7.HL7ToFHIRConverter;
+import io.github.linuxforhealth.hl7.segments.util.ResourceUtils;
+
 class Hl7ORMMessageTest {
+    private HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
 
     @Test
     void testORMO01MinimumOrderOnly() throws IOException {
         String hl7message = "MSH|^~\\&|||||20210407191342||ORM^O01|MSGID_bae9ce6a-e35d-4ff5-8d50-c5dde19cc1aa|T|2.5.1\r"
                 + "ORC|OP|1000|9999999||||^3 times daily^^20210401\r";
 
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         List<Resource> serviceRequests = ResourceUtils.getResourceList(e, ResourceType.ServiceRequest);
         assertThat(serviceRequests).hasSize(1);
@@ -37,7 +42,7 @@ class Hl7ORMMessageTest {
                 + "ORC|OP|1000|9999999||||^3 times daily^^20210401\r"
                 + "RXO|50111032701^hydrALAZINE HCl 25 MG Oral Tablet^NDC^^^^^^hydrALAZINE (APRESOLINE) 25 MG TABS|||||||||||||||||||||||\r";
 
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         List<Resource> medicationRequestResource = ResourceUtils.getResourceList(e, ResourceType.MedicationRequest);
         assertThat(medicationRequestResource).hasSize(1);
@@ -57,7 +62,7 @@ class Hl7ORMMessageTest {
                 + "ORC|OP|1000|9999999||||^3 times daily^^20210401\r"
                 + "RXO|50111032701^hydrALAZINE HCl 25 MG Oral Tablet^NDC^^^^^^hydrALAZINE (APRESOLINE) 25 MG TABS|||||||||||||||||||||||\r";
 
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         List<Resource> patientResource = ResourceUtils.getResourceList(e, ResourceType.Patient);
         assertThat(patientResource).hasSize(1);
@@ -86,7 +91,7 @@ class Hl7ORMMessageTest {
                 + "ORC|SN|ACCESSION_a42990b7-4155-4404-81ef-e85158caed72|ACCESSION_a42990b7-4155-4404-81ef-e85158caed72|2950|||||20210407191758|2739^BY^ENTERED|2799^BY^VERIFIED|3122^PROVIDER^ORDERING||(696)901-1300|20210407191758||||||ORDERING FAC NAME|ADDR^^CITY^STATE^ZIP^USA|(515)-290-8888|9999^^CITY^STATE^ZIP^CAN\n"
                 + "OBR|1|ACCESSION_a42990b7-4155-4404-81ef-e85158caed72|ACCESSION_a42990b7-4155-4404-81ef-e85158caed72|4916^Diffusion-weighted imaging||20210331214400|20210407191758|20210407191758||||||20210331214600||1234^SOURCE^SPECIMEN^LNAME^FNAME^^^^^^^^^LABNAME||||W18562||||P|||^^^^^POCPR|660600^Doctor^FYI||||Result Interpreter\n";
 
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         List<Resource> patientResource = ResourceUtils.getResourceList(e, ResourceType.Patient);
         assertThat(patientResource).hasSize(1);
@@ -130,7 +135,7 @@ class Hl7ORMMessageTest {
                 + "ORC|OP|1000|9999999||||^3 times daily^^20210401\r"
                 + "RXO|50111032701^hydrALAZINE HCl 25 MG Oral Tablet^NDC^^^^^^hydrALAZINE (APRESOLINE) 25 MG TABS|||||||||||||||||||||||\r";
 
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         List<Resource> patientResource = ResourceUtils.getResourceList(e, ResourceType.Patient);
         assertThat(patientResource).hasSize(1);
@@ -175,7 +180,7 @@ class Hl7ORMMessageTest {
                 + "RXO|RX800006^Test15 SODIUM 100 MG CAPSULE|100||mg|||||G||10||5\r"
                 + "OBX|1|ST|TS-F-01-002^Endocrine Disorders^L||obs report||||||F\r";
 
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         List<Resource> patientResource = ResourceUtils.getResourceList(e, ResourceType.Patient);
         assertThat(patientResource).hasSize(1);
@@ -208,7 +213,7 @@ class Hl7ORMMessageTest {
                 + "OBX|1|TX|1234^some text^SCT||First line: Sodium Report||||||F||\n"
                 + "OBX|2|TX|1234^some text^SCT||Second line: Sodium REPORT||||||F||\n";
 
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         List<Resource> medicationRequestResource = ResourceUtils.getResourceList(e, ResourceType.MedicationRequest);
         assertThat(medicationRequestResource).hasSize(2);
@@ -251,7 +256,7 @@ class Hl7ORMMessageTest {
                 + "ORC|OP|1000|9999999||||^3 times daily^^20210401\r"
                 + "RXO|50111032701^hydrALAZINE HCl 25 MG Oral Tablet^NDC^^^^^^hydrALAZINE (APRESOLINE) 25 MG TABS|||||||||||||||||||||||\r";
 
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         List<Resource> patientResource = ResourceUtils.getResourceList(e, ResourceType.Patient);
         assertThat(patientResource).hasSize(1);

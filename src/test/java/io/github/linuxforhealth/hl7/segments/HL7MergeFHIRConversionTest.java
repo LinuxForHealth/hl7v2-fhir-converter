@@ -18,12 +18,14 @@ import org.hl7.fhir.r4.model.Resource;
 import org.hl7.fhir.r4.model.ResourceType;
 import org.junit.jupiter.api.Test;
 
+import io.github.linuxforhealth.hl7.HL7ToFHIRConverter;
 import io.github.linuxforhealth.hl7.segments.util.PatientUtils;
 import io.github.linuxforhealth.hl7.segments.util.ResourceUtils;
 
 /*** Tests the MRG segment ***/
 
 class HL7MergeFHIRConversionTest {
+    private HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
 
     // Test ADT_A34 with one MRG segment (the most it supports).
     @Test
@@ -37,7 +39,7 @@ class HL7MergeFHIRConversionTest {
                 + "MRG|456||||||\r";
 
         // Convert hl7 message
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         // Find the patient resources in the FHIR bundle.
         List<Resource> patientResources = ResourceUtils.getResourceList(e, ResourceType.Patient);
@@ -78,7 +80,6 @@ class HL7MergeFHIRConversionTest {
         //        "value":"456"
         //     }
         // ]
-           
 
         // Verify the patient has two identifiers
         assertThat(patientOneIdentifierList).hasSize(2);
@@ -170,8 +171,7 @@ class HL7MergeFHIRConversionTest {
         // We should have link.other.reference to the PID (1st) patient with a type of 'replaced-by'
         PatientLinkComponent linkTwo = patientTwo.getLink().get(0);
         assertThat(linkTwo.getType()).isEqualTo(Patient.LinkType.REPLACEDBY);
-        assertThat(linkTwo.getOther().getReference()).isEqualTo(patientOneId);
-        ;
+        assertThat(linkTwo.getOther().getReference()).isEqualTo(patientOneId);;
 
     }
 
@@ -179,7 +179,7 @@ class HL7MergeFHIRConversionTest {
     @Test
     void validateHappyPathADT_A40WithMRG() {
 
-        String hl7message = "MSH|^~\\&|REGADT|MCM|RSP1P8|MCM|200301051530|SEC|ADT^A40^ADT_A39|00000003|P|2.6\r"  
+        String hl7message = "MSH|^~\\&|REGADT|MCM|RSP1P8|MCM|200301051530|SEC|ADT^A40^ADT_A39|00000003|P|2.6\r"
                 + "EVN|A40|200301051530\r"
                 // Identifier value MR1 with XYZ system and MR identifier type
                 + "PID|||MR1^^^XYZ^MR||\r"
@@ -187,7 +187,7 @@ class HL7MergeFHIRConversionTest {
                 + "MRG|MR2^^^XYZ\r";
 
         // Convert hl7 message
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         // Find the patient resources in the FHIR bundle.
         List<Resource> patientResources = ResourceUtils.getResourceList(e, ResourceType.Patient);
@@ -254,7 +254,7 @@ class HL7MergeFHIRConversionTest {
 
         // Verify the identifier value is marked as old
         assertThat(patientTwoIdentifierList.get(0).getUse()).isEqualTo(Identifier.IdentifierUse.OLD);
-        
+
         // Verify identifier type is not present
         assertThat(patientTwoIdentifierList.get(0).getType().getCoding()).isEmpty();
 
@@ -286,7 +286,7 @@ class HL7MergeFHIRConversionTest {
                 + "MRG|MR4^^^XYZ^MR||\r";
 
         // Convert hl7 message
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         // Find the patient resources in the FHIR bundle.
         List<Resource> patientResources = ResourceUtils.getResourceList(e, ResourceType.Patient);

@@ -30,6 +30,7 @@ import io.github.linuxforhealth.hl7.segments.util.ResourceUtils;
 
 class Hl7OrderRequestFHIRConversionTest {
 
+    private HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
     private static FHIRContext context = new FHIRContext(true, false);
 
     // Read comments carefully.  Tests
@@ -59,7 +60,7 @@ class Hl7OrderRequestFHIRConversionTest {
                         //  13. OBR.7 is purposely present, but will be ignored because ORC.15 has a value and is preferred.
                         + "OBR|1|248648498^|248648498^|83036E^HEMOGLOBIN A1C^PACSEAP^^^^^^HEMOGLOBIN A1C||20120606120606|20120606120606||||L|||||54321678^SCHMIDT^FRIEDA^^MD^^^^^^^^^NPI||||||20180924152900|||F||^^^20120613071200|||||||||||||||||||||||\n";
 
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         List<Resource> serviceRequestList = ResourceUtils.getResourceList(e, ResourceType.ServiceRequest);
         // Important that we have exactly one service request (no duplication).  OBR creates it as a reference.        
@@ -163,7 +164,7 @@ class Hl7OrderRequestFHIRConversionTest {
                 //  14. OBR.6 creates ServiceRequest.authoredOn
                 + "OBR|1|248648498^|248648498^|83036E^HEMOGLOBIN A1C^PACSEAP^^^^^^HEMOGLOBIN A1C||20120606120606|20170707150707||||L|||||54321678^SCHMIDT^FRIEDA^^MD^^^^NPI^D^^^NPI||||||20180924152900|||F||||||HIV^HIV/Aids^L^^^^V1|323232&Mahoney&Paul&J||||||||||||||||||\n";
 
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         List<Resource> serviceRequestList = ResourceUtils.getResourceList(e, ResourceType.ServiceRequest);
         // Important that we have exactly one service request (no duplication).  OBR creates it as a reference.        
@@ -280,7 +281,6 @@ class Hl7OrderRequestFHIRConversionTest {
                 + "ORC|RE|248648498^|248648498^||ZZ||||20120628071200||||||||||||||||||||||\n"
                 + "OBR|1|248648498^|248648498^|83036E^HEMOGLOBIN A1C^PACSEAP^^^^^^HEMOGLOBIN A1C|||||||L||||||||||||||F||^^^20120606120606|||||||||||||||||||||||\n";
 
-        HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
         String json = ftv.convert(hl7message, PatientUtils.OPTIONS);
         assertThat(json).isNotBlank();
 
@@ -333,7 +333,6 @@ class Hl7OrderRequestFHIRConversionTest {
                         //  ORC.15 is missing, so use OBR.7 as ServiceRequest.occurrenceDateTime
                         + "OBR|1|248648498^|248648498^|83036E^HEMOGLOBIN A1C^PACSEAP^^^^^^HEMOGLOBIN A1C|||20170707120707|20180808120808|||||||||||||||||F|||||||||||||||||||||||||\n";
 
-        HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
         String json = ftv.convert(hl7message, PatientUtils.OPTIONS);
         assertThat(json).isNotBlank();
 
@@ -389,7 +388,7 @@ class Hl7OrderRequestFHIRConversionTest {
                 // OBR.31 used for reason code
                 + "OBR|1|P1005|F1005|71260^CT Chest without contrast^ICD10|||||||||||||||||||||||||||exam reason ID^PREAURICULAR EDEMA text||||\r";
 
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         List<Resource> serviceRequestList = ResourceUtils.getResourceList(e, ResourceType.ServiceRequest);
         assertThat(serviceRequestList).hasSize(1);

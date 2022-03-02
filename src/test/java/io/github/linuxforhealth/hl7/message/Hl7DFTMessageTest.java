@@ -6,10 +6,10 @@
 package io.github.linuxforhealth.hl7.message;
 
 import static org.assertj.core.api.Assertions.assertThat;
+
 import java.io.IOException;
 import java.util.List;
 
-import io.github.linuxforhealth.hl7.segments.util.ResourceUtils;
 import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
 import org.hl7.fhir.r4.model.Observation;
 import org.hl7.fhir.r4.model.Resource;
@@ -17,7 +17,11 @@ import org.hl7.fhir.r4.model.ResourceType;
 import org.hl7.fhir.r4.model.ServiceRequest;
 import org.junit.jupiter.api.Test;
 
+import io.github.linuxforhealth.hl7.HL7ToFHIRConverter;
+import io.github.linuxforhealth.hl7.segments.util.ResourceUtils;
+
 class Hl7DFTMessageTest {
+    private HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
 
     @Test
     void testResourceCreationFromDFT() throws IOException {
@@ -61,7 +65,7 @@ class Hl7DFTMessageTest {
                 // IN1.50 through IN1.53 NOT REFERENCED
                 + "|MEMBER36||||||||||Value46|||J494949||||\n";
 
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         List<Resource> encounters = ResourceUtils.getResourceList(e, ResourceType.Encounter);
         assertThat(encounters).hasSize(1); // From PV1
@@ -79,7 +83,7 @@ class Hl7DFTMessageTest {
         assertThat(relatedPersons).hasSize(1); // From IN1.16 through IN1.19; IN1.43; INI.49 
 
         List<Resource> serviceRequests = ResourceUtils.getResourceList(e, ResourceType.ServiceRequest);
-        assertThat(serviceRequests).hasSize(1);  // From ORC / OBR
+        assertThat(serviceRequests).hasSize(1); // From ORC / OBR
         ServiceRequest serviceRequest = ResourceUtils.getResourceServiceRequest(serviceRequests.get(0),
                 ResourceUtils.context);
         assertThat(serviceRequest.getNote()).hasSize(1);

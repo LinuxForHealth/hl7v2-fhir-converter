@@ -12,9 +12,9 @@ import java.io.IOException;
 import java.util.List;
 
 import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
-import org.hl7.fhir.r4.model.Coverage.ClassComponent;
 import org.hl7.fhir.r4.model.ContactPoint;
 import org.hl7.fhir.r4.model.Coverage;
+import org.hl7.fhir.r4.model.Coverage.ClassComponent;
 import org.hl7.fhir.r4.model.Enumerations;
 import org.hl7.fhir.r4.model.HumanName;
 import org.hl7.fhir.r4.model.Identifier;
@@ -29,6 +29,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 import io.github.linuxforhealth.hl7.ConverterOptions;
 import io.github.linuxforhealth.hl7.ConverterOptions.Builder;
+import io.github.linuxforhealth.hl7.HL7ToFHIRConverter;
 import io.github.linuxforhealth.hl7.segments.util.DatatypeUtils;
 import io.github.linuxforhealth.hl7.segments.util.ResourceUtils;
 
@@ -36,6 +37,8 @@ import io.github.linuxforhealth.hl7.segments.util.ResourceUtils;
  * Tests for IN1, Coverage, and related segments
  */
 class Hl7FinancialInsuranceTest {
+    private HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
+
     // Suppress warnings about too many assertions in a test. Justification: creating a FHIR message is very costly; we need to check many asserts per creation for efficiency.  
     @java.lang.SuppressWarnings("squid:S5961")
     @Test
@@ -117,7 +120,7 @@ class Hl7FinancialInsuranceTest {
                 // IN2.72 is purposely empty (backup to IN1.17) so no RelatedPerson is created.
                 + "|Name69.1^^^^^IdSystem69.6^UNK^^^IdValue69.10||\n";
 
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         List<Resource> encounters = ResourceUtils.getResourceList(e, ResourceType.Encounter);
         assertThat(encounters).hasSize(1); // From PV1
@@ -127,14 +130,14 @@ class Hl7FinancialInsuranceTest {
         Patient patient = (Patient) patients.get(0);
         String patientId = patient.getId();
         assertThat(patient.getIdentifier()).hasSize(1); // From PID.3 
-        
+
         Identifier patientIdentifier = patient.getIdentifier().get(0);
         assertThat(patientIdentifier.getValue()).isEqualTo("MR1"); // PID.3.1 
         assertThat(patientIdentifier.getSystem()).isEqualTo("urn:id:XYZ"); // PID.3.4
         DatatypeUtils.checkCommonCodeableConceptAssertions(patientIdentifier.getType(), "MR", "Medical record number",
                 "http://terminology.hl7.org/CodeSystem/v2-0203", null); // PID.3.5
         // IN1.49 not used        
-  
+
         List<Resource> organizations = ResourceUtils.getResourceList(e, ResourceType.Organization);
         assertThat(organizations).hasSize(3); // From IN1.3 creates Payor, IN2.25 to new PayorId Organization, IN2.69 creates new PolicyHolder Organization Name
         Organization org = (Organization) organizations.get(0);
@@ -308,14 +311,14 @@ class Hl7FinancialInsuranceTest {
     // Tests IN1 & IN2 for all supported message types that have EVN segments.
     // The breadth of this test is sufficent for multiple message type coverage, so other tests are not parameterized.
     @ValueSource(strings = {
-        "DFT^P03^DFT_P03", 
-        "VXU^V04^VXU_V04", 
-        "ADT^A01^ADT_A01",
-        "ADT^A03^ADT_A03", 
-        "ADT^A04^ADT_A01", // ADT^A04 uses structure ADT_A01
-        "ADT^A08^ADT_A01", // ADT^A08 uses structure ADT_A01 
-        "ADT^A28^ADT_A05", // ADT^A28 uses structure ADT_A05 
-        "ADT^A31^ADT_A05"  // ADT^A31 uses structure ADT_A05 
+            "DFT^P03^DFT_P03",
+            "VXU^V04^VXU_V04",
+            "ADT^A01^ADT_A01",
+            "ADT^A03^ADT_A03",
+            "ADT^A04^ADT_A01", // ADT^A04 uses structure ADT_A01
+            "ADT^A08^ADT_A01", // ADT^A08 uses structure ADT_A01 
+            "ADT^A28^ADT_A05", // ADT^A28 uses structure ADT_A05 
+            "ADT^A31^ADT_A05" // ADT^A31 uses structure ADT_A05 
     })
     // Tests IN1.17 coverage by related person. A related person should be created and cross-referenced.
     // Also tests backup field for coverage.order
@@ -380,7 +383,7 @@ class Hl7FinancialInsuranceTest {
                 //    IN2.63.18 to Organization Contact telecom .rank 
                 + "MEMBER61||^^^^^555^7677777^^^^^^20201231145045^20211231145045^^^^1|";
 
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         List<Resource> encounters = ResourceUtils.getResourceList(e, ResourceType.Encounter);
         assertThat(encounters).hasSize(1); // From PV1
@@ -594,7 +597,7 @@ class Hl7FinancialInsuranceTest {
         // TENANT prepend is passed through the options.  
         ConverterOptions customOptionsWithTenant = new Builder().withValidateResource().withPrettyPrint()
                 .withProperty("TENANT", "TenantId").build();
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message,
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message,
                 customOptionsWithTenant);
 
         List<Resource> encounters = ResourceUtils.getResourceList(e, ResourceType.Encounter);
@@ -660,7 +663,8 @@ class Hl7FinancialInsuranceTest {
         assertThat(orgIdentifier.getValue()).isEqualTo("IdValue69.10"); // IN2.69.10
         assertThat(orgIdentifier.getSystem()).isEqualTo("urn:id:IdSystem69.6"); // IN2.69.6
         // Becuase the code is known, the 0203 table lookup is successful and returns code, display, and system
-        DatatypeUtils.checkCommonCodeableConceptAssertions(orgIdentifier.getType(), "XX", "Organization identifier", "http://terminology.hl7.org/CodeSystem/v2-0203", null); // IN2.69.7 with lookup
+        DatatypeUtils.checkCommonCodeableConceptAssertions(orgIdentifier.getType(), "XX", "Organization identifier",
+                "http://terminology.hl7.org/CodeSystem/v2-0203", null); // IN2.69.7 with lookup
 
         List<Resource> coverages = ResourceUtils.getResourceList(e, ResourceType.Coverage);
         assertThat(coverages).hasSize(1); // From IN1 segment
@@ -720,7 +724,7 @@ class Hl7FinancialInsuranceTest {
                 // IN1.8 to 15 NOT REFERENCED (Tested in testBasicInsuranceCoverageFields)
                 + "IN1|1|PLAN001|210012|GOLD CHOICE PLUS|||^^^^^800^3334444||||||||||||\n";
 
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         List<Resource> encounters = ResourceUtils.getResourceList(e, ResourceType.Encounter);
         assertThat(encounters).hasSize(1); // From PV1
@@ -797,7 +801,7 @@ class Hl7FinancialInsuranceTest {
                 // IN2.72 to Coverage.relationship and RelatedPerson.relationship.  (Backup for IN1.17) Codes from table 0344
                 + "04|\n"; // 04 = Natural child
 
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         List<Resource> encounters = ResourceUtils.getResourceList(e, ResourceType.Encounter);
         assertThat(encounters).hasSize(1); // From PV1
@@ -889,7 +893,7 @@ class Hl7FinancialInsuranceTest {
                 // Code 01 (self) should create relationship of ONESELF, and reference to patient
                 + "01|\n";
 
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         List<Resource> encounters = ResourceUtils.getResourceList(e, ResourceType.Encounter);
         assertThat(encounters).hasSize(1); // From PV1
@@ -966,7 +970,7 @@ class Hl7FinancialInsuranceTest {
                 // IN1.37 through IN1.53 NOT REFERENCED
                 + "|MEMBER36|||||||||||||J321456||||\n";
 
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         List<Resource> encounters = ResourceUtils.getResourceList(e, ResourceType.Encounter);
         assertThat(encounters).hasSize(1); // From PV1
@@ -978,7 +982,7 @@ class Hl7FinancialInsuranceTest {
         // No patient identifier should have value IN1.49 "J321456" because relationship is not SEL (self) 
         // Finding exactly 1 expected identifier "workers_comp" proves not "J321456"
         assertThat(patient.getIdentifier()).hasSize(1);
-        assertThat(patient.getIdentifierFirstRep().getValueElement()).hasToString("workers_comp");  
+        assertThat(patient.getIdentifierFirstRep().getValueElement()).hasToString("workers_comp");
 
         List<Resource> organizations = ResourceUtils.getResourceList(e, ResourceType.Organization);
         assertThat(organizations).hasSize(1); // From Payor created by IN1
@@ -1049,7 +1053,7 @@ class Hl7FinancialInsuranceTest {
                 // A valid code in IN2.72 does not take priority over an invalid code in IN1.17.
                 + "04|\n";
 
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         List<Resource> encounters = ResourceUtils.getResourceList(e, ResourceType.Encounter);
         assertThat(encounters).hasSize(1); // From PV1
@@ -1098,8 +1102,7 @@ class Hl7FinancialInsuranceTest {
     // Ensure that Patient data does not bleed into Organizations created for the Patient's insurance
     void testForDataBleedFromPatientToOrganization() throws IOException {
 
-        String hl7message = 
-                "MSH|^~\\&|TEST|TEST|||20220101120000||ADT^A01^ADT_A01|1234|P|2.6\n"
+        String hl7message = "MSH|^~\\&|TEST|TEST|||20220101120000||ADT^A01^ADT_A01|1234|P|2.6\n"
                 // "MSH|^~\\&|HL7Soup|Instance1|MCM|Instance2|200911021022|Security|ADT^A01^ADT_A01|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6|56789^NID^UID|MCM|CDP|^4086::132:2A57:3C28^IPV6|^4086::132:2A57:3C25^IPV6|\n"
                 // PID.11 Used for address
                 // PID.11.9 Used for district calculation
@@ -1111,9 +1114,9 @@ class Hl7FinancialInsuranceTest {
                 // IN1 Broadly populated to create organization
                 + "IN1|1|GLOBAL|7776664|Blue Cross Blue Shield|456 Blue Cross Lane||||Blue|987123|IBM||||||NON||||||||||||20210322145350|Dr Disney|S|GOOD|200|12|B6543|H789456|||17|||1|M|123 IBM way|True|NONE|B|NO|J321456|M|20210322145605|London|YES\n"
                 // IN2 Broadly populated to create organizations
-                + "IN2|A23456|222001111|IBM 1345|EMPLOYEED|E|N23497234|R3294809|S234234|Army|U439823|SGT SCHULTZ|Army|Fort Wayne|USA|E1... E9|ACT|20300402145954|N|N|N|Yes|Grey Duck|Goose|T34941341232|D123123123|C435435345|2|SPR|2ANC|1234.00|O|A0|USA|EN|F|F|Y|N|COG|Stanley|DUTCH|N|M|20170322150208||Software Engineer|8|P|Mr Blue|1-555-333-4444|SURGERY|Jim Stanley|1-555-222-3333|FIRST|20170202150409|20210322150400|3|1-222-333-4444|GLOBAL|GROUP|B14456789|OTH|1-444-777-8888|1-444-555-3333|NONE|N|Y|N|GVH 123456|CDP 98765|2106-3|9\n" ;
+                + "IN2|A23456|222001111|IBM 1345|EMPLOYEED|E|N23497234|R3294809|S234234|Army|U439823|SGT SCHULTZ|Army|Fort Wayne|USA|E1... E9|ACT|20300402145954|N|N|N|Yes|Grey Duck|Goose|T34941341232|D123123123|C435435345|2|SPR|2ANC|1234.00|O|A0|USA|EN|F|F|Y|N|COG|Stanley|DUTCH|N|M|20170322150208||Software Engineer|8|P|Mr Blue|1-555-333-4444|SURGERY|Jim Stanley|1-555-222-3333|FIRST|20170202150409|20210322150400|3|1-222-333-4444|GLOBAL|GROUP|B14456789|OTH|1-444-777-8888|1-444-555-3333|NONE|N|Y|N|GVH 123456|CDP 98765|2106-3|9\n";
 
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         List<Resource> patients = ResourceUtils.getResourceList(e, ResourceType.Patient);
         assertThat(patients).hasSize(1); // From PID
@@ -1124,7 +1127,7 @@ class Hl7FinancialInsuranceTest {
         assertThat(organizations).hasSize(3); // From Payor created by IN1
         Organization org = (Organization) organizations.get(0);
         assertThat(org.getAddressFirstRep().hasDistrict()).isFalse();
-       
+
         org = (Organization) organizations.get(1);
         assertThat(org.hasAddress()).isFalse();
 

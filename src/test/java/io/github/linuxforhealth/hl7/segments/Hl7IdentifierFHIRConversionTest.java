@@ -26,11 +26,13 @@ import org.hl7.fhir.r4.model.Procedure;
 import org.hl7.fhir.r4.model.ServiceRequest;
 import org.junit.jupiter.api.Test;
 
+import io.github.linuxforhealth.hl7.HL7ToFHIRConverter;
 import io.github.linuxforhealth.hl7.segments.util.DatatypeUtils;
 import io.github.linuxforhealth.hl7.segments.util.PatientUtils;
 import io.github.linuxforhealth.hl7.segments.util.ResourceUtils;
 
 class Hl7IdentifierFHIRConversionTest {
+    private HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
 
     // Suppress warnings about too many assertions in a test.  Justification: creating a FHIR message is costly; we need to check many asserts per creation for efficiency.  
     @java.lang.SuppressWarnings("squid:S5961")
@@ -39,7 +41,7 @@ class Hl7IdentifierFHIRConversionTest {
         String patientIdentifiers = "MSH|^~\\&|MIICEHRApplication|MIIC|MIIC|MIIC|201705130822||VXU^V04^VXU_V04|test1100|P|2.5.1|||AL|AL|||||Z22^CDCPHINVS|^^^^^MIIC^SR^^^MIIC|MIIC\n"
                 // Three ID's for testing, plus a SSN in field 19.
                 + "PID|1||MRN12345678^^^ID-XYZ^MR~111223333^^^USA^SS~MN1234567^^^MNDOT^DL|ALTID|Moose^Mickey^J^III^^^||20060504|M|||||||||||444556666|D-12445889-Z||||||||||\n";
-        Patient patient = PatientUtils.createPatientFromHl7Segment(patientIdentifiers);
+        Patient patient = PatientUtils.createPatientFromHl7Segment(ftv, patientIdentifiers);
 
         // Expect 5 identifiers
         assertThat(patient.hasIdentifier()).isTrue();
@@ -117,7 +119,7 @@ class Hl7IdentifierFHIRConversionTest {
         String patientIdentifiersSpecialCases = "MSH|^~\\&|MIICEHRApplication|MIIC|MIIC|MIIC|201705130822||VXU^V04^VXU_V04|test1100|P|2.5.1|||AL|AL|||||Z22^CDCPHINVS|^^^^^MIIC^SR^^^MIIC|MIIC\n"
                 // First ID has blanks in the authority.  Second ID has no authority provided.  Third ID has an unknown CODE in the standard v2 table.
                 + "PID|1||MRN12345678^^^Regional Health ID^MR~111223333^^^^SS~A100071402^^^^AnUnknownCode|ALTID|Moose^Mickey^J^III^^^||20060504|M||||||||||||||||||||||\n";
-        Patient patient = PatientUtils.createPatientFromHl7Segment(patientIdentifiersSpecialCases);
+        Patient patient = PatientUtils.createPatientFromHl7Segment(ftv, patientIdentifiersSpecialCases);
 
         // Expect 2 identifiers
         assertThat(patient.hasIdentifier()).isTrue();
@@ -178,7 +180,7 @@ class Hl7IdentifierFHIRConversionTest {
         String Field1andField3 = "MSH|^~\\&|SE050|050|PACS|050|20120912011230||ADT^A01|102|T|2.6|||AL|NE\r"
                 + "PID|||1234||DOE^JANE^|||F||||||||||||||||||||||\r"
                 + "AL1|1|DA|00000741^OXYCODONE^LN||HYPOTENSION\r";
-        AllergyIntolerance allergy = ResourceUtils.getAllergyResource(Field1andField3);
+        AllergyIntolerance allergy = ResourceUtils.getAllergyResource(ftv, Field1andField3);
 
         // Expect a single identifier
         assertThat(allergy.hasIdentifier()).isTrue();
@@ -195,7 +197,7 @@ class Hl7IdentifierFHIRConversionTest {
         String Field1andField2 = "MSH|^~\\&|SE050|050|PACS|050|20120912011230||ADT^A01|102|T|2.6|||AL|NE\r"
                 + "PID|||1234||DOE^JANE^|||F||||||||||||||||||||||\r"
                 + "AL1|1|DA|00000741^OXYCODONE||HYPOTENSION\r";
-        allergy = ResourceUtils.getAllergyResource(Field1andField2);
+        allergy = ResourceUtils.getAllergyResource(ftv, Field1andField2);
         // Expect a single identifier
         assertThat(allergy.hasIdentifier()).isTrue();
         assertThat(allergy.getIdentifier()).hasSize(1);
@@ -211,7 +213,7 @@ class Hl7IdentifierFHIRConversionTest {
         String justField2 = "MSH|^~\\&|SE050|050|PACS|050|20120912011230||ADT^A01|102|T|2.6|||AL|NE\r"
                 + "PID|||1234||DOE^JANE^|||F||||||||||||||||||||||\r"
                 + "AL1|1|DA|^OXYCODONE||HYPOTENSION\r";
-        allergy = ResourceUtils.getAllergyResource(justField2);
+        allergy = ResourceUtils.getAllergyResource(ftv, justField2);
 
         // Expect a single identifier
         assertThat(allergy.hasIdentifier()).isTrue();
@@ -232,7 +234,7 @@ class Hl7IdentifierFHIRConversionTest {
                 + "PID|||10290^^^WEST^MR||||20040530|M||||||||||||||||||||||N\n"
                 + "PV1||I||||||||SUR||||||||S|8846511^^^ACME|A|||||||||||||||||||SF|K||||20170215080000\n"
                 + "PRB|AD|20170110074000|K80.00^Cholelithiasis^I10||E1|1|20100907175347|20150907175347|20180310074000||||confirmed^Confirmed^http://terminology.hl7.org/CodeSystem/condition-ver-status|remission^Remission^http://terminology.hl7.org/CodeSystem/condition-clinical|20180310074000|20170102074000|textual representation of the time when the problem began|1^primary|ME^Medium|0.4|marginal|good|marginal|marginal|highly sensitive|some prb detail|\r";
-        Condition condition = ResourceUtils.getCondition(withoutPRB4);
+        Condition condition = ResourceUtils.getCondition(ftv, withoutPRB4);
 
         // Expect a single identifier
         assertThat(condition.hasIdentifier()).isTrue();
@@ -252,7 +254,7 @@ class Hl7IdentifierFHIRConversionTest {
         String withPRB4 = "MSH|^~\\&|||||20040629164652|1|PPR^PC1|331|P|2.3.1||\n" +
                 "PID|1||000054321^^^MRN||||19820512|M||2106-3|||||EN^English|M|CAT|78654||||N\n" +
                 "PRB|AD|20170110074000|K80.00^Cholelithiasis^I10|53956|E1|1|20100907175347|20150907175347|20180310074000||||confirmed^Confirmed^http://terminology.hl7.org/CodeSystem/condition-ver-status|remission^Remission^http://terminology.hl7.org/CodeSystem/condition-clinical|20180310074000|20170102074000|textual representation of the time when the problem began|1^primary|ME^Medium|0.4|marginal|good|marginal|marginal|highly sensitive|some prb detail|\r";
-        condition = ResourceUtils.getCondition(withPRB4);
+        condition = ResourceUtils.getCondition(ftv, withPRB4);
 
         // Expect 2 identifiers
         assertThat(condition.hasIdentifier()).isTrue();
@@ -291,7 +293,7 @@ class Hl7IdentifierFHIRConversionTest {
                 + "PID|||10290^^^WEST^MR||||20040530|M||||||||||88654||||||||||||N\n"
                 + "PV1||I||||||||SUR||||||||S||A|||||||||||||||||||SF|K||||20170215080000\n"
                 + "DG1|1|ICD10|C56.9^Ovarian Cancer^I10|Test|20210322154449|A|E123|R45|Y|J76|C|15|1458.98||1|123^DOE^JOHN^A^|C|Y|20210322154326||S1234|Parent Diagnosis|Value345|Group567|DiagnosisG45|Y\r";
-        Condition condition = ResourceUtils.getCondition(withoutDG120);
+        Condition condition = ResourceUtils.getCondition(ftv, withoutDG120);
 
         // Expect 2 identifiers
         assertThat(condition.hasIdentifier()).isTrue();
@@ -330,7 +332,7 @@ class Hl7IdentifierFHIRConversionTest {
                 + "PID|||10290^^^WEST^MR||||20040530|M||||||||||||||||||||||N\n"
                 + "PV1||I||||||||SUR||||||||S|8846511^^^ACME|A|||||||||||||||||||SF|K||||20170215080000\n"
                 + "DG1|1|ICD10|B45678|Broken Arm|20210322154449|A|E123|R45|Y|J76|C|15|1458.98||1|123^DOE^JOHN^A^|C|Y|20210322154326|one^https://terminology.hl7.org/CodeSystem/two^three^https://terminology.hl7.org/CodeSystem/four|S1234|Parent Diagnosis|Value345|Group567|DiagnosisG45|Y\r";
-        Condition condition = ResourceUtils.getCondition(withDG120);
+        Condition condition = ResourceUtils.getCondition(ftv, withDG120);
 
         // Expect 4 identifiers
         assertThat(condition.hasIdentifier()).isTrue();
@@ -385,7 +387,7 @@ class Hl7IdentifierFHIRConversionTest {
                 + "PID|||10290^^^WEST^MR||||20040530|M||||||||||||||||||||||N\n"
                 + "PV1||I||||||||SUR||||||||S||A|||||||||||||||||||SF|K||||20170215080000\n"
                 + "DG1|1|ICD10|^Ovarian Cancer|Test|20210322154449|A|E123|R45|Y|J76|C|15|1458.98||1|123^DOE^JOHN^A^|C|Y|20210322154326||S1234|Parent Diagnosis|Value345|Group567|DiagnosisG45|Y\r";
-        Condition condition = ResourceUtils.getCondition(withDG132);
+        Condition condition = ResourceUtils.getCondition(ftv, withDG132);
 
         // Expect 2 identifiers
         assertThat(condition.hasIdentifier()).isTrue();
@@ -426,7 +428,7 @@ class Hl7IdentifierFHIRConversionTest {
                 + "PV1|1|I|E2^E211^E211B^1488|Elective||||||||||V\r"
                 + "OBR|1|ORD448811^NIST EHR|R-511^NIST Lab Filler|1000^Hepatitis A B C Panel^99USL|||20120628070100|||||||||\r"
                 + "OBX|1|ST|DINnumber^^LSFUSERDATAE||N/A||||||R||||||\r";
-        Observation observation = ResourceUtils.getObservation(joinFillPlaAndObx3);
+        Observation observation = ResourceUtils.getObservation(ftv, joinFillPlaAndObx3);
 
         // Expect a single identifier
         assertThat(observation.hasIdentifier()).isTrue();
@@ -446,7 +448,7 @@ class Hl7IdentifierFHIRConversionTest {
                 + "PV1|1|I|E2^E211^E211B^1488|Elective||||||||||V\r"
                 + "OBR|1|ORD448811^NIST EHR|^NIST Lab Filler|1000^Hepatitis A B C Panel^99USL|||20120628070100|||||||||\r"
                 + "OBX|1|ST|DINnumber^^||N/A||||||R||||||\r";
-        observation = ResourceUtils.getObservation(msg);
+        observation = ResourceUtils.getObservation(ftv, msg);
 
         // Expect a single identifier
         assertThat(observation.hasIdentifier()).isTrue();
@@ -466,7 +468,7 @@ class Hl7IdentifierFHIRConversionTest {
                 + "PRB|AD|200603150625|aortic stenosis|53692||2||200603150625\r"
                 + "OBX|1|ST|DINnumber^^LSFUSERDATAE||ECHOCARDIOGRAPHIC REPORT||||||F|||20150930164100|||\r"
                 + "ORC|NW|PON001|FON001|PGN001|SC|D|1||20170825010500|MS|MS||||20170825010500|";
-        observation = ResourceUtils.getObservation(msg);
+        observation = ResourceUtils.getObservation(ftv, msg);
 
         // Expect a single identifier
         assertThat(observation.hasIdentifier()).isTrue();
@@ -486,7 +488,7 @@ class Hl7IdentifierFHIRConversionTest {
                 + "PRB|AD|200603150625|aortic stenosis|53692||2||200603150625\r"
                 + "OBX|1|ST|DINnumber||ECHOCARDIOGRAPHIC REPORT||||||F|||20150930164100|||\r"
                 + "ORC|NW|PON001|||SC|D|1||20170825010500|MS|MS|||||";
-        observation = ResourceUtils.getObservation(msg);
+        observation = ResourceUtils.getObservation(ftv, msg);
 
         // Expect a single identifier
         assertThat(observation.hasIdentifier()).isTrue();
@@ -509,7 +511,7 @@ class Hl7IdentifierFHIRConversionTest {
                 + "ORC|NW|PON001^LE|FON001^OE PHIMS Stage|PGN001|SC|D|1||20170825010500|MS|MS||||20170825010500|\n"
                 + "OBR|1||CD_000000|2244^General Order|||20170825010500||||||Relevant Clinical Information|||||||002|||||F\n"
                 + "OBX|1|TX|||Impression: 1. Markedly intense metabolic activity corresponding with the area of nodular enhancement in the left oral cavity.||||||F|||20170825010500\n";
-        DiagnosticReport report = ResourceUtils.getDiagnosticReport(diagnosticReport);
+        DiagnosticReport report = ResourceUtils.getDiagnosticReport(ftv, diagnosticReport);
 
         // Expect 3 identifiers
         assertThat(report.hasIdentifier()).isTrue();
@@ -560,7 +562,7 @@ class Hl7IdentifierFHIRConversionTest {
                 + "ORC|NW|||PGN001|SC|D|1||20170825010500|MS|MS||||20170825010500|\n"
                 + "OBR|1|CC_000000^OE PHIMS Stage|CD_000000|2244^General Order|||20170825010500||||||Relevant Clinical Information|||||||002|||||F\n"
                 + "OBX|1|TX|||Impression: 1. Markedly intense metabolic activity corresponding with the area of nodular enhancement in the left oral cavity.||||||F|||20170825010500\n";
-        DiagnosticReport report = ResourceUtils.getDiagnosticReport(diagnosticReport);
+        DiagnosticReport report = ResourceUtils.getDiagnosticReport(ftv, diagnosticReport);
 
         // Expect 3 identifiers
         assertThat(report.hasIdentifier()).isTrue();
@@ -609,7 +611,7 @@ class Hl7IdentifierFHIRConversionTest {
                 + "EVN|A01|20130617154644||01\r"
                 + "PID|||12345^^^^MR||smith^john|||||||||||||112233\r"
                 + "PV1||I||||||||SUR||||||||S||A\r";
-        Encounter encounter = ResourceUtils.getEncounter(encounterMsg);
+        Encounter encounter = ResourceUtils.getEncounter(ftv, encounterMsg);
 
         // Expect a single identifier
         assertThat(encounter.hasIdentifier()).isTrue();
@@ -637,7 +639,7 @@ class Hl7IdentifierFHIRConversionTest {
                 + "EVN|A01|20130617154644||01\r"
                 + "PID|||12345^^^^MR||smith^john\r"
                 + "PV1||I||||||||SUR||||||||S|8846511|A|||||||||||||||||||SF|K||||20170215080000||||||POL8009|\r";
-        Encounter encounter = ResourceUtils.getEncounter(encounterW2Identifiers); //the first identifier is the same. the second Identifier comes from PV1.50
+        Encounter encounter = ResourceUtils.getEncounter(ftv, encounterW2Identifiers); //the first identifier is the same. the second Identifier comes from PV1.50
 
         // Expect 2 identifiers
         assertThat(encounter.hasIdentifier()).isTrue();
@@ -683,7 +685,7 @@ class Hl7IdentifierFHIRConversionTest {
                 + "EVN|A01|20130617154644||01\r"
                 + "PID|||12345^^^^MR||smith^john\r"
                 + "PV1||I||||||||SUR||||||||S||A\r";
-        Encounter encounter = ResourceUtils.getEncounter(encounterMsg);
+        Encounter encounter = ResourceUtils.getEncounter(ftv, encounterMsg);
 
         // Expect a single identifier
         assertThat(encounter.hasIdentifier()).isTrue();
@@ -711,7 +713,7 @@ class Hl7IdentifierFHIRConversionTest {
                 + "PID|1||432155^^^ANF^MR||Patient^Johnny^New^^^^L\r"
                 + "ORC|RE||197027|||||||||M|||||RI2050\r"
                 + "RXA|0|1|20130531|20130531|48^HIB PRP-T^CVX||||00^new immunization record^NIP001|||||||20131210||||CP|A\r";
-        Immunization immunization = ResourceUtils.getImmunization(field1AndField3);
+        Immunization immunization = ResourceUtils.getImmunization(ftv, field1AndField3);
 
         // Expect a single identifier
         assertThat(immunization.hasIdentifier()).isTrue();
@@ -729,7 +731,7 @@ class Hl7IdentifierFHIRConversionTest {
                 + "PID|1||432155^^^ANF^MR||Patient^Johnny^New^^^^L\r"
                 + "ORC|RE||197027||||||||||||||RI2050\r"
                 + "RXA|0|1|20130531|20130531|48^HIB PRP-T||||00^new immunization record^NIP001|||||||20131210||||CP|A\r";
-        immunization = ResourceUtils.getImmunization(field1AndField2);
+        immunization = ResourceUtils.getImmunization(ftv, field1AndField2);
 
         // Expect a single identifier
         assertThat(immunization.hasIdentifier()).isTrue();
@@ -747,7 +749,7 @@ class Hl7IdentifierFHIRConversionTest {
                 + "PID|1||432155^^^ANF^MR||Patient^Johnny^New^^^^L\r"
                 + "ORC|RE||197027||||||||||||||RI2050\r"
                 + "RXA|0|1|20130531|20130531|^HIB PRP-T||||00^new immunization record^NIP001|||||||20131210||||CP|A\r";
-        immunization = ResourceUtils.getImmunization(justField2);
+        immunization = ResourceUtils.getImmunization(ftv, justField2);
         // Expect a single identifier
         assertThat(immunization.hasIdentifier()).isTrue();
         assertThat(immunization.getIdentifier()).hasSize(1);
@@ -768,7 +770,7 @@ class Hl7IdentifierFHIRConversionTest {
                 + "PID|1||000054321^^^MRN|||||||||||||M|CAT|78654^^^ACME||||N\n"
                 + "ROL|5897|UP|AD||20210322133821|20210322133822|10||Hospital|ST||||USA\n"
                 + "PR1|1|ICD10|B45678|Fix break|20210322155008|A|75||V46|80|||32|1|D22|G45|1|G|P98|X|0|0\n";
-        Procedure procedure = ResourceUtils.getProcedure(procedureMsg);
+        Procedure procedure = ResourceUtils.getProcedure(ftv, procedureMsg);
 
         // Expect 2 identifiers
         assertThat(procedure.hasIdentifier()).isTrue();
@@ -804,7 +806,7 @@ class Hl7IdentifierFHIRConversionTest {
                 + "ROL|5897|UP|AD||20210322133821|20210322133822|10||Hospital|ST||||USA\n"
                 + "PR1|1|ICD10|B45678|Fix break|20210322155008|A|75||V46|80|||32|1|D22|G45|1|G||X|0|0\n";
 
-        procedure = ResourceUtils.getProcedure(procedureMSH);
+        procedure = ResourceUtils.getProcedure(ftv, procedureMSH);
 
         // Expect 2 identifiers
         assertThat(procedure.hasIdentifier()).isTrue();
@@ -846,7 +848,7 @@ class Hl7IdentifierFHIRConversionTest {
                 +
                 "TXA|1||B45678||||||\n";
 
-        DocumentReference report = ResourceUtils.getDocumentReference(documentReference);
+        DocumentReference report = ResourceUtils.getDocumentReference(ftv, documentReference);
 
         // Expect 3 identifiers
         assertThat(report.hasIdentifier()).isTrue();
@@ -906,7 +908,7 @@ class Hl7IdentifierFHIRConversionTest {
                 "OBR|1||CD_000000^OE|2244^General Order|||20170825010500||||||Relevant Clinical Information|||||||002|||||F|||550600^Tsadok550600^Janetary~660600^Merrit660600^Darren^F~770600^Das770600^Surjya^P~880600^Winter880600^Oscar^||||770600&Das770600&Surjya&P^^^6N^1234^A|\n"
                 +
                 "TXA|1||B45678|||||||||||PON001^IE||\n";
-        DocumentReference report = ResourceUtils.getDocumentReference(documentReferenceMessage);
+        DocumentReference report = ResourceUtils.getDocumentReference(ftv, documentReferenceMessage);
 
         // Expect 3 identifiers
         assertThat(report.hasIdentifier()).isTrue();
@@ -967,7 +969,7 @@ class Hl7IdentifierFHIRConversionTest {
                 "OBR|1|CD_000000^OE||2244^General Order|||20170825010500||||||Relevant Clinical Information|||||||002|||||F|||550600^Tsadok550600^Janetary~660600^Merrit660600^Darren^F~770600^Das770600^Surjya^P~880600^Winter880600^Oscar^||||770600&Das770600&Surjya&P^^^6N^1234^A|\n"
                 +
                 "TXA|1||B45678||||||||||||FON001^IE\n";
-        DocumentReference report = ResourceUtils.getDocumentReference(documentReferenceMessage);
+        DocumentReference report = ResourceUtils.getDocumentReference(ftv, documentReferenceMessage);
 
         // Expect 3 identifiers
         assertThat(report.hasIdentifier()).isTrue();
@@ -1031,7 +1033,7 @@ class Hl7IdentifierFHIRConversionTest {
                 "ORC||||PG1234567^MYPG||E|^Q6H^D10^^^R\n" +
                 "OBR|1|CD150920001336^OE|CD150920001337^IE|||20150930000000|20150930164100|||||||||25055^MARCUSON^PATRICIA^L|||||||||F|||5755^DUNN^CHAD^B~25055^MARCUSON^PATRICIA^L|||WEAKNESS|DAS, SURJYA P||SHIELDS, SHARON A|||||||||";
 
-        ServiceRequest serviceReq = ResourceUtils.getServiceRequest(serviceRequest);
+        ServiceRequest serviceReq = ResourceUtils.getServiceRequest(ftv, serviceRequest);
 
         // Expect 3 identifiers
         assertThat(serviceReq.hasIdentifier()).isTrue();
@@ -1092,7 +1094,7 @@ class Hl7IdentifierFHIRConversionTest {
                 "ORC||PON001||||E|^Q6H^D10^^^R\n" +
                 "OBR|1||CD150920001336|||20150930000000|20150930164100|||||||||25055^MARCUSON^PATRICIA^L|||||||||F|||5755^DUNN^CHAD^B~25055^MARCUSON^PATRICIA^L|||WEAKNESS|DAS, SURJYA P||SHIELDS, SHARON A|||||||||";
 
-        ServiceRequest serviceReq = ResourceUtils.getServiceRequest(serviceRequest);
+        ServiceRequest serviceReq = ResourceUtils.getServiceRequest(ftv, serviceRequest);
 
         // Expect 3 identifiers
         assertThat(serviceReq.hasIdentifier()).isTrue();
@@ -1157,7 +1159,7 @@ class Hl7IdentifierFHIRConversionTest {
                 //  11. OBR.2 used for Placer
                 + "OBR|1|CD150920001336^OE|CD150920001337^IE|83036E^HEMOGLOBIN A1C^PACSEAP^^^^^^HEMOGLOBIN A1C|||||||||||||||||||||||||||||||||||||||||||\n";
 
-        ServiceRequest serviceReq = ResourceUtils.getServiceRequest(serviceRequest);
+        ServiceRequest serviceReq = ResourceUtils.getServiceRequest(ftv, serviceRequest);
 
         // Expect 3 identifiers
         assertThat(serviceReq.hasIdentifier()).isTrue();
@@ -1223,7 +1225,7 @@ class Hl7IdentifierFHIRConversionTest {
                 //  11. OBR.3 ignored as Filler
                 + "OBR|1|CD150920001336|CD150920001336|83036E^HEMOGLOBIN A1C^PACSEAP^^^^^^HEMOGLOBIN A1C||||||||||||||||||||||||||||||||||||||||||||\n";
 
-        ServiceRequest serviceReq = ResourceUtils.getServiceRequest(serviceRequest);
+        ServiceRequest serviceReq = ResourceUtils.getServiceRequest(ftv, serviceRequest);
 
         // Expect 3 identifiers
         assertThat(serviceReq.hasIdentifier()).isTrue();
@@ -1288,7 +1290,7 @@ class Hl7IdentifierFHIRConversionTest {
                 //  11. OBR.3 ignored as Filler
                 + "OBR|1|||83036E^HEMOGLOBIN A1C^PACSEAP^^^^^^HEMOGLOBIN A1C|||||||||||||||||||||||||||||||||||||||||||\n";
 
-        ServiceRequest serviceReq = ResourceUtils.getServiceRequest(serviceRequest);
+        ServiceRequest serviceReq = ResourceUtils.getServiceRequest(ftv, serviceRequest);
 
         // Expect 3 identifiers
         assertThat(serviceReq.hasIdentifier()).isTrue();
@@ -1346,7 +1348,7 @@ class Hl7IdentifierFHIRConversionTest {
                 + "PV1||I||||||||SUR||||||||S||A|||||||||||||||||||SF|K||||20170215080000\r"
                 + "ORC|NW|PON001^OE|CD2017071101^RX|||E|10^BID^D4^^^R||20170215080000\r"
                 + "RXO|RX700001^DOCUSATE SODIUM 100 MG CAPSULE|100||mg|||||G||10||5|\r";
-        MedicationRequest medReq = ResourceUtils.getMedicationRequest(medicationRequest);
+        MedicationRequest medReq = ResourceUtils.getMedicationRequest(ftv, medicationRequest);
 
         // Expect 4 identifiers
         assertThat(medReq.hasIdentifier()).isTrue();
@@ -1409,7 +1411,7 @@ class Hl7IdentifierFHIRConversionTest {
                 + "PV1||I|||||||||||||||||789789\r"
                 + "ORC|NW|||||E|10^BID^D4^^^R||20170215080000\r"
                 + "RXO|RX700001^DOCUSATE SODIUM 100 MG CAPSULE^ABC|100||mg|||||G||10||5|\r";
-        MedicationRequest medReq = ResourceUtils.getMedicationRequest(medicationRequest);
+        MedicationRequest medReq = ResourceUtils.getMedicationRequest(ftv, medicationRequest);
 
         // Expect 2 identifiers
         assertThat(medReq.hasIdentifier()).isTrue();
@@ -1450,7 +1452,7 @@ class Hl7IdentifierFHIRConversionTest {
                 + "PV1||I||||||||SUR||||||||S||A|||||||||||||||||||SF|K||||20170215080000\r"
                 + "ORC|NW||CD2017071101^RX|||E|10^BID^D4^^^R||20170215080000\r"
                 + "RXO|^DOCUSATE SODIUM 100 MG CAPSULE|100||mg|||||G||10||5|\r";
-        MedicationRequest medReq = ResourceUtils.getMedicationRequest(medicationRequest);
+        MedicationRequest medReq = ResourceUtils.getMedicationRequest(ftv, medicationRequest);
 
         // Expect 3 identifiers
         assertThat(medReq.hasIdentifier()).isTrue();
@@ -1503,7 +1505,7 @@ class Hl7IdentifierFHIRConversionTest {
                 + "ORC|NW|||||E|10^BID^D4^^^R||20170215080000\r"
                 + "RXO|||||||||G||10||5|\r"
                 + "RXE|^^^20170923230000^^R|999^Ampicillin 250 MG TAB^NDC|100||mg|123^test^ABC||||10||5|";
-        MedicationRequest medReq = ResourceUtils.getMedicationRequest(medicationRequest);
+        MedicationRequest medReq = ResourceUtils.getMedicationRequest(ftv, medicationRequest);
 
         // Expect 2 identifier
         assertThat(medReq.hasIdentifier()).isTrue();
@@ -1544,7 +1546,7 @@ class Hl7IdentifierFHIRConversionTest {
                 + "PV1||I|||||||||||||||||789789\r"
                 + "ORC|NW|||||E|10^BID^D4^^^R||20170215080000\r"
                 + "RXE|^^^20170923230000^^R|999^Ampicillin 250 MG TAB^NDC|100||mg|123^test^ABC||||10||5|";
-        MedicationRequest medReq = ResourceUtils.getMedicationRequest(medicationRequest);
+        MedicationRequest medReq = ResourceUtils.getMedicationRequest(ftv, medicationRequest);
 
         // Expect 2 identifiers
         assertThat(medReq.hasIdentifier()).isTrue();

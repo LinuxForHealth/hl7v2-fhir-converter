@@ -24,10 +24,12 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import io.github.linuxforhealth.fhir.FHIRContext;
+import io.github.linuxforhealth.hl7.HL7ToFHIRConverter;
 import io.github.linuxforhealth.hl7.segments.util.ResourceUtils;
 
 class Hl7DocumentReferenceFHIRConversionTest {
 
+    private HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
     private static FHIRContext context = new FHIRContext();
 
     // Note: All tests for MDM_T02 and MDM_T06 are the same. Use parameters.
@@ -45,7 +47,7 @@ class Hl7DocumentReferenceFHIRConversionTest {
                 + "OBR|1||||||20170825010500|||||||||||||002|||||F||||||||\n"
                 + "TXA|1|OP|TEXT|20180117144200|5566^PAPLast^PAPFirst^J^^MD|20180117144200|201801180346||<PHYSID>|<PHYSID>|MODL|<MESSAGEID>|4466^TRANSCLast^TRANSCFirst^J||<MESSAGEID>|This segment is for description|PA|R|AV|||||\n"
                 + "OBX|1|SN|||||||||X";
-        DocumentReference report = ResourceUtils.getDocumentReference(documentReference);
+        DocumentReference report = ResourceUtils.getDocumentReference(ftv, documentReference);
 
         assertThat(report.hasAuthenticator()).isTrue();
         assertThat(report.hasAuthor()).isTrue();
@@ -78,7 +80,7 @@ class Hl7DocumentReferenceFHIRConversionTest {
                 + "OBX|1|ST|100||This is content|||||||X\n";
 
         List<BundleEntryComponent> e = ResourceUtils
-                .createFHIRBundleFromHL7MessageReturnEntryList(documentReferenceMessage);
+                .createFHIRBundleFromHL7MessageReturnEntryList(ftv, documentReferenceMessage);
 
         List<Resource> documentReferenceList = ResourceUtils.getResourceList(e, ResourceType.DocumentReference);
         String s = context.getParser().encodeResourceToString(documentReferenceList.get(0));
@@ -118,7 +120,7 @@ class Hl7DocumentReferenceFHIRConversionTest {
                 + "OBX|2|TX|||NORMAL LV CHAMBER SIZE WITH MILD CONCENTRIC LVH||||||F|||202101010000|||\n"
                 + "OBX|3|TX|||HYPERDYNAMIC LV SYSTOLIC FUNCTION, VISUAL EF 80%||||||F|||202101010000|||\n";
 
-        DocumentReference report = ResourceUtils.getDocumentReference(documentReferenceMessage);
+        DocumentReference report = ResourceUtils.getDocumentReference(ftv, documentReferenceMessage);
         DocumentReference.DocumentReferenceContentComponent content = report.getContentFirstRep();
         assertThat(content.getAttachment().getContentType()).isEqualTo("text/plain"); // Future TXA.3, currently always defaults to text/plain
         assertThat(content.getAttachment().getCreationElement().toString()).containsPattern("2018-01-18T03:46:00"); // TXA.7 date
@@ -139,7 +141,7 @@ class Hl7DocumentReferenceFHIRConversionTest {
                 + "TXA|1||||||201801180346||<PHYSID1>||||||||||AV|||<PHYSID2>||\n"
                 // TODO: find better code for this test which is to see that OBX.2 is the fallback.
                 + "OBX|1|SN|||||||||F";
-        report = ResourceUtils.getDocumentReference(documentReferenceMessage);
+        report = ResourceUtils.getDocumentReference(ftv, documentReferenceMessage);
         content = report.getContentFirstRep();
         // Because the OBX is not TX, the content is put in an Observation
         // FHIR requires a Content element, so only a minimal one is created.
@@ -158,7 +160,7 @@ class Hl7DocumentReferenceFHIRConversionTest {
                 // Ensure that empty TXA.7 still works
                 + "TXA|1||||||||<PHYSID1>||||||||||AV|||<PHYSID2>||\n"
                 + "OBX|1|SN|||||||||F";
-        report = ResourceUtils.getDocumentReference(documentReferenceMessage);
+        report = ResourceUtils.getDocumentReference(ftv, documentReferenceMessage);
         content = report.getContentFirstRep();
         // Because the OBX is not TX, the content is put in an Observation
         // FHIR requires a Content element, so only a minimal one is created.
@@ -186,7 +188,7 @@ class Hl7DocumentReferenceFHIRConversionTest {
                 // OBX is type ST so an observation will be created
                 + "OBX|1|ST|100||This is content|||||||X\n";
         List<BundleEntryComponent> e = ResourceUtils
-                .createFHIRBundleFromHL7MessageReturnEntryList(documentReferenceMessage);
+                .createFHIRBundleFromHL7MessageReturnEntryList(ftv, documentReferenceMessage);
 
         List<Resource> documentReferenceList = ResourceUtils.getResourceList(e, ResourceType.DocumentReference);
         String s = context.getParser().encodeResourceToString(documentReferenceList.get(0));
@@ -243,7 +245,7 @@ class Hl7DocumentReferenceFHIRConversionTest {
                 + "OBR|1||||||20170825010500|||||||||||||002|||||F||||||||\n"
                 + "TXA|1||TEXT|||20180117144200|201801180346||<PHYSID1>||||||||||AV|||<PHYSID2>||\n"
                 + "OBX|1|ST|100||This is content|||||||X\n";
-        DocumentReference report = ResourceUtils.getDocumentReference(documentReferenceMessage);
+        DocumentReference report = ResourceUtils.getDocumentReference(ftv, documentReferenceMessage);
 
         InstantType date = report.getDateElement();
         assertThat(date.toString()).containsPattern("2018-01-17T14:42"); // TXA.6
@@ -262,7 +264,7 @@ class Hl7DocumentReferenceFHIRConversionTest {
                 + "OBR|1||||||20170825010500|||||||||||||002|||||F||||||||\n"
                 + "TXA|1||TEXT||||201801180346||<PHYSID1>|||||||This segment is for description|||AV|||<PHYSID2>||\n"
                 + "OBX|1|ST|100||This is content|||||||X\n";
-        DocumentReference report = ResourceUtils.getDocumentReference(documentReferenceMessage);
+        DocumentReference report = ResourceUtils.getDocumentReference(ftv, documentReferenceMessage);
 
         String description = report.getDescription();
         assertThat(description).isEqualTo("This segment is for description"); // TXA.16
@@ -281,7 +283,7 @@ class Hl7DocumentReferenceFHIRConversionTest {
                 + "OBR|1||||||20170825010500|||||||||||||002|||||F||||||||\n"
                 + "TXA|1||TEXT|||20180117144200|201801180346||<PHYSID1>||||||||PA||AV|||<PHYSID2>||\n"
                 + "OBX|1|ST|100||This is content|||||||X\n";
-        DocumentReference report = ResourceUtils.getDocumentReference(documentReferenceMessage);
+        DocumentReference report = ResourceUtils.getDocumentReference(ftv, documentReferenceMessage);
         DocumentReference.ReferredDocumentStatus docStatus = report.getDocStatus();
         assertThat(docStatus.toCode()).isEqualTo("preliminary"); // TXA.17
         assertThat(docStatus.getDefinition())
@@ -297,7 +299,7 @@ class Hl7DocumentReferenceFHIRConversionTest {
                 + "OBR|1|||555|||20170825010500|||||||||||||002|||||F||||||||\n"
                 + "TXA|1||TEXT|||20180117144200|201801180346||<PHYSID1>||||||||||AV|||<PHYSID2>||\n"
                 + "OBX|1|SN|||||||||F";
-        report = ResourceUtils.getDocumentReference(documentReferenceMessage);
+        report = ResourceUtils.getDocumentReference(ftv, documentReferenceMessage);
         docStatus = report.getDocStatus();
         assertThat(docStatus.toCode()).isEqualTo("final"); // OBX.11
         assertThat(docStatus.getDefinition()).contains(
@@ -313,7 +315,7 @@ class Hl7DocumentReferenceFHIRConversionTest {
                 + "OBR|1|||555|||20170825010500|||||||||||||002|||||F\n"
                 + "TXA|1||TEXT|||20180117144200|201801180346||<PHYSID1>||||||||||AV|||<PHYSID2>\n"
                 + "OBX|1|SN|||||||||X";
-        report = ResourceUtils.getDocumentReference(documentReferenceMessage);
+        report = ResourceUtils.getDocumentReference(ftv, documentReferenceMessage);
         assertThat(report.getDocStatus()).isNull(); // OBX-11 'X' is not mapped
     }
 
@@ -332,7 +334,7 @@ class Hl7DocumentReferenceFHIRConversionTest {
                 + "TXA|1||TEXT|||20180117144200|201801180346||<PHYSID1>||||4466^TRANSCLast^TRANSCFirst^J||||||AV|||<PHYSID2>||\n"
                 + "OBX|1|SN|||||||||X";
         List<BundleEntryComponent> e = ResourceUtils
-                .createFHIRBundleFromHL7MessageReturnEntryList(documentReferenceMessage);
+                .createFHIRBundleFromHL7MessageReturnEntryList(ftv, documentReferenceMessage);
 
         List<Resource> documentReferenceList = ResourceUtils.getResourceList(e, ResourceType.DocumentReference);
         String s = context.getParser().encodeResourceToString(documentReferenceList.get(0));
@@ -362,7 +364,7 @@ class Hl7DocumentReferenceFHIRConversionTest {
                 + "OBR|1||||||20170825010500|||||||||||||002|||||F||||||||\n"
                 + "TXA|1||TEXT||||201801180346||<PHYSID1>||||||||PA|R|AV|||<PHYSID2>||\n"
                 + "OBX|1|SN|||||||||X";
-        DocumentReference report = ResourceUtils.getDocumentReference(documentReferenceMessage);
+        DocumentReference report = ResourceUtils.getDocumentReference(ftv, documentReferenceMessage);
 
         CodeableConcept securityLabel = report.getSecurityLabelFirstRep();
         assertThat(securityLabel.getCodingFirstRep().getCode()).isEqualTo("R"); // TXA.18
@@ -386,7 +388,7 @@ class Hl7DocumentReferenceFHIRConversionTest {
                 + "OBR|1||||||20170825010500|||||||||||||002|||||F||||||||\n"
                 + "TXA|1||TEXT||||201801180346||<PHYSID1>||||||||PA||OB|||<PHYSID2>||\n"
                 + "OBX|1|SN|||||||||X";
-        DocumentReference report = ResourceUtils.getDocumentReference(documentReferenceMessage);
+        DocumentReference report = ResourceUtils.getDocumentReference(ftv, documentReferenceMessage);
         org.hl7.fhir.r4.model.Enumerations.DocumentReferenceStatus status = report.getStatus();
         assertThat(status.toCode()).isEqualTo("superseded"); // TXA.19
         assertThat(status.getSystem()).isEqualTo("http://hl7.org/fhir/document-reference-status");
@@ -401,7 +403,7 @@ class Hl7DocumentReferenceFHIRConversionTest {
                 + "OBR|1||||||20170825010500|||||||||||||002|||||X\n"
                 + "TXA|1||TEXT||||201801180346||<PHYSID1>||||||||PA|||||<PHYSID2>\n"
                 + "OBX|1|SN|||||||||X";
-        report = ResourceUtils.getDocumentReference(documentReferenceMessage);
+        report = ResourceUtils.getDocumentReference(ftv, documentReferenceMessage);
         status = report.getStatus();
         assertThat(status.toCode()).isEqualTo("entered-in-error"); // OBR.25
         assertThat(status.getSystem()).isEqualTo("http://hl7.org/fhir/document-reference-status");
@@ -416,7 +418,7 @@ class Hl7DocumentReferenceFHIRConversionTest {
                 + "OBR|1||||||20170825010500|||||||||||||002\n"
                 + "TXA|1||TEXT||||201801180346||<PHYSID1>||||||||PA\n"
                 + "OBX|1|SN|||||||||X";
-        report = ResourceUtils.getDocumentReference(documentReferenceMessage);
+        report = ResourceUtils.getDocumentReference(ftv, documentReferenceMessage);
         status = report.getStatus();
         assertThat(status.toCode()).isEqualTo("current"); // default value
         assertThat(status.getSystem()).isEqualTo("http://hl7.org/fhir/document-reference-status");
@@ -435,7 +437,7 @@ class Hl7DocumentReferenceFHIRConversionTest {
                 + "TXA|1||TEXT||||201801180346||<PHYSID1>||||||||||AV|||<PHYSID2>||\n"
                 + "OBX|1|SN|||||||||X";
         List<BundleEntryComponent> e = ResourceUtils
-                .createFHIRBundleFromHL7MessageReturnEntryList(documentReferenceMessage);
+                .createFHIRBundleFromHL7MessageReturnEntryList(ftv, documentReferenceMessage);
 
         List<Resource> documentReferenceList = ResourceUtils.getResourceList(e, ResourceType.DocumentReference);
         String s = context.getParser().encodeResourceToString(documentReferenceList.get(0));
@@ -461,7 +463,7 @@ class Hl7DocumentReferenceFHIRConversionTest {
                 + "OBR|1||||||20170825010500|||||||||||||002|||||F||||||||\n"
                 + "TXA|1||TEXT||||201801180346|||||<MESSAGEID>|||||PA|R|AV|||||\n"
                 + "OBX|1|SN|||||||||X";
-        DocumentReference report = ResourceUtils.getDocumentReference(documentReference);
+        DocumentReference report = ResourceUtils.getDocumentReference(ftv, documentReference);
         assertThat(report.hasMasterIdentifier()).isTrue();
         Identifier masterID = report.getMasterIdentifier();
         assertThat(masterID.getValue()).isEqualTo("<MESSAGEID>");
@@ -476,7 +478,7 @@ class Hl7DocumentReferenceFHIRConversionTest {
                 + "OBR|1||||||20170825010500|||||||||||||002|||||F||||||||\n"
                 + "TXA|1||TEXT||||201801180346|||||<MESSAGEID>^SYSTEM|||||PA|R|AV|||||\n"
                 + "OBX|1|SN|||||||||X";
-        report = ResourceUtils.getDocumentReference(documentReference);
+        report = ResourceUtils.getDocumentReference(ftv, documentReference);
         assertThat(report.hasMasterIdentifier()).isTrue();
         masterID = report.getMasterIdentifier();
         assertThat(masterID.getValue()).isEqualTo("<MESSAGEID>");
@@ -491,7 +493,7 @@ class Hl7DocumentReferenceFHIRConversionTest {
                 + "OBR|1||||||20170825010500|||||||||||||002|||||F||||||||\n"
                 + "TXA|1||TEXT||||201801180346|||||^SYSTEM^<BACKUPID>|||||PA|R|AV|||||\n"
                 + "OBX|1|SN|||||||||X";
-        report = ResourceUtils.getDocumentReference(documentReference);
+        report = ResourceUtils.getDocumentReference(ftv, documentReference);
         assertThat(report.hasMasterIdentifier()).isTrue();
         masterID = report.getMasterIdentifier();
         assertThat(masterID.getValue()).isEqualTo("<BACKUPID>");
@@ -511,7 +513,7 @@ class Hl7DocumentReferenceFHIRConversionTest {
                 + "OBR|1||||||20170825010500|||||||||||||002|||||F||||||||\n"
                 + "TXA|1|OP|TEXT||||201801180346||<PHYSID1>||||||||PA||AV|||<PHYSID2>||\n"
                 + "OBX|1|SN|||||||||X";
-        DocumentReference report = ResourceUtils.getDocumentReference(documentReferenceMessage);
+        DocumentReference report = ResourceUtils.getDocumentReference(ftv, documentReferenceMessage);
 
         CodeableConcept type = report.getType();
         assertThat(type.getCodingFirstRep().getCode()).isEqualTo("OP"); // TXA.2
@@ -539,7 +541,7 @@ class Hl7DocumentReferenceFHIRConversionTest {
                 + "OBX|2|TX|||NORMAL LV CHAMBER SIZE WITH MILD CONCENTRIC LVH||||||F|||202101010000|||\r"
                 + "OBX|3|TX|||HYPERDYNAMIC LV SYSTOLIC FUNCTION, VISUAL EF 80%||||||F|||202101010000|||\n";
 
-        DocumentReference documentRef = ResourceUtils.getDocumentReference(documentReferenceMessage);
+        DocumentReference documentRef = ResourceUtils.getDocumentReference(ftv, documentReferenceMessage);
         DocumentReference.DocumentReferenceContextComponent drContext = documentRef.getContext();
         assertThat(drContext.hasPeriod()).isFalse(); // Should contain a reference to the service request
         DocumentReference.DocumentReferenceContentComponent content = documentRef.getContentFirstRep();

@@ -6,9 +6,10 @@
 package io.github.linuxforhealth.hl7.message;
 
 import static org.assertj.core.api.Assertions.assertThat;
+
 import java.io.IOException;
 import java.util.List;
-import java.util.stream.Collectors;
+
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
@@ -20,6 +21,7 @@ import org.hl7.fhir.r4.model.ResourceType;
 import org.hl7.fhir.r4.model.ServiceRequest;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+
 import io.github.linuxforhealth.fhir.FHIRContext;
 import io.github.linuxforhealth.hl7.ConverterOptions;
 import io.github.linuxforhealth.hl7.ConverterOptions.Builder;
@@ -33,16 +35,16 @@ public class HL7OMLMessageTest {
             .withValidateResource()
             .withPrettyPrint()
             .build();
+    private HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
 
     @Test
     public void testOMLO21WithPatientAndOrderWithObservationRequestWithDG1() throws IOException {
         String hl7message = "MSH|^~\\&||Test System|||20210917110100||OML^O21^OML_O21|||2.6\r"
-        + "PID|1||7659afb9-0dfc-d744-1f40-5b9314807108^^^^MR||Feeney^Sam^^^^^L|||M||||||||\r"
-        + "ORC|NW|8125550e-04db-11ec-a9a8-086d41d421ca^^ID^UUID||||||||||\r"
-        + "OBR|1|8125550e-04db-11ec-a9a8-086d41d421ca^^ID^UUID||58410-2^CBC panel - Blood by Automated count^LN||||||||||||\r"
-        + "DG1|1||A013^Paratyphoid fever C^I10C|||A|||||||||1\r";
+                + "PID|1||7659afb9-0dfc-d744-1f40-5b9314807108^^^^MR||Feeney^Sam^^^^^L|||M||||||||\r"
+                + "ORC|NW|8125550e-04db-11ec-a9a8-086d41d421ca^^ID^UUID||||||||||\r"
+                + "OBR|1|8125550e-04db-11ec-a9a8-086d41d421ca^^ID^UUID||58410-2^CBC panel - Blood by Automated count^LN||||||||||||\r"
+                + "DG1|1||A013^Paratyphoid fever C^I10C|||A|||||||||1\r";
 
-        HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
         String json = ftv.convert(hl7message, OPTIONS_PRETTYPRINT);
         assertThat(json).isNotBlank();
         IBaseResource bundleResource = context.getParser().parseResource(json);
@@ -77,11 +79,10 @@ public class HL7OMLMessageTest {
     @Test
     public void testOMLO21WithPatientWithPatientVisitAndMinimumOrder() throws IOException {
         String hl7message = "MSH|^~\\&||Test System|||20210917110100||OML^O21^OML_O21|||2.6\r"
-        + "PID|1||7659afb9-0dfc-d744-1f40-5b9314807108^^^^MR||Feeney^Sam^^^^^L|||M||||||||\r"
-        + "PV1|1|O|||||||||||||||||2462201|||||||||||||||||||||||||20180520230000\r"
-        + "ORC|NW|8125550e-04db-11ec-a9a8-086d41d421ca^^ID^UUID||||||||||\r";
+                + "PID|1||7659afb9-0dfc-d744-1f40-5b9314807108^^^^MR||Feeney^Sam^^^^^L|||M||||||||\r"
+                + "PV1|1|O|||||||||||||||||2462201|||||||||||||||||||||||||20180520230000\r"
+                + "ORC|NW|8125550e-04db-11ec-a9a8-086d41d421ca^^ID^UUID||||||||||\r";
 
-        HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
         String json = ftv.convert(hl7message, OPTIONS_PRETTYPRINT);
         assertThat(json).isNotBlank();
         IBaseResource bundleResource = context.getParser().parseResource(json);
@@ -102,22 +103,21 @@ public class HL7OMLMessageTest {
         // assertThat(serviceResource).hasSize(1);
 
         // Confirm that there are no extra resources
-        assertThat(e.size()).isEqualTo(2);  //TODO: When ServiceRequest is added then this line should check for 3.
+        assertThat(e.size()).isEqualTo(2); //TODO: When ServiceRequest is added then this line should check for 3.
 
     }
 
     @Test
     public void testOMLO21WithPatientAndOrderWithPriorOrder() throws IOException {
         String hl7message = "MSH|^~\\&||Test System|||20210917110100||OML^O21^OML_O21|||2.6\r"
-        + "PID|1||7659afb9-0dfc-d744-1f40-5b9314807108^^^^MR||Feeney^Sam^^^^^L|||M||||||||\r"
-        + "ORC|NW|8125550e-04db-11ec-a9a8-086d41d421ca^^ID^UUID|||||||\r"
-        + "OBR|1|8125550e-04db-11ec-a9a8-086d41d421ca^^ID^UUID||58410-2^CBC panel - Blood by Automated count^LN||||||||||||\r"
-        + "DG1|1||A013^Paratyphoid fever C^I10C|||A|||||||||1\r"
-        + "ORC|NW|8125550e-04db-11ec-a9a8-086d41d421cb^^ID^UUID|||||||\r"
-        + "OBR|2|8125550e-04db-11ec-a9a8-086d41d421cb^^ID^UUID||57698-3^Lipid panel with direct LDL - Serum or Plasma^LN||||||||||||\r"
-        + "DG1|1||A001^Cholera due to Vibrio cholerae 01, biovar eltor^I10C|||A|||||||||1\r";
+                + "PID|1||7659afb9-0dfc-d744-1f40-5b9314807108^^^^MR||Feeney^Sam^^^^^L|||M||||||||\r"
+                + "ORC|NW|8125550e-04db-11ec-a9a8-086d41d421ca^^ID^UUID|||||||\r"
+                + "OBR|1|8125550e-04db-11ec-a9a8-086d41d421ca^^ID^UUID||58410-2^CBC panel - Blood by Automated count^LN||||||||||||\r"
+                + "DG1|1||A013^Paratyphoid fever C^I10C|||A|||||||||1\r"
+                + "ORC|NW|8125550e-04db-11ec-a9a8-086d41d421cb^^ID^UUID|||||||\r"
+                + "OBR|2|8125550e-04db-11ec-a9a8-086d41d421cb^^ID^UUID||57698-3^Lipid panel with direct LDL - Serum or Plasma^LN||||||||||||\r"
+                + "DG1|1||A001^Cholera due to Vibrio cholerae 01, biovar eltor^I10C|||A|||||||||1\r";
 
-        HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
         String json = ftv.convert(hl7message, OPTIONS_PRETTYPRINT);
         assertThat(json).isNotBlank();
         IBaseResource bundleResource = context.getParser().parseResource(json);
@@ -150,12 +150,11 @@ public class HL7OMLMessageTest {
     @Test
     public void testOMLO21WithSpecimen() throws IOException {
         String hl7message = "MSH|^~\\&||Test System|||20210917110100||OML^O21^OML_O21|||2.6\r"
-        + "PID|1||7659afb9-0dfc-d744-1f40-5b9314807108^^^^MR||Feeney^Sam^^^^^L|||M||||||||\r"
-        + "ORC|NW|8125550e-04db-11ec-a9a8-086d41d421ca^^ID^UUID||||||||||\r"
-        + "OBR|1|8125550e-04db-11ec-a9a8-086d41d421ca^^ID^UUID||58410-2^CBC panel - Blood by Automated count^LN||||||||||||\r"
-        + "SPM|1|SpecimenID||BLD|||||||P||||||201410060535|201410060821||Y||||||1\r";
+                + "PID|1||7659afb9-0dfc-d744-1f40-5b9314807108^^^^MR||Feeney^Sam^^^^^L|||M||||||||\r"
+                + "ORC|NW|8125550e-04db-11ec-a9a8-086d41d421ca^^ID^UUID||||||||||\r"
+                + "OBR|1|8125550e-04db-11ec-a9a8-086d41d421ca^^ID^UUID||58410-2^CBC panel - Blood by Automated count^LN||||||||||||\r"
+                + "SPM|1|SpecimenID||BLD|||||||P||||||201410060535|201410060821||Y||||||1\r";
 
-        HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
         String json = ftv.convert(hl7message, OPTIONS_PRETTYPRINT);
         assertThat(json).isNotBlank();
         IBaseResource bundleResource = context.getParser().parseResource(json);
@@ -189,14 +188,13 @@ public class HL7OMLMessageTest {
     @Test
     public void testOMLO21WithAllergy() throws IOException {
         String hl7message = "MSH|^~\\&||Test System|||20210917110100||OML^O21^OML_O21|||2.6\r"
-        + "PID|1||7659afb9-0dfc-d744-1f40-5b9314807108^^^^MR||Feeney^Sam^^^^^L|||M||||||||\r"
-        + "AL1|1|DRUG|00000741^OXYCODONE||HYPOTENSION\r"
-        + "AL1|2|DRUG|00001433^TRAMADOL||SEIZURES~VOMITING\r"    
-        + "ORC|NW|8125550e-04db-11ec-a9a8-086d41d421ca^^ID^UUID||||||||||\r"
-        + "OBR|1|8125550e-04db-11ec-a9a8-086d41d421ca^^ID^UUID||58410-2^CBC panel - Blood by Automated count^LN||||||||||||\r"
-        + "AL1|1|DA|1605^acetaminophen^L|MO|Muscle Pain~hair loss\r";
+                + "PID|1||7659afb9-0dfc-d744-1f40-5b9314807108^^^^MR||Feeney^Sam^^^^^L|||M||||||||\r"
+                + "AL1|1|DRUG|00000741^OXYCODONE||HYPOTENSION\r"
+                + "AL1|2|DRUG|00001433^TRAMADOL||SEIZURES~VOMITING\r"
+                + "ORC|NW|8125550e-04db-11ec-a9a8-086d41d421ca^^ID^UUID||||||||||\r"
+                + "OBR|1|8125550e-04db-11ec-a9a8-086d41d421ca^^ID^UUID||58410-2^CBC panel - Blood by Automated count^LN||||||||||||\r"
+                + "AL1|1|DA|1605^acetaminophen^L|MO|Muscle Pain~hair loss\r";
 
-        HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
         String json = ftv.convert(hl7message, OPTIONS_PRETTYPRINT);
         assertThat(json).isNotBlank();
         IBaseResource bundleResource = context.getParser().parseResource(json);
@@ -220,15 +218,15 @@ public class HL7OMLMessageTest {
         assertThat(e.size()).isEqualTo(6);
     }
 
-    @Test @Disabled
+    @Test
+    @Disabled
     // This test is not currently working.  Support is yet to be added to ensure that a ServiceRequest is created when there is no OBR
     // Note that even though the HL7 message definition does not require PID, it is necessary so that the resulting FHIR ServiceRequests pass FHIR validation.
     public void testOMLO21MinimumMessageWithOrderWithoutObservation() throws IOException {
         String hl7message = "MSH|^~\\&||Test System|||20210917110100||OML^O21^OML_O21|||2.6\r"
-        + "PID|1||7659afb9-0dfc-d744-1f40-5b9314807108^^^^MR||Feeney^Sam^^^^^L|||M||||||||\r"
-        + "ORC|NW|8125550e-04db-11ec-a9a8-086d41d421ca^^ID^UUID||||||||||\r";
+                + "PID|1||7659afb9-0dfc-d744-1f40-5b9314807108^^^^MR||Feeney^Sam^^^^^L|||M||||||||\r"
+                + "ORC|NW|8125550e-04db-11ec-a9a8-086d41d421ca^^ID^UUID||||||||||\r";
 
-        HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
         String json = ftv.convert(hl7message, OPTIONS_PRETTYPRINT);
         assertThat(json).isNotBlank();
         IBaseResource bundleResource = context.getParser().parseResource(json);
@@ -247,17 +245,17 @@ public class HL7OMLMessageTest {
         assertThat(e.size()).isEqualTo(2);
     }
 
-    @Test @Disabled
+    @Test
+    @Disabled
     // This test is not currently working.  Support is yet to be added to ensure that multiple orders are created when there are no Observation groups.
     // In general, support is yet to be added for multiple ORDER groups.  Currently subsequent ORCs are assumed to be part of the ORDER_PRIOR group.
     // Note that even though the HL7 message definition does not require PID, it is necessary so that the resulting FHIR ServiceRequests pass FHIR validation.
     public void testOMLO21MultipleOrdersWithoutObservations() throws IOException {
         String hl7message = "MSH|^~\\&||Test System|||20210917110100||OML^O21^OML_O21|||2.6\r"
-        + "PID|1||7659afb9-0dfc-d744-1f40-5b9314807108^^^^MR||Feeney^Sam^^^^^L|||M||||||||\r"
-        + "ORC|NW|8125550e-04db-11ec-a9a8-086d41d421ca^^ID^UUID||||||||||\r"
-        + "ORC|NW|8125550e-04db-11ec-a9a8-086d41d421ca^^ID^UUID||||||||||\r";
+                + "PID|1||7659afb9-0dfc-d744-1f40-5b9314807108^^^^MR||Feeney^Sam^^^^^L|||M||||||||\r"
+                + "ORC|NW|8125550e-04db-11ec-a9a8-086d41d421ca^^ID^UUID||||||||||\r"
+                + "ORC|NW|8125550e-04db-11ec-a9a8-086d41d421ca^^ID^UUID||||||||||\r";
 
-        HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
         String json = ftv.convert(hl7message, OPTIONS_PRETTYPRINT);
         assertThat(json).isNotBlank();
         IBaseResource bundleResource = context.getParser().parseResource(json);
@@ -276,5 +274,4 @@ public class HL7OMLMessageTest {
         assertThat(e.size()).isEqualTo(3);
     }
 
-
-} 
+}
