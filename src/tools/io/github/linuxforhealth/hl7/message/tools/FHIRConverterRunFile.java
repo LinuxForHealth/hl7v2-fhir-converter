@@ -59,12 +59,14 @@ public class FHIRConverterRunFile {
         HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
         ConverterOptions options = new Builder()
                 .withBundleType(BundleType.COLLECTION)
+                .withProperty("TENANT", "tenantid")
                 .withValidateResource()
                 .withPrettyPrint()
                 .build();
 
         String json = ftv.convert(inputFile, options);
-        if(json == null) json = "Unable to convert the HL7 file - see logs";
+        if (json == null)
+            json = "Unable to convert the HL7 file - see logs";
         System.out.println("----------------");
         System.out.println(json);
         System.out.println("----------------");

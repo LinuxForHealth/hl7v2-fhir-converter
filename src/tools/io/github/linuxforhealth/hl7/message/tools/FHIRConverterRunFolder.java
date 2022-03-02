@@ -14,6 +14,8 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
+import org.hl7.fhir.r4.model.Bundle.BundleType;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
@@ -60,8 +62,12 @@ public class FHIRConverterRunFolder {
         this.flattenOutputFolders = flattenOutputFolders;
         this.debug = debug;
         hl7Converter = new HL7ToFHIRConverter();
-        hl7ConverterOptions = new Builder().withValidateResource().withPrettyPrint()
-                .withProperty("TENANT", "tenantid").build();
+        hl7ConverterOptions = new Builder()
+                .withBundleType(BundleType.COLLECTION)
+                .withProperty("TENANT", "tenantid")
+                .withValidateResource()
+                .withPrettyPrint()
+                .build();
         jsonParser = new JsonParser();
         gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
     }
