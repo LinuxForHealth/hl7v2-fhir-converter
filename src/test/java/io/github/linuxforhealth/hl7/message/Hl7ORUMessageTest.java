@@ -781,4 +781,30 @@ class Hl7ORUMessageTest {
         assertThat(expectStatusUnknown.hasStatus()).isTrue();
         assertThat(status).isEqualTo(DiagnosticReport.DiagnosticReportStatus.UNKNOWN);
     }
+
+    @Test
+    void test_convert_collision_between_two_messages() throws IOException {
+        String ORU_r01 = "MSH|^~\\&|SendApp||||20180101000000||ORU^R01^ORU_R01|MsgId|T|2.6|\r" +
+                "PID|||1234||DOE^JANE^|\r\n" +
+                "OBR|1|||83036E^HEMOGLOBIN A1C^PACSEAP^^^^^^HEMOGLOBIN A1C|||20180101000000|\r" +
+                "OBX|2|NM|17853^MEAN BLOOD GLUCOSE^LRR^^^^^^MEAN BLOOD GLUCOSE||114.02|mg/dL|||||F|||20180101000000|||||20180101000000||||LAB MEDICINE^D|123 Main^^City^MA^02494-2809^^B|\r";
+
+        ftv.convert(ORU_r01, OPTIONS);
+
+        String ORU_r01_2 = "MSH|^~\\&|SendApp||||20180101000000||ORU^R01^ORU_R01|MsgId|T|2.6|\r" +
+                "PID|||1234||DOE^JANE^|\r\n" +
+                "OBR|1|||625-4^Bacteria identified in Stool by Culture^LN^^^^2.33^^Enteric Culture|\r" +
+                "OBX|1|CWE|625-4^Bacteria identified in Stool by Culture^LN^^^^2.33^^result1|1|27268008^Salmonella^SCT||||||P|||20180101|||||201801010000||||State Lab^L^^^^Public Health Lab^FI^^^1234|State Lab^Research Park^Iowa City^IA^52242-5002|";
+
+        String json = ftv.convert(ORU_r01_2, OPTIONS);
+
+        FHIRContext context = new FHIRContext();
+        IBaseResource bundleResource = context.getParser().parseResource(json);
+        assertThat(bundleResource).isNotNull();
+        Bundle b = (Bundle) bundleResource;
+        List<BundleEntryComponent> e = b.getEntry();
+        List<Resource> Organization = ResourceUtils.getResourceList(e, ResourceType.Organization);
+        assertThat(Organization).hasSize(1);
+
+    }
 }
