@@ -48,7 +48,6 @@ class Hl7CustomMessageTest {
     // # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
     private static final String CONF_PROP_HOME = "hl7converter.config.home";
-    private static HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
 
     @TempDir
     static File folder;
@@ -119,6 +118,7 @@ class Hl7CustomMessageTest {
 
     // Need custom convert sequence with options that turn off FHIR validation.
     private static List<BundleEntryComponent> getBundleEntryFromHL7Message(String hl7message) {
+        HL7ToFHIRConverter ftv = new HL7ToFHIRConverter(); // Testing loading of config which happens once per instantiation
         String json = ftv.convert(hl7message, OPTIONS); // Need custom options that turn off FHIR validation.
         assertThat(json).isNotNull();
         FHIRContext context = new FHIRContext();
