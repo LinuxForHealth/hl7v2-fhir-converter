@@ -26,11 +26,13 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import io.github.linuxforhealth.core.terminology.UrlLookup;
+import io.github.linuxforhealth.hl7.HL7ToFHIRConverter;
 import io.github.linuxforhealth.hl7.segments.util.DatatypeUtils;
 import io.github.linuxforhealth.hl7.segments.util.PatientUtils;
 import io.github.linuxforhealth.hl7.segments.util.ResourceUtils;
 
 class CodeableConceptTest {
+    private HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
     private static final String V3_RACE_SYSTEM = "http://terminology.hl7.org/CodeSystem/v3-Race";
 
     // These test cover all the paths to create codeableConcepts from CWEs.
@@ -100,7 +102,7 @@ class CodeableConceptTest {
                 // Test text only race
                 + "PID|1||12345678^^^^MR||TestPatientLastName^Jane^|||||" + cwe + "\n";
 
-        Patient patient = PatientUtils.createPatientFromHl7Segment(patientWithCodeableConcept);
+        Patient patient = PatientUtils.createPatientFromHl7Segment(ftv, patientWithCodeableConcept);
         assertThat(patient.hasExtension()).isTrue();
 
         List<Extension> extensions = patient.getExtensionsByUrl(UrlLookup.getExtensionUrl("race"));
@@ -127,7 +129,7 @@ class CodeableConceptTest {
                 // Race with bad code, but known system
                 + "PID|1||12345678^^^^MR||Jane^TestPatientLastName|||||2186-5^^CDCREC\n";
 
-        Patient patient = PatientUtils.createPatientFromHl7Segment(patientWithCodeableConcept);
+        Patient patient = PatientUtils.createPatientFromHl7Segment(ftv, patientWithCodeableConcept);
         assertThat(patient.hasExtension()).isTrue();
 
         List<Extension> extensions = patient.getExtensionsByUrl(UrlLookup.getExtensionUrl("race"));
@@ -161,7 +163,7 @@ class CodeableConceptTest {
                 // This code does not exist in the CDCREC system, and will fail the lookup, resulting in an error message in display.
                 + "PID|1||12345678^^^^MR||Jane^TestPatientLastName|||||2186-5^hispan^CDCREC\n";
 
-        Patient patient = PatientUtils.createPatientFromHl7Segment(patientWithCodeableConcept);
+        Patient patient = PatientUtils.createPatientFromHl7Segment(ftv, patientWithCodeableConcept);
         assertThat(patient.hasExtension()).isTrue();
 
         List<Extension> extensions = patient.getExtensionsByUrl(UrlLookup.getExtensionUrl("race"));
@@ -199,7 +201,7 @@ class CodeableConceptTest {
                 // Medication request has unknown code in .2
                 + "RXE|^^^20180622230000^^R|73056-017^Test15 SODIUM 100 MG CAPSULE^NDC|100||mg|||||10||5\n";
 
-        MedicationRequest medReq = ResourceUtils.getMedicationRequest(medicationRequestWithCodeableConcept);
+        MedicationRequest medReq = ResourceUtils.getMedicationRequest(ftv, medicationRequestWithCodeableConcept);
         assertThat(medReq.hasMedicationCodeableConcept()).isTrue();
         CodeableConcept medCC = medReq.getMedicationCodeableConcept();
         DatatypeUtils.checkCommonCodeableConceptAssertions(medCC, "73056-017", "Test15 SODIUM 100 MG CAPSULE",
@@ -231,7 +233,7 @@ class CodeableConceptTest {
                 + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
                 + "PRB|AD|2004062916460000|2148-5^CREATININE^LN^F-11380^CREATININE^I9^474747^22222||||20040629|||||||||20040629";
 
-        Condition condition = ResourceUtils.getCondition(conditionWithVersionedAlternateCodeableConcept);
+        Condition condition = ResourceUtils.getCondition(ftv, conditionWithVersionedAlternateCodeableConcept);
 
         assertThat(condition.hasCode()).isTrue();
         CodeableConcept condCC = condition.getCode();
@@ -270,7 +272,7 @@ class CodeableConceptTest {
                 // Test double race in the SAME CWE (not a second CWE) and versions.  Use made up Cauc to ensure test doesn't mix up whites.
                 + "PID|1||12345678^^^^MR||TestPatientLastName^Jane|||||2106-3^White^CDCREC^CA^Caucasian^L^1.1^4|\n";
 
-        Patient patient = PatientUtils.createPatientFromHl7Segment(patientWithDoubleRaceWithVersionAndAlternate);
+        Patient patient = PatientUtils.createPatientFromHl7Segment(ftv, patientWithDoubleRaceWithVersionAndAlternate);
         assertThat(patient.hasExtension()).isTrue();
 
         List<Extension> extensions = patient.getExtensionsByUrl(UrlLookup.getExtensionUrl("race"));
@@ -299,7 +301,7 @@ class CodeableConceptTest {
                 + "PV1||I||||||||||||||||||||||||||||||||||||||||||\r"
                 + "PRB|AD|20170110074000|K80.00^Cholelithiasis^I10|53956|E1|1|20100907175347|20150907175347|20180310074000||||confirmed^Confirmed^http://terminology.hl7.org/CodeSystem/condition-ver-status|remission^Remission^http://terminology.hl7.org/CodeSystem/condition-clinical|20180310074000|20170102074000|textual representation of the time when the problem began|1^primary|ME^Medium|0.4|marginal|good|marginal|marginal|highly sensitive|some prb detail|\r";
 
-        Condition condition = ResourceUtils.getCondition(hl7MessageiCD10Coding);
+        Condition condition = ResourceUtils.getCondition(ftv, hl7MessageiCD10Coding);
         assertThat(condition.hasCode()).isTrue();
         CodeableConcept condCC = condition.getCode();
         DatatypeUtils.checkCommonCodeableConceptAssertions(condCC, "K80.00", "Cholelithiasis",
@@ -383,7 +385,7 @@ class CodeableConceptTest {
         //     "text": "Other respiratory tuberculosis"
         //   } ]
 
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         List<Resource> serviceRequestList = ResourceUtils.getResourceList(e, ResourceType.ServiceRequest);
         // Important that we have exactly one service request (no duplication).  OBR creates it as a reference.        

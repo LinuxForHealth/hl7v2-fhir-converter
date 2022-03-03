@@ -49,6 +49,7 @@ class Hl7ORUMessageTest {
             .withValidateResource()
             .withPrettyPrint()
             .build();
+    private HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
 
     // DiagnosticReports are only created from ORU messages so the test of DiagnosticReport content is included in this test module.
     // Suppress warnings about too many assertions in a test.  Justification: creating a FHIR message is very costly; we need to check many asserts per creation for efficiency.  
@@ -60,7 +61,7 @@ class Hl7ORUMessageTest {
                 + "PID||45483|45483||SMITH^SUZIE^||20160813|M|||123 MAIN STREET^^SCHENECTADY^NY^12345||(123)456-7890|||||^^^T||||||||||||\r"
                 + "OBR|1||986^IA PHIMS Stage^2.16.840.1.114222.4.3.3.5.1.2^ISO|1051-2^New Born Screening^LN|||20151009173644|||||||||||||002|||||F|||2740^Tsadok^Janetary~2913^Merrit^Darren^F~3065^Mahoney^Paul^J~4723^Loh^Robert^L~9052^Winter^Oscar^|||||\r";
 
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         // Verify correct resources created
         List<Resource> patientResource = ResourceUtils.getResourceList(e, ResourceType.Patient);
@@ -127,7 +128,7 @@ class Hl7ORUMessageTest {
                 + "OBX|1|ST|TS-F-01-002^Endocrine Disorders^L||obs report||||||F\r"
                 + "OBX|2|ST|GA-F-01-024^Galactosemia^L||ECHOCARDIOGRAPHIC REPORT||||||F\r";
 
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         // Verify correct resources created
         List<Resource> patientResource = ResourceUtils.getResourceList(e, ResourceType.Patient);
@@ -217,7 +218,7 @@ class Hl7ORUMessageTest {
                 + "OBR|1||bbf1993ab|1122^Final Echocardiogram Report|||20180520230000|||||||||||||002|||||F|||550469^Tsadok550469^Janetary~660469^Merrit660469^Darren^F~770469^Das770469^Surjya^P~880469^Winter880469^Oscar^||||770469&Das770469&Surjya&P^^^6N^1234^A|\r"
                 + "OBX|1|NM|2552^HRTRTMON|1|115||||||F|||20180520230000|||\r";
 
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         // Verify that the right resources are created
         List<Resource> patientResource = ResourceUtils.getResourceList(e, ResourceType.Patient);
@@ -310,7 +311,7 @@ class Hl7ORUMessageTest {
                 + "OBX|1|CWE|625-4^Bacteria identified in Stool by Culture^LN^^^^2.33^^result1|1|27268008^Salmonella^SCT^^^^20090731^^Salmonella species|||A^A^HL70078^^^^2.5|||P|||20120301|||^^^^^^^^Bacterial Culture||201203140957||||||\r"
                 + "OBX|2|ST|TS-F-01-002^Endocrine Disorders^L||ECHOCARDIOGRAPHIC REPORT Group 2||||||F\r";
 
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         // Verify that the right resources are being created
         List<Resource> patientResource = ResourceUtils.getResourceList(e, ResourceType.Patient);
@@ -433,7 +434,7 @@ class Hl7ORUMessageTest {
                 + "OBX|1|ST|TS-F-01-002^Endocrine Disorders^L||obs report||||||F\r"
                 + "SPM|1|SpecimenID||BLD|||||||P||||||201410060535|201410060821||Y||||||1\r";
 
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         // Verify that the right resources are created
         List<Resource> patientResource = ResourceUtils.getResourceList(e, ResourceType.Patient);
@@ -523,7 +524,6 @@ class Hl7ORUMessageTest {
     @java.lang.SuppressWarnings("squid:S5961")
     @Test
     void test_oru_multipleOBXofDifferentTypes() throws IOException {
-        HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
         String json = ftv.convert(new File("src/test/resources/ORU-multiline-short.hl7"), OPTIONS_PRETTYPRINT);
         assertThat(json).isNotBlank();
         LOGGER.debug("FHIR json result:\n" + json);
@@ -650,8 +650,6 @@ class Hl7ORUMessageTest {
     // Suppress warnings about too many assertions in a test.  Justification: creating a FHIR message is very costly; we need to check many asserts per creation for efficiency.  
     @java.lang.SuppressWarnings("squid:S5961")
     void test_oru_multipleOBXWithMixedType() throws IOException {
-
-        HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
         String json = ftv.convert(new File("src/test/resources/ORU-multiline-short-mixed.hl7"), OPTIONS_PRETTYPRINT);
         assertThat(json).isNotBlank();
         LOGGER.debug("FHIR json result:\n" + json);
@@ -765,7 +763,6 @@ class Hl7ORUMessageTest {
                 + "OBX|2|CWE|20575-7^Hepatitis A virus Ab [Presence] in Serum^LN^HAVAB^Hepatitis A antibodies (anti-HAV)^L^2.52||260385009^Negative (qualifier value)^SCT^NEG^NEGATIVE^L^201509USEd^^Negative (qualifier value)||Negative|N|||F|||20150925|||||201509261400\r"
                 + "OBX|3|NM|22316-4^Hepatitis B virus core Ab [Units/volume] in Serum^LN^HBcAbQ^Hepatitis B core antibodies (anti-HBVc) Quant^L^2.52||0.70|[IU]/mL^international unit per milliliter^UCUM^IU/ml^^L^1.9|<0.50 IU/mL|H|||F|||20150925|||||201509261400";
 
-        HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
         String json = ftv.convert(ORU_r01, OPTIONS);
 
         FHIRContext context = new FHIRContext();

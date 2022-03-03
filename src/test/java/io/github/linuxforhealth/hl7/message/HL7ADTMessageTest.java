@@ -18,9 +18,12 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
+import io.github.linuxforhealth.hl7.HL7ToFHIRConverter;
 import io.github.linuxforhealth.hl7.segments.util.ResourceUtils;
 
 class HL7ADTMessageTest {
+
+    private HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
 
     @ParameterizedTest
     // ADT_A01, ADT_A04, ADT_A08, ADT_A13 all use the same message structure so we can reuse adt_a01 tests for them.
@@ -32,7 +35,7 @@ class HL7ADTMessageTest {
                 + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\r"
                 + "PV1||I||||||||SUR||||||||S|VisitNumber^^^ACME|A||||||||||||||||||||||||20150502090000|\r";
 
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         List<Resource> patientResource = ResourceUtils.getResourceList(e, ResourceType.Patient);
         assertThat(patientResource).hasSize(1); // from PID
@@ -56,7 +59,7 @@ class HL7ADTMessageTest {
                 + "PV1||I||||||||SUR||||||||S|VisitNumber^^^ACME|A||||||||||||||||||||||||20150502090000|\r"
                 + "PR1|1|ICD10|B45678|Fix break|20210322155008|A|75||V46|80|||32|1|D22|G45|1|G|P98|X|0|0\r";
 
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         List<Resource> patientResource = ResourceUtils.getResourceList(e, ResourceType.Patient);
         assertThat(patientResource).hasSize(1); // from PID
@@ -89,7 +92,7 @@ class HL7ADTMessageTest {
                 + "AL1|1|DA|1605^acetaminophen^L|MO|Muscle Pain~hair loss\r"
                 + "DG1|1||B45678|||A|\r";
 
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         List<Resource> patientResource = ResourceUtils.getResourceList(e, ResourceType.Patient);
         assertThat(patientResource).hasSize(1); // from PID, PD1
@@ -139,7 +142,7 @@ class HL7ADTMessageTest {
                 // IN2.72 creates a RelatedPerson,
                 + "IN2||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||04|\n";
 
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         List<Resource> patientResource = ResourceUtils.getResourceList(e, ResourceType.Patient);
         assertThat(patientResource).hasSize(1); // from PID, PD1
@@ -183,7 +186,7 @@ class HL7ADTMessageTest {
                 + "PV1||I||||||||SUR||||||||S|VisitNumber^^^ACME|A||||||||||||||||||||||||20150502090000|\n"
                 + "AL1|1|DA|1605^acetaminophen^L|MO|Muscle Pain~hair loss\r";
 
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         // Expecting 2 total resources
         assertThat(e).hasSize(2);
@@ -215,7 +218,7 @@ class HL7ADTMessageTest {
                 + "IN1||||Large Blue Organization|456 Ultramarine Lane^^Faketown^CA^ZIP5\n"
                 + "IN1||||Large Blue Organization|456 Ultramarine Lane^^Faketown^CA^ZIP5\n";
 
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         // Expecting 15 total resources
         assertThat(e).hasSize(15);
@@ -260,7 +263,7 @@ class HL7ADTMessageTest {
                 + "OBX|1|NM|111^TotalProtein\r"
                 + "OBX|2|ST|100\r";
 
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         // Expecting 7 total resources
         assertThat(e).hasSize(7);
@@ -289,7 +292,7 @@ class HL7ADTMessageTest {
                 + "PID|||1234^^^^MR\r"
                 + "PV1||I||||||||SUR||||||||S|VisitNumber^^^ACME|A||||||||||||||||||||||||20150502090000|\r";
 
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         List<Resource> patientResource = ResourceUtils.getResourceList(e, ResourceType.Patient);
         assertThat(patientResource).hasSize(1); // from PID
@@ -310,7 +313,7 @@ class HL7ADTMessageTest {
                 + "PV1||I||||||||SUR||||||||S|VisitNumber^^^ACME|A||||||||||||||||||||||||20150502090000|\r"
                 + "PR1|1||B45678||20210322155008\r";
 
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         List<Resource> patientResource = ResourceUtils.getResourceList(e, ResourceType.Patient);
         assertThat(patientResource).hasSize(1); // from PID
@@ -337,7 +340,7 @@ class HL7ADTMessageTest {
                 // IN2.72 creates a RelatedPerson,
                 + "IN2||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||04|\n";
 
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         List<Resource> patientResource = ResourceUtils.getResourceList(e, ResourceType.Patient);
         assertThat(patientResource).hasSize(1); // from PID
@@ -384,7 +387,7 @@ class HL7ADTMessageTest {
                 // IN2.72 creates a RelatedPerson,
                 + "IN2||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||04|\n";
 
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         // Expecting 14 total resources
         // Patient, Encounter, Condition, Observation (2), AllergyIntolerance (2), Procedure (2), Coverage, RelatedPerson, Organization
@@ -439,7 +442,7 @@ class HL7ADTMessageTest {
                 // IN2.72 creates a RelatedPerson,
                 + "IN2|2|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||04|\n";
 
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         List<Resource> patientResource = ResourceUtils.getResourceList(e, ResourceType.Patient);
         assertThat(patientResource).hasSize(1); // from PID and PD1
@@ -474,7 +477,7 @@ class HL7ADTMessageTest {
                 + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\r"
                 + "MRG|456||||||\n";
 
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         // There should be two patient resources, the PID patient and the MRG patient.
         List<Resource> patientResource = ResourceUtils.getResourceList(e, ResourceType.Patient);
@@ -504,7 +507,7 @@ class HL7ADTMessageTest {
                 + "PD1|||||||||||01|N||||A\r"
                 + "MRG|456||||||\n";
 
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         // There should be two patient resources, the PID patient and the MRG patient.
         List<Resource> patientResource = ResourceUtils.getResourceList(e, ResourceType.Patient);
@@ -528,7 +531,7 @@ class HL7ADTMessageTest {
                 + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\r"
                 + "MRG|456||||||\n";
 
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         // There should be two patient resources, the PID patient and the MRG patient.
         List<Resource> patientResource = ResourceUtils.getResourceList(e, ResourceType.Patient);
@@ -556,7 +559,7 @@ class HL7ADTMessageTest {
                 + "PID|||3333^^^^MR||DOE^Larry^|||F||||||||||||||||||||||\r"
                 + "MRG|789||||||\n";
 
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         // There should be six patient resources from the PID segments and MRG segments.
         List<Resource> patientResource = ResourceUtils.getResourceList(e, ResourceType.Patient);
@@ -589,7 +592,7 @@ class HL7ADTMessageTest {
                 + "PV1||I||||||||SUR||||||||S|VisitNumber^^^ACME|A||||||||||||||||||||||||20150502090000|\r"
                 + "PID|||4444^^^^MR||DOE^Elizabeth^|||F||||||||||||||||||||||\r";
 
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         // There should be patient resources from the PID and the MRG segments.
         List<Resource> patientResource = ResourceUtils.getResourceList(e, ResourceType.Patient);

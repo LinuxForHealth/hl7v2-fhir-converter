@@ -30,6 +30,7 @@ import io.github.linuxforhealth.hl7.HL7ToFHIRConverter;
 
 class HL7EventTypeFHIRConversionTest {
 
+    private HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
     private static final ConverterOptions OPTIONS = new Builder().withValidateResource().withPrettyPrint().build();
 
     @Test
@@ -39,7 +40,6 @@ class HL7EventTypeFHIRConversionTest {
                 + "EVN||||O||20210319134735|\r"
                 + "PV1|1|I||R|||||||||R|1||||||||||||||||||||||||||||||||||||||";
 
-        HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
         String json = ftv.convert(hl7message, OPTIONS);
         assertThat(json).isNotBlank();
 
@@ -80,7 +80,6 @@ class HL7EventTypeFHIRConversionTest {
                 + "EVN||||O||20210319134735|\r"
                 + "PV1|1|I||R|||||||||R|1||||||||||||||||||||||||||||||200603150624|200603150625|||||||";
 
-        HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
         String json = ftv.convert(hl7message, OPTIONS);
         assertThat(json).isNotBlank();
         FHIRContext context = new FHIRContext();
@@ -124,7 +123,6 @@ class HL7EventTypeFHIRConversionTest {
                 + "PV1|1|I||R|||||||||R|1||||||||||||||||||||||||||||||200603150624|200603150625|||||||\r"
                 + "OBX|1|CWE|DQW^Some text 1^SNM3|||||||||||||||||||||\r";
 
-        HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
         String json = ftv.convert(hl7message, OPTIONS);
         assertThat(json).isNotBlank();
 

@@ -7,7 +7,6 @@ package io.github.linuxforhealth.hl7.data;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.List;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -18,34 +17,36 @@ import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Properties;
 import java.util.TimeZone;
 
+import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
+import org.hl7.fhir.r4.model.Condition;
+import org.hl7.fhir.r4.model.Resource;
+import org.hl7.fhir.r4.model.ResourceType;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
-import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
-import org.hl7.fhir.r4.model.Condition;
-import org.hl7.fhir.r4.model.Resource;
-import org.hl7.fhir.r4.model.ResourceType;
-
 import io.github.linuxforhealth.core.config.ConverterConfiguration;
 import io.github.linuxforhealth.core.terminology.UrlLookup;
 import io.github.linuxforhealth.hl7.ConverterOptions;
 import io.github.linuxforhealth.hl7.ConverterOptions.Builder;
+import io.github.linuxforhealth.hl7.HL7ToFHIRConverter;
 import io.github.linuxforhealth.hl7.data.date.DateUtil;
 import io.github.linuxforhealth.hl7.segments.util.ResourceUtils;
 
 // This is a specialized test to see that with no configured time zone, the JVM time zone is used.
 
 class JvmTimeZoneIdTest {
+    private HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
 
     // These variables and before and after test processing are needed to
     // Store the original config, set our own config, then restore the original config.
-    
+
     private static final String CONF_PROP_HOME = "hl7converter.config.home";
 
     @TempDir
@@ -93,7 +94,7 @@ class JvmTimeZoneIdTest {
         // Otherwise a test might work only half of the year.
 
         // Calculate the local server zone offset
-        LocalDateTime localDateTime = LocalDateTime.of(2002,Month.FEBRUARY,2,2,0,0);  //20020202020000
+        LocalDateTime localDateTime = LocalDateTime.of(2002, Month.FEBRUARY, 2, 2, 0, 0); //20020202020000
         String defaultLocalZone = TimeZone.getDefault().getID();
         ZoneId localZoneId = ZoneId.of(defaultLocalZone);
         ZonedDateTime localZonedDateTime = localDateTime.atZone(localZoneId);
@@ -119,7 +120,7 @@ class JvmTimeZoneIdTest {
                 + "PRB|AD|20020202020000|K80.00^Cholelithiasis^I10|53956||||||||||||\r";
 
         ConverterOptions customOptionsWithTenant = new Builder().withValidateResource().withPrettyPrint().build();
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message,
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message,
                 customOptionsWithTenant);
         // Find the condition from the FHIR bundle.
         List<Resource> conditionResource = ResourceUtils.getResourceList(e, ResourceType.Condition);
@@ -127,7 +128,7 @@ class JvmTimeZoneIdTest {
         Condition condition = (Condition) conditionResource.get(0);
 
         // Get the recordedDate value; convert it back to a zoned time; get the offset for comparison
-        testDateTime = condition.getRecordedDateElement().getValueAsString();  // PRB.2 
+        testDateTime = condition.getRecordedDateElement().getValueAsString(); // PRB.2 
         testZonedDateTime = ZonedDateTime.parse(testDateTime, dateTimeFormatter);
         testOffset = testZonedDateTime.getOffset();
 
@@ -139,9 +140,10 @@ class JvmTimeZoneIdTest {
 
     private void writeSimpleProperties(File configFile) throws FileNotFoundException, IOException {
         Properties prop = new Properties();
-        prop.put("supported.hl7.messages", "ADT_A01, ADT_A03, DFT_P03, MDM_T02, MDM_T06, OML_O21, ORM_O01, OMP_O09, ORU_R01, PPR_PC1, RDE_O11, RDE_O25, VXU_V04");
+        prop.put("supported.hl7.messages",
+                "ADT_A01, ADT_A03, DFT_P03, MDM_T02, MDM_T06, OML_O21, ORM_O01, OMP_O09, ORU_R01, PPR_PC1, RDE_O11, RDE_O25, VXU_V04");
         // default.time.zone purposely not set
         prop.store(new FileOutputStream(configFile), null);
     }
- 
+
 }

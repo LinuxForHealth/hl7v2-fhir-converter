@@ -23,9 +23,9 @@ import org.hl7.fhir.r4.model.MedicationRequest;
 import org.hl7.fhir.r4.model.MedicationRequest.MedicationRequestStatus;
 import org.hl7.fhir.r4.model.Patient;
 import org.hl7.fhir.r4.model.Practitioner;
-import org.hl7.fhir.r4.model.Ratio;
-import org.hl7.fhir.r4.model.Range;
 import org.hl7.fhir.r4.model.Quantity;
+import org.hl7.fhir.r4.model.Range;
+import org.hl7.fhir.r4.model.Ratio;
 import org.hl7.fhir.r4.model.Resource;
 import org.hl7.fhir.r4.model.ResourceType;
 import org.junit.jupiter.api.Test;
@@ -33,10 +33,12 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import io.github.linuxforhealth.core.config.ConverterConfiguration;
+import io.github.linuxforhealth.hl7.HL7ToFHIRConverter;
 import io.github.linuxforhealth.hl7.segments.util.DatatypeUtils;
 import io.github.linuxforhealth.hl7.segments.util.ResourceUtils;
 
 class Hl7MedicationRequestFHIRConversionTest {
+    private HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
 
     // private static FHIRContext context = new FHIRContext(true, false);
     //     private static final Logger LOGGER = LoggerFactory.getLogger(Hl7MedicationRequestFHIRConversionTest.class);
@@ -50,7 +52,7 @@ class Hl7MedicationRequestFHIRConversionTest {
                 + "RXO|RX800006^Test15 SODIUM 100 MG CAPSULE|100||mg|||||G||10||5\n"
                 + "RXE|^^^20180622230000^^R|62756-017^Testosterone Cypionate^NDC|100||mg|||||10||5\n";
 
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         List<Resource> patientList = ResourceUtils.getResourceList(e, ResourceType.Patient);
         assertThat(patientList).hasSize(1);
@@ -81,7 +83,7 @@ class Hl7MedicationRequestFHIRConversionTest {
                 + "RXO|RX800006^Test15 SODIUM 100 MG CAPSULE|100||mg|||||G||10||5\n"
                 + "RXE|^^^20180622230000^^R|62756-017^Testosterone Cypionate^NDC|100||mg|||||10||5\n";
 
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         List<Resource> medicationRequestList = ResourceUtils.getResourceList(e, ResourceType.MedicationRequest);
         assertThat(medicationRequestList).hasSize(1);
@@ -95,7 +97,7 @@ class Hl7MedicationRequestFHIRConversionTest {
                 + "ORC|NW|F800006^OE|P800006^RX||CM|E|10^BID^D4^^^R||20180622230000\n"
                 + "RXO|RX800006^Test15 SODIUM 100 MG CAPSULE|100||mg|||||G||10||5\n"
                 + "RXE|^^^20180622230000^^R|62756-017^Testosterone Cypionate^NDC|100||mg|||||10||5\n";
-        e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         medicationRequestList.clear();
         medicationRequestList = ResourceUtils.getResourceList(e, ResourceType.MedicationRequest);
@@ -110,7 +112,7 @@ class Hl7MedicationRequestFHIRConversionTest {
                 + "ORC|NW|F800006^OE|P800006^RX||ER|E|10^BID^D4^^^R||20180622230000\n"
                 + "RXO|RX800006^Test15 SODIUM 100 MG CAPSULE|100||mg|||||G||10||5\n"
                 + "RXE|^^^20180622230000^^R|62756-017^Testosterone Cypionate^NDC|100||mg|||||10||5\n";
-        e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         medicationRequestList.clear();
         medicationRequestList = ResourceUtils.getResourceList(e, ResourceType.MedicationRequest);
@@ -126,7 +128,7 @@ class Hl7MedicationRequestFHIRConversionTest {
                 + "RXO|RX800006^Test15 SODIUM 100 MG CAPSULE|100||mg|||||G||10||5\n"
                 + "RXE|^^^20180622230000^^R|62756-017^Testosterone Cypionate^NDC|100||mg|||||10||5\n";
 
-        e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         medicationRequestList.clear();
         medicationRequestList = ResourceUtils.getResourceList(e, ResourceType.MedicationRequest);
@@ -141,7 +143,7 @@ class Hl7MedicationRequestFHIRConversionTest {
                 + "ORC|RP|F800006^OE|P800006^RX|||E|10^BID^D4^^^R||20180622230000\n"
                 + "RXO|RX800006^Test15 SODIUM 100 MG CAPSULE|100||mg|||||G||10||5\n"
                 + "RXE|^^^20180622230000^^R|62756-017^Testosterone Cypionate^NDC|100||mg|||||10||5\n";
-        e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         medicationRequestList.clear();
         medicationRequestList = ResourceUtils.getResourceList(e, ResourceType.MedicationRequest);
@@ -156,7 +158,7 @@ class Hl7MedicationRequestFHIRConversionTest {
                 + "ORC|DC|F800006^OE|P800006^RX|||E|10^BID^D4^^^R||20180622230000\n"
                 + "RXO|RX800006^Test15 SODIUM 100 MG CAPSULE|100||mg|||||G||10||5\n"
                 + "RXE|^^^20180622230000^^R|62756-017^Testosterone Cypionate^NDC|100||mg|||||10||5\n";
-        e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         medicationRequestList.clear();
         medicationRequestList = ResourceUtils.getResourceList(e, ResourceType.MedicationRequest);
@@ -179,7 +181,7 @@ class Hl7MedicationRequestFHIRConversionTest {
                 + "ORC|CA|F800006^OE|P800006^RX|||E|10^BID^D4^^^R||20180622230000\n"
                 + "RXO|RX800006^Test15 SODIUM 100 MG CAPSULE|100||mg|||||G||10||5\n"
                 + "RXE|^^^20180622230000^^R|62756-017^Testosterone Cypionate^NDC|100||mg|||||10||5\n";
-        e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         medicationRequestList.clear();
         medicationRequestList = ResourceUtils.getResourceList(e, ResourceType.MedicationRequest);
@@ -208,7 +210,7 @@ class Hl7MedicationRequestFHIRConversionTest {
                 + "RXO|00054418425^Dexamethasone 4 MG Oral Tablet^NDC^^^^^^dexamethasone (DECADRON) 4 MG TABS||||||Take 1 tablet by mouth every 6 (six) hours.||G||4|tablet^tablet|0|222^JONES^JON^E.||||||||||^DECADRON\n"
                 + "RXR|PO^Oral\n";
 
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         List<Resource> medicationRequestList = ResourceUtils.getResourceList(e, ResourceType.MedicationRequest);
         // Confirm that one medicationRequest was created. 
@@ -236,7 +238,7 @@ class Hl7MedicationRequestFHIRConversionTest {
                 + "RXO|RX800006^Test15 SODIUM 100 MG CAPSULE^NDC||100||mg|||||G||10||5\n"
                 + "RXE||DUONEB3INH^3 ML PLAS CONT : IPRATROPIUM-ALBUTEROL 0.5-2.5 (3) MG/3ML IN SOLN^ADS||||||||||||||||||||||||||||||||||||||\n";
 
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         List<Resource> medicationRequestList = ResourceUtils.getResourceList(e, ResourceType.MedicationRequest);
         assertThat(medicationRequestList).hasSize(1);
@@ -287,7 +289,7 @@ class Hl7MedicationRequestFHIRConversionTest {
                 // RXE.32 to MedicationRequest.AuthoredOn                
                 + "RXE|||3||mL|47||||1|PC||||||||||||||||||||DUONEB3INH^3 ML PLAS CONT : IPRATROPIUM-ALBUTEROL 0.5-2.5 (3) MG/3ML IN SOLN^ADS|20180622230000||||||||\n"; //RXE.31
 
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         List<Resource> medicationRequestList = ResourceUtils.getResourceList(e, ResourceType.MedicationRequest);
         assertThat(medicationRequestList).hasSize(1);
@@ -336,7 +338,7 @@ class Hl7MedicationRequestFHIRConversionTest {
                 + "ORC|NW|F800006^OE|P800006^RX|||E|10^BID^D4^^^R||\n"
                 + "RXO|RX800006^Test15 SODIUM 100 MG CAPSULE^NDC||100||mg|||||G||10||5\n";
 
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         List<Resource> medicationRequestList = ResourceUtils.getResourceList(e, ResourceType.MedicationRequest);
 
@@ -367,9 +369,9 @@ class Hl7MedicationRequestFHIRConversionTest {
     @ParameterizedTest
     @ValueSource(strings = {
             "MSH|^~\\&||||||S1|PPR^PC1||T|2.6|||||||||\r",
-    // --UNCOMMENT BELOW WHEN CONVERTER SUPPORTS THIS MESSAGE TYPE--
-    // "MSH|^~\\&||||||S1|PPR^PC2||T|2.6|||||||||\r",
-    // "MSH|^~\\&||||||S1|PPR^PC3||T|2.6|||||||||\r",
+            // --UNCOMMENT BELOW WHEN CONVERTER SUPPORTS THIS MESSAGE TYPE--
+            // "MSH|^~\\&||||||S1|PPR^PC2||T|2.6|||||||||\r",
+            // "MSH|^~\\&||||||S1|PPR^PC3||T|2.6|||||||||\r",
     })
     void test_medicationCodeableConcept_and_intent_in_PPR(String msh) {
 
@@ -380,7 +382,7 @@ class Hl7MedicationRequestFHIRConversionTest {
                 + "OBR|1|||555|||20170825010500||||||||||||||||||F\r"
                 + "RXO|RX800006^Test15 SODIUM 100 MG CAPSULE^NDC||100||mg|||||G||10||5\n";
 
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         List<Resource> medicationRequestList = ResourceUtils.getResourceList(e, ResourceType.MedicationRequest);
         assertThat(medicationRequestList).hasSize(1);
@@ -411,9 +413,9 @@ class Hl7MedicationRequestFHIRConversionTest {
     @ParameterizedTest
     @ValueSource(strings = {
             "MSH|^~\\&||||||S1|PPR^PC1||T|2.6|||||||||\r",
-    // --UNCOMMENT BELOW WHEN CONVERTER SUPPORTS THIS MESSAGE TYPE--
-    // "MSH|^~\\&||||||S1|PPR^PC2||T|2.6|||||||||\r",
-    // "MSH|^~\\&||||||S1|PPR^PC3||T|2.6|||||||||\r",
+            // --UNCOMMENT BELOW WHEN CONVERTER SUPPORTS THIS MESSAGE TYPE--
+            // "MSH|^~\\&||||||S1|PPR^PC2||T|2.6|||||||||\r",
+            // "MSH|^~\\&||||||S1|PPR^PC3||T|2.6|||||||||\r",
     })
     void testMedicationRequestInPPRWithAPatientVisit() {
 
@@ -425,7 +427,7 @@ class Hl7MedicationRequestFHIRConversionTest {
                 + "OBR|1|||555|||20170825010500||||||||||||||||||F\r"
                 + "RXO|65862-063-01^METOPROLOL TARTRATE^NDC||||Tablet||||||||2|2|AP1234567||||325|mg\r";
 
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         List<Resource> medicationRequestList = ResourceUtils.getResourceList(e, ResourceType.MedicationRequest);
         assertThat(medicationRequestList).hasSize(1);
@@ -463,7 +465,7 @@ class Hl7MedicationRequestFHIRConversionTest {
                 // RXO.2 through RXO.35 otherwise purposely empty
                 + "RXO|65862-063-01^METOPROLOL TARTRATE^NDC|||||||||||||||||||134006\r";
 
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         List<Resource> medicationRequestList = ResourceUtils.getResourceList(e, ResourceType.MedicationRequest);
         assertThat(medicationRequestList).hasSize(1);
@@ -486,7 +488,7 @@ class Hl7MedicationRequestFHIRConversionTest {
                 // RXE.6 through RXE.44 otherwise purposely empty
                 + "RXE|^Q24H&0600^^20210330144208^^ROU|DUONEB3INH^3 ML PLAS CONT : IPRATROPIUM-ALBUTEROL 0.5-2.5 (3) MG/3ML IN SOLN^ADS|3||mL||||||||||||||||||||||Wheezing^Wheezing^PRN|||||||||||||\r";
 
-        e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         medicationRequestList = ResourceUtils.getResourceList(e, ResourceType.MedicationRequest);
         assertThat(medicationRequestList).hasSize(1);
@@ -495,7 +497,7 @@ class Hl7MedicationRequestFHIRConversionTest {
 
         assertThat(medicationRequest.getReasonCode()).hasSize(1);
         assertThat(medicationRequest.getReasonCodeFirstRep().getCoding()).hasSize(1);
-        assertThat(medicationRequest.getReasonCodeFirstRep().getCodingFirstRep().getCode()).isEqualTo("Wheezing");  // RXE.27
+        assertThat(medicationRequest.getReasonCodeFirstRep().getCodingFirstRep().getCode()).isEqualTo("Wheezing"); // RXE.27
         assertThat(medicationRequest.getReasonCodeFirstRep().getCodingFirstRep().getDisplay()).isEqualTo("Wheezing"); // RXE.27
         assertThat(medicationRequest.getReasonCodeFirstRep().getCodingFirstRep().getSystem()).isEqualTo("urn:id:PRN"); // RXE.27
 
@@ -509,7 +511,7 @@ class Hl7MedicationRequestFHIRConversionTest {
                 // RXE.6 through RXE.44 purposely empty
                 + "RXE|^Q24H&0600^^20210330144208^^ROU|DUONEB3INH^3 ML PLAS CONT : IPRATROPIUM-ALBUTEROL 0.5-2.5 (3) MG/3ML IN SOLN^ADS|3||mL|||||||||||||||||||||||||||||||||||\n";
 
-        e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         medicationRequestList = ResourceUtils.getResourceList(e, ResourceType.MedicationRequest);
         assertThat(medicationRequestList).hasSize(1);
@@ -535,7 +537,7 @@ class Hl7MedicationRequestFHIRConversionTest {
                 // RXE.13 empty so ORC.12 takes priority
                 + "RXE|^Q24H&0600^^20210330144208^^ROU|DUONEB3INH^3 ML PLAS CONT : IPRATROPIUM-ALBUTEROL 0.5-2.5 (3) MG/3ML IN SOLN^ADS|3||mL|47||||||||||||||||||||||||||||||||||\n";
 
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         List<Resource> medicationRequestList = ResourceUtils.getResourceList(e, ResourceType.MedicationRequest);
         assertThat(medicationRequestList).hasSize(1);
@@ -578,7 +580,7 @@ class Hl7MedicationRequestFHIRConversionTest {
                 // RXE.13 to practitioner take priority over ORC.12
                 + "|2213^ORDERING^PROVIDER|||||||||||||||||||||||||||\n";
 
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         List<Resource> medicationRequestList = ResourceUtils.getResourceList(e, ResourceType.MedicationRequest);
         assertThat(medicationRequestList).hasSize(1);
@@ -628,7 +630,7 @@ class Hl7MedicationRequestFHIRConversionTest {
                 // RX0.13 to getNumberOfRepeatsAllowed
                 + "|4|tablet^tablet|2|||||||||||\n";
 
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         List<Resource> medicationRequestList = ResourceUtils.getResourceList(e, ResourceType.MedicationRequest);
         // Confirm that one medicationRequest was created.
@@ -655,23 +657,23 @@ class Hl7MedicationRequestFHIRConversionTest {
     void dispenseRequestTestRXE() {
         // Get DispenseRequest from RXE segment (RXE.10, RXE.11.1 and RXE.11.3)
         String hl7message = "MSH|^~\\&||||||S1|RDE^O11||T|2.6|||||||||\n"
-                    + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
-                    + "ORC|NW||||||||||||||||||||||||||||\n"
-                    + "RXE||DUONEB3INH^3 ML PLAS CONT : IPRATROPIUM-ALBUTEROL 0.5-2.5 (3) MG/3ML IN SOLN^ADS|||||||"
-                    // Split and concatenate RXE for easier understanding
-                    // RXE.10 to dispenseRequest.quantity.value
-                    // RXE.11 to dispenseRequest.quantity.unit
-                    // RXE.11.3 purposely set to unknown system to check the default is not used
-                    // RXE.12 to numberOfRepeatsAllowed
-                    // RXE.39 to dispenseRequest.InitialFill.Quantity
-                    + "|1|PC^^measureofunits|0|||||||||||||||||||||||||||7|\n";
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+                + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\n"
+                + "ORC|NW||||||||||||||||||||||||||||\n"
+                + "RXE||DUONEB3INH^3 ML PLAS CONT : IPRATROPIUM-ALBUTEROL 0.5-2.5 (3) MG/3ML IN SOLN^ADS|||||||"
+                // Split and concatenate RXE for easier understanding
+                // RXE.10 to dispenseRequest.quantity.value
+                // RXE.11 to dispenseRequest.quantity.unit
+                // RXE.11.3 purposely set to unknown system to check the default is not used
+                // RXE.12 to numberOfRepeatsAllowed
+                // RXE.39 to dispenseRequest.InitialFill.Quantity
+                + "|1|PC^^measureofunits|0|||||||||||||||||||||||||||7|\n";
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         List<Resource> medicationRequestList = ResourceUtils.getResourceList(e, ResourceType.MedicationRequest);
-            // Confirm that one medicationRequest was created.
-            assertThat(medicationRequestList).hasSize(1);
+        // Confirm that one medicationRequest was created.
+        assertThat(medicationRequestList).hasSize(1);
         MedicationRequest medicationRequest = ResourceUtils.getResourceMedicationRequest(medicationRequestList.get(0),
-                    ResourceUtils.context);
+                ResourceUtils.context);
 
         MedicationRequest.MedicationRequestDispenseRequestComponent disReq = medicationRequest.getDispenseRequest();
 
@@ -705,7 +707,7 @@ class Hl7MedicationRequestFHIRConversionTest {
                 // RXO.23 to dosageInstruction.maxDosePerPeriod.numerator
                 + "|7^PC|\n";
 
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         List<Resource> medicationRequestList = ResourceUtils.getResourceList(e, ResourceType.MedicationRequest);
         // Confirm that one medicationRequest was created.
@@ -742,7 +744,7 @@ class Hl7MedicationRequestFHIRConversionTest {
                 // RXE.19 to dosageInstruction.maxDosePerPeriod.numerator 
                 + "|5^PC|||||||||||||||||||||\n";
 
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         List<Resource> medicationRequestList = ResourceUtils.getResourceList(e, ResourceType.MedicationRequest);
         // Confirm that one medicationRequest was created.
@@ -779,7 +781,7 @@ class Hl7MedicationRequestFHIRConversionTest {
                 // RXO.7 to dosageInstruction.patientInstruction
                 + "|^Take 1 tablet by mouth every 6 (six) hours.|||||||||||||||||\n";
 
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         List<Resource> medicationRequestList = ResourceUtils.getResourceList(e, ResourceType.MedicationRequest);
         // Confirm that one medicationRequest was created.
@@ -808,7 +810,7 @@ class Hl7MedicationRequestFHIRConversionTest {
                 // RXE.7 to dosageInstruction.patientInstruction
                 + "|333^Take 1 tablet by mouth every 6 (six) hours.|||||||||||||||||||||||||||||||||\n";
 
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         List<Resource> medicationRequestList = ResourceUtils.getResourceList(e, ResourceType.MedicationRequest);
         // Confirm that one medicationRequest was created.
@@ -838,7 +840,7 @@ class Hl7MedicationRequestFHIRConversionTest {
                 // RXO.6.2 to dosageInstruction.text (Purposely leave RXO.6.1 empty) take priority over RXE.21
                 + "|^Take 1 tablet by mouth every 6 (six) hours.||||||||||||||||||\n";
 
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         List<Resource> medicationRequestList = ResourceUtils.getResourceList(e, ResourceType.MedicationRequest);
         // Confirm that one medicationRequest was created.
@@ -866,7 +868,7 @@ class Hl7MedicationRequestFHIRConversionTest {
                 // Split and concatenate RXE for easier understanding
                 // RXE.21 to dosageInstruction.text
                 + "|333^Take 1 tablet by mouth every 6 (six) hours.|||||||||||||||||||\n";
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         List<Resource> medicationRequestList = ResourceUtils.getResourceList(e, ResourceType.MedicationRequest);
         // Confirm that one medicationRequest was created.
@@ -896,7 +898,7 @@ class Hl7MedicationRequestFHIRConversionTest {
                 // RXO.5 to dosageInstruction.Route
                 + "|6064005^Topical route^http://snomed.info/sct|||||||||||||||||\n";
 
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         List<Resource> medicationRequestList = ResourceUtils.getResourceList(e, ResourceType.MedicationRequest);
         // Confirm that one medicationRequest was created.
@@ -928,7 +930,7 @@ class Hl7MedicationRequestFHIRConversionTest {
                 // RXE.6 to route
                 + "|6064005||||||||||||||||||||||||||||||||||\n";
 
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         List<Resource> medicationRequestList = ResourceUtils.getResourceList(e, ResourceType.MedicationRequest);
         // Confirm that one medicationRequest was created.
@@ -964,8 +966,7 @@ class Hl7MedicationRequestFHIRConversionTest {
                 // RXO.22 to dosageInstruction.doseAndRate.rateRatio.numerator.unit
                 + "|mL||||6|PC^^UCUM||\n";
 
-
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         List<Resource> medicationRequestList = ResourceUtils.getResourceList(e, ResourceType.MedicationRequest);
         // Confirm that one medicationRequest was created.
@@ -1003,7 +1004,7 @@ class Hl7MedicationRequestFHIRConversionTest {
                 // RXE.24 to dosageInstruction.doseAndRate.rateRatio.numerator.unit 
                 // RXE.24.3 empty to cause default in dosageInstruction.doseAndRate.rateRatio.numerator.system  
                 + "|PC|7|PC||||||||||||||||\n";
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         List<Resource> medicationRequestList = ResourceUtils.getResourceList(e, ResourceType.MedicationRequest);
         // Confirm that one medicationRequest was created.
@@ -1041,7 +1042,7 @@ class Hl7MedicationRequestFHIRConversionTest {
                 // RXO.22.3 purposely empty to check that default system is used
                 + "RXO|00054418425^Dexamethasone 4 MG Oral Tablet^NDC||||||||||||||||||||6|PC||||||||\n";
 
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         List<Resource> medicationRequestList = ResourceUtils.getResourceList(e, ResourceType.MedicationRequest);
         // Confirm that one medicationRequest was created.
@@ -1049,7 +1050,8 @@ class Hl7MedicationRequestFHIRConversionTest {
         MedicationRequest medicationRequest = ResourceUtils.getResourceMedicationRequest(medicationRequestList.get(0),
                 ResourceUtils.context);
 
-        Quantity rateQuantity  = medicationRequest.getDosageInstructionFirstRep().getDoseAndRateFirstRep().getRateQuantity();
+        Quantity rateQuantity = medicationRequest.getDosageInstructionFirstRep().getDoseAndRateFirstRep()
+                .getRateQuantity();
 
         // dosageInstruction.doseAndRate.rateQuantity RXO.21
         assertThat(rateQuantity.getValue()).hasToString("6.0"); //RXO.21
@@ -1075,7 +1077,7 @@ class Hl7MedicationRequestFHIRConversionTest {
                 // RXE.24.3 purposely empty to check that default system is used
                 + "||7|PC^^http://unitsofmeasure.org||||||||||||||||\n";
 
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         List<Resource> medicationRequestList = ResourceUtils.getResourceList(e, ResourceType.MedicationRequest);
         // Confirm that one medicationRequest was created.
@@ -1083,7 +1085,8 @@ class Hl7MedicationRequestFHIRConversionTest {
         MedicationRequest medicationRequest = ResourceUtils.getResourceMedicationRequest(medicationRequestList.get(0),
                 ResourceUtils.context);
 
-        Quantity rateQuantity  = medicationRequest.getDosageInstructionFirstRep().getDoseAndRateFirstRep().getRateQuantity();
+        Quantity rateQuantity = medicationRequest.getDosageInstructionFirstRep().getDoseAndRateFirstRep()
+                .getRateQuantity();
 
         // dosageInstruction.doseAndRate.rateQuantity RXE.23
         assertThat(rateQuantity.getValue()).hasToString("7.0"); //RXO.23
@@ -1110,7 +1113,7 @@ class Hl7MedicationRequestFHIRConversionTest {
                 // RXO.5 through RXO.35 not used.
                 + "RXO|00054418425^Dexamethasone 4 MG Oral Tablet^NDC|100||CC||||||||||||||||||||||||||\n";
 
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         List<Resource> medicationRequestList = ResourceUtils.getResourceList(e, ResourceType.MedicationRequest);
         // Confirm that one medicationRequest was created.
@@ -1118,7 +1121,8 @@ class Hl7MedicationRequestFHIRConversionTest {
         MedicationRequest medicationRequest = ResourceUtils.getResourceMedicationRequest(medicationRequestList.get(0),
                 ResourceUtils.context);
 
-        Quantity doseQuantity  = medicationRequest.getDosageInstructionFirstRep().getDoseAndRateFirstRep().getDoseQuantity();
+        Quantity doseQuantity = medicationRequest.getDosageInstructionFirstRep().getDoseAndRateFirstRep()
+                .getDoseQuantity();
 
         // dosageInstruction.doseAndRate.doseQuantity RXO.2
         assertThat(doseQuantity.getValue()).hasToString("100.0"); //RXO.2
@@ -1144,8 +1148,7 @@ class Hl7MedicationRequestFHIRConversionTest {
                 // RXE.6 through RXE.44 not used.
                 + "RXE||DUONEB3INH^3 ML PLAS CONT : IPRATROPIUM-ALBUTEROL 0.5-2.5 (3) MG/3ML IN SOLN^ADS|3||mL|||||||||||||||||||||||||||||\n";
 
-
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         List<Resource> medicationRequestList = ResourceUtils.getResourceList(e, ResourceType.MedicationRequest);
         // Confirm that one medicationRequest was created.
@@ -1153,7 +1156,8 @@ class Hl7MedicationRequestFHIRConversionTest {
         MedicationRequest medicationRequest = ResourceUtils.getResourceMedicationRequest(medicationRequestList.get(0),
                 ResourceUtils.context);
 
-        Quantity doseQuantity  = medicationRequest.getDosageInstructionFirstRep().getDoseAndRateFirstRep().getDoseQuantity();
+        Quantity doseQuantity = medicationRequest.getDosageInstructionFirstRep().getDoseAndRateFirstRep()
+                .getDoseQuantity();
 
         // dosageInstruction.doseAndRate.doseQuantity RXE.3
         assertThat(doseQuantity.getValue()).hasToString("3.0"); //RXE.3
@@ -1180,8 +1184,7 @@ class Hl7MedicationRequestFHIRConversionTest {
                 // RXO.5 through RXO.35 not used.
                 + "RXO|00054418425^Dexamethasone 4 MG Oral Tablet^NDC^^^^^^dexamethasone (DECADRON) 4 MG TABS|100|150|CC||||||||||||||||||||||||||\n";
 
-
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         List<Resource> medicationRequestList = ResourceUtils.getResourceList(e, ResourceType.MedicationRequest);
         // Confirm that one medicationRequest was created.
@@ -1221,7 +1224,7 @@ class Hl7MedicationRequestFHIRConversionTest {
                 // RXE.6 through RXE.44 not used.
                 + "RXE||DUONEB3INH^3 ML PLAS CONT : IPRATROPIUM-ALBUTEROL 0.5-2.5 (3) MG/3ML IN SOLN^ADS|3|6|mL||||||||||||||||||||||||||||||||||\n";
 
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         List<Resource> medicationRequestList = ResourceUtils.getResourceList(e, ResourceType.MedicationRequest);
         // Confirm that one medicationRequest was created.

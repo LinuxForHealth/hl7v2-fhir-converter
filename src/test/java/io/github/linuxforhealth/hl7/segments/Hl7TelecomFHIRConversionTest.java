@@ -13,9 +13,11 @@ import org.hl7.fhir.r4.model.ContactPoint;
 import org.hl7.fhir.r4.model.Patient;
 import org.junit.jupiter.api.Test;
 
+import io.github.linuxforhealth.hl7.HL7ToFHIRConverter;
 import io.github.linuxforhealth.hl7.segments.util.PatientUtils;
 
 class Hl7TelecomFHIRConversionTest {
+    private HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
 
     // Suppress warnings about too many assertions in a test.  Justification: creating a FHIR message is very costly; we need to check many asserts per creation for efficiency.  
     @java.lang.SuppressWarnings("squid:S5961")
@@ -26,7 +28,7 @@ class Hl7TelecomFHIRConversionTest {
                 // Home has 2 phones and an email, work has one phone and two emails
                 + "PID|1||12345678^^^^MR|ALTID|Moose^Mickey^J^III^^^||20060504|M|||||^PRN^PH^^22^555^1111313^^^^^^^^^^^3~^PRN^CP^^22^555^2221313^^^^^^^^^^^1~^NET^X.400^email.test@gmail.com^^^^^^^^^^^^^^2|^PRN^PH^^^555^1111414^889~^^^professional@buisness.com~^^^moose.mickey@buisness.com^^^^^^^^^^^^^^4||||||||||||||||\n";
 
-        Patient patient = PatientUtils.createPatientFromHl7Segment(patientPhone);
+        Patient patient = PatientUtils.createPatientFromHl7Segment(ftv, patientPhone);
         assertThat(patient.hasTelecom()).isTrue();
         List<ContactPoint> contacts = patient.getTelecom();
         assertThat(contacts.size()).isEqualTo(6);
@@ -85,7 +87,7 @@ class Hl7TelecomFHIRConversionTest {
         String patientNoPhone = "MSH|^~\\&|MIICEHRApplication|MIIC|MIIC|MIIC|201705130822||VXU^V04^VXU_V04|test1100|P|2.5.1|||AL|AL|||||Z22^CDCPHINVS|^^^^^MIIC^SR^^^MIIC|MIIC\n"
                 + "PID|1||12345678^^^^MR|ALTID|Moose^Mickey^J^III^^^||20060504|M||||||||||||||||||||||\n";
 
-        Patient patient = PatientUtils.createPatientFromHl7Segment(patientNoPhone);
+        Patient patient = PatientUtils.createPatientFromHl7Segment(ftv, patientNoPhone);
         assertThat(patient.hasTelecom()).isFalse();
 
     }

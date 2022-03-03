@@ -18,6 +18,9 @@ import java.util.stream.Collectors;
 import org.apache.commons.io.IOUtils;
 import org.hl7.fhir.exceptions.FHIRException;
 import org.hl7.fhir.instance.model.api.IBaseResource;
+import org.hl7.fhir.r4.model.Bundle;
+import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
+import org.hl7.fhir.r4.model.Bundle.BundleType;
 import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.Identifier;
@@ -26,9 +29,6 @@ import org.hl7.fhir.r4.model.Organization;
 import org.hl7.fhir.r4.model.Quantity;
 import org.hl7.fhir.r4.model.Resource;
 import org.hl7.fhir.r4.model.ResourceType;
-import org.hl7.fhir.r4.model.Bundle;
-import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
-import org.hl7.fhir.r4.model.Bundle.BundleType;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -49,15 +49,15 @@ class FHIRConverterTest {
     private static final String HL7_FILE_WIN_NEWLINE = "src/test/resources/sample_win.hl7";
     private static final ConverterOptions OPTIONS = new Builder().withValidateResource().withPrettyPrint().build();
     private static final Logger LOGGER = LoggerFactory.getLogger(FHIRConverterTest.class);
+    private HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
 
     @Test
     void test_patient_encounter_bundle_return() throws IOException {
 
-        String hl7message =  "MSH|^~\\&|REGADT|MCM|RSP1P8|MCM|200301051530|SEC|ADT^A40^ADT_A39|00000003|P|2.6\n" +
+        String hl7message = "MSH|^~\\&|REGADT|MCM|RSP1P8|MCM|200301051530|SEC|ADT^A40^ADT_A39|00000003|P|2.6\n" +
                 "PID|||MR1^^^XYZ||MAIDENNAME^EVE\n" +
                 "MRG|MR2^^^XYZ\n";
 
-        HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
         Bundle b = ftv.convertToBundle(hl7message, OPTIONS, null);
 
         assertThat(b.getType()).isEqualTo(BundleType.COLLECTION);
@@ -80,7 +80,6 @@ class FHIRConverterTest {
                 + "AL1|1|DRUG|00000741^OXYCODONE||HYPOTENSION\r" + "AL1|2|DRUG|00001433^TRAMADOL||SEIZURES~VOMITING\r"
                 + "PRB|AD|200603150625|aortic stenosis|53692||2||200603150625";
 
-        HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
         String json = ftv.convert(hl7message, OPTIONS);
         verifyResult(json, Constants.DEFAULT_BUNDLE_TYPE);
 
@@ -97,7 +96,6 @@ class FHIRConverterTest {
                 + "AL1|1|DRUG|00000741^OXYCODONE||HYPOTENSION\r" + "AL1|2|DRUG|00001433^TRAMADOL||SEIZURES~VOMITING\r"
                 + "PRB|AD|200603150625|aortic stenosis|53692||2||200603150625";
 
-        HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
         String json = ftv.convert(hl7message, OPTIONS);
         LOGGER.debug("FHIR json result:\n" + json);
         verifyResult(json, Constants.DEFAULT_BUNDLE_TYPE, false);
@@ -106,7 +104,6 @@ class FHIRConverterTest {
 
     @Test
     void convert_hl7_from_file_to_fhir_unix_line_endings() throws IOException {
-        HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
         String json = ftv.convert(new File(HL7_FILE_UNIX_NEWLINE));
         verifyResult(json, BundleType.COLLECTION);
 
@@ -114,7 +111,6 @@ class FHIRConverterTest {
 
     @Test
     void convert_hl7_from_file_to_fhir_wiin_line_endings() throws IOException {
-        HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
         ConverterOptions options = new Builder().withBundleType(BundleType.COLLECTION).withValidateResource().build();
 
         String json = ftv.convert(new File(HL7_FILE_WIN_NEWLINE), options);
@@ -130,8 +126,6 @@ class FHIRConverterTest {
                 + "PV1|1|O|||||2741^Yung^Den|2914^Smith^John^F|3066^Mahr^Paul^J||||||||9053^Summer^Oscar^||1001200\n"
                 + "MRG|000010510^^^def^MR~000010765^^^ST01B^MR|||000010510^^^def|||WHITE^CHARLES";
 
-        HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
-
         Assertions.assertThrows(UnsupportedOperationException.class, () -> {
             ftv.convert(hl7message);
         });
@@ -146,7 +140,6 @@ class FHIRConverterTest {
                 "ORC|RE||197023^CMC|||||||^Clark^Dave||1234567890^Smith^Janet^^^^^^NPPES^L^^^NPI^^^^^^^^MD\r" +
                 "RXA|0|1|20140730||08^HEPB-PEDIATRIC/ADOLESCENT^CVX|.5|mL^mL^UCUM||00^NEW IMMUNIZATION RECORD^NIP001|1234567890^Smith^Janet^^^^^^NPPES^^^^NPI^^^^^^^^MD |^^^DE-000001||||0039F|20200531|MSD^MERCK^MVX|||CP|A";
 
-        HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
         String json = ftv.convert(hl7message, OPTIONS);
 
         FHIRContext context = new FHIRContext();
@@ -174,8 +167,6 @@ class FHIRConverterTest {
     void test_invalid_message_throws_error() throws IOException {
         String hl7message = "some text";
 
-        HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
-
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
             ftv.convert(hl7message);
         });
@@ -184,8 +175,6 @@ class FHIRConverterTest {
     @Test
     void test_blank_message_throws_error() throws IOException {
         String hl7message = "";
-
-        HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
 
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
             ftv.convert(hl7message);
@@ -215,7 +204,6 @@ class FHIRConverterTest {
         assertThat(messageType).isEqualTo("ADT_A40");
 
         // Convert and check for a patient resource
-        HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
         String json = ftv.convert(hl7messageString, ConverterOptions.SIMPLE_OPTIONS);
 
         FHIRContext context = new FHIRContext();
@@ -257,7 +245,6 @@ class FHIRConverterTest {
         assertThat(messageType).isEqualTo("ADT_A40");
 
         // Convert and check for a patient resource
-        HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
         String json = ftv.convert(hl7messageString, ConverterOptions.SIMPLE_OPTIONS);
 
         FHIRContext context = new FHIRContext();
@@ -290,8 +277,6 @@ class FHIRConverterTest {
                 + "RXA|0|1|20130528|20130529|48^HIB PRP-T^CVX|0.5|ML^^ISO+||00^new immunization record^NIP001|^Sticker^Nurse|^^^RI2050||||33k2a|20131210|PMC^sanofi^MVX|||CP|A\r"
                 // Test HL70162 & HL70163
                 + "RXR|C28161^IM^NCIT^IM^INTRAMUSCULAR^HL70162|RT^right thigh^HL70163\r";
-
-        HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
 
         String json = ftv.convert(hl7VUXmessageRep, OPTIONS);
 

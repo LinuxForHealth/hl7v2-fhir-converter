@@ -7,8 +7,10 @@ package io.github.linuxforhealth.hl7.segments;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import java.util.List;
 import java.util.stream.Collectors;
+
 import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
 import org.hl7.fhir.r4.model.Condition;
 import org.hl7.fhir.r4.model.Encounter;
@@ -18,10 +20,13 @@ import org.hl7.fhir.r4.model.ResourceType;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+
+import io.github.linuxforhealth.hl7.HL7ToFHIRConverter;
 import io.github.linuxforhealth.hl7.segments.util.DatatypeUtils;
 import io.github.linuxforhealth.hl7.segments.util.ResourceUtils;
 
 class HL7ConditionFHIRConversionTest {
+    private HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
 
     // --------------------- DIAGNOSIS UNIT TESTS (DG1) ---------------------
 
@@ -34,10 +39,10 @@ class HL7ConditionFHIRConversionTest {
             // "MSH|^~\\&|||||||ADT^A03|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6||||||\r",
             // "MSH|^~\\&|||||||ADT^A04|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6||||||\r",
             "MSH|^~\\&|||||||ADT^A08|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6||||||\r",
-    // "MSH|^~\\&|||||||ADT^A28^ADT^A28|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6||||||\r",
-    // "MSH|^~\\&|||||||ADT^A31|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6||||||\r",
-    // "MSH|^~\\&|||||||ORM^O01|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6||||||\r"
-    // PPR_PC1, PPR_PC2, and PPR_PC3 create Conditions but they don't have a DG1 segment so they are tested in a different testcase.
+            // "MSH|^~\\&|||||||ADT^A28^ADT^A28|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6||||||\r",
+            // "MSH|^~\\&|||||||ADT^A31|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6||||||\r",
+            // "MSH|^~\\&|||||||ORM^O01|64322|P|2.6|123|456|ER|AL|USA|ASCII|en|2.6||||||\r"
+            // PPR_PC1, PPR_PC2, and PPR_PC3 create Conditions but they don't have a DG1 segment so they are tested in a different testcase.
     })
     void validateDiagnosis(String msh) {
 
@@ -52,7 +57,7 @@ class HL7ConditionFHIRConversionTest {
                 // DG1.20 to Identifier
                 + "DG1|1||C56.9^Ovarian Cancer^I10||20210322154449|A|||||||||1|123^DOE^JOHN^A^|||20210322154326|V45|||||\r";
 
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
         // Verify no extraneous resources
         // Expect encounter, patient, practitioner, condition
         assertThat(e).hasSize(4);
@@ -120,7 +125,7 @@ class HL7ConditionFHIRConversionTest {
                 .isEqualTo("Condition/");
         DatatypeUtils.checkCommonCodeableConceptAssertions(encounter.getDiagnosisFirstRep().getUse(), "AD",
                 "Admission diagnosis",
-                "http://terminology.hl7.org/CodeSystem/diagnosis-role", null);  // DG1.6
+                "http://terminology.hl7.org/CodeSystem/diagnosis-role", null); // DG1.6
         assertThat(encounter.getDiagnosisFirstRep().getRank()).isEqualTo(1); // DG1.15
 
         // --- PRACTIONER TESTS ---
@@ -154,7 +159,7 @@ class HL7ConditionFHIRConversionTest {
                 // DG1.20 to identifers
                 + "DG1|1||B45678|||A||||||||||||||one^https://terminology.hl7.org/CodeSystem/two^three^https://terminology.hl7.org/CodeSystem/four||||||\r";
 
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         // Find the condition from the FHIR bundle.
         List<Resource> conditionResource = ResourceUtils.getResourceList(e, ResourceType.Condition);
@@ -191,7 +196,7 @@ class HL7ConditionFHIRConversionTest {
                 + "DG1|2|D2|R00.0^Tachycardia, unspecified^ICD-10^^^|Tachycardia, unspecified|20150725201300|A\r"
                 + "DG1|3|D3|R06.02^Shortness of breath^ICD-10^^^|Shortness of breath||A\r";
 
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         // Find the condition from the FHIR bundle.
         List<Resource> conditionResource = ResourceUtils.getResourceList(e, ResourceType.Condition);
@@ -252,7 +257,7 @@ class HL7ConditionFHIRConversionTest {
                 + "DG1|6|D7|I05.9^Mitral valve disorder in childbirth^ICD-10^^^|Mitral valve disorder in childbirth||F|||||||||8|\r"
                 + "DG1|7|D8|J45.909^Unspecified asthma, uncomplicated^ICD-10^^^|Unspecified asthma, uncomplicated||F|||||||||8|\r";
 
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         // Find the conditions from the FHIR bundle.
         List<Resource> conditionResource = ResourceUtils.getResourceList(e, ResourceType.Condition);
@@ -276,10 +281,10 @@ class HL7ConditionFHIRConversionTest {
         // Verify there is encounter.diagnosis for every diagnosis. Therefore there should be 8.
         assertThat(encounter.getDiagnosis()).hasSize(8);
         List<String> referencedConditions = encounter.getDiagnosis().stream()
-            .map(i -> i.getCondition().getReference()).collect(Collectors.toList());
+                .map(i -> i.getCondition().getReference()).collect(Collectors.toList());
 
         List<String> condIdentifiers = conditionResource.stream().map(r -> (Condition) r)
-            .map(c -> c.getId()).collect(Collectors.toList());
+                .map(c -> c.getId()).collect(Collectors.toList());
 
         assertThat(referencedConditions).containsExactlyInAnyOrderElementsOf(condIdentifiers);
         // Verify each diagnosis is set correctly.
@@ -309,7 +314,7 @@ class HL7ConditionFHIRConversionTest {
                 + "PV1||I|||||||||||||||||1492|||||||||||||||||||||||||\r"
                 + "DG1|1|ICD-10-CM|M54.5^Low back pain^ICD-10-CM|Low back pain|20210407191342|A\r";
 
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         // Find the conditions from the FHIR bundle.
         List<Resource> conditionResource = ResourceUtils.getResourceList(e, ResourceType.Condition);
@@ -329,8 +334,8 @@ class HL7ConditionFHIRConversionTest {
     // all the fields in the happy path (PART 1).
     @ParameterizedTest
     @ValueSource(strings = { "MSH|^~\\&|||||20040629164652|1|PPR^PC1|331|P|2.3.1||\r",
-    // "MSH|^~\\&|||||20040629164652|1|PPR^PC2|331|P|2.3.1||\r",
-    // "MSH|^~\\&|||||20040629164652|1|PPR^PC3|331|P|2.3.1||\r",
+            // "MSH|^~\\&|||||20040629164652|1|PPR^PC2|331|P|2.3.1||\r",
+            // "MSH|^~\\&|||||20040629164652|1|PPR^PC3|331|P|2.3.1||\r",
     })
     void validateProblemHappyTestOne(String msh) {
 
@@ -349,7 +354,7 @@ class HL7ConditionFHIRConversionTest {
                 // PRB.26 for severity
                 + "|20170102074000|textual representation of the time when the problem began|||||||||some prb detail|\r";
 
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         // Find the condition from the FHIR bundle.
         List<Resource> conditionResource = ResourceUtils.getResourceList(e, ResourceType.Condition);
@@ -399,8 +404,8 @@ class HL7ConditionFHIRConversionTest {
     // all the fields in the happy path (Part 2).
     @ParameterizedTest
     @ValueSource(strings = { "MSH|^~\\&|||||20040629164652|1|PPR^PC1|331|P|2.3.1||\r",
-    // "MSH|^~\\&|||||20040629164652|1|PPR^PC2|331|P|2.3.1||\r",
-    // "MSH|^~\\&|||||20040629164652|1|PPR^PC3|331|P|2.3.1||\r",
+            // "MSH|^~\\&|||||20040629164652|1|PPR^PC2|331|P|2.3.1||\r",
+            // "MSH|^~\\&|||||20040629164652|1|PPR^PC3|331|P|2.3.1||\r",
     })
     void validateProblemHappyTestTwo(String msh) {
 
@@ -411,7 +416,7 @@ class HL7ConditionFHIRConversionTest {
                 // // PRB.14 for clinical Status
                 + "PRB|AD|20170110074000|K80.00^Cholelithiasis^I10|53956||||||||||remission^Remission^http://terminology.hl7.org/CodeSystem/condition-clinical|||||||||||||\r";
 
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         // Find the conditions from the FHIR bundle.
         List<Resource> conditionResource = ResourceUtils.getResourceList(e, ResourceType.Condition);
@@ -463,7 +468,7 @@ class HL7ConditionFHIRConversionTest {
                 + "PV1||I||||||||||||||||||||||||||||||||||||||||||\r"
                 + problemSegment;
 
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         // Find the condition from the FHIR bundle.
         List<Resource> conditionResource = ResourceUtils.getResourceList(e, ResourceType.Condition);
@@ -492,7 +497,7 @@ class HL7ConditionFHIRConversionTest {
                 // PRB.14 to clinicalStatus
                 + "PRB|AD|20170110074000|K80.00^Cholelithiasis^I10|53956|||||||||confirmed|remission|\r";
 
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         // Find the condition from the FHIR bundle.
         List<Resource> conditionResource = ResourceUtils.getResourceList(e, ResourceType.Condition);
@@ -523,7 +528,7 @@ class HL7ConditionFHIRConversionTest {
                 // PRB.13 to verificationStatus
                 + "PRB|AD|20170110074000|K80.00^Cholelithiasis^I10|53956|||||||||confirmed^Confirmed^Confirmation Status List||\r";
 
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         // Find the condition from the FHIR bundle.
         List<Resource> conditionResource = ResourceUtils.getResourceList(e, ResourceType.Condition);
@@ -550,7 +555,7 @@ class HL7ConditionFHIRConversionTest {
                 // PRB.14 to clinicalStatus
                 + "PRB|AD|20170110074000|K80.00^Cholelithiasis^I10|53956|||||||||confirmed^Confirmed^BADCLINCALSTATUSSYSTEM|remission^Remission^BADVERIFICATIONSTATUSSYSTEM|\r";
 
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         // Find the condition from the FHIR bundle.
         List<Resource> conditionResource = ResourceUtils.getResourceList(e, ResourceType.Condition);
@@ -592,7 +597,7 @@ class HL7ConditionFHIRConversionTest {
                 // PRB.1 to PRB.4 required
                 + "PRB|AD|20210101000000|G47.31^Primary central sleep apnea^ICD-10-CM|28827016|\r";
 
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         // Find the condition from the FHIR bundle.
         List<Resource> conditionResource = ResourceUtils.getResourceList(e, ResourceType.Condition);
@@ -616,7 +621,7 @@ class HL7ConditionFHIRConversionTest {
                 + "PRB|AD|20170110074000|N39.0^Urinary Tract Infection^I9|53957|E2|1|20090907175347|20150907175347||||||||||||||||||\r"
                 + "PRB|AD|20170110074000|C56.9^Ovarian Cancer^I10|53958|E3|2|20110907175347|20160907175347||||||||||||||||||\r";
 
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         // Find the condition from the FHIR bundle.
         List<Resource> conditionResource = ResourceUtils.getResourceList(e, ResourceType.Condition);
@@ -640,7 +645,7 @@ class HL7ConditionFHIRConversionTest {
         String hl7message = "MSH|^~\\&|||||20040629164652|1|PPR^PC1|331|P|2.3.1||\r"
                 + "PID||||||||||||||||||||||||||||||\r"
                 + segmentPRB;
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         // Find the condition from the FHIR bundle.
         List<Resource> conditionResource = ResourceUtils.getResourceList(e, ResourceType.Condition);
@@ -667,7 +672,7 @@ class HL7ConditionFHIRConversionTest {
                 // PRB.17 to Onset
                 + "PRB|AD|20170110074000|K80.00^Cholelithiasis^I10|53956|||||20150907175347||||||||textual representation of the time when the problem began|||||||||||\r";
 
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         // Find the condition from the FHIR bundle.
         List<Resource> conditionResource = ResourceUtils.getResourceList(e, ResourceType.Condition);
@@ -693,7 +698,7 @@ class HL7ConditionFHIRConversionTest {
                 // PRB.9 Actual Problem Resolution Date used in connection with INVALID PRB.14 to trigger Resolved clinicalStatus
                 + "PRB|AD|20170110074000|K80.00^Cholelithiasis^I10|53956|||||20150907175347|||||INVALID|||||||||||||\r";
 
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         // Find the condition from the FHIR bundle.
         List<Resource> conditionResource = ResourceUtils.getResourceList(e, ResourceType.Condition);

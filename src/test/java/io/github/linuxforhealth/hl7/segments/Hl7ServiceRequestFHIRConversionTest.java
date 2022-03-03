@@ -37,6 +37,7 @@ class Hl7ServiceRequestFHIRConversionTest {
     private static FHIRContext context = new FHIRContext(true, false);
     private static final Logger LOGGER = LoggerFactory.getLogger(Hl7ServiceRequestFHIRConversionTest.class);
     private static final ConverterOptions OPTIONS = new Builder().withValidateResource().build();
+    private HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
 
     @Test
     void test_ppr_pc1_service_request() throws IOException {
@@ -51,7 +52,7 @@ class Hl7ServiceRequestFHIRConversionTest {
                 + "OBR|1|TESTID|TESTID|||202101010000|202101010000||||||||||||||||||F||||||WEAKNESS||||||||||||\n"
                 + "OBX|1|TX|||ECHOCARDIOGRAPHIC REPORT||||||F|||202101010000|||\n"
                 + "OBX|2|TX|||NORMAL LV CHAMBER SIZE WITH MILD CONCENTRIC LVH||||||F|||202101010000|||\n";
-        HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
+
         String json = ftv.convert(hl7message, OPTIONS);
         assertThat(json).isNotBlank();
         IBaseResource bundleResource = context.getParser().parseResource(json);
@@ -83,7 +84,6 @@ class Hl7ServiceRequestFHIRConversionTest {
                 + "PV1||I|6N^1234^A^GENHOS|||||||SUR||||||||S||||||||||||||||||||||||||\n"
                 + "PRB|AD||202101010000|aortic stenosis|53692||2|||202101010000\n"
                 + "ORC|NW|1000^OE|9999999^RX|||E|^Q6H^D10^^^R\n";
-        ftv = new HL7ToFHIRConverter();
         json = ftv.convert(hl7message, OPTIONS);
         assertThat(json).isNotBlank();
         bundleResource = context.getParser().parseResource(json);

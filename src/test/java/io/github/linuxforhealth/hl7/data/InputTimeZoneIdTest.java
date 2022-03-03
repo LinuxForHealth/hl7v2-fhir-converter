@@ -20,12 +20,14 @@ import org.junit.jupiter.api.Test;
 
 import io.github.linuxforhealth.hl7.ConverterOptions;
 import io.github.linuxforhealth.hl7.ConverterOptions.Builder;
+import io.github.linuxforhealth.hl7.HL7ToFHIRConverter;
 import io.github.linuxforhealth.hl7.segments.util.ResourceUtils;
 
 /**
  * Tests key changes in ZoneId input through context
  */
 class InputTimeZoneIdTest {
+    private HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
 
     @Test
     void validateTimeZoneIdSettingViaOption() {
@@ -46,7 +48,7 @@ class InputTimeZoneIdTest {
         ConverterOptions customOptionsWithTenant = new Builder().withValidateResource().withPrettyPrint()
                 .withZoneIdText("America/Chicago").build();
         // "America/Chicago" will become -06:00 in winter (CST) -05:00 in spring/summer/fall (CDT).  This is expected. 
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message,
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message,
                 customOptionsWithTenant);
         // Find the condition from the FHIR bundle.
         List<Resource> conditionResource = ResourceUtils.getResourceList(e, ResourceType.Condition);
@@ -61,7 +63,7 @@ class InputTimeZoneIdTest {
         // SECOND test with fixed ZoneId passed through options      
         customOptionsWithTenant = new Builder().withValidateResource().withPrettyPrint().withZoneIdText("+03:00")
                 .build();
-        e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message,
+        e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message,
                 customOptionsWithTenant);
         // Find the condition from the FHIR bundle.
         conditionResource = ResourceUtils.getResourceList(e, ResourceType.Condition);
@@ -75,7 +77,7 @@ class InputTimeZoneIdTest {
 
         // THIRD test with no ZoneId passed through options, so it uses the config.properties ZoneId       
         customOptionsWithTenant = new Builder().withValidateResource().withPrettyPrint().build();
-        e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message,
+        e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message,
                 customOptionsWithTenant);
         // Find the condition from the FHIR bundle.
         conditionResource = ResourceUtils.getResourceList(e, ResourceType.Condition);
@@ -105,7 +107,7 @@ class InputTimeZoneIdTest {
         ConverterOptions customOptionsWithTenant = new Builder().withValidateResource().withPrettyPrint()
                 .withZoneIdText("Europe/Paris").build();
         // "Europe/Paris" will become -01:00, but it we don't see because it is internal and relative to other date. 
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message,
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message,
                 customOptionsWithTenant);
         // Find the encounter from the FHIR bundle.
         List<Resource> encounters = ResourceUtils.getResourceList(e, ResourceType.Encounter);

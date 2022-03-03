@@ -22,9 +22,11 @@ import org.hl7.fhir.r4.model.ServiceRequest;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
+import io.github.linuxforhealth.hl7.HL7ToFHIRConverter;
 import io.github.linuxforhealth.hl7.segments.util.ResourceUtils;
 
 class Hl7MDMMessageTest {
+    private HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
 
     //An example message for reference:
     // "MSH|^~\\&|HNAM|W|RAD_IMAGING_REPORT|W|20180118111520||MDM^T06|<MESSAGEID>|P|2.6\n"
@@ -63,7 +65,7 @@ class Hl7MDMMessageTest {
                 + "OBX|2|TX|05^Operative Report||                             <HOSPITAL ADDRESS2>||||||P\n"
                 + "OBX|3|TX|05^Operative Report||                              <HOSPITAL ADDRESS2>||||||P\n";
 
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         // Check for the expected resources
         List<Resource> encounterResource = ResourceUtils.getResourceList(e, ResourceType.Encounter);
@@ -161,7 +163,7 @@ class Hl7MDMMessageTest {
                 + "TXA|1|OP^Operative Report|TX||||201801171442||||||||||||AV|||||\r"
                 + "OBX|1|TX|05^Operative Report||                        <HOSPITAL NAME>||||||P\r";
 
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         // Check for the expected resources
         List<Resource> encounterResource = ResourceUtils.getResourceList(e, ResourceType.Encounter);
@@ -187,7 +189,7 @@ class Hl7MDMMessageTest {
                 + "TXA|1|HP^History and physical examination|TX||||201801171442||||||||||||AV|||||\r"
                 + "OBX|1|NM|Most Current Weight^Most current measured weight (actual)||90|kg\r";
 
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         // Check for the expected resources
         List<Resource> encounterResource = ResourceUtils.getResourceList(e, ResourceType.Encounter);
@@ -218,7 +220,7 @@ class Hl7MDMMessageTest {
                 + "OBX|2|TX|05^Operative Report||                             <HOSPITAL ADDRESS>||||||P\r"
                 + "OBX|3|TX|05^Operative Report||                             <HOSPITAL ADDRESS2>||||||P\r";
 
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         // Check for the expected resources
         List<Resource> encounterResource = ResourceUtils.getResourceList(e, ResourceType.Encounter);
@@ -246,7 +248,7 @@ class Hl7MDMMessageTest {
                 + "OBX|2|ST|100||This is content|||||||X\r"
                 + "OBX|3|ST|48767-8^Annotation^LN|2|Some text from doctor||||||F|||20130531\r";
 
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         // Check for the expected resources
         List<Resource> encounterResource = ResourceUtils.getResourceList(e, ResourceType.Encounter);
@@ -277,7 +279,7 @@ class Hl7MDMMessageTest {
                 + "TXA|1|OP^Operative Report|TX||||201801171442||||||||||||AV|||||\r"
                 + "OBX|1|TX|05^Operative Report||                        <HOSPITAL NAME>||||||P\r";
 
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         // Check for the expected resources
         List<Resource> encounterResource = ResourceUtils.getResourceList(e, ResourceType.Encounter);
@@ -315,7 +317,7 @@ class Hl7MDMMessageTest {
                 + "NTE|1|L|TEST OBX NOTE BB line 1|\n"
                 + "NTE|2|L|TEST NOTE BB line 2||Pract2ID^Pract2Last^Pract2First|\n";
 
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         // Check for the expected resources
         List<Resource> encounterResource = ResourceUtils.getResourceList(e, ResourceType.Encounter);
@@ -380,7 +382,7 @@ class Hl7MDMMessageTest {
                 + "OBX|2|TX|05^Operative Report||                             <HOSPITAL ADDRESS>||||||P\r"
                 + "OBX|3|TX|05^Operative Report||                             <HOSPITAL ADDRESS2>||||||P\r";
 
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         // Check for the expected resources
         List<Resource> encounterResource = ResourceUtils.getResourceList(e, ResourceType.Encounter);
@@ -417,7 +419,7 @@ class Hl7MDMMessageTest {
                 + "OBX|2|ST|100||This is content|||||||X\r"
                 + "OBX|3|ST|48767-8^Annotation^LN|2|Some text from doctor||||||F|||20130531\r";
 
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         // Check for the expected resources
         List<Resource> encounterResource = ResourceUtils.getResourceList(e, ResourceType.Encounter);

@@ -6,9 +6,11 @@
 package io.github.linuxforhealth.hl7.segments.util;
 
 import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r4.model.AllergyIntolerance;
 import org.hl7.fhir.r4.model.Base;
@@ -33,6 +35,7 @@ import org.hl7.fhir.r4.model.ResourceType;
 import org.hl7.fhir.r4.model.ServiceRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import io.github.linuxforhealth.fhir.FHIRContext;
 import io.github.linuxforhealth.hl7.ConverterOptions;
 import io.github.linuxforhealth.hl7.ConverterOptions.Builder;
@@ -42,15 +45,16 @@ public class ResourceUtils {
 
     public static FHIRContext context = new FHIRContext();
     private static final Logger LOGGER = LoggerFactory.getLogger(ResourceUtils.class);
-    private static final ConverterOptions STANDARD_OPTIONS =
-        new Builder().withValidateResource().withPrettyPrint().build();
+    private static final ConverterOptions STANDARD_OPTIONS = new Builder().withValidateResource().withPrettyPrint()
+            .build();
 
-    public static List<BundleEntryComponent> createFHIRBundleFromHL7MessageReturnEntryList(String inputSegment) {
-        return createFHIRBundleFromHL7MessageReturnEntryList(inputSegment, STANDARD_OPTIONS);
+    public static List<BundleEntryComponent> createFHIRBundleFromHL7MessageReturnEntryList(HL7ToFHIRConverter ftv,
+            String inputSegment) {
+        return createFHIRBundleFromHL7MessageReturnEntryList(ftv, inputSegment, STANDARD_OPTIONS);
     }
 
-    public static List<BundleEntryComponent> createFHIRBundleFromHL7MessageReturnEntryList(String inputSegment, ConverterOptions options ) {
-        HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
+    public static List<BundleEntryComponent> createFHIRBundleFromHL7MessageReturnEntryList(HL7ToFHIRConverter ftv,
+            String inputSegment, ConverterOptions options) {
         String json = ftv.convert(inputSegment, options);
         assertThat(json).isNotBlank();
         LOGGER.debug("FHIR json result:\n" + json);
@@ -74,8 +78,8 @@ public class ResourceUtils {
         return value;
     }
 
-    public static AllergyIntolerance getAllergyResource(String inputSegment) {
-        List<BundleEntryComponent> resource = createFHIRBundleFromHL7MessageReturnEntryList(inputSegment);
+    public static AllergyIntolerance getAllergyResource(HL7ToFHIRConverter ftv, String inputSegment) {
+        List<BundleEntryComponent> resource = createFHIRBundleFromHL7MessageReturnEntryList(ftv, inputSegment);
 
         List<Resource> allergy = resource.stream()
                 .filter(v -> ResourceType.AllergyIntolerance == v.getResource().getResourceType())
@@ -86,8 +90,8 @@ public class ResourceUtils {
         return (AllergyIntolerance) context.getParser().parseResource(klass, s);
     }
 
-    public static Condition getCondition(String inputSegment) {
-        List<BundleEntryComponent> resource = createFHIRBundleFromHL7MessageReturnEntryList(inputSegment);
+    public static Condition getCondition(HL7ToFHIRConverter ftv, String inputSegment) {
+        List<BundleEntryComponent> resource = createFHIRBundleFromHL7MessageReturnEntryList(ftv, inputSegment);
 
         List<Resource> condition = resource.stream()
                 .filter(v -> ResourceType.Condition == v.getResource().getResourceType())
@@ -99,8 +103,8 @@ public class ResourceUtils {
         return (Condition) context.getParser().parseResource(klass, s);
     }
 
-    public static DiagnosticReport getDiagnosticReport(String inputSegment) {
-        List<BundleEntryComponent> resource = createFHIRBundleFromHL7MessageReturnEntryList(inputSegment);
+    public static DiagnosticReport getDiagnosticReport(HL7ToFHIRConverter ftv, String inputSegment) {
+        List<BundleEntryComponent> resource = createFHIRBundleFromHL7MessageReturnEntryList(ftv, inputSegment);
 
         List<Resource> diagnosticReport = resource.stream()
                 .filter(v -> ResourceType.DiagnosticReport == v.getResource().getResourceType())
@@ -112,8 +116,8 @@ public class ResourceUtils {
         return (DiagnosticReport) context.getParser().parseResource(klass, s);
     }
 
-    public static DocumentReference getDocumentReference(String inputSegment) {
-        List<BundleEntryComponent> resource = createFHIRBundleFromHL7MessageReturnEntryList(inputSegment);
+    public static DocumentReference getDocumentReference(HL7ToFHIRConverter ftv, String inputSegment) {
+        List<BundleEntryComponent> resource = createFHIRBundleFromHL7MessageReturnEntryList(ftv, inputSegment);
 
         List<Resource> documentReference = resource.stream()
                 .filter(v -> ResourceType.DocumentReference == v.getResource().getResourceType())
@@ -125,8 +129,8 @@ public class ResourceUtils {
         return (DocumentReference) context.getParser().parseResource(klass, s);
     }
 
-    public static Encounter getEncounter(String inputSegment) {
-        List<BundleEntryComponent> resource = createFHIRBundleFromHL7MessageReturnEntryList(inputSegment);
+    public static Encounter getEncounter(HL7ToFHIRConverter ftv, String inputSegment) {
+        List<BundleEntryComponent> resource = createFHIRBundleFromHL7MessageReturnEntryList(ftv, inputSegment);
 
         List<Resource> encounter = resource.stream()
                 .filter(v -> ResourceType.Encounter == v.getResource().getResourceType())
@@ -138,8 +142,8 @@ public class ResourceUtils {
         return (Encounter) context.getParser().parseResource(klass, s);
     }
 
-    public static Immunization getImmunization(String inputSegment) {
-        List<BundleEntryComponent> resource = createFHIRBundleFromHL7MessageReturnEntryList(inputSegment);
+    public static Immunization getImmunization(HL7ToFHIRConverter ftv, String inputSegment) {
+        List<BundleEntryComponent> resource = createFHIRBundleFromHL7MessageReturnEntryList(ftv, inputSegment);
 
         List<Resource> immunization = resource.stream()
                 .filter(v -> ResourceType.Immunization == v.getResource().getResourceType())
@@ -151,8 +155,8 @@ public class ResourceUtils {
         return (Immunization) context.getParser().parseResource(klass, s);
     }
 
-    public static Observation getObservation(String inputSegment) {
-        List<BundleEntryComponent> resource = createFHIRBundleFromHL7MessageReturnEntryList(inputSegment);
+    public static Observation getObservation(HL7ToFHIRConverter ftv, String inputSegment) {
+        List<BundleEntryComponent> resource = createFHIRBundleFromHL7MessageReturnEntryList(ftv, inputSegment);
 
         List<Resource> observation = resource.stream()
                 .filter(v -> ResourceType.Observation == v.getResource().getResourceType())
@@ -164,8 +168,8 @@ public class ResourceUtils {
         return (Observation) context.getParser().parseResource(klass, s);
     }
 
-    public static Procedure getProcedure(String inputSegment) {
-        List<BundleEntryComponent> resource = createFHIRBundleFromHL7MessageReturnEntryList(inputSegment);
+    public static Procedure getProcedure(HL7ToFHIRConverter ftv, String inputSegment) {
+        List<BundleEntryComponent> resource = createFHIRBundleFromHL7MessageReturnEntryList(ftv, inputSegment);
 
         List<Resource> procedure = resource.stream()
                 .filter(v -> ResourceType.Procedure == v.getResource().getResourceType())
@@ -177,8 +181,8 @@ public class ResourceUtils {
         return (Procedure) context.getParser().parseResource(klass, s);
     }
 
-    public static ServiceRequest getServiceRequest(String inputSegment) {
-        List<BundleEntryComponent> resource = createFHIRBundleFromHL7MessageReturnEntryList(inputSegment);
+    public static ServiceRequest getServiceRequest(HL7ToFHIRConverter ftv, String inputSegment) {
+        List<BundleEntryComponent> resource = createFHIRBundleFromHL7MessageReturnEntryList(ftv, inputSegment);
 
         List<Resource> serviceRequest = resource.stream()
                 .filter(v -> ResourceType.ServiceRequest == v.getResource().getResourceType())
@@ -190,8 +194,8 @@ public class ResourceUtils {
         return (ServiceRequest) context.getParser().parseResource(klass, s);
     }
 
-    public static Patient getPatient(String inputSegment) {
-        List<BundleEntryComponent> resource = createFHIRBundleFromHL7MessageReturnEntryList(inputSegment);
+    public static Patient getPatient(HL7ToFHIRConverter ftv, String inputSegment) {
+        List<BundleEntryComponent> resource = createFHIRBundleFromHL7MessageReturnEntryList(ftv, inputSegment);
 
         List<Resource> patient = resource.stream()
                 .filter(v -> ResourceType.Patient == v.getResource().getResourceType())
@@ -204,8 +208,8 @@ public class ResourceUtils {
         return (Patient) context.getParser().parseResource(klass, s);
     }
 
-    public static MedicationRequest getMedicationRequest(String inputSegment) {
-        List<BundleEntryComponent> resource = createFHIRBundleFromHL7MessageReturnEntryList(inputSegment);
+    public static MedicationRequest getMedicationRequest(HL7ToFHIRConverter ftv, String inputSegment) {
+        List<BundleEntryComponent> resource = createFHIRBundleFromHL7MessageReturnEntryList(ftv, inputSegment);
 
         List<Resource> medicationRequest = resource.stream()
                 .filter(v -> ResourceType.MedicationRequest == v.getResource().getResourceType())
@@ -217,8 +221,8 @@ public class ResourceUtils {
         return (MedicationRequest) context.getParser().parseResource(klass, s);
     }
 
-    public static MedicationAdministration getMedicationAdministration(String inputSegment) {
-        List<BundleEntryComponent> resource = createFHIRBundleFromHL7MessageReturnEntryList(inputSegment);
+    public static MedicationAdministration getMedicationAdministration(HL7ToFHIRConverter ftv, String inputSegment) {
+        List<BundleEntryComponent> resource = createFHIRBundleFromHL7MessageReturnEntryList(ftv, inputSegment);
 
         List<Resource> medicationAdministration = resource.stream()
                 .filter(v -> ResourceType.MedicationAdministration == v.getResource().getResourceType())

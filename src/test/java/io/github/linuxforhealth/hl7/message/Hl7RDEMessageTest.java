@@ -16,20 +16,24 @@ import org.hl7.fhir.r4.model.ResourceType;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
+import io.github.linuxforhealth.hl7.HL7ToFHIRConverter;
 import io.github.linuxforhealth.hl7.segments.util.ResourceUtils;
 
 class Hl7RDEMessageTest {
+    private HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
 
     @ParameterizedTest
-    @ValueSource(strings = { "RDE^O11", "RDE^O25"})
+    @ValueSource(strings = { "RDE^O11", "RDE^O25" })
+
     void testRdeMinimumPatientAndMinimumOrder(String message) throws IOException {
-        String hl7message = "MSH|^~\\&|||||20210407191342||"+message+"|MSGID_bae9ce6a-e35d-4ff5-8d50-c5dde19cc1aa|T|2.5.1\r"
+        String hl7message = "MSH|^~\\&|||||20210407191342||" + message
+                + "|MSGID_bae9ce6a-e35d-4ff5-8d50-c5dde19cc1aa|T|2.5.1\r"
                 + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\r"
                 + "ORC|RE|||3200|||||20210407191342||2799^BY^VERIFIED||||20210407191342||||||ORDERING FAC NAME||||||||I\r"
                 + "RXE|^Q24H&0600^^20210407191342^^ROU|DEFAULTMED^cefTRIAXone (ROCEPHIN) 2 g in sodium chloride 0.9 % 50 mL IVPB|2||g||||||||\r"
                 + "RXR|IM\r";
 
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         List<Resource> patientResource = ResourceUtils.getResourceList(e, ResourceType.Patient);
         assertThat(patientResource).hasSize(1);
@@ -42,15 +46,16 @@ class Hl7RDEMessageTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = { "RDE^O11", "RDE^O25"})
+    @ValueSource(strings = { "RDE^O11", "RDE^O25" })
     // In the HL7 spec RXR is required for these messages, however, we can handle having no RXR.
     void testRdeMinimumPatientAndMinimumOrderWithoutRXR(String message) throws IOException {
-        String hl7message = "MSH|^~\\&|||||20210407191342||"+message+"|MSGID_bae9ce6a-e35d-4ff5-8d50-c5dde19cc1aa|T|2.5.1\r"
+        String hl7message = "MSH|^~\\&|||||20210407191342||" + message
+                + "|MSGID_bae9ce6a-e35d-4ff5-8d50-c5dde19cc1aa|T|2.5.1\r"
                 + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\r"
                 + "ORC|RE|||3200|||||20210407191342||2799^BY^VERIFIED||||20210407191342||||||ORDERING FAC NAME||||||||I\r"
                 + "RXE|^Q24H&0600^^20210407191342^^ROU|DEFAULTMED^cefTRIAXone (ROCEPHIN) 2 g in sodium chloride 0.9 % 50 mL IVPB|2||g||||||||\r";
 
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         List<Resource> patientResource = ResourceUtils.getResourceList(e, ResourceType.Patient);
         assertThat(patientResource).hasSize(1);
@@ -63,16 +68,17 @@ class Hl7RDEMessageTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = { "RDE^O11", "RDE^O25"})
+    @ValueSource(strings = { "RDE^O11", "RDE^O25" })
     void testRdePatientWithPatientVisitAndMinimumOrder(String message) throws IOException {
-        String hl7message = "MSH|^~\\&|||||20210407191342||"+message+"|MSGID_bae9ce6a-e35d-4ff5-8d50-c5dde19cc1aa|T|2.5.1\r"
+        String hl7message = "MSH|^~\\&|||||20210407191342||" + message
+                + "|MSGID_bae9ce6a-e35d-4ff5-8d50-c5dde19cc1aa|T|2.5.1\r"
                 + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\r"
                 + "PV1||I|||||||||||||||||Visit_0a4d960d-c528-45c9-bb10-7e9929968247|||||||||||||||||||||||||20210407191342\r"
                 + "ORC|RE|||3200|||||20210407191342||2799^BY^VERIFIED||||20210407191342||||||ORDERING FAC NAME||||||||I\r"
                 + "RXE|^Q24H&0600^^20210407191342^^ROU|DEFAULTMED^cefTRIAXone (ROCEPHIN) 2 g in sodium chloride 0.9 % 50 mL IVPB|2||g||||||||\r"
                 + "RXR|IM\r";
 
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         List<Resource> patientResource = ResourceUtils.getResourceList(e, ResourceType.Patient);
         assertThat(patientResource).hasSize(1);
@@ -88,9 +94,10 @@ class Hl7RDEMessageTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = { "RDE^O11", "RDE^O25"})
+    @ValueSource(strings = { "RDE^O11", "RDE^O25" })
     void testRdePatientWithFullPatientVisitWithFullInsuranceAndMinimumOrder(String message) throws IOException {
-        String hl7message = "MSH|^~\\&|||||20210407191342||"+message+"|MSGID_bae9ce6a-e35d-4ff5-8d50-c5dde19cc1aa|T|2.5.1\r"
+        String hl7message = "MSH|^~\\&|||||20210407191342||" + message
+                + "|MSGID_bae9ce6a-e35d-4ff5-8d50-c5dde19cc1aa|T|2.5.1\r"
                 + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\r"
                 + "PD1|||||||||||01|N||||A\r"
                 + "PV1||I|||||||||||||||||Visit_0a4d960d-c528-45c9-bb10-7e9929968247|||||||||||||||||||||||||20210407191342\r"
@@ -103,7 +110,7 @@ class Hl7RDEMessageTest {
                 + "RXE|^Q24H&0600^^20210407191342^^ROU|DEFAULTMED^cefTRIAXone (ROCEPHIN) 2 g in sodium chloride 0.9 % 50 mL IVPB|2||g||||||||\r"
                 + "RXR|IM\r";
 
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         List<Resource> patientResource = ResourceUtils.getResourceList(e, ResourceType.Patient);
         assertThat(patientResource).hasSize(1);
@@ -128,9 +135,10 @@ class Hl7RDEMessageTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = { "RDE^O11", "RDE^O25"})
+    @ValueSource(strings = { "RDE^O11", "RDE^O25" })
     void testRdePatientWithAllergyAndMinimumOrder(String message) throws IOException {
-        String hl7message = "MSH|^~\\&|||||20210407191342||"+message+"|MSGID_bae9ce6a-e35d-4ff5-8d50-c5dde19cc1aa|T|2.5.1\r"
+        String hl7message = "MSH|^~\\&|||||20210407191342||" + message
+                + "|MSGID_bae9ce6a-e35d-4ff5-8d50-c5dde19cc1aa|T|2.5.1\r"
                 + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\r"
                 + "PV1||I|||||||||||||||||Visit_0a4d960d-c528-45c9-bb10-7e9929968247|||||||||||||||||||||||||20210407191342\r"
                 + "AL1|1|DA|1605^acetaminophen^L|MO|Muscle Pain~hair loss\r"
@@ -138,7 +146,7 @@ class Hl7RDEMessageTest {
                 + "RXE|^Q24H&0600^^20210407191342^^ROU|DEFAULTMED^cefTRIAXone (ROCEPHIN) 2 g in sodium chloride 0.9 % 50 mL IVPB|2||g||||||||\r"
                 + "RXR|IM\r";
 
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         List<Resource> patientResource = ResourceUtils.getResourceList(e, ResourceType.Patient);
         assertThat(patientResource).hasSize(1);
@@ -157,15 +165,16 @@ class Hl7RDEMessageTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = { "RDE^O11", "RDE^O25"})
+    @ValueSource(strings = { "RDE^O11", "RDE^O25" })
     void testRdeMinimumPatientAndOrderWithObservation(String message) throws IOException {
-        String hl7message = "MSH|^~\\&|||||20210407191342||"+message+"|MSGID_bae9ce6a-e35d-4ff5-8d50-c5dde19cc1aa|T|2.5.1\r"
+        String hl7message = "MSH|^~\\&|||||20210407191342||" + message
+                + "|MSGID_bae9ce6a-e35d-4ff5-8d50-c5dde19cc1aa|T|2.5.1\r"
                 + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\r"
                 + "ORC|RE|||3200|||||20210407191342||2799^BY^VERIFIED||||20210407191342||||||ORDERING FAC NAME||||||||I\r"
                 + "RXE|^Q24H&0600^^20210407191342^^ROU|DEFAULTMED^cefTRIAXone (ROCEPHIN) 2 g in sodium chloride 0.9 % 50 mL IVPB|2||g||||||||\r"
                 + "OBX|1|NM|Most Current Weight^Most current measured weight (actual)||90|kg";
 
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         List<Resource> patientResource = ResourceUtils.getResourceList(e, ResourceType.Patient);
         assertThat(patientResource).hasSize(1);
@@ -181,9 +190,10 @@ class Hl7RDEMessageTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = { "RDE^O11", "RDE^O25"})
+    @ValueSource(strings = { "RDE^O11", "RDE^O25" })
     void testRdePatientWithEncounterWithInsuranceAndOrderWithObservation(String message) throws IOException {
-        String hl7message = "MSH|^~\\&|||||20210407191342||"+message+"|MSGID_bae9ce6a-e35d-4ff5-8d50-c5dde19cc1aa|T|2.5.1\r"
+        String hl7message = "MSH|^~\\&|||||20210407191342||" + message
+                + "|MSGID_bae9ce6a-e35d-4ff5-8d50-c5dde19cc1aa|T|2.5.1\r"
                 + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\r"
                 + "PV1||I|||||||||||||||||Visit_0a4d960d-c528-45c9-bb10-7e9929968247|||||||||||||||||||||||||20210407191342\r"
                 // Minimal Insurance. Minimal Organization for Payor, which is required.
@@ -194,7 +204,7 @@ class Hl7RDEMessageTest {
                 + "RXE|^Q24H&0600^^20210407191342^^ROU|DEFAULTMED^cefTRIAXone (ROCEPHIN) 2 g in sodium chloride 0.9 % 50 mL IVPB|2||g||||||||\r"
                 + "OBX|1|NM|Most Current Weight^Most current measured weight (actual)||90|kg";
 
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         List<Resource> patientResource = ResourceUtils.getResourceList(e, ResourceType.Patient);
         assertThat(patientResource).hasSize(1);
@@ -222,9 +232,11 @@ class Hl7RDEMessageTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = { "RDE^O11", "RDE^O25"})
-    void testRdePatientWithEncounterWithMultipleInsuranceWithAllergyAndOrderWithObservation(String message) throws IOException {
-        String hl7message = "MSH|^~\\&|||||20210407191342||"+message+"|MSGID_bae9ce6a-e35d-4ff5-8d50-c5dde19cc1aa|T|2.5.1\r"
+    @ValueSource(strings = { "RDE^O11", "RDE^O25" })
+    void testRdePatientWithEncounterWithMultipleInsuranceWithAllergyAndOrderWithObservation(String message)
+            throws IOException {
+        String hl7message = "MSH|^~\\&|||||20210407191342||" + message
+                + "|MSGID_bae9ce6a-e35d-4ff5-8d50-c5dde19cc1aa|T|2.5.1\r"
                 + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\r"
                 + "PV1||I|||||||||||||||||Visit_0a4d960d-c528-45c9-bb10-7e9929968247|||||||||||||||||||||||||20210407191342\r"
                 // Minimal Insurance 1. Minimal Organization for Payor, which is required. IN2.72 creates a RelatedPerson.
@@ -241,7 +253,7 @@ class Hl7RDEMessageTest {
                 + "RXR|IM\r"
                 + "OBX|1|NM|Most Current Weight^Most current measured weight (actual)||90|kg";
 
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         List<Resource> patientResource = ResourceUtils.getResourceList(e, ResourceType.Patient);
         assertThat(patientResource).hasSize(1);
@@ -265,7 +277,7 @@ class Hl7RDEMessageTest {
         assertThat(allergyIntolerances).hasSize(1);
 
         List<Resource> observations = ResourceUtils.getResourceList(e, ResourceType.Observation);
-        assertThat(observations).hasSize(1); 
+        assertThat(observations).hasSize(1);
 
         // Expecting only the above resources, no extras!
         assertThat(e).hasSize(13);

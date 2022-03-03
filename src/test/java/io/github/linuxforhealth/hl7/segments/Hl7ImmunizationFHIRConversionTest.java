@@ -13,23 +13,25 @@ import java.util.List;
 import java.util.Map;
 
 import org.hl7.fhir.r4.model.Bundle;
+import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
 import org.hl7.fhir.r4.model.Encounter;
 import org.hl7.fhir.r4.model.Immunization;
-import org.hl7.fhir.r4.model.Organization;
+import org.hl7.fhir.r4.model.Immunization.ImmunizationEducationComponent;
 import org.hl7.fhir.r4.model.Observation;
+import org.hl7.fhir.r4.model.Organization;
 import org.hl7.fhir.r4.model.Practitioner;
 import org.hl7.fhir.r4.model.Resource;
 import org.hl7.fhir.r4.model.ResourceType;
-import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
-import org.hl7.fhir.r4.model.Immunization.ImmunizationEducationComponent;
 import org.junit.jupiter.api.Test;
 
 import io.github.linuxforhealth.hl7.ConverterOptions;
 import io.github.linuxforhealth.hl7.ConverterOptions.Builder;
+import io.github.linuxforhealth.hl7.HL7ToFHIRConverter;
 import io.github.linuxforhealth.hl7.segments.util.DatatypeUtils;
 import io.github.linuxforhealth.hl7.segments.util.ResourceUtils;
 
 class Hl7ImmunizationFHIRConversionTest {
+    private HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
 
     // Suppress warnings about too many assertions in a test.  Justification: creating a FHIR message is very costly; we need to check many asserts per creation for efficiency.  
     @java.lang.SuppressWarnings("squid:S5961")
@@ -47,7 +49,7 @@ class Hl7ImmunizationFHIRConversionTest {
                 + "OBX|1|CWE|31044-1^Reaction^LN|1|VXC9^Persistent, inconsolable crying lasting > 3 hours within 48 hours of dose^CDCPHINVS||||||F|||20130531|||VXC40^per imm^CDCPHINVS\r";
 
         List<Bundle.BundleEntryComponent> e = ResourceUtils
-                .createFHIRBundleFromHL7MessageReturnEntryList(hl7VUXmessageRep);
+                .createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7VUXmessageRep);
         List<Resource> immu = ResourceUtils.getResourceList(e, ResourceType.Immunization);
         assertThat(immu).hasSize(1);
         Immunization resource = ResourceUtils.getResourceImmunization(immu.get(0), ResourceUtils.context);
@@ -170,7 +172,7 @@ class Hl7ImmunizationFHIRConversionTest {
                 + "RXA|||20130531||48^HIB PRP-T^CVX|0.5|ML^^^|||^Sticker^Nurse||||||||00^Patient refusal^NIP002|||\r"
                 + "OBX|1|CWE|64994-7^vaccine fund pgm elig cat^LN|1|V02^VFC eligible Medicaid/MedicaidManaged Care^HL70064\r";
 
-        Immunization immunization = ResourceUtils.getImmunization(hl7VUXmessageRep);
+        Immunization immunization = ResourceUtils.getImmunization(ftv, hl7VUXmessageRep);
 
         assertThat(immunization.getPerformer()).hasSize(1);
         DatatypeUtils.checkCommonCodingAssertions(immunization.getPerformer().get(0).getFunction().getCodingFirstRep(),
@@ -213,7 +215,7 @@ class Hl7ImmunizationFHIRConversionTest {
                 + "RXA|||20130531||48^HIB PRP-T^CVX|0.5|ML^^UCUM||||||||||||00^refusal|RE\r"
                 + "OBX|1|CWE|30963-3^ VACCINE FUNDING SOURCE^LN|1|V02^VFC eligible Medicaid/MedicaidManaged Care^HL70064\r";
 
-        Immunization immunization = ResourceUtils.getImmunization(hl7VUXmessageRep);
+        Immunization immunization = ResourceUtils.getImmunization(ftv, hl7VUXmessageRep);
 
         assertThat(immunization.hasReasonCode()).isTrue();
         assertThat(immunization.getReasonCodeFirstRep().getCodingFirstRep().getCode()).isEqualTo("00");
@@ -263,7 +265,7 @@ class Hl7ImmunizationFHIRConversionTest {
                 + "OBX|4|CWE|31044-1^Reaction^LN|1|VXC9^Persistent, inconsolable crying lasting > 3 hours within 48 hours of dose^CDCPHINVS||||||F|||20170201\r";
 
         List<Bundle.BundleEntryComponent> e = ResourceUtils
-                .createFHIRBundleFromHL7MessageReturnEntryList(hl7VUXmessageRep);
+                .createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7VUXmessageRep);
         List<Resource> immunizations = ResourceUtils.getResourceList(e, ResourceType.Immunization);
         assertThat(immunizations).hasSize(1);
         Immunization immunization = ResourceUtils.getResourceImmunization(immunizations.get(0), ResourceUtils.context);
@@ -324,7 +326,7 @@ class Hl7ImmunizationFHIRConversionTest {
                 + "ORC|||197027||PA|||||^Clerk^Myron|||||||RI2050\r"
                 + "RXA|0|1|20130531||48^HIB PRP-T^CVX|999|ML^^UCUM||||||||||||||A\r";
 
-        Immunization immunization = ResourceUtils.getImmunization(hl7VUXmessageRep);
+        Immunization immunization = ResourceUtils.getImmunization(ftv, hl7VUXmessageRep);
         // doseQuantity with 999 as the value which should return null;
         assertThat(immunization.hasDoseQuantity()).isFalse();
         assertThat(immunization.getStatus().getDisplay()).isEqualTo("completed"); //ORC.5 backs up RXA.20 and RXA.18
@@ -346,7 +348,7 @@ class Hl7ImmunizationFHIRConversionTest {
                 + "RXA|0|1|20130531||48^HIB PRP-T^CVX|999|||1|\r"
                 + "OBX|1|CE|30945-0^contraindication^LN|1|V02^VFC eligible Medicaid/MedicaidManaged Care^HL70064||||||F||||||\r";
 
-        Immunization immunization = ResourceUtils.getImmunization(hl7VUXmessageRep);
+        Immunization immunization = ResourceUtils.getImmunization(ftv, hl7VUXmessageRep);
 
         assertThat(immunization.getStatus().getDisplay()).isEqualTo("completed"); //Status defaults to completed
         assertThat(immunization.hasStatusReason()).isTrue();
@@ -372,7 +374,7 @@ class Hl7ImmunizationFHIRConversionTest {
                 + "RXA|0|1|20130531||48^HIB PRP-T^CVX|||||||||||||||NA\r"
                 + "OBX|1|CE|30945-0^contraindication^LN|1|V02^VFC eligible Medicaid/MedicaidManaged Care^HL70064||||||F||||||\r";
 
-        Immunization immunization = ResourceUtils.getImmunization(hl7VUXmessageRep);
+        Immunization immunization = ResourceUtils.getImmunization(ftv, hl7VUXmessageRep);
 
         assertThat(immunization.getStatus().getDisplay()).isEqualTo("not-done"); // RXA-20
         assertThat(immunization.hasStatusReason()).isTrue();
@@ -397,7 +399,7 @@ class Hl7ImmunizationFHIRConversionTest {
                 + "RXA|0|1|20130531||48^HIB PRP-T^CVX\r"
                 + "OBX|1|CE|59784-9^Disease with presumed immunity^LN|1|V02^VFC eligible Medicaid/MedicaidManaged Care^HL70064\r";
 
-        Immunization immunization = ResourceUtils.getImmunization(hl7VUXmessageRep);
+        Immunization immunization = ResourceUtils.getImmunization(ftv, hl7VUXmessageRep);
 
         assertThat(immunization.getStatus().getDisplay()).isEqualTo("completed"); //Status defaults to completed
         assertThat(immunization.hasStatusReason()).isTrue();
@@ -409,8 +411,9 @@ class Hl7ImmunizationFHIRConversionTest {
         assertThat(immunization.getStatusReason().getCoding().get(1).getCode()).isEqualTo("59784-9");
         assertThat(immunization.getStatusReason().getCoding().get(1).getSystem())
                 .isEqualTo("http://loinc.org");
-        assertThat(immunization.getStatusReason().getCoding().get(1).getDisplay()).isEqualTo("Disease with presumed immunity");
-        assertThat(immunization.getStatusReason().getText()).isEqualTo("Disease with presumed immunity");        
+        assertThat(immunization.getStatusReason().getCoding().get(1).getDisplay())
+                .isEqualTo("Disease with presumed immunity");
+        assertThat(immunization.getStatusReason().getText()).isEqualTo("Disease with presumed immunity");
 
     }
 
@@ -424,7 +427,7 @@ class Hl7ImmunizationFHIRConversionTest {
                 + "RXA|0|1|20130531||48^HIB PRP-T^CVX|||||||||||||||NA\r"
                 + "OBX|1|CE|59784-9^Disease with presumed immunity^LN|1|V02^VFC eligible Medicaid/MedicaidManaged Care^HL70064\r";
 
-        Immunization immunization = ResourceUtils.getImmunization(hl7VUXmessageRep);
+        Immunization immunization = ResourceUtils.getImmunization(ftv, hl7VUXmessageRep);
 
         assertThat(immunization.getStatus().getDisplay()).isEqualTo("not-done"); // RXA.20
         assertThat(immunization.hasStatusReason()).isTrue();
@@ -436,7 +439,8 @@ class Hl7ImmunizationFHIRConversionTest {
         assertThat(immunization.getStatusReason().getCoding().get(1).getCode()).isEqualTo("59784-9");
         assertThat(immunization.getStatusReason().getCoding().get(1).getSystem())
                 .isEqualTo("http://loinc.org");
-        assertThat(immunization.getStatusReason().getCoding().get(1).getDisplay()).isEqualTo("Disease with presumed immunity");
+        assertThat(immunization.getStatusReason().getCoding().get(1).getDisplay())
+                .isEqualTo("Disease with presumed immunity");
         assertThat(immunization.getStatusReason().getText()).isEqualTo("Disease with presumed immunity");
     }
 
@@ -449,7 +453,7 @@ class Hl7ImmunizationFHIRConversionTest {
                 + "RXA|0|1|20130531\r"
                 + "OBX|1|CWE|30956-7^vaccine type^LN|1|107^DTAP^CVX\r";
 
-        Immunization immunization = ResourceUtils.getImmunization(hl7VUXmessageRep);
+        Immunization immunization = ResourceUtils.getImmunization(ftv, hl7VUXmessageRep);
 
         assertThat(immunization.getStatus().getDisplay()).isEqualTo("completed"); // Status defaults to completed
         assertThat(immunization.hasStatusReason()).isFalse();
@@ -484,7 +488,7 @@ class Hl7ImmunizationFHIRConversionTest {
                 + "ORC|RE||IZ-783279^NDA||||||||||||||\r"
                 + "RXA|0|1|20170513|20170513|136^MCV4-CRM^CVX^90734^MCV4-CRM^CPT|1|mL||||||||MRK1234|20211201|MSD^MERCK^MVX||||CP|A\r";
         List<Bundle.BundleEntryComponent> e = ResourceUtils
-                .createFHIRBundleFromHL7MessageReturnEntryList(hl7VUXmessageRep);
+                .createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7VUXmessageRep);
         List<Resource> immunizations = ResourceUtils.getResourceList(e, ResourceType.Immunization);
         assertThat(immunizations).hasSize(3); // Exactly 3
 
@@ -528,7 +532,7 @@ class Hl7ImmunizationFHIRConversionTest {
                 + "OBX|1|CE|59784-9^Disease with presumed immunity^LN||\r";
 
         List<Bundle.BundleEntryComponent> e = ResourceUtils
-                .createFHIRBundleFromHL7MessageReturnEntryList(hl7VUXmessageRep);
+                .createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7VUXmessageRep);
 
         // We expect two different organizations, one for Encounter.serviceProvider, one for Immunization.performer   
         List<Resource> organizations = ResourceUtils.getResourceList(e, ResourceType.Organization);
@@ -571,7 +575,7 @@ class Hl7ImmunizationFHIRConversionTest {
                 + "OBX|1|CE|59784-9^Disease with presumed immunity^LN||\r";
 
         List<Bundle.BundleEntryComponent> e = ResourceUtils
-                .createFHIRBundleFromHL7MessageReturnEntryList(hl7VUXmessageRep);
+                .createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7VUXmessageRep);
 
         List<Resource> organizations = ResourceUtils.getResourceList(e, ResourceType.Organization);
         assertThat(organizations).hasSize(1); // Proves that deduplication worked
@@ -609,7 +613,8 @@ class Hl7ImmunizationFHIRConversionTest {
         // TENANT prepend is passed through the options.  
         ConverterOptions customOptionsWithTenant = new Builder().withValidateResource().withPrettyPrint()
                 .withProperty("TENANT", "TenantId").build();
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7VUXmessageRep,
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv,
+                hl7VUXmessageRep,
                 customOptionsWithTenant);
 
         // We expect two different organizations, one for Encounter.serviceProvider, one for Immunization.performer   
@@ -724,7 +729,7 @@ class Hl7ImmunizationFHIRConversionTest {
                 + "ORC|RE||9999^EHR|||||||\n";
 
         List<Bundle.BundleEntryComponent> e = ResourceUtils
-                .createFHIRBundleFromHL7MessageReturnEntryList(hl7VUXmessageRep);
+                .createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7VUXmessageRep);
         List<Resource> immunizations = ResourceUtils.getResourceList(e, ResourceType.Immunization);
         assertThat(immunizations).hasSize(3);
 

@@ -28,6 +28,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import io.github.linuxforhealth.hl7.HL7ToFHIRConverter;
 import io.github.linuxforhealth.hl7.segments.util.ResourceUtils;
 
 // These tests push deep into NTE's and precise creation.
@@ -35,6 +36,7 @@ import io.github.linuxforhealth.hl7.segments.util.ResourceUtils;
 // For MDM_T0x in test_mdm_ORDER_with_OBXnotTX
 
 class Hl7NoteFHIRConverterTest {
+    private HL7ToFHIRConverter ftv = new HL7ToFHIRConverter();
 
     // Tests NTE creation for OBX (Observations) and ORC/OBRs (ServiceRequests)
     // Test associated Practitioners and references created. (NTE.4)
@@ -76,7 +78,7 @@ class Hl7NoteFHIRConverterTest {
                 + "NTE|3|L| |\n" // Test that blank lines are preserved.
                 + "NTE|4|L|TEST NOTE CC line 4|\n";
 
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7ORU);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7ORU);
         List<Resource> diagnosticReports = ResourceUtils.getResourceList(e, ResourceType.DiagnosticReport);
 
         // DiagnosticReport expected for ORU, but not for ORM
@@ -199,7 +201,7 @@ class Hl7NoteFHIRConverterTest {
                 + "NTE|3|L| |\n" // Test that blank lines are preserved.
                 + "NTE|4|L|TEST NOTE CC line 4|\n";
 
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
 
         // Expect MedicationRequest containing NTE for RXO or RXE
         List<Resource> medicationRequests = ResourceUtils.getResourceList(e, ResourceType.MedicationRequest);
@@ -304,7 +306,7 @@ class Hl7NoteFHIRConverterTest {
                 + "OBX|2|NM|7302^Resp Rate|1|19||||||F|||20180520230000|||\n"
                 + "NTE|1|L|TEST OBXf NOTE FF line 1|\n"; // Single NTE to ensure it is created correctly
 
-        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(hl7message);
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
         List<Resource> patients = ResourceUtils.getResourceList(e, ResourceType.Patient);
         assertThat(patients).hasSize(1);
 
