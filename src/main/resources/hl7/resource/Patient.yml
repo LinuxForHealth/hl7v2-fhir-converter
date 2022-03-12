@@ -54,6 +54,18 @@ identifier_4:
       use: old
       mrgIdentifier: MRG.1
 # Add the old MR # from the MRG segment
+identifier_5:
+   condition: $valueIn NOT_NULL
+   valueOf: datatype/Identifier_var
+   generateList: true
+   expressionType: resource
+   specs: PID.2
+   vars:
+      valueIn: String, PID.2.1
+   constants:
+      system: http://terminology.hl7.org/CodeSystem/v2-0203
+      code: MR
+      display: Medical Record Number
 
 name:
    valueOf: datatype/HumanName
