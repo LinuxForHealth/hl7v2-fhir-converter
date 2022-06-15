@@ -2159,7 +2159,7 @@
   oid: "urn:oid:2.16.840.1.113883.18.302"
 - id: "MSH"
   description: "MeSH"
-  url: "http://terminology.hl7.org/CodeSystem/MSH"
+  url: "https://www.nlm.nih.gov/mesh"
   oid: "urn:oid:2.16.840.1.113883.6.177"
 - id: "v3-snomed-CT"
   description: "SNOMED\_CT International Edition"
