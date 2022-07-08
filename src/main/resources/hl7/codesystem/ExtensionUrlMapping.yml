@@ -41,3 +41,5 @@
 #condition-assertedDate
 - id: "condition-assertedDate"
   url: "http://hl7.org/fhir/StructureDefinition/condition-assertedDate"
+- id: "tenant-id"
+  url: "http://ibm.com/fhir/cdm/StructureDefinition/tenant-id"
