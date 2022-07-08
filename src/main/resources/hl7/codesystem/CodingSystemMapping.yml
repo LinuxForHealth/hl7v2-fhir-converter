@@ -143,6 +143,9 @@
   description: "ICD-10 Procedure Codes"
   url: "http://www.cms.gov/Medicare/Coding/ICD10"
   oid: "urn:oid:2.16.840.1.113883.6.4"
+- id: "ICD-10-PCS"
+  description: "ICD-10 Procedure Coding System"
+  url: http://terminology.hl7.org/CodeSystem/icd10PCS
 - id: "I9"
   description: "ICD9"
   url: "http://terminology.hl7.org/CodeSystem/icd9"
@@ -4531,3 +4534,4 @@
   url: "http://terminology.hl7.org/CodeSystem/v2-0430"
 - id: "encounter-modeOfArrival-extension"
   url: "http://hl7.org/fhir/StructureDefinition/encounter-modeOfArrival"
+  
