@@ -44,3 +44,6 @@
 # tenant-id
 - id: "tenant-id"
   url: "http://ibm.com/fhir/cdm/StructureDefinition/tenant-id"
+# process-timestamp
+- id: "process-timestamp"
+  url: "http://ibm.com/fhir/cdm/StructureDefinition/process-timestamp"
