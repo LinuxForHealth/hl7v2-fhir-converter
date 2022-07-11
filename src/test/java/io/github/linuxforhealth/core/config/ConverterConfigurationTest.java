@@ -52,6 +52,7 @@ class ConverterConfigurationTest {
             System.clearProperty(CONF_PROP_HOME);
         UrlLookup.reset();
         folder.setWritable(true);
+        folder.delete();
     }
 
     @Test
