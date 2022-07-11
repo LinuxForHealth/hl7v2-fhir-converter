@@ -56,6 +56,7 @@ class JvmTimeZoneIdTest {
     @BeforeAll
     static void saveConfigHomeProperty() {
         originalConfigHome = System.getProperty(CONF_PROP_HOME);
+        folder.setWritable(true);
     }
 
     @AfterEach
