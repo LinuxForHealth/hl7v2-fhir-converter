@@ -73,6 +73,7 @@ class JvmTimeZoneIdTest {
         else
             System.clearProperty(CONF_PROP_HOME);
         UrlLookup.reset();
+        folder.setWritable(true);
     }
 
     @Test

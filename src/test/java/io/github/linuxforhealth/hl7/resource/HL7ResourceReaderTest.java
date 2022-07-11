@@ -49,6 +49,7 @@ class HL7ResourceReaderTest {
       System.setProperty(CONF_PROP_HOME, originalConfigHome);
     else
       System.clearProperty(CONF_PROP_HOME);
+    folder.setWritable(true);
   }
 
   // This tests that messagetemplates are still loaded the old way via class path
