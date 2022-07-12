@@ -6,6 +6,7 @@
 ---
 resourceType: AllergyIntolerance
 id:
+  type: STRING
   valueOf: "GeneralUtils.generateResourceId()"
   expressionType: JEXL
 
