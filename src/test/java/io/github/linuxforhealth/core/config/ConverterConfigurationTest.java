@@ -42,8 +42,6 @@ class ConverterConfigurationTest {
         System.clearProperty(CONF_PROP_HOME);
         ConverterConfiguration.reset();
         UrlLookup.reset();
-        folder.setWritable(true);
-        folder.delete();
     }
 
     @AfterAll
