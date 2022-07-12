@@ -42,6 +42,8 @@ class ConverterConfigurationTest {
         System.clearProperty(CONF_PROP_HOME);
         ConverterConfiguration.reset();
         UrlLookup.reset();
+        folder.setWritable(true);
+        folder.delete();
     }
 
     @AfterAll
@@ -68,6 +70,7 @@ class ConverterConfigurationTest {
         url = UrlLookup.getExtensionUrl("mothersMaidenName");
         assertThat(url).isEqualTo("http://hl7.org/fhir/StructureDefinition/patient-mothersMaidenName");
         configFile.delete();
+        folder.delete();
     }
 
     @Test
@@ -85,6 +88,7 @@ class ConverterConfigurationTest {
                 .isEqualTo("src/test/resources/additional_conceptmap.yml");
         assertThat(theConvConfig.getAdditionalResourcesLocation()).isEqualTo("src/test/resources/additional_resources");
         configFile.delete();
+        folder.delete();
     }
 
     private void writeProperties(File configFile) throws FileNotFoundException, IOException {
@@ -110,6 +114,7 @@ class ConverterConfigurationTest {
         assertThat(theConvConfig.getAdditionalConceptmapFile()).isNull();
         assertThat(theConvConfig.getAdditionalResourcesLocation()).isNull();
         configFile.delete();
+        folder.delete();
     }
 
     private void writePropertiesDefaultMessages(File configFile) throws FileNotFoundException, IOException {
