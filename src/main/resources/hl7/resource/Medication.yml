@@ -6,7 +6,7 @@
 resourceType: Medication
 id:
   type: STRING
-  valueOf: UUID.randomUUID()
+  valueOf: "GeneralUtils.generateResourceId()"
   expressionType: JEXL
 
 identifier:

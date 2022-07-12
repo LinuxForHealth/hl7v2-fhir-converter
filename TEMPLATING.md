@@ -85,7 +85,7 @@ Sample resource template:
 resourceType: Patient
 id:
   type: STRING
-  valueOf: 'UUID.randomUUID()'
+  valueOf: "GeneralUtils.generateResourceId()"
   expressionType: JEXL
 
 identifier:
@@ -120,7 +120,7 @@ birthDate:
 resourceType: Condition
 id:
   type: STRING
-  valueOf: 'UUID.randomUUID()'
+  valueOf: "GeneralUtils.generateResourceId()"
   expressionType: JEXL
 
 category_x1:

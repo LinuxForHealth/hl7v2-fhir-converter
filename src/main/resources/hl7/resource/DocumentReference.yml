@@ -6,7 +6,7 @@
 resourceType: DocumentReference
 id:
    type: STRING
-   valueOf: 'UUID.randomUUID()'
+   valueOf: "GeneralUtils.generateResourceId()"
    expressionType: JEXL
 
 masterIdentifier_1:

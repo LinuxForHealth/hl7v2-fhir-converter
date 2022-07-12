@@ -10,7 +10,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.UUID;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -44,6 +43,7 @@ import io.github.linuxforhealth.core.resource.ResourceResult;
 import io.github.linuxforhealth.core.resource.SimpleResourceValue;
 import io.github.linuxforhealth.fhir.FHIRContext;
 import io.github.linuxforhealth.fhir.FHIRResourceMapper;
+import io.github.linuxforhealth.hl7.data.Hl7RelatedGeneralUtils;
 import io.github.linuxforhealth.hl7.message.util.SegmentExtractorUtil;
 import io.github.linuxforhealth.hl7.message.util.SegmentGroup;
 import io.github.linuxforhealth.hl7.resource.ResourceEvaluationResult;
@@ -247,7 +247,7 @@ public class HL7MessageEngine implements MessageEngine {
     private Bundle initBundle() {
         Bundle bundle = new Bundle();
         bundle.setType(this.bundleType);
-        bundle.setId(UUID.randomUUID().toString());
+        bundle.setId(Hl7RelatedGeneralUtils.generateResourceId());
         Meta m = new Meta();
         m.setLastUpdated(LocalDateTime.now().toDate());
         bundle.setMeta(m);

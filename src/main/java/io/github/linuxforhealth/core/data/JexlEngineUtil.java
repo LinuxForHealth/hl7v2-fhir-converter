@@ -8,7 +8,6 @@ package io.github.linuxforhealth.core.data;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import org.apache.commons.jexl3.JexlBuilder;
 import org.apache.commons.jexl3.JexlContext;
 import org.apache.commons.jexl3.JexlEngine;
@@ -40,8 +39,6 @@ public final class JexlEngineUtil {
     functions.put(StringUtils.class.getSimpleName(), StringUtils.class);
     functions.put(NumberUtils.class.getSimpleName(), NumberUtils.class);
     functions.put(String.class.getSimpleName(), String.class);
-    functions.put(UUID.class.getSimpleName(), UUID.class);
-
   }
 
   public JexlEngineUtil(Map<String, Object> functions) {
