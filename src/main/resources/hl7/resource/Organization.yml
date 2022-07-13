@@ -9,7 +9,7 @@ resourceType: Organization
 id_1:
   condition: $orgIdValue NULL
   type: STRING
-  valueOf: UUID.randomUUID()
+  valueOf: "GeneralUtils.generateResourceId()"
   expressionType: JEXL
 
 # When there is IN1 / IN2 record but there is NO TENANT

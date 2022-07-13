@@ -8,7 +8,7 @@ resourceType: Patient
 # reference: https://www.hl7.org/fhir/patient.html
 id:
   type: STRING
-  valueOf: UUID.randomUUID()
+  valueOf: "GeneralUtils.generateResourceId()"
   expressionType: JEXL
 
 identifier_1:

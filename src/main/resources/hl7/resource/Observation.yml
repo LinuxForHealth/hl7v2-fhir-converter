@@ -8,7 +8,7 @@
 resourceType: Observation
 id:
   type: STRING
-  valueOf: "UUID.randomUUID()"
+  valueOf: "GeneralUtils.generateResourceId()"
   expressionType: JEXL
 
 identifier_1: #joins filler | placer | MSH.7 with whatever gets returned from BUILD_FROM_CWE. that magic happens in identifier_Observation

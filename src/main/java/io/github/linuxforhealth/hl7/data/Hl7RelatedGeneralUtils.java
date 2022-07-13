@@ -5,6 +5,8 @@
  */
 package io.github.linuxforhealth.hl7.data;
 
+import java.math.BigInteger;
+import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.Temporal;
 import java.time.temporal.UnsupportedTemporalTypeException;
@@ -13,6 +15,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.UUID;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringEscapeUtils;
 import org.apache.commons.text.StringTokenizer;
@@ -132,6 +135,19 @@ public class Hl7RelatedGeneralUtils {
             return DateUtil.formatToDateTimeWithZone(val, zoneIdText);
         }
         return null;
+    }
+
+    /** 
+     * Generates a string id for resource and bundle creation.
+     * Format is <current nano second>.<UUID>.
+     */
+    public static String generateResourceId() {
+        Instant now = Instant.now();
+        BigInteger nano = BigInteger.valueOf(now.getEpochSecond());
+        nano = nano.multiply(BigInteger.valueOf(1000000000));
+        nano = nano.add(BigInteger.valueOf(now.getNano()));
+        
+        return nano.toString() + "." + UUID.randomUUID().toString();
     }
 
     // Special extractor only for use with PV1 records.

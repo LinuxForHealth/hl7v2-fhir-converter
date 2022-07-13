@@ -11,7 +11,7 @@
 resourceType: Observation
 id:
   type: STRING
-  valueOf: 'UUID.randomUUID()'
+  valueOf: "GeneralUtils.generateResourceId()"
   expressionType: JEXL
 identifier:
   valueOf: datatype/Identifier_Observation

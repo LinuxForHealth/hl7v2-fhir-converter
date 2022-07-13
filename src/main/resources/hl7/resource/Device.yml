@@ -7,7 +7,7 @@
 resourceType: Device
 id:
   type: STRING
-  valueOf: 'UUID.randomUUID()'
+  valueOf: "GeneralUtils.generateResourceId()"
   expressionType: JEXL
 
 # The FHIR Device resource doesn't have any required fields.
