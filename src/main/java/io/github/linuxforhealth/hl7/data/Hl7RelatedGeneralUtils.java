@@ -142,9 +142,10 @@ public class Hl7RelatedGeneralUtils {
      * Format is <current nano second>.<UUID>.
      */
     public static String generateResourceId() {
-        BigInteger nano = BigInteger.valueOf(Instant.now().getEpochSecond());
+        Instant now = Instant.now();
+        BigInteger nano = BigInteger.valueOf(now.getEpochSecond());
         nano = nano.multiply(BigInteger.valueOf(1000000000));
-        nano = nano.add(BigInteger.valueOf(Instant.now().getNano()));
+        nano = nano.add(BigInteger.valueOf(now.getNano()));
         
         return nano.toString() + "." + UUID.randomUUID().toString();
     }
