@@ -6,6 +6,8 @@
 package io.github.linuxforhealth.hl7.data;
 
 import java.math.BigInteger;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.Temporal;
@@ -135,6 +137,21 @@ public class Hl7RelatedGeneralUtils {
             return DateUtil.formatToDateTimeWithZone(val, zoneIdText);
         }
         return null;
+    }
+
+    public static String getCurrentDateTimeUsingZoneId(Object zoneId) {
+        // get the current data and time
+        LocalDateTime now = LocalDateTime.now();
+
+        // format now so it can be formatted by formatToDateTimeWithZone
+        final String FORMAT = "yyyyMMddHHmmss";
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(FORMAT);
+        String nowText = now.format(formatter);
+
+        // format the date with the timezone
+        String zoneIdText = Hl7DataHandlerUtil.getStringValue(zoneId);
+        String formattedDateTime = DateUtil.formatToDateTimeWithZone(nowText, zoneIdText);
+        return formattedDateTime;
     }
 
     /** 

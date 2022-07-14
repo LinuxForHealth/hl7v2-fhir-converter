@@ -595,8 +595,8 @@ class Hl7MedicationRequestFHIRConversionTest {
         HumanName practName = practBundle.getNameFirstRep();
         CodeableConcept practitionerIdentifierType = practitionerIdentifier.getType();
 
-        //Check meta extension.display is null
-        Extension ext = practBundle.getMeta().getExtension().get(0);
+        //Check meta extension.display is null - source-event-trigger
+        Extension ext = practBundle.getMeta().getExtension().get(1);
         assertThat(ext).isNotNull();
         CodeableConcept cc = (CodeableConcept) ext.getValue();
 
