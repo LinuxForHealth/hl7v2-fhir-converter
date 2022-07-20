@@ -383,7 +383,7 @@ class Hl7PatientFHIRConversionTest {
     }
 
     private void validate_lineage_json(List<Extension> extensions, String messageType, boolean millis) {
-        assertThat(extensions.size()).isEqualTo(7);
+        assertThat(extensions.size()).isEqualTo(8);
         for (Extension extension : extensions) {
             // Get the URL
             String url = extension.getUrl();
@@ -434,6 +434,10 @@ class Hl7PatientFHIRConversionTest {
                 case "process-timestamp":
                     // this is the current time the message was converted
                     assertThat(value).contains("DateTimeType");
+                    break;
+                case "tenant-id":
+                    LOGGER.debug(value);
+                    // TODO: Verify tenant-id is correct.
                     break;
                 default:
                     // this shouldn't happen
