@@ -56,6 +56,7 @@ class JvmTimeZoneIdTest {
     @BeforeAll
     static void saveConfigHomeProperty() {
         originalConfigHome = System.getProperty(CONF_PROP_HOME);
+        folder.setWritable(true);
     }
 
     @AfterEach
@@ -72,6 +73,7 @@ class JvmTimeZoneIdTest {
         else
             System.clearProperty(CONF_PROP_HOME);
         UrlLookup.reset();
+        folder.setWritable(true);
     }
 
     @Test
