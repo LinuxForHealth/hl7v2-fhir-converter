@@ -93,7 +93,7 @@ extension_8:
   valueOf: extension/Extension
   expressionType: resource
   vars:
-    value: null, GeneralUtils.getTenantId()
+    value: $TENANT
   constants:
     KEY_NAME_SUFFIX: String
     urlValue: tenant-id

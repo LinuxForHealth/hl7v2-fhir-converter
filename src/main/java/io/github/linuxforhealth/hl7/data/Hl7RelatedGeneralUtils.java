@@ -36,8 +36,6 @@ import ca.uhn.hl7v2.model.v26.datatype.DTM;
 import io.github.linuxforhealth.api.ResourceValue;
 import io.github.linuxforhealth.core.ObjectMapperUtil;
 import io.github.linuxforhealth.hl7.data.date.DateUtil;
-import io.github.linuxforhealth.core.config.ConverterConfiguration;
-import io.github.linuxforhealth.hl7.ConverterOptions;
 
 public class Hl7RelatedGeneralUtils {
     private static final Logger LOGGER = LoggerFactory.getLogger(Hl7RelatedGeneralUtils.class);
@@ -159,13 +157,6 @@ public class Hl7RelatedGeneralUtils {
         String zoneIdText = Hl7DataHandlerUtil.getStringValue(zoneId);
         String formattedDateTime = DateUtil.formatToDateTimeWithZone(nowText, zoneIdText);
         return formattedDateTime;
-    }
-
-    public static String getTenantId() {
-        ConverterConfiguration cc = ConverterConfiguration.getInstance();
-        // I want to get the tenant-id. More specifically we want to be able to get any properties
-        // passed in to Converter options.
-        return "tenant-id";
     }
 
     /** 
