@@ -108,7 +108,7 @@ class FHIRExtensionsTest {
 
     @Test
     // Verifies the meta extension process-timestamp is present and verifies if the property
-    // TENANT is passed into converter option it will show up as a meta extension with the right value.
+    // TENANT is passed into converter option it will show up in a tenant-id meta extension with the right value.
     void testProcessTimestampAndTenant() throws IOException {
         String hl7VUXmessageRep = "MSH|^~\\&|||||20140701041038||VXU^V04^VXU_V04|MSG.Valid_01|P|2.6|||\n"
                 + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\r"
@@ -132,6 +132,7 @@ class FHIRExtensionsTest {
         String process_timestamp_class = process_timestamp.getValue().getClass().toString();
         assertThat(process_timestamp_class).contains("DateTimeType");
 
+        // Verify tenant-id meta extension is present and correct
         Extension tenant_id = m.getExtensionByUrl("http://ibm.com/fhir/cdm/StructureDefinition/tenant-id");
         assertThat(tenant_id).isNotNull();
         String tenant = tenant_id.getValue().toString();
@@ -158,6 +159,7 @@ class FHIRExtensionsTest {
         // Get the Meta from the first resource in the bundle 
         Meta m = e.get(0).getResource().getMeta();
 
+        // Verify tenant-id meta extension id not present
         Extension tenant_id = m.getExtensionByUrl("http://ibm.com/fhir/cdm/StructureDefinition/tenant-id");
         assertThat(tenant_id).isNull();
         
