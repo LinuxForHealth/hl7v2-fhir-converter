@@ -87,3 +87,13 @@ extension_7:
   constants:
     KEY_NAME_SUFFIX: DateTime
     urlValue: process-timestamp
+
+extension_8:
+  generateList: true
+  valueOf: extension/Extension
+  expressionType: resource
+  vars:
+    value: $TENANT
+  constants:
+    KEY_NAME_SUFFIX: String
+    urlValue: tenant-id
