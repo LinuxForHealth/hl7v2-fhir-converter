@@ -365,7 +365,7 @@ class Hl7FinancialInsuranceTest {
                 //      NOTE: Purposely XX to ensure we are doing a lookup, and not getting bleed from other hard-coded XV uses
                 // IN1.50 through IN1.53 NOT REFERENCED
                 + "|MEMBER36|||||||F|||Value46|||J494949^^^Large HMO^XX||||\n"
-                // IN2.2 to RelatedPerson.identifier (SSN)
+                // IN2.2 to RelatedPerson.identifier (SSN) Has dashes which are to be removed during processing.
                 // IN2.6 to Coverage.identifier MC Patient's Medicare number and Patient.identifier MC Medicare number 
                 // IN2.8 to Coverage.identifier MA Patient Medicaid number and Patient.identifier MA Medicare number
                 // IN2.9 through IN2.60 not used     
@@ -483,7 +483,7 @@ class Hl7FinancialInsuranceTest {
         DatatypeUtils.checkCommonCodeableConceptAssertions(related.getIdentifier().get(0).getType(), "XX", // IN1.49.5
                 "Organization identifier", // Display value looked up from code 'XX'
                 "http://terminology.hl7.org/CodeSystem/v2-0203", null);
-        assertThat(related.getIdentifier().get(1).getValue()).isEqualTo("777-88-9999"); // IN2.2
+        assertThat(related.getIdentifier().get(1).getValue()).isEqualTo("777889999"); // IN2.2 with dashes removed
         assertThat(related.getIdentifier().get(1).hasSystem()).isFalse(); // No system to assign
         DatatypeUtils.checkCommonCodeableConceptAssertions(related.getIdentifier().get(1).getType(), "SS",
                 "Social Security number",
@@ -579,13 +579,13 @@ class Hl7FinancialInsuranceTest {
                 // IN1.46 to third XV Coverage.identifier
                 // IN1.47 through IN1.53 NOT REFERENCED
                 + "|MEMBER36||||||||||Value46|||||||\n"
-                // IN2.2 to SSN Patient.identifier because relationship = self and PID.19 is empty
+                // IN2.2 to SSN Patient.identifier because relationship = self and PID.19 is empty. Test that dashes are removed.
                 // IN2.6 is purposely empty so will not create an MC Coverage.identifier
                 // IN2.8 is purposely empty so will not create an MA Coverage.identifier
                 // IN2.25 to new PayorId Organization
                 // IN2.61 is purposely empty (primary to IN1.36) so IN1.36 will be used as the MB Coverage.identifier and MB Patient.Identifier
                 // Only used for MB Patient.Identifier because subscriber is SELF
-                + "IN2||SSN123456|||||||||||||||||||||||IdValue25.1^^^IdSystem25.4^IdType25.5^^20201231145045^20211231145045|||||||||||||||||||||||||||||||||||||||||||"
+                + "IN2||SSN-12-3456|||||||||||||||||||||||IdValue25.1^^^IdSystem25.4^IdType25.5^^20201231145045^20211231145045|||||||||||||||||||||||||||||||||||||||||||"
                 // IN2.69 to new PolicyHolder Organization 
                 //    IN2.69.1 to PolicyHolder Organization Name
                 //    IN2.69.6 to PolicyHolder Organization Identifier.system
@@ -620,7 +620,7 @@ class Hl7FinancialInsuranceTest {
         DatatypeUtils.checkCommonCodeableConceptAssertions(patientIdentifier.getType(), "MB", "Member Number",
                 "http://terminology.hl7.org/CodeSystem/v2-0203", null);
         patientIdentifier = patient.getIdentifier().get(2);
-        assertThat(patientIdentifier.getValue()).isEqualTo("SSN123456"); // IN2.2
+        assertThat(patientIdentifier.getValue()).isEqualTo("SSN123456"); // IN2.2 Dashes should be removed
         assertThat(patientIdentifier.hasSystem()).isFalse(); // No system for SSN
         DatatypeUtils.checkCommonCodeableConceptAssertions(patientIdentifier.getType(), "SS", "Social Security number",
                 "http://terminology.hl7.org/CodeSystem/v2-0203", null);

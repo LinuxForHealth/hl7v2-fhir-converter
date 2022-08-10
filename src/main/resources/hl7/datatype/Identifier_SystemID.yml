@@ -38,11 +38,25 @@ system_2:
           systemCreated: SYSTEM_ID, $systemID
           systemLookup: SYSTEM_URL, $systemID
     
+# Because the value is required, the logic is within a nesting, so that
+# if either leg is successful, a result is provided to satisfy required.
+# If it comes from an SSN field, it is "cleaned", such as removing dashes.
 value: 
-     type: STRING
-     valueOf: CX.1 | CWE.1 | EI.1 | $value
-     expressionType: HL7Spec
-     required: true
+     expressionType: nested
+     required: true  
+     vars:
+        cx5: String, CX.5
+     expressions:
+        - condition: $cx5 EQUALS SS
+          type: STRING
+          expressionType: HL7Spec
+          valueOf: $cx1
+          vars:
+               cx1: CLEAN_SSN, CX.1 | CWE.1 | EI.1 | $value
+        - condition: $cx5 NOT_EQUALS SS || $cx5 NULL
+          type: STRING
+          expressionType: HL7Spec
+          valueOf: CX.1 | CWE.1 | EI.1 | $value    
 
 period:  
     valueOf: datatype/Period

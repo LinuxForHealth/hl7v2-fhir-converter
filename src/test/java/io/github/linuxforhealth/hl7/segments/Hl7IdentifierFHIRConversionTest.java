@@ -39,8 +39,8 @@ class Hl7IdentifierFHIRConversionTest {
     @Test
     void patientIdentifiersTest() {
         String patientIdentifiers = "MSH|^~\\&|MIICEHRApplication|MIIC|MIIC|MIIC|201705130822||VXU^V04^VXU_V04|test1100|P|2.5.1|||AL|AL|||||Z22^CDCPHINVS|^^^^^MIIC^SR^^^MIIC|MIIC\n"
-                // Three ID's for testing, plus a SSN in field 19.
-                + "PID|1||MRN12345678^^^ID-XYZ^MR~111223333^^^USA^SS~MN1234567^^^MNDOT^DL|ALTID|Moose^Mickey^J^III^^^||20060504|M|||||||||||444556666|D-12445889-Z||||||||||\n";
+                // Three ID's for testing, plus a SSN in field 19.  Both SSNs have dashes that should be removed
+                + "PID|1||MRN12345678^^^ID-XYZ^MR~111-22-3333^^^USA^SS~MN34567^^^MNDOT^DL|ALTID|Moose^Mickey^J^III^^^||20060504|M|||||||||||444-55-6666|D-12445889-Z||||||||||\n";
         Patient patient = PatientUtils.createPatientFromHl7Segment(ftv, patientIdentifiers);
 
         // Expect 5 identifiers
@@ -53,7 +53,7 @@ class Hl7IdentifierFHIRConversionTest {
         assertThat(posMR).isNotSameAs(-1);
         int posSSN = getIdentifierPositionByValue("111223333", identifiers);
         assertThat(posSSN).isNotSameAs(-1);
-        int posDL = getIdentifierPositionByValue("MN1234567", identifiers);
+        int posDL = getIdentifierPositionByValue("MN34567", identifiers);
         assertThat(posDL).isNotSameAs(-1);
         int posSSNPID19 = getIdentifierPositionByValue("444556666", identifiers);
         assertThat(posSSNPID19).isNotSameAs(-1);
@@ -84,7 +84,7 @@ class Hl7IdentifierFHIRConversionTest {
         identifier = identifiers.get(posDL);
         assertThat(identifier.hasSystem()).isTrue();
         assertThat(identifier.getSystem()).hasToString("urn:id:MNDOT");
-        assertThat(identifier.getValue()).hasToString("MN1234567");
+        assertThat(identifier.getValue()).hasToString("MN34567");
         assertThat(identifier.hasType()).isTrue();
         cc = identifier.getType();
         assertThat(cc.hasText()).isFalse();
@@ -95,6 +95,7 @@ class Hl7IdentifierFHIRConversionTest {
         assertThat(identifier.hasSystem()).isFalse();
         // PID.19 SSN has no authority value and therefore no system id
         // Using different SS than ID#2 to confirm coming from PID.19
+        // Also tests that dashes are removed from SSN
         assertThat(identifier.getValue()).hasToString("444556666");
         assertThat(identifier.hasType()).isTrue();
         cc = identifier.getType();
@@ -118,13 +119,14 @@ class Hl7IdentifierFHIRConversionTest {
     void patientIdentifiersSpecialCasesTest() {
         String patientIdentifiersSpecialCases = "MSH|^~\\&|MIICEHRApplication|MIIC|MIIC|MIIC|201705130822||VXU^V04^VXU_V04|test1100|P|2.5.1|||AL|AL|||||Z22^CDCPHINVS|^^^^^MIIC^SR^^^MIIC|MIIC\n"
                 // First ID has blanks in the authority.  Second ID has no authority provided.  Third ID has an unknown CODE in the standard v2 table.
-                + "PID|1||MRN12345678^^^Regional Health ID^MR~111223333^^^^SS~A100071402^^^^AnUnknownCode|ALTID|Moose^Mickey^J^III^^^||20060504|M||||||||||||||||||||||\n";
+                // SSN has dashes which should be removed during processing.
+                + "PID|1||MRN12345678^^^Regional Health ID^MR~111-22-3333^^^^SS~A100071402^^^^AnUnknownCode|ALTID|Moose^Mickey^J^III^^^||20060504|M||||||||||||||||||||||\n";
         Patient patient = PatientUtils.createPatientFromHl7Segment(ftv, patientIdentifiersSpecialCases);
 
         // Expect 2 identifiers
         assertThat(patient.hasIdentifier()).isTrue();
         List<Identifier> identifiers = patient.getIdentifier();
-        assertThat(identifiers.size()).isEqualTo(3);
+                assertThat(identifiers.size()).isEqualTo(3);
 
         // Match the id's to position; we can't depend on an order.
         int posMR = getIdentifierPositionByValue("MRN12345678", identifiers);
@@ -1588,7 +1590,7 @@ class Hl7IdentifierFHIRConversionTest {
 
     private static int getIdentifierPositionByValue(String value, List<Identifier> identifiers) {
         for (int i = 0; i < identifiers.size(); i++) {
-            if (value.contains(identifiers.get(i).getValue())) {
+            if (identifiers.get(i).hasValue() && value.contains(identifiers.get(i).getValue())) {
                 return i;
             }
         }
