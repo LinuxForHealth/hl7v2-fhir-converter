@@ -4,7 +4,7 @@ In addition to general Java best practices, these are additional requirements an
 for keeping the increasingly large converter code maintable.  
 
 1. Format code before checkin. This includes Java and YML files.
-1. Remove all println's
+1. Remove all println's.
 1. NO Logging of PHI.  Anything that could potentially contain PHI must be put into a debug statement.
 1. Use a linter.  The linter is your friend, and will help you avoid _code smell_.  We recommend `SonarLint` on VS Code or IntelliJ, a SonarQube based linter.
 1. Solve all linter warnings. Watch for:
