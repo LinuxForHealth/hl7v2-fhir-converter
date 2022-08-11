@@ -208,7 +208,7 @@ class HL7ConditionFHIRConversionTest {
         Condition condition = (Condition) conditionResource.get(0);
         DatatypeUtils.checkCommonCodeableConceptAssertions(condition.getCode(), "V72.83",
                 "Other specified pre-operative examination",
-                "http://terminology.hl7.org/CodeSystem/icd9", "Other specified pre-operative examination");
+                "http://hl7.org/fhir/sid/icd-9-cm", "Other specified pre-operative examination");
 
         condition = (Condition) conditionResource.get(1);
         DatatypeUtils.checkCommonCodeableConceptAssertions(condition.getCode(), "R00.0", "Tachycardia, unspecified",

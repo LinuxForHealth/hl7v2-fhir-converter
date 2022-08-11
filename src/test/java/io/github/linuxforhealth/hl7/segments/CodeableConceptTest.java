@@ -245,7 +245,7 @@ class CodeableConceptTest {
         DatatypeUtils.checkCommonCodingAssertions(condCC.getCoding().get(0), "2148-5", "CREATININE", "http://loinc.org",
                 "474747");
         DatatypeUtils.checkCommonCodingAssertions(condCC.getCoding().get(1), "F-11380", "CREATININE",
-                "http://terminology.hl7.org/CodeSystem/icd9", "22222");
+                "http://hl7.org/fhir/sid/icd-9-cm", "22222");
     }
 
     @Test
