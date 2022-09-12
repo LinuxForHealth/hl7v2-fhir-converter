@@ -223,7 +223,7 @@ class Hl7NoteFHIRConverterTest {
         Observation obsGlucose = ResourceUtils.getResourceObservation(observations.get(0), ResourceUtils.context);
         Observation obsHemoglobin = ResourceUtils.getResourceObservation(observations.get(1), ResourceUtils.context);
         // Figure out which is first and reassign if needed for testing
-        if (obsGlucose.getCode().getText() != "MEAN BLOOD GLUCOSE") {
+        if (!obsGlucose.getCode().getText().equalsIgnoreCase("MEAN BLOOD GLUCOSE")) {
             Observation temp = obsGlucose;
             obsGlucose = obsHemoglobin;
             obsHemoglobin = temp;
@@ -373,7 +373,7 @@ class Hl7NoteFHIRConverterTest {
                         // Check the contents and the parent
                         Observation obs = ResourceUtils.getResourceObservation(observations.get(obsIndex),
                                 ResourceUtils.context);
-                        String code = obs.getCode().getCodingFirstRep().getCode().toString();
+                        String code = obs.getCode().getCodingFirstRep().getCode();
                         // The Annotation text should match the mapped text for this key
                         assertThat(obs.getNoteFirstRep().getText()).hasToString(matchObsCodeToNotes.get(code));
                         // The parent Condition code.coding.code should match the expected mapped code for this key

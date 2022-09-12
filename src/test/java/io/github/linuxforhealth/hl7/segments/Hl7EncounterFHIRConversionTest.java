@@ -353,7 +353,7 @@ class Hl7EncounterFHIRConversionTest {
 
         CodeableConcept encounterReasonEVN = reasonCodes.get(0);
         CodeableConcept encounterReasonPV2 = reasonCodes.get(1);
-        if (encounterReasonPV2.getTextElement().toString() != "Fatigue") {
+        if (!encounterReasonPV2.getTextElement().toString().equalsIgnoreCase("Fatigue")) {
             encounterReasonEVN = reasonCodes.get(1);
             encounterReasonPV2 = reasonCodes.get(0);
         }
