@@ -105,7 +105,7 @@ class Hl7NoteFHIRConverterTest {
         Observation obsGlucose = ResourceUtils.getResourceObservation(observations.get(0), ResourceUtils.context);
         Observation obsHemoglobin = ResourceUtils.getResourceObservation(observations.get(1), ResourceUtils.context);
         // Figure out which is first and reassign if needed for testing
-        if (obsGlucose.getCode().getText() != "MEAN BLOOD GLUCOSE") {
+        if (!obsGlucose.getCode().getText().equals("MEAN BLOOD GLUCOSE")) {
             Observation temp = obsGlucose;
             obsGlucose = obsHemoglobin;
             obsHemoglobin = temp;
@@ -223,7 +223,7 @@ class Hl7NoteFHIRConverterTest {
         Observation obsGlucose = ResourceUtils.getResourceObservation(observations.get(0), ResourceUtils.context);
         Observation obsHemoglobin = ResourceUtils.getResourceObservation(observations.get(1), ResourceUtils.context);
         // Figure out which is first and reassign if needed for testing
-        if (!obsGlucose.getCode().getText().equalsIgnoreCase("MEAN BLOOD GLUCOSE")) {
+        if (!obsGlucose.getCode().getText().equals("MEAN BLOOD GLUCOSE")) {
             Observation temp = obsGlucose;
             obsGlucose = obsHemoglobin;
             obsHemoglobin = temp;
