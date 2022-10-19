@@ -14,7 +14,7 @@ resourceType: RelatedPerson
 #  $Patient 
 id:
    type: STRING
-   valueOf: UUID.randomUUID()
+   valueOf: "GeneralUtils.generateResourceId()"
    expressionType: JEXL
 
 identifier_1:
@@ -40,7 +40,7 @@ identifier_2:
    generateList: true
    expressionType: resource
    vars:
-      valueIn: String, IN2.2
+     valueIn: CLEAN_SSN, IN2.2 # subscriber SSN
    constants:
       system: http://terminology.hl7.org/CodeSystem/v2-0203
       code: SS

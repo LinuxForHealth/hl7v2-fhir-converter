@@ -38,6 +38,12 @@
 # source-record-type
 - id: "source-record-type"
   url: "http://ibm.com/fhir/cdm/StructureDefinition/source-record-type"
-#condition-assertedDate
+# condition-assertedDate
 - id: "condition-assertedDate"
   url: "http://hl7.org/fhir/StructureDefinition/condition-assertedDate"
+# tenant-id
+- id: "tenant-id"
+  url: "http://ibm.com/fhir/cdm/StructureDefinition/tenant-id"
+# process-timestamp
+- id: "process-timestamp"
+  url: "http://ibm.com/fhir/cdm/StructureDefinition/process-timestamp"

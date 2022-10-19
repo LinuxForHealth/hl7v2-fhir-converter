@@ -12,7 +12,7 @@
 resourceType: Coverage
 id:
   type: STRING
-  valueOf: "UUID.randomUUID()"
+  valueOf: "GeneralUtils.generateResourceId()"
   expressionType: JEXL
 
 identifier_1:

@@ -77,3 +77,23 @@ extension_6:
         display: $NULL
       constants:
         system_code: "source-event-trigger-system"
+
+extension_7:
+  generateList: true
+  valueOf: extension/Extension
+  expressionType: resource
+  vars:
+    value: null, GeneralUtils.getCurrentDateTimeUsingZoneId(ZONEID)
+  constants:
+    KEY_NAME_SUFFIX: DateTime
+    urlValue: process-timestamp
+
+extension_8:
+  generateList: true
+  valueOf: extension/Extension
+  expressionType: resource
+  vars:
+    value: $TENANT
+  constants:
+    KEY_NAME_SUFFIX: String
+    urlValue: tenant-id

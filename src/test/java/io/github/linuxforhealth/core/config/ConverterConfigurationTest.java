@@ -34,6 +34,7 @@ class ConverterConfigurationTest {
     @BeforeAll
     static void saveConfigHomeProperty() {
         originalConfigHome = System.getProperty(CONF_PROP_HOME);
+        folder.setWritable(true);
     }
 
     @AfterEach
@@ -41,6 +42,7 @@ class ConverterConfigurationTest {
         System.clearProperty(CONF_PROP_HOME);
         ConverterConfiguration.reset();
         UrlLookup.reset();
+        folder.setWritable(true);
     }
 
     @AfterAll
@@ -50,6 +52,8 @@ class ConverterConfigurationTest {
         else
             System.clearProperty(CONF_PROP_HOME);
         UrlLookup.reset();
+        folder.setWritable(true);
+        folder.delete();
     }
 
     @Test
@@ -64,6 +68,7 @@ class ConverterConfigurationTest {
         UrlLookup.reset(Constants.EXTENSION_URL_MAPPING);
         url = UrlLookup.getExtensionUrl("mothersMaidenName");
         assertThat(url).isEqualTo("http://hl7.org/fhir/StructureDefinition/patient-mothersMaidenName");
+        configFile.delete();
     }
 
     @Test
@@ -80,6 +85,7 @@ class ConverterConfigurationTest {
         assertThat(theConvConfig.getAdditionalConceptmapFile())
                 .isEqualTo("src/test/resources/additional_conceptmap.yml");
         assertThat(theConvConfig.getAdditionalResourcesLocation()).isEqualTo("src/test/resources/additional_resources");
+        configFile.delete();
     }
 
     private void writeProperties(File configFile) throws FileNotFoundException, IOException {
@@ -104,6 +110,7 @@ class ConverterConfigurationTest {
         assertThat(theConvConfig.getSupportedMessageTemplates().get(0)).contains("*"); // * indicates search for templates.
         assertThat(theConvConfig.getAdditionalConceptmapFile()).isNull();
         assertThat(theConvConfig.getAdditionalResourcesLocation()).isNull();
+        configFile.delete();
     }
 
     private void writePropertiesDefaultMessages(File configFile) throws FileNotFoundException, IOException {

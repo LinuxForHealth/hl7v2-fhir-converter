@@ -25,7 +25,6 @@ import ca.uhn.hl7v2.model.v26.group.VXU_V04_OBSERVATION;
 import ca.uhn.hl7v2.model.v26.group.VXU_V04_ORDER;
 import ca.uhn.hl7v2.model.v26.segment.OBX;
 import ca.uhn.hl7v2.HL7Exception;
-import ca.uhn.hl7v2.model.DataTypeException;
 import ca.uhn.hl7v2.model.Varies;
 
 import org.apache.commons.lang3.BooleanUtils;
@@ -90,6 +89,15 @@ public class SimpleDataValueResolver {
         if (strValue != null) {
             strValue = strValue.toLowerCase();
             return strValue.replaceAll("[^a-zA-Z0-9.]", "-");
+        }
+        return null;
+    };
+
+    // Clean up of SSN currently removes any dashes.
+    public static final ValueExtractor<Object, String> CLEAN_SSN = (Object value) -> {
+        String strValue = Hl7DataHandlerUtil.getStringValue(value);
+        if (strValue != null) {
+            return strValue.replaceAll("\\-", "");
         }
         return null;
     };

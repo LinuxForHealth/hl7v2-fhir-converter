@@ -60,6 +60,25 @@ class SimpleDataValueResolverTest {
     }
 
     @Test
+    void get_clean_ssn() {
+        // Check dashes are removed
+        String ssn = "777-88-9999";
+        assertThat(SimpleDataValueResolver.CLEAN_SSN.apply(ssn)).isEqualTo("777889999");
+
+        // Check no dashes remains the same
+        ssn = "777889999";
+        assertThat(SimpleDataValueResolver.CLEAN_SSN.apply(ssn)).isEqualTo("777889999");
+
+        // Check that empty input returns empty (and doesn't crash)
+        ssn = "";
+        assertThat(SimpleDataValueResolver.CLEAN_SSN.apply(ssn)).isEqualTo("");
+
+        // Check that null input returns null (and doesn't crash)
+        ssn = null;
+        assertThat(SimpleDataValueResolver.CLEAN_SSN.apply(ssn)).isEqualTo(null);
+    }
+
+    @Test
     void get_boolean_value_true() {
         String gen = "True";
         assertThat(SimpleDataValueResolver.BOOLEAN.apply(gen)).isTrue();

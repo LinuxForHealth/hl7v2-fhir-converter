@@ -49,8 +49,7 @@ bin/
 .idea
 
 # VSCode
-.vscode/settings.json
-
+.vscode/
 # Local History files
 .history
 

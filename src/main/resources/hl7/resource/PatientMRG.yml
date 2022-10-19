@@ -10,7 +10,7 @@ resourceType: Patient
 # This patient resource is used to create patient resources generated from MRG segments.
 id:
    type: STRING
-   valueOf: UUID.randomUUID()
+   valueOf: "GeneralUtils.generateResourceId()"
    expressionType: JEXL
 
 identifier:

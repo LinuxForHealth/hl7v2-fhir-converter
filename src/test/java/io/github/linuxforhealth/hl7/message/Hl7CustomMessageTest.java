@@ -59,6 +59,7 @@ class Hl7CustomMessageTest {
         originalConfigHome = System.getProperty(CONF_PROP_HOME);
         ConverterConfiguration.reset();
         ResourceReader.reset();
+        folder.setWritable(true);
     }
 
     @AfterEach
@@ -74,6 +75,7 @@ class Hl7CustomMessageTest {
             System.setProperty(CONF_PROP_HOME, originalConfigHome);
         else
             System.clearProperty(CONF_PROP_HOME);
+        folder.setWritable(true);
     }
 
     @Test

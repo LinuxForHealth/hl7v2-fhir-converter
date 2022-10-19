@@ -5,6 +5,10 @@
  */
 package io.github.linuxforhealth.hl7.data;
 
+import java.math.BigInteger;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.Temporal;
 import java.time.temporal.UnsupportedTemporalTypeException;
@@ -13,6 +17,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.UUID;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringEscapeUtils;
 import org.apache.commons.text.StringTokenizer;
@@ -34,6 +39,7 @@ import io.github.linuxforhealth.hl7.data.date.DateUtil;
 
 public class Hl7RelatedGeneralUtils {
     private static final Logger LOGGER = LoggerFactory.getLogger(Hl7RelatedGeneralUtils.class);
+    private static final String NOW_FORMAT = "yyyyMMddHHmmss";
 
     private Hl7RelatedGeneralUtils() {
     }
@@ -132,6 +138,38 @@ public class Hl7RelatedGeneralUtils {
             return DateUtil.formatToDateTimeWithZone(val, zoneIdText);
         }
         return null;
+    }
+
+     /** 
+     * Generated the current date and time as a String with the proper formatting.
+     * @param zoneId the system's ZONEID
+     * @return The formatted current dateTime as a String.
+     */
+    public static String getCurrentDateTimeUsingZoneId(Object zoneId) {
+        // get the current data and time
+        LocalDateTime now = LocalDateTime.now();
+
+        // format now so it can be formatted by formatToDateTimeWithZone
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(NOW_FORMAT);
+        String nowText = now.format(formatter);
+
+        // format the date with the timezone
+        String zoneIdText = Hl7DataHandlerUtil.getStringValue(zoneId);
+        String formattedDateTime = DateUtil.formatToDateTimeWithZone(nowText, zoneIdText);
+        return formattedDateTime;
+    }
+
+    /** 
+     * Generates a string id for resource and bundle creation.
+     * Format is <current nano second>.<UUID>.
+     */
+    public static String generateResourceId() {
+        Instant now = Instant.now();
+        BigInteger nano = BigInteger.valueOf(now.getEpochSecond());
+        nano = nano.multiply(BigInteger.valueOf(1000000000));
+        nano = nano.add(BigInteger.valueOf(now.getNano()));
+        
+        return nano.toString() + "." + UUID.randomUUID().toString();
     }
 
     // Special extractor only for use with PV1 records.
