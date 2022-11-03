@@ -351,11 +351,16 @@ class Hl7EncounterFHIRConversionTest {
         List<CodeableConcept> reasonCodes = encounter.getReasonCode();
         assertThat(reasonCodes).hasSize(2);
 
-        CodeableConcept encounterReasonEVN = reasonCodes.get(0);
-        CodeableConcept encounterReasonPV2 = reasonCodes.get(1);
-        if (!encounterReasonPV2.getTextElement().toString().equals("Fatigue")) {
-            encounterReasonEVN = reasonCodes.get(1);
+        CodeableConcept encounterReasonEVN;
+        CodeableConcept encounterReasonPV2;
+
+        //Put correct reason code in EVN or PV2 variable to simplify rest of test
+        if (reasonCodes.get(0).getTextElement() != null && reasonCodes.get(0).getTextElement().toString().equals("Fatigue")) {
             encounterReasonPV2 = reasonCodes.get(0);
+            encounterReasonEVN = reasonCodes.get(1);
+        } else {
+            encounterReasonPV2 = reasonCodes.get(1);
+            encounterReasonEVN = reasonCodes.get(0);
         }
         DatatypeUtils.checkCommonCodeableConceptAssertions(encounterReasonPV2, "01.4", "Fatigue",
                 "http://terminology.hl7.org/CodeSystem/CCC", "Fatigue");
