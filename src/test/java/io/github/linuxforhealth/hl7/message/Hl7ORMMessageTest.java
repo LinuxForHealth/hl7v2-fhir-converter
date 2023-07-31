@@ -9,8 +9,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
 import java.util.List;
+import java.math.BigDecimal;
 
 import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
+import org.hl7.fhir.r4.model.Observation;
 import org.hl7.fhir.r4.model.Resource;
 import org.hl7.fhir.r4.model.ResourceType;
 import org.junit.jupiter.api.Test;
@@ -197,6 +199,23 @@ class Hl7ORMMessageTest {
         // Confirm that there are no extra resources created
         assertThat(e).hasSize(9);
 
+    }
+
+    @Test
+    void test_ORM_O01_Order_For_Big_Decimal_In_Observation_OBX5() throws IOException {
+        String hl7message = "MSH|^~\\&|||||20210407191342||ORM^O01|MSGID_bae9ce6a-e35d-4ff5-8d50-c5dde19cc1aa|T|2.5.1\r"
+                + "PID|||1234^^^^MR||DOE^JANE^|||F|||||||||||||||||||||\r"
+                + "ORC|OP|1000|9999999||||^3 times daily^^20210401\r"
+                + "RXO|50111032701^hydrALAZINE HCl 25 MG Oral Tablet^NDC^^^^^^hydrALAZINE (APRESOLINE) 25 MG TABS|||||||||||||||||||||||\r"
+                + "OBX|1|NM|8339-4^BIRTH WEIGHT MEASURED^LN|1|1769.859285|g^gram^UCUM|||||O|||20230506050000-0500|||||||||||||||QST|AOE\r";
+
+        List<BundleEntryComponent> e = ResourceUtils.createFHIRBundleFromHL7MessageReturnEntryList(ftv, hl7message);
+
+        List<Resource> observationResource = ResourceUtils.getResourceList(e, ResourceType.Observation);
+        assertThat(observationResource).hasSize(1);
+
+        Observation observation = ResourceUtils.getResourceObservation(observationResource.get(0), ResourceUtils.context);
+        assertThat(observation.getValueQuantity().getValue()).isEqualTo(new BigDecimal("1769.859285"));
     }
 
     @Test

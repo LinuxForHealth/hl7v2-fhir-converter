@@ -161,7 +161,7 @@ public class Hl7RelatedGeneralUtils {
 
     /** 
      * Generates a string id for resource and bundle creation.
-     * Format is <current nano second>.<UUID>.
+     * Format is "current nano second"."UUID".
      */
     public static String generateResourceId() {
         Instant now = Instant.now();
