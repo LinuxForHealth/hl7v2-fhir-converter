@@ -5,6 +5,7 @@
  */
 package io.github.linuxforhealth.hl7.data;
 
+import java.math.BigDecimal;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -559,6 +560,19 @@ public class SimpleDataValueResolver {
         }
         if (NumberUtils.isCreatable(val)) {
             return NumberUtils.createFloat(val);
+        } else {
+            LOGGER.warn("Value {} for DECIMAL is not a valid number so returning null.", value);
+            return null;
+        }
+    };
+
+    public static final ValueExtractor<Object, BigDecimal> BIG_DECIMAL = (Object value) -> {
+        String val = Hl7DataHandlerUtil.getStringValue(value);
+        if (null == val) {
+            return null;
+        }
+        if (NumberUtils.isCreatable(val)) {
+            return new BigDecimal(val);
         } else {
             LOGGER.warn("Value {} for DECIMAL is not a valid number so returning null.", value);
             return null;
