@@ -51,7 +51,6 @@ public class FHIRConverterRunFolder {
     int numConvertedFolders = 0;
     HL7ToFHIRConverter hl7Converter;
     ConverterOptions hl7ConverterOptions;
-    JsonParser jsonParser;
     Gson gson;
 
     public FHIRConverterRunFolder(String inputFolderName, String outputFolderName, boolean traverseSubFolders,
@@ -68,7 +67,6 @@ public class FHIRConverterRunFolder {
                 .withValidateResource()
                 .withPrettyPrint()
                 .build();
-        jsonParser = new JsonParser();
         gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
     }
 
@@ -171,7 +169,7 @@ public class FHIRConverterRunFolder {
                     }
 
                     // Create a JSON object to be able to pretty print 
-                    JsonObject jsonObj = jsonParser.parse(json).getAsJsonObject();
+                    JsonObject jsonObj = JsonParser.parseString(json).getAsJsonObject();
                     String prettyJson = gson.toJson(jsonObj);
                     if (debug) {
                         System.out.println("Output JSON message:\n" + prettyJson);
