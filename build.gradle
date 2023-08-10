@@ -8,6 +8,7 @@ plugins {
     // Apply the java-library plugin to add support for Java Library
     id 'java'
     id 'java-library'
+    id 'application'
     id 'jacoco'
     id 'maven-publish'
     id 'signing'
@@ -75,11 +76,11 @@ repositories {
 // Overriding the source directories to the target.
 // This will cause the build/compile to use target instead of src.
 if(!localDevEnv.toBoolean()) {
-    println "Overriding sourceset to the target directory"
+    println "Overriding sourceset to the target directory (without tools)"
     sourceSets.main.java.srcDirs = ['target/main/java'];
     sourceSets.main.resources.srcDirs = ['target/main/resources'];
 } else {
-    println "localDevEnv is true - Setting sourceset to the src directory"
+    println "localDevEnv is true - Setting sourceset to the src directory (including tools)"
     sourceSets.main.java.srcDirs = ['src/main/java', 'src/tools'];
     sourceSets.main.resources.srcDirs = ['src/main/resources'];
 }
@@ -113,6 +114,10 @@ publishing {
       }
     }
   }
+}
+
+application {
+    mainClass = 'io.github.linuxforhealth.hl7.message.tools.FHIRConverterRunFile'
 }
 
 task sourcesJar(type: Jar, dependsOn: classes) {
