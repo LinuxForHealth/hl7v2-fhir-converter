@@ -53,6 +53,8 @@ import org.hl7.fhir.r4.model.codesystems.ConditionClinical;
 import org.hl7.fhir.r4.model.codesystems.ConditionVerStatus;
 import org.hl7.fhir.r4.model.codesystems.CompositionStatus;
 
+import org.hl7.fhir.r4.model.codesystems.ContactPointSystem;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -530,6 +532,18 @@ public class SimpleDataValueResolver {
         }
     };
 
+    public static final ValueExtractor<Object, String> CONTACT_POINT_SYSTEM_FHIR = (Object value) -> {
+        String val = Hl7DataHandlerUtil.getStringValue(value);
+        String code = getFHIRCode(val, ContactPointSystem.class);
+        if (code != null) {
+            return code;
+        } else if (val == null) {
+            return null;
+        } else {
+            return ContactPointSystem.OTHER.toCode();
+        }
+    }; 
+        
     public static final ValueExtractor<Object, Boolean> BOOLEAN = (Object value) -> {
         String val = Hl7DataHandlerUtil.getStringValue(value);
         if (null == val) {

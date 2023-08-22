@@ -48,9 +48,20 @@ class SimpleDataValueResolverTest {
     }
 
     @Test
-    void get_adm_gender_value_unknow() {
+    void get_adm_gender_value_unknown() {
         String gen = "ABC";
         assertThat(SimpleDataValueResolver.ADMINISTRATIVE_GENDER_CODE_FHIR.apply(gen)).isEqualTo("unknown");
+    }
+
+    @Test
+    void get_contact_point_system_value_phone() {
+        String gen = "PH";
+        assertThat(SimpleDataValueResolver.CONTACT_POINT_SYSTEM_FHIR.apply(gen)).isEqualTo("phone");
+    }
+    @Test
+    void get_contact_point_system_value_other() {
+        String gen = "XX";
+        assertThat(SimpleDataValueResolver.CONTACT_POINT_SYSTEM_FHIR.apply(gen)).isEqualTo("other");
     }
 
     @Test
