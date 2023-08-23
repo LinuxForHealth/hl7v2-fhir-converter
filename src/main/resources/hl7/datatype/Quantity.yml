@@ -6,7 +6,7 @@
 ---
 
 value : 
-   type: FLOAT
+   type: BIG_DECIMAL
    valueOf: $value
 comparator : 
    type: String
