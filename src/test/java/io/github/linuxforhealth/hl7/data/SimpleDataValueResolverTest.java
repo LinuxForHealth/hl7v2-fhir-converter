@@ -7,6 +7,7 @@ package io.github.linuxforhealth.hl7.data;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.math.BigDecimal;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.UUID;
@@ -104,14 +105,37 @@ class SimpleDataValueResolverTest {
     }
 
     @Test
+    void get_big_decimal_value_valid() {
+        String gen = "123";
+        assertThat(SimpleDataValueResolver.BIG_DECIMAL.apply(gen)).isEqualTo(new BigDecimal(gen));
+    }
+
+    @Test
+    void get_big_decimal_value_valid_with_bigger_than_float_decimal() {
+        String gen = "1769.859285";
+        assertThat(SimpleDataValueResolver.BIG_DECIMAL.apply(gen)).isEqualTo(new BigDecimal(gen));
+    }
+
+    @Test
     void get_float_value_null() {
         assertThat(SimpleDataValueResolver.FLOAT.apply(null)).isNull();
+    }
+
+    @Test
+    void get_big_decimal_value_null() {
+        assertThat(SimpleDataValueResolver.BIG_DECIMAL.apply(null)).isNull();
     }
 
     @Test
     void get_float_value_invalid() {
         String gen = "abc";
         assertThat(SimpleDataValueResolver.FLOAT.apply(gen)).isNull();
+    }
+
+    @Test
+    void get_big_decimal_value_invalid() {
+        String gen = "abc";
+        assertThat(SimpleDataValueResolver.BIG_DECIMAL.apply(gen)).isNull();
     }
 
     @Test
