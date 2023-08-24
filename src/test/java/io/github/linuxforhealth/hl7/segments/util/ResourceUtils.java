@@ -39,7 +39,7 @@ import org.slf4j.LoggerFactory;
 import io.github.linuxforhealth.fhir.FHIRContext;
 import io.github.linuxforhealth.hl7.ConverterOptions;
 import io.github.linuxforhealth.hl7.ConverterOptions.Builder;
-import io.github.linuxforhealth.hl7.expression.varable.CustomMessageEngine;
+import io.github.linuxforhealth.hl7.expression.variable.CustomMessageEngine;
 import io.github.linuxforhealth.hl7.HL7ToFHIRConverter;
 import io.github.linuxforhealth.hl7.message.HL7MessageEngine;
 

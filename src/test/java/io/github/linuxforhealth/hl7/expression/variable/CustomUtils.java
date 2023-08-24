@@ -1,8 +1,11 @@
-package io.github.linuxforhealth.hl7.expression.varable;
-
+package io.github.linuxforhealth.hl7.expression.variable;
 
 /*
- *   A trivial set of customFunctions - to be called by JEXL
+ * (C) Copyright Te Whatu Ora - Health New Zealand, 2023
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * A trivial set of customFunctions - to be called by JEXL
  */
 import io.github.linuxforhealth.hl7.data.Hl7DataHandlerUtil;
 

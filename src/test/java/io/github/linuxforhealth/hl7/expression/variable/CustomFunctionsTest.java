@@ -1,7 +1,11 @@
-package io.github.linuxforhealth.hl7.expression.varable;
+package io.github.linuxforhealth.hl7.expression.variable;
 
 /*
- *   Test to make sure we can put customFunctions into variables in JEXL expressions
+ * (C) Copyright Te Whatu Ora - Health New Zealand, 2023
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * Test to make sure we can put customFunctions into variables in JEXL expressions
  */
 import java.io.File;
 import java.io.FileNotFoundException;

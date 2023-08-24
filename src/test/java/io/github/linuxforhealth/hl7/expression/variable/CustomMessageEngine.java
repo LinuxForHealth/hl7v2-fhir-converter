@@ -1,7 +1,11 @@
-package io.github.linuxforhealth.hl7.expression.varable;
+package io.github.linuxforhealth.hl7.expression.variable;
 
-/* 
- *    Rather trivial extension of HL7MessageEngine that adds a new set of customFunctions for JEXL Expressions
+/*
+ * (C) Copyright Te Whatu Ora - Health New Zealand, 2023
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ *  A rather trivial extension of HL7MessageEngine that adds a new set of customFunctions for JEXL Expressions
  */
 
 import java.util.HashMap;
