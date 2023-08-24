@@ -33,7 +33,7 @@ implementation 'ca.uhn.hapi:hapi-structures-v26:2.3'
 implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.10.1'
 implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.10.1'
 
-implementation group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-yaml', version: '2.14.0'
+implementation group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-yaml', version: '2.15.0'
     
 api 'com.fasterxml.jackson.core:jackson-databind:2.13.4.2' 
     // https://mvnrepository.com/artifact/org.apache.commons/commons-text
