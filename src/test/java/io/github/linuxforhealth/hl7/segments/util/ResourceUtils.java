@@ -39,14 +39,18 @@ import org.slf4j.LoggerFactory;
 import io.github.linuxforhealth.fhir.FHIRContext;
 import io.github.linuxforhealth.hl7.ConverterOptions;
 import io.github.linuxforhealth.hl7.ConverterOptions.Builder;
+import io.github.linuxforhealth.hl7.expression.variable.CustomMessageEngine;
 import io.github.linuxforhealth.hl7.HL7ToFHIRConverter;
+import io.github.linuxforhealth.hl7.message.HL7MessageEngine;
 
 public class ResourceUtils {
 
-    public static FHIRContext context = new FHIRContext();
+    public static FHIRContext context = new FHIRContext(true, false);
     private static final Logger LOGGER = LoggerFactory.getLogger(ResourceUtils.class);
     private static final ConverterOptions STANDARD_OPTIONS = new Builder().withValidateResource().withPrettyPrint()
             .build();
+
+    private static final HL7MessageEngine CUSTOM_ENGINE = new CustomMessageEngine(context, STANDARD_OPTIONS.getBundleType());
 
     public static List<BundleEntryComponent> createFHIRBundleFromHL7MessageReturnEntryList(HL7ToFHIRConverter ftv,
             String inputSegment) {
@@ -55,15 +59,25 @@ public class ResourceUtils {
 
     public static List<BundleEntryComponent> createFHIRBundleFromHL7MessageReturnEntryList(HL7ToFHIRConverter ftv,
             String inputSegment, ConverterOptions options) {
-        String json = ftv.convert(inputSegment, options);
-        assertThat(json).isNotBlank();
-        LOGGER.debug("FHIR json result:\n" + json);
-        FHIRContext context = new FHIRContext();
-        IBaseResource bundleResource = context.getParser().parseResource(json);
-        assertThat(bundleResource).isNotNull();
-        Bundle b = (Bundle) bundleResource;
-        List<BundleEntryComponent> e = b.getEntry();
-        return e;
+
+        Bundle bundle = ftv.convertToBundle(inputSegment, options, CUSTOM_ENGINE);
+        assertThat(bundle).isNotNull();
+
+        LOGGER.debug("FHIR json result:\n" + CUSTOM_ENGINE.getFHIRContext().encodeResourceToString(bundle));
+
+        List<BundleEntryComponent> retVal = bundle.getEntry();
+        assertThat(retVal).isNotEmpty();            
+        return retVal;
+
+        // String json = ftv.convert(inputSegment, options);
+        // assertThat(json).isNotBlank();
+        // LOGGER.debug("FHIR json result:\n" + json);
+        // FHIRContext context = new FHIRContext();
+        // IBaseResource bundleResource = context.getParser().parseResource(json);
+        // assertThat(bundleResource).isNotNull();
+        // Bundle b = (Bundle) bundleResource;
+        // List<BundleEntryComponent> e = b.getEntry();
+        // return e;
     }
 
     // Helper method that gets the first (and usually only) value of the property out of a FHIR Base object.

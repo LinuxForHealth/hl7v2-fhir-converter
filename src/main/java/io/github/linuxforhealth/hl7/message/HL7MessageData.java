@@ -50,7 +50,12 @@ public class HL7MessageData implements InputDataExtractor {
     JEXL = new JexlEngineUtil(customFunctions);
   }
 
-
+  public HL7MessageData(HL7DataExtractor hde, Map<String, Object> customFunctions) {
+    Preconditions.checkArgument(hde != null, "Hl7DataExtractor cannot be null.");
+    this.hde = hde;
+    customFunctions.put("GeneralUtils", Hl7RelatedGeneralUtils.class);
+    JEXL = new JexlEngineUtil(customFunctions);
+  }
 
   @Override
   public EvaluationResult extractMultipleValuesForSpec(Specification spec,
