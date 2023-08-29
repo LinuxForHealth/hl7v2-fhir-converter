@@ -27,7 +27,7 @@ steps:
     jdkArchitectureOption: 'x64'
     publishJUnitResults: true
     testResultsFiles: '**/TEST-*.xml'
-    options: '-x test -Pversion=1.0.20-SNAPSHOT'
+    options: '-x test -Pversion=1.0.21-SNAPSHOT'
     tasks: 'publish'
 
 
