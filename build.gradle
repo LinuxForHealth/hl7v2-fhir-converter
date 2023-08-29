@@ -12,6 +12,7 @@ plugins {
     id 'jacoco'
     id 'maven-publish'
     id 'signing'
+    id "net.linguica.maven-settings" version "0.5"
 }
 
 group = 'io.github.linuxforhealth'
@@ -71,6 +72,13 @@ testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:5.8.2"
 // In this section you declare where to find the dependencies of your project
 repositories {
     mavenCentral()  
+    maven {
+        url 'https://pkgs.dev.azure.com/MDHB/bde66c03-6853-427d-add5-c1d0f7862346/_packaging/LinuxForHealthHL7Converter/maven/v1'
+        name 'LinuxForHealthHL7Converter'
+        authentication {
+            basic(BasicAuthentication)
+        }
+    }
 }
 
 // Overriding the source directories to the target.
@@ -104,14 +112,11 @@ jacocoTestReport {
 publishing {
   repositories {
     maven {
-      name = "OSSRH"
-      def releaseRepo = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
-      def snapshotRepo = "https://oss.sonatype.org/content/repositories/snapshots/"
-      url = isReleaseVersion ? releaseRepo : snapshotRepo
-      credentials {
-        username = System.getenv("MAVEN_USERNAME")
-        password = System.getenv("MAVEN_PASSWORD")
-      }
+        url 'https://pkgs.dev.azure.com/MDHB/bde66c03-6853-427d-add5-c1d0f7862346/_packaging/LinuxForHealthHL7Converter/maven/v1'
+        name 'LinuxForHealthHL7Converter'
+        authentication {
+            basic(BasicAuthentication)
+        }
     }
   }
 }
