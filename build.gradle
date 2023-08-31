@@ -238,3 +238,10 @@ project.tasks.deleteJavaDebugLogs.dependsOn project.tasks.resourcesCopy
 //BUT FIRST delete target directory
 project.tasks.resourcesCopy.dependsOn project.tasks.deleteTarget
 
+// Exclude all the resource so the base YAML templates are not packaged into our build and risk conflict with our own templates
+jar {
+    processResources {
+        exclude("*")
+    }
+}
+
