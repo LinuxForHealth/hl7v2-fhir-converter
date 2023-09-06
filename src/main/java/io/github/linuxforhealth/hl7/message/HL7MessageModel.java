@@ -124,7 +124,8 @@ public class HL7MessageModel implements MessageTemplate<Message> {
         while (i.hasNext()) {
             BundleEntryComponent entry = i.next(); // Safe traversal for removal
             // Currently only looking for duplicate Organizations, because their Urls and Id's are created from org data.
-            if (entry.getFullUrl().startsWith("Organization/") && duplicateFound(entry, entries)) {
+            // Not all entries have fullUrl (it depends upon the templates being used)
+            if (entry.hasFullUrl() && entry.getFullUrl().startsWith("Organization/") && duplicateFound(entry, entries)) {
                 i.remove();  // Safe removal
             }
         }

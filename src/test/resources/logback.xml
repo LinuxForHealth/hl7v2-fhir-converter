@@ -11,6 +11,8 @@
 	
 
 	<logger name="io.github.linuxforhealth" level="error" />
+	<logger name="io.github.linuxforhealth.hl7.segments.util" level="debug" />
+
 	<root level="error">
 		<appender-ref ref="Console" />
 	</root>
