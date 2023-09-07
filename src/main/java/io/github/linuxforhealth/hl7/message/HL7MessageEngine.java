@@ -306,9 +306,11 @@ public class HL7MessageEngine implements MessageEngine {
                     Visitable vs = baseValue.getValue();
                     if((vs != null && ! vs.isEmpty()) || ! ignoreEmpty) {
 
-                        // baseValue is either not empty or we're ignoring empty segments
+                        // baseValue is either not empty or we're not allowed to ignore empty segments
                         ResourceResult result = rs.evaluate(hl7DataInput, ImmutableMap.copyOf(localContextValues),
                                 baseValue);
+
+                        // We can't rely on empty segment giving us an empty resource; as common templates populate Resource.meta fields
                         if (result != null && result.getValue() != null) {
                             resourceResults.add(result);
                             if (!generateMultiple) {
