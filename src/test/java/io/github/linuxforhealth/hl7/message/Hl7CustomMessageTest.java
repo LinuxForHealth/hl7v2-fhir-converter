@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Properties;
 
 import org.hl7.fhir.instance.model.api.IBaseResource;
+import org.hl7.fhir.r4.model.AllergyIntolerance;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
 import org.hl7.fhir.r4.model.Resource;
@@ -24,6 +25,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import io.github.linuxforhealth.core.config.ConverterConfiguration;
 import io.github.linuxforhealth.fhir.FHIRContext;
@@ -82,7 +85,7 @@ class Hl7CustomMessageTest {
     void testCustomPatMessage() throws IOException {
 
         // Set up the config file
-        commonConfigFileSetup();
+        commonConfigFileSetup(true);
 
         String hl7message = "MSH|^~\\&|||||20211005105125||CUSTOM^PAT|1a3952f1-38fe-4d55-95c6-ce58ebfc7f10|P|2.6\n"
                 + "PID|1|100009^^^FAC^MR|100009^^^FAC^MR||DOE^JANE||195001010000|M|||||5734421788|||U\n"
@@ -107,13 +110,60 @@ class Hl7CustomMessageTest {
         assertThat(e.size()).isEqualTo(5);
     }
 
-    private static void commonConfigFileSetup() throws IOException {
+    @ParameterizedTest
+    @ValueSource(strings = { "ADT^A09", "ADT^A10" })   // ADT_A09 has ignoreEmpty = true; ADT_A10 doesn't
+    void testIgnoreEmptySegment(String messageType) throws IOException {
+
+        // ADT^A09 can ignore empty AL1 and ZAL segments;  ADT^A01 can ignore empty AL1, and always ignores ZAL segments
+        int alCount = messageType.equals("ADT^A09") ? 0 : 2;
+
+        // Set up the config file
+        commonConfigFileSetup(false);
+
+        // An empty AL1 Segment...
+        String hl7message = "MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||" + messageType + "|controlID|P|2.6\r"
+                + "EVN|A01|20150502090000|\r"
+                + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\r"
+                + "PV1||I||||||||SUR||||||||S|VisitNumber^^^ACME|A||||||||||||||||||||||||20150502090000|\r"
+                + "AL1|\r"
+                + "ZAL|\r";
+
+        List<BundleEntryComponent> e = getBundleEntryFromHL7Message(hl7message);
+
+        List<Resource> patientResource = ResourceUtils.getResourceList(e, ResourceType.Patient);
+        assertThat(patientResource).hasSize(1); // from PID
+
+        List<Resource> encounterResource = ResourceUtils.getResourceList(e, ResourceType.Encounter);
+        assertThat(encounterResource).hasSize(1); // from EVN, PV1
+
+        List<Resource> allergyIntoleranceResource = ResourceUtils.getResourceList(e, ResourceType.AllergyIntolerance);
+        assertThat(allergyIntoleranceResource).hasSize(alCount); // empty AL1 and ZAL Segments
+
+        // Confirm that there are no extra resources
+        assertThat(e).hasSize(2 + alCount);
+
+        // We might be done
+        if(alCount == 0)
+            return;
+
+        // Let's take a peek at the 'empty' AL1 Segment
+        assertThat(allergyIntoleranceResource).allSatisfy(rs -> {
+
+                AllergyIntolerance ai = (AllergyIntolerance) rs;
+                assert(ai.hasId());
+                assert(ai.hasClinicalStatus());
+                assert(ai.hasVerificationStatus());
+            });
+    }
+
+    private static void commonConfigFileSetup(boolean customResources) throws IOException {
         File configFile = new File(folder, "config.properties");
         Properties prop = new Properties();
         prop.put("base.path.resource", "src/main/resources");
-        prop.put("supported.hl7.messages", "*"); // Must use wild card so the custom resources are found.
+        prop.put("supported.hl7.messages", customResources ? "*" : "ADT_A09, ADT_A10"); // Must use wild card so the custom resources are found.
         prop.put("default.zoneid", "+08:00");
-        prop.put("additional.resources.location", "src/test/resources/additional_custom_resources"); // Location of custom resources
+        // Location of custom (or merely additional) resources
+        prop.put("additional.resources.location",  customResources ? "src/test/resources/additional_custom_resources" : "src/test/resources/additional_resources");
         prop.store(new FileOutputStream(configFile), null);
         System.setProperty(CONF_PROP_HOME, configFile.getParent());
     }
