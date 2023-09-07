@@ -52,6 +52,10 @@ public class HL7FHIRResourceTemplate implements FHIRResourceTemplate {
     return this.attributes.isReferenced();
   }
 
+  @Override
+  public boolean ignoreEmpty() {
+    return this.attributes.ignoreEmpty();
+  }
 
 
 }
