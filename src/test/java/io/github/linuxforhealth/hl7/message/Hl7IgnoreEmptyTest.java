@@ -27,7 +27,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import io.github.linuxforhealth.core.config.ConverterConfiguration;
 import io.github.linuxforhealth.fhir.FHIRContext;
@@ -81,12 +81,14 @@ class Hl7IgnoreEmptyTest {
         folder.setWritable(true);
     }
 
+    // ADT_A09 has ignoreEmpty = true; ADT_A10 doesn't
     @ParameterizedTest
-    @ValueSource(strings = { "ADT^A09", "ADT^A10" })   // ADT_A09 has ignoreEmpty = true; ADT_A10 doesn't
-    void testIgnoreEmptySegment(String messageType) throws IOException {
-
-        // ADT^A09 can ignore empty AL1 and ZAL segments;  ADT^A01 can ignore empty AL1, and always ignores ZAL segments
-        int alCount = messageType.equals("ADT^A09") ? 0 : 2;
+    @CsvSource({ "ADT^A09,ZAL|\r,0", "ADT^A10,ZAL|\r,1",     // Custom ZAL segment
+                 "ADT^A09,AL1|\r,0", "ADT^A10,AL1|\r,1",     // Standard AL1 segment
+                 "ADT^A09,ZAL|||||||||||||||\r,0",           // ZAL segment with all fields being empty
+                 "ADT^A09,ZAL|\"\"|\"\"|\"\"|\"\"|\"\"|\"\"|\"\"|\"\"|\"\"|\"\"|\"\"|\"\"|\"\"|\"\"|\"\"\r,1"    // So-called EMPTY ZAL segment is not actually empty
+               })
+    void testIgnoreEmptySegment(String messageType, String emptySegment, int aiCount) throws IOException {
 
         // Set up the config file
         commonConfigFileSetup();
@@ -96,8 +98,7 @@ class Hl7IgnoreEmptyTest {
                 + "EVN|A01|20150502090000|\r"
                 + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\r"
                 + "PV1||I||||||||SUR||||||||S|VisitNumber^^^ACME|A||||||||||||||||||||||||20150502090000|\r"
-                + "AL1|\r"
-                + "ZAL|\r";
+                + emptySegment;
 
         List<BundleEntryComponent> e = getBundleEntryFromHL7Message(hl7message);
 
@@ -108,18 +109,19 @@ class Hl7IgnoreEmptyTest {
         assertThat(encounterResource).hasSize(1); // from EVN, PV1
 
         List<Resource> allergyIntoleranceResource = ResourceUtils.getResourceList(e, ResourceType.AllergyIntolerance);
-        assertThat(allergyIntoleranceResource).hasSize(alCount); // empty AL1 and ZAL Segments
+        assertThat(allergyIntoleranceResource).hasSize(aiCount); // empty AL1 and ZAL Segments
 
         // Confirm that there are no extra resources
-        assertThat(e).hasSize(2 + alCount);
+        assertThat(e).hasSize(2 + aiCount);
 
         // We might be done
-        if(alCount == 0)
+        if(aiCount == 0)
             return;
 
-        // Let's take a peek at the 'empty' AL1 Segment
+        // Let's take a peek at the 'empty' ZAL Segment
         assertThat(allergyIntoleranceResource).allSatisfy(rs -> {
 
+                // Only some of the fields
                 AllergyIntolerance ai = (AllergyIntolerance) rs;
                 assert(ai.hasId());
                 assert(ai.hasClinicalStatus());
