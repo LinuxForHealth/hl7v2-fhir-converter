@@ -98,10 +98,10 @@ class HL7FHIRResourceConditionTest {
   @Test
   void testResourceConditionSegmentISNULL() {
 
-    HL7FHIRResourceCondition cond = new HL7FHIRResourceCondition("ZAL.2.1 IS_NULL");
+    HL7FHIRResourceCondition cond = new HL7FHIRResourceCondition("ZAL.2.1 NULL");
 
     assertThat(cond.fieldSpec).hasToString("[ZAL.2.1]");
-    assertThat(cond.op).isEqualTo(HL7FHIRResourceCondition.Operator.IS_NULL);
+    assertThat(cond.op).isEqualTo(HL7FHIRResourceCondition.Operator.NULL);
     assertThat(cond.values).hasSize(0);
   }
 

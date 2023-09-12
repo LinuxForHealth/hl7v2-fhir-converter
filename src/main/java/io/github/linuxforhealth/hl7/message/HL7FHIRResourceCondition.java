@@ -30,10 +30,10 @@ import org.slf4j.LoggerFactory;
 /**
   * Allows us to conditionally apply a ResourceTemplate depending upon particular values being present in the HL7 message.
   * 
-  *   <expression>  EQUALS | NOT_EQUALS | IN | NOT_IN | IS_NULL | NOT_NULL   value | [ ... ]
+  *   <expression>  EQUALS | NOT_EQUALS | IN | NOT_IN | NULL | NOT_NULL   value | [ ... ]
   *
   *   eg:  ZSC.2.1.3 NOT_NULL
-  *        ZCR.2(1).1 IS_NULL
+  *        ZCR.2(1).1 NULL
   *        ZCP.3.1 IN [A3, A4, H1, H3, FA, DA]
   *        ZCP.3.1 NOT_IN [A2, F3, DA]
   *        ZFD.2 EQUALS A4
@@ -44,7 +44,7 @@ import org.slf4j.LoggerFactory;
   */
 public class HL7FHIRResourceCondition implements ResourceCondition {
   public enum Operator {
-    EQUALS, NOT_EQUALS, IN, NOT_IN, IS_NULL, NOT_NULL
+    EQUALS, NOT_EQUALS, IN, NOT_IN, NULL, NOT_NULL
   }
 
   public HL7Specification fieldSpec;       //  expression for the field to be checked
@@ -58,24 +58,24 @@ public class HL7FHIRResourceCondition implements ResourceCondition {
         "HL7FHIRResourceCondition (if present) cannot be null, empty or blank");
 
     //  Chop the condition up into pieces - using a non-trivial regexp
-    String regexp="([A-Z][A-Z0-9]+(?:\\.\\d+)?(?:\\(\\d\\))?(?:\\.\\d+)?(?:\\.\\d+)?)\\s+(IN|NOT_IN|EQUALS|NOT_EQUALS|IS_NULL|NOT_NULL)(?:\\s+(?:(\\w+)|\\[([\\s\\w,]+)\\])?)?";
+    String regexp="([A-Z][A-Z0-9]+(?:\\.\\d+)?(?:\\(\\d\\))?(?:\\.\\d+)?(?:\\.\\d+)?)\\s+(IN|NOT_IN|EQUALS|NOT_EQUALS|NULL|NOT_NULL)(?:\\s+(?:(\\w+)|\\[([\\s\\w,]+)\\])?)?";
     Pattern pattern = Pattern.compile(regexp);
     Matcher matcher = pattern.matcher(condition);
 
     // Make sure the expression matched
     if(! matcher.matches())
-      throw new IllegalArgumentException(String.format("Can't parse %s - regexp 'fieldSpec EQUALS|NOT_EQUALS|IN|NOT_IN values' doesn't match", condition));
+      throw new IllegalArgumentException(String.format("Can't parse %s - regexp 'fieldSpec EQUALS|NOT_EQUALS|IN|NOT_IN|NULL|NOT_NULL values' doesn't match", condition));
 
     // populate our fields
     this.fieldSpec = (HL7Specification) SpecificationParser.parse(matcher.group(1), false, false);
     op = Operator.valueOf(matcher.group(2));
 
-    // group(3) and group(4) are both null for IS_NULL and NOT_NULL
+    // group(3) and group(4) are both null for NULL and NOT_NULL
     if(matcher.group(3) == null && matcher.group(4) == null) {
 
-      // Only on IS_NULL and NOT_NULL
-      if(! op.equals(Operator.IS_NULL) && ! op.equals(Operator.NOT_NULL))
-        throw new IllegalArgumentException(String.format("Can't parse %s - non-value only applies to IS_NULL and NOT_NULL", condition));
+      // Only on NULL and NOT_NULL
+      if(! op.equals(Operator.NULL) && ! op.equals(Operator.NOT_NULL))
+        throw new IllegalArgumentException(String.format("Can't parse %s - non-value only applies to NULL and NOT_NULL", condition));
 
       // ... and we're done
       return;
@@ -193,7 +193,7 @@ public class HL7FHIRResourceCondition implements ResourceCondition {
       case NOT_NULL:
         return candidateVal != null;
 
-      case IS_NULL:
+      case NULL:
         return candidateVal == null;
 
       default:
