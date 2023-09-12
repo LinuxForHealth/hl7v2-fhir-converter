@@ -1,0 +1,93 @@
+#
+# (C) Te Whatu Ora, Health New Zealand, 2023
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+# FHIR Resources to extract from (pretend) ADT_A11 message
+#
+
+########################################################################
+# Used for testing only. Not used in production.
+########################################################################
+
+---
+resources:
+    - resourceName: MessageHeader
+      segment: MSH
+      resourcePath: resource/MessageHeader
+      repeats: false
+      isReferenced: false
+      additionalSegments: 
+        - EVN
+   
+    - resourceName: Patient
+      segment: PID
+      resourcePath: resource/Patient
+      repeats: false
+      isReferenced: true
+      additionalSegments:
+        - PD1
+        - MSH
+
+    - resourceName: Encounter
+      segment: PV1
+      resourcePath: resource/Encounter
+      repeats: false
+      isReferenced: true
+      additionalSegments:
+        - PV2
+        - EVN
+        - MSH
+        - DG1
+
+    - resourceName: AllergyIntolerance
+      segment: AL1
+      resourcePath: resource/AllergyIntolerance
+      repeats: true
+      additionalSegments:
+        - MSH
+
+    # SEGMENT - based condition
+    - resourceName: AllergyIntolerance
+      segment: ZSG
+      resourcePath: resource/AllergyIntolerance   ## The AllergyIntolerance will be badly filled in
+      condition: ZSG EQUALS L2
+      repeats: true
+      additionalSegments:
+        - MSH
+
+    # FIELD - based condition
+    - resourceName: AllergyIntolerance
+      segment: ZFD
+      resourcePath: resource/AllergyIntolerance  ## The AllergyIntolerance will be badly filled in
+      condition: ZFD.2 EQUALS L2
+      repeats: true
+      additionalSegments:
+        - MSH
+
+    # COMPONENT based condition
+    - resourceName: AllergyIntolerance
+      segment: ZCP
+      resourcePath: resource/AllergyIntolerance  ## The AllergyIntolerance will be badly filled in
+      condition: ZCP.2.1 IN [A3, A4, H1, H3]
+      repeats: true
+      additionalSegments:
+        - MSH
+
+    # COMPONENT based condition (repetition)
+    - resourceName: AllergyIntolerance
+      segment: ZCR
+      resourcePath: resource/AllergyIntolerance  ## The AllergyIntolerance will be badly filled in
+      condition: ZCR.2(1).1 IN [A3, A4, H1, H3]
+      repeats: true
+      additionalSegments:
+        - MSH
+
+    # SUB COMPONENT based condition
+    - resourceName: AllergyIntolerance
+      segment: ZSC
+      resourcePath: resource/AllergyIntolerance  ## The AllergyIntolerance will be badly filled in
+      condition: ZSC.2.1.2 IN [A3, A4, H1, H3]
+      repeats: true
+      additionalSegments:
+        - MSH

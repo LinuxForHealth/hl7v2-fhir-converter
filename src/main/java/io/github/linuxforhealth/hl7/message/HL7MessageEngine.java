@@ -34,6 +34,7 @@ import io.github.linuxforhealth.api.EvaluationResult;
 import io.github.linuxforhealth.api.FHIRResourceTemplate;
 import io.github.linuxforhealth.api.InputDataExtractor;
 import io.github.linuxforhealth.api.MessageEngine;
+import io.github.linuxforhealth.api.ResourceCondition;
 import io.github.linuxforhealth.api.ResourceModel;
 import io.github.linuxforhealth.api.ResourceValue;
 import io.github.linuxforhealth.core.Constants;
@@ -191,7 +192,7 @@ public class HL7MessageEngine implements MessageEngine {
         if (!multipleSegments.isEmpty()) {
 
             resourceResults = generateMultipleResources(hl7DataInput, resourceModel, contextValues,
-                    multipleSegments, template.isGenerateMultiple(), template.ignoreEmpty());
+                    multipleSegments, template.isGenerateMultiple(), template.ignoreEmpty(), template.condition());
         }
         return resourceResults;
     }
@@ -286,7 +287,8 @@ public class HL7MessageEngine implements MessageEngine {
 
     private static List<ResourceResult> generateMultipleResources(final HL7MessageData hl7DataInput,
             final ResourceModel rs, final Map<String, EvaluationResult> contextValues,
-            final List<SegmentGroup> multipleSegments, boolean generateMultiple, boolean ignoreEmpty) {
+            final List<SegmentGroup> multipleSegments, boolean generateMultiple, boolean ignoreEmpty, 
+                  ResourceCondition condition) {
         List<ResourceResult> resourceResults = new ArrayList<>();
         for (SegmentGroup currentGroup : multipleSegments) {
 
@@ -302,20 +304,25 @@ public class HL7MessageEngine implements MessageEngine {
 
             for (EvaluationResult baseValue : baseValues) {
                 try {
-                    // We might need to check if the baseValue is empty
+                    // We need to check if the baseValue is empty
                     Visitable vs = baseValue.getValue();
                     if((vs != null && ! vs.isEmpty()) || ! ignoreEmpty) {
 
-                        // baseValue is either not empty or we're not allowed to ignore empty segments
-                        ResourceResult result = rs.evaluate(hl7DataInput, ImmutableMap.copyOf(localContextValues),
-                                baseValue);
+                        // Ok the baseValue is either not empty or we're not allowed to ignore empty segments
+                        //   (We can't rely on empty segment giving us an empty resource; as common templates populate Resource.meta fields)
 
-                        // We can't rely on empty segment giving us an empty resource; as common templates populate Resource.meta fields
-                        if (result != null && result.getValue() != null) {
-                            resourceResults.add(result);
-                            if (!generateMultiple) {
-                                // If only single resource needs to be generated then return.
-                                return resourceResults;
+                        // If we have a condition then make sure it is satisfied before we translate this baseValue into a Resource
+                        if (condition == null || condition.isConditionSatisfied(hl7DataInput, baseValue)) {
+
+                            ResourceResult result = rs.evaluate(hl7DataInput, ImmutableMap.copyOf(localContextValues),
+                                    baseValue);
+
+                            if (result != null && result.getValue() != null) {
+                                resourceResults.add(result);
+                                if (!generateMultiple) {
+                                    // If only single resource needs to be generated then return.
+                                    return resourceResults;
+                                }
                             }
                         }
                     }
