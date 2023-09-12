@@ -120,7 +120,7 @@ The rules for determining a time zone for a date time value are:
 
 Hints about the ways syntax and references work in the YAML files
 
-### Condition test variables, not templates
+### Condition test variables, not segment fields
 
 Testing the segment fields directly in conditions doesn't work. Instead you must create a var for the template field and test the var.
 
@@ -261,3 +261,66 @@ fundingSource:
         expressionType: resource
         specs: OBX.5
 ```
+
+## Conditional Templates
+
+Sometimes, when dealing with custom HL7 segments the correct FHIR resource for the segment differs
+depending upon some value in the segment. For example, in our ZAL custom Alert segment field `ZAL.2.1` denotes the Alert Category,
+and when the value is one of `A1`, `A3`, `H2` or `H4` then the correct FHIR resource is `AllergyIntolerance`;  for all other 
+alert category values the correct FHIR resource is `Flag`
+
+Two resources template entries with suitable `condition` expressions will direct each `ZAL` segment to its correct resource template.
+
+```yml
+resources:
+    - resourceName: AllergyIntolerance
+      segment: ZAL
+      resourcePath: resource/AllergyIntoleranceZAL
+      repeats: true
+      condition: ZAL.2.1 IN [A1, A3, H2, H4]          ## Some of our custom ZAL segments are AllergyIntolerance
+      additionalSegments:
+
+    - resourceName: Flag
+      segment: ZAL
+      resourcePath: resource/FlagZAL
+      repeats: true
+      condition: ZAL.2.1 NOT_IN [A1, A3, H2, H4]      ## The rest of our custom ZAL segments are more general alert Flags
+      additionalSegments:
+
+```
+The grammar for the condition field is as follows:
+
+```
+   <hl7spec>  EQUALS | NOT_EQUALS | IN | NOT_IN | NULL | NOT_NULL   <value> | [ ... ]
+```
+**Notes:**
+  * hl7spec uses the same dot notation as expression syntax inside templates and can be of the folowing forms:
+    - SEGMENT
+    - SEGMENT.FIELD
+    - SEGMENT.FIELD.COMPONENT
+    - SEGMENT.FIELD.COMPONENT.SUBCOMPONENT
+    - SEGMENT.FIELD(REPETITION)
+    - SEGMENT.FIELD(REPETITION).COMPONENT
+    - SEGMENT.FIELD(REPETITION).COMPONENT.SUBCOMPONENT
+  
+    `ZAL`, `ZAL.2`,  `ZAL.2.1`,  `ZAL.2.1.2`, `PID.14(1).2` & `PID.14(1).2.1` are all valid values for hl7spec.
+  
+  * The SEGMENT part of hl7spec **MUST** match the value of the `segment` field.
+
+  * EQUALS and NOT_EQUALS expressions only accept a single value on the right-hand side of the expression.
+  
+  * IN and NOT_IN expressions only accept a list of values, delimited by comma, in square brackets on the right-hand side of the expression.
+  
+  * NULL and NOT_NULL do not accept any value.
+
+  * The condition expression cannot be much more complex, as there are no context variables available at evaluation time.
+
+**Examples**:
+  *  `PID.5.1.2 EQUALS van`
+  *  `ZAL.2.1.3 NOT_NULL`
+  *  `ZAL.2(1).1 NULL`
+  *  `ZAL.3.1 IN [A3, A4, H1, H3, FA, DA]`
+  *  `ZAL.3.1 NOT_IN [A2, F3, DA]`
+  *  `ZAL.2 EQUALS A4`
+  *  `ZAL NOT_EQUALS H2`
+  
