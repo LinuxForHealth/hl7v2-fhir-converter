@@ -74,7 +74,7 @@ repositories {
     mavenCentral()  
     maven {
         url 'https://pkgs.dev.azure.com/MDHB/bde66c03-6853-427d-add5-c1d0f7862346/_packaging/LinuxForHealthHL7Converter/maven/v1'
-        name 'LinuxForHealthHL7Converter'
+        name 'mdhb-l4h'
         authentication {
             basic(BasicAuthentication)
         }
@@ -113,7 +113,7 @@ publishing {
   repositories {
     maven {
         url 'https://pkgs.dev.azure.com/MDHB/bde66c03-6853-427d-add5-c1d0f7862346/_packaging/LinuxForHealthHL7Converter/maven/v1'
-        name 'LinuxForHealthHL7Converter'
+        name 'mdhb-l4h'
         authentication {
             basic(BasicAuthentication)
         }

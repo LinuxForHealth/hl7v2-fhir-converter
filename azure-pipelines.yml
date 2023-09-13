@@ -10,24 +10,38 @@ trigger:
 pool:
   vmImage: ubuntu-latest
 
-steps:
-- task: MavenAuthenticate@0
-  displayName: 'Authenticate Maven to artifact feed'
-  inputs:
-    artifactsFeeds: 'mdhb'
+stages:
+    
+ - stage: BuildGradle
+   displayName: Build the Gradle project Hl7-fhir-converter IntegrationWorks fork
+   jobs:
+   - job: Build_JAR
+     displayName: Build JAR to be deployed to Azure Artifact Feed
+     steps:
+         
+     - task: DownloadSecureFile@1
+       name: mvnSettings
+       displayName: 'Download Maven settings'
+       inputs:
+         secureFile: 'settings.xml'
 
-- task: Gradle@2
-  displayName: 'Gradle build and publish to artifact feed'
-  inputs:
-    workingDirectory: ''
-    gradleWrapperFile: 'gradlew'
-    gradleOptions: '-Xmx3072m'
-    javaHomeOption: 'JDKVersion'
-    jdkVersionOption: '1.11'
-    jdkArchitectureOption: 'x64'
-    publishJUnitResults: true
-    testResultsFiles: '**/TEST-*.xml'
-    options: '-x test -Pversion=1.0.21-SNAPSHOT'
-    tasks: 'publish'
+     - task: MavenAuthenticate@0
+       displayName: Maven Authenticate Artifacts
+       inputs:
+         artifactsFeeds: 'mdhb'
+
+     - task: Gradle@2
+       displayName: 'Gradle build and publish to artifact feed'
+       inputs:
+         workingDirectory: ''
+         gradleWrapperFile: 'gradlew'
+         gradleOptions: '-Xmx3072m'
+         javaHomeOption: 'JDKVersion'
+         jdkVersionOption: '1.11'
+         jdkArchitectureOption: 'x64'
+         publishJUnitResults: true
+         testResultsFiles: '**/TEST-*.xml'
+         options: '-x test -Pversion=1.0.21-SNAPSHOT --settings-file $(mvnSettings.secureFilePath)'
+         tasks: 'publish'
 
 
