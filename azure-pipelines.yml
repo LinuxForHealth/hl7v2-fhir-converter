@@ -28,7 +28,7 @@ stages:
      - task: MavenAuthenticate@0
        displayName: Maven Authenticate Artifacts
        inputs:
-         artifactsFeeds: 'mdhb'
+         artifactsFeeds: 'LinuxForHealthHL7Converter'
 
      - task: Gradle@2
        displayName: 'Gradle build and publish to artifact feed'
@@ -41,7 +41,7 @@ stages:
          jdkArchitectureOption: 'x64'
          publishJUnitResults: true
          testResultsFiles: '**/TEST-*.xml'
-         options: '-x test -Pversion=1.0.21-SNAPSHOT --settings-file $(mvnSettings.secureFilePath)'
+         options: '-x test -Pversion=1.0.21-SNAPSHOT -PmvnUserSettingsFile=$(mvnSettings.secureFilePath)'
          tasks: 'publish'
 
 
