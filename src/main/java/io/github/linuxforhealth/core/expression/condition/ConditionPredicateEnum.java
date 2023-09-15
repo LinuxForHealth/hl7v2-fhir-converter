@@ -60,8 +60,11 @@ public enum ConditionPredicateEnum {
       String klassSimpleName) {
     // Append the predicate if not already present 
     // Some classes need a string predicate     
-    String klassAdjustedName = klassSimpleName.equalsIgnoreCase("ST") || klassSimpleName.equalsIgnoreCase("IS") || klassSimpleName.equalsIgnoreCase("NULLDT") ? "STRING" : klassSimpleName.toUpperCase();
-    String enumName = conditionOperator.endsWith(klassAdjustedName) ? conditionOperator : conditionOperator + "_" + klassSimpleName;
+    //   - Fields, Components & SubComponents from custom segments are in Varies or GenericPrimitive objects and are assumed to be STRING values
+    String klassAdjustedName = klassSimpleName.equals("Varies") || klassSimpleName.equals("GenericPrimitive") ||  klassSimpleName.equalsIgnoreCase("ST") || klassSimpleName.equalsIgnoreCase("IS") || klassSimpleName.equalsIgnoreCase("NULLDT") ? "STRING" : klassSimpleName.toUpperCase();
+
+    // Gotta be using the adjusted name - or what's the point of the adjustment?
+    String enumName = conditionOperator.endsWith(klassAdjustedName) ? conditionOperator : conditionOperator + "_" + klassAdjustedName;
     return EnumUtils.getEnumIgnoreCase(ConditionPredicateEnum.class, enumName);
 
   }

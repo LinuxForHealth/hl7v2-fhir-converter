@@ -32,11 +32,21 @@ public class SimpleBiCondition implements Condition {
   @Override
   public boolean test(Map<String, EvaluationResult> contextVariables) {
     Object var1Value = null;
+    String var1Type = null;
     EvaluationResult variable1;
     if (VariableUtils.isVar(var1)) {
       variable1 = contextVariables.get(VariableUtils.getVarName(var1));
+
+      if(VariableUtils.getVarName(var1).equals("zal21"))
+        System.out.println("Hello Stuey zal21");
+
       if (variable1 != null && !variable1.isEmpty()) {
         var1Value = variable1.getValue();
+
+        // generic variables (derived from fields,components & subComponents in custom segments) will have UNKNOWN type;
+        var1Type = variable1.getIdentifier();
+        if(var1Type.equals("UNKNOWN") && var1Value != null)
+            var1Type = var1Value.getClass().getSimpleName();
       }
     } else {
       throw new IllegalArgumentException("First value should be a variable");
@@ -49,12 +59,16 @@ public class SimpleBiCondition implements Condition {
       // Some classes have string values, but are not strings and must be converted first.
       if (var1Value.getClass().getTypeName().equalsIgnoreCase("ca.uhn.hl7v2.model.v26.datatype.ST")
       || var1Value.getClass().getTypeName().equalsIgnoreCase("ca.uhn.hl7v2.model.v26.datatype.IS")
-      || var1Value.getClass().getTypeName().equalsIgnoreCase("ca.uhn.hl7v2.model.v26.datatype.NULLDT")){
+      || var1Value.getClass().getTypeName().equalsIgnoreCase("ca.uhn.hl7v2.model.v26.datatype.NULLDT")
+
+      // When we get data back from CustomSegment fields,components or subComponents ...
+      || var1Value instanceof ca.uhn.hl7v2.model.Varies
+      || var1Value instanceof ca.uhn.hl7v2.model.GenericPrimitive) {
         var1Value = Hl7DataHandlerUtil.getStringValue(var1Value);
       }
     
       ConditionPredicateEnum condEnum = ConditionPredicateEnum
-          .getConditionPredicate(this.conditionOperator, variable1.getIdentifier());
+          .getConditionPredicate(this.conditionOperator, var1Type);
       if (condEnum != null) {
         // if var2 is a string and must be converted to an integer to test
         if (var2Value.getClass().getTypeName().equalsIgnoreCase("java.lang.String") 
@@ -100,6 +114,16 @@ public class SimpleBiCondition implements Condition {
     return conditionOperator;
   }
 
+  @Override
+  public String toString() {
+     java.io.StringWriter sw = new java.io.StringWriter();
+     sw.write(var1.toString());
+     sw.write(" ");
+     sw.write(conditionOperator);
+     sw.write(" ");
+     sw.write(var2.toString());
 
+     return sw.toString();
+  }
 
 }
