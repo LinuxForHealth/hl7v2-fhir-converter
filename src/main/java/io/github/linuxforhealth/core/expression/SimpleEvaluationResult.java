@@ -57,6 +57,7 @@ public class SimpleEvaluationResult<V> implements EvaluationResult {
     Preconditions.checkArgument(additionalResources != null, "additionalResources cannot be null");
     this.value = value;
 
+
     this.klass = value.getClass();
     this.klassName = DataTypeUtil.getDataType(value);
     this.additionalResources = new ArrayList<>();
