@@ -59,7 +59,7 @@ resources:
     # FIELD - based condition
     - resourceName: AllergyIntolerance
       segment: ZFD
-      resourcePath: resource/AllergyIntolerance  ## The AllergyIntolerance will be badly filled in
+      resourcePath: resource/AllergyIntoleranceZFD  ## The AllergyIntolerance will be badly filled in
       condition: ZFD.2 EQUALS L2
       repeats: true
       additionalSegments:
@@ -68,7 +68,7 @@ resources:
     # COMPONENT based condition
     - resourceName: AllergyIntolerance
       segment: ZCP
-      resourcePath: resource/AllergyIntolerance  ## The AllergyIntolerance will be badly filled in
+      resourcePath: resource/AllergyIntoleranceZCP  ## The AllergyIntolerance will be badly filled in
       condition: ZCP.2.1 IN [A3, A4, H1, H3]
       repeats: true
       additionalSegments:
@@ -77,7 +77,7 @@ resources:
     # COMPONENT based condition (repetition)
     - resourceName: AllergyIntolerance
       segment: ZCR
-      resourcePath: resource/AllergyIntolerance  ## The AllergyIntolerance will be badly filled in
+      resourcePath: resource/AllergyIntoleranceZCP  ## The AllergyIntolerance will be badly filled in
       condition: ZCR.2(1).1 IN [A3, A4, H1, H3]
       repeats: true
       additionalSegments:
@@ -86,7 +86,7 @@ resources:
     # SUB COMPONENT based condition
     - resourceName: AllergyIntolerance
       segment: ZSC
-      resourcePath: resource/AllergyIntolerance  ## The AllergyIntolerance will be badly filled in
+      resourcePath: resource/AllergyIntoleranceZSC  ## The AllergyIntolerance will be badly filled in
       condition: ZSC.2.1.2 IN [A3, A4, H1, H3]
       repeats: true
       additionalSegments:

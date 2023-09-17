@@ -150,6 +150,30 @@ telecom_1:
        use: "work"
 ```
 
+**Note**: You can now test fields, components and sub-components
+from custom segments (Segments beginning with `Z`):
+
+```yml
+type_1:
+  condition: $zsc322 EQUALS H1 || $zsc322 EQUALS H2
+  generateList: false
+  expressionType: HL7Spec
+  valueOf: $code
+  vars:
+     zsc322: ZSC.3.2.2
+  constants:
+     code: allergy
+
+type_2:
+  condition: $zsc322 NOT_EQUALS H1 && $zsc322 NOT_EQUALS H2
+  generateList: false
+  expressionType: HL7Spec
+  valueOf: $code
+  vars:
+     zsc322: ZSC.3.2.2
+  constants:
+     code: intolerance
+```
 ### Referencing resources
 
 Resources are referenced (linked) in one of two ways:
@@ -323,4 +347,3 @@ The grammar for the condition field is as follows:
   *  `ZAL.3.1 NOT_IN [A2, F3, DA]`
   *  `ZAL.2 EQUALS A4`
   *  `ZAL NOT_EQUALS H2`
-  
