@@ -1,0 +1,48 @@
+#
+# (c) Te Whatu Ora, Health New Zealand, 2023
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+## pretend AllergyIntolerance from ZCP custom segment
+##   - actually for testing use of custom segment COMPONENT in conditions.
+---
+resourceType: AllergyIntolerance
+
+type_1:
+  condition: $zsc322 EQUALS H1 || $zsc322 EQUALS H2
+  generateList: false
+  expressionType: HL7Spec
+  valueOf: $code
+  vars:
+     zsc322: ZSC.3.2.2
+  constants:
+     code: allergy
+
+type_2:
+  condition: $zsc322 NOT_EQUALS H1 && $zsc322 NOT_EQUALS H2
+  generateList: false
+  expressionType: HL7Spec
+  valueOf: $code
+  vars:
+     zsc322: ZSC.3.2.2
+  constants:
+     code: intolerance
+
+clinicalStatus:
+  valueOf: datatype/CodeableConcept_var
+  generateList: true
+  expressionType: resource
+  constants:
+    system: "http://terminology.hl7.org/CodeSystem/allergyintolerance-clinical"
+    code: "activeXXX"
+    display: "Active"
+
+verificationStatus:
+  valueOf: datatype/CodeableConcept_var
+  generateList: true
+  expressionType: resource
+  constants:
+    system: "http://terminology.hl7.org/CodeSystem/allergyintolerance-verification"
+    code: "confirmed"
+    display: "Confirmed"
+

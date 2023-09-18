@@ -10,6 +10,7 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.common.base.Preconditions;
+import io.github.linuxforhealth.api.ResourceCondition;
 import io.github.linuxforhealth.api.ResourceModel;
 import io.github.linuxforhealth.hl7.resource.ResourceReader;
 
@@ -21,6 +22,8 @@ public class HL7FHIRResourceTemplateAttributes {
   private String resourcePath;
   private boolean isReferenced;
   private boolean ignoreEmpty;
+  private ResourceCondition condition;
+  private String conditionExpression;
   private HL7Segment segment;// primary segment
   private List<HL7Segment> additionalSegments;
   private ResourceModel resource;
@@ -36,6 +39,8 @@ public class HL7FHIRResourceTemplateAttributes {
     this.repeats = builder.repeats;
     this.isReferenced = builder.isReferenced;
     this.ignoreEmpty = builder.ignoreEmpty;
+    this.condition = builder.condition;
+    this.conditionExpression = builder.conditionExpression;
     additionalSegments = new ArrayList<>();
     builder.rawAdditionalSegments
         .forEach(e -> additionalSegments.add(HL7Segment.parse(e, builder.group)));
@@ -90,6 +95,14 @@ public class HL7FHIRResourceTemplateAttributes {
     return ignoreEmpty;
   }
 
+  public ResourceCondition condition() {
+    return condition;
+  }
+
+  public String conditionExpression() {
+      return conditionExpression;
+  }
+
   private static ResourceModel generateResourceModel(String resourcePath) {
     return ResourceReader.getInstance().generateResourceModel(resourcePath);
   }
@@ -106,6 +119,8 @@ public class HL7FHIRResourceTemplateAttributes {
     private String group;
     private boolean isReferenced;
     private boolean ignoreEmpty;
+    private ResourceCondition condition;
+    private String conditionExpression;
     private boolean repeats;
     private ResourceModel resourceModel;
 
@@ -162,6 +177,12 @@ public class HL7FHIRResourceTemplateAttributes {
 
     public Builder withignoreEmpty(boolean ignoreEmpty) {
       this.ignoreEmpty = ignoreEmpty;
+      return this;
+    }
+
+    public Builder withCondition(String conditionExpr) {
+      this.conditionExpression = conditionExpr;
+      this.condition = new HL7FHIRResourceCondition(conditionExpr);
       return this;
     }
 

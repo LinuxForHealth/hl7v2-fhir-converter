@@ -15,6 +15,7 @@ A HL7 message template maps one or more HL7 segments to a FHIR resource using th
       repeats:  [DEFAULT false]
       isReferenced: [DEFAULT false]
       ignoreEmpty: [DEFAULT false]
+      condition: [DEFAULT empty]
       additionalSegments: [DEFAULT empty]
 ```
 
@@ -26,6 +27,7 @@ A HL7 message template maps one or more HL7 segments to a FHIR resource using th
 | repeats            | Default: false   | Indicates if a repeating HL7 segment will generate multiple FHIR resources.                                                                                                                          |
 | isReferenced       | Default: false   | Indicates if the FHIR Resource is referenced by other FHIR resources.                                                                                                                                |
 | ignoreEmpty        | Default: false   | Indicates if an empty HL7 segment will NOT generate the matching (almost empty) FHIR resource   |
+| condition          | Default: empty   | Indicates that the segment must satisfy the given condition for it to generate the matching FHIR resource. see [Techniques: Conditional Templates](TECHNIQUES.md#Conditional-Templates) |
 | group | Default: empty   | Base group from which the segment and additionalSegments are specified. 
 | additionalSegments | Default: empty   | List of additional HL7 segment names required to complete the FHIR resource mapping.                                                                                                                 |
 
@@ -66,6 +68,19 @@ resources:
       ignoreEmpty: true   ## Sometimes AL1 segments arrive empty
       additionalSegments:
 
+    - resourceName: AllergyIntolerance
+      segment: ZAL
+      resourcePath: resource/AllergyIntoleranceZAL
+      repeats: true
+      condition: ZAL.2.1 IN [A1, A3, H2, H4]          ## Some of our custom ZAL segments are AllergyIntolerance
+      additionalSegments:
+
+    - resourceName: Flag
+      segment: ZAL
+      resourcePath: resource/FlagZAL
+      repeats: true
+      condition: ZAL.2.1 NOT_IN [A1, A3, H2, H4]      ## The rest of our custom ZAL segments are more general alert Flags
+      additionalSegments:
 
 ```
 
@@ -262,6 +277,7 @@ The specification expression has the following format :
     - SEGMENT
     - SEGMENT.FIELD
     - SEGMENT.FIELD.COMPONENT
+    - SEGMENT.FIELD.COMPONENT.SUBCOMPONENT
     - FIELD
     - FIELD.COMPONENT
     - FIELD.COMPONENT.SUBCOMPONENT<br>
