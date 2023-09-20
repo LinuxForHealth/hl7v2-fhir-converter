@@ -28,6 +28,8 @@ import ca.uhn.hl7v2.model.v26.segment.OBX;
 import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Varies;
 
+import com.google.common.collect.ImmutableList;
+
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -65,6 +67,9 @@ import io.github.linuxforhealth.core.terminology.SimpleCode;
 import io.github.linuxforhealth.core.terminology.TerminologyLookup;
 import io.github.linuxforhealth.core.terminology.UrlLookup;
 import io.github.linuxforhealth.hl7.data.date.DateUtil;
+
+import io.github.linuxforhealth.api.EvaluationResult;
+import io.github.linuxforhealth.core.expression.EvaluationResultFactory;
 
 public class SimpleDataValueResolver {
     private static final Logger LOGGER = LoggerFactory.getLogger(SimpleDataValueResolver.class);
@@ -606,7 +611,7 @@ public class SimpleDataValueResolver {
     public static final ValueExtractor<Object, Object> OBJECT = (Object value) -> {
         return value;
     };
-
+    
     // Special case of a SYSTEM V2.  Identifiers allow unknown codes.
     // When an unknown code is detected, return a null so that the text is displayed instead.
     // Only a known code returns a coding.
@@ -839,6 +844,18 @@ public class SimpleDataValueResolver {
             }
         }
         return null;
+    };
+
+    public static final ValueExtractor<Object, List<Object>> RELATIVE_REFERENCE_IDENTIIFER = (Object value) -> {
+
+        if(value instanceof Map<?,?>) {
+
+            //  Go looking for the "identifier"
+            List<Object> identifier = ((Map<String,List<Object>>) value).get("identifier");
+            if(identifier != null && ! identifier.isEmpty())
+                return ImmutableList.copyOf(identifier);
+        }
+        return new ArrayList<>();
     };
 
     public static final ValueExtractor<Object, String> DIAGNOSTIC_REPORT_STATUS_CODES = (Object value) -> {
