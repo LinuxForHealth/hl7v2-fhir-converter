@@ -67,7 +67,11 @@ public class SimpleVariable implements Variable {
     return name;
   }
 
-
+  @Override
+  public String toString() {
+    return name + "=" + spec.toString();   // let's improve debugging
+  }
+  
   // resolve variable value
 
   @Override

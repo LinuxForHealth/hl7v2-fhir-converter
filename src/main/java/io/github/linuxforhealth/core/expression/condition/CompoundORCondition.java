@@ -20,7 +20,7 @@ public class CompoundORCondition implements Condition {
 
   public CompoundORCondition(List<Condition> conditions) {
     Preconditions.checkArgument(conditions != null && !conditions.isEmpty(),
-        "onditions cannot be null or empty");
+        "conditions cannot be null or empty");
     this.conditions = new ArrayList<>(conditions);
   }
 
