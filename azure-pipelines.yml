@@ -41,7 +41,7 @@ stages:
          jdkArchitectureOption: 'x64'
          publishJUnitResults: true
          testResultsFiles: '**/TEST-*.xml'
-         options: '-x test -Pversion=1.0.21-SNAPSHOT -PmvnUserSettingsFile=$(mvnSettings.secureFilePath)'
+         options: '-x test -Pversion=1.0.22-SNAPSHOT -PmvnUserSettingsFile=$(mvnSettings.secureFilePath)'
          tasks: 'publish'
 
 
