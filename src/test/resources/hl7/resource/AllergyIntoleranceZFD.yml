@@ -46,3 +46,22 @@ verificationStatus:
     code: "confirmed"
     display: "Confirmed"
 
+# field ZFD-4 is absent --> LOW
+criticality_1:
+  condition: $zfd4 NULL
+  valueOf: $code
+  expressionType: HL7Spec
+  constants:
+    code: low
+  vars:
+    zfd4: ZFD.4
+
+# field ZFD-4 is present --> HIGH
+criticality_2:
+  condition: $zfd4 NOT_NULL
+  valueOf: $code
+  expressionType: HL7Spec
+  constants:
+    code: high
+  vars:
+    zfd4: ZFD.4

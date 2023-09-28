@@ -37,9 +37,6 @@ public class SimpleBiCondition implements Condition {
     if (VariableUtils.isVar(var1)) {
       variable1 = contextVariables.get(VariableUtils.getVarName(var1));
 
-      if(VariableUtils.getVarName(var1).equals("zal21"))
-        System.out.println("Hello Stuey zal21");
-
       if (variable1 != null && !variable1.isEmpty()) {
         var1Value = variable1.getValue();
 

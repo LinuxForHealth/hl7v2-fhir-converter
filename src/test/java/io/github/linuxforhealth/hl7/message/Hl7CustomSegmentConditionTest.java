@@ -89,11 +89,11 @@ class Hl7CustomSegmentConditionTest {
 
     // Custom Segment Field Condition Test ZFD
     @ParameterizedTest
-    @CsvSource({ "ADT^A11,ZFD|1|L2|H1|four\r,ALLERGY",      // ZFD.3 = H1 --> allergy
-                 "ADT^A11,ZFD|1|L2|H2|four\r,ALLERGY",      // ZFD.3 = H2 --> allergy
-                 "ADT^A11,ZFD|1|L2|H3|four\r,INTOLERANCE",  // ZFD.3 = H3 --> intolerance
-                })
-    void testCustomSegmentFieldInCondition(String messageType, String zSegment, String aiType) throws IOException {
+    @CsvSource({ "ADT^A11,ZFD|1|L2|H1|four\r,ALLERGY,HIGH",       // ZFD.3 = H1 --> allergy       ZFD.4 isNotNULL --> high
+                 "ADT^A11,ZFD|1|L2|H2|\r,ALLERGY,LOW",            // ZFD.3 = H2 --> allergy       ZFD.4 isNULL    --> low
+                 "ADT^A11,ZFD|1|L2|H3||five\r,INTOLERANCE,LOW",   // ZFD.3 = H3 --> intolerance   ZFD.4 isNULL    --> low
+    })
+    void testCustomSegmentFieldInCondition(String messageType, String zSegment, String aiType, String aiCriticality) throws IOException {
 
         // Set up the config file
         commonConfigFileSetup();
@@ -114,13 +114,18 @@ class Hl7CustomSegmentConditionTest {
         assertThat(encounterResource).hasSize(1); // from EVN, PV1
 
         List<Resource> allergyIntoleranceResources = ResourceUtils.getResourceList(e, ResourceType.AllergyIntolerance);
-        assertThat(allergyIntoleranceResources).hasSize(1)   // from ZFD segment
-            .element(0).satisfies(ai -> {
+        assertThat(allergyIntoleranceResources).hasSize(1);   // from ZFD segment
+        assertThat((AllergyIntolerance) allergyIntoleranceResources.get(0)).satisfies(ai -> {
 
                 // Make sure the type field is present & correct
-                assertThat(((AllergyIntolerance) ai).hasType()).isTrue();
-                assertThat(((AllergyIntolerance) ai).getType()).hasToString(aiType);
-            });
+                assertThat(ai.hasType()).isTrue();
+                assertThat(ai.getType()).hasToString(aiType);
+
+
+                // .. and the code field  (checking NULL / NOT_NULL)
+                assertThat(ai.hasCriticality()).isTrue();
+                assertThat(ai.getCriticality()).hasToString(aiCriticality);
+        });
 
 
 
@@ -131,11 +136,11 @@ class Hl7CustomSegmentConditionTest {
 
     // Custom Segment COMPONENT Condition Test ZCP
     @ParameterizedTest
-    @CsvSource({ "ADT^A11,ZCP|1|A3^yy|xx^H1|four\r,ALLERGY",      // ZCP.3.2 = H1 --> allergy
-                 "ADT^A11,ZCP|1|A3^yy|xx^H2|four\r,ALLERGY",      // ZCP.3.2 = H2 --> allergy
-                 "ADT^A11,ZCP|1|A3^yy|xx^H3|four\r,INTOLERANCE",  // ZCP.3.2 = H3 --> intolerance
+    @CsvSource({ "ADT^A11,ZCP|1|A3^yy|xx^H1|four\r,ALLERGY,HIGH",        // ZCP.3.2 = H1 --> allergy            ZCP.4.1 isNotNULL --> high
+                 "ADT^A11,ZCP|1|A3^yy|xx^H2|\r,ALLERGY,LOW",             // ZCP.3.2 = H2 --> allergy            ZCP.4.1 isNULL --> low
+                 "ADT^A11,ZCP|1|A3^yy|xx^H3|^four\r,INTOLERANCE,LOW",    // ZCP.3.2 = H3 --> intolerance        ZCP.4.1 isNull --> low
                 })
-    void testCustomSegmentComponentInCondition(String messageType, String zSegment, String aiType) throws IOException {
+    void testCustomSegmentComponentInCondition(String messageType, String zSegment, String aiType, String aiCriticality) throws IOException {
 
         // Set up the config file
         commonConfigFileSetup();
@@ -156,12 +161,16 @@ class Hl7CustomSegmentConditionTest {
         assertThat(encounterResource).hasSize(1); // from EVN, PV1
 
         List<Resource> allergyIntoleranceResources = ResourceUtils.getResourceList(e, ResourceType.AllergyIntolerance);
-        assertThat(allergyIntoleranceResources).hasSize(1)   // from ZFD segment
-            .element(0).satisfies(ai -> {
+        assertThat(allergyIntoleranceResources).hasSize(1);   // from ZCP segment
+        assertThat((AllergyIntolerance) allergyIntoleranceResources.get(0)).satisfies (ai ->{
 
                 // Make sure the type field is present & correct
-                assertThat(((AllergyIntolerance) ai).hasType()).isTrue();
-                assertThat(((AllergyIntolerance) ai).getType()).hasToString(aiType);
+                assertThat( ai.hasType()).isTrue();
+                assertThat( ai.getType()).hasToString(aiType);
+
+                // .. and the code field  (checking NULL / NOT_NULL)
+                assertThat(ai.hasCriticality()).isTrue();
+                assertThat(ai.getCriticality()).hasToString(aiCriticality);
             });
 
 

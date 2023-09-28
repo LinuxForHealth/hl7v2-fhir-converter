@@ -46,3 +46,22 @@ verificationStatus:
     code: "confirmed"
     display: "Confirmed"
 
+# field ZCP-4.1 is absent --> LOW
+criticality_1:
+  condition: $zcp41 NULL
+  valueOf: $code
+  expressionType: HL7Spec
+  constants:
+    code: low
+  vars:
+    zcp41: ZCP.4.1
+
+# field ZCP-4.1 is present --> HIGH
+criticality_2:
+  condition: $zcp41 NOT_NULL
+  valueOf: $code
+  expressionType: HL7Spec
+  constants:
+    code: high
+  vars:
+    zcp41: ZCP.4.1
