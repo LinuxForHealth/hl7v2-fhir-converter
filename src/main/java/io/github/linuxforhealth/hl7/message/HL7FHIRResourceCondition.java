@@ -30,7 +30,7 @@ import org.slf4j.LoggerFactory;
 /**
   * Allows us to conditionally apply a ResourceTemplate depending upon particular values being present in the HL7 message.
   * 
-  *   <expression>  EQUALS | NOT_EQUALS | IN | NOT_IN | NULL | NOT_NULL   value | [ ... ]
+  *   expression  EQUALS | NOT_EQUALS | IN | NOT_IN | NULL | NOT_NULL   value | [ ... ]
   *
   *   eg:  ZSC.2.1.3 NOT_NULL
   *        ZCR.2(1).1 NULL
@@ -49,7 +49,7 @@ public class HL7FHIRResourceCondition implements ResourceCondition {
 
   public HL7Specification fieldSpec;       //  expression for the field to be checked
   public Operator op;                      //  Which comparison?
-  public ArrayList<String> values = new ArrayList<String>();
+  public ArrayList<String> values = new ArrayList<>();
 
   private static final Logger LOGGER = LoggerFactory.getLogger(HL7FHIRResourceCondition.class);
 

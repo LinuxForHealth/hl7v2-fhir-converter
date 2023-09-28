@@ -16,6 +16,7 @@ public interface ResourceCondition {
     /**
      * Evaluates the condition against the HL7 Message
      * 
+     * @param ide input data extractor
      * @param context {@link EvaluationResult} representing the HL7 Segment being evaluated
      * @return true if condition is satisfied by the HL7 Segment being evaluated, otherwise returns false;
      */
