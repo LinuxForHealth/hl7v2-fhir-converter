@@ -611,18 +611,6 @@ public class SimpleDataValueResolver {
 
     public static final ValueExtractor<Object, Object> OBJECT = (Object value) -> {
         return value;
-    };
-    
-    public static final ValueExtractor<Object, String> CONTACT_POINT_SYSTEM_FHIR = (Object value) -> {
-        String val = Hl7DataHandlerUtil.getStringValue(value);
-        String code = getFHIRCode(val, ContactPointSystem.class);
-        if (code != null) {
-            return code;
-        } else if (val == null) {
-            return null;
-        } else {
-            return ContactPointSystem.OTHER.toCode();
-        }
     }; 
 
     // Special case of a SYSTEM V2.  Identifiers allow unknown codes.
