@@ -55,6 +55,7 @@ import org.hl7.fhir.r4.model.codesystems.DiagnosisRole;
 import org.hl7.fhir.r4.model.codesystems.ConditionClinical;
 import org.hl7.fhir.r4.model.codesystems.ConditionVerStatus;
 import org.hl7.fhir.r4.model.codesystems.CompositionStatus;
+import org.hl7.fhir.r4.model.codesystems.ContactPointSystem;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -598,6 +599,18 @@ public class SimpleDataValueResolver {
         return value;
     };
     
+    public static final ValueExtractor<Object, String> CONTACT_POINT_SYSTEM_FHIR = (Object value) -> {
+        String val = Hl7DataHandlerUtil.getStringValue(value);
+        String code = getFHIRCode(val, ContactPointSystem.class);
+        if (code != null) {
+            return code;
+        } else if (val == null) {
+            return null;
+        } else {
+            return ContactPointSystem.OTHER.toCode();
+        }
+    }; 
+
     // Special case of a SYSTEM V2.  Identifiers allow unknown codes.
     // When an unknown code is detected, return a null so that the text is displayed instead.
     // Only a known code returns a coding.
@@ -823,8 +836,13 @@ public class SimpleDataValueResolver {
             mapValue = rv.getResource();
         }
         if (mapValue != null) {
-            String type = Hl7DataHandlerUtil.getStringValue(mapValue.get("resourceType"));
             String refId = Hl7DataHandlerUtil.getStringValue(mapValue.get("id"));
+            // If they've put a URN into the refId then just use it as is.
+            if(refId.startsWith("urn:"))
+                return refId;
+
+            // Otherwise, assemble resourceType/refId
+            String type = Hl7DataHandlerUtil.getStringValue(mapValue.get("resourceType"));
             if (StringUtils.isNotBlank(type) && StringUtils.isNotBlank(refId)) {
                 return type + "/" + refId;
             }
