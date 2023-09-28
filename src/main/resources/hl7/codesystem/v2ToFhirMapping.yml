@@ -33,6 +33,12 @@ ServiceRequestStatus:
    IP: active
    SC: active
       
+ContactPointSystem:
+  PH: phone
+  FX: fax
+  CP: sms
+  BP: pager
+
 AdministrativeGender:
    A: other
    F: female
