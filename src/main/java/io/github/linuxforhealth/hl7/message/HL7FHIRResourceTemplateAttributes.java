@@ -175,7 +175,7 @@ public class HL7FHIRResourceTemplateAttributes {
       return this;
     }
 
-    public Builder withignoreEmpty(boolean ignoreEmpty) {
+    public Builder withIgnoreEmpty(boolean ignoreEmpty) {
       this.ignoreEmpty = ignoreEmpty;
       return this;
     }
