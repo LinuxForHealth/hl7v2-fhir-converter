@@ -32,7 +32,6 @@ ServiceRequestStatus:
    HD: on-hold
    IP: active
    SC: active
-
 ContactPointSystem:
   PH: phone
   FX: fax
