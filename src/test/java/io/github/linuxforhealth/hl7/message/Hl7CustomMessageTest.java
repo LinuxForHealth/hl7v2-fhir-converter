@@ -17,8 +17,10 @@ import java.util.Properties;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
+import org.hl7.fhir.r4.model.Patient;
 import org.hl7.fhir.r4.model.Resource;
 import org.hl7.fhir.r4.model.ResourceType;
+import org.hl7.fhir.r4.model.codesystems.AdministrativeGender;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -96,6 +98,10 @@ class Hl7CustomMessageTest {
         // Check for the expected resources 1 patient, 2 conditions, 2 allergies
         List<Resource> patientResource = ResourceUtils.getResourceList(e, ResourceType.Patient);
         assertThat(patientResource).hasSize(1); // From PID
+        Patient patient = (Patient) patientResource.get(0);
+        assertThat(patient.getGenderElement().getExtension()).hasSize(1);
+        assertThat(patient.getGenderElement().getExtension().get(0).getUrl()).isEqualTo("gender-extension");
+        assertThat(patient.getGender().getDisplay()).isEqualTo(AdministrativeGender.MALE.getDisplay());
 
         List<Resource> conditionResource = ResourceUtils.getResourceList(e, ResourceType.Condition);
         assertThat(conditionResource).hasSize(2); // From 2x PRB
