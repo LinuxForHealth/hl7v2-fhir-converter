@@ -20,7 +20,7 @@ resources:
    
     - resourceName: Patient
       segment: PID
-      resourcePath: resource/Patient
+      resourcePath: resource/CustomPatient
       repeats: false
       isReferenced: true
       additionalSegments:
