@@ -122,9 +122,12 @@ public class ExpressionUtility {
     }
 
     private static String getKeyName(String key, String suffix) {
+        boolean hasLeadingUnderscore = StringUtils.startsWith(key, "_");
         String[] keyComponents = StringUtils.split(key, "_", 2);
         if (keyComponents.length == 2 && KEY_NAME_SUFFIX.equalsIgnoreCase(keyComponents[1])) {
             return keyComponents[0] + suffix;
+        } else if(hasLeadingUnderscore) {
+            return "_" + keyComponents[0];
         } else {
             return keyComponents[0];
         }
