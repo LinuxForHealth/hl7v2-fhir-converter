@@ -38,5 +38,8 @@ public class SimpleResourceValue implements ResourceValue {
    return (resource==null || resource.isEmpty());
   }
 
-
+  @Override
+  public String toString() {
+    return resourceClass + " " + resource.toString();
+  }
 }
