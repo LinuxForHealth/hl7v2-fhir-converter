@@ -4,6 +4,13 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 
+# Set the resource profile (if we have it)
+profile:
+  condition: $RESOURCE_PROFILE NOT_NULL
+  generateList: true
+  type: STRING
+  valueOf: $RESOURCE_PROFILE
+
 extension_1:
   generateList: true
   valueOf: extension/Extension
