@@ -28,7 +28,7 @@ public class HL7FHIRResourceTemplateAttributes {
   private List<HL7Segment> additionalSegments;
   private ResourceModel resource;
   private List<String> group;
-
+  private String resourceProfile;
 
   public HL7FHIRResourceTemplateAttributes(Builder builder) {
     Preconditions.checkArgument(StringUtils.isNotBlank(builder.resourceName),
@@ -53,6 +53,7 @@ public class HL7FHIRResourceTemplateAttributes {
     }
     Preconditions.checkArgument(this.resource != null, "Resource model cannot be null");
     this.group = HL7Segment.parseGroup(builder.group);
+    this.resourceProfile = builder.resourceProfile;
   }
 
 
@@ -103,11 +104,14 @@ public class HL7FHIRResourceTemplateAttributes {
       return conditionExpression;
   }
 
+  public String resourceProfile() {
+    return resourceProfile;
+  }
+
   private static ResourceModel generateResourceModel(String resourcePath) {
     return ResourceReader.getInstance().generateResourceModel(resourcePath);
   }
-
-
+  
 
   public static class Builder {
 
@@ -123,6 +127,7 @@ public class HL7FHIRResourceTemplateAttributes {
     private String conditionExpression;
     private boolean repeats;
     private ResourceModel resourceModel;
+    private String resourceProfile;
 
     public Builder() {
       this.rawAdditionalSegments = new ArrayList<>();
@@ -188,6 +193,11 @@ public class HL7FHIRResourceTemplateAttributes {
 
     public Builder withResourceModel(ResourceModel resourceModel) {
       this.resourceModel = resourceModel;
+      return this;
+    }
+
+    public Builder withResourceProfile(String profile) {
+      this.resourceProfile = profile;
       return this;
     }
 

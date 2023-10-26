@@ -62,4 +62,10 @@ public interface FHIRResourceTemplate {
   * @return Simple condition expression which must be True for the template to be applied;  e.g.  ZAL.1 IN [A3, A4, H1, H3]
   */
   String conditionExpression();
+
+  /**
+   * 
+   * @return String  - being the URL that identifies the FHIR Resource Profile being generated.
+   */
+  String getResourceProfile();
 }

@@ -192,7 +192,7 @@ public class HL7MessageEngine implements MessageEngine {
         if (!multipleSegments.isEmpty()) {
 
             resourceResults = generateMultipleResources(hl7DataInput, resourceModel, contextValues,
-                    multipleSegments, template.isGenerateMultiple(), template.ignoreEmpty(), template.condition());
+                    multipleSegments, template.isGenerateMultiple(), template.ignoreEmpty(), template.condition(), template.getResourceProfile());
         }
         return resourceResults;
     }
@@ -288,11 +288,16 @@ public class HL7MessageEngine implements MessageEngine {
     private static List<ResourceResult> generateMultipleResources(final HL7MessageData hl7DataInput,
             final ResourceModel rs, final Map<String, EvaluationResult> contextValues,
             final List<SegmentGroup> multipleSegments, boolean generateMultiple, boolean ignoreEmpty, 
-                  ResourceCondition condition) {
+                  ResourceCondition condition, String resourceProfile) {
         List<ResourceResult> resourceResults = new ArrayList<>();
         for (SegmentGroup currentGroup : multipleSegments) {
 
             Map<String, EvaluationResult> localContextValues = new HashMap<>(contextValues);
+
+            // We need the resourceProfile available as a variable
+            localContextValues.put(Constants.RESOURCE_PROFILE,
+                    EvaluationResultFactory.getEvaluationResult(resourceProfile));
+
             localContextValues.put(Constants.GROUP_ID,
                     EvaluationResultFactory.getEvaluationResult(currentGroup.getGroupId()));
             // Resource needs to be generated for each base value in the group

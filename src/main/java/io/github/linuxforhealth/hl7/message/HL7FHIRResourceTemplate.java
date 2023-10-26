@@ -63,6 +63,11 @@ public class HL7FHIRResourceTemplate implements FHIRResourceTemplate {
     return this.attributes.conditionExpression();
   }
 
+  @Override
+  public String getResourceProfile() {
+    return this.attributes.resourceProfile();
+  }
+
   // The conditionExpression above gets parsed into a ResourceCondition
   public ResourceCondition condition() {
     return this.attributes.condition();

@@ -11,6 +11,7 @@ public class Constants {
     public static final boolean DEFAULT_PRETTY_PRINT = false;
     public static final BundleType DEFAULT_BUNDLE_TYPE = BundleType.COLLECTION;
     public static final String GROUP_ID = "GROUP_ID";
+    public static final String RESOURCE_PROFILE = "RESOURCE_PROFILE";   // A new context variable
     public static final String BASE_VALUE_NAME = "BASE_VALUE";
     public static final String USE_GROUP = "useGroup";
 
