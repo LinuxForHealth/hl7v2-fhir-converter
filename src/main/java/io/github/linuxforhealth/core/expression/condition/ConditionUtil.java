@@ -31,7 +31,9 @@ public class ConditionUtil {
         "conditionString cannot be blank or null.");
     StringTokenizer ors = new StringTokenizer(conditionString, "||");
     StringTokenizer ands = new StringTokenizer(conditionString, "&&");
-    if (ors.getTokenList().size() > 1) {
+    if(ors.getTokenList().size() > 1 && ands.getTokenList().size()> 1) {
+      return new CompoundAndOrCondition(conditionString);
+    } else if (ors.getTokenList().size() > 1) {
       return getListOrConditions(ors, useGroup);
     } else if (ands.getTokenList().size() > 1) {
       return getListAndConditions(ands, useGroup);
