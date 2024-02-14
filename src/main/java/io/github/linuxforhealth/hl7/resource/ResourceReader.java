@@ -45,7 +45,15 @@ public class ResourceReader {
 
   private static ResourceReader reader;
 
-  private final ConverterConfiguration converterConfig = ConverterConfiguration.getInstance();
+  private final ConverterConfiguration converterConfig;
+
+  private ResourceReader() {
+    converterConfig = ConverterConfiguration.getInstance();
+  }
+
+  public ResourceReader(ConverterConfiguration config) {
+    converterConfig = config;
+  }
 
   /**
    * Loads a file resource configuration, returning a String

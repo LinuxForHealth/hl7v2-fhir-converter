@@ -45,6 +45,15 @@ public class ConverterConfiguration {
   private String additionalResourcesLocation;
 
   private ConverterConfiguration() {
+    initializeConfiguration();
+  }
+
+  public ConverterConfiguration(String resourceFolderPath) {
+    resourceFolder = resourceFolderPath;
+    initializeConfiguration();
+  }
+
+  private void initializeConfiguration() {
     try {
 
       List<FileLocationStrategy> subs = Arrays.asList(new ConfigDirectoryLocationStrategy(),
@@ -62,12 +71,14 @@ public class ConverterConfiguration {
                       .setListDelimiterHandler(new DefaultListDelimiterHandler(',')));
       Configuration config = builder.getConfiguration();
 
-      String resourceLoc = config.getString(BASE_PATH_RESOURCE, null);
-      if (StringUtils.isNotBlank(resourceLoc)) {
-        resourceFolder = resourceLoc;
-      } else {
-        resourceFolder = "";
-        resourcefromClassPath = true;
+      if (resourceFolder = null) {
+        String resourceLoc = config.getString(BASE_PATH_RESOURCE, null);
+        if (StringUtils.isNotBlank(resourceLoc)) {
+          resourceFolder = resourceLoc;
+        } else {
+          resourceFolder = "";
+          resourcefromClassPath = true;
+        }
       }
 
       // get list of supported messages, if not found, default to *
