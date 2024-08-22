@@ -186,7 +186,7 @@ public class HL7ToFHIRConverter {
                     } else {
                         int firstDash = line.indexOf("-");
                         // Added fail-safe check if the content after "-" is less than 5 characters
-                        int lastContentIndex = Math.min(firstDash + 5, line.length() - 1);
+                        int lastContentIndex = Math.min(firstDash + 5, line.length());
                         output.append(line.substring(0, lastContentIndex));
                     }
                     output.append("\n");

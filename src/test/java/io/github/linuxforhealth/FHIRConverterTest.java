@@ -324,6 +324,26 @@ class FHIRConverterTest {
         assertThat(coding.getSystem()).isEqualTo("http://terminology.hl7.org/CodeSystem/v2-0163");
     }
 
+    @Test
+    void test_nte_split_print_structure_on_dash(){
+        String hl7message = "MSH|^~\\&|Lab|Lab|GeneralHosp|MySys|202408160605-1000||ORU^R01|218374717|P|2.3|\n" +
+                "PID|1||||||||123|\n" +
+                "ORC|RE||123|\n" +
+                "OBR|1||123|456||||||||||||||||||202408160605-1000|||F|||||\n" +
+                "OBX|1|NM|1894^Non-HDL Cholesterol, calc^43396-1^1894||180|mg/dL|<130 optimal|H|||F|||202408160605-1000|12D0620420^General's Hospital|%AUTO^%AUTO^2|\n" +
+                "NTE|1|#9151E| |\n" +
+                "NTE|2|#9151E|LDL and Non-HDL Cholesterol goals based on level of risk:|\n" +
+                "NTE|3|#9151E| |\n" +
+                "NTE|4|#9151E|                                          LDL           NON-HDL|\n" +
+                "NTE|5|#9151E|                                          ------------------------|\n" +
+                "SPM|1|YF123321||123456^Specimen (specimen)^SCT|||||||||||||202408180502-1000|202408180531-1000|";
+
+        Bundle b = ftv.convertToBundle(hl7message, OPTIONS, null);
+
+        assertThat(b.getType()).isEqualTo(BundleType.COLLECTION);
+
+    }
+
     private void verifyResult(String json, BundleType expectedBundleType) {
         verifyResult(json, expectedBundleType, true);
     }
