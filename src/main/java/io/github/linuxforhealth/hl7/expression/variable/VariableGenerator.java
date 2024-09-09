@@ -31,7 +31,10 @@ public class VariableGenerator {
         ExpressionAttributes.extractExpressionModifiers(variableExpression, false);
 
     String rawVariable = exp.getExpression();
-    if (StringUtils.contains(rawVariable, "GeneralUtils")) {
+    // Are they putting a java GeneralUtils fn result into a variable? 
+    //   - It might not just be GeneralUtils - It could be one of their own custom fns (which **MUST** end in Utils)
+    //   - TODO: Go find the Map of customFunctions, and check all the keys specifically
+    if (StringUtils.contains(rawVariable, "Utils.")) { 
       String[] values = rawVariable.split(",", 2);
       // Handle * in combination with GeneralUtils function
       exp = ExpressionAttributes.extractExpressionModifiers(values[0], false);

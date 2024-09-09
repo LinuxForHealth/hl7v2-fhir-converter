@@ -3,15 +3,12 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  */
-package io.github.linuxforhealth.hl7.expression.varable;
+package io.github.linuxforhealth.hl7.expression.variable;
 
 import java.io.IOException;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import io.github.linuxforhealth.hl7.expression.variable.DataTypeVariable;
-import io.github.linuxforhealth.hl7.expression.variable.ExpressionVariable;
-import io.github.linuxforhealth.hl7.expression.variable.VariableGenerator;
 
 class VariableGeneratorTest {
 
