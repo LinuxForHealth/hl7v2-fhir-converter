@@ -17,22 +17,25 @@ public abstract class AbstractFHIRResourceTemplate implements FHIRResourceTempla
   private boolean repeats;
   private String resourcePath;
   private boolean isReferenced;
+  private boolean ignoreEmpty;
 
 
   @JsonCreator
   public AbstractFHIRResourceTemplate(@JsonProperty("resourceName") String resourceName,
       @JsonProperty("resourcePath") String resourcePath,
       @JsonProperty("isReferenced") boolean isReferenced,
-      @JsonProperty("repeats") boolean repeats) {
+      @JsonProperty("repeats") boolean repeats,
+      @JsonProperty("ignoreEmpty") boolean ignoreEmpty) {
     this.resourceName = resourceName;
     this.resourcePath = resourcePath;
     this.repeats = repeats;
     this.isReferenced = isReferenced;
+    this.ignoreEmpty = ignoreEmpty;
   }
 
 
   public AbstractFHIRResourceTemplate(String resourceName, String resourcePath) {
-    this(resourceName, resourcePath, false, false);
+    this(resourceName, resourcePath, false, false, false);
   }
 
   @Override
@@ -62,6 +65,11 @@ public abstract class AbstractFHIRResourceTemplate implements FHIRResourceTempla
   @Override
   public boolean isReferenced() {
     return isReferenced;
+  }
+
+  @Override
+  public boolean ignoreEmpty() {
+    return ignoreEmpty;
   }
 
 

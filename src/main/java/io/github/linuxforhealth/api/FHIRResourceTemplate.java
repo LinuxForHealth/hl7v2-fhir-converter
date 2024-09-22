@@ -49,6 +49,10 @@ public interface FHIRResourceTemplate {
    */
   boolean isReferenced();
 
-
-
+ /**
+  * If this resource is to ignore empty source segments
+  * 
+  * @return True/False
+  */
+  boolean ignoreEmpty();
 }

@@ -20,11 +20,11 @@ public class HL7FHIRResourceTemplateAttributes {
   private boolean repeats;
   private String resourcePath;
   private boolean isReferenced;
+  private boolean ignoreEmpty;
   private HL7Segment segment;// primary segment
   private List<HL7Segment> additionalSegments;
   private ResourceModel resource;
   private List<String> group;
-
 
 
   public HL7FHIRResourceTemplateAttributes(Builder builder) {
@@ -35,6 +35,7 @@ public class HL7FHIRResourceTemplateAttributes {
     this.resourcePath = builder.resourcePath;
     this.repeats = builder.repeats;
     this.isReferenced = builder.isReferenced;
+    this.ignoreEmpty = builder.ignoreEmpty;
     additionalSegments = new ArrayList<>();
     builder.rawAdditionalSegments
         .forEach(e -> additionalSegments.add(HL7Segment.parse(e, builder.group)));
@@ -85,7 +86,9 @@ public class HL7FHIRResourceTemplateAttributes {
     return isReferenced;
   }
 
-
+  public boolean ignoreEmpty() {
+    return ignoreEmpty;
+  }
 
   private static ResourceModel generateResourceModel(String resourcePath) {
     return ResourceReader.getInstance().generateResourceModel(resourcePath);
@@ -102,6 +105,7 @@ public class HL7FHIRResourceTemplateAttributes {
     private String resourcePath;
     private String group;
     private boolean isReferenced;
+    private boolean ignoreEmpty;
     private boolean repeats;
     private ResourceModel resourceModel;
 
@@ -153,6 +157,11 @@ public class HL7FHIRResourceTemplateAttributes {
 
     public Builder withIsReferenced(boolean isReferenced) {
       this.isReferenced = isReferenced;
+      return this;
+    }
+
+    public Builder withIgnoreEmpty(boolean ignoreEmpty) {
+      this.ignoreEmpty = ignoreEmpty;
       return this;
     }
 

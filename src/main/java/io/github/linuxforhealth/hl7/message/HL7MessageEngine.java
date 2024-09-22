@@ -27,7 +27,9 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 
+import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Structure;
+import ca.uhn.hl7v2.model.Visitable;
 import io.github.linuxforhealth.api.EvaluationResult;
 import io.github.linuxforhealth.api.FHIRResourceTemplate;
 import io.github.linuxforhealth.api.InputDataExtractor;
@@ -189,7 +191,7 @@ public class HL7MessageEngine implements MessageEngine {
         if (!multipleSegments.isEmpty()) {
 
             resourceResults = generateMultipleResources(hl7DataInput, resourceModel, contextValues,
-                    multipleSegments, template.isGenerateMultiple());
+                    multipleSegments, template.isGenerateMultiple(), template.ignoreEmpty());
         }
         return resourceResults;
     }
@@ -284,7 +286,7 @@ public class HL7MessageEngine implements MessageEngine {
 
     private static List<ResourceResult> generateMultipleResources(final HL7MessageData hl7DataInput,
             final ResourceModel rs, final Map<String, EvaluationResult> contextValues,
-            final List<SegmentGroup> multipleSegments, boolean generateMultiple) {
+            final List<SegmentGroup> multipleSegments, boolean generateMultiple, boolean ignoreEmpty) {
         List<ResourceResult> resourceResults = new ArrayList<>();
         for (SegmentGroup currentGroup : multipleSegments) {
 
@@ -300,16 +302,24 @@ public class HL7MessageEngine implements MessageEngine {
 
             for (EvaluationResult baseValue : baseValues) {
                 try {
-                    ResourceResult result = rs.evaluate(hl7DataInput, ImmutableMap.copyOf(localContextValues),
-                            baseValue);
-                    if (result != null && result.getValue() != null) {
-                        resourceResults.add(result);
-                        if (!generateMultiple) {
-                            // If only single resource needs to be generated then return.
-                            return resourceResults;
+                    // We might need to check if the baseValue is empty
+                    Visitable vs = baseValue.getValue();
+                    if((vs != null && ! vs.isEmpty()) || ! ignoreEmpty) {
+
+                        // baseValue is either not empty or we're not allowed to ignore empty segments
+                        ResourceResult result = rs.evaluate(hl7DataInput, ImmutableMap.copyOf(localContextValues),
+                                baseValue);
+
+                        // We can't rely on empty segment giving us an empty resource; as common templates populate Resource.meta fields
+                        if (result != null && result.getValue() != null) {
+                            resourceResults.add(result);
+                            if (!generateMultiple) {
+                                // If only single resource needs to be generated then return.
+                                return resourceResults;
+                            }
                         }
                     }
-                } catch (RequiredConstraintFailureException | IllegalArgumentException
+                } catch (RequiredConstraintFailureException | IllegalArgumentException | HL7Exception
                         | IllegalStateException e) {
                     LOGGER.warn("generateMultipleResources - Exception encountered");
                     LOGGER.debug("generateMultipleResources - Exception encountered", e);
