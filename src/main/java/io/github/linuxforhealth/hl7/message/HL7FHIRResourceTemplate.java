@@ -7,6 +7,7 @@ package io.github.linuxforhealth.hl7.message;
 
 import com.google.common.base.Preconditions;
 import io.github.linuxforhealth.api.FHIRResourceTemplate;
+import io.github.linuxforhealth.api.ResourceCondition;
 import io.github.linuxforhealth.api.ResourceModel;
 
 
@@ -52,6 +53,18 @@ public class HL7FHIRResourceTemplate implements FHIRResourceTemplate {
     return this.attributes.isReferenced();
   }
 
+  @Override
+  public boolean ignoreEmpty() {
+    return this.attributes.ignoreEmpty();
+  }
 
+  @Override
+  public String conditionExpression() {
+    return this.attributes.conditionExpression();
+  }
 
+  // The conditionExpression above gets parsed into a ResourceCondition
+  public ResourceCondition condition() {
+    return this.attributes.condition();
+ }
 }

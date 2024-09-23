@@ -1,9 +1,9 @@
 #
-# (C) Copyright IBM Corp. 2021
+# (C) Te Whatu Ora, Health New Zealand, 2023
 #
 # SPDX-License-Identifier: Apache-2.0
 #
-# FHIR Resources to extract from ADT_A09 message
+# FHIR Resources to extract from (pretend) ADT_A10 message
 #
 
 ########################################################################
@@ -44,7 +44,7 @@ resources:
       segment: AL1
       resourcePath: resource/AllergyIntolerance
       repeats: true
-      ignoreEmpty: true      ## We want to test our new ignoreEmpty flag
+      ignoreEmpty: false      ## We want to test our new ignoreEmpty flag
       additionalSegments:
         - MSH
 
@@ -52,6 +52,6 @@ resources:
       segment: ZAL
       resourcePath: resource/AllergyIntolerance
       repeats: true
-      ignoreEmpty: true      ## We want to test our new ignoreEmpty flag on 'Z' segments
+      ignoreEmpty: false      ## We want to test our new ignoreEmpty flag on 'Z' segments
       additionalSegments:
         - MSH
