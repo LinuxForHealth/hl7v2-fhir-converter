@@ -12,6 +12,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.UUID;
 
+import ca.uhn.hl7v2.model.v26.datatype.XTN;
 import org.hl7.fhir.r4.model.Observation.ObservationStatus;
 import org.hl7.fhir.r4.model.ServiceRequest.ServiceRequestStatus;
 import org.hl7.fhir.r4.model.Specimen.SpecimenStatus;
@@ -29,6 +30,8 @@ import ca.uhn.hl7v2.model.v26.message.ORU_R01;
 
 import io.github.linuxforhealth.core.terminology.SimpleCode;
 import io.github.linuxforhealth.hl7.data.date.DateUtil;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 class SimpleDataValueResolverTest {
 
@@ -399,4 +402,59 @@ class SimpleDataValueResolverTest {
         assertThat(coding.getDisplay()).isNull();
     }
 
+    @ParameterizedTest
+    @ValueSource(strings = { "PH", "FX", "CP", "BP", "Internet", "X.400", "MD", "TDD", "TTY", "SAT", ""})
+    void testContactPointSystem(String hl7Code) throws DataTypeException {
+        XTN xtn = new XTN(null);
+        xtn.getTelecommunicationEquipmentType().setValue(hl7Code);
+        String system = SimpleDataValueResolver.CONTACT_POINT_SYSTEM.apply(xtn);
+        switch (hl7Code) {
+            case "PH":
+            case "CP":
+                assertThat(system).isEqualTo("phone");
+                break;
+            case "FX":
+                assertThat(system).isEqualTo("fax");
+                break;
+            case "BP":
+                assertThat(system).isEqualTo("pager");
+                break;
+            case "Internet":
+            case "X.400":
+                assertThat(system).isEqualTo("email");
+                break;
+            case "MD":
+            case "SAT":
+            case "TTY":
+            case "TDD":
+                assertThat(system).isEqualTo("other");
+                break;
+            default:
+                assertThat(system).isNull();
+                break;
+        }
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = { "PRN", "VHN", "WPN", "PRS", ""})
+    void testContactPointUse(String hl7Code) throws DataTypeException {
+        XTN xtn = new XTN(null);
+        xtn.getTelecommunicationUseCode().setValue(hl7Code);
+        String system = SimpleDataValueResolver.CONTACT_POINT_USE.apply(xtn);
+        switch (hl7Code) {
+            case "PRN":
+            case "VHN":
+                assertThat(system).isEqualTo("home");
+                break;
+            case "WPN":
+                assertThat(system).isEqualTo("work");
+                break;
+            case "PRS":
+                assertThat(system).isEqualTo("mobile");
+                break;
+            default:
+                assertThat(system).isNull();
+                break;
+        }
+    }
 }

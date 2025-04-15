@@ -521,4 +521,73 @@ class Hl7PatientFHIRConversionTest {
         validate_data_lineage(hl7message, "VXU^V04");
     }
 
+    @ParameterizedTest
+    @ValueSource(strings={"PRN", "VHN", "WPN", "PRS", ""})
+    void testPatientContactPointUse(String use) {
+        String hl7message = "MSH|^~\\&|SendingApplication|RI88140101|KIDSNET_IFL|RIHEALTH|20060915210000||VXU^V04|1473973200100600|P|2.3|||NE|AL||||||RI543763\r"
+                + "PID||B987654^^^CLINIC^ABC|B987655^^^CLINIC^XYZ|B987656^^^CLINIC^PQR|Doe^John^Allen^Jr.^Mr.^L||19800101|M|||123 Main St^Apt 4B^Metropolis^NY^10001^USA^H^NY001||(555)555-1234^"+use+"^BP\r";
+
+        Patient patient = PatientUtils.createPatientFromHl7Segment(ftv, hl7message);
+        assertThat(patient.hasTelecom()).isTrue();
+        assertThat(patient.getTelecom()).hasSize(1);
+        if (use.isEmpty()) {
+            assertThat(patient.getTelecom().get(0).hasUse()).isFalse();
+        } else {
+            assertThat(patient.getTelecom().get(0).hasUse()).isTrue();
+        }
+        switch (use) {
+            case "PRN":
+            case "VHN":
+                assertThat(patient.getTelecom().get(0).getUse().toCode()).isEqualTo("home");
+                break;
+            case "WPN":
+                assertThat(patient.getTelecom().get(0).getUse().toCode()).isEqualTo("work");
+                break;
+            case "PRS":
+                assertThat(patient.getTelecom().get(0).getUse().toCode()).isEqualTo("mobile");
+                break;
+            default:
+                assertThat(patient.getTelecom().get(0).getUse()).isNull();
+        }
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = { "PH", "FX", "CP", "BP", "Internet", "X.400", "MD", "TDD", "TTY", "SAT", ""})
+    void testPatientContactPointSystem(String system) {
+        String hl7message = "MSH|^~\\&|SendingApplication|RI88140101|KIDSNET_IFL|RIHEALTH|20060915210000||VXU^V04|1473973200100600|P|2.3|||NE|AL||||||RI543763\r"
+                + "PID||B987654^^^CLINIC^ABC|B987655^^^CLINIC^XYZ|B987656^^^CLINIC^PQR|Doe^John^Allen^Jr.^Mr.^L||19800101|M|||123 Main St^Apt 4B^Metropolis^NY^10001^USA^H^NY001||(555)555-1234^PRN^"+system+"\r";
+        Patient patient = PatientUtils.createPatientFromHl7Segment(ftv, hl7message);
+        assertThat(patient.hasTelecom()).isTrue();
+        assertThat(patient.getTelecom()).hasSize(1);
+        if(system.isEmpty()) {
+            assertThat(patient.getTelecom().get(0).hasSystem()).isFalse();
+        } else {
+            assertThat(patient.getTelecom().get(0).hasSystem()).isTrue();
+        }
+        switch (system) {
+            case "PH":
+            case "CP":
+                assertThat(patient.getTelecom().get(0).getSystem().toCode()).isEqualTo("phone");
+                break;
+            case "FX":
+                assertThat(patient.getTelecom().get(0).getSystem().toCode()).isEqualTo("fax");
+                break;
+            case "BP":
+                assertThat(patient.getTelecom().get(0).getSystem().toCode()).isEqualTo("pager");
+                break;
+            case "Internet":
+            case "X.400":
+                assertThat(patient.getTelecom().get(0).getSystem().toCode()).isEqualTo("email");
+                break;
+            case "MD":
+            case "SAT":
+            case "TTY":
+            case "TDD":
+                assertThat(patient.getTelecom().get(0).getSystem().toCode()).isEqualTo("other");
+                break;
+            default:
+                assertThat(patient.getTelecom().get(0).getSystem()).isNull();
+                break;
+        }
+    }
 }

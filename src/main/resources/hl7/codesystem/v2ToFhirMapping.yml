@@ -556,3 +556,21 @@ RelatedPersonNeededIN272:
   17: TRUE # Minor dependent of a minor dependant input (grandchild dependent) : Grandparent
   18: TRUE # Parent : Child 
   19: TRUE # Grandparent : Grandchild 
+
+ContactPointSystem:
+  PH: phone
+  FX: fax
+  CP: phone
+  BP: pager
+  INTERNET: email
+  X.400: email
+  MD: other
+  TDD: other
+  TTY: other
+  SAT: other
+
+ContactPointUse:
+  PRN: home
+  VHN: home
+  WPN: work
+  PRS: mobile
