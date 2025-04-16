@@ -248,7 +248,6 @@ telecom_1:
   vars:
     pid14: PID.14
   constants:
-    use: work
 
 telecom_2:
   condition: $pid13 NOT_NULL
@@ -258,8 +257,6 @@ telecom_2:
   specs: PID.13
   vars:
     pid13: PID.13
-  constants:
-    use: home
 
 # The yaml is processed in reverse order, therefore
 # Put the PID.13 last in yaml so it is first to be processed
