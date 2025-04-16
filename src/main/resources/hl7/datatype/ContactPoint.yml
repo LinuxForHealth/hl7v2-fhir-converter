@@ -15,11 +15,11 @@ system_1:
     emailValue: XTN.4
 
 system_2:
-  condition: $emailValue NOT_NULL
-  type: STRING
-  valueOf: "email"
-  vars:
-    emailValue: XTN.4
+     condition: $emailValue NOT_NULL
+     type: STRING
+     valueOf: "email"
+     vars:
+          emailValue: XTN.4
 
 # value is phone number or email address depending on a value in email address (XTN.4)
 value_1:
@@ -43,7 +43,7 @@ value_2:
      vars: 
           emailValue: XTN.4       
 
-# whatever is passed in
+# Default use to "home" or "work", whatever is passed in
 use_1:
     condition: $useValue NOT_NULL
     type: STRING
