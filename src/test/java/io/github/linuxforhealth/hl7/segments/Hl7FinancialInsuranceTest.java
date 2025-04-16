@@ -181,8 +181,9 @@ class Hl7FinancialInsuranceTest {
         // Check Payor Organization contact telecom.  IN1.7 is standard XTN, tested exhaustively in other tests.
         assertThat(org.getContact().get(0).getTelecom()).hasSize(1);
         ContactPoint contactPoint = org.getContact().get(0).getTelecomFirstRep(); // telecom is type ContactPoint
-        assertThat(contactPoint.getSystemElement().getCode()).hasToString("phone"); // default type hardcoded.
-        assertThat(contactPoint.hasUseElement()).isFalse(); // IN1.7.2 is not mapped (ignored)
+        assertThat(contactPoint.getSystemElement().getCode()).isNull(); // default type hardcoded.
+        assertThat(contactPoint.hasUseElement()).isTrue(); // IN1.7.2 is not mapped (ignored)
+        assertThat(contactPoint.getUseElement().getCode()).isEqualTo("work"); // IN1.7.3
         assertThat(contactPoint.getValue()).hasToString("(333) 444 4444"); // IN1.7.6, IN1.7.7 via getFormattedTelecomNumberValue
         assertThat(contactPoint.getPeriod().getStartElement().toString()).containsPattern("2020-12-31T14:50:45"); // IN1.7.13
         assertThat(contactPoint.getPeriod().getEndElement().toString()).containsPattern("2021-12-31T14:50:45"); // IN1.7.14
@@ -512,8 +513,8 @@ class Hl7FinancialInsuranceTest {
 
         // Check RelatedPerson telecom.  IN2.63 is standard XTN, tested exhaustively in other tests.
         ContactPoint contactPoint = related.getTelecomFirstRep(); // telecom is type ContactPoint
-        assertThat(contactPoint.getSystemElement().getCode()).hasToString("phone"); // default type hardcoded.
-        assertThat(contactPoint.getUseElement().getCode()).isEqualTo("home");; // Hard-coded to home.  IN2.63.2 is not mapped (ignored).
+        assertThat(contactPoint.getSystemElement().getCode()).isNull(); // default type hardcoded.
+        assertThat(contactPoint.getUseElement().getCode()).isNull(); // Hard-coded to home.  IN2.63.2 is not mapped (ignored).
         assertThat(contactPoint.getValue()).hasToString("(555) 767 7777"); // IN2.63.6, IN2.63.7 via getFormattedTelecomNumberValue
         assertThat(contactPoint.getPeriod().getStartElement().toString()).containsPattern("2020-12-31T14:50:45"); // IN2.63.13
         assertThat(contactPoint.getPeriod().getEndElement().toString()).containsPattern("2021-12-31T14:50:45"); // IN2.63.14
@@ -748,7 +749,7 @@ class Hl7FinancialInsuranceTest {
         // Check Organization contact telecom.  IN1.7 is standard XTN, tested exhaustively in other tests.
         assertThat(org.getContact().get(0).getTelecom()).hasSize(1);
         ContactPoint contactPoint = org.getContact().get(0).getTelecomFirstRep(); // telecom is type ContactPoint
-        assertThat(contactPoint.getSystemElement().getCode()).hasToString("phone"); // default type hardcoded.
+        assertThat(contactPoint.getSystemElement().getCode()).isNull(); // default type hardcoded.
         assertThat(contactPoint.hasUseElement()).isFalse(); // IN1.7.2 is not mapped 
         assertThat(contactPoint.getValue()).hasToString("(800) 333 4444"); // IN1.7.6, IN1.7.7 via getFormattedTelecomNumberValue
 

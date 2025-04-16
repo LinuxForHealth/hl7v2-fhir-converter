@@ -13,6 +13,7 @@ import java.net.URISyntaxException;
 import java.util.UUID;
 
 import ca.uhn.hl7v2.model.v26.datatype.XTN;
+import org.hl7.fhir.r4.model.ContactPoint;
 import org.hl7.fhir.r4.model.Observation.ObservationStatus;
 import org.hl7.fhir.r4.model.ServiceRequest.ServiceRequestStatus;
 import org.hl7.fhir.r4.model.Specimen.SpecimenStatus;
@@ -411,23 +412,23 @@ class SimpleDataValueResolverTest {
         switch (hl7Code) {
             case "PH":
             case "CP":
-                assertThat(system).isEqualTo("phone");
+                assertThat(system).isEqualTo(ContactPoint.ContactPointSystem.PHONE.toCode());
                 break;
             case "FX":
-                assertThat(system).isEqualTo("fax");
+                assertThat(system).isEqualTo(ContactPoint.ContactPointSystem.FAX.toCode());
                 break;
             case "BP":
-                assertThat(system).isEqualTo("pager");
+                assertThat(system).isEqualTo(ContactPoint.ContactPointSystem.PAGER.toCode());
                 break;
             case "Internet":
             case "X.400":
-                assertThat(system).isEqualTo("email");
+                assertThat(system).isEqualTo(ContactPoint.ContactPointSystem.EMAIL.toCode());
                 break;
             case "MD":
             case "SAT":
             case "TTY":
             case "TDD":
-                assertThat(system).isEqualTo("other");
+                assertThat(system).isEqualTo(ContactPoint.ContactPointSystem.OTHER.toCode());
                 break;
             default:
                 assertThat(system).isNull();
@@ -444,13 +445,13 @@ class SimpleDataValueResolverTest {
         switch (hl7Code) {
             case "PRN":
             case "VHN":
-                assertThat(system).isEqualTo("home");
+                assertThat(system).isEqualTo(ContactPoint.ContactPointUse.HOME.toCode());
                 break;
             case "WPN":
-                assertThat(system).isEqualTo("work");
+                assertThat(system).isEqualTo(ContactPoint.ContactPointUse.WORK.toCode());
                 break;
             case "PRS":
-                assertThat(system).isEqualTo("mobile");
+                assertThat(system).isEqualTo(ContactPoint.ContactPointUse.MOBILE.toCode());
                 break;
             default:
                 assertThat(system).isNull();

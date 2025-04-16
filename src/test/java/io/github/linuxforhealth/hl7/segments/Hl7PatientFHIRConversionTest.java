@@ -10,19 +10,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.List;
 
 import org.hl7.fhir.instance.model.api.IBaseResource;
-import org.hl7.fhir.r4.model.Bundle;
+import org.hl7.fhir.r4.model.*;
 import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
-import org.hl7.fhir.r4.model.Coding;
-import org.hl7.fhir.r4.model.Enumerations;
-import org.hl7.fhir.r4.model.Extension;
-import org.hl7.fhir.r4.model.HumanName;
-import org.hl7.fhir.r4.model.Meta;
-import org.hl7.fhir.r4.model.Patient;
-import org.hl7.fhir.r4.model.Practitioner;
-import org.hl7.fhir.r4.model.Reference;
-import org.hl7.fhir.r4.model.Resource;
-import org.hl7.fhir.r4.model.ResourceType;
-import org.hl7.fhir.r4.model.StringType;
 import org.hl7.fhir.r4.model.codesystems.V3MaritalStatus;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -538,13 +527,13 @@ class Hl7PatientFHIRConversionTest {
         switch (use) {
             case "PRN":
             case "VHN":
-                assertThat(patient.getTelecom().get(0).getUse().toCode()).isEqualTo("home");
+                assertThat(patient.getTelecom().get(0).getUse()).isEqualTo(ContactPoint.ContactPointUse.HOME);
                 break;
             case "WPN":
-                assertThat(patient.getTelecom().get(0).getUse().toCode()).isEqualTo("work");
+                assertThat(patient.getTelecom().get(0).getUse()).isEqualTo(ContactPoint.ContactPointUse.WORK);
                 break;
             case "PRS":
-                assertThat(patient.getTelecom().get(0).getUse().toCode()).isEqualTo("mobile");
+                assertThat(patient.getTelecom().get(0).getUse()).isEqualTo(ContactPoint.ContactPointUse.MOBILE);
                 break;
             default:
                 assertThat(patient.getTelecom().get(0).getUse()).isNull();
@@ -567,23 +556,23 @@ class Hl7PatientFHIRConversionTest {
         switch (system) {
             case "PH":
             case "CP":
-                assertThat(patient.getTelecom().get(0).getSystem().toCode()).isEqualTo("phone");
+                assertThat(patient.getTelecom().get(0).getSystem()).isEqualTo(ContactPoint.ContactPointSystem.PHONE);
                 break;
             case "FX":
-                assertThat(patient.getTelecom().get(0).getSystem().toCode()).isEqualTo("fax");
+                assertThat(patient.getTelecom().get(0).getSystem()).isEqualTo(ContactPoint.ContactPointSystem.FAX);
                 break;
             case "BP":
-                assertThat(patient.getTelecom().get(0).getSystem().toCode()).isEqualTo("pager");
+                assertThat(patient.getTelecom().get(0).getSystem()).isEqualTo(ContactPoint.ContactPointSystem.PAGER);
                 break;
             case "Internet":
             case "X.400":
-                assertThat(patient.getTelecom().get(0).getSystem().toCode()).isEqualTo("email");
+                assertThat(patient.getTelecom().get(0).getSystem()).isEqualTo(ContactPoint.ContactPointSystem.EMAIL);
                 break;
             case "MD":
             case "SAT":
             case "TTY":
             case "TDD":
-                assertThat(patient.getTelecom().get(0).getSystem().toCode()).isEqualTo("other");
+                assertThat(patient.getTelecom().get(0).getSystem()).isEqualTo(ContactPoint.ContactPointSystem.OTHER);
                 break;
             default:
                 assertThat(patient.getTelecom().get(0).getSystem()).isNull();
