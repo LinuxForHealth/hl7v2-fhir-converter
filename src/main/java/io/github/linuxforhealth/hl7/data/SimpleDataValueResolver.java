@@ -22,6 +22,8 @@ import ca.uhn.hl7v2.model.v26.datatype.DTM;
 import ca.uhn.hl7v2.model.v26.datatype.PPN;
 import ca.uhn.hl7v2.model.v26.datatype.TS;
 import ca.uhn.hl7v2.model.v26.datatype.XCN;
+import ca.uhn.hl7v2.model.v26.datatype.XTN;
+
 import ca.uhn.hl7v2.model.v26.group.VXU_V04_OBSERVATION;
 import ca.uhn.hl7v2.model.v26.group.VXU_V04_ORDER;
 import ca.uhn.hl7v2.model.v26.segment.OBX;
@@ -41,6 +43,7 @@ import org.hl7.fhir.r4.model.MedicationRequest;
 import org.hl7.fhir.r4.model.Observation.ObservationStatus;
 import org.hl7.fhir.r4.model.ServiceRequest.ServiceRequestStatus;
 import org.hl7.fhir.r4.model.Specimen.SpecimenStatus;
+
 import org.hl7.fhir.r4.model.codesystems.V3ActCode;
 import org.hl7.fhir.r4.model.codesystems.V3MaritalStatus;
 import org.hl7.fhir.r4.model.codesystems.ConditionCategory;
@@ -53,6 +56,9 @@ import org.hl7.fhir.r4.model.codesystems.DiagnosisRole;
 import org.hl7.fhir.r4.model.codesystems.ConditionClinical;
 import org.hl7.fhir.r4.model.codesystems.ConditionVerStatus;
 import org.hl7.fhir.r4.model.codesystems.CompositionStatus;
+import org.hl7.fhir.r4.model.codesystems.ContactPointSystem;
+import org.hl7.fhir.r4.model.codesystems.ContactPointUse;
+
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -921,4 +927,19 @@ public class SimpleDataValueResolver {
             return null;
         }
     }
+    public static final ValueExtractor<Object, String> CONTACT_POINT_SYSTEM = (Object value) -> {
+        if (value instanceof XTN){
+            XTN xtn = (XTN) value;
+            return getFHIRCode(Hl7DataHandlerUtil.getStringValue(xtn.getTelecommunicationEquipmentType()), ContactPointSystem.class);
+        }
+        return null;
+    };
+
+    public static final ValueExtractor<Object, String> CONTACT_POINT_USE = (Object value) -> {
+        if (value instanceof XTN){
+            XTN xtn = (XTN) value;
+            return getFHIRCode(Hl7DataHandlerUtil.getStringValue(xtn.getTelecommunicationUseCode()), ContactPointUse.class);
+        }
+        return null;
+    };
 }

@@ -5,19 +5,20 @@
 # 
 # HL7 FHIR Data Type ContactPoint was previously called Telecom
 ---
-# system is phone or email depending on a value in email address (XTN.4)
+# system is phone or email depending on a value in email address (XTN.3)
 system_1:
-     condition: $emailValue NULL
-     type: STRING
-     valueOf: "phone"
-     vars: 
-          emailValue: XTN.4
- 
+  condition: $emailValue NULL
+  type: CONTACT_POINT_SYSTEM
+  valueOf: XTN
+  expressionType: HL7Spec
+  vars:
+    emailValue: XTN.4
+
 system_2:
      condition: $emailValue NOT_NULL
      type: STRING
      valueOf: "email"
-     vars: 
+     vars:
           emailValue: XTN.4
 
 # value is phone number or email address depending on a value in email address (XTN.4)
@@ -44,20 +45,21 @@ value_2:
 
 # Default use to "home" or "work", whatever is passed in
 use_1:
-     type: STRING
-     valueOf: $use
-     expressionType: HL7Spec
+    condition: $useValue NOT_NULL
+    type: STRING
+    valueOf: $use
+    expressionType: HL7Spec
+    vars:
+      useValue: STRING, $use
 
-# But if CP, then change use to "mobile"
+# populate from the HL7 field xtn.2
 use_2:
-     condition: $equipmentType EQUALS CP
-     type: STRING
-     valueOf: $mobile
+     condition: $useValue NULL
+     type: CONTACT_POINT_USE
+     valueOf: XTN
      expressionType: HL7Spec
      vars:
-         equipmentType: String, XTN.3
-     constants:
-         mobile: "mobile"      
+       useValue: STRING, $use
 
 period:
     valueOf: datatype/Period

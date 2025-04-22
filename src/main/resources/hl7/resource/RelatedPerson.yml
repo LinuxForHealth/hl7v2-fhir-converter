@@ -104,5 +104,3 @@ telecom:
    vars: 
      phoneNumber: IN2.63.1
      localNumber: IN2.63.7
-   constants:
-     use: home

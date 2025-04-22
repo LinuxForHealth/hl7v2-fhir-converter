@@ -26,7 +26,7 @@ class Hl7TelecomFHIRConversionTest {
 
         String patientPhone = "MSH|^~\\&|MIICEHRApplication|MIIC|MIIC|MIIC|201705130822||VXU^V04^VXU_V04|test1100|P|2.5.1|||AL|AL|||||Z22^CDCPHINVS|^^^^^MIIC^SR^^^MIIC|MIIC\n"
                 // Home has 2 phones and an email, work has one phone and two emails
-                + "PID|1||12345678^^^^MR|ALTID|Moose^Mickey^J^III^^^||20060504|M|||||^PRN^PH^^22^555^1111313^^^^^^^^^^^3~^PRN^CP^^22^555^2221313^^^^^^^^^^^1~^NET^X.400^email.test@gmail.com^^^^^^^^^^^^^^2|^PRN^PH^^^555^1111414^889~^^^professional@buisness.com~^^^moose.mickey@buisness.com^^^^^^^^^^^^^^4||||||||||||||||\n";
+                + "PID|1||12345678^^^^MR|ALTID|Moose^Mickey^J^III^^^||20060504|M|||||^PRN^PH^^22^555^1111313^^^^^^^^^^^3~^PRS^CP^^22^555^2221313^^^^^^^^^^^1~^NET^X.400^email.test@gmail.com^^^^^^^^^^^^^^2|^WPN^PH^^^555^1111414^889~^WPN^X.400^professional@buisness.com~^WPN^Internet^moose.mickey@buisness.com^^^^^^^^^^^^^^4||||||||||||||||\n";
 
         Patient patient = PatientUtils.createPatientFromHl7Segment(ftv, patientPhone);
         assertThat(patient.hasTelecom()).isTrue();
