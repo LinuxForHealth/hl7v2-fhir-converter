@@ -43,7 +43,7 @@ public final class JexlEngineUtil {
 
   public JexlEngineUtil(Map<String, Object> functions) {
     this();
-    functions.putAll(functions);
+    this.functions.putAll(functions);
 
   }
 
