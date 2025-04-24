@@ -18,6 +18,7 @@ import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.UUID;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringEscapeUtils;
 import org.apache.commons.text.StringTokenizer;
@@ -170,6 +171,25 @@ public class Hl7RelatedGeneralUtils {
         nano = nano.add(BigInteger.valueOf(now.getNano()));
         
         return nano.toString() + "." + UUID.randomUUID().toString();
+    }
+
+    /**
+     * Generates a resource id when provide type.
+     * Format can be urn:uuid:<random-uuid>, urn:oid:<random-int> default is <current nano second>.<random-uuid>
+     */
+    public static String generateResourceId(String type) {
+        if(type == null || type.isEmpty()) {
+            return generateResourceId();
+        }
+        DataEnum.ResourceIdType resourceIdType = DataEnum.ResourceIdType.valueOf(type);
+        switch (resourceIdType) {
+            case UUID:
+                return "urn:uuid:" + UUID.randomUUID();
+            case OID:
+                return "urn:oid:" + (int)(Math.random() * 1000000);
+            default:
+                return generateResourceId();
+        }
     }
 
     // Special extractor only for use with PV1 records.
