@@ -9,10 +9,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+
 import com.google.common.collect.Lists;
 
 import org.hl7.fhir.r4.model.codesystems.EncounterStatus;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -424,4 +428,18 @@ class Hl7RelatedGeneralUtilsTest {
         assertThat(Hl7RelatedGeneralUtils.dateTimeWithZoneId(null,null)).isNull();
     }
 
+    @ParameterizedTest
+    @ValueSource(strings = { "UUID", "OID", ""})
+    void getResourceIdWithType(String type) {
+        String resourceId = Hl7RelatedGeneralUtils.generateResourceId(type);
+        System.out.println("ResourceId: " + resourceId);
+        assertThat(resourceId).isNotNull();
+        if(type.equals("UUID")) {
+            assertThat(resourceId).startsWith("urn:uuid:");
+        } else if (type.equals("OID")) {
+            assertThat(resourceId).startsWith("urn:oid:");
+        } else {
+            assertThat(resourceId).contains(".");
+        }
+    }
 }
