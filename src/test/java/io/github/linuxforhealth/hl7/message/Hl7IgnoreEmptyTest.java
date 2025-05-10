@@ -1,7 +1,9 @@
 /*
- * (C) Copyright IBM Corp. 2020, 2021
+ * (c) Te Whatu Ora, Health New Zealand, 2023
  *
  * SPDX-License-Identifier: Apache-2.0
+ * 
+ * @author Stuart McGrigor
  */
 
 package io.github.linuxforhealth.hl7.message;
@@ -15,17 +17,17 @@ import java.util.List;
 import java.util.Properties;
 
 import org.hl7.fhir.instance.model.api.IBaseResource;
+import org.hl7.fhir.r4.model.AllergyIntolerance;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
-import org.hl7.fhir.r4.model.Patient;
 import org.hl7.fhir.r4.model.Resource;
 import org.hl7.fhir.r4.model.ResourceType;
-import org.hl7.fhir.r4.model.codesystems.AdministrativeGender;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import io.github.linuxforhealth.core.config.ConverterConfiguration;
 import io.github.linuxforhealth.fhir.FHIRContext;
@@ -35,14 +37,13 @@ import io.github.linuxforhealth.hl7.HL7ToFHIRConverter;
 import io.github.linuxforhealth.hl7.resource.ResourceReader;
 import io.github.linuxforhealth.hl7.segments.util.ResourceUtils;
 
-// This shows how and tests the ability to create a custom Hl7 class
-// Detailed documentation about how this works is found here: 
-// http://javadox.com/ca.uhn.hapi/hapi-base/2.1/ca/uhn/hl7v2/parser/DefaultModelClassFactory.html#packageList(java.lang.String)
-// In this test, the custom class which HL7 uses for validation is placed in src/test/java/org/foo/hl7/custom/message/CUSTOM_PAT.java
-// The custom message is placed in src/test/resources/additional_custom_resources/hl7/message/CUSTOM_PAT.yml
-// The custom packages class is placed in src/test/java/custom_packages/2.6 and references the custom package /org/foo/hl7/custom/
+// This class uses the ability to create ADDITIONAL HL7 messages to convert weird HL7 messages
+// that exercise the new ignoreEmpty Resource Template functionality
+//
+// In these tests, the additional message definitions for (entirely ficticious) ADT^A09 and ^A10 messages
+// are placed in src/test/resources/additional_resources/hl7/message/ADT_A09.yml and ADT_A10.yml
 
-class Hl7CustomMessageTest {
+class Hl7IgnoreEmptyTest {
 
     // # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
     // NOTE VALIDATION IS INTENTIONALLY NOT USED BECAUSE WE ARE CREATING RESOURCES THAT ARE NOT STANDARD
@@ -80,46 +81,63 @@ class Hl7CustomMessageTest {
         folder.setWritable(true);
     }
 
-    @Test
-    void testCustomPatMessage() throws IOException {
+    // ADT_A09 has ignoreEmpty = true; ADT_A10 doesn't
+    @ParameterizedTest
+    @CsvSource({ "ADT^A09,ZAL|\r,0", "ADT^A10,ZAL|\r,1",     // Custom ZAL segment
+                 "ADT^A09,AL1|\r,0", "ADT^A10,AL1|\r,1",     // Standard AL1 segment
+                 "ADT^A09,ZAL|||||||||||||||\r,0",           // ZAL segment with all fields being empty
+                 "ADT^A09,ZAL|\"\"|\"\"|\"\"|\"\"|\"\"|\"\"|\"\"|\"\"|\"\"|\"\"|\"\"|\"\"|\"\"|\"\"|\"\"\r,1"    // So-called EMPTY ZAL segment is not actually empty
+               })
+    void testIgnoreEmptySegment(String messageType, String emptySegment, int aiCount) throws IOException {
 
+        // Set up the config file
         commonConfigFileSetup();
 
-        String hl7message = "MSH|^~\\&|||||20211005105125||CUSTOM^PAT|1a3952f1-38fe-4d55-95c6-ce58ebfc7f10|P|2.6\n"
-                + "PID|1|100009^^^FAC^MR|100009^^^FAC^MR||DOE^JANE||195001010000|M|||||5734421788|||U\n"
-                + "PRB|1|20211005|10281^LYMPHOID LEUKEMIA NEC^ICD9||||201208061011||201208061011|||||||201208061011\n"
-                + "PRB|2|20211005|11334^ABNORMALITIES OF HAIR^ICD9||||201208071000||201208071000|||||||201208071000\n"
-                + "AL1|50|DA|penicillin|MO||20210629\n"
-                + "AL1|50|MA|cat dander|SV|hives\\R\\ difficult breathing|20210629\n";
+        // An empty AL1 and ZAL Segment...
+        String hl7message = "MSH|^~\\&|TestSystem||TestTransformationAgent||20150502090000||" + messageType + "|controlID|P|2.6\r"
+                + "EVN|A01|20150502090000|\r"
+                + "PID|||1234^^^^MR||DOE^JANE^|||F||||||||||||||||||||||\r"
+                + "PV1||I||||||||SUR||||||||S|VisitNumber^^^ACME|A||||||||||||||||||||||||20150502090000|\r"
+                + emptySegment;
 
         List<BundleEntryComponent> e = getBundleEntryFromHL7Message(hl7message);
 
-        // Check for the expected resources 1 patient, 2 conditions, 2 allergies
         List<Resource> patientResource = ResourceUtils.getResourceList(e, ResourceType.Patient);
-        assertThat(patientResource).hasSize(1); // From PID
-        Patient patient = (Patient) patientResource.get(0);
-        assertThat(patient.getGenderElement().getExtension()).hasSize(1);
-        assertThat(patient.getGenderElement().getExtension().get(0).getUrl()).isEqualTo("gender-extension");
-        assertThat(patient.getGender().getDisplay()).isEqualTo(AdministrativeGender.MALE.getDisplay());
+        assertThat(patientResource).hasSize(1); // from PID
 
-        List<Resource> conditionResource = ResourceUtils.getResourceList(e, ResourceType.Condition);
-        assertThat(conditionResource).hasSize(2); // From 2x PRB
+        List<Resource> encounterResource = ResourceUtils.getResourceList(e, ResourceType.Encounter);
+        assertThat(encounterResource).hasSize(1); // from EVN, PV1
 
         List<Resource> allergyIntoleranceResource = ResourceUtils.getResourceList(e, ResourceType.AllergyIntolerance);
-        assertThat(allergyIntoleranceResource).hasSize(2); // From 2x AL1
+        assertThat(allergyIntoleranceResource).hasSize(aiCount); // empty AL1 and ZAL Segments
 
-        // Confirm that no extra resources are created
-        assertThat(e.size()).isEqualTo(5);
+        // Confirm that there are no extra resources
+        assertThat(e).hasSize(2 + aiCount);
+
+        // We might be done
+        if(aiCount == 0)
+            return;
+
+        // Let's take a peek at the 'empty' ZAL Segment
+        assertThat(allergyIntoleranceResource).allSatisfy(rs -> {
+
+                // Only some of the fields
+                AllergyIntolerance ai = (AllergyIntolerance) rs;
+                assert(ai.hasId());
+                assert(ai.hasClinicalStatus());
+                assert(ai.hasVerificationStatus());
+            });
     }
+
 
     private static void commonConfigFileSetup() throws IOException {
         File configFile = new File(folder, "config.properties");
         Properties prop = new Properties();
         prop.put("base.path.resource", "src/main/resources");
-        prop.put("supported.hl7.messages", "*"); // Must use wild card so the custom resources are found.
+        prop.put("supported.hl7.messages", "ADT_A09, ADT_A10, ADT_A11"); // We're using weird ADT messages
         prop.put("default.zoneid", "+08:00");
-        // Location of custom (or merely additional) resources
-        prop.put("additional.resources.location",  "src/test/resources/additional_custom_resources");
+        // Location of additional resources
+        prop.put("additional.resources.location",  "src/test/resources/additional_resources");
         prop.store(new FileOutputStream(configFile), null);
         System.setProperty(CONF_PROP_HOME, configFile.getParent());
     }

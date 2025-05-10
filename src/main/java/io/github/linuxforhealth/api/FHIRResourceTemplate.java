@@ -49,6 +49,17 @@ public interface FHIRResourceTemplate {
    */
   boolean isReferenced();
 
+ /**
+  * If this resource is to ignore empty source segments
+  * 
+  * @return True/False
+  */
+  boolean ignoreEmpty();
 
-
+ /**
+  *  If this resource is only to be applied sometimes
+  *  
+  * @return Simple condition expression which must be True for the template to be applied;  e.g.  ZAL.1 IN [A3, A4, H1, H3]
+  */
+  String conditionExpression();
 }
