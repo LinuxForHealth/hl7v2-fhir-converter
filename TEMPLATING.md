@@ -14,6 +14,7 @@ A HL7 message template maps one or more HL7 segments to a FHIR resource using th
       resourcePath: [REQUIRED]
       repeats:  [DEFAULT false]
       isReferenced: [DEFAULT false]
+      ignoreEmpty: [DEFAULT false]
       additionalSegments: [DEFAULT empty]
 ```
 
@@ -24,6 +25,7 @@ A HL7 message template maps one or more HL7 segments to a FHIR resource using th
 | resourcePath       | Required         | Relative path to the resource template. Example: resource/Patient                                                                                                                                    |
 | repeats            | Default: false   | Indicates if a repeating HL7 segment will generate multiple FHIR resources.                                                                                                                          |
 | isReferenced       | Default: false   | Indicates if the FHIR Resource is referenced by other FHIR resources.                                                                                                                                |
+| ignoreEmpty        | Default: false   | Indicates if an empty HL7 segment will NOT generate the matching (almost empty) FHIR resource   |
 | group | Default: empty   | Base group from which the segment and additionalSegments are specified. 
 | additionalSegments | Default: empty   | List of additional HL7 segment names required to complete the FHIR resource mapping.                                                                                                                 |
 
@@ -61,6 +63,7 @@ resources:
       segment: AL1
       resourcePath: resource/AllergyIntolerance
       repeats: true
+      ignoreEmpty: true   ## Sometimes AL1 segments arrive empty
       additionalSegments:
 
 
